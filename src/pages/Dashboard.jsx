@@ -18,22 +18,32 @@ import {
     HelpCircle,
     Settings,
     ShieldCheck,
-    ChevronRight
+    ChevronRight,
+    Building2
 } from 'lucide-react';
 import { authService } from '../services/auth.service';
 import HomeBoard from './HomeBoard';
 import NewAccountBoard from './NewAccountBoard';
-import CustomerBoard from './CustomerBoard';
+import CustomerBoard from '../HomeMaster/CustomerBoard';
 import VendorBoard from './VendorBoard';
 import EnterBillBoard from './EnterBillBoard';
 import PayBillBoard from './PayBillBoard';
 import WriteChequeBoard from './WriteChequeBoard';
-import PettyCashBoard from './PettyCashBoard';
 import MakeDepositBoard from './MakeDepositBoard';
 import JournalEntryBoard from './JournalEntryBoard';
 import BankReconciliationBoard from './BankReconciliationBoard';
 import TrialBalanceBoard from './TrialBalanceBoard';
 import SearchBoard from './SearchBoard';
+import PurchaseOrderBoard from '../HomeMaster/PurchaseOrderBoard';
+import GRNBoard from '../HomeMaster/GRNBoard';
+import PettyCashBoard from '../HomeMaster/PettyCashBoard';
+import SalesOrderBoard from '../HomeMaster/SalesOrderBoard';
+import SalesReceiptBoard from '../HomeMaster/SalesReceiptBoard';
+import ReceivePaymentBoard from '../HomeMaster/ReceivePaymentBoard';
+import ChequeRegisterBoard from '../HomeMaster/ChequeRegisterBoard';
+import PrintChequeBoard from '../HomeMaster/PrintChequeBoard';
+import MarketingToolBoard from '../HomeMaster/MarketingToolBoard';
+import AccountBalanceBoard from '../HomeMaster/AccountBalanceBoard';
 import MasterFileModal from '../components/modals/MasterFileModal';
 import ViewUtilityModal from '../components/modals/ViewUtilityModal';
 import TransactionModal from '../components/modals/TransactionModal';
@@ -52,12 +62,21 @@ const Dashboard = () => {
     const [showEnterBillModal, setShowEnterBillModal] = useState(false);
     const [showPayBillModal, setShowPayBillModal] = useState(false);
     const [showWriteChequeModal, setShowWriteChequeModal] = useState(false);
-    const [showPettyCashModal, setShowPettyCashModal] = useState(false);
     const [showMakeDepositModal, setShowMakeDepositModal] = useState(false);
     const [showJournalEntryModal, setShowJournalEntryModal] = useState(false);
     const [showBankRecModal, setShowBankRecModal] = useState(false);
     const [showTrialBalanceModal, setShowTrialBalanceModal] = useState(false);
     const [showSearchModal, setShowSearchModal] = useState(false);
+    const [showMarketingToolModal, setShowMarketingToolModal] = useState(false);
+    const [showPurchaseOrderModal, setShowPurchaseOrderModal] = useState(false);
+    const [showGRNModal, setShowGRNModal] = useState(false);
+    const [showPettyCashModal, setShowPettyCashModal] = useState(false);
+    const [showSalesOrderModal, setShowSalesOrderModal] = useState(false);
+    const [showSalesReceiptModal, setShowSalesReceiptModal] = useState(false);
+    const [showReceivePaymentModal, setShowReceivePaymentModal] = useState(false);
+    const [showChequeRegisterModal, setShowChequeRegisterModal] = useState(false);
+    const [showPrintChequeModal, setShowPrintChequeModal] = useState(false);
+    const [showAccountBalanceModal, setShowAccountBalanceModal] = useState(false);
     const [showMasterFileModal, setShowMasterFileModal] = useState(false);
     const [showViewUtilityModal, setShowViewUtilityModal] = useState(false);
     const [showTransactionModal, setShowTransactionModal] = useState(false);
@@ -116,20 +135,57 @@ const Dashboard = () => {
     return (
         <div className="h-screen w-screen flex flex-col font-['Plus_Jakarta_Sans'] bg-white select-none text-slate-800 overflow-hidden">
             {/* 1. Modal Overlays */}
-            <HomeBoard isOpen={showHomeModal} onClose={() => setShowHomeModal(false)} />
+            <HomeBoard
+                isOpen={showHomeModal}
+                onClose={() => setShowHomeModal(false)}
+                onOpenModal={(label) => {
+                    // Item Mapping from Legend/Original Home Page
+                    if (label === 'Home') setShowHomeModal(true);
+                    if (label === 'Vender') setShowVendorModal(true);
+                    if (label === 'Customer') setShowCustomerModal(true);
+                    if (label === 'Acc.Balance') setShowAccountBalanceModal(true);
+
+                    // Vendor Section
+                    if (label === 'Purchase Order') setShowPurchaseOrderModal(true);
+                    if (label === 'GRN') setShowGRNModal(true);
+                    if (label === 'Petty Cash') setShowPettyCashModal(true);
+                    if (label === 'Enter Bills') setShowEnterBillModal(true);
+                    if (label === 'Pay Bills') setShowPayBillModal(true);
+
+                    // Customer Section
+                    if (label === 'Sales Order') setShowSalesOrderModal(true);
+                    if (label === 'Create Sales Receipt') setShowSalesReceiptModal(true);
+                    if (label === 'Receive Payment') setShowReceivePaymentModal(true);
+                    if (label === 'Estimate') setShowCustomerModal(true);
+                    if (label === 'Create Invoice') setShowCustomerModal(true);
+                    if (label === 'Refunds and Credit') setShowCustomerModal(true);
+
+                    // Banking Section
+                    if (label === 'Collection Deposit' || label === 'Make Deposit') setShowMakeDepositModal(true);
+                    if (label === 'Cheque Register' || label === 'Register') setShowChequeRegisterModal(true);
+                    if (label === 'Write Cheque') setShowWriteChequeModal(true);
+                    if (label === 'Print Cheque') setShowPrintChequeModal(true);
+
+                    // Company Section
+                    if (label === 'Journal Entry') setShowJournalEntryModal(true);
+                    if (label === 'Items and Servies' || label === 'Items & Services') setShowNewAccountModal(true);
+                    if (label === 'Marketing Tool') setShowMarketingToolModal(true);
+
+                    // Close home board after selecting an option (except when selecting Home)
+                    if (label !== 'Home') setShowHomeModal(false);
+                }}
+            />
             <NewAccountBoard isOpen={showNewAccountModal} onClose={() => setShowNewAccountModal(false)} />
             <CustomerBoard isOpen={showCustomerModal} onClose={() => setShowCustomerModal(false)} />
             <VendorBoard isOpen={showVendorModal} onClose={() => setShowVendorModal(false)} />
             <EnterBillBoard isOpen={showEnterBillModal} onClose={() => setShowEnterBillModal(false)} />
             <PayBillBoard isOpen={showPayBillModal} onClose={() => setShowPayBillModal(false)} />
             <WriteChequeBoard isOpen={showWriteChequeModal} onClose={() => setShowWriteChequeModal(false)} />
-            <PettyCashBoard isOpen={showPettyCashModal} onClose={() => setShowPettyCashModal(false)} />
             <MakeDepositBoard isOpen={showMakeDepositModal} onClose={() => setShowMakeDepositModal(false)} />
             <JournalEntryBoard isOpen={showJournalEntryModal} onClose={() => setShowJournalEntryModal(false)} />
             <BankReconciliationBoard isOpen={showBankRecModal} onClose={() => setShowBankRecModal(false)} />
             <TrialBalanceBoard isOpen={showTrialBalanceModal} onClose={() => setShowTrialBalanceModal(false)} />
             <SearchBoard isOpen={showSearchModal} onClose={() => setShowSearchModal(false)} />
-            <MasterFileModal isOpen={showMasterFileModal} onClose={() => setShowMasterFileModal(false)} />
             <MasterFileModal isOpen={showMasterFileModal} onClose={() => setShowMasterFileModal(false)} />
             <ViewUtilityModal
                 isOpen={showViewUtilityModal}
@@ -140,6 +196,17 @@ const Dashboard = () => {
             <TransactionModal isOpen={showTransactionModal} onClose={() => setShowTransactionModal(false)} />
             <ReportsModal isOpen={showReportsModal} onClose={() => setShowReportsModal(false)} />
             <SystemAdminModal isOpen={showSystemAdminModal} onClose={() => setShowSystemAdminModal(false)} />
+
+            <PurchaseOrderBoard isOpen={showPurchaseOrderModal} onClose={() => setShowPurchaseOrderModal(false)} />
+            <GRNBoard isOpen={showGRNModal} onClose={() => setShowGRNModal(false)} />
+            <PettyCashBoard isOpen={showPettyCashModal} onClose={() => setShowPettyCashModal(false)} />
+            <SalesOrderBoard isOpen={showSalesOrderModal} onClose={() => setShowSalesOrderModal(false)} />
+            <SalesReceiptBoard isOpen={showSalesReceiptModal} onClose={() => setShowSalesReceiptModal(false)} />
+            <ReceivePaymentBoard isOpen={showReceivePaymentModal} onClose={() => setShowReceivePaymentModal(false)} />
+            <ChequeRegisterBoard isOpen={showChequeRegisterModal} onClose={() => setShowChequeRegisterModal(false)} />
+            <PrintChequeBoard isOpen={showPrintChequeModal} onClose={() => setShowPrintChequeModal(false)} />
+            <MarketingToolBoard isOpen={showMarketingToolModal} onClose={() => setShowMarketingToolModal(false)} />
+            <AccountBalanceBoard isOpen={showAccountBalanceModal} onClose={() => setShowAccountBalanceModal(false)} />
 
             {/* Side Bar Component */}
             <SideBar
@@ -169,6 +236,24 @@ const Dashboard = () => {
                             {item}
                         </button>
                     ))}
+
+                    {/* 1.1 Active Profile Status - Repositioned after Menu */}
+                    <div className="flex items-center gap-4 ml-2 h-[26px] bg-white/10 px-3 rounded-[8px] border border-white/20 transition-all hover:bg-white/20">
+                        <div className="flex items-center gap-2">
+                            <div className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse shadow-[0_0_5px_rgba(74,222,128,0.5)]" />
+                            <ShieldCheck size={12} className="text-blue-100" />
+                            <span className="text-[10px] font-black uppercase tracking-wider text-white">
+                                {user?.EmpName || user?.empName || user?.Emp_Name || user?.username || 'Admin'}
+                            </span>
+                        </div>
+                        <div className="w-[1px] h-3 bg-white/20" />
+                        <div className="flex items-center gap-2">
+                            <Building2 size={12} className="text-blue-100" />
+                            <span className="text-[10px] font-bold text-blue-50/80 tracking-wide">
+                                {selectedCompany?.CompanyName || selectedCompany?.companyName || selectedCompany?.name || 'ONIMTA IT'}
+                            </span>
+                        </div>
+                    </div>
 
                     {/* Expand Trigger when collapsed */}
                     {isTopBarCollapsed && (
@@ -230,15 +315,15 @@ const Dashboard = () => {
             <main className="flex-1 relative overflow-y-auto">
                 {/* Visual Watermark Background - HD Vector Quality */}
                 <div
-                    className="fixed inset-0 z-0 bg-cover bg-center bg-no-repeat opacity-[0.06] pointer-events-none"
-                    style={{ backgroundImage: `url('/dashboard-backgroun.jpg')` }}
+                    className="fixed inset-0 z-0 bg-cover bg-center bg-no-repeat pointer-events-none"
+                    style={{ backgroundImage: `url('/')` }}
                 />
 
-                {/* Subtle Focus Overlay to prioritize cards */}
-                <div className="fixed inset-0 z-0 bg-white/40 backdrop-blur-[1px] pointer-events-none" />
+                {/* Glassmorphism Frosted Overlay */}
+                <div className="fixed inset-0 z-0 bg-white/40 backdrop-blur-[10px] pointer-events-none" />
 
                 {/* Dashboard Center Watermark - Coins Image */}
-               
+
 
                 <div className="relative z-10 p-12 max-w-7xl mx-auto flex flex-col gap-10">
 
@@ -246,13 +331,10 @@ const Dashboard = () => {
                     <div className="w-full flex justify-center">
                         <button
                             onClick={() => setShowSearchModal(true)}
-                            className="w-full max-w-2xl flex items-center gap-4 px-6 h-16 bg-white border border-slate-200 rounded-[8px] shadow-sm hover:shadow-md hover:border-[#0078d4]/30 transition-all group text-left"
+                            className="w-full max-w-2xl flex items-center gap-4 px-6 h-14 bg-white border border-slate-200 rounded-[8px] shadow-sm hover:shadow-md hover:border-[#0078d4]/30 transition-all group text-left"
                         >
-                            <Search size={22} className="text-slate-400 group-hover:text-[#0078d4] transition-colors" />
-                            <span className="text-slate-400 font-medium group-hover:text-slate-500 transition-colors">Search documents, accounts, or ledger entries...</span>
-                            <div className="ml-auto px-2 py-1 bg-slate-50 border border-slate-200 rounded-[4px] text-[10px] font-black text-slate-400 uppercase tracking-tighter shadow-sm">
-                                Ctrl + K
-                            </div>
+                            <Search size={20} className="text-slate-400 group-hover:text-[#0078d4] transition-colors" />
+                            <span className="text-slate-400 font-medium group-hover:text-slate-500 transition-colors">Search...</span>
                         </button>
                     </div>
 
@@ -265,35 +347,34 @@ const Dashboard = () => {
                                 <button
                                     key={idx}
                                     onClick={item.onClick}
-                                    className="flex flex-col items-center justify-center p-4 bg-white border border-slate-200 rounded-[8px] shadow-sm hover:shadow-[0_20px_40px_-10px_rgba(0,120,212,0.2)] hover:border-[#0078d4]/50 hover:scale-[1.04] hover:-translate-y-2.5 active:scale-95 transition-all duration-500 ease-out group relative overflow-hidden"
+                                    className="flex flex-col items-center justify-center p-6 bg-white border border-slate-200 rounded-[12px] shadow-sm hover:shadow-[0_20px_40px_-10px_rgba(0,120,212,0.2)] hover:border-[#0078d4]/50 hover:scale-[1.04] hover:-translate-y-2 active:scale-95 transition-all duration-500 ease-out group relative overflow-hidden"
                                 >
                                     {/* Focus Glow Effect */}
-                                    <div className="absolute inset-x-0 bottom-0 h-1 bg-[#0078d4] transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500" />
                                     <div className="absolute inset-0 bg-[#0078d4]/[0.02] opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                                    {/* Indicator Dot */}
-                                    <div className="absolute top-2.5 left-2.5 w-1.5 h-1.5 rounded-full bg-slate-200 group-hover:bg-[#0078d4] group-hover:shadow-[0_0_10px_rgba(0,120,212,0.6)] transition-all duration-500" />
 
-                                    <div className={`relative z-10 mb-2 ${isAnimated ? 'w-20 h-20' : 'w-14 h-10'} transition-all duration-500 flex items-center justify-center`}>
-                                        {item.gif ? (
-                                            <>
-                                                {/* Static Icon shown by default for Animated Items */}
-                                                {isAnimated && (
-                                                    <Icon
-                                                        size={40}
-                                                        strokeWidth={1.5}
-                                                        className="text-slate-500 group-hover:opacity-0 transition-opacity duration-300 absolute"
+                                    <div className={`relative z-10 mb-4 transition-all duration-500 flex items-center justify-center`}>
+                                        <div className={`${isAnimated ? 'w-24 h-24' : 'w-14 h-14'} flex items-center justify-center transition-transform duration-500 group-hover:scale-110`}>
+                                            {item.gif ? (
+                                                <>
+                                                    {/* Static Icon shown by default for Animated Items */}
+                                                    {isAnimated && (
+                                                        <Icon
+                                                            size={40}
+                                                            strokeWidth={1.5}
+                                                            className="text-slate-400 group-hover:opacity-0 transition-opacity duration-300 absolute"
+                                                        />
+                                                    )}
+                                                    {/* GIF shown only on hover/active for Animated Items */}
+                                                    <img
+                                                        src={item.gif}
+                                                        alt={item.label}
+                                                        className={`object-contain transition-all duration-500 ${isAnimated ? 'w-24 h-24 opacity-0 group-hover:opacity-100' : 'w-10 h-10 opacity-100'}`}
                                                     />
-                                                )}
-                                                {/* GIF shown only on hover/active for Animated Items */}
-                                                <img
-                                                    src={item.gif}
-                                                    alt={item.label}
-                                                    className={`object-contain transition-all duration-500 ${isAnimated ? 'w-20 h-20 opacity-0 group-hover:opacity-100 scale-90 group-hover:scale-100' : 'w-8 h-8 opacity-100'}`}
-                                                />
-                                            </>
-                                        ) : (
-                                            <Icon size={32} strokeWidth={1.5} className="text-slate-500 group-hover:text-[#0078d4] transition-colors duration-500" />
-                                        )}
+                                                </>
+                                            ) : (
+                                                <Icon size={36} strokeWidth={1.5} className="text-slate-500 group-hover:text-[#0078d4] transition-colors duration-500" />
+                                            )}
+                                        </div>
                                     </div>
                                     <span className="relative z-10 text-[13px] font-bold text-slate-700 group-hover:text-[#0078d4] transition-colors duration-500 text-center leading-tight">
                                         {item.label}
