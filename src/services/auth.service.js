@@ -8,6 +8,21 @@ const api = axios.create({
   },
 });
 
+// Add a response interceptor to handle token expiration (401)
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      // Token expired or invalid
+      localStorage.removeItem('user');
+      localStorage.removeItem('token');
+      localStorage.removeItem('selectedCompany');
+      window.location.href = '/'; // Force redirect to login
+    }
+    return Promise.reject(error);
+  }
+);
+
 export const authService = {
   // LOGIN
   async login(empName, password) {
@@ -96,6 +111,90 @@ export const authService = {
     } catch (error) {
       console.error('Open Company Error:', error);
       throw error.response?.data || 'Failed to open company.';
+    }
+  },
+
+  // CREATE COMPANY
+  async createCompany(companyData) {
+    try {
+      const token = this.getToken();
+      const response = await api.post(`/Company/create`, companyData, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Create Company Error:', error);
+      throw error.response?.data || 'Failed to create company.';
+    }
+  },
+
+  // EDIT COMPANY
+  async editCompany(companyData) {
+    try {
+      const token = this.getToken();
+      const response = await api.put(`/Company/edit`, companyData, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Edit Company Error:', error);
+      throw error.response?.data || 'Failed to update company.';
+    }
+  },
+
+  // DELETE COMPANY
+  async deleteCompany(code) {
+    try {
+      const token = this.getToken();
+      const response = await api.delete(`/Company/delete/${code}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Delete Company Error:', error);
+      throw error.response?.data || 'Failed to delete company.';
+    }
+  },
+
+  // GET COMPANY DETAILS
+  async getCompanyDetails(code) {
+    try {
+      const token = this.getToken();
+      const response = await api.get(`/Company/details/${code}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Get Company Details Error:', error);
+      throw error.response?.data || 'Failed to fetch company details.';
+    }
+  },
+
+  // GET ALL COUNTRIES
+  async getAllCountries() {
+    try {
+      const token = this.getToken();
+      const response = await api.get(`/Country/all`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Get Countries Error:', error);
+      throw error.response?.data || 'Failed to fetch countries.';
+    }
+  },
+
+  // GET ALL INDUSTRIES
+  async getAllIndustries() {
+    try {
+      const token = this.getToken();
+      const response = await api.get(`/Industry/all`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Get Industries Error:', error);
+      throw error.response?.data || 'Failed to fetch industries.';
     }
   },
 
