@@ -96,8 +96,22 @@ const CompanyBoard = ({ isOpen, onClose }) => {
         setSearching(true);
         setShowLookup(true);
         try {
-            const data = await authService.getAllCompanies();
-            setLookupResults(data);
+            const userName = user?.empName || user?.EmpName || user?.username;
+            let data;
+            if (userName && userName !== 'Admin') {
+                data = await authService.getCompaniesByEmployee(userName);
+            } else {
+                data = await authService.getAllCompanies();
+            }
+            
+            // Normalize data to ensure companyCode works (backend might return CompanyCode vs companyCode)
+            const normalizedData = data.map(c => ({
+                ...c,
+                companyCode: c.companyCode || c.CompanyCode,
+                companyName: c.companyName || c.CompanyName
+            }));
+            
+            setLookupResults(normalizedData);
         } catch (error) {
             console.error('Error fetching companies:', error);
             toast.error('Failed to load companies for search.');

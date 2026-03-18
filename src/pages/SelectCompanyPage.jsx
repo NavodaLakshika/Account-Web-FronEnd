@@ -47,15 +47,16 @@ const SelectCompanyPage = () => {
     const handleSearchClick = async (e) => {
         e.stopPropagation();
         setShowSelection(true);
+        if (!userName || userName === 'Guest') return;
         try {
             setSearching(true);
-            const data = await authService.getAllCompanies();
+            const data = await authService.getCompaniesByEmployee(userName);
             setCompanies(data.map(c => ({
                 id: c.companyCode || c.CompanyCode,
                 name: c.companyName || c.CompanyName
             })));
         } catch (err) {
-            toast.error(typeof err === 'object' ? (err.message || "Failed to load all companies") : err);
+            toast.error(typeof err === 'object' ? (err.message || "Failed to load companies") : err);
         } finally {
             setSearching(false);
         }
