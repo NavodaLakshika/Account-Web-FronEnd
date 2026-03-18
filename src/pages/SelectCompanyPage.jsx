@@ -188,8 +188,8 @@ const SelectCompanyPage = () => {
 
             {showSelection && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-black/80 backdrop-blur-md" onClick={() => setShowSelection(false)}></div>
-                    <div className="relative w-full max-w-md bg-[#111111] border border-white/10 rounded-[40px] overflow-hidden shadow-2xl animate-in zoom-in-95 fade-in duration-300">
+                    <div className="absolute inset-0 backdrop-blur-md" onClick={() => setShowSelection(false)}></div>
+                    <div className="relative w-full max-w-md  border border-white/10 rounded-[40px] overflow-hidden shadow-2xl animate-in zoom-in-95 fade-in duration-300">
                         {/* Modal Header */}
                         <div className="p-8 pb-4 flex justify-between items-center">
                             <div>
