@@ -293,20 +293,11 @@ const CompanyBoard = ({ isOpen, onClose }) => {
 
                     <div className="space-y-3">
                         <div className="flex items-center gap-2">
-                            <label className="text-xs font-semibold text-gray-600 w-[150px] shrink-0">Company ID / Name</label>
-                            <div className="w-[120px] h-7 bg-gray-50 border border-gray-200 px-2 text-[10px] flex items-center text-gray-600 font-bold rounded-sm select-none">
-                                {formData.Code || <span className="text-gray-400 italic">AUTO-GEN</span>}
-                            </div>
-                            <div className="flex-1 flex gap-1">
-                                <input 
-                                    type="text" 
-                                    name="Comp_Name"
-                                    value={formData.Comp_Name}
-                                    onChange={handleInputChange}
-                                    maxLength={50}
-                                    placeholder="Company Name"
-                                    className="flex-1 h-7 border border-gray-300 px-2 text-sm focus:border-blue-500 outline-none" 
-                                />
+                            <label className="text-xs font-semibold text-gray-600 w-[150px] shrink-0">Company ID</label>
+                            <div className="flex-1 flex gap-2">
+                                <div className="w-[120px] h-7 bg-gray-50 border border-gray-200 px-2 text-[10px] flex items-center text-gray-600 font-bold rounded-sm select-none">
+                                    {formData.Code || <span className="text-gray-400 italic">AUTO-GEN</span>}
+                                </div>
                                 <button 
                                     onClick={handleSearch}
                                     className="w-7 h-7 bg-[#0078d4] text-white flex items-center justify-center hover:bg-[#005a9e] rounded-sm shadow-sm transition-colors"
@@ -315,6 +306,18 @@ const CompanyBoard = ({ isOpen, onClose }) => {
                                 </button>
                             </div>
                         </div>
+
+                        <FormRow label="Company Name">
+                            <input 
+                                type="text" 
+                                name="Comp_Name"
+                                value={formData.Comp_Name}
+                                onChange={handleInputChange}
+                                maxLength={50}
+                                placeholder="Company Name"
+                                className="flex-1 h-7 border border-gray-300 px-2 text-sm focus:border-blue-500 outline-none" 
+                            />
+                        </FormRow>
 
                         <FormRow label="Legal Company Name">
                             <input 
@@ -346,45 +349,42 @@ const CompanyBoard = ({ isOpen, onClose }) => {
                             />
                         </FormRow>
 
-                        <div className="flex items-center gap-4">
-                            <div className="flex-1 flex items-center gap-2">
-                                <label className="text-xs font-semibold text-gray-600 w-[150px] shrink-0">Country</label>
-                                <div className="flex-1 flex gap-1">
-                                    <select 
-                                        name="Country"
-                                        value={formData.Country}
-                                        onChange={handleInputChange}
-                                        className="flex-1 h-7 border border-gray-300 px-1 text-sm bg-white focus:border-blue-500 outline-none"
-                                    >
-                                        <option value="">&lt; Select Country... &gt;</option>
-                                        {countries.map((c, idx) => (
-                                            <option key={idx} value={c.countryName}>
-                                                {c.countryName}
-                                            </option>
-                                        ))}
-                                        {formData.Country && !countries.find(c => c.countryName === formData.Country) && (
-                                            <option value={formData.Country}>{formData.Country}</option>
-                                        )}
-                                    </select>
-                                    <button 
-                                        onClick={handleCountrySearch}
-                                        className="w-7 h-7 bg-[#0078d4] text-white flex items-center justify-center hover:bg-[#005a9e] rounded-sm shadow-sm transition-colors"
-                                    >
-                                        <Globe size={14} />
-                                    </button>
-                                </div>
-                            </div>
-                            <div className="w-[300px] flex items-center gap-2">
-                                <label className="text-xs font-semibold text-gray-600 shrink-0">Phone No:</label>
-                                <input 
-                                    type="text" 
-                                    name="Phone"
-                                    value={formData.Phone}
+                        <FormRow label="Country">
+                            <div className="flex-1 flex gap-1">
+                                <select 
+                                    name="Country"
+                                    value={formData.Country}
                                     onChange={handleInputChange}
-                                    className="flex-1 h-7 border border-gray-300 px-2 text-sm focus:border-blue-500 outline-none" 
-                                />
+                                    className="flex-1 h-7 border border-gray-300 px-1 text-sm bg-white focus:border-blue-500 outline-none"
+                                >
+                                    <option value="">&lt; Select Country... &gt;</option>
+                                    {countries.map((c, idx) => (
+                                        <option key={idx} value={c.countryName}>
+                                            {c.countryName}
+                                        </option>
+                                    ))}
+                                    {formData.Country && !countries.find(c => c.countryName === formData.Country) && (
+                                        <option value={formData.Country}>{formData.Country}</option>
+                                    )}
+                                </select>
+                                <button 
+                                    onClick={handleCountrySearch}
+                                    className="w-7 h-7 bg-[#0078d4] text-white flex items-center justify-center hover:bg-[#005a9e] rounded-sm shadow-sm transition-colors"
+                                >
+                                    <Globe size={14} />
+                                </button>
                             </div>
-                        </div>
+                        </FormRow>
+
+                        <FormRow label="Phone No:">
+                            <input 
+                                type="text" 
+                                name="Phone"
+                                value={formData.Phone}
+                                onChange={handleInputChange}
+                                className="flex-1 h-7 border border-gray-300 px-2 text-sm focus:border-blue-500 outline-none" 
+                            />
+                        </FormRow>
 
                         <FormRow label="E-Mail Address">
                             <input 
@@ -456,54 +456,47 @@ const CompanyBoard = ({ isOpen, onClose }) => {
                             />
                         </div>
 
-                        <div className="flex items-center gap-2">
-                            <label className="text-xs font-semibold text-gray-600 w-[150px] shrink-0">Financial Year</label>
-                            <div className="flex items-center gap-4">
-                                <div className="flex items-center gap-2">
-                                    <span className="text-[10px] text-gray-500">From:</span>
-                                    <input 
-                                        type="text" 
-                                        name="Acc_Year"
-                                        value={formData.Acc_Year}
-                                        onChange={handleInputChange}
-                                        placeholder="DD/MM"
-                                        className="w-[100px] h-7 border border-gray-300 px-2 text-sm focus:border-blue-500 outline-none" 
-                                    />
-                                </div>
-                                <span className="text-xs font-semibold text-gray-600">To:</span>
-                                <input 
-                                    type="text" 
-                                    name="To_Year"
-                                    value={formData.To_Year}
-                                    onChange={handleInputChange}
-                                    placeholder="DD/MM"
-                                    className="w-[100px] h-7 border border-gray-300 px-2 text-sm focus:border-blue-500 outline-none" 
-                                />
-                            </div>
-                        </div>
+                        <FormRow label="Fin. Year From">
+                            <input 
+                                type="text" 
+                                name="Acc_Year"
+                                value={formData.Acc_Year}
+                                onChange={handleInputChange}
+                                placeholder="DD/MM"
+                                className="w-[180px] h-7 border border-gray-300 px-2 text-sm focus:border-blue-500 outline-none" 
+                            />
+                        </FormRow>
 
-                        <div className="flex items-center gap-4">
-                            <div className="flex-1 flex items-center gap-2">
-                                <label className="text-xs font-semibold text-gray-600 w-[150px] shrink-0">Company Reg. No</label>
-                                <input 
-                                    type="text" 
-                                    name="Reg_Number"
-                                    value={formData.Reg_Number}
-                                    onChange={handleInputChange}
-                                    className="flex-1 h-7 border border-gray-300 px-2 text-sm focus:border-blue-500 outline-none" 
-                                />
-                            </div>
-                            <div className="flex-1 flex items-center gap-2">
-                                <label className="text-xs font-semibold text-gray-600 w-[100px] shrink-0 text-right pr-2">Tax ID</label>
-                                <input 
-                                    type="text" 
-                                    name="Tax_ID"
-                                    value={formData.Tax_ID}
-                                    onChange={handleInputChange}
-                                    className="flex-1 h-7 border border-gray-300 px-2 text-sm focus:border-blue-500 outline-none" 
-                                />
-                            </div>
-                        </div>
+                        <FormRow label="Fin. Year To">
+                            <input 
+                                type="text" 
+                                name="To_Year"
+                                value={formData.To_Year}
+                                onChange={handleInputChange}
+                                placeholder="DD/MM"
+                                className="w-[180px] h-7 border border-gray-300 px-2 text-sm focus:border-blue-500 outline-none" 
+                            />
+                        </FormRow>
+
+                        <FormRow label="Company Reg. No">
+                            <input 
+                                type="text" 
+                                name="Reg_Number"
+                                value={formData.Reg_Number}
+                                onChange={handleInputChange}
+                                className="flex-1 h-7 border border-gray-300 px-2 text-sm focus:border-blue-500 outline-none" 
+                            />
+                        </FormRow>
+
+                        <FormRow label="Tax ID">
+                            <input 
+                                type="text" 
+                                name="Tax_ID"
+                                value={formData.Tax_ID}
+                                onChange={handleInputChange}
+                                className="flex-1 h-7 border border-gray-300 px-2 text-sm focus:border-blue-500 outline-none" 
+                            />
+                        </FormRow>
                     </div>
                 </div>
             </SimpleModal>

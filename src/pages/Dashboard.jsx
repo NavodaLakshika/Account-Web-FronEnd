@@ -24,8 +24,8 @@ import {
 import { authService } from '../services/auth.service';
 import HomeBoard from './HomeBoard';
 import NewAccountBoard from './NewAccountBoard';
-import CustomerBoard from '../HomeMaster/CustomerBoard';
-import VendorBoard from './VendorBoard';
+import CustomerMasterBoard from '../components/modals/MasterSubModal/CustomerMasterBoard';
+import SupplierMasterBoard from '../components/modals/MasterSubModal/SupplierMasterBoard';
 import EnterBillBoard from './EnterBillBoard';
 import PayBillBoard from './PayBillBoard';
 import WriteChequeBoard from './WriteChequeBoard';
@@ -176,8 +176,8 @@ const Dashboard = () => {
                 }}
             />
             <NewAccountBoard isOpen={showNewAccountModal} onClose={() => setShowNewAccountModal(false)} />
-            <CustomerBoard isOpen={showCustomerModal} onClose={() => setShowCustomerModal(false)} />
-            <VendorBoard isOpen={showVendorModal} onClose={() => setShowVendorModal(false)} />
+            <CustomerMasterBoard isOpen={showCustomerModal} onClose={() => setShowCustomerModal(false)} />
+            <SupplierMasterBoard isOpen={showVendorModal} onClose={() => setShowVendorModal(false)} />
             <EnterBillBoard isOpen={showEnterBillModal} onClose={() => setShowEnterBillModal(false)} />
             <PayBillBoard isOpen={showPayBillModal} onClose={() => setShowPayBillModal(false)} />
             <WriteChequeBoard isOpen={showWriteChequeModal} onClose={() => setShowWriteChequeModal(false)} />
