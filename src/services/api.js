@@ -24,11 +24,15 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      console.warn('Session expired. Redirecting to login...');
-      localStorage.removeItem('user');
-      localStorage.removeItem('token');
-      localStorage.removeItem('selectedCompany');
-      window.location.href = '/'; // Force redirect to login
+      // Skip redirect if this was the login request itself
+      const isLoginRequest = error.config?.url?.includes('/Auth/login');
+      if (!isLoginRequest) {
+        console.warn('Session expired. Redirecting to login...');
+        localStorage.removeItem('user');
+        localStorage.removeItem('token');
+        localStorage.removeItem('selectedCompany');
+        window.location.href = '/'; // Force redirect to login
+      }
     }
     return Promise.reject(error);
   }

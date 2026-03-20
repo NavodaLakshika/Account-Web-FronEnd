@@ -250,7 +250,7 @@ const Dashboard = () => {
                         <div className="flex items-center gap-2">
                             <Building2 size={12} className="text-blue-100" />
                             <span className="text-[10px] font-bold text-blue-50/80 tracking-wide">
-                                {selectedCompany?.CompanyName || selectedCompany?.companyName || selectedCompany?.name || 'ONIMTA IT'}
+                                {selectedCompany?.CompanyName || selectedCompany?.companyName || selectedCompany?.name || 'No Company Selected'}
                             </span>
                         </div>
                     </div>
@@ -420,7 +420,7 @@ const Dashboard = () => {
                 <div className="whitespace-nowrap animate-marquee flex items-center gap-10">
                     {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
                         <span key={i} className="text-[10px] font-bold text-[#0078d4]/60 uppercase tracking-[0.2em] flex items-center gap-2">
-                            ONIMTA INFORMATION TECHNOLOGY (PVT)
+                            {selectedCompany?.CompanyName || selectedCompany?.companyName || "ACCOUNTING CLOUD SYSTEM"}
                             <div className="h-1 w-1 bg-[#0078d4]/30 rounded-full" />
                         </span>
                     ))}
@@ -435,7 +435,9 @@ const Dashboard = () => {
 
                 <div className="flex items-center gap-1.5 group">
                     <span className="text-[11px] font-medium text-slate-500">Powered by</span>
-                    <span className="text-[#0078d4] text-sm font-black tracking-tighter group-hover:scale-105 transition-transform cursor-default">ONIMTA</span>
+                    <span className="text-[#0078d4] text-sm font-black tracking-tighter group-hover:scale-105 transition-transform cursor-default">
+                        {selectedCompany?.CompanyName || selectedCompany?.companyName || "SYSTEM"}
+                    </span>
                 </div>
             </footer>
 

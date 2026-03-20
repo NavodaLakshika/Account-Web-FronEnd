@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import SimpleModal from '../../SimpleModal';
-import { Search, RotateCcw, Save, Trash2, Loader2, X, Briefcase, Layers } from 'lucide-react';
+import { Search, RotateCcw, Save, Trash2, Loader2, X, Layers } from 'lucide-react';
 import { categoryService } from '../../../services/category.service';
 import { departmentService } from '../../../services/department.service';
 import { toast } from 'react-hot-toast';
@@ -11,9 +11,8 @@ const CategoryBoard = ({ isOpen, onClose }) => {
         Cat_Name: '',
         Dept_Code: '',
         Dept_Name: '',
-        Loca_Id: '',
         Company: '',
-        CurrentUser: 'SYSTEM'
+        CurrentUser: ''
     };
 
     const [formData, setFormData] = useState(initialState);
@@ -32,11 +31,11 @@ const CategoryBoard = ({ isOpen, onClose }) => {
             const user = JSON.parse(localStorage.getItem('user'));
             const companyData = localStorage.getItem('selectedCompany');
             
-            let companyCode = 'C001';
+            let companyCode = '';
             if (companyData) {
                 try {
                     const parsed = JSON.parse(companyData);
-                    companyCode = parsed.companyCode || parsed.CompanyCode || companyData;
+                    companyCode = parsed.companyCode || parsed.CompanyCode || parsed.code || parsed.Code || companyData;
                 } catch (e) {
                     companyCode = companyData;
                 }
@@ -45,7 +44,7 @@ const CategoryBoard = ({ isOpen, onClose }) => {
             if (user) {
                 setFormData(prev => ({ 
                     ...prev, 
-                    CurrentUser: user.empName || user.EmpName || user.Emp_Name || 'SYSTEM',
+                    CurrentUser: user.empName || user.EmpName || user.Emp_Name || user.emp_Name || user.username || '',
                     Company: companyCode
                 }));
             }
@@ -97,7 +96,7 @@ const CategoryBoard = ({ isOpen, onClose }) => {
 
         setLoading(true);
         try {
-            await categoryService.delete(formData.Code, formData.Dept_Code, formData.Loca_Id, formData.Company);
+            await categoryService.delete(formData.Code, formData.Company);
             toast.success('Category deleted');
             handleClear();
         } catch (err) {
@@ -109,10 +108,14 @@ const CategoryBoard = ({ isOpen, onClose }) => {
     };
 
     const openDeptSearch = async () => {
+        if (!formData.Company) {
+            toast.error('Company not identified');
+            return;
+        }
         setLoading(true);
         try {
-            const data = await departmentService.getAll();
-            setDeptList(data);
+            const data = await departmentService.getAll(formData.Company);
+            setDeptList(data || []);
             setShowDeptSearch(true);
         } catch (err) {
             toast.error('Failed to load departments');
@@ -126,7 +129,6 @@ const CategoryBoard = ({ isOpen, onClose }) => {
             ...prev, 
             Dept_Code: dept.code, 
             Dept_Name: dept.name, 
-            Loca_Id: dept.locaId || dept.loca_Id || '',
             Code: '' 
         }));
         setIsEditMode(false);
@@ -134,14 +136,14 @@ const CategoryBoard = ({ isOpen, onClose }) => {
     };
 
     const openCatSearch = async () => {
-        if (!formData.Dept_Code || !formData.Loca_Id) {
+        if (!formData.Dept_Code) {
             toast.error('Select a department first');
             return;
         }
         setLoading(true);
         try {
-            const data = await categoryService.searchCategories(formData.Dept_Code, formData.Loca_Id, searchQuery);
-            setCatList(data);
+            const data = await categoryService.searchCategories(formData.Dept_Code, formData.Company, searchQuery);
+            setCatList(data || []);
             setShowCatSearch(true);
         } catch (err) {
             toast.error('Failed to load categories');
@@ -196,12 +198,6 @@ const CategoryBoard = ({ isOpen, onClose }) => {
                             </div>
                         </div>
 
-                        {/* Location ID (Hidden usually, but let's show for debugging or data integrity) */}
-                        <div className="flex items-center gap-3">
-                            <label className="text-xs font-semibold text-gray-600 w-32 shrink-0">Location ID</label>
-                            <input type="text" value={formData.Loca_Id} readOnly className="w-32 h-8 border border-gray-300 px-2 text-sm bg-gray-50 text-gray-500 rounded-sm" placeholder="Location Id" />
-                        </div>
-
                         {/* Category ID Row */}
                         <div className="flex items-center gap-3">
                             <label className="text-xs font-semibold text-gray-600 w-32 shrink-0">Category ID</label>
@@ -220,7 +216,7 @@ const CategoryBoard = ({ isOpen, onClose }) => {
                 </div>
             </SimpleModal>
 
-            {/* Department Search Modal with Location mapping */}
+            {/* Department Search Modal */}
             {showDeptSearch && (
                 <SearchModal 
                     title="Search Departments" 
@@ -228,7 +224,7 @@ const CategoryBoard = ({ isOpen, onClose }) => {
                     onSelect={selectDept} 
                     onClose={() => setShowDeptSearch(false)}
                     placeholder="Search by code or name..."
-                    columns={['code', 'name', 'locaId']}
+                    columns={['code', 'name']}
                 />
             )}
 
@@ -266,16 +262,14 @@ const SearchModal = ({ title, list, onSelect, onClose, placeholder, columns = ['
                             <tr>
                                 <th className="p-3 border-b text-center w-24">Code</th>
                                 <th className="p-3 border-b">Display Name</th>
-                                {columns.includes('locaId') && <th className="p-3 border-b text-center w-24">Location</th>}
                                 <th className="p-3 border-b text-center w-24">Action</th>
                             </tr>
                         </thead>
                         <tbody>
                             {list.filter(x => (x.name || '').toLowerCase().includes(query.toLowerCase()) || (x.code || '').toLowerCase().includes(query.toLowerCase())).map(x => (
-                                <tr key={`${x.code}-${x.locaId || ''}`} className="hover:bg-blue-50 transition-colors group">
+                                <tr key={x.code} className="hover:bg-blue-50 transition-colors group">
                                     <td className="p-3 border-b text-center font-bold text-[#0078d4] text-[11px]">{x.code}</td>
                                     <td className="p-3 border-b text-gray-700 font-semibold uppercase">{x.name}</td>
-                                    {columns.includes('locaId') && <td className="p-3 border-b text-center text-gray-500 text-[11px]">{x.locaId || x.loca_Id}</td>}
                                     <td className="p-3 border-b text-center"><button onClick={() => onSelect(x)} className="bg-[#0078d4] text-white text-[10px] px-3 py-1 rounded-sm font-bold hover:bg-[#005a9e]">Select</button></td>
                                 </tr>
                             ))}

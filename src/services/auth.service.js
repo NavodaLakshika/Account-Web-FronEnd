@@ -13,11 +13,14 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Token expired or invalid
-      localStorage.removeItem('user');
-      localStorage.removeItem('token');
-      localStorage.removeItem('selectedCompany');
-      window.location.href = '/'; // Force redirect to login
+      // Only redirect to login if this was NOT the login request itself
+      const isLoginRequest = error.config?.url?.includes('/Auth/login');
+      if (!isLoginRequest) {
+        localStorage.removeItem('user');
+        localStorage.removeItem('token');
+        localStorage.removeItem('selectedCompany');
+        window.location.href = '/'; // Force redirect to login
+      }
     }
     return Promise.reject(error);
   }
@@ -27,8 +30,11 @@ export const authService = {
   // LOGIN
   async login(empName, password) {
     try {
-      // Updated to match DTO LoginRequest: { Emp_Name, Pass_Word }
-      // Sending as BODY [FromBody]
+      // Clear any stale session data before logging in
+      localStorage.removeItem('user');
+      localStorage.removeItem('token');
+      localStorage.removeItem('selectedCompany');
+
       const response = await api.post(`/Auth/login`, {
         Emp_Name: empName,
         Pass_Word: password

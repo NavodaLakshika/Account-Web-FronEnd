@@ -1,18 +1,18 @@
 import api from './api';
 
 export const categoryService = {
-  async getAll() {
+  async getAll(company) {
     try {
-      const response = await api.get('/Category/all');
+      const response = await api.get('/Category/all', { params: { company } });
       return response.data;
     } catch (error) {
       throw error.response?.data || 'Failed to fetch categories';
     }
   },
 
-  async searchCategories(deptCode, locaId, query = '') {
+  async searchCategories(deptCode, company, query = '') {
     try {
-      const response = await api.get('/Category/search', { params: { deptCode, locaId, query } });
+      const response = await api.get('/Category/search', { params: { deptCode, company, query } });
       return response.data;
     } catch (error) {
       throw error.response?.data || 'Failed to search categories';
@@ -28,9 +28,9 @@ export const categoryService = {
     }
   },
 
-  async delete(code, deptCode, locaId, company) {
+  async delete(code, company) {
     try {
-      const response = await api.delete('/Category/delete', { params: { code, deptCode, locaId, company } });
+      const response = await api.delete('/Category/delete', { params: { code, company } });
       return response.data;
     } catch (error) {
       throw error.response?.data || 'Failed to delete category';

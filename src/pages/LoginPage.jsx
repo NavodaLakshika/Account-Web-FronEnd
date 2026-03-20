@@ -1,30 +1,38 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { User, Lock, Loader2, Github, Twitter, Facebook, Chrome } from 'lucide-react';
+import { User, Lock, Loader2, Github, Twitter, Facebook, Chrome, AlertCircle } from 'lucide-react';
 import { authService } from '../services/auth.service';
 import toast from 'react-hot-toast';
 
 const LoginPage = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
   const [formData, setFormData] = useState({
     empName: '',
     password: ''
   });
 
   const handleChange = (e) => {
+    setErrorMsg(''); // Clear error when user starts typing
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleLogin = async (e) => {
-    e.preventDefault();
+    e.preventDefault(); // Always prevent default FIRST
+    if (!formData.empName || !formData.password) {
+      setErrorMsg('Please enter your username and password.');
+      return;
+    }
     setLoading(true);
+    setErrorMsg('');
     try {
       const result = await authService.login(formData.empName, formData.password);
       toast.success(result.message || 'Login Successful!');
       navigate('/dashboard');
     } catch (err) {
-      toast.error(typeof err === 'string' ? err : 'Invalid credentials');
+      const msg = typeof err === 'string' ? err : 'Invalid username or password. Please try again.';
+      setErrorMsg(msg);
     } finally {
       setLoading(false);
     }
@@ -85,8 +93,7 @@ const LoginPage = () => {
                     value={formData.empName}
                     onChange={handleChange}
                     placeholder="Username / Emp Name"
-                    className="w-full pl-12 pr-4 py-4 bg-slate-50 border-2 border-transparent rounded-2xl focus:bg-white focus:border-[#2b5797] outline-none transition-all placeholder:text-slate-400 text-slate-700 font-medium"
-                    required
+                    className={`w-full pl-12 pr-4 py-4 bg-slate-50 border-2 rounded-2xl focus:bg-white outline-none transition-all placeholder:text-slate-400 text-slate-700 font-medium ${errorMsg ? 'border-red-200 focus:border-red-400' : 'border-transparent focus:border-[#2b5797]'}`}
                   />
                 </div>
               </div>
@@ -101,8 +108,7 @@ const LoginPage = () => {
                     value={formData.password}
                     onChange={handleChange}
                     placeholder="••••••••"
-                    className="w-full pl-12 pr-4 py-4 bg-slate-50 border-2 border-transparent rounded-2xl focus:bg-white focus:border-[#2b5797] outline-none transition-all placeholder:text-slate-400 text-slate-700 font-medium"
-                    required
+                    className={`w-full pl-12 pr-4 py-4 bg-slate-50 border-2 rounded-2xl focus:bg-white outline-none transition-all placeholder:text-slate-400 text-slate-700 font-medium ${errorMsg ? 'border-red-200 focus:border-red-400' : 'border-transparent focus:border-[#2b5797]'}`}
                   />
                 </div>
               </div>
@@ -114,6 +120,13 @@ const LoginPage = () => {
                 </label>
                 <a href="#" className="text-xs font-bold text-[#2b5797] hover:underline decoration-2">Forgot Password?</a>
               </div>
+
+              {errorMsg && (
+                <div className="flex items-start gap-3 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-2xl animate-in fade-in slide-in-from-top-2 duration-300">
+                  <AlertCircle className="w-5 h-5 mt-0.5 shrink-0 text-red-500" />
+                  <span className="text-sm font-semibold">{errorMsg}</span>
+                </div>
+              )}
 
               <button
                 type="submit"

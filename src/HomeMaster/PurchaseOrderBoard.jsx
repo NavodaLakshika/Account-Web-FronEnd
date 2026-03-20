@@ -23,6 +23,8 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
     });
 
     const [products, setProducts] = useState([]);
+    const [orders, setOrders] = useState([]); // List of existing POs for picker
+    const [showSearchModal, setShowSearchModal] = useState(false);
     
     const [entry, setEntry] = useState({
         prodCode: '',
@@ -156,11 +158,21 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
     };
 
     const handleSearch = async () => {
-        if (!formData.docNo) return toast.error("Enter Doc No to fetch.");
         try {
-            const data = await purchOrderService.getOrder(formData.docNo, formData.company);
+            const data = await purchOrderService.searchDocs(formData.company);
+            setOrders(data || []);
+            setShowSearchModal(true);
+        } catch (error) {
+            toast.error('Failed to load purchase orders.');
+        }
+    };
+
+    const handleSelectOrder = async (docNo) => {
+        try {
+            const data = await purchOrderService.getOrder(docNo, formData.company);
             setFormData(prev => ({
                 ...prev,
+                docNo: data.header.doc_No || docNo,
                 postDate: data.header.post_Date?.split('T')[0] || prev.postDate,
                 expectedDate: data.header.expected_Date?.split('T')[0] || prev.expectedDate,
                 vendorId: data.header.vendor_Id || '',
@@ -182,6 +194,7 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
                 amount: d.amount?.toString()
             }));
             setProducts(detailedProducts);
+            setShowSearchModal(false);
             toast.success("Order Loaded Successfully.");
         } catch (error) {
             toast.error(error.toString());
@@ -193,7 +206,36 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
         if (!formData.payType) return toast.error('Payment type has not been selected.');
         if (products.length === 0) return toast.error('No products entered.');
 
-        const payload = {
+        const payload = preparePayload();
+
+        try {
+            const resp = await purchOrderService.save(payload);
+            toast.success(`Draft saved successfully (${resp.docNo}).`);
+        } catch (error) {
+            toast.error(error.toString());
+        }
+    };
+
+    const handleApply = async () => {
+        if (!formData.vendorId) return toast.error('Select User/Supplier.');
+        if (!formData.payType) return toast.error('Payment type has not been selected.');
+        if (products.length === 0) return toast.error('No products entered.');
+
+        if (!window.confirm("Are you sure you want to save and apply this record?")) return;
+
+        const payload = preparePayload();
+
+        try {
+            const resp = await purchOrderService.apply(payload);
+            toast.success(`Record applied successfully (${resp.docNo}).`);
+            handleClear();
+        } catch (error) {
+            toast.error(error.toString());
+        }
+    };
+
+    const preparePayload = () => {
+        return {
             docNo: formData.docNo,
             company: formData.company,
             createUser: formData.createUser,
@@ -219,14 +261,6 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
                 amount: parseFloat(p.amount) || 0
             }))
         };
-
-        try {
-            const resp = await purchOrderService.save(payload);
-            toast.success(`Record saved successfully (${resp.docNo}).`);
-            handleClear();
-        } catch (error) {
-            toast.error(error.toString());
-        }
     };
 
     const handleDelete = async () => {
@@ -250,19 +284,22 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
             maxWidth="max-w-[1000px]"
             footer={
                 <div className="flex justify-between items-center w-full">
-                    <div className="flex gap-2">
-                         <button onClick={handleDelete} className="px-6 h-8 bg-red-600 text-white text-[13px] font-bold rounded-sm border border-red-700 hover:bg-red-700 shadow-sm flex items-center gap-2">
-                             <Trash2 size={14} /> Delete
+                    <div className="flex gap-2 text-[10px]">
+                         <button onClick={handleDelete} className="px-4 h-8 bg-red-600 text-white font-bold rounded-sm border border-red-700 hover:bg-red-700 shadow-sm flex items-center gap-2">
+                             <Trash2 size={14} /> Delete Draft
                          </button>
                     </div>
-                    <div className="flex justify-end gap-3 flex-1">
-                        <button onClick={handleSave} className="px-10 h-8 bg-[#0078d4] text-white text-[13px] font-bold rounded-sm border border-[#005a9e] hover:bg-[#005a9e] shadow-sm transition-all flex items-center gap-2">
-                            <CheckCircle size={14} /> Save
+                    <div className="flex justify-end gap-2 flex-1">
+                        <button onClick={handleApply} className="px-6 h-8 bg-[#0078d4] text-white text-[12px] font-bold rounded-sm border border-[#005a9e] hover:bg-[#005a9e] shadow-sm transition-all flex items-center gap-2 shrink-0">
+                            <CheckCircle size={14} /> Save & Apply
                         </button>
-                        <button onClick={handleClear} className="px-10 h-8 bg-[#0078d4] text-white text-[13px] font-bold rounded-sm border border-[#005a9e] hover:bg-[#005a9e] shadow-sm transition-all focus:ring-2 focus:ring-blue-400">
+                        <button onClick={handleSave} className="px-6 h-8 bg-white text-[#0078d4] text-[12px] font-bold rounded-sm border border-[#0078d4] hover:bg-blue-50 shadow-sm transition-all shrink-0">
+                            Save Draft
+                        </button>
+                        <button onClick={handleClear} className="px-6 h-8 bg-[#0078d4] text-white text-[12px] font-bold rounded-sm border border-[#005a9e] hover:bg-[#005a9e] shadow-sm transition-all">
                             Clear
                         </button>
-                        <button onClick={onClose} className="px-10 h-8 bg-[#0078d4] text-white text-[13px] font-bold rounded-sm border border-[#005a9e] hover:bg-[#005a9e] shadow-sm transition-all focus:ring-2 focus:ring-blue-400">
+                        <button onClick={onClose} className="px-6 h-8 bg-[#0078d4] text-white text-[12px] font-bold rounded-sm border border-[#005a9e] hover:bg-[#005a9e] shadow-sm transition-all">
                             Exit
                         </button>
                     </div>
@@ -276,7 +313,7 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
                         <div className="col-span-4 flex items-center gap-3">
                              <label className="text-[12px] font-bold text-gray-700 w-24 shrink-0">PO No</label>
                              <div className="flex-1 flex gap-1">
-                                <input type="text" name="docNo" value={formData.docNo} onChange={handleInput} onKeyDown={(e) => e.key === 'Enter' && handleSearch()} className="flex-1 h-7 border border-[#0078d4]/50 px-2 text-[12px] font-bold text-[#000080] bg-blue-50/20 rounded-sm outline-none focus:border-blue-500" />
+                                <input type="text" name="docNo" value={formData.docNo} onChange={handleInput} onKeyDown={(e) => e.key === 'Enter' && handleSelectOrder(formData.docNo)} className="flex-1 h-7 border border-[#0078d4]/50 px-2 text-[12px] font-bold text-[#000080] bg-blue-50/20 rounded-sm outline-none focus:border-blue-500" />
                                 <button onClick={handleSearch} className="w-8 h-7 bg-[#0078d4] text-white flex items-center justify-center hover:bg-[#005a9e] rounded-sm transition-colors">
                                     <Search size={14} />
                                 </button>
@@ -408,6 +445,41 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
                     </div>
                 </div>
             </div>
+
+            {/* Existing PO Picker Modal */}
+            <SimpleModal
+                isOpen={showSearchModal}
+                onClose={() => setShowSearchModal(false)}
+                title="Select Saved Purchase Order"
+                maxWidth="max-w-[500px]"
+            >
+                <div className="space-y-2 p-2 max-h-[400px] overflow-y-auto">
+                    {orders.length === 0 ? (
+                        <div className="text-center py-4 text-gray-400 text-[13px]">No saved orders found.</div>
+                    ) : (
+                        <table className="w-full text-[13px] border-collapse">
+                            <thead className="bg-gray-50 text-gray-600 border-b">
+                                <tr>
+                                    <th className="py-2 px-3 text-left">Doc No</th>
+                                    <th className="py-2 px-3 text-left">Date</th>
+                                    <th className="w-16"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {orders.map((order, i) => (
+                                    <tr key={i} className="border-b hover:bg-blue-50 transition-colors cursor-pointer" onClick={() => handleSelectOrder(order.docNo)}>
+                                        <td className="py-2.5 px-3 font-bold text-[#000080]">{order.docNo}</td>
+                                        <td className="py-2.5 px-3 text-gray-600">{order.date?.split('T')[0]}</td>
+                                        <td className="py-2.5 px-3 text-right">
+                                            <button className="text-[#0078d4] font-bold hover:underline">Select</button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    )}
+                </div>
+            </SimpleModal>
         </SimpleModal>
     );
 };

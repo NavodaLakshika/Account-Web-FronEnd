@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: '/api/PurchOrder',
+  baseURL: '/api/Grn',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -18,7 +18,7 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-export const purchOrderService = {
+export const grnService = {
   async getLookups(company) {
     try {
       const response = await api.get('/lookups', { params: { company } });
@@ -42,7 +42,7 @@ export const purchOrderService = {
       const response = await api.get('/search', { params: { company } });
       return response.data;
     } catch (error) {
-      throw error.response?.data || 'Failed to search documents';
+      throw error.response?.data || 'Failed to search GRNs';
     }
   },
 
@@ -51,7 +51,7 @@ export const purchOrderService = {
       const response = await api.get(`/${docNo}`, { params: { company } });
       return response.data;
     } catch (error) {
-      throw error.response?.data || 'Failed to fetch order details';
+      throw error.response?.data || 'Failed to fetch GRN details';
     }
   },
 
@@ -60,16 +60,7 @@ export const purchOrderService = {
       const response = await api.post('/save', data);
       return response.data;
     } catch (error) {
-      throw error.response?.data || 'Failed to save record';
-    }
-  },
-
-  async delete(docNo, company) {
-    try {
-      const response = await api.delete(`/${docNo}`, { params: { company } });
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || 'Failed to delete record';
+      throw error.response?.data || 'Failed to save GRN draft';
     }
   },
 
@@ -78,7 +69,16 @@ export const purchOrderService = {
       const response = await api.post('/apply', data);
       return response.data;
     } catch (error) {
-      throw error.response?.data || 'Failed to apply record';
+      throw error.response?.data || 'Failed to apply GRN';
+    }
+  },
+
+  async delete(docNo, company) {
+    try {
+      const response = await api.delete(`/${docNo}`, { params: { company } });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || 'Failed to delete GRN';
     }
   }
 };

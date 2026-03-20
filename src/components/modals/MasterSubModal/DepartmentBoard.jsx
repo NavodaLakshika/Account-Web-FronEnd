@@ -17,7 +17,7 @@ const DepartmentBoard = ({ isOpen, onClose }) => {
     const [formData, setFormData] = useState(initialState);
     const [loading, setLoading] = useState(false);
     const [isEditMode, setIsEditMode] = useState(false);
-    
+
     // Lookups
     const [showLocaSearch, setShowLocaSearch] = useState(false);
     const [locationsList, setLocationsList] = useState([]);
@@ -29,21 +29,22 @@ const DepartmentBoard = ({ isOpen, onClose }) => {
         if (isOpen) {
             const user = JSON.parse(localStorage.getItem('user'));
             const companyData = localStorage.getItem('selectedCompany');
-            
+
             let companyCode = 'C001';
             if (companyData) {
                 try {
                     const parsed = JSON.parse(companyData);
-                    companyCode = parsed.companyCode || parsed.CompanyCode || companyData;
+                    // Support multiple casing from different API versions
+                    companyCode = parsed.companyCode || parsed.CompanyCode || parsed.code || parsed.Code || companyData;
                 } catch (e) {
                     companyCode = companyData;
                 }
             }
 
             if (user) {
-                setFormData(prev => ({ 
-                    ...prev, 
-                    CurrentUser: user.empName || user.EmpName || user.Emp_Name || 'SYSTEM',
+                setFormData(prev => ({
+                    ...prev,
+                    CurrentUser: user.empName || user.EmpName || user.Emp_Name || user.emp_Name || user.username || '',
                     Company: companyCode
                 }));
             }
@@ -106,10 +107,14 @@ const DepartmentBoard = ({ isOpen, onClose }) => {
     };
 
     const openLocaSearch = async () => {
+        if (!formData.Company) {
+            toast.error('Company not identified');
+            return;
+        }
         setLoading(true);
         try {
-            const data = await departmentService.getAllLocations();
-            setLocationsList(data);
+            const data = await departmentService.getAllLocations(formData.Company);
+            setLocationsList(data || []);
             setShowLocaSearch(true);
         } catch (err) {
             toast.error('Failed to load locations');
@@ -130,8 +135,8 @@ const DepartmentBoard = ({ isOpen, onClose }) => {
         }
         setLoading(true);
         try {
-            const data = await departmentService.searchDepartments(formData.Loca_Id, searchQuery);
-            setDeptList(data);
+            const data = await departmentService.searchDepartments(formData.Loca_Id, formData.Company, searchQuery);
+            setDeptList(data || []);
             setShowDeptSearch(true);
         } catch (err) {
             toast.error('Failed to load departments');
@@ -141,10 +146,10 @@ const DepartmentBoard = ({ isOpen, onClose }) => {
     };
 
     const selectDept = (dept) => {
-        setFormData(prev => ({ 
-            ...prev, 
-            Code: dept.code, 
-            Dept_Name: dept.name 
+        setFormData(prev => ({
+            ...prev,
+            Code: dept.code,
+            Dept_Name: dept.name
         }));
         setIsEditMode(true);
         setShowDeptSearch(false);
@@ -153,7 +158,7 @@ const DepartmentBoard = ({ isOpen, onClose }) => {
     const footer = (
         <div className="flex justify-center gap-3 w-full border-t border-gray-300 pt-3 mt-2 bg-[#f0f0f0]">
             <button onClick={handleSave} disabled={loading} className="w-32 h-8 bg-[#0078d4] text-white text-sm font-medium rounded-sm border hover:bg-[#005a9e] flex items-center justify-center gap-2">
-                {loading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />} 
+                {loading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
                 {isEditMode ? 'Update' : 'Save'}
             </button>
             <button onClick={handleDelete} disabled={!isEditMode || loading} className="w-32 h-8 bg-[#d13438] text-white text-sm font-medium rounded-sm border hover:bg-[#a4262c] flex items-center justify-center gap-2">
@@ -171,7 +176,7 @@ const DepartmentBoard = ({ isOpen, onClose }) => {
             <SimpleModal isOpen={isOpen} onClose={onClose} title="Department Selection" maxWidth="max-w-xl" footer={footer}>
                 <div className="space-y-4 py-2 font-['Plus_Jakarta_Sans']">
                     <h2 className="text-sm font-bold text-gray-800 border-b pb-2 mb-4 uppercase">Department Details Profile</h2>
-                    
+
                     <div className="space-y-3">
                         {/* Location ID Row */}
                         <div className="flex items-center gap-3">
@@ -203,10 +208,10 @@ const DepartmentBoard = ({ isOpen, onClose }) => {
 
             {/* Location Search Modal */}
             {showLocaSearch && (
-                <SearchModal 
-                    title="Search Locations" 
-                    list={locationsList} 
-                    onSelect={selectLocation} 
+                <SearchModal
+                    title="Search Locations"
+                    list={locationsList}
+                    onSelect={selectLocation}
                     onClose={() => setShowLocaSearch(false)}
                     placeholder="Search by code or name..."
                 />
@@ -214,10 +219,10 @@ const DepartmentBoard = ({ isOpen, onClose }) => {
 
             {/* Dept Search Modal */}
             {showDeptSearch && (
-                <SearchModal 
-                    title="Search Departments" 
-                    list={deptList} 
-                    onSelect={selectDept} 
+                <SearchModal
+                    title="Search Departments"
+                    list={deptList}
+                    onSelect={selectDept}
                     onClose={() => setShowDeptSearch(false)}
                     placeholder="Search by code or name..."
                 />

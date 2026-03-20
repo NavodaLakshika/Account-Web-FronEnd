@@ -1,27 +1,27 @@
 import api from './api';
 
 export const departmentService = {
-  async getAll() {
+  async getAll(company) {
     try {
-      const response = await api.get('/Department/all');
+      const response = await api.get('/Department/all', { params: { company } });
       return response.data;
     } catch (error) {
       throw error.response?.data || 'Failed to fetch departments';
     }
   },
 
-  async getAllLocations() {
+  async getAllLocations(company) {
     try {
-      const response = await api.get('/Department/locations/all');
+      const response = await api.get('/Department/locations/all', { params: { company } });
       return response.data;
     } catch (error) {
       throw error.response?.data || 'Failed to fetch locations';
     }
   },
 
-  async searchDepartments(locaId, query = '') {
+  async searchDepartments(locaId, company, query = '') {
     try {
-      const response = await api.get('/Department/search', { params: { locaId, query } });
+      const response = await api.get('/Department/search', { params: { locaId, company, query } });
       return response.data;
     } catch (error) {
       throw error.response?.data || 'Failed to search departments';
