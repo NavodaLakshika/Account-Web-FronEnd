@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import SimpleModal from '../../SimpleModal';
-import { Search, RotateCcw, Calendar, ChevronDown } from 'lucide-react';
+import { Search, RotateCcw, Calendar, ChevronDown , X} from 'lucide-react';
 
 const FindBoard = ({ isOpen, onClose }) => {
     const [activeTab, setActiveTab] = useState('General');
@@ -17,14 +17,14 @@ const FindBoard = ({ isOpen, onClose }) => {
                          <span className="text-[18px] font-bold text-gray-400 italic tracking-wider opacity-60">onimta IT</span>
                     </div>
                     <div className="flex items-center gap-3">
-                        <button className="px-10 h-8 bg-white text-[#000080] text-[13px] font-bold rounded-sm border border-gray-400 hover:bg-gray-100 shadow-sm transition-all flex items-center gap-2">
+                        <button className="px-6 h-10 bg-slate-100 text-slate-600 text-sm font-bold rounded-md hover:bg-slate-200 transition-all active:scale-95 border-none flex items-center gap-2">
                             <Search size={14} /> Find
                         </button>
-                        <button className="px-10 h-8 bg-white text-[#000080] text-[13px] font-bold rounded-sm border border-gray-400 hover:bg-gray-100 shadow-sm transition-all flex items-center gap-2">
+                        <button className="px-6 h-10 bg-slate-100 text-slate-600 text-sm font-bold rounded-md hover:bg-slate-200 transition-all active:scale-95 border-none flex items-center gap-2">
                             <RotateCcw size={14} /> Clear
                         </button>
-                        <button onClick={onClose} className="px-10 h-8 bg-white text-[#000080] text-[13px] font-bold rounded-sm border border-gray-400 hover:bg-gray-100 shadow-sm transition-all flex items-center gap-2">
-                            Exit
+                        <button onClick={onClose} className="px-6 h-10 bg-slate-100 text-slate-600 text-sm font-bold rounded-md hover:bg-slate-200 transition-all active:scale-95 border-none flex items-center gap-2">
+                            <X size={14} /> Exit
                         </button>
                     </div>
                 </div>

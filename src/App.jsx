@@ -12,11 +12,26 @@ function App() {
         <Toaster 
             position="top-right"
             toastOptions={{
-                className: 'font-["Outfit"] shadow-xl border-none p-4 rounded-2xl',
+                className: 'font-["Plus_Jakarta_Sans"] shadow-2xl border border-gray-100 rounded-xl text-sm font-bold',
                 duration: 4000,
                 style: {
                     background: '#ffffff',
                     color: '#1e293b',
+                    borderRadius: '12px',
+                    padding: '16px 24px',
+                    boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+                },
+                success: {
+                    iconTheme: {
+                        primary: '#10b981',
+                        secondary: '#ffffff',
+                    },
+                },
+                error: {
+                    iconTheme: {
+                        primary: '#d13438',
+                        secondary: '#ffffff',
+                    },
                 }
             }}
         />

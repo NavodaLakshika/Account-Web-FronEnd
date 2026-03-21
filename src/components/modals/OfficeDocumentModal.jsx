@@ -13,21 +13,21 @@ const OfficeDocumentModal = ({ isOpen, onClose }) => {
         <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4">
             {/* Backdrop */}
             <div 
-                className="absolute inset-0 bg-black/30 backdrop-blur-[2px]" 
+                className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" 
                 onClick={onClose} 
             />
             
             {/* Modal Container */}
             <div 
-                className="relative w-full max-w-[260px] bg-[#f0f0f0] border border-gray-400 rounded-lg shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-200"
+                className="relative w-full max-w-[260px] bg-white border border-gray-100 rounded-xl shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-200"
                 onClick={(e) => e.stopPropagation()}
             >
                 
                 {/* Title Bar */}
-                <div className="bg-white px-3 py-2 flex items-center justify-between border-b border-gray-300 select-none">
+                <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-100 select-none">
                     <div className="flex items-center gap-2">
                         <Files size={14} className="text-[#0078d4]" />
-                        <span className="text-xs font-bold text-gray-700">Office Integration</span>
+                        <span className="text-lg font-bold text-slate-800 tracking-tight">Office Integration</span>
                     </div>
                     <button 
                         onClick={onClose} 
@@ -56,7 +56,7 @@ const OfficeDocumentModal = ({ isOpen, onClose }) => {
                 </div>
 
                 {/* Status Bar */}
-                <div className="bg-[#f0f0f0] px-3 py-1.5 border-t border-gray-300 flex justify-end">
+                <div className="bg-slate-50 px-6 py-4 flex justify-end gap-3 border-t border-gray-100">
                     <span className="text-[10px] text-[#0078d4] font-bold uppercase tracking-widest italic">Ready</span>
                 </div>
             </div>

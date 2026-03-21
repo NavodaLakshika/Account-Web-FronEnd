@@ -82,10 +82,10 @@ const AuthPage = () => {
                 <div className="bg-white p-1 rounded-full shadow-lg">
                     <img src="/logo-removebg.png" alt="Logo" className="w-8 h-8 object-contain" />
                 </div>
-                <span className="text-white text-lg tracking-[0.1em] opacity-90 uppercase">Onimta {t.systemTitle}</span>
+                <span className="text-white text-xs tracking-[0.2em] opacity-70 uppercase font-medium">Onimta {t.systemTitle}</span>
             </div>
 
-            <div className="relative z-10 w-full max-w-lg px-8 py-12 flex flex-col items-center">
+            <div className="relative z-10 w-full max-w-lg px-8 py-12 flex flex-col items-center scale-95 origin-center">
                 <div className="mb-12 text-center">
                     <h1 className="text-4xl font-bold text-white tracking-[0.2em] mb-2 uppercase">ONIMTA</h1>
                     <p className="text-white/60 text-lg tracking-wide uppercase">{t.systemTitle}</p>

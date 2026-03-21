@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import SimpleModal from '../components/SimpleModal';
-import { Search, Calendar, RefreshCw, Trash2, Plus, X } from 'lucide-react';
+import { Search, Calendar, RefreshCw, Trash2, Plus, X , Save} from 'lucide-react';
 import { salesOrderService } from '../services/salesOrder.service';
 import { toast } from 'react-hot-toast';
 
@@ -224,7 +224,7 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
                     <div className="flex gap-2">
                         <button onClick={() => handleSave(true)} className="px-10 h-8 bg-[#0078d4] text-white text-[13px] font-bold rounded shadow-sm hover:bg-[#005a9e] transition-all min-w-[100px]">Save</button>
                         <button onClick={handleClear} className="px-10 h-8 bg-white border border-gray-300 text-[13px] font-bold text-gray-700 rounded shadow-sm hover:bg-gray-50 transition-all min-w-[100px]">Clear</button>
-                        <button onClick={onClose} className="px-10 h-8 bg-white border border-gray-300 text-[13px] font-bold text-gray-700 rounded shadow-sm hover:bg-gray-50 transition-all min-w-[100px]">Exit</button>
+                        <button onClick={onClose} className="px-10 h-8 bg-white border border-gray-300 text-[13px] font-bold text-gray-700 rounded shadow-sm hover:bg-gray-50 transition-all min-w-[100px]"><X size={14} /> Exit</button>
                     </div>
                 </div>
             }

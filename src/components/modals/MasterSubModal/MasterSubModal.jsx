@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import { X, ChevronRight, Building2, Target, Users, UserSquare, CreditCard, PieChart, UserCog, Settings, Key, LogOut, Layers, Briefcase } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { authService } from '../../../services/auth.service';
+
 import ChartOfAccountantModal from '../ChartOfAccountsModels/ChartOfAccountantModal';
 import FixedAssetsBoard from '../ChartOfAccountsModels/FixedAssetsBoard';
 import LongTermLiabilityBoard from '../ChartOfAccountsModels/LongTermLiabilityBoard';
@@ -17,8 +20,17 @@ import CardCommissionBoard from './CardCommissionBoard';
 import UserProfileBoard from './UserProfileBoard';
 import VendorTypesBoard from './VendorTypesBoard';
 import ChangePasswordBoard from './ChangePasswordBoard';
+import ThankYouModal from '../ThankYouModal';
+
 
 const MasterSubModal = ({ isOpen, onClose }) => {
+    const navigate = useNavigate();
+
+    const handleLogOff = () => {
+        setShowThankYouModal(true);
+    };
+
+
     const [showChartOfAccountantModal, setShowChartOfAccountantModal] = useState(false);
     const [showCompanyBoard, setShowCompanyBoard] = useState(false);
     const [showCostCenterBoard, setShowCostCenterBoard] = useState(false);
@@ -36,6 +48,8 @@ const MasterSubModal = ({ isOpen, onClose }) => {
     const [showUserProfileBoard, setShowUserProfileBoard] = useState(false);
     const [showVendorTypesBoard, setShowVendorTypesBoard] = useState(false);
     const [showChangePasswordBoard, setShowChangePasswordBoard] = useState(false);
+    const [showThankYouModal, setShowThankYouModal] = useState(false);
+
 
     if (!isOpen) return null;
 
@@ -52,34 +66,35 @@ const MasterSubModal = ({ isOpen, onClose }) => {
         { icon: Settings, label: 'Vendor Types', shortcut: '', onClick: () => setShowVendorTypesBoard(true) },
         { icon: Key, label: 'Change Password', shortcut: '', onClick: () => setShowChangePasswordBoard(true) },
         { type: 'separator' },
-        { icon: LogOut, label: 'Log Off', shortcut: 'Alt+F4', color: 'text-red-600' },
+        { icon: LogOut, label: 'Log Off', shortcut: 'Alt+F4', color: 'text-red-600', onClick: handleLogOff },
+
     ];
 
     return (
         <>
             <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
                 {/* Backdrop */}
-                <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px]" onClick={onClose} />
+                <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={onClose} />
                 
                 {/* Modal Container */}
-                <div className="relative w-full max-w-sm bg-[#f0f0f0] border border-gray-400 rounded-lg shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
+                <div className="relative w-full max-w-sm bg-white border border-gray-100 rounded-xl shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
                     
                     {/* Header */}
-                    <div className="bg-white px-3 py-2 flex items-center justify-between border-b border-gray-300 select-none">
+                    <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-100 select-none">
                         <div className="flex items-center gap-2">
                             <Layers size={14} className="text-[#0078d4]" />
-                            <span className="text-xs font-bold text-gray-700">Master File Management</span>
+                            <span className="text-lg font-bold text-slate-800 tracking-tight">Master File Management</span>
                         </div>
                         <button 
                             onClick={onClose} 
-                            className="w-8 h-5 flex items-center justify-center bg-white hover:bg-[#e81123] hover:text-white transition-colors border border-gray-300 rounded group"
+                            className="w-8 h-8 flex items-center justify-center hover:bg-red-50 text-slate-400 hover:text-red-500 transition-colors rounded-full group outline-none"
                         >
                             <X size={12} className="group-hover:stroke-white" />
                         </button>
                     </div>
 
                     {/* Menu Content */}
-                    <div className="p-1 bg-white m-1 border border-gray-300 flex-1 overflow-y-auto max-h-[75vh] no-scrollbar">
+                    <div className="p-6 bg-white flex-1 overflow-y-auto max-h-[75vh] no-scrollbar">
                         {menuItems.map((item, idx) => {
                             if (item.type === 'separator') {
                                 return <div key={idx} className="my-1.5 h-[1px] bg-gray-200 mx-2" />;
@@ -115,7 +130,7 @@ const MasterSubModal = ({ isOpen, onClose }) => {
                     </div>
 
                     {/* Footer */}
-                    <div className="bg-[#f0f0f0] px-3 py-1.5 border-t border-gray-300 flex justify-between items-center">
+                    <div className="bg-slate-50 px-6 py-4 border-t border-gray-100 flex justify-between items-center">
                         <span className="text-[10px] text-gray-500 font-medium">{menuItems.filter(i => i.type !== 'separator').length} Items</span>
                         <span className="text-[10px] text-[#0078d4] font-bold uppercase tracking-widest italic font-sans">Master Master Sub Modal</span>
                     </div>
@@ -264,8 +279,18 @@ const MasterSubModal = ({ isOpen, onClose }) => {
                     onClose={() => setShowChangePasswordBoard(false)} 
                 />
             )}
+
+            <ThankYouModal 
+                isOpen={showThankYouModal} 
+                onClose={() => {
+                    setShowThankYouModal(false);
+                    onClose();
+                }} 
+            />
         </>
     );
 };
+
+
 
 export default MasterSubModal;

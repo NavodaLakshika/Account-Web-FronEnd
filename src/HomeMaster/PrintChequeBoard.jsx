@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import SimpleModal from '../components/SimpleModal';
-import { Search, Calendar, ChevronDown } from 'lucide-react';
+import { Search, Calendar, ChevronDown , X} from 'lucide-react';
 
 const PrintChequeBoard = ({ isOpen, onClose }) => {
     const [rows, setRows] = useState([
@@ -22,14 +22,14 @@ const PrintChequeBoard = ({ isOpen, onClose }) => {
 
                     {/* Action Buttons */}
                     <div className="flex gap-2">
-                        <button className="px-10 h-8 bg-gradient-to-b from-[#f0f9ff] to-[#e0f2fe] border border-gray-300 text-[13px] font-bold text-gray-700 rounded shadow-sm hover:from-white hover:to-[#ebf8ff] transition-all min-w-[100px]">
+                        <button className="px-6 h-10 bg-slate-100 text-slate-600 text-sm font-bold rounded-md hover:bg-slate-200 transition-all active:scale-95">
                             Print
                         </button>
-                        <button className="px-10 h-8 bg-gradient-to-b from-[#f0f9ff] to-[#e0f2fe] border border-gray-300 text-[13px] font-bold text-gray-700 rounded shadow-sm hover:from-white hover:to-[#ebf8ff] transition-all min-w-[100px]">
+                        <button className="px-6 h-10 bg-slate-100 text-slate-600 text-sm font-bold rounded-md hover:bg-slate-200 transition-all active:scale-95">
                             Clear
                         </button>
-                        <button onClick={onClose} className="px-10 h-8 bg-gradient-to-b from-[#f0f9ff] to-[#e0f2fe] border border-gray-300 text-[13px] font-bold text-gray-700 rounded shadow-sm hover:from-white hover:to-[#ebf8ff] transition-all min-w-[100px]">
-                            Exit
+                        <button onClick={onClose} className="px-6 h-10 bg-slate-100 text-slate-600 text-sm font-bold rounded-md hover:bg-slate-200 transition-all active:scale-95">
+                            <X size={14} /> Exit
                         </button>
                     </div>
                 </div>
@@ -102,7 +102,7 @@ const PrintChequeBoard = ({ isOpen, onClose }) => {
                         </div>
 
                         <div className="col-span-4 flex justify-end pt-2">
-                            <button className="px-8 h-8 bg-white border border-gray-300 text-[12px] font-black text-[#0078d4] rounded shadow-sm hover:bg-gray-50 shadow-[#0078d4]/10 transition-all uppercase tracking-wider">
+                            <button className="px-6 h-10 bg-[#0078d4]/10 text-[#0078d4] text-sm font-bold rounded-md hover:bg-[#0078d4]/20 transition-all active:scale-95 border-none transition-all uppercase tracking-wider">
                                 View
                             </button>
                         </div>

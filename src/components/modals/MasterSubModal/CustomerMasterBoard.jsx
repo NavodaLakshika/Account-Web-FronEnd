@@ -241,19 +241,20 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
     };
 
     const footer = (
-        <div className="flex justify-center gap-3 w-full border-t border-gray-300 pt-3 mt-4 bg-[#f0f0f0]">
-            <button onClick={handleSave} disabled={loading} className="w-32 h-8 bg-[#0078d4] text-white text-[13px] font-bold rounded-sm border hover:bg-[#005a9e] shadow-sm flex items-center justify-center">
+        <div className="bg-slate-50 px-6 py-4 w-full flex justify-end gap-3 border-t border-gray-100 mt-4 rounded-b-xl">
+            <button onClick={handleSave} disabled={loading} className={`px-6 h-10 bg-[#0078d4] text-white text-sm font-bold rounded-md shadow-md shadow-blue-200 hover:bg-[#005a9e] transition-all active:scale-95 flex items-center justify-center gap-2 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                
                 {loading ? <Loader2 size={14} className="animate-spin mr-2" /> : null} 
                 Save
             </button>
-            <button onClick={handleDelete} disabled={!isEditMode || loading} className="w-32 h-8 bg-[#0078d4] text-white text-[13px] font-bold rounded-sm border hover:bg-[#005a9e] shadow-sm flex items-center justify-center">
-                Delete
+            <button onClick={handleDelete} disabled={!isEditMode || loading} className={`px-6 h-10 bg-[#d13438] text-white text-sm font-bold rounded-md shadow-md shadow-red-200 hover:bg-[#a4262c] transition-all active:scale-95 flex items-center justify-center gap-2 ${(!isEditMode || loading) ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                <Trash2 size={14} /> Delete
             </button>
-            <button onClick={handleClear} className="w-32 h-8 bg-[#0078d4] text-white text-[13px] font-bold rounded-sm border hover:bg-[#005a9e] shadow-sm flex items-center justify-center">
-                Clear
+            <button onClick={handleClear} className="px-6 h-10 bg-slate-100 text-slate-600 text-sm font-bold rounded-md hover:bg-slate-200 transition-all active:scale-95 flex items-center justify-center gap-2 border-none">
+                <RotateCcw size={14} /> Clear
             </button>
-            <button onClick={onClose} className="w-32 h-8 bg-[#0078d4] text-white text-[13px] font-bold rounded-sm border hover:bg-[#005a9e] shadow-sm flex items-center justify-center">
-                Exit
+            <button onClick={onClose} className="px-6 h-10 bg-[#0078d4] text-white text-sm font-bold rounded-md shadow-md shadow-blue-200 hover:bg-[#005a9e] transition-all active:scale-95 flex items-center justify-center gap-2 border-none">
+                <X size={14} /> Exit
             </button>
         </div>
     );
@@ -417,7 +418,7 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
             {showAreaSearch && (
                 <div className="fixed inset-0 z-[400] flex items-center justify-center p-4">
                     <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowAreaSearch(false)} />
-                    <div className="relative w-full max-w-md bg-[#f0f0f0] shadow-2xl rounded-sm border border-gray-400 overflow-hidden flex flex-col max-h-[70vh]">
+                    <div className="relative w-full max-w-md bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col max-h-[70vh]">
                         <div className="p-3 border-b border-gray-300 flex justify-between items-center bg-white">
                             <h3 className="font-bold text-gray-700 text-sm">Select Area</h3>
                             <button onClick={() => setShowAreaSearch(false)} className="text-gray-400 hover:text-gray-600"><X size={20} /></button>
@@ -433,7 +434,7 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
                         </div>
                         <div className="overflow-y-auto p-1 bg-white m-1 border border-gray-300">
                             <table className="w-full text-[12.5px] text-left">
-                                <thead className="bg-[#f0f0f0] h-8 font-bold text-gray-600 text-[10px] uppercase">
+                                <thead className="bg-slate-50 h-8 font-bold text-gray-600 text-[10px] uppercase">
                                     <tr>
                                         <th className="px-3 border-b">Code</th>
                                         <th className="px-3 border-b">Area Name</th>
@@ -461,7 +462,7 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
             {showRouteSearch && (
                 <div className="fixed inset-0 z-[400] flex items-center justify-center p-4">
                     <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowRouteSearch(false)} />
-                    <div className="relative w-full max-w-md bg-[#f0f0f0] shadow-2xl rounded-sm border border-gray-400 overflow-hidden flex flex-col max-h-[70vh]">
+                    <div className="relative w-full max-w-md bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col max-h-[70vh]">
                         <div className="p-3 border-b border-gray-300 flex justify-between items-center bg-white">
                             <h3 className="font-bold text-gray-700 text-sm">Select Route</h3>
                             <button onClick={() => setShowRouteSearch(false)} className="text-gray-400 hover:text-gray-600"><X size={20} /></button>
@@ -477,7 +478,7 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
                         </div>
                         <div className="overflow-y-auto p-1 bg-white m-1 border border-gray-300">
                             <table className="w-full text-[12.5px] text-left">
-                                <thead className="bg-[#f0f0f0] h-8 font-bold text-gray-600 text-[10px] uppercase">
+                                <thead className="bg-slate-50 h-8 font-bold text-gray-600 text-[10px] uppercase">
                                     <tr>
                                         <th className="px-3 border-b">Code</th>
                                         <th className="px-3 border-b">Route Name</th>
@@ -505,7 +506,7 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
             {showBankSearch && (
                 <div className="fixed inset-0 z-[400] flex items-center justify-center p-4">
                     <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowBankSearch(false)} />
-                    <div className="relative w-full max-w-md bg-[#f0f0f0] shadow-2xl rounded-sm border border-gray-400 overflow-hidden flex flex-col max-h-[70vh]">
+                    <div className="relative w-full max-w-md bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col max-h-[70vh]">
                         <div className="p-3 border-b border-gray-300 flex justify-between items-center bg-white font-['Plus_Jakarta_Sans']">
                             <h3 className="font-bold text-gray-700 text-sm">Select Bank</h3>
                             <button onClick={() => setShowBankSearch(false)} className="text-gray-400 hover:text-gray-600"><X size={20} /></button>
@@ -521,7 +522,7 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
                         </div>
                         <div className="overflow-y-auto p-1 bg-white m-1 border border-gray-300">
                             <table className="w-full text-[12.5px] text-left">
-                                <thead className="bg-[#f0f0f0] sticky top-0 text-gray-700 font-bold uppercase text-[10px] h-8">
+                                <thead className="bg-slate-50 sticky top-0 text-gray-700 font-bold uppercase text-[10px] h-8">
                                     <tr>
                                         <th className="px-3 border-b border-gray-300">Bank Name</th>
                                         <th className="px-3 border-b border-gray-300 text-center w-24">Action</th>
@@ -552,7 +553,7 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
             {showSearchModal && (
                 <div className="fixed inset-0 z-[300] flex items-center justify-center p-4">
                     <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowSearchModal(false)} />
-                    <div className="relative w-full max-w-4xl bg-[#f0f0f0] shadow-2xl rounded-sm border border-gray-400 overflow-hidden flex flex-col max-h-[85vh]">
+                    <div className="relative w-full max-w-4xl bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col max-h-[85vh]">
                         <div className="p-3 border-b border-gray-300 flex justify-between items-center bg-white font-['Plus_Jakarta_Sans']">
                             <h3 className="font-bold text-gray-700 text-sm">Search Customers - {customersList.length} Found</h3>
                             <div className="flex gap-4">
@@ -562,7 +563,7 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
                         </div>
                         <div className="overflow-y-auto p-2 font-['Plus_Jakarta_Sans'] bg-white m-1 border border-gray-300">
                             <table className="w-full text-[13px] text-left">
-                                <thead className="bg-[#f0f0f0] sticky top-0 text-gray-700 font-bold uppercase text-[11px] tracking-wider h-9">
+                                <thead className="bg-slate-50 sticky top-0 text-gray-700 font-bold uppercase text-[11px] tracking-wider h-9">
                                     <tr>
                                         <th className="px-3 border-b border-gray-300 text-center w-24">Code</th>
                                         <th className="px-3 border-b border-gray-300">Customer Name</th>

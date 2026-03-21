@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import SimpleModal from '../components/SimpleModal';
-import { ChevronDown, Printer, UserPlus, FileText, Calendar } from 'lucide-react';
+import { ChevronDown, Printer, UserPlus, FileText, Calendar , X} from 'lucide-react';
 
 const CustomerBoard = ({ isOpen, onClose }) => {
     const [selectedTab, setSelectedTab] = useState('Customer Search');
@@ -16,8 +16,8 @@ const CustomerBoard = ({ isOpen, onClose }) => {
                     <div className="flex items-center gap-2 pl-4">
                         <span className="text-[24px] font-black italic text-[#0078d4]/30 tracking-tighter select-none">onimta IT</span>
                     </div>
-                    <button onClick={onClose} className="px-10 h-8 bg-gradient-to-b from-[#f0f9ff] to-[#e0f2fe] border border-gray-300 text-[13px] font-bold text-gray-700 rounded shadow-sm hover:from-white hover:to-[#ebf8ff] transition-all min-w-[100px]">
-                        Exit
+                    <button onClick={onClose} className="px-6 h-10 bg-slate-100 text-slate-600 text-sm font-bold rounded-md hover:bg-slate-200 transition-all active:scale-95">
+                        <X size={14} /> Exit
                     </button>
                 </div>
             }

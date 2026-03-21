@@ -1,6 +1,6 @@
 import React from 'react';
 import SimpleModal from '../components/SimpleModal';
-import { Search, RotateCcw, Save, Trash2, Plus } from 'lucide-react';
+import { Search, RotateCcw, Save, Trash2, Plus , X} from 'lucide-react';
 
 const DepartmentBoard = ({ isOpen, onClose }) => {
     return (
@@ -11,17 +11,17 @@ const DepartmentBoard = ({ isOpen, onClose }) => {
             maxWidth="max-w-3xl"
             footer={
                 <>
-                    <button className="px-8 h-8 bg-[#0078d4] text-white text-sm font-medium rounded-sm border border-[#005a9e] hover:bg-[#005a9e] flex items-center gap-2">
+                    <button className="px-6 h-10 bg-[#0078d4] text-white text-sm font-bold rounded-md shadow-md shadow-blue-200 hover:bg-[#005a9e] transition-all active:scale-95 flex items-center gap-2">
                         <Save size={14} /> Save
                     </button>
-                    <button className="px-8 h-8 bg-white text-gray-700 text-sm font-medium rounded-sm border border-gray-400 hover:bg-gray-100 flex items-center gap-2">
+                    <button className="px-6 h-10 bg-slate-100 text-slate-600 text-sm font-bold rounded-md hover:bg-slate-200 transition-all active:scale-95 flex items-center gap-2">
                         <RotateCcw size={14} /> Clear
                     </button>
-                    <button className="px-8 h-8 bg-[#d13438] text-white text-sm font-medium rounded-sm border border-[#a4262c] hover:bg-[#a4262c] flex items-center gap-2">
+                    <button className="px-6 h-10 bg-[#d13438] text-white text-sm font-bold rounded-md shadow-md shadow-red-200 hover:bg-[#a4262c] transition-all active:scale-95 flex items-center gap-2">
                         <Trash2 size={14} /> Delete
                     </button>
-                    <button onClick={onClose} className="px-8 h-8 bg-white text-gray-700 text-sm font-medium rounded-sm border border-gray-400 hover:bg-gray-100">
-                        Exit
+                    <button onClick={onClose} className="px-6 h-10 bg-slate-100 text-slate-600 text-sm font-bold rounded-md hover:bg-slate-200 transition-all active:scale-95">
+                        <X size={14} /> Exit
                     </button>
                 </>
             }

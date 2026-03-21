@@ -1,6 +1,6 @@
 import React from 'react';
 import SimpleModal from '../../SimpleModal';
-import { Save, RotateCcw } from 'lucide-react';
+import { Save, RotateCcw , X} from 'lucide-react';
 
 const FixedIncomeBoard = ({ isOpen, onClose }) => {
     return (
@@ -11,14 +11,14 @@ const FixedIncomeBoard = ({ isOpen, onClose }) => {
             maxWidth="max-w-4xl"
             footer={
                 <>
-                    <button className="px-8 h-8 bg-[#0078d4] text-white text-sm font-medium rounded-sm border border-[#005a9e] hover:bg-[#005a9e] flex items-center gap-2">
+                    <button className="px-6 h-10 bg-[#0078d4] text-white text-sm font-bold rounded-md shadow-md shadow-blue-200 hover:bg-[#005a9e] transition-all active:scale-95 flex items-center gap-2">
                         <Save size={14} /> Save
                     </button>
-                    <button className="px-8 h-8 bg-white text-gray-700 text-sm font-medium rounded-sm border border-gray-400 hover:bg-gray-100 flex items-center gap-2">
+                    <button className="px-6 h-10 bg-slate-100 text-slate-600 text-sm font-bold rounded-md hover:bg-slate-200 transition-all active:scale-95 flex items-center gap-2">
                         <RotateCcw size={14} /> Clear
                     </button>
-                    <button onClick={onClose} className="px-8 h-8 bg-[#0078d4] text-white text-sm font-medium rounded-sm border border-[#005a9e] hover:bg-[#005a9e]">
-                        Exit
+                    <button onClick={onClose} className="px-6 h-10 bg-[#0078d4] text-white text-sm font-bold rounded-md shadow-md shadow-blue-200 hover:bg-[#005a9e] transition-all active:scale-95">
+                        <X size={14} /> Exit
                     </button>
                 </>
             }

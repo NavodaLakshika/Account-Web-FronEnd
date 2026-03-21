@@ -259,29 +259,29 @@ const CompanyBoard = ({ isOpen, onClose }) => {
                         <button 
                             onClick={handleAddNew}
                             disabled={loading || !!formData.Code}
-                            className={`px-6 h-8 bg-[#0078d4] text-white text-sm font-medium rounded-sm border border-[#005a9e] hover:bg-[#005a9e] flex items-center gap-2 ${(loading || !!formData.Code) ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            className={`px-6 h-10 bg-[#0078d4] text-white text-sm font-bold rounded-md shadow-md shadow-blue-200 hover:bg-[#005a9e] transition-all active:scale-95 flex items-center gap-2 ${(loading || !!formData.Code) ? 'opacity-50 cursor-not-allowed' : ''}`}
                         >
                             <Plus size={14} /> Add New
                         </button>
                         <button 
                             onClick={handleEdit}
                             disabled={loading || !formData.Code}
-                            className={`px-6 h-8 bg-white text-gray-700 text-sm font-medium rounded-sm border border-gray-400 hover:bg-gray-100 flex items-center gap-2 ${(loading || !formData.Code) ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            className={`px-6 h-10 bg-slate-100 text-slate-600 text-sm font-bold rounded-md hover:bg-slate-200 transition-all active:scale-95 flex items-center gap-2 ${(loading || !formData.Code) ? 'opacity-50 cursor-not-allowed' : ''}`}
                         >
                             <Edit size={14} /> {loading ? 'Saving...' : 'Edit'}
                         </button>
                         <button 
                             onClick={handleDelete}
                             disabled={loading || !formData.Code}
-                            className={`px-6 h-8 bg-[#d13438] text-white text-sm font-medium rounded-sm border border-[#a4262c] hover:bg-[#a4262c] flex items-center gap-2 ${(loading || !formData.Code) ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            className={`px-6 h-10 bg-[#d13438] text-white text-sm font-bold rounded-md shadow-md shadow-red-200 hover:bg-[#a4262c] transition-all active:scale-95 flex items-center gap-2 ${(loading || !formData.Code) ? 'opacity-50 cursor-not-allowed' : ''}`}
                         >
                             <Trash2 size={14} /> Delete
                         </button>
-                        <button onClick={handleClear} className="px-6 h-8 bg-white text-gray-700 text-sm font-medium rounded-sm border border-gray-400 hover:bg-gray-100 flex items-center gap-2">
+                        <button onClick={handleClear} className="px-6 h-10 bg-slate-100 text-slate-600 text-sm font-bold rounded-md hover:bg-slate-200 transition-all active:scale-95 flex items-center gap-2">
                             <RotateCcw size={14} /> Clear
                         </button>
-                        <button onClick={onClose} className="px-8 h-8 bg-[#0078d4] text-white text-sm font-medium rounded-sm border border-[#005a9e] hover:bg-[#005a9e]">
-                            Exit
+                        <button onClick={onClose} className="px-6 h-10 bg-[#0078d4] text-white text-sm font-bold rounded-md shadow-md shadow-blue-200 hover:bg-[#005a9e] transition-all active:scale-95">
+                            <X size={14} /> Exit
                         </button>
                     </>
                 }
@@ -504,8 +504,8 @@ const CompanyBoard = ({ isOpen, onClose }) => {
             {/* Company Lookup Modal */}
             {showLookup && (
                 <div className="fixed inset-0 z-[600] flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowLookup(false)} />
-                    <div className="relative w-full max-w-lg bg-white rounded-lg shadow-2xl overflow-hidden border border-gray-300 animate-in zoom-in-95 duration-200">
+                    <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setShowLookup(false)} />
+                    <div className="relative w-full max-w-lg bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden animate-in zoom-in-95 duration-200">
                         {/* Header */}
                         <div className="bg-[#0078d4] px-4 py-2 flex items-center justify-between text-white">
                             <div className="flex items-center gap-2">
@@ -560,7 +560,7 @@ const CompanyBoard = ({ isOpen, onClose }) => {
             {showDeleteConfirm && (
                 <div className="fixed inset-0 z-[700] flex items-center justify-center p-4">
                     <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => !loading && setShowDeleteConfirm(false)} />
-                    <div className="relative w-full max-w-md bg-white rounded-[24px] shadow-2xl overflow-hidden border border-white/20 animate-in zoom-in-95 duration-200">
+                    <div className="relative w-full max-w-md bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden animate-in zoom-in-95 duration-200">
                         <div className="p-8 text-center">
                             <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6 border-4 border-white shadow-lg">
                                 <AlertTriangle size={40} className="text-[#d13438]" />
@@ -599,8 +599,8 @@ const CompanyBoard = ({ isOpen, onClose }) => {
             {/* Country Lookup Modal */}
             {showCountryLookup && (
                 <div className="fixed inset-0 z-[600] flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowCountryLookup(false)} />
-                    <div className="relative w-full max-w-md bg-white rounded-lg shadow-2xl overflow-hidden border border-gray-300 animate-in zoom-in-95 duration-200">
+                    <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setShowCountryLookup(false)} />
+                    <div className="relative w-full max-w-md bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden animate-in zoom-in-95 duration-200">
                         {/* Header */}
                         <div className="bg-[#0078d4] px-4 py-2 flex items-center justify-between text-white">
                             <div className="flex items-center gap-2">
@@ -654,8 +654,8 @@ const CompanyBoard = ({ isOpen, onClose }) => {
             {/* Industry Lookup Modal */}
             {showIndustryLookup && (
                 <div className="fixed inset-0 z-[600] flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowIndustryLookup(false)} />
-                    <div className="relative w-full max-w-md bg-white rounded-lg shadow-2xl overflow-hidden border border-gray-300 animate-in zoom-in-95 duration-200">
+                    <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setShowIndustryLookup(false)} />
+                    <div className="relative w-full max-w-md bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden animate-in zoom-in-95 duration-200">
                         {/* Header */}
                         <div className="bg-[#0078d4] px-4 py-2 flex items-center justify-between text-white">
                             <div className="flex items-center gap-2">

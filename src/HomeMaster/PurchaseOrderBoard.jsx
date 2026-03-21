@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import SimpleModal from '../components/SimpleModal';
-import { Search, Calendar, ChevronDown, CheckCircle, Trash2, Printer } from 'lucide-react';
+import { Search, Calendar, ChevronDown, CheckCircle, Trash2, Printer , X, Save} from 'lucide-react';
 import { purchOrderService } from '../services/purchOrder.service';
 import { toast } from 'react-hot-toast';
 
@@ -300,7 +300,7 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
                             Clear
                         </button>
                         <button onClick={onClose} className="px-6 h-8 bg-[#0078d4] text-white text-[12px] font-bold rounded-sm border border-[#005a9e] hover:bg-[#005a9e] shadow-sm transition-all">
-                            Exit
+                            <X size={14} /> Exit
                         </button>
                     </div>
                 </div>

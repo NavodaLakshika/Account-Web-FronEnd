@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import SimpleModal from '../components/SimpleModal';
-import { Search, Calendar, ChevronDown, Database, User, Truck, Hash, FileSearch, Trash2, RotateCcw, Download } from 'lucide-react';
+import { Search, Calendar, ChevronDown, Database, User, Truck, Hash, FileSearch, Trash2, RotateCcw, Download , X} from 'lucide-react';
 
 const SearchBoard = ({ isOpen, onClose }) => {
     const [entityType, setEntityType] = useState('Customer');
@@ -13,14 +13,14 @@ const SearchBoard = ({ isOpen, onClose }) => {
             maxWidth="max-w-[95vw]"
             footer={
                 <>
-                    <button className="px-6 h-8 bg-white text-gray-700 text-sm font-medium rounded-sm border border-gray-400 hover:bg-gray-100 flex items-center gap-2">
+                    <button className="px-6 h-10 bg-slate-100 text-slate-600 text-sm font-bold rounded-md hover:bg-slate-200 transition-all active:scale-95 flex items-center gap-2">
                         <RotateCcw size={14} /> Clear Search
                     </button>
-                    <button className="px-6 h-8 bg-white text-gray-700 text-sm font-medium rounded-sm border border-gray-400 hover:bg-gray-100 flex items-center gap-2">
+                    <button className="px-6 h-10 bg-slate-100 text-slate-600 text-sm font-bold rounded-md hover:bg-slate-200 transition-all active:scale-95 flex items-center gap-2">
                         <Download size={14} /> Export Results
                     </button>
-                    <button onClick={onClose} className="px-8 h-8 bg-white text-gray-700 text-sm font-medium rounded-sm border border-gray-400 hover:bg-gray-100">
-                        Exit
+                    <button onClick={onClose} className="px-6 h-10 bg-slate-100 text-slate-600 text-sm font-bold rounded-md hover:bg-slate-200 transition-all active:scale-95">
+                        <X size={14} /> Exit
                     </button>
                 </>
             }

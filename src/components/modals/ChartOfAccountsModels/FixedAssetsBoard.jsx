@@ -216,11 +216,11 @@ const FixedAssetsBoard = ({ isOpen, onClose }) => {
                             {loading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />} 
                             {isEditMode ? 'Update' : 'Save'}
                         </button>
-                        <button onClick={handleClear} className="px-8 h-8 bg-white text-gray-700 text-sm font-medium rounded-sm border border-gray-400 hover:bg-gray-100 flex items-center gap-2">
+                        <button onClick={handleClear} className="px-6 h-10 bg-slate-100 text-slate-600 text-sm font-bold rounded-md hover:bg-slate-200 transition-all active:scale-95 flex items-center gap-2">
                             <RotateCcw size={14} /> Clear
                         </button>
-                        <button onClick={onClose} className="px-8 h-8 bg-white text-gray-700 text-sm font-medium rounded-sm border border-gray-400 hover:bg-gray-100 flex items-center gap-2">
-                            Exit
+                        <button onClick={onClose} className="px-6 h-10 bg-slate-100 text-slate-600 text-sm font-bold rounded-md hover:bg-slate-200 transition-all active:scale-95 flex items-center gap-2">
+                            <X size={14} /> Exit
                         </button>
                     </div>
                 }
@@ -365,9 +365,9 @@ const FixedAssetsBoard = ({ isOpen, onClose }) => {
 
             {showSearchModal && (
                 <div className="fixed inset-0 z-[300] flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowSearchModal(false)} />
-                    <div className="relative w-full max-w-3xl bg-white shadow-2xl rounded-lg overflow-hidden flex flex-col max-h-[80vh] border border-gray-300 animate-in fade-in zoom-in-95 duration-200">
-                        <div className="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-50">
+                    <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setShowSearchModal(false)} />
+                    <div className="relative w-full max-w-3xl bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col max-h-[80vh] border border-gray-300 animate-in fade-in zoom-in-95 duration-200">
+                        <div className="px-6 py-4 flex items-center justify-between border-b border-gray-100 bg-white select-none">
                             <div className="flex items-center gap-3">
                                 <PlusCircle size={20} className="text-[#0078d4]" />
                                 <h3 className="font-black text-gray-700 uppercase tracking-tight">Fixed Asset Registry Search</h3>

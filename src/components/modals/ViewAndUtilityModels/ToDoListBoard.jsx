@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import SimpleModal from '../../SimpleModal';
-import { Save, Calendar, Clock, ChevronDown } from 'lucide-react';
+import { Save, Calendar, Clock, ChevronDown , X} from 'lucide-react';
 
 const ToDoListBoard = ({ isOpen, onClose }) => {
     const [currentTime, setCurrentTime] = useState(new Date().toLocaleTimeString());
@@ -20,11 +20,11 @@ const ToDoListBoard = ({ isOpen, onClose }) => {
             maxWidth="max-w-xl"
             footer={
                 <>
-                    <button className="px-10 h-8 bg-[#0078d4] text-white text-sm font-medium rounded-sm border border-[#005a9e] hover:bg-[#005a9e] flex items-center gap-2">
+                    <button className="px-6 h-10 bg-[#0078d4] text-white text-sm font-bold rounded-md shadow-md shadow-blue-200 hover:bg-[#005a9e] transition-all active:scale-95 border-none flex items-center gap-2">
                          Save
                     </button>
-                    <button onClick={onClose} className="px-10 h-8 bg-[#0078d4] text-white text-sm font-medium rounded-sm border border-[#005a9e] hover:bg-[#005a9e]">
-                        Exit
+                    <button onClick={onClose} className="px-6 h-10 bg-[#0078d4] text-white text-sm font-bold rounded-md shadow-md shadow-blue-200 hover:bg-[#005a9e] transition-all active:scale-95 border-none">
+                        <X size={14} /> Exit
                     </button>
                 </>
             }

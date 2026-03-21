@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import SimpleModal from '../components/SimpleModal';
-import { Calendar, ChevronDown } from 'lucide-react';
+import { Calendar, ChevronDown , X} from 'lucide-react';
 
 const ChequeRegisterBoard = ({ isOpen, onClose }) => {
     return (
@@ -73,7 +73,7 @@ const ChequeRegisterBoard = ({ isOpen, onClose }) => {
                         Clear
                     </button>
                     <button onClick={onClose} className="w-full h-8 bg-[#0078d4] text-white text-[12px] font-black uppercase tracking-wider rounded border border-[#005a9e] shadow-md hover:bg-[#005a9e] active:scale-95 transition-all">
-                        Exit
+                        <X size={14} /> Exit
                     </button>
                 </div>
             </div>

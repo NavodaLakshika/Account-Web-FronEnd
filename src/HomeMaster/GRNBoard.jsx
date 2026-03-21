@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import SimpleModal from '../components/SimpleModal';
-import { Search, Calendar, ChevronDown, CheckCircle, Trash2, XCircle } from 'lucide-react';
+import { Search, Calendar, ChevronDown, CheckCircle, Trash2, XCircle , Save, X} from 'lucide-react';
 import { grnService } from '../services/grn.service';
 import { toast } from 'react-hot-toast';
 
@@ -270,7 +270,7 @@ const GRNBoard = ({ isOpen, onClose }) => {
                             <CheckCircle size={14} /> Save & Apply
                         </button>
                         <button onClick={handleSaveDraft} className="px-8 h-8 bg-white text-[#0078d4] border border-[#0078d4] font-bold rounded hover:bg-blue-50">Save Draft</button>
-                        <button onClick={onClose} className="px-8 h-8 bg-gray-600 text-white font-bold rounded hover:bg-gray-700">Exit</button>
+                        <button onClick={onClose} className="px-8 h-8 bg-gray-600 text-white font-bold rounded hover:bg-gray-700"><X size={14} /> Exit</button>
                     </div>
                 </div>
             }

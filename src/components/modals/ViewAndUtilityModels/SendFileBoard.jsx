@@ -1,6 +1,6 @@
 import React from 'react';
 import SimpleModal from '../../SimpleModal';
-import { Send, Monitor, MoreHorizontal } from 'lucide-react';
+import { Send, Monitor, MoreHorizontal , X} from 'lucide-react';
 
 const SendFileBoard = ({ isOpen, onClose }) => {
     return (
@@ -11,11 +11,11 @@ const SendFileBoard = ({ isOpen, onClose }) => {
             maxWidth="max-w-2xl"
             footer={
                 <>
-                    <button className="px-10 h-8 bg-[#0078d4] text-white text-sm font-medium rounded-sm border border-[#005a9e] hover:bg-[#005a9e] flex items-center gap-2">
+                    <button className="px-6 h-10 bg-[#0078d4] text-white text-sm font-bold rounded-md shadow-md shadow-blue-200 hover:bg-[#005a9e] transition-all active:scale-95 border-none flex items-center gap-2">
                         <Send size={14} /> Send
                     </button>
-                    <button onClick={onClose} className="px-10 h-8 bg-white text-gray-700 text-sm font-medium rounded-sm border border-gray-400 hover:bg-gray-100 flex items-center gap-2">
-                        Exit
+                    <button onClick={onClose} className="px-6 h-10 bg-slate-100 text-slate-600 text-sm font-bold rounded-md hover:bg-slate-200 transition-all active:scale-95 border-none flex items-center gap-2">
+                        <X size={14} /> Exit
                     </button>
                 </>
             }

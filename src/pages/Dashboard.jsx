@@ -50,6 +50,10 @@ import TransactionModal from '../components/modals/TransactionModal';
 import ReportsModal from '../components/modals/ReportsModal';
 import SystemAdminModal from '../components/modals/SystemAdminModal';
 import SideBar from '../components/SideBar';
+import ChangePasswordBoard from '../components/modals/ChangePasswordBoard';
+import ThankYouModal from '../components/modals/ThankYouModal';
+
+
 
 const Dashboard = () => {
     const navigate = useNavigate();
@@ -82,7 +86,12 @@ const Dashboard = () => {
     const [showTransactionModal, setShowTransactionModal] = useState(false);
     const [showReportsModal, setShowReportsModal] = useState(false);
     const [showSystemAdminModal, setShowSystemAdminModal] = useState(false);
+    const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
     const [showSideBar, setShowSideBar] = useState(false);
+    const [showThankYouModal, setShowThankYouModal] = useState(false);
+
+
+
     const [isTopBarCollapsed, setIsTopBarCollapsed] = useState(false);
     const [currentTime, setCurrentTime] = useState(new Date());
 
@@ -195,7 +204,16 @@ const Dashboard = () => {
             />
             <TransactionModal isOpen={showTransactionModal} onClose={() => setShowTransactionModal(false)} />
             <ReportsModal isOpen={showReportsModal} onClose={() => setShowReportsModal(false)} />
-            <SystemAdminModal isOpen={showSystemAdminModal} onClose={() => setShowSystemAdminModal(false)} />
+            <SystemAdminModal 
+                isOpen={showSystemAdminModal} 
+                onClose={() => setShowSystemAdminModal(false)} 
+                onOpenChangePassword={() => {
+                    setShowSystemAdminModal(false);
+                    setShowChangePasswordModal(true);
+                }}
+            />
+            <ChangePasswordBoard isOpen={showChangePasswordModal} onClose={() => setShowChangePasswordModal(false)} />
+
 
             <PurchaseOrderBoard isOpen={showPurchaseOrderModal} onClose={() => setShowPurchaseOrderModal(false)} />
             <GRNBoard isOpen={showGRNModal} onClose={() => setShowGRNModal(false)} />
@@ -273,7 +291,9 @@ const Dashboard = () => {
                 {/* Row 2: Icon Ribbon */}
                 <div className={`flex items-center px-2 py-1 gap-1  overflow-x-auto no-scrollbar transition-all duration-500 ${isTopBarCollapsed ? 'opacity-0 -translate-y-10 scale-95 pointer-events-none' : 'opacity-100 translate-y-0 scale-100'}`}>
                     {/* Logout always first */}
-                    <RibbonButton icon={LogOut} label="LogOut" onClick={handleLogout} iconColor="text-red-500" />
+                    <RibbonButton icon={LogOut} label="LogOut" onClick={() => setShowThankYouModal(true)} iconColor="text-red-500" />
+
+
 
                     <div className="h-10 w-[1px] bg-white/20 mx-1" />
 
@@ -441,6 +461,11 @@ const Dashboard = () => {
                 </div>
             </footer>
 
+            {/* Thank You / Logout Modal */}
+            <ThankYouModal
+                isOpen={showThankYouModal}
+                onClose={() => setShowThankYouModal(false)}
+            />
             <style hmr-ignore="true">{`
                 @keyframes marquee {
                     0% { transform: translateX(0); }

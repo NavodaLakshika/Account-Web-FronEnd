@@ -163,18 +163,18 @@ const CategoryBoard = ({ isOpen, onClose }) => {
     };
 
     const footer = (
-        <div className="flex justify-center gap-3 w-full border-t border-gray-300 pt-3 mt-2 bg-[#f0f0f0]">
-            <button onClick={handleSave} disabled={loading} className="w-32 h-8 bg-[#0078d4] text-white text-sm font-medium rounded-sm border hover:bg-[#005a9e] flex items-center justify-center gap-2">
+        <div className="bg-slate-50 px-6 py-4 w-full flex justify-end gap-3 border-t border-gray-100 mt-4 rounded-b-xl">
+            <button onClick={handleSave} disabled={loading} className={`px-6 h-10 bg-[#0078d4] text-white text-sm font-bold rounded-md shadow-md shadow-blue-200 hover:bg-[#005a9e] transition-all active:scale-95 flex items-center justify-center gap-2 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}>
                 {loading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />} 
                 {isEditMode ? 'Update' : 'Save'}
             </button>
-            <button onClick={handleDelete} disabled={!isEditMode || loading} className="w-32 h-8 bg-[#d13438] text-white text-sm font-medium rounded-sm border hover:bg-[#a4262c] flex items-center justify-center gap-2">
+            <button onClick={handleDelete} disabled={!isEditMode || loading} className={`px-6 h-10 bg-[#d13438] text-white text-sm font-bold rounded-md shadow-md shadow-red-200 hover:bg-[#a4262c] transition-all active:scale-95 flex items-center justify-center gap-2 ${(!isEditMode || loading) ? 'opacity-50 cursor-not-allowed' : ''}`}>
                 <Trash2 size={14} /> Delete
             </button>
-            <button onClick={handleClear} className="w-32 h-8 bg-white text-gray-700 text-sm font-medium rounded-sm border border-gray-400 hover:bg-gray-100 flex items-center justify-center gap-2">
+            <button onClick={handleClear} className="px-6 h-10 bg-slate-100 text-slate-600 text-sm font-bold rounded-md hover:bg-slate-200 transition-all active:scale-95 border-none flex items-center justify-center gap-2">
                 <RotateCcw size={14} /> Clear
             </button>
-            <button onClick={onClose} className="w-32 h-8 bg-white text-gray-700 text-sm font-medium rounded-sm border border-gray-400 hover:bg-gray-100 flex items-center justify-center">Exit</button>
+            <button onClick={onClose} className="px-6 h-10 bg-slate-100 text-slate-600 text-sm font-bold rounded-md hover:bg-slate-200 transition-all active:scale-95 border-none flex items-center justify-center gap-2"><X size={14} /> Exit</button>
         </div>
     );
 
@@ -247,13 +247,13 @@ const SearchModal = ({ title, list, onSelect, onClose, placeholder, columns = ['
     const [query, setQuery] = useState('');
     return (
         <div className="fixed inset-0 z-[300] flex items-center justify-center p-4">
-            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
-            <div className="relative w-full max-w-2xl bg-white shadow-2xl rounded-lg overflow-hidden flex flex-col max-h-[80vh]">
+            <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={onClose} />
+            <div className="relative w-full max-w-2xl bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col max-h-[80vh]">
                 <div className="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-50/50">
-                    <h3 className="font-bold text-gray-700">{title}</h3>
+                    <h3 className="text-lg font-bold text-slate-800 tracking-tight">{title}</h3>
                     <div className="flex gap-2">
                         <input type="text" placeholder={placeholder} className="h-8 border border-gray-300 px-3 text-sm rounded-md w-48 focus:border-blue-500 outline-none" value={query} onChange={(e) => setQuery(e.target.value)} />
-                        <button onClick={onClose} className="text-gray-400 hover:text-gray-600"><X size={20} /></button>
+                        <button onClick={onClose} className="w-8 h-8 flex items-center justify-center hover:bg-red-50 text-slate-400 hover:text-red-500 transition-colors rounded-full outline-none"><X size={20} /></button>
                     </div>
                 </div>
                 <div className="overflow-y-auto p-2 font-['Plus_Jakarta_Sans']">

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import SimpleModal from '../components/SimpleModal';
-import { Search, RotateCcw, Save, Trash2, Loader2 } from 'lucide-react';
+import { Search, RotateCcw, Save, Trash2, Loader2 , X} from 'lucide-react';
 import { customerService } from '../services/customer.service';
 import { toast } from 'react-hot-toast';
 
@@ -193,27 +193,27 @@ const CustomerBoard = ({ isOpen, onClose }) => {
         <>
             <button 
                 onClick={handleClear}
-                className="px-6 h-8 bg-white text-gray-700 text-sm font-medium rounded-sm border border-gray-400 hover:bg-gray-100 flex items-center gap-2"
+                className="px-6 h-10 bg-slate-100 text-slate-600 text-sm font-bold rounded-md hover:bg-slate-200 transition-all active:scale-95 flex items-center gap-2"
             >
                 <RotateCcw size={14} /> Clear
             </button>
             <button 
                 onClick={handleDelete}
                 disabled={!isEditMode || loading}
-                className={`px-6 h-8 bg-[#d13438] text-white text-sm font-medium rounded-sm border border-[#a4262c] hover:bg-[#a4262c] flex items-center gap-2 ${(!isEditMode || loading) ? 'opacity-50 cursor-not-allowed' : ''}`}
+                className={`px-6 h-10 bg-[#d13438] text-white text-sm font-bold rounded-md shadow-md shadow-red-200 hover:bg-[#a4262c] transition-all active:scale-95 flex items-center gap-2 ${(!isEditMode || loading) ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
                 <Trash2 size={14} /> Delete
             </button>
             <button 
                 onClick={handleSave}
                 disabled={loading}
-                className={`px-8 h-8 bg-[#0078d4] text-white text-sm font-medium rounded-sm border border-[#005a9e] hover:bg-[#005a9e] flex items-center gap-2 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                className={`px-6 h-10 bg-[#0078d4] text-white text-sm font-bold rounded-md shadow-md shadow-blue-200 hover:bg-[#005a9e] transition-all active:scale-95 flex items-center gap-2 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
                 {loading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />} 
                 {isEditMode ? 'Update' : 'Save'}
             </button>
-            <button onClick={onClose} className="px-8 h-8 bg-white text-gray-700 text-sm font-medium rounded-sm border border-gray-400 hover:bg-gray-100">
-                Exit
+            <button onClick={onClose} className="px-6 h-10 bg-slate-100 text-slate-600 text-sm font-bold rounded-md hover:bg-slate-200 transition-all active:scale-95">
+                <X size={14} /> Exit
             </button>
         </>
     );
@@ -417,10 +417,10 @@ const CustomerBoard = ({ isOpen, onClose }) => {
             {/* Simple Search Modal */}
             {showSearchModal && (
                 <div className="fixed inset-0 z-[300] flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowSearchModal(false)} />
-                    <div className="relative w-full max-w-2xl bg-white shadow-2xl rounded-lg overflow-hidden flex flex-col max-h-[80vh]">
-                        <div className="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-50">
-                            <h3 className="font-bold text-gray-700">Search Customers</h3>
+                    <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setShowSearchModal(false)} />
+                    <div className="relative w-full max-w-2xl bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col max-h-[80vh]">
+                        <div className="px-6 py-4 flex items-center justify-between border-b border-gray-100 bg-white select-none">
+                            <h3 className="text-lg font-bold text-slate-800 tracking-tight">Search Customers</h3>
                             <input 
                                 type="text" 
                                 placeholder="Search by name or code..."
@@ -463,8 +463,8 @@ const CustomerBoard = ({ isOpen, onClose }) => {
                                 </tbody>
                             </table>
                         </div>
-                        <div className="p-3 border-t bg-gray-50 flex justify-end">
-                            <button onClick={() => setShowSearchModal(false)} className="px-4 py-1 bg-gray-200 text-sm rounded hover:bg-gray-300">Close</button>
+                        <div className="bg-slate-50 px-6 py-4 flex justify-end gap-3 border-t border-gray-100">
+                            <button onClick={() => setShowSearchModal(false)} className="px-6 h-10 flex items-center justify-center bg-slate-100 text-slate-600 text-sm font-bold rounded-md hover:bg-slate-200 transition-all active:scale-95">Close</button>
                         </div>
                     </div>
                 </div>

@@ -16,27 +16,27 @@ const CustomerCenterModal = ({ isOpen, onClose }) => {
     return (
         <div className="fixed inset-0 z-[300] flex items-center justify-center p-4">
             {/* Backdrop */}
-            <div className="absolute inset-0 bg-black/20 backdrop-blur-[1px]" onClick={onClose} />
+            <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={onClose} />
             
             {/* Modal Container */}
-            <div className="relative w-full max-w-[280px] bg-[#f0f0f0] border border-gray-400 rounded-lg shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
+            <div className="relative w-full max-w-[280px] bg-white border border-gray-100 rounded-xl shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
                 
                 {/* Header */}
-                <div className="bg-white px-3 py-2 flex items-center justify-between border-b border-gray-300 select-none">
+                <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-100 select-none">
                     <div className="flex items-center gap-2">
                         <Users size={14} className="text-[#0078d4]" />
-                        <span className="text-xs font-bold text-gray-700">Customer Center</span>
+                        <span className="text-lg font-bold text-slate-800 tracking-tight">Customer Center</span>
                     </div>
                     <button 
                         onClick={onClose} 
-                        className="w-8 h-5 flex items-center justify-center bg-white hover:bg-[#e81123] hover:text-white transition-colors border border-gray-300 rounded group"
+                        className="w-8 h-8 flex items-center justify-center hover:bg-red-50 text-slate-400 hover:text-red-500 transition-colors rounded-full group outline-none"
                     >
                         <X size={12} className="group-hover:stroke-white" />
                     </button>
                 </div>
 
                 {/* Menu Content */}
-                <div className="p-1 bg-white m-1 border border-gray-300 flex-1 overflow-y-auto no-scrollbar">
+                <div className="p-6 bg-white flex-1 overflow-y-auto no-scrollbar">
                     {menuItems.map((item, idx) => {
                         const Icon = item.icon;
                         return (
@@ -56,7 +56,7 @@ const CustomerCenterModal = ({ isOpen, onClose }) => {
                 </div>
 
                 {/* Footer */}
-                <div className="bg-[#f0f0f0] px-3 py-1.5 border-t border-gray-300 flex justify-end">
+                <div className="bg-slate-50 px-6 py-4 flex justify-end gap-3 border-t border-gray-100">
                     <span className="text-[10px] text-[#0078d4] font-bold uppercase tracking-widest italic">Sales Records</span>
                 </div>
             </div>

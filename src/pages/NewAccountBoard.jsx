@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import SimpleModal from '../components/SimpleModal';
-import { HelpCircle, ChevronDown, PlusCircle } from 'lucide-react';
+import { HelpCircle, ChevronDown, PlusCircle , X} from 'lucide-react';
 
 const NewAccountBoard = ({ isOpen, onClose }) => {
     const [selectedType, setSelectedType] = useState('Expence');
@@ -66,7 +66,7 @@ const NewAccountBoard = ({ isOpen, onClose }) => {
             footer={
                 <>
                     <button
-                        className="px-8 h-8 bg-[#0078d4] text-white text-sm font-medium rounded-sm border border-[#005a9e] hover:bg-[#005a9e] flex items-center gap-2"
+                        className="px-6 h-10 bg-[#0078d4] text-white text-sm font-bold rounded-md shadow-md shadow-blue-200 hover:bg-[#005a9e] transition-all active:scale-95 flex items-center gap-2"
                         onClick={() => {
                             console.log('Creating account:', selectedType === 'Other' ? otherAccountType : selectedType);
                             onClose();
@@ -74,8 +74,8 @@ const NewAccountBoard = ({ isOpen, onClose }) => {
                     >
                         <PlusCircle size={14} /> Create Account
                     </button>
-                    <button onClick={onClose} className="px-8 h-8 bg-white text-gray-700 text-sm font-medium rounded-sm border border-gray-400 hover:bg-gray-100">
-                        Exit
+                    <button onClick={onClose} className="px-6 h-10 bg-slate-100 text-slate-600 text-sm font-bold rounded-md hover:bg-slate-200 transition-all active:scale-95">
+                        <X size={14} /> Exit
                     </button>
                 </>
             }

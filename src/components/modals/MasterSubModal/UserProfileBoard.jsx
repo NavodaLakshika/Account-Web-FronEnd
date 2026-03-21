@@ -1,6 +1,6 @@
 import React from 'react';
 import SimpleModal from '../../SimpleModal';
-import { Search, Plus, ShieldCheck, UserPlus, UserMinus, Calendar } from 'lucide-react';
+import { Search, Plus, ShieldCheck, UserPlus, UserMinus, Calendar , X} from 'lucide-react';
 
 const UserProfileBoard = ({ isOpen, onClose }) => {
     return (
@@ -11,14 +11,14 @@ const UserProfileBoard = ({ isOpen, onClose }) => {
             maxWidth="max-w-xl"
             footer={
                 <>
-                    <button className="px-6 h-8 bg-[#0078d4] text-white text-sm font-medium rounded-sm border border-[#005a9e] hover:bg-[#005a9e] flex items-center gap-2">
+                    <button className="px-6 h-10 bg-[#0078d4] text-white text-sm font-bold rounded-md shadow-md shadow-blue-200 hover:bg-[#005a9e] transition-all active:scale-95 flex items-center gap-2">
                          Add User
                     </button>
-                    <button className="px-6 h-8 bg-[#0078d4] text-white text-sm font-medium rounded-sm border border-[#005a9e] hover:bg-[#005a9e] flex items-center gap-2">
+                    <button className="px-6 h-10 bg-[#0078d4] text-white text-sm font-bold rounded-md shadow-md shadow-blue-200 hover:bg-[#005a9e] transition-all active:scale-95 flex items-center gap-2">
                          Delete User
                     </button>
-                    <button onClick={onClose} className="px-8 h-8 bg-[#0078d4] text-white text-sm font-medium rounded-sm border border-[#005a9e] hover:bg-[#005a9e]">
-                        Exit
+                    <button onClick={onClose} className="px-6 h-10 bg-[#0078d4] text-white text-sm font-bold rounded-md shadow-md shadow-blue-200 hover:bg-[#005a9e] transition-all active:scale-95">
+                        <X size={14} /> Exit
                     </button>
                 </>
             }

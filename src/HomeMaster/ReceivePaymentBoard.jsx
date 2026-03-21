@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import SimpleModal from '../components/SimpleModal';
-import { Search, Calendar, ChevronDown, Loader2 } from 'lucide-react';
+import { Search, Calendar, ChevronDown, Loader2 , X, Save} from 'lucide-react';
 import receivePaymentService from '../services/receivePayment.service';
 import { toast } from 'react-hot-toast';
 
@@ -185,7 +185,7 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
                             Clear
                         </button>
                         <button onClick={onClose} className="px-10 h-8 bg-white border border-gray-300 text-[13px] font-bold text-gray-700 rounded shadow-sm hover:bg-gray-50 transition-all min-w-[100px]">
-                            Exit
+                            <X size={14} /> Exit
                         </button>
                     </div>
                 </div>

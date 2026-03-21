@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import SimpleModal from '../components/SimpleModal';
-import { Search, Calendar, ChevronDown, Trash2 } from 'lucide-react';
+import { Search, Calendar, ChevronDown, Trash2 , X, Save} from 'lucide-react';
 import { enterBillService } from '../services/enterBill.service';
 import { toast } from 'react-hot-toast';
 
@@ -153,7 +153,7 @@ const EnterBillBoard = ({ isOpen, onClose }) => {
                         Clear
                     </button>
                     <button onClick={onClose} className="px-12 h-8 bg-[#0078d4] text-white text-[13px] font-bold rounded-sm border border-[#005a9e] hover:bg-[#005a9e] shadow-sm transition-all focus:ring-2 focus:ring-blue-400">
-                        Exit
+                        <X size={14} /> Exit
                     </button>
                 </div>
             }
