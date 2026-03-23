@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import SimpleModal from '../components/SimpleModal';
-import { Search, RotateCcw, Save, Trash2, Loader2 , X} from 'lucide-react';
+import { Search, RotateCcw, Save, Trash2, Loader2, X } from 'lucide-react';
 import { customerService } from '../services/customer.service';
 import { toast } from 'react-hot-toast';
 
@@ -123,7 +123,7 @@ const CustomerBoard = ({ isOpen, onClose }) => {
 
     const handleDelete = async () => {
         if (!isEditMode || !formData.Code) return;
-        
+
         if (!window.confirm('Are you sure you want to delete this customer?')) return;
 
         setLoading(true);
@@ -191,28 +191,28 @@ const CustomerBoard = ({ isOpen, onClose }) => {
 
     const footer = (
         <>
-            <button 
+            <button
                 onClick={handleClear}
-                className="px-6 h-10 bg-slate-100 text-slate-600 text-sm font-bold rounded-md hover:bg-slate-200 transition-all active:scale-95 flex items-center gap-2"
+                className="px-6 h-10 bg-slate-100 text-slate-600 text-sm font-bold rounded-md hover:bg-slate-200 transition-all active:scale-95 flex items-center gap-2 border-none"
             >
-                <RotateCcw size={14} /> Clear
+                <RotateCcw size={14} className="text-[#0078d4]" /> Clear
             </button>
-            <button 
+            <button
                 onClick={handleDelete}
                 disabled={!isEditMode || loading}
-                className={`px-6 h-10 bg-[#d13438] text-white text-sm font-bold rounded-md shadow-md shadow-red-200 hover:bg-[#a4262c] transition-all active:scale-95 flex items-center gap-2 ${(!isEditMode || loading) ? 'opacity-50 cursor-not-allowed' : ''}`}
+                className={`px-6 h-10 bg-red-50 text-red-600 text-sm font-bold rounded-md hover:bg-red-100 transition-all active:scale-95 flex items-center gap-2 border border-red-100 ${(!isEditMode || loading) ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
                 <Trash2 size={14} /> Delete
             </button>
-            <button 
+            <button
                 onClick={handleSave}
                 disabled={loading}
                 className={`px-6 h-10 bg-[#0078d4] text-white text-sm font-bold rounded-md shadow-md shadow-blue-200 hover:bg-[#005a9e] transition-all active:scale-95 flex items-center gap-2 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
-                {loading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />} 
+                {loading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
                 {isEditMode ? 'Update' : 'Save'}
             </button>
-            <button onClick={onClose} className="px-6 h-10 bg-slate-100 text-slate-600 text-sm font-bold rounded-md hover:bg-slate-200 transition-all active:scale-95">
+            <button onClick={onClose} className="px-6 h-10 bg-slate-100 text-slate-600 text-sm font-bold rounded-md hover:bg-slate-200 transition-all active:scale-95 flex items-center gap-2 border-none">
                 <X size={14} /> Exit
             </button>
         </>
@@ -224,7 +224,7 @@ const CustomerBoard = ({ isOpen, onClose }) => {
                 isOpen={isOpen}
                 onClose={onClose}
                 title="Customer Information"
-                maxWidth="max-w-5xl"
+                maxWidth="max-w-4xl"
                 footer={footer}
             >
                 <div className="space-y-4">
@@ -233,16 +233,16 @@ const CustomerBoard = ({ isOpen, onClose }) => {
                         <div className="col-span-3">
                             <label className="block text-xs font-bold text-gray-700 mb-1">Customer ID</label>
                             <div className="flex gap-1">
-                                <input 
-                                    type="text" 
+                                <input
+                                    type="text"
                                     name="Code"
                                     value={formData.Code}
                                     onChange={handleInputChange}
-                                    className="w-full h-8 border border-gray-300 px-2 text-sm bg-gray-50 font-bold" 
+                                    className="w-full h-8 border border-gray-300 px-2 text-sm bg-gray-50 font-bold"
                                     placeholder="AUTO"
                                     readOnly={isEditMode}
                                 />
-                                <button 
+                                <button
                                     onClick={openSearch}
                                     className="w-8 h-8 bg-gray-100 border border-gray-300 flex items-center justify-center hover:bg-gray-200"
                                 >
@@ -252,13 +252,13 @@ const CustomerBoard = ({ isOpen, onClose }) => {
                         </div>
                         <div className="col-span-9">
                             <label className="block text-xs font-bold text-gray-700 mb-1">Customer Name</label>
-                            <input 
-                                type="text" 
+                            <input
+                                type="text"
                                 name="Cust_Name"
                                 value={formData.Cust_Name}
                                 onChange={handleInputChange}
-                                className="w-full h-8 border border-gray-300 px-2 text-sm focus:border-blue-500 outline-none" 
-                                placeholder="Enter customer name..." 
+                                className="w-full h-8 border border-gray-300 px-2 text-sm focus:border-blue-500 outline-none"
+                                placeholder="Enter customer name..."
                             />
                         </div>
                     </div>
@@ -320,10 +320,10 @@ const CustomerBoard = ({ isOpen, onClose }) => {
                                 <h3 className="text-xs font-bold text-blue-800 uppercase border-b border-blue-100 pb-1">Banking</h3>
                                 <div className="grid grid-cols-1 gap-2">
                                     <FormRow label="Bank Name">
-                                        <select 
-                                            name="Bank" 
-                                            value={formData.Bank} 
-                                            onChange={handleInputChange} 
+                                        <select
+                                            name="Bank"
+                                            value={formData.Bank}
+                                            onChange={handleInputChange}
                                             className="flex-1 h-7 border border-gray-300 px-1 text-sm bg-white"
                                         >
                                             <option value="">Select Bank...</option>
@@ -347,10 +347,10 @@ const CustomerBoard = ({ isOpen, onClose }) => {
                         <div className="grid grid-cols-2 gap-8">
                             <div className="space-y-2">
                                 <FormRow label="Type">
-                                    <select 
-                                        name="Type" 
-                                        value={formData.Type} 
-                                        onChange={handleInputChange} 
+                                    <select
+                                        name="Type"
+                                        value={formData.Type}
+                                        onChange={handleInputChange}
                                         className="flex-1 h-7 border border-gray-300 px-1 text-sm bg-white"
                                     >
                                         <option value="">Select Type...</option>
@@ -358,13 +358,13 @@ const CustomerBoard = ({ isOpen, onClose }) => {
                                     </select>
                                 </FormRow>
                                 <div className="flex items-center gap-2 ml-[120px]">
-                                    <input 
-                                        type="checkbox" 
-                                        id="locked" 
-                                        name="Locked" 
-                                        checked={formData.Locked} 
-                                        onChange={handleInputChange} 
-                                        className="w-4 h-4" 
+                                    <input
+                                        type="checkbox"
+                                        id="locked"
+                                        name="Locked"
+                                        checked={formData.Locked}
+                                        onChange={handleInputChange}
+                                        className="w-4 h-4"
                                     />
                                     <label htmlFor="locked" className="text-xs text-gray-700 font-bold">Mark as Locked (Inactive)</label>
                                 </div>
@@ -372,15 +372,15 @@ const CustomerBoard = ({ isOpen, onClose }) => {
                             <div className="space-y-2">
                                 <FormRow label="Area">
                                     <div className="flex gap-1 flex-1">
-                                        <input 
-                                            type="text" 
-                                            name="Area_Code" 
-                                            value={formData.Area_Code} 
-                                            onChange={handleInputChange} 
-                                            className="w-16 h-7 border border-gray-300 px-2 text-sm" 
+                                        <input
+                                            type="text"
+                                            name="Area_Code"
+                                            value={formData.Area_Code}
+                                            onChange={handleInputChange}
+                                            className="w-16 h-7 border border-gray-300 px-2 text-sm"
                                         />
-                                        <select 
-                                            value={formData.Area_Code} 
+                                        <select
+                                            value={formData.Area_Code}
                                             onChange={(e) => setFormData(p => ({ ...p, Area_Code: e.target.value }))}
                                             className="flex-1 h-7 border border-gray-300 px-1 text-sm bg-white"
                                         >
@@ -391,15 +391,15 @@ const CustomerBoard = ({ isOpen, onClose }) => {
                                 </FormRow>
                                 <FormRow label="Route">
                                     <div className="flex gap-1 flex-1">
-                                        <input 
-                                            type="text" 
-                                            name="Route_Code" 
-                                            value={formData.Route_Code} 
-                                            onChange={handleInputChange} 
-                                            className="w-16 h-7 border border-gray-300 px-2 text-sm" 
+                                        <input
+                                            type="text"
+                                            name="Route_Code"
+                                            value={formData.Route_Code}
+                                            onChange={handleInputChange}
+                                            className="w-16 h-7 border border-gray-300 px-2 text-sm"
                                         />
-                                        <select 
-                                            value={formData.Route_Code} 
+                                        <select
+                                            value={formData.Route_Code}
                                             onChange={(e) => setFormData(p => ({ ...p, Route_Code: e.target.value }))}
                                             className="flex-1 h-7 border border-gray-300 px-1 text-sm bg-white"
                                         >
@@ -421,8 +421,8 @@ const CustomerBoard = ({ isOpen, onClose }) => {
                     <div className="relative w-full max-w-2xl bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col max-h-[80vh]">
                         <div className="px-6 py-4 flex items-center justify-between border-b border-gray-100 bg-white select-none">
                             <h3 className="text-lg font-bold text-slate-800 tracking-tight">Search Customers</h3>
-                            <input 
-                                type="text" 
+                            <input
+                                type="text"
                                 placeholder="Search by name or code..."
                                 className="h-9 border border-gray-300 px-3 text-sm rounded-md w-64"
                                 value={searchQuery}
@@ -442,19 +442,19 @@ const CustomerBoard = ({ isOpen, onClose }) => {
                                     {customersList
                                         .filter(c => (c.cust_Name || c.Cust_Name)?.toLowerCase().includes(searchQuery.toLowerCase()) || (c.code || c.Code)?.toLowerCase().includes(searchQuery.toLowerCase()))
                                         .map(c => (
-                                        <tr key={c.code || c.Code} className="hover:bg-blue-50">
-                                            <td className="p-2 border font-mono">{c.code || c.Code}</td>
-                                            <td className="p-2 border">{c.cust_Name || c.Cust_Name}</td>
-                                            <td className="p-2 border">
-                                                <button 
-                                                    onClick={() => selectCustomer(c.code || c.Code)}
-                                                    className="w-full bg-blue-600 text-white text-xs py-1 rounded hover:bg-blue-700"
-                                                >
-                                                    Select
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    ))}
+                                            <tr key={c.code || c.Code} className="hover:bg-blue-50">
+                                                <td className="p-2 border font-mono">{c.code || c.Code}</td>
+                                                <td className="p-2 border">{c.cust_Name || c.Cust_Name}</td>
+                                                <td className="p-2 border">
+                                                    <button
+                                                        onClick={() => selectCustomer(c.code || c.Code)}
+                                                        className="w-full bg-blue-600 text-white text-xs py-1 rounded hover:bg-blue-700"
+                                                    >
+                                                        Select
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        ))}
                                     {customersList.length === 0 && (
                                         <tr>
                                             <td colSpan="3" className="p-4 text-center text-gray-500">No customers found.</td>

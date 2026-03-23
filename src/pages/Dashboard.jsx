@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { DotLottiePlayer } from '@dotlottie/react-player';
+
 import {
     LogOut,
     Home,
@@ -19,8 +21,11 @@ import {
     Settings,
     ShieldCheck,
     ChevronRight,
-    Building2
+    Building2,
+    Menu,
+    Bot
 } from 'lucide-react';
+
 import { authService } from '../services/auth.service';
 import HomeBoard from './HomeBoard';
 import NewAccountBoard from './NewAccountBoard';
@@ -52,10 +57,14 @@ import SystemAdminModal from '../components/modals/SystemAdminModal';
 import SideBar from '../components/SideBar';
 import ChangePasswordBoard from '../components/modals/ChangePasswordBoard';
 import ThankYouModal from '../components/modals/ThankYouModal';
+import LogoutConfirmModal from '../components/modals/LogoutConfirmModal';
+
+import AIChatbotBoard from './AIChatbotBoard';
 
 
 
 const Dashboard = () => {
+
     const navigate = useNavigate();
     const [user, setUser] = useState(null);
     const [selectedCompany, setSelectedCompany] = useState(null);
@@ -89,11 +98,19 @@ const Dashboard = () => {
     const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
     const [showSideBar, setShowSideBar] = useState(false);
     const [showThankYouModal, setShowThankYouModal] = useState(false);
+    const [showLogoutConfirmModal, setShowLogoutConfirmModal] = useState(false);
+
+    const [showAIChatbotModal, setShowAIChatbotModal] = useState(false);
+
 
 
 
     const [isTopBarCollapsed, setIsTopBarCollapsed] = useState(false);
+    const [isAIThinking, setIsAIThinking] = useState(false);
+
+
     const [currentTime, setCurrentTime] = useState(new Date());
+
 
     useEffect(() => {
         const timer = setInterval(() => {
@@ -114,14 +131,27 @@ const Dashboard = () => {
         }
     }, [navigate]);
 
+    const handleAIClick = () => {
+        setIsAIThinking(true);
+        setTimeout(() => {
+            setIsAIThinking(false);
+            setShowAIChatbotModal(true);
+        }, 3000);
+    };
+
+
+
+
+
     const handleLogout = () => {
+
         authService.logout();
         localStorage.removeItem('selectedCompany');
         navigate('/login');
     };
 
     const navItems = [
-        { icon: Home, gif: '/icons/home.gif', label: 'Main', onClick: () => setShowHomeModal(true), active: showHomeModal },
+        { icon: Home, gif: '/icons/home.gif', label: 'Home', onClick: () => setShowHomeModal(true), active: showHomeModal },
         { icon: UserPlus, gif: '/icons/new account2.gif', label: 'Accounts', onClick: () => setShowNewAccountModal(true), active: showNewAccountModal },
         { icon: Users, gif: '/icons/customer.gif', label: 'Customers', onClick: () => setShowCustomerModal(true), active: showCustomerModal },
         { icon: Truck, gif: '/icons/vendors.gif', label: 'Vendors', onClick: () => setShowVendorModal(true), active: showVendorModal },
@@ -135,6 +165,8 @@ const Dashboard = () => {
         { icon: BarChart2, gif: '/icons/report.gif', label: 'Report', onClick: () => setShowTrialBalanceModal(true), active: showTrialBalanceModal },
         { icon: Search, label: 'Search', onClick: () => setShowSearchModal(true), active: showSearchModal },
     ];
+
+
 
     const menuBar = [
         'Master File', 'View and Utility', 'Transaction', 'Reports', 'System Admin', 'Help', 'About'
@@ -179,6 +211,8 @@ const Dashboard = () => {
                     if (label === 'Journal Entry') setShowJournalEntryModal(true);
                     if (label === 'Items and Servies' || label === 'Items & Services') setShowNewAccountModal(true);
                     if (label === 'Marketing Tool') setShowMarketingToolModal(true);
+                    if (label === 'AI Chat') setShowAIChatbotModal(true);
+
 
                     // Close home board after selecting an option (except when selecting Home)
                     if (label !== 'Home') setShowHomeModal(false);
@@ -204,15 +238,48 @@ const Dashboard = () => {
             />
             <TransactionModal isOpen={showTransactionModal} onClose={() => setShowTransactionModal(false)} />
             <ReportsModal isOpen={showReportsModal} onClose={() => setShowReportsModal(false)} />
-            <SystemAdminModal 
-                isOpen={showSystemAdminModal} 
-                onClose={() => setShowSystemAdminModal(false)} 
+            <SystemAdminModal
+                isOpen={showSystemAdminModal}
+                onClose={() => setShowSystemAdminModal(false)}
                 onOpenChangePassword={() => {
                     setShowSystemAdminModal(false);
                     setShowChangePasswordModal(true);
                 }}
             />
             <ChangePasswordBoard isOpen={showChangePasswordModal} onClose={() => setShowChangePasswordModal(false)} />
+            <AIChatbotBoard isOpen={showAIChatbotModal} onClose={() => setShowAIChatbotModal(false)} />
+
+            <LogoutConfirmModal
+                isOpen={showLogoutConfirmModal}
+                onClose={() => setShowLogoutConfirmModal(false)}
+                onConfirm={() => {
+                    setShowLogoutConfirmModal(false);
+                    setShowThankYouModal(true);
+                }}
+            />
+
+            {/* AI Thinking Overlay (Robot Animation centered) */}
+            {isAIThinking && (
+                <div className="fixed inset-0 z-[200] flex items-center justify-center bg-white transition-all duration-500">
+                    <div className="flex flex-col items-center">
+                        <DotLottiePlayer
+                            src="/images/Ai Robot Vector Art.lottie"
+                            autoplay
+                            loop
+                            className="w-96 h-96"
+                        />
+                        <div className="mt-8 text-[#0078d4] text-[10px] font-black uppercase tracking-[0.8em] animate-pulse">
+                            Initializing Assistant
+                        </div>
+                    </div>
+                </div>
+            )}
+
+
+
+
+
+
 
 
             <PurchaseOrderBoard isOpen={showPurchaseOrderModal} onClose={() => setShowPurchaseOrderModal(false)} />
@@ -255,8 +322,7 @@ const Dashboard = () => {
                         </button>
                     ))}
 
-                    {/* 1.1 Active Profile Status - Repositioned after Menu */}
-                    <div className="flex items-center gap-4 ml-2 h-[26px] bg-white/10 px-3 rounded-[8px] border border-white/20 transition-all hover:bg-white/20">
+                    <div className="flex items-center gap-4 ml-auto h-[26px] bg-white/10 px-3 rounded-[8px] border border-white/20 transition-all hover:bg-white/20">
                         <div className="flex items-center gap-2">
                             <div className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse shadow-[0_0_5px_rgba(74,222,128,0.5)]" />
                             <ShieldCheck size={12} className="text-blue-100" />
@@ -273,6 +339,14 @@ const Dashboard = () => {
                         </div>
                     </div>
 
+                    <div className="w-[1px] h-4 bg-white/20 mx-3" />
+                    <button
+                        onClick={() => setShowSideBar(!showSideBar)}
+                        className={`p-1.5 rounded-md transition-all flex items-center justify-center ${showSideBar ? 'bg-white/30 text-white shadow-lg' : 'text-white/70 hover:bg-white/10 hover:text-white'}`}
+                    >
+                        <Menu size={18} />
+                    </button>
+
                     {/* Expand Trigger when collapsed */}
                     {isTopBarCollapsed && (
                         <div className="ml-auto pr-4 flex items-center">
@@ -288,14 +362,14 @@ const Dashboard = () => {
                     )}
                 </div>
 
+
                 {/* Row 2: Icon Ribbon */}
                 <div className={`flex items-center px-2 py-1 gap-1  overflow-x-auto no-scrollbar transition-all duration-500 ${isTopBarCollapsed ? 'opacity-0 -translate-y-10 scale-95 pointer-events-none' : 'opacity-100 translate-y-0 scale-100'}`}>
-                    {/* Logout always first */}
-                    <RibbonButton icon={LogOut} label="LogOut" onClick={() => setShowThankYouModal(true)} iconColor="text-red-500" />
+                    {/* Logout Trigger (First step in the logout flow) */}
+                    <RibbonButton icon={LogOut} label="LogOut" onClick={() => setShowLogoutConfirmModal(true)} iconColor="text-red-500" />
 
 
 
-                    <div className="h-10 w-[1px] bg-white/20 mx-1" />
 
                     <RibbonButton icon={Home} label="Home" onClick={() => setShowHomeModal(true)} active={showHomeModal} />
 
@@ -315,16 +389,18 @@ const Dashboard = () => {
                     <RibbonButton icon={RefreshCcw} label="Bank Rec" onClick={() => setShowBankRecModal(true)} active={showBankRecModal} />
                     <RibbonButton icon={BarChart2} label="Trial Balance" onClick={() => setShowTrialBalanceModal(true)} active={showTrialBalanceModal} />
                     <RibbonButton icon={Search} label="Search" onClick={() => setShowSearchModal(true)} active={showSearchModal} />
+                    <RibbonButton icon={Bot} label="AI Chat" onClick={handleAIClick} active={showAIChatbotModal} iconColor="text-blue-500" />
+
                     <RibbonButton icon={HelpCircle} label="Help" onClick={() => { }} />
 
-                    {/* Right side arrow - Collapse Trigger */}
-                    <div className="ml-auto pr-4">
+
+
+                    <div className="ml-auto pr-4 flex items-center">
                         <ChevronRight
                             size={16}
                             className="text-white/50 cursor-pointer hover:text-white transition-all transform -rotate-90"
                             onClick={() => {
                                 setIsTopBarCollapsed(true);
-                                setShowSideBar(true);
                             }}
                         />
                     </div>
@@ -345,7 +421,9 @@ const Dashboard = () => {
                 {/* Dashboard Center Watermark - Coins Image */}
 
 
-                <div className="relative z-10 p-12 max-w-7xl mx-auto flex flex-col gap-10">
+                <div className="relative z-10 p-12 max-w-7xl mx-auto flex flex-col gap-20">
+
+
 
                     {/* Integrated Search Bar (Transformed from Search Card) */}
                     <div className="w-full flex justify-center">
@@ -362,85 +440,71 @@ const Dashboard = () => {
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
                         {navItems.filter(item => item.label !== 'Search').map((item, idx) => {
                             const Icon = item.icon;
-                            const isAnimated = item.gif && (item.label === 'Main' || item.label === 'Accounts' || item.label === 'Customers' || item.label === 'Vendors' || item.label === 'Billing' || item.label === 'Pay Bills' || item.label === 'Cheques' || item.label === 'Cash' || item.label === 'Deposit' || item.label === 'Journal' || item.label === 'Rec.' || item.label === 'Report');
+                            const isAnimated = item.gif && (item.label === 'Home' || item.label === 'Accounts' || item.label === 'Customers' || item.label === 'Vendors' || item.label === 'Billing' || item.label === 'Pay Bills' || item.label === 'Cheques' || item.label === 'Cash' || item.label === 'Deposit' || item.label === 'Journal' || item.label === 'Rec.' || item.label === 'Report');
                             return (
-                                <button
-                                    key={idx}
-                                    onClick={item.onClick}
-                                    className="flex flex-col items-center justify-center p-6 bg-white border border-slate-200 rounded-[12px] shadow-sm hover:shadow-[0_20px_40px_-10px_rgba(0,120,212,0.2)] hover:border-[#0078d4]/50 hover:scale-[1.04] hover:-translate-y-2 active:scale-95 transition-all duration-500 ease-out group relative overflow-hidden"
-                                >
-                                    {/* Focus Glow Effect */}
-                                    <div className="absolute inset-0 bg-[#0078d4]/[0.02] opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                                <div key={idx} className="flex flex-col items-center gap-3 group">
+                                    <button
+                                        onClick={item.onClick}
+                                        className="w-full flex flex-col items-center justify-center p-6 bg-white border border-slate-200 rounded-[20px] shadow-sm hover:shadow-[0_20px_40px_-10px_rgba(0,120,212,0.2)] hover:border-[#0078d4]/50 hover:scale-[1.04] hover:-translate-y-2 active:scale-95 transition-all duration-500 ease-out relative overflow-hidden aspect-square"
+                                    >
+                                        {/* Focus Glow Effect */}
+                                        <div className="absolute inset-0 bg-[#0078d4]/[0.02] opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
-                                    <div className={`relative z-10 mb-4 transition-all duration-500 flex items-center justify-center`}>
-                                        <div className={`${isAnimated ? 'w-24 h-24' : 'w-14 h-14'} flex items-center justify-center transition-transform duration-500 group-hover:scale-110`}>
-                                            {item.gif ? (
-                                                <>
-                                                    {/* Static Icon shown by default for Animated Items */}
-                                                    {isAnimated && (
-                                                        <Icon
-                                                            size={40}
-                                                            strokeWidth={1.5}
-                                                            className="text-slate-400 group-hover:opacity-0 transition-opacity duration-300 absolute"
+                                        <div className={`relative z-10 transition-all duration-500 flex items-center justify-center`}>
+                                            <div className={`${isAnimated ? 'w-24 h-24' : 'w-14 h-14'} flex items-center justify-center transition-transform duration-500 group-hover:scale-110`}>
+                                                {item.gif ? (
+                                                    <>
+                                                        {/* Static State: Image or Lucide Icon */}
+                                                        {isAnimated && (
+                                                            item.staticImg ? (
+                                                                <img
+                                                                    src={item.staticImg}
+                                                                    alt={item.label}
+                                                                    className="w-16 h-16 object-contain group-hover:opacity-0 transition-opacity duration-300 absolute"
+                                                                />
+                                                            ) : (
+                                                                <Icon
+                                                                    size={58}
+                                                                    strokeWidth={1.5}
+                                                                    className="text-slate-400 group-hover:opacity-0 transition-opacity duration-300 absolute"
+                                                                />
+                                                            )
+                                                        )}
+                                                        {/* GIF shown only on hover/active for Animated Items */}
+                                                        <img
+                                                            src={item.gif}
+                                                            alt={item.label}
+                                                            className={`object-contain transition-all duration-500 ${isAnimated ? 'w-24 h-24 opacity-0 group-hover:opacity-100' : 'w-12 h-12 opacity-100'}`}
                                                         />
-                                                    )}
-                                                    {/* GIF shown only on hover/active for Animated Items */}
-                                                    <img
-                                                        src={item.gif}
-                                                        alt={item.label}
-                                                        className={`object-contain transition-all duration-500 ${isAnimated ? 'w-24 h-24 opacity-0 group-hover:opacity-100' : 'w-10 h-10 opacity-100'}`}
-                                                    />
-                                                </>
-                                            ) : (
-                                                <Icon size={36} strokeWidth={1.5} className="text-slate-500 group-hover:text-[#0078d4] transition-colors duration-500" />
-                                            )}
+                                                    </>
+                                                ) : (
+                                                    item.staticImg ? (
+                                                        <img src={item.staticImg} alt={item.label} className="w-16 h-16 object-contain group-hover:text-[#0078d4] transition-colors duration-500" />
+                                                    ) : (
+                                                        <Icon size={54} strokeWidth={1.5} className="text-slate-500 group-hover:text-[#0078d4] transition-colors duration-500" />
+                                                    )
+                                                )}
+                                            </div>
                                         </div>
-                                    </div>
-                                    <span className="relative z-10 text-[13px] font-bold text-slate-700 group-hover:text-[#0078d4] transition-colors duration-500 text-center leading-tight">
+                                    </button>
+                                    <span className="text-[12px] font-medium text-slate-500 group-hover:text-[#0078d4] uppercase tracking-wider transition-colors duration-300 text-center leading-tight">
                                         {item.label}
                                     </span>
-                                </button>
+
+                                </div>
                             );
                         })}
                     </div>
 
-                    {/* Compact Secondary Navigation (Menu Categories) */}
-                    <div className="mt-4 border-t border-slate-200 pt-10">
-                        <div className="flex items-center gap-4 mb-6">
-                            <div className="h-0.5 w-8 bg-[#0078d4]" />
-                            <h2 className="text-[11px] font-black uppercase tracking-[0.4em] text-slate-400">System Categories</h2>
-                        </div>
-
-                        <div className="flex flex-wrap items-center gap-3">
-                            {menuBar.map((item, idx) => (
-                                <button
-                                    key={idx}
-                                    onClick={() => {
-                                        if (item === 'Master File') setShowMasterFileModal(true);
-                                        if (item === 'View and Utility') setShowViewUtilityModal(true);
-                                        if (item === 'Transaction') setShowTransactionModal(true);
-                                        if (item === 'Reports') setShowReportsModal(true);
-                                        if (item === 'System Admin') setShowSystemAdminModal(true);
-                                    }}
-                                    className="flex items-center gap-2.5 px-3 py-2 bg-white border border-slate-200 rounded-[8px] shadow-sm hover:shadow-md hover:border-[#0078d4]/30 hover:-translate-y-0.5 transition-all group"
-                                >
-                                    <span className="text-[14px] font-medium text-slate-600 uppercase tracking-tight whitespace-nowrap group-hover:text-[#0078d4] transition-colors">
-                                        {item}
-                                    </span>
-                                    <ChevronRight size={12} className="text-slate-300 group-hover:text-[#0078d4] group-hover:translate-x-0.5 transition-all" />
-                                </button>
-                            ))}
-                        </div>
-                    </div>
                 </div>
             </main>
 
             {/* Animated Information Ticker */}
             <div className="h-6 bg-slate-50 border-t border-slate-100 flex items-center overflow-hidden relative z-50">
                 <div className="whitespace-nowrap animate-marquee flex items-center gap-10">
-                    {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16].map((i) => (
                         <span key={i} className="text-[10px] font-bold text-[#0078d4]/60 uppercase tracking-[0.2em] flex items-center gap-2">
-                            {selectedCompany?.CompanyName || selectedCompany?.companyName || "ACCOUNTING CLOUD SYSTEM"}
+                            ONIMTA INFORMATION TECHNOLOGY (PVT) LTD
                             <div className="h-1 w-1 bg-[#0078d4]/30 rounded-full" />
                         </span>
                     ))}
@@ -461,16 +525,41 @@ const Dashboard = () => {
                 </div>
             </footer>
 
+            {/* Floating AI Chatbot Button (Bottom Right) - Extra Large Lottie Version (No Label) */}
+            <button
+                onClick={handleAIClick}
+                className="fixed bottom-20 right-10 z-[60] w-32 h-32 flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 group drop-shadow-2xl"
+            >
+                {/* No Background - Transparent Lottie Only */}
+                <DotLottiePlayer
+                    src="/images/Ai Robot Vector Art.lottie"
+                    autoplay
+                    loop
+                    className="w-full h-full"
+                />
+            </button>
+
+
+
+
+
             {/* Thank You / Logout Modal */}
             <ThankYouModal
                 isOpen={showThankYouModal}
                 onClose={() => setShowThankYouModal(false)}
             />
+
             <style hmr-ignore="true">{`
+                @keyframes flip {
+                    0% { transform: scaleY(1); opacity: 1; }
+                    50% { transform: scaleY(0); opacity: 0.5; }
+                    100% { transform: scaleY(1); opacity: 1; }
+                }
                 @keyframes marquee {
                     0% { transform: translateX(0); }
                     100% { transform: translateX(-50%); }
                 }
+
                 .animate-marquee {
                     display: inline-flex;
                     animation: marquee 40s linear infinite;
@@ -527,12 +616,8 @@ const RibbonButton = ({ icon: Icon, label, onClick, active, hasBadge, isHighligh
                 <Icon size={30} strokeWidth={2} className={`group-hover:scale-110 transition-transform ${iconColor || ''}`} />
             )}
 
-            {/* New Badge */}
-            {hasBadge && (
-                <div className="absolute -top-1 -right-3 bg-white text-[#0078d4] text-[7px] font-black px-1 rounded shadow-sm">
-                    New
-                </div>
-            )}
+
+
         </div>
 
         <span className="text-[10px] font-bold mt-2 tracking-tight leading-none text-center">

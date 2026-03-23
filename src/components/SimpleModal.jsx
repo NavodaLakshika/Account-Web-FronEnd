@@ -1,7 +1,7 @@
 import React from 'react';
 import { X, HelpCircle, Layout } from 'lucide-react';
 
-const SimpleModal = ({ isOpen, onClose, title, children, footer, maxWidth = "max-w-4xl" }) => {
+const SimpleModal = ({ isOpen, onClose, title, children, footer, maxWidth = "max-w-4xl", zoom = 1 }) => {
     if (!isOpen) return null;
 
     return (
@@ -10,7 +10,10 @@ const SimpleModal = ({ isOpen, onClose, title, children, footer, maxWidth = "max
             <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={onClose} />
             
             {/* Dialog Container */}
-            <div className={`relative w-full ${maxWidth} bg-white shadow-2xl border border-gray-100 rounded-xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-200`}>
+            <div 
+                className={`relative w-full ${maxWidth} bg-white shadow-2xl border border-gray-100 rounded-xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-200`}
+                style={{ zoom }}
+            >
                 
                 {/* Header */}
                 <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-100 select-none">

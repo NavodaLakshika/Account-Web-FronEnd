@@ -55,7 +55,7 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
             fetchLookups();
             const user = JSON.parse(localStorage.getItem('user'));
             const companyData = localStorage.getItem('selectedCompany');
-            
+
             let companyCode = '';
             if (companyData) {
                 try {
@@ -67,8 +67,8 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
             }
 
             if (user) {
-                setFormData(prev => ({ 
-                    ...prev, 
+                setFormData(prev => ({
+                    ...prev,
                     CurrentUser: user.empName || user.EmpName || user.Emp_Name || user.emp_Name || user.username || '',
                     Company: companyCode
                 }));
@@ -243,8 +243,8 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
     const footer = (
         <div className="bg-slate-50 px-6 py-4 w-full flex justify-end gap-3 border-t border-gray-100 mt-4 rounded-b-xl">
             <button onClick={handleSave} disabled={loading} className={`px-6 h-10 bg-[#0078d4] text-white text-sm font-bold rounded-md shadow-md shadow-blue-200 hover:bg-[#005a9e] transition-all active:scale-95 flex items-center justify-center gap-2 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}>
-                
-                {loading ? <Loader2 size={14} className="animate-spin mr-2" /> : null} 
+
+                {loading ? <Loader2 size={14} className="animate-spin mr-2" /> : null}
                 Save
             </button>
             <button onClick={handleDelete} disabled={!isEditMode || loading} className={`px-6 h-10 bg-[#d13438] text-white text-sm font-bold rounded-md shadow-md shadow-red-200 hover:bg-[#a4262c] transition-all active:scale-95 flex items-center justify-center gap-2 ${(!isEditMode || loading) ? 'opacity-50 cursor-not-allowed' : ''}`}>
@@ -266,7 +266,7 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
                     <h2 className="text-base font-bold text-black mb-6 flex items-center gap-2">
                         Enter New Customer Details & Update
                     </h2>
-                    
+
                     <div className="space-y-2 text-[12.5px]">
                         {/* Row 1: ID and Name */}
                         <div className="flex items-center gap-3">
@@ -341,15 +341,15 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
                         <div className="flex items-center gap-3">
                             <label className="w-32 font-bold text-gray-700">Bank Detail</label>
                             <div className="flex-1 flex gap-2">
-                                <input 
-                                    type="text" 
-                                    value={formData.Bank_Name} 
-                                    readOnly 
+                                <input
+                                    type="text"
+                                    value={formData.Bank_Name}
+                                    readOnly
                                     placeholder="Select Bank..."
-                                    className="flex-1 h-8 border border-gray-300 px-2 bg-gray-50 rounded-sm outline-none" 
+                                    className="flex-1 h-8 border border-gray-300 px-2 bg-gray-50 rounded-sm outline-none"
                                 />
-                                <button 
-                                    onClick={() => setShowBankSearch(true)} 
+                                <button
+                                    onClick={() => setShowBankSearch(true)}
                                     className="w-9 h-8 bg-[#0078d4] text-white flex items-center justify-center hover:bg-[#005a9e] rounded-sm transition-colors shadow-sm"
                                 >
                                     <Search size={18} />
@@ -424,12 +424,12 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
                             <button onClick={() => setShowAreaSearch(false)} className="text-gray-400 hover:text-gray-600"><X size={20} /></button>
                         </div>
                         <div className="p-3 bg-white">
-                            <input 
-                                type="text" 
-                                placeholder="Search area..." 
-                                className="w-full h-8 border border-gray-300 px-3 text-sm rounded-sm outline-none" 
-                                value={areaSearchQuery} 
-                                onChange={(e) => setAreaSearchQuery(e.target.value)} 
+                            <input
+                                type="text"
+                                placeholder="Search area..."
+                                className="w-full h-8 border border-gray-300 px-3 text-sm rounded-sm outline-none"
+                                value={areaSearchQuery}
+                                onChange={(e) => setAreaSearchQuery(e.target.value)}
                             />
                         </div>
                         <div className="overflow-y-auto p-1 bg-white m-1 border border-gray-300">
@@ -468,12 +468,12 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
                             <button onClick={() => setShowRouteSearch(false)} className="text-gray-400 hover:text-gray-600"><X size={20} /></button>
                         </div>
                         <div className="p-3 bg-white">
-                            <input 
-                                type="text" 
-                                placeholder="Search route..." 
-                                className="w-full h-8 border border-gray-300 px-3 text-sm rounded-sm outline-none" 
-                                value={routeSearchQuery} 
-                                onChange={(e) => setRouteSearchQuery(e.target.value)} 
+                            <input
+                                type="text"
+                                placeholder="Search route..."
+                                className="w-full h-8 border border-gray-300 px-3 text-sm rounded-sm outline-none"
+                                value={routeSearchQuery}
+                                onChange={(e) => setRouteSearchQuery(e.target.value)}
                             />
                         </div>
                         <div className="overflow-y-auto p-1 bg-white m-1 border border-gray-300">
@@ -512,12 +512,12 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
                             <button onClick={() => setShowBankSearch(false)} className="text-gray-400 hover:text-gray-600"><X size={20} /></button>
                         </div>
                         <div className="p-3 bg-white">
-                            <input 
-                                type="text" 
-                                placeholder="Search bank..." 
-                                className="w-full h-8 border border-gray-300 px-3 text-sm rounded-sm focus:border-[#0078d4] outline-none" 
-                                value={bankSearchQuery} 
-                                onChange={(e) => setBankSearchQuery(e.target.value)} 
+                            <input
+                                type="text"
+                                placeholder="Search bank..."
+                                className="w-full h-8 border border-gray-300 px-3 text-sm rounded-sm focus:border-[#0078d4] outline-none"
+                                value={bankSearchQuery}
+                                onChange={(e) => setBankSearchQuery(e.target.value)}
                             />
                         </div>
                         <div className="overflow-y-auto p-1 bg-white m-1 border border-gray-300">
@@ -533,8 +533,8 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
                                         <tr key={b.code} className="hover:bg-blue-50 transition-colors h-8">
                                             <td className="px-3 border-b border-gray-100 font-medium text-gray-700">{b.name}</td>
                                             <td className="px-3 border-b border-gray-100 text-center">
-                                                <button 
-                                                    onClick={() => selectBank(b)} 
+                                                <button
+                                                    onClick={() => selectBank(b)}
                                                     className="bg-[#0078d4] text-white text-[9px] px-3 py-1 rounded-sm font-bold hover:bg-[#005a9e]"
                                                 >
                                                     SELECT

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import SimpleModal from '../components/SimpleModal';
-import { Search, Calendar, ChevronDown, RefreshCw , X, Save} from 'lucide-react';
+import { Search, Calendar, ChevronDown, RefreshCw , X, Save, RotateCcw, Loader2} from 'lucide-react';
 import { payBillService } from '../services/payBill.service';
 import { toast } from 'react-hot-toast';
 
@@ -27,6 +27,16 @@ const PayBillBoard = ({ isOpen, onClose }) => {
 
     const [bills, setBills] = useState([]);
     const [loading, setLoading] = useState(false);
+
+    // Modal States
+    const [showVendorModal, setShowVendorModal] = useState(false);
+    const [vendorSearch, setVendorSearch] = useState('');
+    const [showCCModal, setShowCCModal] = useState(false);
+    const [ccSearch, setCcSearch] = useState('');
+    const [ccSource, setCcSource] = useState('header'); // 'header' or 'payment'
+    const [showPayTypeModal, setShowPayTypeModal] = useState(false);
+    const [showAccModal, setShowAccModal] = useState(false);
+    const [accSearch, setAccSearch] = useState('');
 
     useEffect(() => {
         if (isOpen) {
@@ -147,19 +157,9 @@ const PayBillBoard = ({ isOpen, onClose }) => {
     }, [bills]);
 
     const handleClear = () => {
-        setBills([]);
-        setFormData({
-            ...formData,
-            vendorId: '',
-            accId: '',
-            payType: '',
-            chqNo: '',
-            voucherNo: '',
-            memo: '',
-            payAmount: 0,
-            costCenter: '',
-            payCostCenter: ''
-        });
+        setVendorSearch('');
+        setCcSearch('');
+        setAccSearch('');
         generateDocNo();
     };
 
@@ -174,6 +174,7 @@ const PayBillBoard = ({ isOpen, onClose }) => {
            return toast.error('No valid bills selected to pay.');
         }
 
+        setLoading(true);
         const payload = {
             payDoc: formData.payDoc,
             vendorId: formData.vendorId,
@@ -203,24 +204,28 @@ const PayBillBoard = ({ isOpen, onClose }) => {
             handleClear();
         } catch (error) {
             toast.error(error.toString());
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
+        <>
         <SimpleModal
             isOpen={isOpen}
             onClose={onClose}
             title="Pay Bill"
-            maxWidth="max-w-[1100px]"
+            maxWidth="max-w-[95vw]"
             footer={
-                <div className="flex justify-end gap-3 w-full">
-                    <button onClick={handleSave} className="px-12 h-8 bg-[#0078d4] text-white text-[13px] font-bold rounded-sm border border-[#005a9e] hover:bg-[#005a9e] shadow-sm transition-all focus:ring-2 focus:ring-blue-400">
+                <div className="bg-slate-50 px-6 py-4 w-full flex justify-end gap-3 border-t border-gray-100 rounded-b-xl">
+                    <button onClick={handleSave} disabled={loading} className={`px-6 h-10 bg-[#0078d4] text-white text-sm font-bold rounded-md shadow-md shadow-blue-200 hover:bg-[#005a9e] transition-all active:scale-95 flex items-center justify-center gap-2 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                        {loading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />} 
                         Pay Bill
                     </button>
-                    <button onClick={handleClear} className="px-12 h-8 bg-[#0078d4] text-white text-[13px] font-bold rounded-sm border border-[#005a9e] hover:bg-[#005a9e] shadow-sm transition-all focus:ring-2 focus:ring-blue-400">
-                        Clear
+                    <button onClick={handleClear} disabled={loading} className="px-6 h-10 bg-slate-100 text-slate-600 text-sm font-bold rounded-md hover:bg-slate-200 transition-all active:scale-95 flex items-center justify-center gap-2 border-none">
+                        <RotateCcw size={14} /> Clear
                     </button>
-                    <button onClick={onClose} className="px-12 h-8 bg-[#0078d4] text-white text-[13px] font-bold rounded-sm border border-[#005a9e] hover:bg-[#005a9e] shadow-sm transition-all focus:ring-2 focus:ring-blue-400">
+                    <button onClick={onClose} className="px-6 h-10 bg-slate-100 text-slate-600 text-sm font-bold rounded-md hover:bg-slate-200 transition-all active:scale-95 flex items-center justify-center gap-2 border-none">
                         <X size={14} /> Exit
                     </button>
                 </div>
@@ -240,15 +245,16 @@ const PayBillBoard = ({ isOpen, onClose }) => {
                         <div className="col-span-6 flex items-center gap-2">
                              <label className="text-[12px] font-bold text-gray-700 w-16 shrink-0">Vender</label>
                              <div className="flex-1 flex gap-1 px-4">
-                                <select 
-                                    name="vendorId" 
-                                    value={formData.vendorId} 
-                                    onChange={handleInput} 
-                                    className="flex-1 h-7 border border-gray-300 px-2 text-[12px] rounded-sm outline-none font-bold text-[#b91c1c] focus:border-blue-500 bg-white"
-                                >
-                                    <option value="">Select Vender...</option>
-                                    {lookups.vendors.map((v, i) => <option key={i} value={v.code}>{v.name}</option>)}
-                                </select>
+                                <input 
+                                    type="text" 
+                                    readOnly 
+                                    value={lookups.vendors.find(v => v.code === formData.vendorId)?.name || ''} 
+                                    placeholder="Select Vendor..." 
+                                    className="flex-1 h-7 border border-gray-300 px-2 text-[12px] rounded-sm outline-none font-bold text-[#b91c1c] bg-gray-50" 
+                                />
+                                <button onClick={() => setShowVendorModal(true)} className="w-8 h-7 bg-[#0078d4] text-white flex items-center justify-center hover:bg-[#005a9e] rounded-sm transition-colors shadow-sm">
+                                    <Search size={14} />
+                                </button>
                              </div>
                         </div>
 
@@ -259,11 +265,17 @@ const PayBillBoard = ({ isOpen, onClose }) => {
 
                         <div className="col-span-4 flex items-center gap-2">
                              <label className="text-[12px] font-bold text-gray-700 w-20 shrink-0">Cost Center</label>
-                             <div className="flex-1 relative">
-                                <select name="costCenter" value={formData.costCenter} onChange={handleInput} className="w-full h-7 border border-gray-300 px-2 text-[12px] bg-white rounded-sm outline-none focus:border-blue-500">
-                                    <option value="">Select Cost Center...</option>
-                                    {lookups.costCenters.map((c, i) => <option key={i} value={c.code}>{c.name}</option>)}
-                                </select>
+                             <div className="flex-1 flex gap-1">
+                                <input 
+                                    type="text" 
+                                    readOnly 
+                                    value={lookups.costCenters.find(c => c.code === formData.costCenter)?.name || ''} 
+                                    placeholder="Select Cost Center..." 
+                                    className="flex-1 h-7 border border-gray-300 px-2 text-[12px] bg-gray-50 rounded-sm outline-none" 
+                                />
+                                <button onClick={() => { setCcSource('header'); setShowCCModal(true); }} className="w-8 h-7 bg-[#0078d4] text-white flex items-center justify-center hover:bg-[#005a9e] rounded-sm transition-colors shadow-sm">
+                                    <Search size={14} />
+                                </button>
                              </div>
                         </div>
 
@@ -362,25 +374,33 @@ const PayBillBoard = ({ isOpen, onClose }) => {
                     <div className="grid grid-cols-12 gap-x-8 gap-y-1.5">
                         <div className="col-span-4 flex items-center gap-3">
                              <label className="text-[12px] font-bold text-gray-700 w-28 shrink-0">Payment Method</label>
-                             <div className="flex-1 relative">
-                                <select name="payType" value={formData.payType} onChange={handleInput} className="w-full h-7 border border-gray-300 px-2 text-[12px] font-bold text-[#b91c1c] bg-white rounded-sm outline-none focus:border-blue-500">
-                                    <option value="">Select...</option>
-                                    <option value="Cash">Cash</option>
-                                    <option value="Cheque">Cheque</option>
-                                    <option value="Online">Online</option>
-                                    <option value="Petty Cash">Petty Cash</option>
-                                    <option value="Settlement">Settlement</option>
-                                </select>
+                             <div className="flex-1 flex gap-1">
+                                <input 
+                                    type="text" 
+                                    readOnly 
+                                    value={formData.payType || ''} 
+                                    placeholder="Select..." 
+                                    className="flex-1 h-7 border border-gray-300 px-2 text-[12px] font-bold text-[#b91c1c] bg-gray-50 rounded-sm outline-none" 
+                                />
+                                <button onClick={() => setShowPayTypeModal(true)} className="w-8 h-7 bg-[#0078d4] text-white flex items-center justify-center hover:bg-[#005a9e] rounded-sm transition-colors shadow-sm">
+                                    <Search size={14} />
+                                </button>
                              </div>
                         </div>
 
                         <div className="col-span-8 flex items-center gap-3">
                              <label className="text-[12px] font-bold text-gray-700 w-32 shrink-0">Payment Account</label>
-                             <div className="flex-1 relative">
-                                 <select name="accId" value={formData.accId} onChange={handleInput} className="w-full h-7 border border-gray-300 px-2 text-[12px] font-semibold bg-white rounded-sm outline-none focus:border-blue-500">
-                                     <option value="">Select Account...</option>
-                                     {availableAccounts.map((a, i) => <option key={i} value={a.code}>{a.code} - {a.name}</option>)}
-                                 </select>
+                             <div className="flex-1 flex gap-1">
+                                 <input 
+                                    type="text" 
+                                    readOnly 
+                                    value={availableAccounts.find(a => a.code === formData.accId)?.name ? `${formData.accId} - ${availableAccounts.find(a => a.code === formData.accId).name}` : ''} 
+                                    placeholder="Select Account..." 
+                                    className="flex-1 h-7 border border-gray-300 px-2 text-[12px] font-semibold bg-gray-50 rounded-sm outline-none" 
+                                 />
+                                 <button onClick={() => setShowAccModal(true)} className="w-8 h-7 bg-[#0078d4] text-white flex items-center justify-center hover:bg-[#005a9e] rounded-sm transition-colors shadow-sm">
+                                    <Search size={14} />
+                                 </button>
                              </div>
                         </div>
 
@@ -392,12 +412,16 @@ const PayBillBoard = ({ isOpen, onClose }) => {
                         <div className="col-span-8 flex items-center gap-3">
                              <label className="text-[12px] font-bold text-gray-700 w-32 shrink-0">Payment Cost Center</label>
                              <div className="flex-1 flex gap-1 items-center">
-                                <div className="flex-1 relative">
-                                    <select name="payCostCenter" value={formData.payCostCenter} onChange={handleInput} className="w-full h-7 border border-gray-300 px-2 text-[12px] bg-[#f0f0f0] rounded-sm outline-none focus:border-blue-500">
-                                        <option value="">Select Cost Center...</option>
-                                        {lookups.costCenters.map((c, i) => <option key={i} value={c.code}>{c.name}</option>)}
-                                    </select>
-                                </div>
+                                 <input 
+                                    type="text" 
+                                    readOnly 
+                                    value={lookups.costCenters.find(c => c.code === formData.payCostCenter)?.name || ''} 
+                                    placeholder="Select Cost Center..." 
+                                    className="flex-1 h-7 border border-gray-300 px-2 text-[12px] bg-gray-50 rounded-sm outline-none" 
+                                 />
+                                 <button onClick={() => { setCcSource('payment'); setShowCCModal(true); }} className="w-8 h-7 bg-[#0078d4] text-white flex items-center justify-center hover:bg-[#005a9e] rounded-sm transition-colors shadow-sm">
+                                    <Search size={14} />
+                                 </button>
                              </div>
                         </div>
 
@@ -424,6 +448,162 @@ const PayBillBoard = ({ isOpen, onClose }) => {
                 </div>
             </div>
         </SimpleModal>
+
+        {/* Vendor Search Modal */}
+        {showVendorModal && (
+            <div className="fixed inset-0 z-[350] flex items-center justify-center p-4">
+                <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setShowVendorModal(false)} />
+                <div className="relative w-full max-w-2xl bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col max-h-[85vh]">
+                    <div className="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-50 font-['Plus_Jakarta_Sans']">
+                        <h3 className="text-lg font-bold text-slate-800 tracking-tight">Search Vendors</h3>
+                        <div className="flex gap-4">
+                            <input type="text" placeholder="Search by name or code..." className="h-9 border border-gray-300 px-3 text-sm rounded-md w-64 focus:border-blue-500 outline-none" value={vendorSearch} onChange={(e) => setVendorSearch(e.target.value)} />
+                            <button onClick={() => setShowVendorModal(false)} className="w-8 h-8 flex items-center justify-center hover:bg-red-50 text-slate-400 hover:text-red-500 transition-colors rounded-full"><X size={24} /></button>
+                        </div>
+                    </div>
+                    <div className="overflow-y-auto p-2 font-['Inter']">
+                        <table className="w-full text-sm text-left">
+                            <thead className="bg-slate-50 sticky top-0 text-gray-600 font-bold uppercase text-[11px] tracking-wider">
+                                <tr>
+                                    <th className="p-3 border-b">Code</th>
+                                    <th className="p-3 border-b">Vendor Name</th>
+                                    <th className="p-3 border-b text-center">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {lookups.vendors.filter(v => (v.name || '').toLowerCase().includes(vendorSearch.toLowerCase()) || (v.code || '').toLowerCase().includes(vendorSearch.toLowerCase())).map((v, idx) => (
+                                    <tr key={idx} className="hover:bg-blue-50 transition-colors cursor-pointer" onClick={() => {
+                                        handleInput({ target: { name: 'vendorId', value: v.code } });
+                                        setShowVendorModal(false);
+                                    }}>
+                                        <td className="p-3 border-b font-medium text-gray-700">{v.code}</td>
+                                        <td className="p-3 border-b font-medium uppercase text-blue-600">{v.name}</td>
+                                        <td className="p-3 border-b text-center">
+                                            <button className="bg-[#0078d4] text-white text-[10px] px-3 py-1.5 rounded-sm font-bold hover:bg-[#005a9e]">SELECT</button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        )}
+
+        {/* Cost Center Search Modal */}
+        {showCCModal && (
+            <div className="fixed inset-0 z-[350] flex items-center justify-center p-4">
+                <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setShowCCModal(false)} />
+                <div className="relative w-full max-w-2xl bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col max-h-[85vh]">
+                    <div className="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-50 font-['Plus_Jakarta_Sans']">
+                        <h3 className="text-lg font-bold text-slate-800 tracking-tight">Search Cost Centers</h3>
+                        <div className="flex gap-4">
+                            <input type="text" placeholder="Search by name or code..." className="h-9 border border-gray-300 px-3 text-sm rounded-md w-64 focus:border-blue-500 outline-none" value={ccSearch} onChange={(e) => setCcSearch(e.target.value)} />
+                            <button onClick={() => setShowCCModal(false)} className="w-8 h-8 flex items-center justify-center hover:bg-red-50 text-slate-400 hover:text-red-500 transition-colors rounded-full"><X size={24} /></button>
+                        </div>
+                    </div>
+                    <div className="overflow-y-auto p-2 font-['Inter']">
+                        <table className="w-full text-sm text-left">
+                            <thead className="bg-slate-50 sticky top-0 text-gray-600 font-bold uppercase text-[11px] tracking-wider">
+                                <tr>
+                                    <th className="p-3 border-b">Code</th>
+                                    <th className="p-3 border-b">Cost Center</th>
+                                    <th className="p-3 border-b text-center">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {lookups.costCenters.filter(c => (c.name || '').toLowerCase().includes(ccSearch.toLowerCase()) || (c.code || '').toLowerCase().includes(ccSearch.toLowerCase())).map((c, idx) => (
+                                    <tr key={idx} className="hover:bg-blue-50 transition-colors cursor-pointer" onClick={() => {
+                                        const field = ccSource === 'header' ? 'costCenter' : 'payCostCenter';
+                                        setFormData(prev => ({ ...prev, [field]: c.code }));
+                                        setShowCCModal(false);
+                                    }}>
+                                        <td className="p-3 border-b font-medium text-gray-700">{c.code}</td>
+                                        <td className="p-3 border-b font-medium uppercase text-blue-600">{c.name}</td>
+                                        <td className="p-3 border-b text-center">
+                                            <button className="bg-[#0078d4] text-white text-[10px] px-3 py-1.5 rounded-sm font-bold hover:bg-[#005a9e]">SELECT</button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        )}
+
+        {/* Payment Method Search Modal */}
+        {showPayTypeModal && (
+            <div className="fixed inset-0 z-[350] flex items-center justify-center p-4">
+                <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setShowPayTypeModal(false)} />
+                <div className="relative w-full max-w-md bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col">
+                    <div className="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-50 font-['Plus_Jakarta_Sans']">
+                        <h3 className="text-lg font-bold text-slate-800 tracking-tight">Select Payment Method</h3>
+                        <button onClick={() => setShowPayTypeModal(false)} className="w-8 h-8 flex items-center justify-center hover:bg-red-50 text-slate-400 hover:text-red-500 transition-colors rounded-full"><X size={24} /></button>
+                    </div>
+                    <div className="p-2 space-y-1">
+                        {['Cash', 'Cheque', 'Online', 'Petty Cash', 'Settlement'].map((type, idx) => (
+                            <button 
+                                key={idx} 
+                                onClick={() => {
+                                    setFormData(prev => ({ ...prev, payType: type, accId: '' }));
+                                    setShowPayTypeModal(false);
+                                }}
+                                className="w-full text-left px-4 py-3 text-sm font-bold text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-md transition-colors flex items-center justify-between group"
+                            >
+                                {type}
+                                <ChevronDown size={14} className="opacity-0 group-hover:opacity-100 -rotate-90 transition-all" />
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            </div>
+        )}
+
+        {/* Payment Account Search Modal */}
+        {showAccModal && (
+            <div className="fixed inset-0 z-[350] flex items-center justify-center p-4">
+                <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setShowAccModal(false)} />
+                <div className="relative w-full max-w-2xl bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col max-h-[85vh]">
+                    <div className="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-50 font-['Plus_Jakarta_Sans']">
+                        <h3 className="text-lg font-bold text-slate-800 tracking-tight">Search Payment Accounts ({formData.payType})</h3>
+                        <div className="flex gap-4">
+                            <input type="text" placeholder="Search accounts..." className="h-9 border border-gray-300 px-3 text-sm rounded-md w-64 focus:border-blue-500 outline-none" value={accSearch} onChange={(e) => setAccSearch(e.target.value)} />
+                            <button onClick={() => setShowAccModal(false)} className="w-8 h-8 flex items-center justify-center hover:bg-red-50 text-slate-400 hover:text-red-500 transition-colors rounded-full"><X size={24} /></button>
+                        </div>
+                    </div>
+                    <div className="overflow-y-auto p-2 font-['Inter']">
+                        <table className="w-full text-sm text-left">
+                            <thead className="bg-slate-50 sticky top-0 text-gray-600 font-bold uppercase text-[11px] tracking-wider">
+                                <tr>
+                                    <th className="p-3 border-b">Code</th>
+                                    <th className="p-3 border-b">Account Name</th>
+                                    <th className="p-3 border-b text-center">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {availableAccounts.filter(a => (a.name || '').toLowerCase().includes(accSearch.toLowerCase()) || (a.code || '').toLowerCase().includes(accSearch.toLowerCase())).map((a, idx) => (
+                                    <tr key={idx} className="hover:bg-blue-50 transition-colors cursor-pointer" onClick={() => {
+                                        setFormData(prev => ({ ...prev, accId: a.code }));
+                                        setShowAccModal(false);
+                                    }}>
+                                        <td className="p-3 border-b font-medium text-gray-700">{a.code}</td>
+                                        <td className="p-3 border-b font-medium uppercase text-blue-600">{a.name}</td>
+                                        <td className="p-3 border-b text-center">
+                                            <button className="bg-[#0078d4] text-white text-[10px] px-3 py-1.5 rounded-sm font-bold hover:bg-[#005a9e]">SELECT</button>
+                                        </td>
+                                    </tr>
+                                ))}
+                                {availableAccounts.length === 0 && (
+                                    <tr><td colSpan="3" className="p-8 text-center text-gray-400 font-medium">Please select a Payment Method first.</td></tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        )}
+        </>
     );
 };
 

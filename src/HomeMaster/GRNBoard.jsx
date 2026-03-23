@@ -1,12 +1,19 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import SimpleModal from '../components/SimpleModal';
-import { Search, Calendar, ChevronDown, CheckCircle, Trash2, XCircle , Save, X} from 'lucide-react';
+import { Search, Calendar, ChevronDown, CheckCircle, Trash2, XCircle, Save, X, RotateCcw, ChevronLeft, ChevronRight } from 'lucide-react';
 import { grnService } from '../services/grn.service';
 import { toast } from 'react-hot-toast';
 
 const GRNBoard = ({ isOpen, onClose }) => {
     const [lookups, setLookups] = useState({ suppliers: [], products: [], pos: [] });
     const [showSearchModal, setShowSearchModal] = useState(false);
+    const [showSupplierSearch, setShowSupplierSearch] = useState(false);
+    const [showProductSearch, setShowProductSearch] = useState(false);
+    const [showDatePicker, setShowDatePicker] = useState(false);
+    const [datePickerField, setDatePickerField] = useState('grnDate');
+    const [viewDate, setViewDate] = useState(new Date());
+    const [supplierSearchQuery, setSupplierSearchQuery] = useState('');
+    const [productSearchQuery, setProductSearchQuery] = useState('');
     const [orders, setOrders] = useState([]);
 
     const [formData, setFormData] = useState({
@@ -56,7 +63,7 @@ const GRNBoard = ({ isOpen, onClose }) => {
                     companyCode = parsed.company_Code || parsed.companyCode || parsed.CompanyCode || companyData;
                 } catch (e) { companyCode = companyData; }
             }
-            
+
             const initCompany = companyCode;
             const initUser = user?.emp_Name || user?.empName || 'SYSTEM';
 
@@ -86,11 +93,28 @@ const GRNBoard = ({ isOpen, onClose }) => {
 
     const handleInput = (e) => {
         const { name, value, type, checked } = e.target;
-        setFormData(prev => ({ 
-            ...prev, 
-            [name]: type === 'checkbox' ? checked : value 
+        setFormData(prev => ({
+            ...prev,
+            [name]: type === 'checkbox' ? checked : value
         }));
     };
+
+    const handleDateSelect = (day) => {
+        const selectedDate = new Date(viewDate.getFullYear(), viewDate.getMonth(), day);
+        // Add one day cross-check for TZ if needed, but local is fine here
+        const dateStr = selectedDate.toISOString().split('T')[0];
+        setFormData(prev => ({ ...prev, [datePickerField]: dateStr }));
+        setShowDatePicker(false);
+    };
+
+    const calendarDays = useMemo(() => {
+        const firstDay = new Date(viewDate.getFullYear(), viewDate.getMonth(), 1).getDay();
+        const daysInMonth = new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 0).getDate();
+        const days = [];
+        for (let i = 0; i < firstDay; i++) days.push(null);
+        for (let i = 1; i <= daysInMonth; i++) days.push(i);
+        return days;
+    }, [viewDate]);
 
     const handleEntryInput = (e) => {
         const { name, value } = e.target;
@@ -122,7 +146,7 @@ const GRNBoard = ({ isOpen, onClose }) => {
     const addProduct = () => {
         if (!entry.prodCode) return toast.error('Select a Product.');
         if (!entry.qty || parseFloat(entry.qty) <= 0) return toast.error('Enter valid Quantity.');
-        
+
         setProducts([...products, { ...entry }]);
         setEntry({ prodCode: '', prodName: '', unit: '', packSize: 1, qty: '', free: '', cost: '', selling: '', amount: '0.00' });
     };
@@ -137,7 +161,7 @@ const GRNBoard = ({ isOpen, onClose }) => {
 
         const nbtAmt = discountedSum * (parseFloat(formData.nbtPer) || 0) / 100;
         const taxAmt = discountedSum * (parseFloat(formData.taxPer) || 0) / 100;
-        
+
         const adj = parseFloat(formData.adjAmt) || 0;
         const finalAdj = formData.adjType === 'Add' ? adj : -adj;
 
@@ -162,7 +186,7 @@ const GRNBoard = ({ isOpen, onClose }) => {
     const handleApply = async () => {
         if (!formData.suppCode) return toast.error('Select Supplier.');
         if (products.length === 0) return toast.error('No products entered.');
-        
+
         if (!window.confirm("Are you sure you want to Save & Apply this GRN?")) return;
 
         const payload = preparePayload();
@@ -200,7 +224,7 @@ const GRNBoard = ({ isOpen, onClose }) => {
         setEntry({ prodCode: '', prodName: '', unit: '', packSize: 1, qty: '', free: '', cost: '', selling: '', amount: '0.00' });
         setFormData(prev => ({
             ...prev,
-            suppCode: '', poNo: '', suppInv: '', invAmount: '0.00', consignmentBasis: false, 
+            suppCode: '', poNo: '', suppInv: '', invAmount: '0.00', consignmentBasis: false,
             acceptOtherSupp: false, comment: '', taxPer: '0', nbtPer: '0', discPer: '0', adjType: '', adjAmt: '0.00'
         }));
         generateDocNo(formData.company);
@@ -238,7 +262,7 @@ const GRNBoard = ({ isOpen, onClose }) => {
                 adjType: h.adjType || '',
                 adjAmt: h.adjst?.toString() || '0.00'
             }));
-            
+
             setProducts(data.details.map(d => ({
                 prodCode: d.prod_Code,
                 prodName: d.prod_Name,
@@ -261,57 +285,115 @@ const GRNBoard = ({ isOpen, onClose }) => {
             isOpen={isOpen}
             onClose={onClose}
             title="Good Received Note (GRN)"
-            maxWidth="max-w-[1100px]"
+            maxWidth="max-w-[1000px]"
             footer={
                 <div className="flex justify-between items-center w-full px-2">
-                    <button onClick={handleClear} className="px-6 h-8 bg-gray-100 text-gray-700 font-bold rounded border hover:bg-gray-200">Clear</button>
-                    <div className="flex gap-2">
-                        <button onClick={handleApply} className="px-10 h-8 bg-[#0078d4] text-white font-bold rounded shadow hover:bg-[#005a9e] flex items-center gap-2">
+                    <button
+                        onClick={handleClear}
+                        className="px-6 h-10 bg-white text-orange-500 text-sm font-bold rounded-md border border-orange-500 hover:bg-orange-50 transition-all active:scale-95 flex items-center gap-2"
+                    >
+                        <RotateCcw size={14} /> Clear
+                    </button>
+                    <div className="flex gap-3">
+                        <button
+                            onClick={handleSaveDraft}
+                            className="px-6 h-10 bg-white text-[#0078d4] text-sm font-bold rounded-md border border-[#0078d4] hover:bg-blue-50 transition-all active:scale-95 flex items-center gap-2"
+                        >
+                            <Save size={14} /> Save Draft
+                        </button>
+                        <button
+                            onClick={handleApply}
+                            className="px-6 h-10 bg-[#0078d4] text-white text-sm font-bold rounded-md shadow-md shadow-blue-200 hover:bg-[#005a9e] transition-all active:scale-95 flex items-center gap-2"
+                        >
                             <CheckCircle size={14} /> Save & Apply
                         </button>
-                        <button onClick={handleSaveDraft} className="px-8 h-8 bg-white text-[#0078d4] border border-[#0078d4] font-bold rounded hover:bg-blue-50">Save Draft</button>
-                        <button onClick={onClose} className="px-8 h-8 bg-gray-600 text-white font-bold rounded hover:bg-gray-700"><X size={14} /> Exit</button>
+                        <button
+                            onClick={onClose}
+                            className="px-6 h-10 bg-slate-100 text-slate-600 text-sm font-bold rounded-md hover:bg-slate-200 transition-all active:scale-95 flex items-center gap-2 border-none"
+                        >
+                            <X size={14} /> Exit
+                        </button>
                     </div>
                 </div>
             }
         >
             <div className="space-y-4 p-1 overflow-y-auto no-scrollbar font-['Inter']">
                 {/* Header Information */}
-                <div className="bg-white p-4 border border-gray-200 rounded-sm shadow-sm space-y-3">
-                    <div className="grid grid-cols-12 gap-x-6 gap-y-3">
+                <div className="bg-white p-3 border border-gray-200 rounded-sm shadow-sm space-y-3">
+                    <div className="grid grid-cols-12 gap-x-10 gap-y-3">
+                        {/* Doc Number */}
                         <div className="col-span-4 flex items-center gap-3">
-                            <label className="text-[12px] font-bold text-gray-700 w-24 shrink-0">Doc No</label>
+                            <label className="text-[12px] font-bold text-gray-700 w-20 shrink-0">Doc No</label>
                             <div className="flex-1 flex gap-1">
-                                <input type="text" name="docNo" value={formData.docNo} onChange={handleInput} className="flex-1 h-7 border border-[#0078d4]/30 px-2 text-[12px] font-bold text-[#000080]" />
-                                <button onClick={handleSearchClick} className="w-8 h-7 bg-[#0078d4] text-white flex items-center justify-center hover:bg-[#005a9e]"><Search size={14} /></button>
+                                <input type="text" name="docNo" value={formData.docNo} onChange={handleInput} className="flex-1 h-7 border border-[#0078d4]/30 px-2 text-[12px] font-bold text-[#000080] bg-blue-50/20 rounded-sm outline-none" />
+                                <button onClick={handleSearchClick} className="w-8 h-7 bg-[#0078d4] text-white flex items-center justify-center hover:bg-[#005a9e] rounded-sm transition-colors shadow-sm"><Search size={14} /></button>
                             </div>
                         </div>
+
+                        {/* GRN Date */}
                         <div className="col-span-4 flex items-center gap-3">
-                            <label className="text-[12px] font-bold text-gray-700 w-24">Date</label>
-                            <input type="date" name="grnDate" value={formData.grnDate} onChange={handleInput} className="flex-1 h-7 border border-gray-300 px-2 text-[12px]" />
+                            <label className="text-[12px] font-bold text-gray-700 w-20 shrink-0">Date</label>
+                            <div className="flex-1 flex gap-1">
+                                <input
+                                    type="text"
+                                    readOnly
+                                    value={formData.grnDate}
+                                    className="flex-1 h-7 border border-gray-300 px-2 text-[12px] font-bold text-gray-700 bg-gray-50 rounded-sm outline-none cursor-pointer ml-[-30px]"
+                                    onClick={() => { setDatePickerField('grnDate'); setViewDate(new Date(formData.grnDate)); setShowDatePicker(true); }}
+                                />
+                                <button
+                                    onClick={() => { setDatePickerField('grnDate'); setViewDate(new Date(formData.grnDate)); setShowDatePicker(true); }}
+                                    className="w-8 h-7 bg-[#0078d4] text-white flex items-center justify-center hover:bg-[#005a9e] rounded-sm transition-colors shadow-sm"
+                                >
+                                    <Calendar size={14} />
+                                </button>
+                            </div>
                         </div>
+
+                        {/* Expected Date */}
                         <div className="col-span-4 flex items-center gap-3">
-                            <label className="text-[12px] font-bold text-gray-700 w-24">Expected On</label>
-                            <input type="date" name="expectedDate" value={formData.expectedDate} onChange={handleInput} className="flex-1 h-7 border border-gray-300 px-2 text-[12px]" />
+                            <label className="text-[12px] font-bold text-gray-700 w-24 shrink-0">Expected On</label>
+                            <div className="flex-1 flex gap-1">
+                                <input
+                                    type="text"
+                                    readOnly
+                                    value={formData.expectedDate}
+                                    className="flex-1 w-7 h-7 border border-gray-300 px-2 text-[12px] font-bold text-gray-700 bg-gray-50 rounded-sm outline-none cursor-pointer"
+                                    onClick={() => { setDatePickerField('expectedDate'); setViewDate(new Date(formData.expectedDate)); setShowDatePicker(true); }}
+                                />
+                                <button
+                                    onClick={() => { setDatePickerField('expectedDate'); setViewDate(new Date(formData.expectedDate)); setShowDatePicker(true); }}
+                                    className="w-8 h-7 bg-[#0078d4] text-white flex items-center justify-center hover:bg-[#005a9e] rounded-sm transition-colors shadow-sm"
+                                >
+                                    <Calendar size={14} />
+                                </button>
+                            </div>
                         </div>
 
                         <div className="col-span-6 flex items-center gap-3">
-                            <label className="text-[12px] font-bold text-gray-700 w-24 shrink-0">Supplier</label>
-                            <select name="suppCode" value={formData.suppCode} onChange={handleInput} className="flex-1 h-7 border border-gray-300 px-2 text-[12px] font-bold text-[#b91c1c]">
-                                <option value="">Select Supplier...</option>
-                                {lookups.suppliers.map(s => <option key={s.code} value={s.code}>{s.name} ({s.code})</option>)}
-                            </select>
+                            <label className="text-[12px] font-bold text-gray-700 w-20 shrink-0">Supplier</label>
+                            <div className="flex-1 flex gap-1">
+                                <input
+                                    type="text"
+                                    readOnly
+                                    value={lookups.suppliers.find(s => s.code === formData.suppCode)?.name || 'Select Supplier...'}
+                                    className="flex-1 h-7 border border-gray-300 px-2 text-[12px] font-bold text-[#b91c1c] bg-gray-50 rounded-sm outline-none"
+                                />
+                                <button onClick={() => setShowSupplierSearch(true)} className="w-8 h-7 bg-[#0078d4] text-white flex items-center justify-center hover:bg-[#005a9e] rounded-sm transition-colors shadow-sm">
+                                    <Search size={14} />
+                                </button>
+                            </div>
                         </div>
                         <div className="col-span-3 flex items-center gap-3">
-                            <label className="text-[12px] font-bold text-gray-700 w-24">PO Number</label>
-                            <select name="poNo" value={formData.poNo} onChange={handleInput} className="flex-1 h-7 border border-gray-300 px-1 text-[12px]">
+                            <label className="text-[12px] font-bold text-gray-700 w-20 shrink-0 underline decoration-[#0078d4]/30">PO Number</label>
+                            <select name="poNo" value={formData.poNo} onChange={handleInput} className="flex-1 h-7 border border-gray-300 px-1 text-[12px] rounded-sm bg-white outline-none">
                                 <option value="">-NO-</option>
                                 {lookups.pos.map(p => <option key={p.docNo} value={p.docNo}>{p.docNo}</option>)}
                             </select>
                         </div>
                         <div className="col-span-3 flex items-center gap-3">
-                            <label className="text-[12px] font-bold text-gray-700 w-24">Payment</label>
-                            <select name="payType" value={formData.payType} onChange={handleInput} className="flex-1 h-7 border border-gray-300 px-2 text-[12px]">
+                            <label className="text-[12px] font-bold text-gray-700 w-16 shrink-0 underline decoration-[#0078d4]/30">Payment</label>
+                            <select name="payType" value={formData.payType} onChange={handleInput} className="flex-1 h-7 border border-gray-300 px-2 text-[12px] rounded-sm bg-white outline-none font-bold text-[#000080]">
                                 <option value="Cash">Cash</option>
                                 <option value="Cheque">Cheque</option>
                                 <option value="Credit">Credit</option>
@@ -319,28 +401,28 @@ const GRNBoard = ({ isOpen, onClose }) => {
                         </div>
 
                         <div className="col-span-4 flex items-center gap-3">
-                            <label className="text-[12px] font-bold text-gray-700 w-24">Supplier Inv.</label>
-                            <input type="text" name="suppInv" value={formData.suppInv} onChange={handleInput} className="flex-1 h-7 border border-gray-300 px-2 text-[12px]" />
+                            <label className="text-[12px] font-bold text-gray-700 w-20 shrink-0">Supp. Inv.</label>
+                            <input type="text" name="suppInv" value={formData.suppInv} onChange={handleInput} className="flex-1 h-7 border border-gray-300 px-2 text-[12px] rounded-sm bg-white outline-none focus:border-[#0078d4]" />
                         </div>
                         <div className="col-span-3 flex items-center gap-3">
-                            <label className="text-[12px] font-bold text-gray-700">Inv Amount</label>
-                            <input type="text" name="invAmount" value={formData.invAmount} onChange={handleInput} className="flex-1 h-7 border border-gray-300 px-2 text-[12px] text-right" />
+                            <label className="text-[12px] font-bold text-gray-700 w-14 shrink-0">Amount</label>
+                            <input type="text" name="invAmount" value={formData.invAmount} onChange={handleInput} className="flex-1 h-7 border border-gray-300 px-2 text-[12px] text-right font-black text-gray-800 rounded-sm bg-white outline-none focus:border-[#0078d4]" />
                         </div>
                         <div className="col-span-5 flex items-center gap-6 pl-4">
-                            <label className="flex items-center gap-2 cursor-pointer">
-                                <input type="checkbox" name="consignmentBasis" checked={formData.consignmentBasis} onChange={handleInput} className="w-4 h-4 text-[#0078d4]" />
-                                <span className="text-[11px] font-bold text-gray-600 uppercase">Consignment Basis</span>
+                            <label className="flex items-center gap-2 cursor-pointer transition-opacity hover:opacity-80">
+                                <input type="checkbox" name="consignmentBasis" checked={formData.consignmentBasis} onChange={handleInput} className="w-4 h-4 text-[#0078d4] cursor-pointer" />
+                                <span className="text-[10px] font-black text-slate-500 uppercase tracking-tighter">Consignment Basis</span>
                             </label>
-                            <label className="flex items-center gap-2 cursor-pointer">
-                                <input type="checkbox" name="acceptOtherSupp" checked={formData.acceptOtherSupp} onChange={handleInput} className="w-4 h-4 text-[#0078d4]" />
-                                <span className="text-[11px] font-bold text-gray-600 uppercase">Other Supp. Product</span>
+                            <label className="flex items-center gap-2 cursor-pointer transition-opacity hover:opacity-80">
+                                <input type="checkbox" name="acceptOtherSupp" checked={formData.acceptOtherSupp} onChange={handleInput} className="w-4 h-4 text-[#0078d4] cursor-pointer" />
+                                <span className="text-[10px] font-black text-slate-500 uppercase tracking-tighter">Other Supp. Product</span>
                             </label>
                         </div>
                     </div>
                 </div>
 
                 {/* Main Table Section */}
-                <div className="border border-[#0078d4]/20 rounded bg-white shadow-sm flex flex-col min-h-[300px]">
+                <div className="border border-[#0078d4]/20 rounded bg-white shadow-sm flex flex-col min-h-[250px]">
                     <div className="flex bg-gray-50 border-b border-gray-200 text-[11px] font-bold text-gray-600 uppercase">
                         <div className="flex-[2] py-2 px-3 border-r">Product Name</div>
                         <div className="w-16 py-2 px-3 border-r text-center">Unit</div>
@@ -353,11 +435,16 @@ const GRNBoard = ({ isOpen, onClose }) => {
                     </div>
 
                     <div className="flex bg-yellow-50/30 border-b border-yellow-200 p-1 gap-1 items-center">
-                        <div className="flex-[2] px-1">
-                            <select name="prodCode" value={entry.prodCode} onChange={handleEntryInput} className="w-full h-7 border border-yellow-300 bg-white font-bold px-2 text-[12px] outline-none rounded-sm">
-                                <option value="">Select Product...</option>
-                                {lookups.products.map(p => <option key={p.code} value={p.code}>{p.name} [{p.code}]</option>)}
-                            </select>
+                        <div className="flex-[2] px-1 flex gap-1">
+                            <input
+                                type="text"
+                                readOnly
+                                value={entry.prodName || 'Select Product...'}
+                                className="flex-1 h-7 border border-yellow-300 bg-white font-bold px-2 text-[12px] outline-none rounded-sm"
+                            />
+                            <button onClick={() => setShowProductSearch(true)} className="w-8 h-7 bg-orange-500 text-white flex items-center justify-center hover:bg-orange-600 rounded-sm transition-colors shadow-sm">
+                                <Search size={14} />
+                            </button>
                         </div>
                         <div className="w-16"><input type="text" readOnly value={entry.unit} className="w-full h-7 border bg-gray-50 text-center text-[12px] font-bold outline-none rounded-sm text-gray-400" /></div>
                         <div className="w-24 px-1"><input type="text" name="cost" value={entry.cost} onChange={handleEntryInput} className="w-full h-7 border border-yellow-300 text-right px-2 text-[12px] font-bold outline-none rounded-sm" /></div>
@@ -368,7 +455,7 @@ const GRNBoard = ({ isOpen, onClose }) => {
                         <div className="w-8"><button onClick={addProduct} className="w-7 h-7 bg-orange-500 text-white rounded-sm hover:bg-orange-600">+</button></div>
                     </div>
 
-                    <div className="flex-1 bg-white overflow-y-auto max-h-[180px]">
+                    <div className="flex-1 bg-white overflow-y-auto max-h-[160px]">
                         {products.map((p, idx) => (
                             <div key={idx} className="flex border-b border-gray-100 text-[12px] font-semibold text-gray-600 items-center">
                                 <div className="flex-[2] py-1.5 px-3 border-r truncate">{p.prodName} [{p.prodCode}]</div>
@@ -378,7 +465,7 @@ const GRNBoard = ({ isOpen, onClose }) => {
                                 <div className="w-16 py-1.5 px-3 border-r text-center font-bold">{p.qty}</div>
                                 <div className="w-16 py-1.5 px-3 border-r text-center text-green-600">{p.free || '0'}</div>
                                 <div className="w-28 py-1.5 px-3 text-right font-bold text-[#000080]">{parseFloat(p.amount).toFixed(2)}</div>
-                                <div className="w-8 flex justify-center"><button onClick={() => setProducts(products.filter((_, i) => i !== idx))} className="text-red-400 hover:text-red-600"><Trash2 size={14}/></button></div>
+                                <div className="w-8 flex justify-center"><button onClick={() => setProducts(products.filter((_, i) => i !== idx))} className="text-red-400 hover:text-red-600"><Trash2 size={14} /></button></div>
                             </div>
                         ))}
                     </div>
@@ -387,7 +474,7 @@ const GRNBoard = ({ isOpen, onClose }) => {
                 {/* Footer Section */}
                 <div className="grid grid-cols-12 gap-6 items-start">
                     <div className="col-span-7 space-y-3">
-                        <textarea name="comment" value={formData.comment} onChange={handleInput} placeholder="Add additional comments here..." className="w-full h-24 border border-gray-300 p-2 text-[12px] outline-none resize-none rounded-sm bg-gray-50/30"></textarea>
+                        <textarea name="comment" value={formData.comment} onChange={handleInput} placeholder="Add additional comments here..." className="w-full h-[80px] border border-gray-300 p-2 text-[12px] outline-none resize-none rounded-sm bg-gray-50/30"></textarea>
                         <div className="grid grid-cols-2 gap-4">
                             <div className="flex items-center gap-3">
                                 <label className="text-[12px] font-bold text-gray-700 w-24">Expense Ac.</label>
@@ -466,6 +553,171 @@ const GRNBoard = ({ isOpen, onClose }) => {
                             ))}
                         </tbody>
                     </table>
+                </div>
+            </SimpleModal>
+            {/* Supplier Search Modal */}
+            <SimpleModal
+                isOpen={showSupplierSearch}
+                onClose={() => setShowSupplierSearch(false)}
+                title="Select Supplier"
+                maxWidth="max-w-[500px]"
+            >
+                <div className="space-y-4">
+                    <div className="relative">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+                        <input
+                            type="text"
+                            placeholder="Search supplier by name or code..."
+                            value={supplierSearchQuery}
+                            onChange={(e) => setSupplierSearchQuery(e.target.value)}
+                            className="w-full h-10 pl-10 pr-4 border border-gray-200 rounded-md outline-none focus:border-[#0078d4] text-sm"
+                            autoFocus
+                        />
+                    </div>
+                    <div className="max-h-[350px] overflow-y-auto no-scrollbar border rounded-md">
+                        {lookups.suppliers.filter(s =>
+                            s.name.toLowerCase().includes(supplierSearchQuery.toLowerCase()) ||
+                            s.code.toLowerCase().includes(supplierSearchQuery.toLowerCase())
+                        ).map((s) => (
+                            <div
+                                key={s.code}
+                                onClick={() => {
+                                    setFormData(prev => ({ ...prev, suppCode: s.code }));
+                                    setShowSupplierSearch(false);
+                                    setSupplierSearchQuery('');
+                                }}
+                                className="p-3 border-b last:border-0 hover:bg-blue-50 cursor-pointer transition-colors flex justify-between items-center group"
+                            >
+                                <div>
+                                    <div className="text-sm font-bold text-gray-800 group-hover:text-[#0078d4]">{s.name}</div>
+                                    <div className="text-[11px] text-gray-400 font-mono tracking-tighter uppercase">{s.code}</div>
+                                </div>
+                                <div className="text-xs font-bold text-[#0078d4] opacity-0 group-hover:opacity-100 transition-opacity uppercase tracking-tighter">Select →</div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </SimpleModal>
+
+            {/* Product Search Modal */}
+            <SimpleModal
+                isOpen={showProductSearch}
+                onClose={() => setShowProductSearch(false)}
+                title="Select Product"
+                maxWidth="max-w-[550px]"
+            >
+                <div className="space-y-4">
+                    <div className="relative">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+                        <input
+                            type="text"
+                            placeholder="Search product by name or code..."
+                            value={productSearchQuery}
+                            onChange={(e) => setProductSearchQuery(e.target.value)}
+                            className="w-full h-10 pl-10 pr-4 border border-gray-200 rounded-md outline-none focus:border-orange-500 text-sm"
+                            autoFocus
+                        />
+                    </div>
+                    <div className="max-h-[350px] overflow-y-auto no-scrollbar border rounded-md">
+                        {lookups.products.filter(p =>
+                            p.name.toLowerCase().includes(productSearchQuery.toLowerCase()) ||
+                            p.code.toLowerCase().includes(productSearchQuery.toLowerCase())
+                        ).map((p) => (
+                            <div
+                                key={p.code}
+                                onClick={() => {
+                                    handleEntryInput({ target: { name: 'prodCode', value: p.code } });
+                                    setShowProductSearch(false);
+                                    setProductSearchQuery('');
+                                }}
+                                className="p-3 border-b last:border-0 hover:bg-orange-50 cursor-pointer transition-colors flex justify-between items-center group"
+                            >
+                                <div>
+                                    <div className="text-sm font-bold text-gray-800 group-hover:text-orange-600">{p.name}</div>
+                                    <div className="text-[11px] text-gray-400 font-mono tracking-tighter uppercase">{p.code} | {p.unit}</div>
+                                </div>
+                                <div className="text-right">
+                                    <div className="text-xs font-bold text-gray-600">Cost: Rs.{parseFloat(p.price || 0).toFixed(2)}</div>
+                                    <div className="text-[10px] font-bold text-orange-600 opacity-0 group-hover:opacity-100 transition-opacity uppercase tracking-tighter">Add to Entry →</div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </SimpleModal>
+
+            {/* Date Selection Modal */}
+            <SimpleModal
+                isOpen={showDatePicker}
+                onClose={() => setShowDatePicker(false)}
+                title={`Select ${datePickerField === 'grnDate' ? 'GRN Date' : 'Expected Date'}`}
+                maxWidth="max-w-[320px]"
+            >
+                <div className="p-1 px-2">
+                    <div className="flex items-center justify-between mb-4">
+                        <button
+                            onClick={() => setViewDate(new Date(viewDate.getFullYear(), viewDate.getMonth() - 1, 1))}
+                            className="p-1.5 hover:bg-slate-100 rounded-md text-slate-500 transition-all active:scale-90"
+                        >
+                            <ChevronLeft size={18} />
+                        </button>
+                        <div className="flex gap-2">
+                            <select
+                                value={viewDate.getMonth()}
+                                onChange={(e) => setViewDate(new Date(viewDate.getFullYear(), parseInt(e.target.value), 1))}
+                                className="text-[14px] font-bold text-slate-700 outline-none bg-transparent hover:text-[#0078d4] cursor-pointer appearance-none px-1"
+                            >
+                                {['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'].map((m, i) => <option key={i} value={i}>{m}</option>)}
+                            </select>
+                            <select
+                                value={viewDate.getFullYear()}
+                                onChange={(e) => setViewDate(new Date(parseInt(e.target.value), viewDate.getMonth(), 1))}
+                                className="text-[14px] font-bold text-slate-700 outline-none bg-transparent hover:text-[#0078d4] cursor-pointer appearance-none px-1"
+                            >
+                                {Array.from({ length: 20 }, (_, i) => new Date().getFullYear() - 10 + i).map(y => <option key={y} value={y}>{y}</option>)}
+                            </select>
+                        </div>
+                        <button
+                            onClick={() => setViewDate(new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 1))}
+                            className="p-1.5 hover:bg-slate-100 rounded-md text-slate-500 transition-all active:scale-90"
+                        >
+                            <ChevronRight size={18} />
+                        </button>
+                    </div>
+
+                    <div className="grid grid-cols-7 mb-2">
+                        {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map(d => (
+                            <div key={d} className="text-center text-[10px] font-black text-slate-400 uppercase tracking-tighter">{d}</div>
+                        ))}
+                    </div>
+
+                    <div className="grid grid-cols-7 gap-1">
+                        {calendarDays.map((day, i) => {
+                            if (!day) return <div key={i} className="h-8" />;
+                            const isSelected = formData[datePickerField] === new Date(viewDate.getFullYear(), viewDate.getMonth(), day).toISOString().split('T')[0];
+                            const isToday = new Date().toDateString() === new Date(viewDate.getFullYear(), viewDate.getMonth(), day).toDateString();
+                            return (
+                                <button
+                                    key={i}
+                                    onClick={() => handleDateSelect(day)}
+                                    className={`h-8 w-8 text-[12px] font-bold rounded-md flex items-center justify-center transition-all ${isSelected
+                                        ? 'bg-[#0078d4] text-white shadow-md'
+                                        : isToday
+                                            ? 'bg-blue-50 text-[#0078d4]'
+                                            : 'hover:bg-slate-100 text-slate-700'
+                                        }`}
+                                >
+                                    {day}
+                                </button>
+                            );
+                        })}
+                    </div>
+                    <button
+                        onClick={() => { setViewDate(new Date()); handleDateSelect(new Date().getDate()); }}
+                        className="w-full mt-4 py-1.5 text-[11px] font-bold text-[#0078d4] hover:bg-blue-50 rounded-md transition-colors"
+                    >
+                        GO TO TODAY
+                    </button>
                 </div>
             </SimpleModal>
         </SimpleModal>
