@@ -320,30 +320,30 @@ const GRNBoard = ({ isOpen, onClose }) => {
             <div className="space-y-4 p-1 overflow-y-auto no-scrollbar font-['Inter']">
                 {/* Header Information */}
                 <div className="bg-white p-3 border border-gray-200 rounded-sm shadow-sm space-y-3">
-                    <div className="grid grid-cols-12 gap-x-10 gap-y-3">
+                    <div className="grid grid-cols-12 gap-x-6 gap-y-3">
                         {/* Doc Number */}
-                        <div className="col-span-4 flex items-center gap-3">
-                            <label className="text-[12px] font-bold text-gray-700 w-20 shrink-0">Doc No</label>
-                            <div className="flex-1 flex gap-1">
-                                <input type="text" name="docNo" value={formData.docNo} onChange={handleInput} className="flex-1 h-7 border border-[#0078d4]/30 px-2 text-[12px] font-bold text-[#000080] bg-blue-50/20 rounded-sm outline-none" />
-                                <button onClick={handleSearchClick} className="w-8 h-7 bg-[#0078d4] text-white flex items-center justify-center hover:bg-[#005a9e] rounded-sm transition-colors shadow-sm"><Search size={14} /></button>
+                        <div className="col-span-4 flex items-center gap-2">
+                            <label className="text-[12px] font-bold text-gray-700 w-14 shrink-0 whitespace-nowrap">Doc No</label>
+                            <div className="flex-1 flex gap-1 items-center min-w-0">
+                                <input type="text" name="docNo" value={formData.docNo} onChange={handleInput} className="flex-1 h-7 border border-[#0078d4]/30 px-2 text-[12px] font-bold text-[#000080] bg-blue-50/20 rounded-sm outline-none w-full min-w-0" />
+                                <button onClick={handleSearchClick} className="w-8 h-7 bg-[#0078d4] text-white flex items-center justify-center hover:bg-[#005a9e] rounded-sm transition-colors shadow-sm shrink-0"><Search size={14} /></button>
                             </div>
                         </div>
 
                         {/* GRN Date */}
-                        <div className="col-span-4 flex items-center gap-3">
-                            <label className="text-[12px] font-bold text-gray-700 w-20 shrink-0">Date</label>
-                            <div className="flex-1 flex gap-1">
-                                <input
-                                    type="text"
-                                    readOnly
-                                    value={formData.grnDate}
-                                    className="flex-1 h-7 border border-gray-300 px-2 text-[12px] font-bold text-gray-700 bg-gray-50 rounded-sm outline-none cursor-pointer ml-[-30px]"
+                        <div className="col-span-4 flex items-center gap-2 pl-4">
+                            <label className="text-[12px] font-bold text-gray-700 w-10 shrink-0 whitespace-nowrap">Date</label>
+                            <div className="flex-1 flex gap-1 items-center min-w-0">
+                                <input 
+                                    type="text" 
+                                    readOnly 
+                                    value={formData.grnDate} 
+                                    className="flex-1 h-7 border border-gray-300 px-2 text-[12px] font-bold text-gray-700 bg-gray-50 rounded-sm outline-none cursor-pointer w-full min-w-0"
                                     onClick={() => { setDatePickerField('grnDate'); setViewDate(new Date(formData.grnDate)); setShowDatePicker(true); }}
                                 />
-                                <button
+                                <button 
                                     onClick={() => { setDatePickerField('grnDate'); setViewDate(new Date(formData.grnDate)); setShowDatePicker(true); }}
-                                    className="w-8 h-7 bg-[#0078d4] text-white flex items-center justify-center hover:bg-[#005a9e] rounded-sm transition-colors shadow-sm"
+                                    className="w-8 h-7 bg-[#0078d4] text-white flex items-center justify-center hover:bg-[#005a9e] rounded-sm transition-colors shadow-sm shrink-0"
                                 >
                                     <Calendar size={14} />
                                 </button>
@@ -351,71 +351,71 @@ const GRNBoard = ({ isOpen, onClose }) => {
                         </div>
 
                         {/* Expected Date */}
-                        <div className="col-span-4 flex items-center gap-3">
-                            <label className="text-[12px] font-bold text-gray-700 w-24 shrink-0">Expected On</label>
-                            <div className="flex-1 flex gap-1">
-                                <input
-                                    type="text"
-                                    readOnly
-                                    value={formData.expectedDate}
-                                    className="flex-1 w-7 h-7 border border-gray-300 px-2 text-[12px] font-bold text-gray-700 bg-gray-50 rounded-sm outline-none cursor-pointer"
+                        <div className="col-span-4 flex items-center gap-2 pl-4">
+                            <label className="text-[12px] font-bold text-gray-700 w-16 shrink-0 whitespace-nowrap">Exp. On</label>
+                            <div className="flex-1 flex gap-1 items-center min-w-0">
+                                <input 
+                                    type="text" 
+                                    readOnly 
+                                    value={formData.expectedDate} 
+                                    className="flex-1 h-7 border border-gray-300 px-2 text-[12px] font-bold text-gray-700 bg-gray-50 rounded-sm outline-none cursor-pointer w-full min-w-0"
                                     onClick={() => { setDatePickerField('expectedDate'); setViewDate(new Date(formData.expectedDate)); setShowDatePicker(true); }}
                                 />
-                                <button
+                                <button 
                                     onClick={() => { setDatePickerField('expectedDate'); setViewDate(new Date(formData.expectedDate)); setShowDatePicker(true); }}
-                                    className="w-8 h-7 bg-[#0078d4] text-white flex items-center justify-center hover:bg-[#005a9e] rounded-sm transition-colors shadow-sm"
+                                    className="w-8 h-7 bg-[#0078d4] text-white flex items-center justify-center hover:bg-[#005a9e] rounded-sm transition-colors shadow-sm shrink-0"
                                 >
                                     <Calendar size={14} />
                                 </button>
                             </div>
                         </div>
 
-                        <div className="col-span-6 flex items-center gap-3">
-                            <label className="text-[12px] font-bold text-gray-700 w-20 shrink-0">Supplier</label>
-                            <div className="flex-1 flex gap-1">
-                                <input
-                                    type="text"
-                                    readOnly
-                                    value={lookups.suppliers.find(s => s.code === formData.suppCode)?.name || 'Select Supplier...'}
-                                    className="flex-1 h-7 border border-gray-300 px-2 text-[12px] font-bold text-[#b91c1c] bg-gray-50 rounded-sm outline-none"
+                        <div className="col-span-5 flex items-center gap-2">
+                            <label className="text-[12px] font-bold text-gray-700 w-14 shrink-0 whitespace-nowrap">Supplier</label>
+                            <div className="flex-1 flex gap-1 items-center min-w-0">
+                                <input 
+                                    type="text" 
+                                    readOnly 
+                                    value={lookups.suppliers.find(s => s.code === formData.suppCode)?.name || 'Select Supplier...'} 
+                                    className="flex-1 h-7 border border-gray-300 px-2 text-[12px] font-bold text-[#b91c1c] bg-gray-50 rounded-sm outline-none overflow-hidden text-ellipsis w-full min-w-0" 
                                 />
-                                <button onClick={() => setShowSupplierSearch(true)} className="w-8 h-7 bg-[#0078d4] text-white flex items-center justify-center hover:bg-[#005a9e] rounded-sm transition-colors shadow-sm">
+                                <button onClick={() => setShowSupplierSearch(true)} className="w-8 h-7 bg-[#0078d4] text-white flex items-center justify-center hover:bg-[#005a9e] rounded-sm transition-colors shadow-sm shrink-0">
                                     <Search size={14} />
                                 </button>
                             </div>
                         </div>
-                        <div className="col-span-3 flex items-center gap-3">
-                            <label className="text-[12px] font-bold text-gray-700 w-20 shrink-0 underline decoration-[#0078d4]/30">PO Number</label>
-                            <select name="poNo" value={formData.poNo} onChange={handleInput} className="flex-1 h-7 border border-gray-300 px-1 text-[12px] rounded-sm bg-white outline-none">
+                        <div className="col-span-4 flex items-center gap-2 pl-4">
+                            <label className="text-[12px] font-bold text-gray-700 w-20 shrink-0 whitespace-nowrap">PO Number</label>
+                            <select name="poNo" value={formData.poNo} onChange={handleInput} className="flex-1 h-7 border border-gray-300 px-1 text-[12px] rounded-sm bg-white outline-none w-full min-w-0">
                                 <option value="">-NO-</option>
                                 {lookups.pos.map(p => <option key={p.docNo} value={p.docNo}>{p.docNo}</option>)}
                             </select>
                         </div>
-                        <div className="col-span-3 flex items-center gap-3">
-                            <label className="text-[12px] font-bold text-gray-700 w-16 shrink-0 underline decoration-[#0078d4]/30">Payment</label>
-                            <select name="payType" value={formData.payType} onChange={handleInput} className="flex-1 h-7 border border-gray-300 px-2 text-[12px] rounded-sm bg-white outline-none font-bold text-[#000080]">
+                        <div className="col-span-3 flex items-center gap-2 pl-4">
+                            <label className="text-[12px] font-bold text-gray-700 w-14 shrink-0 whitespace-nowrap">Payment</label>
+                            <select name="payType" value={formData.payType} onChange={handleInput} className="flex-1 h-7 border border-gray-300 px-2 text-[12px] rounded-sm bg-white outline-none font-bold text-[#000080] w-full min-w-0">
                                 <option value="Cash">Cash</option>
                                 <option value="Cheque">Cheque</option>
                                 <option value="Credit">Credit</option>
                             </select>
                         </div>
 
-                        <div className="col-span-4 flex items-center gap-3">
-                            <label className="text-[12px] font-bold text-gray-700 w-20 shrink-0">Supp. Inv.</label>
-                            <input type="text" name="suppInv" value={formData.suppInv} onChange={handleInput} className="flex-1 h-7 border border-gray-300 px-2 text-[12px] rounded-sm bg-white outline-none focus:border-[#0078d4]" />
+                        <div className="col-span-4 flex items-center gap-2">
+                            <label className="text-[12px] font-bold text-gray-700 w-14 shrink-0 whitespace-nowrap">Supp. Inv.</label>
+                            <input type="text" name="suppInv" value={formData.suppInv} onChange={handleInput} className="flex-1 h-7 border border-gray-300 px-2 text-[12px] rounded-sm bg-white outline-none focus:border-[#0078d4] w-full min-w-0" />
                         </div>
-                        <div className="col-span-3 flex items-center gap-3">
-                            <label className="text-[12px] font-bold text-gray-700 w-14 shrink-0">Amount</label>
-                            <input type="text" name="invAmount" value={formData.invAmount} onChange={handleInput} className="flex-1 h-7 border border-gray-300 px-2 text-[12px] text-right font-black text-gray-800 rounded-sm bg-white outline-none focus:border-[#0078d4]" />
+                        <div className="col-span-3 flex items-center gap-2 pl-4">
+                            <label className="text-[12px] font-bold text-gray-700 w-12 shrink-0 whitespace-nowrap">Amount</label>
+                            <input type="text" name="invAmount" value={formData.invAmount} onChange={handleInput} className="flex-1 h-7 border border-gray-300 px-2 text-[12px] text-right font-black text-gray-800 rounded-sm bg-white outline-none focus:border-[#0078d4] w-full min-w-0" />
                         </div>
-                        <div className="col-span-5 flex items-center gap-6 pl-4">
-                            <label className="flex items-center gap-2 cursor-pointer transition-opacity hover:opacity-80">
+                        <div className="col-span-5 flex items-center gap-4 pl-4 min-w-0">
+                            <label className="flex items-center gap-1 cursor-pointer transition-opacity hover:opacity-80 shrink-0">
                                 <input type="checkbox" name="consignmentBasis" checked={formData.consignmentBasis} onChange={handleInput} className="w-4 h-4 text-[#0078d4] cursor-pointer" />
-                                <span className="text-[10px] font-black text-slate-500 uppercase tracking-tighter">Consignment Basis</span>
+                                <span className="text-[10px] font-black text-slate-500 uppercase tracking-tighter whitespace-nowrap">CONSIGNMENT BASIS</span>
                             </label>
-                            <label className="flex items-center gap-2 cursor-pointer transition-opacity hover:opacity-80">
+                            <label className="flex items-center gap-1 cursor-pointer transition-opacity hover:opacity-80 shrink-0">
                                 <input type="checkbox" name="acceptOtherSupp" checked={formData.acceptOtherSupp} onChange={handleInput} className="w-4 h-4 text-[#0078d4] cursor-pointer" />
-                                <span className="text-[10px] font-black text-slate-500 uppercase tracking-tighter">Other Supp. Product</span>
+                                <span className="text-[10px] font-black text-slate-500 uppercase tracking-tighter whitespace-nowrap">OTHER SUPP. PRODUCT</span>
                             </label>
                         </div>
                     </div>
