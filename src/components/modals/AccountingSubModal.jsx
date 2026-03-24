@@ -1,17 +1,17 @@
 import React from 'react';
 import { X, Scale, Wallet, Coins, BookOpen, History, Calculator } from 'lucide-react';
 
-const AccountingSubModal = ({ isOpen, onClose }) => {
+const AccountingSubModal = ({ isOpen, onClose, onOpenOpeningBalance, onOpenPettyCash, onOpenMainCash, onOpenJournalEntry, onOpenReversalEntry, onOpenPaymentSetoff }) => {
     if (!isOpen) return null;
 
     const menuItems = [
-        { icon: Scale, label: 'Opening Balance' },
-        { icon: Coins, label: 'Petty Cash Entry' },
-        { icon: Wallet, label: 'Main Cash' },
-        { icon: BookOpen, label: 'Make General Journal Entries' },
+        { icon: Scale, label: 'Opening Balance', action: onOpenOpeningBalance },
+        { icon: Coins, label: 'Petty Cash Entry', action: onOpenPettyCash },
+        { icon: Wallet, label: 'Main Cash', action: onOpenMainCash },
+        { icon: BookOpen, label: 'Make General Journal Entries', action: onOpenJournalEntry },
         { type: 'separator' },
-        { icon: History, label: 'Reversal Entry Form' },
-        { icon: Calculator, label: 'Payment Setoff' },
+        { icon: History, label: 'Reversal Entry Form', action: onOpenReversalEntry },
+        { icon: Calculator, label: 'Payment Setoff', action: onOpenPaymentSetoff },
     ];
 
     return (
@@ -47,6 +47,12 @@ const AccountingSubModal = ({ isOpen, onClose }) => {
                         return (
                             <button
                                 key={idx}
+                                onClick={() => {
+                                    if (item.action) {
+                                        item.action();
+                                        onClose();
+                                    }
+                                }}
                                 className="w-full flex items-center justify-between px-3 py-2.5 rounded-sm hover:bg-[#0078d4] group transition-all text-left"
                             >
                                 <div className="flex items-center gap-3">

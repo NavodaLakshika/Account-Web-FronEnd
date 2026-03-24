@@ -1,15 +1,34 @@
-import React from 'react';
-import { X, UserPlus, Users, FileText, ShoppingCart, Truck } from 'lucide-react';
+import { X, FileText, CreditCard, Banknote, Truck } from 'lucide-react';
+import toast from 'react-hot-toast';
 
-const VendorsCenterModal = ({ isOpen, onClose }) => {
+const VendorsCenterModal = ({ isOpen, onClose, onOpenEnterBill, onOpenPayBill, onOpenAdvancePay }) => {
     if (!isOpen) return null;
 
     const menuItems = [
-        { icon: UserPlus, label: 'Add New Vendor' },
-        { icon: Users, label: 'Vendor List' },
-        { icon: FileText, label: 'Purchase Requisition' },
-        { icon: ShoppingCart, label: 'Purchase Order' },
-        { icon: Truck, label: 'Goods Received Note (GRN)' },
+        { 
+            icon: FileText, 
+            label: 'Enter bill', 
+            onClick: () => {
+                onOpenEnterBill();
+                onClose();
+            }
+        },
+        { 
+            icon: CreditCard, 
+            label: 'Paybill', 
+            onClick: () => {
+                onOpenPayBill();
+                onClose();
+            }
+        },
+        { 
+            icon: Banknote, 
+            label: 'Advanced Issued', 
+            onClick: () => {
+                onOpenAdvancePay();
+                onClose();
+            }
+        },
     ];
 
     return (
@@ -41,6 +60,7 @@ const VendorsCenterModal = ({ isOpen, onClose }) => {
                         return (
                             <button
                                 key={idx}
+                                onClick={item.onClick}
                                 className="w-full flex items-center justify-between px-3 py-2.5 rounded-sm hover:bg-[#0078d4] group transition-all text-left"
                             >
                                 <div className="flex items-center gap-3">

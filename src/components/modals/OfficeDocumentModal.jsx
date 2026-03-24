@@ -5,8 +5,26 @@ const OfficeDocumentModal = ({ isOpen, onClose }) => {
     if (!isOpen) return null;
 
     const menuItems = [
-        { icon: FileText, label: 'Word Document', color: 'text-blue-500' },
-        { icon: Files, label: 'Excel Spreadsheet', color: 'text-green-500' },
+        { 
+            icon: FileText, 
+            label: 'Word Document', 
+            color: 'text-blue-500',
+            onClick: () => {
+                // Fetching from backend is much more reliable than browser protocols
+                fetch('/api/utility/open-word');
+                onClose();
+            }
+        },
+        { 
+            icon: Files, 
+            label: 'Excel Spreadsheet', 
+            color: 'text-green-500',
+            onClick: () => {
+                // Fetching from backend is much more reliable than browser protocols
+                fetch('/api/utility/open-excel');
+                onClose();
+            }
+        },
     ];
 
     return (
@@ -44,6 +62,7 @@ const OfficeDocumentModal = ({ isOpen, onClose }) => {
                         return (
                             <button
                                 key={idx}
+                                onClick={item.onClick}
                                 className="w-full flex items-center gap-3 px-3 py-3 rounded-md hover:bg-[#0078d4] group transition-all text-left"
                             >
                                 <Icon size={20} className={`${item.color} group-hover:text-white transition-colors`} />

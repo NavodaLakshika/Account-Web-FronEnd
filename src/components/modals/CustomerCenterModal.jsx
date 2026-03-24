@@ -1,16 +1,50 @@
 import React from 'react';
-import { X, UserPlus, Users, FileText, ShoppingCart, CreditCard, ClipboardList } from 'lucide-react';
+import { X, FileText, ShoppingCart, CreditCard, Receipt, Banknote, Users } from 'lucide-react';
 
-const CustomerCenterModal = ({ isOpen, onClose }) => {
+const CustomerCenterModal = ({ isOpen, onClose, onOpenSalesOrder, onOpenCustomerInvoice, onOpenSalesReceipt, onOpenReceivePayment, onOpenCustomerAdvance }) => {
     if (!isOpen) return null;
 
     const menuItems = [
-        { icon: UserPlus, label: 'Add New Customer' },
-        { icon: Users, label: 'Customer List' },
-        { icon: FileText, label: 'Sales Quotation' },
-        { icon: ShoppingCart, label: 'Sales Order' },
-        { icon: CreditCard, label: 'Tax Invoice' },
-        { icon: ClipboardList, label: 'Direct Invoice' },
+        { 
+            icon: ShoppingCart, 
+            label: 'Create Invoices', 
+            onClick: () => {
+                onOpenSalesOrder();
+                onClose();
+            }
+        },
+        { 
+            icon: FileText, 
+            label: 'Customer Invoices', 
+            onClick: () => {
+                onOpenCustomerInvoice();
+                onClose();
+            }
+        },
+        { 
+            icon: CreditCard, 
+            label: 'Received Payment', 
+            onClick: () => {
+                onOpenReceivePayment();
+                onClose();
+            }
+        },
+        { 
+            icon: Receipt, 
+            label: 'Customer Receipt', 
+            onClick: () => {
+                onOpenSalesReceipt();
+                onClose();
+            }
+        },
+        { 
+            icon: Banknote, 
+            label: 'Customer Advanced Receive', 
+            onClick: () => {
+                onOpenCustomerAdvance();
+                onClose();
+            }
+        },
     ];
 
     return (
@@ -42,6 +76,7 @@ const CustomerCenterModal = ({ isOpen, onClose }) => {
                         return (
                             <button
                                 key={idx}
+                                onClick={item.onClick}
                                 className="w-full flex items-center justify-between px-3 py-2.5 rounded-sm hover:bg-[#0078d4] group transition-all text-left"
                             >
                                 <div className="flex items-center gap-3">

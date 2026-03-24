@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { X, FileText, FileSpreadsheet, Mail, Calculator, Printer, PenLine, Settings, Power, ChevronLeft, ShieldCheck, Zap } from 'lucide-react';
 
-const SideBar = ({ isOpen, onClose, onOpenCalculator }) => {
+const SideBar = ({ isOpen, onClose, onOpenCalculator, onOpenReminder, onOpenWord, onOpenExcel, onOpenEmail, onOpenNotepad, onOpenPrinter, isTopBarCollapsed }) => {
     const [isFocusMode, setIsFocusMode] = useState(false);
 
     if (!isOpen) return null;
 
     return (
-        <div className={`fixed right-0 top-0 bottom-0 w-[80px] z-[100] animate-in slide-in-from-right duration-300 ease-out flex flex-col bg-white shadow-[-5px_0_20px_rgba(0,0,0,0.1)] border-l border-gray-200 ${isFocusMode ? 'brightness-[0.98]' : ''}`}>
+        <div className={`fixed right-0 ${isTopBarCollapsed ? 'top-8' : 'top-[120px]'} bottom-9 w-[80px] z-[100] animate-in slide-in-from-right duration-300 ease-out flex flex-col bg-white shadow-[-5px_0_20px_rgba(0,0,0,0.1)] border-l border-gray-200 ${isFocusMode ? 'brightness-[0.98]' : ''}`}>
             {/* 1. Toggle Handle */}
             <button
                 onClick={onClose}
@@ -21,9 +21,9 @@ const SideBar = ({ isOpen, onClose, onOpenCalculator }) => {
 
                 {/* Office Document Group */}
                 <div className="flex flex-col items-center gap-5">
-                    <SidebarButton icon={FileText} color="text-blue-600" label="Word" />
-                    <SidebarButton icon={FileSpreadsheet} color="text-green-600" label="Excel" />
-                    <SidebarButton icon={Mail} color="text-[#0078d4]" label="Email" badge="3" />
+                    <SidebarButton icon={FileText} color="text-blue-600" label="Word" onClick={onOpenWord} />
+                    <SidebarButton icon={FileSpreadsheet} color="text-green-600" label="Excel" onClick={onOpenExcel} />
+                    <SidebarButton icon={Mail} color="text-[#0078d4]" label="Email" badge="3" onClick={onOpenEmail} />
                 </div>
 
                 {/* Separator */}
@@ -32,8 +32,8 @@ const SideBar = ({ isOpen, onClose, onOpenCalculator }) => {
                 {/* Utility Group */}
                 <div className="flex flex-col items-center gap-5">
                     <SidebarButton icon={Calculator} color="text-gray-600" label="Calc" onClick={onOpenCalculator} />
-                    <SidebarButton icon={PenLine} color="text-gray-600" label="Note" />
-                    <SidebarButton icon={Printer} color="text-gray-600" label="Print" />
+                    <SidebarButton icon={PenLine} color="text-gray-600" label="Note" onClick={onOpenNotepad} />
+                    <SidebarButton icon={Printer} color="text-gray-600" label="Print" onClick={onOpenPrinter} />
                 </div>
 
                 {/* Focus Mode Switch (Minimalist) */}

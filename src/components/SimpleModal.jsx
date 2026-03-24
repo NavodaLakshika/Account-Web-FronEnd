@@ -5,7 +5,7 @@ const SimpleModal = ({ isOpen, onClose, title, children, footer, maxWidth = "max
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 font-['Plus_Jakarta_Sans']">
+        <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 font-['Plus_Jakarta_Sans']">
             {/* Backdrop */}
             <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={onClose} />
             

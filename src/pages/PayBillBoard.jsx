@@ -215,7 +215,7 @@ const PayBillBoard = ({ isOpen, onClose }) => {
             isOpen={isOpen}
             onClose={onClose}
             title="Pay Bill"
-            maxWidth="max-w-[95vw]"
+            maxWidth="max-w-[1000px]"
             footer={
                 <div className="bg-slate-50 px-6 py-4 w-full flex justify-end gap-3 border-t border-gray-100 rounded-b-xl">
                     <button onClick={handleSave} disabled={loading} className={`px-6 h-10 bg-[#0078d4] text-white text-sm font-bold rounded-md shadow-md shadow-blue-200 hover:bg-[#005a9e] transition-all active:scale-95 flex items-center justify-center gap-2 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}>
@@ -231,7 +231,7 @@ const PayBillBoard = ({ isOpen, onClose }) => {
                 </div>
             }
         >
-            <div className="space-y-1.5 overflow-y-auto no-scrollbar font-['Inter']">
+            <div className="space-y-4 overflow-y-auto no-scrollbar font-['Inter']">
                 {/* 1. Top Header Configuration */}
                 <div className="bg-white p-2 border border-gray-200 rounded-sm shadow-sm space-y-2">
                     <div className="grid grid-cols-12 gap-x-6 gap-y-2 items-center">

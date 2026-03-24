@@ -261,7 +261,7 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
 
     return (
         <>
-            <SimpleModal isOpen={isOpen} onClose={onClose} title="Customer Master File" maxWidth="max-w-[850px]" footer={footer}>
+            <SimpleModal isOpen={isOpen} onClose={onClose} title="Customer Master File" maxWidth="max-w-[1000px]" footer={footer}>
                 <div className="py-2 font-['Plus_Jakarta_Sans'] select-none">
                     <h2 className="text-base font-bold text-black mb-6 flex items-center gap-2">
                         Enter New Customer Details & Update

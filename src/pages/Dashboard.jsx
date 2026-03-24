@@ -23,7 +23,9 @@ import {
     ChevronRight,
     Building2,
     Menu,
-    Bot
+    Bot,
+    Calculator,
+    Bell
 } from 'lucide-react';
 
 import { authService } from '../services/auth.service';
@@ -49,6 +51,8 @@ import ChequeRegisterBoard from '../HomeMaster/ChequeRegisterBoard';
 import PrintChequeBoard from '../HomeMaster/PrintChequeBoard';
 import MarketingToolBoard from '../HomeMaster/MarketingToolBoard';
 import AccountBalanceBoard from '../HomeMaster/AccountBalanceBoard';
+import ReminderBoard from '../HomeMaster/ReminderBoard';
+import ReminderListBoard from '../HomeMaster/ReminderListBoard';
 import MasterFileModal from '../components/modals/MasterFileModal';
 import ViewUtilityModal from '../components/modals/ViewUtilityModal';
 import TransactionModal from '../components/modals/TransactionModal';
@@ -57,9 +61,32 @@ import SystemAdminModal from '../components/modals/SystemAdminModal';
 import SideBar from '../components/SideBar';
 import ChangePasswordBoard from '../components/modals/ChangePasswordBoard';
 import ThankYouModal from '../components/modals/ThankYouModal';
+import AdvancePayBoard from './AdvancePayBoard';
+import CustomerAdvanceBoard from './CustomerAdvanceBoard';
+import CustomerInvoiceBoard from './CustomerInvoiceBoard';
+import ReceivedPaymentBoard from './ReceivedPaymentBoard';
+import CustomerReceiptBoard from './CustomerReceiptBoard';
+import OpeningBalanceBoard from './OpeningBalanceBoard';
+import MainCashBoard from './MainCashBoard';
+import ReversalEntryBoard from './ReversalEntryBoard';
+import PaymentSetoffBoard from './PaymentSetoffBoard';
+import CollectionToDepositBoard from './CollectionToDepositBoard';
+import DirectBankTransactionBoard from './DirectBankTransactionBoard';
+import FundsTransferBoard from './FundsTransferBoard';
+import ChequeCancelBoard from './ChequeCancelBoard';
+import CustomerChequeReturnBoard from './CustomerChequeReturnBoard';
+import ChequePrintingBoard from './ChequePrintingBoard';
+import ChequeBookEntryBoard from './ChequeBookEntryBoard';
+import ChequeInHandBoard from './ChequeInHandBoard';
+import NotPresentedChequesBoard from './NotPresentedChequesBoard';
 import LogoutConfirmModal from '../components/modals/LogoutConfirmModal';
+import AlarmAlertModal from '../components/modals/AlarmAlertModal';
+import { reminderService } from '../services/reminder.service';
 
 import AIChatbotBoard from './AIChatbotBoard';
+import DepartmentBoard from './DepartmentBoard';
+import CalculatorBoard from '../components/modals/ViewAndUtilityModels/CalculatorBoard';
+import { Layers } from 'lucide-react';
 
 
 
@@ -89,7 +116,26 @@ const Dashboard = () => {
     const [showReceivePaymentModal, setShowReceivePaymentModal] = useState(false);
     const [showChequeRegisterModal, setShowChequeRegisterModal] = useState(false);
     const [showPrintChequeModal, setShowPrintChequeModal] = useState(false);
+    const [topBarColor, setTopBarColor] = useState(localStorage.getItem('topBarColor') || '#0078d4');
     const [showAccountBalanceModal, setShowAccountBalanceModal] = useState(false);
+    const [showAdvancePayModal, setShowAdvancePayModal] = useState(false);
+    const [showCustomerAdvanceModal, setShowCustomerAdvanceModal] = useState(false);
+    const [showCustomerInvoiceModal, setShowCustomerInvoiceModal] = useState(false);
+    const [showReceivedPaymentModal, setShowReceivedPaymentModal] = useState(false);
+    const [showCustomerReceiptModal, setShowCustomerReceiptModal] = useState(false);
+    const [showOpeningBalanceModal, setShowOpeningBalanceModal] = useState(false);
+    const [showMainCashModal, setShowMainCashModal] = useState(false);
+    const [showReversalEntryModal, setShowReversalEntryModal] = useState(false);
+    const [showPaymentSetoffModal, setShowPaymentSetoffModal] = useState(false);
+    const [showCollectionToDepositModal, setShowCollectionToDepositModal] = useState(false);
+    const [showDirectBankTransactionModal, setShowDirectBankTransactionModal] = useState(false);
+    const [showFundsTransferModal, setShowFundsTransferModal] = useState(false);
+    const [showChequeCancelModal, setShowChequeCancelModal] = useState(false);
+    const [showCustomerChequeReturnModal, setShowCustomerChequeReturnModal] = useState(false);
+    const [showChequePrintModal, setShowChequePrintModal] = useState(false);
+    const [showChequeBookEntryModal, setShowChequeBookEntryModal] = useState(false);
+    const [showChequeInHandModal, setShowChequeInHandModal] = useState(false);
+    const [showNotPresentedChequesModal, setShowNotPresentedChequesModal] = useState(false);
     const [showMasterFileModal, setShowMasterFileModal] = useState(false);
     const [showViewUtilityModal, setShowViewUtilityModal] = useState(false);
     const [showTransactionModal, setShowTransactionModal] = useState(false);
@@ -99,6 +145,13 @@ const Dashboard = () => {
     const [showSideBar, setShowSideBar] = useState(false);
     const [showThankYouModal, setShowThankYouModal] = useState(false);
     const [showLogoutConfirmModal, setShowLogoutConfirmModal] = useState(false);
+    const [showDepartmentModal, setShowDepartmentModal] = useState(false);
+    const [showCalculatorModal, setShowCalculatorModal] = useState(false);
+    const [showReminderModal, setShowReminderModal] = useState(false);
+    const [showReminderListModal, setShowReminderListModal] = useState(false);
+    const [editingTask, setEditingTask] = useState(null);
+    const [showCategoryModal, setShowCategoryModal] = useState(false);
+    const [ribbonIcons, setRibbonIcons] = useState(['logout', 'home', 'new_account', 'customer', 'vendor', 'reminder', 'enter_bill', 'pay_bill', 'write_chq', 'petty_cash', 'make_deposit', 'journal_entry', 'bank_rec', 'trial_balance', 'search', 'ai_chat']);
 
     const [showAIChatbotModal, setShowAIChatbotModal] = useState(false);
 
@@ -108,7 +161,8 @@ const Dashboard = () => {
     const [isTopBarCollapsed, setIsTopBarCollapsed] = useState(false);
     const [isAIThinking, setIsAIThinking] = useState(false);
 
-
+    // Reminder Alarm Logic
+    const [activeAlarmTask, setActiveAlarmTask] = useState(null);
     const [currentTime, setCurrentTime] = useState(new Date());
 
 
@@ -122,14 +176,155 @@ const Dashboard = () => {
     useEffect(() => {
         const currentUser = authService.getCurrentUser();
         const company = localStorage.getItem('selectedCompany');
+        const savedIcons = localStorage.getItem('ribbon_icons');
 
         if (!currentUser) {
             navigate('/login');
         } else {
             setUser(currentUser);
             setSelectedCompany(company ? JSON.parse(company) : null);
+            if (savedIcons) setRibbonIcons(JSON.parse(savedIcons));
         }
     }, [navigate]);
+
+    // Persistent set of task IDs that have already alerted today
+    const [alertedTaskIds, setAlertedTaskIds] = useState(() => {
+        const saved = localStorage.getItem('alertedReminders');
+        if (saved) {
+            try {
+                const parsed = JSON.parse(saved);
+                // Filter out old alerts from previous days
+                const now = new Date();
+                const todayPrefix = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()}`;
+                const validAlerts = Object.keys(parsed)
+                    .filter(key => key.startsWith(todayPrefix))
+                    .reduce((obj, key) => {
+                        obj[key] = parsed[key];
+                        return obj;
+                    }, {});
+                return new Set(Object.values(validAlerts));
+            } catch (e) { return new Set(); }
+        }
+        return new Set();
+    });
+
+    const [snoozedReminders, setSnoozedReminders] = useState({});
+    const [pendingSnoozeTask, setPendingSnoozeTask] = useState(null);
+
+    // Handle Alarm Close (Snooze 10 mins)
+    const handleAlarmDismiss = (taskId) => {
+        if (!taskId) {
+            setActiveAlarmTask(null);
+            return;
+        }
+        
+        const snoozeUntil = new Date(new Date().getTime() + 30 * 60000); // 30 minutes from now
+        setSnoozedReminders(prev => ({
+            ...prev,
+            [taskId]: snoozeUntil
+        }));
+        
+        // Show persistent banner after dismissal
+        setPendingSnoozeTask(activeAlarmTask);
+        setActiveAlarmTask(null);
+    };
+
+    // Mark as permanently handled for today (Done)
+    const handlePermanentDismiss = (taskId) => {
+        setAlertedTaskIds(prev => {
+            const newSet = new Set(prev);
+            newSet.add(taskId);
+            
+            const now = new Date();
+            const todayPrefix = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()}`;
+            const saved = localStorage.getItem('alertedReminders');
+            let parsed = {};
+            try { parsed = JSON.parse(saved) || {}; } catch(e) {}
+            parsed[`${todayPrefix}-${taskId}`] = taskId;
+            localStorage.setItem('alertedReminders', JSON.stringify(parsed));
+            
+            return newSet;
+        });
+
+        // Clear banner if this task was pending
+        if (pendingSnoozeTask && (pendingSnoozeTask.id_No || pendingSnoozeTask.Id_No || pendingSnoozeTask.idNo) === taskId) {
+            setPendingSnoozeTask(null);
+        }
+
+        setActiveAlarmTask(null);
+    };
+
+    // Check Reminders
+    useEffect(() => {
+        const checkReminders = async () => {
+            try {
+                const reminders = await reminderService.getReminders();
+                const now = new Date();
+                
+                const dd = String(now.getDate()).padStart(2, '0');
+                const mm = String(now.getMonth() + 1).padStart(2, '0');
+                const yyyy = now.getFullYear();
+                const todayStr = `${dd}/${mm}/${yyyy}`;
+                
+                const curH = now.getHours();
+                const curM = now.getMinutes();
+
+                const dueTask = reminders.find(r => {
+                    const rId = r.id_No || r.Id_No || r.idNo;
+                    const rDate = (r.date || r.Date || '').trim();
+                    const rTime = (r.time || r.Time || '').trim();
+                    const rExpire = (r.expire || r.Expire || 'F').trim();
+                    
+                    if (rExpire !== 'F' || rDate !== todayStr || alertedTaskIds.has(rId)) return false;
+
+                    // Snooze logic
+                    if (snoozedReminders[rId] && now < snoozedReminders[rId]) return false;
+
+                    try {
+                        const timeMatch = rTime.match(/(\d+)[.:](\d+)\s*(AM|PM)/i);
+                        if (!timeMatch) return false;
+
+                        let h = parseInt(timeMatch[1]);
+                        const m = parseInt(timeMatch[2]);
+                        const p = timeMatch[3].toUpperCase();
+                        
+                        if (p === 'PM' && h < 12) h += 12;
+                        if (p === 'AM' && h === 12) h = 0;
+
+                        // Mobile-Style alarm logic: Trigger ONLY if it is EXACTLY the same minute
+                        // Allowing 5 second wiggle room (check interval is 5s)
+                        if (curH === h && curM === m) {
+                            return true;
+                        }
+                    } catch (e) {
+                        return false;
+                    }
+                    return false;
+                });
+
+                if (dueTask) {
+                    setActiveAlarmTask(dueTask);
+                    // Persistent banner stays until finished or new snooze replaces it in dismiss logic
+                }
+            } catch (error) {
+                console.error('Error checking reminders:', error);
+            }
+        };
+
+        const interval = setInterval(checkReminders, 5000);
+        return () => clearInterval(interval);
+    }, [alertedTaskIds, snoozedReminders]);
+
+    const handleCompleteAlarm = async (task) => {
+        try {
+            const taskId = task.id_No || task.Id_No || task.idNo;
+            await reminderService.expireReminder(taskId);
+            handlePermanentDismiss(taskId); // Mark as permanently alerted today
+            toast.success("Task marked as completed!");
+        } catch (error) {
+            console.error("Error completing task:", error);
+        }
+    };
 
     const handleAIClick = () => {
         setIsAIThinking(true);
@@ -144,7 +339,7 @@ const Dashboard = () => {
 
 
     const handleLogout = () => {
-
+        setPendingSnoozeTask(null);
         authService.logout();
         localStorage.removeItem('selectedCompany');
         navigate('/login');
@@ -227,6 +422,12 @@ const Dashboard = () => {
             <MakeDepositBoard isOpen={showMakeDepositModal} onClose={() => setShowMakeDepositModal(false)} />
             <JournalEntryBoard isOpen={showJournalEntryModal} onClose={() => setShowJournalEntryModal(false)} />
             <BankReconciliationBoard isOpen={showBankRecModal} onClose={() => setShowBankRecModal(false)} />
+            <ChequeCancelBoard isOpen={showChequeCancelModal} onClose={() => setShowChequeCancelModal(false)} />
+            <CustomerChequeReturnBoard isOpen={showCustomerChequeReturnModal} onClose={() => setShowCustomerChequeReturnModal(false)} />
+            <ChequePrintingBoard isOpen={showChequePrintModal} onClose={() => setShowChequePrintModal(false)} />
+            <ChequeBookEntryBoard isOpen={showChequeBookEntryModal} onClose={() => setShowChequeBookEntryModal(false)} />
+            <ChequeInHandBoard isOpen={showChequeInHandModal} onClose={() => setShowChequeInHandModal(false)} />
+            <NotPresentedChequesBoard isOpen={showNotPresentedChequesModal} onClose={() => setShowNotPresentedChequesModal(false)} />
             <TrialBalanceBoard isOpen={showTrialBalanceModal} onClose={() => setShowTrialBalanceModal(false)} />
             <SearchBoard isOpen={showSearchModal} onClose={() => setShowSearchModal(false)} />
             <MasterFileModal isOpen={showMasterFileModal} onClose={() => setShowMasterFileModal(false)} />
@@ -234,9 +435,120 @@ const Dashboard = () => {
                 isOpen={showViewUtilityModal}
                 onClose={() => setShowViewUtilityModal(false)}
                 onToggleSideBar={() => setShowSideBar(!showSideBar)}
-                onOpenCalculator={() => setShowTrialBalanceModal(true)} // Or link to the new CalculatorBoard if I had a toggle in Dashboard
+                onOpenCalculator={() => window.open('ms-calculator:')}
+                onOpenNotepad={() => fetch('/api/utility/open-notepad')}
+                onOpenPrinter={() => fetch('/api/utility/open-printer')}
+                onOpenReminder={() => setShowReminderModal(true)}
+                currentTopBarColor={topBarColor}
+                onColorSelect={(color) => {
+                    setTopBarColor(color);
+                    localStorage.setItem('topBarColor', color);
+                }}
             />
-            <TransactionModal isOpen={showTransactionModal} onClose={() => setShowTransactionModal(false)} />
+            <TransactionModal 
+                isOpen={showTransactionModal} 
+                onClose={() => setShowTransactionModal(false)} 
+                onOpenEnterBill={() => {
+                    setShowEnterBillModal(true);
+                    setShowTransactionModal(false);
+                }}
+                onOpenPayBill={() => {
+                    setShowPayBillModal(true);
+                    setShowTransactionModal(false);
+                }}
+                onOpenAdvancePay={() => {
+                    setShowAdvancePayModal(true);
+                    setShowTransactionModal(false);
+                }}
+                onOpenSalesOrder={() => {
+                    setShowSalesOrderModal(true);
+                    setShowTransactionModal(false);
+                }}
+                onOpenCustomerInvoice={() => {
+                    setShowCustomerInvoiceModal(true);
+                    setShowTransactionModal(false);
+                }}
+                onOpenSalesReceipt={() => {
+                    setShowCustomerReceiptModal(true);
+                    setShowTransactionModal(false);
+                }}
+                onOpenReceivePayment={() => {
+                    setShowReceivePaymentModal(true);
+                    setShowTransactionModal(false);
+                }}
+                onOpenCustomerAdvance={() => {
+                    setShowCustomerAdvanceModal(true);
+                    setShowTransactionModal(false);
+                }}
+                onOpenOpeningBalance={() => {
+                    setShowOpeningBalanceModal(true);
+                    setShowTransactionModal(false);
+                }}
+                onOpenPettyCash={() => {
+                    setShowPettyCashModal(true);
+                    setShowTransactionModal(false);
+                }}
+                onOpenMainCash={() => {
+                    setShowMainCashModal(true);
+                    setShowTransactionModal(false);
+                }}
+                onOpenJournalEntry={() => {
+                    setShowJournalEntryModal(true);
+                    setShowTransactionModal(false);
+                }}
+                onOpenReversalEntry={() => {
+                    setShowReversalEntryModal(true);
+                    setShowTransactionModal(false);
+                }}
+                onOpenPaymentSetoff={() => {
+                    setShowPaymentSetoffModal(true);
+                    setShowTransactionModal(false);
+                }}
+                onOpenCollectionDeposit={() => {
+                    setShowCollectionToDepositModal(true);
+                    setShowTransactionModal(false);
+                }}
+                onOpenDirectBankTransaction={() => {
+                    setShowDirectBankTransactionModal(true);
+                    setShowTransactionModal(false);
+                }}
+                onOpenFundsTransfer={() => {
+                    setShowFundsTransferModal(true);
+                    setShowTransactionModal(false);
+                }}
+                onOpenBankReconciliation={() => {
+                    setShowBankRecModal(true);
+                    setShowTransactionModal(false);
+                }}
+                onOpenChequeCancel={() => {
+                    setShowChequeCancelModal(true);
+                    setShowTransactionModal(false);
+                }}
+                onOpenCustomerChequeReturn={() => {
+                    setShowCustomerChequeReturnModal(true);
+                    setShowTransactionModal(false);
+                }}
+                onOpenChequePrint={() => {
+                    setShowChequePrintModal(true);
+                    setShowTransactionModal(false);
+                }}
+                onOpenChequeBookEntry={() => {
+                    setShowChequeBookEntryModal(true);
+                    setShowTransactionModal(false);
+                }}
+                onOpenChequeInHand={() => {
+                    setShowChequeInHandModal(true);
+                    setShowTransactionModal(false);
+                }}
+                onOpenNotPresented={() => {
+                    setShowNotPresentedChequesModal(true);
+                    setShowTransactionModal(false);
+                }}
+                onOpenWriteCheque={() => {
+                    setShowWriteChequeModal(true);
+                    setShowTransactionModal(false);
+                }}
+            />
             <ReportsModal isOpen={showReportsModal} onClose={() => setShowReportsModal(false)} />
             <SystemAdminModal
                 isOpen={showSystemAdminModal}
@@ -248,6 +560,29 @@ const Dashboard = () => {
             />
             <ChangePasswordBoard isOpen={showChangePasswordModal} onClose={() => setShowChangePasswordModal(false)} />
             <AIChatbotBoard isOpen={showAIChatbotModal} onClose={() => setShowAIChatbotModal(false)} />
+            <DepartmentBoard isOpen={showDepartmentModal} onClose={() => setShowDepartmentModal(false)} />
+            <CalculatorBoard isOpen={showCalculatorModal} onClose={() => setShowCalculatorModal(false)} />
+            <ReminderBoard 
+                isOpen={showReminderModal} 
+                onClose={() => {
+                    setShowReminderModal(false);
+                    setEditingTask(null);
+                }} 
+                onViewAll={() => {
+                    setShowReminderModal(false);
+                    setShowReminderListModal(true);
+                }}
+                taskToEdit={editingTask}
+            />
+            <ReminderListBoard 
+                isOpen={showReminderListModal}
+                onClose={() => setShowReminderListModal(false)}
+                onEditTask={(task) => {
+                    setEditingTask(task);
+                    setShowReminderListModal(false);
+                    setShowReminderModal(true);
+                }}
+            />
 
             <LogoutConfirmModal
                 isOpen={showLogoutConfirmModal}
@@ -287,23 +622,43 @@ const Dashboard = () => {
             <PettyCashBoard isOpen={showPettyCashModal} onClose={() => setShowPettyCashModal(false)} />
             <SalesOrderBoard isOpen={showSalesOrderModal} onClose={() => setShowSalesOrderModal(false)} />
             <SalesReceiptBoard isOpen={showSalesReceiptModal} onClose={() => setShowSalesReceiptModal(false)} />
-            <ReceivePaymentBoard isOpen={showReceivePaymentModal} onClose={() => setShowReceivePaymentModal(false)} />
+            <ReceivedPaymentBoard isOpen={showReceivePaymentModal} onClose={() => setShowReceivePaymentModal(false)} />
             <ChequeRegisterBoard isOpen={showChequeRegisterModal} onClose={() => setShowChequeRegisterModal(false)} />
             <PrintChequeBoard isOpen={showPrintChequeModal} onClose={() => setShowPrintChequeModal(false)} />
             <MarketingToolBoard isOpen={showMarketingToolModal} onClose={() => setShowMarketingToolModal(false)} />
             <AccountBalanceBoard isOpen={showAccountBalanceModal} onClose={() => setShowAccountBalanceModal(false)} />
+            <AdvancePayBoard isOpen={showAdvancePayModal} onClose={() => setShowAdvancePayModal(false)} />
+            <CustomerAdvanceBoard isOpen={showCustomerAdvanceModal} onClose={() => setShowCustomerAdvanceModal(false)} />
+            <CustomerInvoiceBoard isOpen={showCustomerInvoiceModal} onClose={() => setShowCustomerInvoiceModal(false)} />
+            <CustomerReceiptBoard isOpen={showCustomerReceiptModal} onClose={() => setShowCustomerReceiptModal(false)} />
+            <OpeningBalanceBoard isOpen={showOpeningBalanceModal} onClose={() => setShowOpeningBalanceModal(false)} />
+            <MainCashBoard isOpen={showMainCashModal} onClose={() => setShowMainCashModal(false)} />
+            <JournalEntryBoard isOpen={showJournalEntryModal} onClose={() => setShowJournalEntryModal(false)} />
+            <ReversalEntryBoard isOpen={showReversalEntryModal} onClose={() => setShowReversalEntryModal(false)} />
+            <PaymentSetoffBoard isOpen={showPaymentSetoffModal} onClose={() => setShowPaymentSetoffModal(false)} />
+            <CollectionToDepositBoard isOpen={showCollectionToDepositModal} onClose={() => setShowCollectionToDepositModal(false)} />
+            <DirectBankTransactionBoard isOpen={showDirectBankTransactionModal} onClose={() => setShowDirectBankTransactionModal(false)} />
+            <FundsTransferBoard isOpen={showFundsTransferModal} onClose={() => setShowFundsTransferModal(false)} />
 
             {/* Side Bar Component */}
             <SideBar
                 isOpen={showSideBar}
                 onClose={() => setShowSideBar(false)}
-                onOpenCalculator={() => {
-                    setShowViewUtilityModal(true); // Re-open or just open the specific modal
-                }}
+                onOpenCalculator={() => fetch('/api/utility/open-calculator')}
+                onOpenWord={() => fetch('/api/utility/open-word')}
+                onOpenExcel={() => fetch('/api/utility/open-excel')}
+                onOpenEmail={() => fetch('/api/utility/open-outlook')}
+                onOpenNotepad={() => fetch('/api/utility/open-notepad')}
+                onOpenPrinter={() => fetch('/api/utility/open-printer')}
+                onOpenReminder={() => setShowReminderModal(true)}
+                isTopBarCollapsed={isTopBarCollapsed}
             />
 
             {/* 2. Top Ribbon Navigation (Matches Reference Image) */}
-            <header className={`z-50 bg-[#0078d4] text-white shadow-md transition-all duration-500 ease-in-out overflow-hidden ${isTopBarCollapsed ? 'h-8' : 'h-[120px]'}`}>
+            <header 
+                className={`z-50 text-white shadow-md transition-all duration-500 ease-in-out overflow-hidden ${isTopBarCollapsed ? 'h-8' : 'h-[120px]'}`}
+                style={{ backgroundColor: topBarColor }}
+            >
                 {/* Row 1: Text Menu */}
                 <div className={`flex items-center gap-6 px-4 py-1.5 border-b border-white/10 overflow-x-auto no-scrollbar transition-opacity duration-300 ${isTopBarCollapsed ? 'h-full flex items-center' : ''}`}>
                     {menuBar.map((item, idx) => (
@@ -365,33 +720,43 @@ const Dashboard = () => {
 
                 {/* Row 2: Icon Ribbon */}
                 <div className={`flex items-center px-2 py-1 gap-1  overflow-x-auto no-scrollbar transition-all duration-500 ${isTopBarCollapsed ? 'opacity-0 -translate-y-10 scale-95 pointer-events-none' : 'opacity-100 translate-y-0 scale-100'}`}>
-                    {/* Logout Trigger (First step in the logout flow) */}
-                    <RibbonButton icon={LogOut} label="LogOut" onClick={() => setShowLogoutConfirmModal(true)} iconColor="text-red-500" />
+                    {ribbonIcons.map((iconId) => {
+                        const iconData = {
+                            logout: { icon: LogOut, label: 'LogOut', onClick: () => setShowLogoutConfirmModal(true), iconColor: 'text-red-500' },
+                            home: { icon: Home, label: 'Home', onClick: () => setShowHomeModal(true), active: showHomeModal },
+                            new_account: { icon: UserPlus, label: 'New Account', onClick: () => setShowNewAccountModal(true), active: showNewAccountModal, hasBadge: true },
+                            customer: { icon: Users, label: 'Customer', onClick: () => setShowCustomerModal(true), active: showCustomerModal },
+                            vendor: { icon: Truck, label: 'Vendor', onClick: () => setShowVendorModal(true), active: showVendorModal },
+                            enter_bill: { icon: FileText, label: 'Enter Bill', onClick: () => setShowEnterBillModal(true), active: showEnterBillModal },
+                            pay_bill: { icon: CreditCard, label: 'Pay Bill', onClick: () => setShowPayBillModal(true), active: showPayBillModal },
+                            write_chq: { icon: PenTool, label: 'Write Chq', onClick: () => setShowWriteChequeModal(true), active: showWriteChequeModal },
+                            petty_cash: { icon: Wallet, label: 'Petty Cash', onClick: () => setShowPettyCashModal(true), active: showPettyCashModal },
+                            make_deposit: { icon: ArrowDownLeft, label: 'Make Deposit', onClick: () => setShowMakeDepositModal(true), active: showMakeDepositModal },
+                            journal_entry: { icon: BookOpen, label: 'Journal Entry', onClick: () => setShowJournalEntryModal(true), active: showJournalEntryModal },
+                            bank_rec: { icon: RefreshCcw, label: 'Bank Rec', onClick: () => setShowBankRecModal(true), active: showBankRecModal },
+                            trial_balance: { icon: BarChart2, label: 'Trial Balance', onClick: () => setShowTrialBalanceModal(true), active: showTrialBalanceModal },
+                            search: { icon: Search, label: 'Search', onClick: () => setShowSearchModal(true), active: showSearchModal },
+                            ai_chat: { icon: Bot, label: 'AI Chat', onClick: handleAIClick, active: showAIChatbotModal, iconColor: 'text-blue-500' },
+                            department: { icon: Building2, label: 'Dept.', onClick: () => setShowDepartmentModal(true), active: showDepartmentModal },
+                            calculator: { icon: Calculator, label: 'Calculator', onClick: () => window.open('ms-calculator:'), active: showCalculatorModal },
+                            help: { icon: HelpCircle, label: 'Help', onClick: () => { } },
+                            category: { icon: Layers, label: 'Category', onClick: () => setShowCategoryModal(true), active: showCategoryModal },
+                            reminder: { icon: Bell, label: 'Reminder', onClick: () => setShowReminderModal(true), active: showReminderModal, iconColor: 'text-yellow-400' },
+                        }[iconId];
 
-
-
-
-                    <RibbonButton icon={Home} label="Home" onClick={() => setShowHomeModal(true)} active={showHomeModal} />
-
-                    {/* New Account with Badge */}
-                    <RibbonButton icon={UserPlus} label="New Account" onClick={() => setShowNewAccountModal(true)} active={showNewAccountModal} hasBadge />
-
-                    {/* Highlighted Customer Item */}
-                    <RibbonButton icon={Users} label="Customer" onClick={() => setShowCustomerModal(true)} active={showCustomerModal} />
-
-                    <RibbonButton icon={Truck} label="Vendor" onClick={() => setShowVendorModal(true)} active={showVendorModal} />
-                    <RibbonButton icon={FileText} label="Enter Bill" onClick={() => setShowEnterBillModal(true)} active={showEnterBillModal} />
-                    <RibbonButton icon={CreditCard} label="Pay Bill" onClick={() => setShowPayBillModal(true)} active={showPayBillModal} />
-                    <RibbonButton icon={PenTool} label="Write Chq" onClick={() => setShowWriteChequeModal(true)} active={showWriteChequeModal} />
-                    <RibbonButton icon={Wallet} label="Petty Cash" onClick={() => setShowPettyCashModal(true)} active={showPettyCashModal} />
-                    <RibbonButton icon={ArrowDownLeft} label="Make Deposit" onClick={() => setShowMakeDepositModal(true)} active={showMakeDepositModal} />
-                    <RibbonButton icon={BookOpen} label="Journal Entry" onClick={() => setShowJournalEntryModal(true)} active={showJournalEntryModal} />
-                    <RibbonButton icon={RefreshCcw} label="Bank Rec" onClick={() => setShowBankRecModal(true)} active={showBankRecModal} />
-                    <RibbonButton icon={BarChart2} label="Trial Balance" onClick={() => setShowTrialBalanceModal(true)} active={showTrialBalanceModal} />
-                    <RibbonButton icon={Search} label="Search" onClick={() => setShowSearchModal(true)} active={showSearchModal} />
-                    <RibbonButton icon={Bot} label="AI Chat" onClick={handleAIClick} active={showAIChatbotModal} iconColor="text-blue-500" />
-
-                    <RibbonButton icon={HelpCircle} label="Help" onClick={() => { }} />
+                        if (!iconData) return null;
+                        return (
+                            <RibbonButton 
+                                key={iconId}
+                                icon={iconData.icon} 
+                                label={iconData.label} 
+                                onClick={iconData.onClick} 
+                                active={iconData.active}
+                                hasBadge={iconData.hasBadge}
+                                iconColor={iconData.iconColor}
+                            />
+                        );
+                    })}
 
 
 
@@ -499,54 +864,115 @@ const Dashboard = () => {
                 </div>
             </main>
 
-            {/* Animated Information Ticker */}
-            <div className="h-6 bg-slate-50 border-t border-slate-100 flex items-center overflow-hidden relative z-50">
-                <div className="whitespace-nowrap animate-marquee flex items-center gap-10">
-                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16].map((i) => (
-                        <span key={i} className="text-[10px] font-bold text-[#0078d4]/60 uppercase tracking-[0.2em] flex items-center gap-2">
-                            ONIMTA INFORMATION TECHNOLOGY (PVT) LTD
-                            <div className="h-1 w-1 bg-[#0078d4]/30 rounded-full" />
-                        </span>
-                    ))}
-                </div>
-            </div>
-
-            {/* 4. Minimalist Footer (Matches Reference) */}
-            <footer className="h-10 bg-white border-t border-slate-100 flex items-center justify-between px-6 z-50">
-                <div className="flex items-center gap-2">
-                    <span className="text-[9px] font-bold text-red-600 uppercase tracking-tighter">Licensed</span>
+            {/* Unified One-Line Professional Footer (Ticker + Company Info) */}
+            <footer className="h-9 bg-white border-t border-slate-200 flex items-center justify-between px-6 z-50 overflow-hidden relative">
+                {/* Left: Branding/License (Above Ticker) */}
+                <div className="flex items-center gap-2 relative z-20 bg-white pr-6">
+                    <span className="text-[10px] font-black text-red-600 uppercase tracking-tight">Licensed</span>
                 </div>
 
-                <div className="flex items-center gap-1.5 group">
-                    <span className="text-[11px] font-medium text-slate-500">Powered by</span>
-                    <span className="text-[#0078d4] text-sm font-black tracking-tighter group-hover:scale-105 transition-transform cursor-default">
-                        {selectedCompany?.CompanyName || selectedCompany?.companyName || "SYSTEM"}
+                {/* Center: Animated Information Ticker (Middle Layer) */}
+                <div className="flex-1 overflow-hidden relative mx-4">
+                    {/* Fade Edges for Professional Look */}
+                    <div className="absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-white to-transparent z-10" />
+                    <div className="absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-white to-transparent z-10" />
+                    
+                    <div className="whitespace-nowrap animate-marquee flex items-center gap-12">
+                        {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+                            <span key={i} className="text-[9px] font-bold text-slate-400 uppercase tracking-[0.25em] flex items-center gap-2">
+                                ONIMTA INFORMATION TECHNOLOGY (PVT) LTD
+                                <div className="h-1 w-1 bg-[#0078d4]/40 rounded-full" />
+                            </span>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Right: Company Credits (Above Ticker) */}
+                <div className="flex items-center gap-1.5 group relative z-20 bg-white pl-6">
+                    <span className="text-[10px] font-medium text-slate-400 uppercase tracking-tighter">Powered by</span>
+                    <span className="text-[#0078d4] text-[12px] font-black tracking-tight group-hover:scale-105 transition-transform cursor-default uppercase">
+                        {selectedCompany?.CompanyName || selectedCompany?.companyName || "ONIMTA"}
                     </span>
                 </div>
             </footer>
 
-            {/* Floating AI Chatbot Button (Bottom Right) - Extra Large Lottie Version (No Label) */}
-            <button
-                onClick={handleAIClick}
-                className="fixed bottom-20 right-10 z-[60] w-32 h-32 flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 group drop-shadow-2xl"
-            >
-                {/* No Background - Transparent Lottie Only */}
-                <DotLottiePlayer
-                    src="/images/Ai Robot Vector Art.lottie"
-                    autoplay
-                    loop
-                    className="w-full h-full"
-                />
-            </button>
+            {/* Floating AI Assistant with Dynamic Positioning (Status-Based) */}
+            <div className={`fixed bottom-16 z-[60] flex flex-col pointer-events-none transition-all duration-700 ease-in-out ${pendingSnoozeTask ? 'left-10 items-start' : 'right-10 items-end'}`}>
+                {/* Minimalist Red Quote Frame Speech Bubble for Task Alert */}
+                {pendingSnoozeTask && (
+                    <div className="mb-4 ml-6 relative animate-in fade-in slide-in-from-bottom-2 duration-500 pointer-events-auto">
+                        
+                        {/* The Quote Frame Bubble */}
+                        <div className="bg-white/95 backdrop-blur-sm p-4 px-8 border-2 border-[#f05252] rounded-[18px] max-w-[420px] relative shadow-xl">
+                             
+                             {/* Top Left Quote Marks */}
+                             <div className="absolute -top-3 -left-1 bg-white px-1 flex gap-1">
+                                <span className="text-[#f05252] text-xl font-black rotate-180">„</span>
+                             </div>
+
+                             {/* Bottom Right Quote Marks */}
+                             <div className="absolute -bottom-4 -right-1 bg-white px-1 flex gap-1">
+                                <span className="text-[#f05252] text-xl font-black">“</span>
+                             </div>
+
+                             {/* Content Inner */}
+                             <div className="flex items-center gap-6 relative z-10">
+                                 <div className="flex-1">
+                                     <div className="flex items-center gap-2 mb-1">
+                                        <div className="w-4 h-4 bg-[#f05252]/10 rounded-full flex items-center justify-center border border-[#f05252]/20">
+                                            <Bell size={8} className="text-[#f05252]" />
+                                        </div>
+                                        <p className="text-[9px] font-medium uppercase tracking-[0.2em] text-[#f05252]/80">System Reminder</p>
+                                     </div>
+                                    
+                                    <p className="text-[13px] font-medium leading-none text-slate-800 whitespace-nowrap">
+                                        Navoda, You have one pending job.
+                                    </p>
+                                 </div>
+                                
+                                <button 
+                                    onClick={() => handleCompleteAlarm(pendingSnoozeTask)}
+                                    className="px-5 py-2.5 bg-[#f05252] text-white text-[9px] font-black rounded-lg uppercase tracking-[0.2em] hover:bg-[#d43f3f] transition-all active:scale-95 shadow-lg shadow-red-500/20 shrink-0 whitespace-nowrap"
+                                >
+                                    Finish Now
+                                </button>
+                             </div>
+                            
+                            {/* Pointy Tail matching the Red Frame (Left-Side Pointing) */}
+                            <div className="absolute -bottom-2.5 left-6 w-6 h-6 bg-white rotate-[45deg] border-r-2 border-b-2 border-[#f05252]" />
+                            
+                        </div>
+                    </div>
+                )}
+
+                {/* Robot Lottie Button (Dynamic Alignment) */}
+                <button
+                    onClick={handleAIClick}
+                    className="w-32 h-32 flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 group drop-shadow-2xl pointer-events-auto"
+                >
+                    <DotLottiePlayer
+                        src="/images/Ai Robot Vector Art.lottie"
+                        autoplay
+                        loop
+                        className="w-full h-full"
+                    />
+                </button>
+            </div>
 
 
 
 
 
-            {/* Thank You / Logout Modal */}
             <ThankYouModal
                 isOpen={showThankYouModal}
                 onClose={() => setShowThankYouModal(false)}
+            />
+
+            <AlarmAlertModal 
+                isOpen={!!activeAlarmTask}
+                onClose={() => handleAlarmDismiss(activeAlarmTask?.id_No || activeAlarmTask?.Id_No || activeAlarmTask?.idNo)}
+                task={activeAlarmTask}
+                onComplete={handleCompleteAlarm}
             />
 
             <style hmr-ignore="true">{`

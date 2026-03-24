@@ -1,22 +1,22 @@
 import React from 'react';
 import { X, Landmark, ArrowRightLeft, RefreshCw, Ban, Reply, Printer, Hash, PenTool, ClipboardCheck, Clock } from 'lucide-react';
 
-const BankingSubModal = ({ isOpen, onClose }) => {
+const BankingSubModal = ({ isOpen, onClose, onOpenCollectionDeposit, onOpenDirectBankTransaction, onOpenFundsTransfer, onOpenBankReconciliation, onOpenChequeCancel, onOpenCustomerChequeReturn, onOpenChequePrint, onOpenChequeBookEntry, onOpenWriteCheque, onOpenChequeInHand, onOpenNotPresented }) => {
     if (!isOpen) return null;
 
     const menuItems = [
-        { icon: Landmark, label: 'Make Deposits' },
-        { icon: Landmark, label: 'Direct Bank Transaction' },
-        { icon: ArrowRightLeft, label: 'Transfer Funds' },
-        { icon: RefreshCw, label: 'Reconcile' },
-        { icon: Ban, label: 'Cheque Cancel' },
-        { icon: Reply, label: 'Customer Cheque Return' },
-        { icon: Printer, label: 'Cheque Printing' },
-        { icon: Hash, label: 'Enter Cheque Book Number' },
-        { icon: PenTool, label: 'Cheque Writing' },
+        { icon: Landmark, label: 'Make Deposits', action: onOpenCollectionDeposit },
+        { icon: Landmark, label: 'Direct Bank Transaction', action: onOpenDirectBankTransaction },
+        { icon: ArrowRightLeft, label: 'Transfer Funds', action: onOpenFundsTransfer },
+        { icon: RefreshCw, label: 'Reconcile', action: onOpenBankReconciliation },
+        { icon: Ban, label: 'Cheque Cancel', action: onOpenChequeCancel },
+        { icon: Reply, label: 'Customer Cheque Return', action: onOpenCustomerChequeReturn },
+        { icon: Printer, label: 'Cheque Printing', action: onOpenChequePrint },
+        { icon: Hash, label: 'Enter Cheque Book Number', action: onOpenChequeBookEntry },
+        { icon: PenTool, label: 'Cheque Writing', action: onOpenWriteCheque },
         { type: 'separator' },
-        { icon: ClipboardCheck, label: 'Cheque In Hand' },
-        { icon: Clock, label: 'Not Precented Cheques' },
+        { icon: ClipboardCheck, label: 'Cheque In Hand', action: onOpenChequeInHand },
+        { icon: Clock, label: 'Not Presented Cheques', action: onOpenNotPresented },
     ];
 
     return (
@@ -24,9 +24,8 @@ const BankingSubModal = ({ isOpen, onClose }) => {
             {/* Backdrop */}
             <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={onClose} />
             
-            {/* Modal Container */}
-            <div className="relative w-full max-w-[280px] bg-white border border-gray-100 rounded-xl shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
-                
+            {/* Modal */}
+            <div className="relative w-full max-w-[280px] bg-white border border-gray-100 rounded-xl shadow-2xl overflow-hidden flex flex-col animate-in slide-in-from-bottom-4 duration-300">
                 {/* Header */}
                 <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-100 select-none">
                     <div className="flex items-center gap-2">
@@ -52,6 +51,12 @@ const BankingSubModal = ({ isOpen, onClose }) => {
                         return (
                             <button
                                 key={idx}
+                                onClick={() => {
+                                    if (item.action) {
+                                        item.action();
+                                        onClose();
+                                    }
+                                }}
                                 className="w-full flex items-center justify-between px-3 py-2.5 rounded-sm hover:bg-[#0078d4] group transition-all text-left"
                             >
                                 <div className="flex items-center gap-3">
@@ -60,6 +65,7 @@ const BankingSubModal = ({ isOpen, onClose }) => {
                                         {item.label}
                                     </span>
                                 </div>
+                                <ChevronRight size={10} className="text-gray-300 group-hover:text-white transition-colors" />
                             </button>
                         );
                     })}
@@ -73,5 +79,22 @@ const BankingSubModal = ({ isOpen, onClose }) => {
         </div>
     );
 };
+
+const ChevronRight = ({ size, className }) => (
+    <svg 
+        xmlns="http://www.w3.org/2000/svg" 
+        width={size} 
+        height={size} 
+        viewBox="0 0 24 24" 
+        fill="none" 
+        stroke="currentColor" 
+        strokeWidth="2" 
+        strokeLinecap="round" 
+        strokeLinejoin="round" 
+        className={className}
+    >
+        <path d="m9 18 6-6-6-6"/>
+    </svg>
+);
 
 export default BankingSubModal;

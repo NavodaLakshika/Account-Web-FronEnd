@@ -61,7 +61,7 @@ const BankReconciliationBoard = ({ isOpen, onClose }) => {
                 isOpen={isOpen}
                 onClose={onClose}
                 title="Professional Bank Reconciliation"
-                maxWidth="max-w-7xl"
+                maxWidth="max-w-[1100px]"
                 footer={
                     <div className="bg-slate-50 px-6 py-4 w-full flex justify-end gap-3 border-t border-gray-100 rounded-b-xl">
                         <button onClick={handleReset} className="px-6 h-10 bg-slate-100 text-slate-600 text-sm font-bold rounded-md hover:bg-slate-200 transition-all active:scale-95 flex items-center gap-2 border-none">
@@ -136,15 +136,15 @@ const BankReconciliationBoard = ({ isOpen, onClose }) => {
                                     {clearedBalance.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                 </div>
                             </div>
-                            <div className="flex flex-col justify-center bg-slate-900 p-4 rounded-sm shadow-xl relative overflow-hidden group">
-                                <div className={`absolute inset-0 transition-opacity duration-500 ${isMatched ? 'bg-green-600/20 opacity-100' : 'opacity-0'}`} />
-                                <span className={`text-[10px] font-black uppercase tracking-widest leading-none mb-2 relative z-10 ${isMatched ? 'text-green-400' : 'text-blue-400'}`}>
+                            <div className="flex flex-col justify-center bg-white p-4 rounded-sm border border-gray-200 shadow-sm relative overflow-hidden group">
+                                <div className={`absolute inset-0 transition-opacity duration-500 ${isMatched ? 'bg-green-600/10 opacity-100' : 'opacity-0'}`} />
+                                <span className={`text-[10px] font-black uppercase tracking-widest leading-none mb-2 relative z-10 ${isMatched ? 'text-green-600' : 'text-slate-400'}`}>
                                     {isMatched ? 'Perfectly Matched' : 'Reconciliation Delta'}
                                 </span>
-                                <div className={`text-2xl font-black tabular-nums tracking-tighter relative z-10 flex items-baseline gap-1 ${isMatched ? 'text-green-400' : 'text-white'}`}>
-                                    <span className="text-[12px] font-bold opacity-30">LKR</span>
+                                <div className={`text-2xl font-black tabular-nums tracking-tighter relative z-10 flex items-baseline gap-1 ${isMatched ? 'text-green-600' : 'text-[#0078d4]'}`}>
+                                    <span className="text-[12px] font-bold opacity-30 text-slate-400">LKR</span>
                                     {delta.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                                    {isMatched && <CheckCircle2 size={24} className="ml-auto text-green-400" />}
+                                    {isMatched && <CheckCircle2 size={24} className="ml-auto text-green-600" />}
                                 </div>
                             </div>
                         </div>

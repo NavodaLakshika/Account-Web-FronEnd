@@ -6,27 +6,42 @@ import ToDoListBoard from './ViewAndUtilityModels/ToDoListBoard';
 import SendFileBoard from './ViewAndUtilityModels/SendFileBoard';
 import FindBoard from './ViewAndUtilityModels/FindBoard';
 import CalculatorBoard from './ViewAndUtilityModels/CalculatorBoard';
+import ChangeBackgroundBoard from './ViewAndUtilityModels/ChangeBackgroundBoard';
 
-const ViewUtilityModal = ({ isOpen, onClose, onToggleSideBar }) => {
+const ViewUtilityModal = ({ isOpen, onClose, onToggleSideBar, onOpenReminder, onOpenCalculator, onOpenNotepad, onOpenPrinter, currentTopBarColor, onColorSelect }) => {
     const [showLetterEnvelopesModal, setShowLetterEnvelopesModal] = useState(false);
     const [showOfficeDocumentModal, setShowOfficeDocumentModal] = useState(false);
     const [showToDoListBoard, setShowToDoListBoard] = useState(false);
     const [showSendFileBoard, setShowSendFileBoard] = useState(false);
     const [showFindBoard, setShowFindBoard] = useState(false);
     const [showCalculatorBoard, setShowCalculatorBoard] = useState(false);
+    const [showCustomizeIconBarBoard, setShowCustomizeIconBarBoard] = useState(false);
+    const [showChangeBackgroundBoard, setShowChangeBackgroundBoard] = useState(false);
 
     if (!isOpen) return null;
 
     const menuItems = [
-        { icon: Layout, label: 'Customize Icon Bar', shortcut: '' },
-        { icon: Bell, label: 'Reminder - To Do List', shortcut: '', onClick: () => setShowToDoListBoard(true) },
+        { icon: Layout, label: 'Customize Icon Bar', shortcut: '', onClick: () => setShowCustomizeIconBarBoard(true) },
+        { icon: Bell, label: 'Reminder - To Do List', shortcut: '', onClick: () => {
+             onOpenReminder();
+             onClose();
+        } },
         { icon: Send, label: 'Send File', shortcut: '', onClick: () => setShowSendFileBoard(true) },
         { icon: Mail, label: 'Use E-Mail', shortcut: '' },
         { icon: Search, label: 'Find', shortcut: 'Ctrl+F', onClick: () => setShowFindBoard(true) },
         { icon: Search, label: 'Search', shortcut: '', onClick: () => setShowFindBoard(true) },
-        { icon: Calculator, label: 'Use Calculator', shortcut: '', onClick: () => setShowCalculatorBoard(true) },
-        { icon: Printer, label: 'Printer Setup', shortcut: '' },
-        { icon: FileText, label: 'Open Notepad', shortcut: '' },
+        { icon: Calculator, label: 'Use Calculator', shortcut: '', onClick: () => {
+             onOpenCalculator();
+             onClose();
+        } },
+        { icon: Printer, label: 'Printer Setup', shortcut: '', onClick: () => {
+             onOpenPrinter();
+             onClose();
+        } },
+        { icon: FileText, label: 'Open Notepad', shortcut: '', onClick: () => {
+             onOpenNotepad();
+             onClose();
+        } },
         { icon: File, label: 'Open Office Document', hasSubmenu: true, onClick: () => {
             console.log('Opening Office Modal...');
             setShowOfficeDocumentModal(true);
@@ -37,11 +52,12 @@ const ViewUtilityModal = ({ isOpen, onClose, onToggleSideBar }) => {
             onClose();
         }},
         { type: 'separator' },
-        { icon: Image, label: 'Change Background...', shortcut: '' },
+        { icon: Image, label: 'Change Background...', shortcut: '', onClick: () => setShowChangeBackgroundBoard(true) },
     ];
 
     return (
         <>
+            {/* Modal Container Logic */}
             <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
                 {/* Backdrop */}
                 <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={onClose} />
@@ -121,31 +137,28 @@ const ViewUtilityModal = ({ isOpen, onClose, onToggleSideBar }) => {
                 />
             )}
 
-            {showToDoListBoard && (
-                <ToDoListBoard 
-                    isOpen={showToDoListBoard} 
-                    onClose={() => setShowToDoListBoard(false)} 
-                />
-            )}
-
-            {showSendFileBoard && (
-                <SendFileBoard 
-                    isOpen={showSendFileBoard} 
-                    onClose={() => setShowSendFileBoard(false)} 
-                />
-            )}
-
             {showFindBoard && (
                 <FindBoard 
                     isOpen={showFindBoard} 
                     onClose={() => setShowFindBoard(false)} 
                 />
             )}
-
-            {showCalculatorBoard && (
-                <CalculatorBoard 
-                    isOpen={showCalculatorBoard} 
-                    onClose={() => setShowCalculatorBoard(false)} 
+            {showCustomizeIconBarBoard && (
+                <CustomizeIconBarBoard 
+                    isOpen={showCustomizeIconBarBoard} 
+                    onClose={() => setShowCustomizeIconBarBoard(false)}
+                    onSave={() => window.location.reload()} // Reload to apply icons across dashboard
+                />
+            )}
+            {showChangeBackgroundBoard && (
+                <ChangeBackgroundBoard
+                    isOpen={showChangeBackgroundBoard}
+                    onClose={() => setShowChangeBackgroundBoard(false)}
+                    currentTopBarColor={currentTopBarColor}
+                    onColorSelect={(color) => {
+                        onColorSelect(color);
+                        setShowChangeBackgroundBoard(false);
+                    }}
                 />
             )}
         </>

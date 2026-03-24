@@ -85,7 +85,7 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
             isOpen={isOpen}
             onClose={onClose}
             title="Write Cheque"
-            maxWidth="max-w-[95vw]"
+            maxWidth="max-w-[1000px]"
             footer={
                 <div className="bg-slate-50 px-6 py-4 w-full flex justify-end gap-3 border-t border-gray-100 rounded-b-xl">
                     <button onClick={handleClear} className="px-6 h-10 bg-slate-100 text-slate-600 text-sm font-bold rounded-md hover:bg-slate-200 transition-all active:scale-95 flex items-center gap-2 border-none">
@@ -104,7 +104,7 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
                 </div>
             }
         >
-            <div className="space-y-6 font-['Inter']">
+            <div className="space-y-4 font-['Inter']">
                 {/* Header Section */}
                 <div className="grid grid-cols-12 gap-8">
                     <div className="col-span-12 lg:col-span-7 space-y-3">

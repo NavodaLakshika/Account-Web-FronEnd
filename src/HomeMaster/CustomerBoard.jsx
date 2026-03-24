@@ -10,7 +10,7 @@ const CustomerBoard = ({ isOpen, onClose }) => {
             isOpen={isOpen}
             onClose={onClose}
             title="Customer Center"
-            maxWidth="max-w-[1200px]"
+            maxWidth="max-w-[1100px]"
             footer={
                 <div className="flex items-center justify-between w-full">
                     <div className="flex items-center gap-2 pl-4">

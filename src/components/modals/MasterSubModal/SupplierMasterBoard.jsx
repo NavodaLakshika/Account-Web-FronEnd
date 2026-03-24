@@ -226,7 +226,7 @@ const SupplierMasterBoard = ({ isOpen, onClose }) => {
 
     return (
         <>
-            <SimpleModal isOpen={isOpen} onClose={onClose} title="Supplier Master File" maxWidth="max-w-4xl" footer={footer}>
+            <SimpleModal isOpen={isOpen} onClose={onClose} title="Supplier Master File" maxWidth="max-w-[1000px]" footer={footer}>
                 <div className="space-y-4 py-2 font-['Plus_Jakarta_Sans']">
                     <div className="border-b border-gray-200 pb-2 mb-4 flex items-center gap-2">
                         <Truck size={18} className="text-[#0078d4]" />
