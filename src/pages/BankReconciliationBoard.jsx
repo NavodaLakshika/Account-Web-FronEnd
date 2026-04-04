@@ -280,7 +280,7 @@ const FormRow = ({ label, children }) => (
 );
 
 const SearchModal = ({ title, query, setQuery, onClose, data, columns, onSelect }) => (
-    <div className="fixed inset-0 z-[350] flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4">
         <div className="absolute inset-0 bg-slate-500/30 backdrop-blur-[2px]" onClick={onClose} />
         <div className="relative w-full max-w-2xl bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col max-h-[85vh] font-['Inter']">
             <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-slate-50/50">

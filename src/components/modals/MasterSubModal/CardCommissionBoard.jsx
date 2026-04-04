@@ -225,7 +225,7 @@ const handleSave = async () => {
 
             {/* Custom Save Confirmation Modal */}
             {showSaveConfirm && (
-                <div className="fixed inset-0 z-[700] flex items-center justify-center p-4">
+                <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4">
                     <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => !loading && setShowSaveConfirm(false)} />
                     <div className="relative w-full max-w-md bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden animate-in zoom-in-95 duration-200">
                         <div className="p-8 text-center">
@@ -265,7 +265,7 @@ const handleSave = async () => {
 
             {/* Bank Search Modal */}
             {showBankModal && (
-                <div className="fixed inset-0 z-[350] flex items-center justify-center p-4">
+                <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4">
                     <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setShowBankModal(false)} />
                     <div className="relative w-full max-w-2xl bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col max-h-[85vh]">
                         <div className="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-50 font-['Plus_Jakarta_Sans']">
@@ -303,7 +303,7 @@ const handleSave = async () => {
 
             {/* Card Search Modal */}
             {showCardModal && (
-                <div className="fixed inset-0 z-[350] flex items-center justify-center p-4">
+                <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4">
                     <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setShowCardModal(false)} />
                     <div className="relative w-full max-w-2xl bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col max-h-[85vh]">
                         <div className="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-50 font-['Plus_Jakarta_Sans']">

@@ -69,7 +69,7 @@ const AIChatbotBoard = ({ isOpen, onClose }) => {
 
     return (
         <>
-            <div className={`fixed inset-0 z-[100] flex items-center justify-center p-6 transition-all duration-700 ${isOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'}`}>
+            <div className={`fixed inset-0 z-[1100] flex items-center justify-center p-6 transition-all duration-700 ${isOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'}`}>
                 {!showIntro && (
                     <div className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-all duration-700" onClick={onClose} />
                 )}

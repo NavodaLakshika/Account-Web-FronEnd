@@ -329,7 +329,7 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
 
         {/* Bank Account Search Modal */}
         {showBankModal && (
-            <div className="fixed inset-0 z-[350] flex items-center justify-center p-4">
+            <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4">
                 <div className="absolute inset-0 bg-slate-500/30 backdrop-blur-[2px]" onClick={() => setShowBankModal(false)} />
                 <div className="relative w-full max-w-2xl bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col max-h-[85vh]">
                     <div className="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-50 font-['Plus_Jakarta_Sans']">
@@ -370,7 +370,7 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
 
         {/* Cost Center Search Modal */}
         {showCCModal && (
-            <div className="fixed inset-0 z-[350] flex items-center justify-center p-4">
+            <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4">
                 <div className="absolute inset-0 bg-slate-500/30 backdrop-blur-[2px]" onClick={() => setShowCCModal(false)} />
                 <div className="relative w-full max-w-2xl bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col max-h-[85vh]">
                     <div className="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-50 font-['Plus_Jakarta_Sans']">
@@ -417,7 +417,7 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
 
         {/* Endorsement Search Modal */}
         {showEndorsementModal && (
-            <div className="fixed inset-0 z-[350] flex items-center justify-center p-4">
+            <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4">
                 <div className="absolute inset-0 bg-slate-500/30 backdrop-blur-[2px]" onClick={() => setShowEndorsementModal(false)} />
                 <div className="relative w-full max-w-md bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col shadow-blue-500/20">
                     <div className="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-50 font-['Plus_Jakarta_Sans']">
@@ -445,7 +445,7 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
 
         {/* Account Search Modal (Lines) */}
         {showAccModal && (
-            <div className="fixed inset-0 z-[350] flex items-center justify-center p-4">
+            <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4">
                 <div className="absolute inset-0 bg-slate-500/30 backdrop-blur-[2px]" onClick={() => setShowAccModal(false)} />
                 <div className="relative w-full max-w-2xl bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col max-h-[85vh]">
                     <div className="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-50 font-['Plus_Jakarta_Sans']">

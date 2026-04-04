@@ -222,7 +222,7 @@ const CostCenterBoard = ({ isOpen, onClose }) => {
 
             {/* Search Modal */}
             {showSearchModal && (
-                <div className="fixed inset-0 z-[300] flex items-center justify-center p-4">
+                <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4">
                     <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setShowSearchModal(false)} />
                     <div className="relative w-full max-w-lg bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col max-h-[80vh] font-['Plus_Jakarta_Sans']">
                         <div className="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-50/50">

@@ -503,7 +503,7 @@ const CompanyBoard = ({ isOpen, onClose }) => {
 
             {/* Company Lookup Modal */}
             {showLookup && (
-                <div className="fixed inset-0 z-[600] flex items-center justify-center p-4">
+                <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4">
                     <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setShowLookup(false)} />
                     <div className="relative w-full max-w-lg bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden animate-in zoom-in-95 duration-200">
                         {/* Header */}
@@ -558,7 +558,7 @@ const CompanyBoard = ({ isOpen, onClose }) => {
 
             {/* Custom Delete Confirmation Modal */}
             {showDeleteConfirm && (
-                <div className="fixed inset-0 z-[700] flex items-center justify-center p-4">
+                <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4">
                     <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => !loading && setShowDeleteConfirm(false)} />
                     <div className="relative w-full max-w-md bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden animate-in zoom-in-95 duration-200">
                         <div className="p-8 text-center">
@@ -598,7 +598,7 @@ const CompanyBoard = ({ isOpen, onClose }) => {
 
             {/* Country Lookup Modal */}
             {showCountryLookup && (
-                <div className="fixed inset-0 z-[600] flex items-center justify-center p-4">
+                <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4">
                     <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setShowCountryLookup(false)} />
                     <div className="relative w-full max-w-md bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden animate-in zoom-in-95 duration-200">
                         {/* Header */}
@@ -653,7 +653,7 @@ const CompanyBoard = ({ isOpen, onClose }) => {
 
             {/* Industry Lookup Modal */}
             {showIndustryLookup && (
-                <div className="fixed inset-0 z-[600] flex items-center justify-center p-4">
+                <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4">
                     <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setShowIndustryLookup(false)} />
                     <div className="relative w-full max-w-md bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden animate-in zoom-in-95 duration-200">
                         {/* Header */}

@@ -451,7 +451,7 @@ const PayBillBoard = ({ isOpen, onClose }) => {
 
         {/* Vendor Search Modal */}
         {showVendorModal && (
-            <div className="fixed inset-0 z-[350] flex items-center justify-center p-4">
+            <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4">
                 <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setShowVendorModal(false)} />
                 <div className="relative w-full max-w-2xl bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col max-h-[85vh]">
                     <div className="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-50 font-['Plus_Jakarta_Sans']">
@@ -492,7 +492,7 @@ const PayBillBoard = ({ isOpen, onClose }) => {
 
         {/* Cost Center Search Modal */}
         {showCCModal && (
-            <div className="fixed inset-0 z-[350] flex items-center justify-center p-4">
+            <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4">
                 <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setShowCCModal(false)} />
                 <div className="relative w-full max-w-2xl bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col max-h-[85vh]">
                     <div className="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-50 font-['Plus_Jakarta_Sans']">
@@ -534,7 +534,7 @@ const PayBillBoard = ({ isOpen, onClose }) => {
 
         {/* Payment Method Search Modal */}
         {showPayTypeModal && (
-            <div className="fixed inset-0 z-[350] flex items-center justify-center p-4">
+            <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4">
                 <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setShowPayTypeModal(false)} />
                 <div className="relative w-full max-w-md bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col">
                     <div className="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-50 font-['Plus_Jakarta_Sans']">
@@ -562,7 +562,7 @@ const PayBillBoard = ({ isOpen, onClose }) => {
 
         {/* Payment Account Search Modal */}
         {showAccModal && (
-            <div className="fixed inset-0 z-[350] flex items-center justify-center p-4">
+            <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4">
                 <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setShowAccModal(false)} />
                 <div className="relative w-full max-w-2xl bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col max-h-[85vh]">
                     <div className="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-50 font-['Plus_Jakarta_Sans']">

@@ -345,7 +345,7 @@ const SupplierMasterBoard = ({ isOpen, onClose }) => {
 
             {/* Vendor Type Search Modal */}
             {showVTModal && (
-                <div className="fixed inset-0 z-[350] flex items-center justify-center p-4">
+                <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4">
                     <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setShowVTModal(false)} />
                     <div className="relative w-full max-w-2xl bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col max-h-[85vh]">
                         <div className="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-50 font-['Plus_Jakarta_Sans']">
@@ -393,7 +393,7 @@ const SupplierMasterBoard = ({ isOpen, onClose }) => {
 
             {/* Bank Search Modal */}
             {showBankModal && (
-                <div className="fixed inset-0 z-[350] flex items-center justify-center p-4">
+                <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4">
                     <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setShowBankModal(false)} />
                     <div className="relative w-full max-w-2xl bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col max-h-[85vh]">
                         <div className="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-50 font-['Plus_Jakarta_Sans']">
@@ -438,7 +438,7 @@ const SupplierMasterBoard = ({ isOpen, onClose }) => {
             )}
 
             {showSearchModal && (
-                <div className="fixed inset-0 z-[300] flex items-center justify-center p-4">
+                <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4">
                     <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowSearchModal(false)} />
                     <div className="relative w-full max-w-4xl bg-white shadow-2xl rounded-lg overflow-hidden flex flex-col max-h-[85vh]">
                         <div className="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-50 font-['Plus_Jakarta_Sans']">

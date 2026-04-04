@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import SimpleModal from '../components/SimpleModal';
-import { Search, Calendar, ChevronDown, CheckCircle, Trash2, Printer, X, Save, RotateCcw, ChevronLeft, ChevronRight } from 'lucide-react';
+import ConfirmModal from '../components/modals/ConfirmModal';
+import { Search, Calendar, ChevronDown, CheckCircle, Trash2, Printer, X, Save, RotateCcw, ChevronLeft, ChevronRight, Plus } from 'lucide-react';
 import { purchOrderService } from '../services/purchOrder.service';
 import { toast } from 'react-hot-toast';
 
@@ -25,8 +26,11 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
     const [products, setProducts] = useState([]);
     const [orders, setOrders] = useState([]); // List of existing POs for picker
     const [showSearchModal, setShowSearchModal] = useState(false);
+    const [showConfirmModal, setShowConfirmModal] = useState(false);
+    const [isApplying, setIsApplying] = useState(false);
     const [showSupplierSearch, setShowSupplierSearch] = useState(false);
     const [showProductSearch, setShowProductSearch] = useState(false);
+    const [showAddProductModal, setShowAddProductModal] = useState(false);
     const [supplierSearchQuery, setSupplierSearchQuery] = useState('');
     const [productSearchQuery, setProductSearchQuery] = useState('');
     const [showDatePicker, setShowDatePicker] = useState(false);
@@ -228,16 +232,22 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
         if (!formData.payType) return toast.error('Payment type has not been selected.');
         if (products.length === 0) return toast.error('No products entered.');
 
-        if (!window.confirm("Are you sure you want to save and apply this record?")) return;
+        setShowConfirmModal(true);
+    };
 
+    const confirmApply = async () => {
+        setIsApplying(true);
         const payload = preparePayload();
 
         try {
             const resp = await purchOrderService.apply(payload);
             toast.success(`Record applied successfully (${resp.docNo}).`);
             handleClear();
+            setShowConfirmModal(false);
         } catch (error) {
             toast.error(error.toString());
+        } finally {
+            setIsApplying(false);
         }
     };
 
@@ -462,53 +472,62 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
                         </div>
                     </div>
 
-                    <div className="border border-[#0078d4]/30 rounded-sm bg-white shadow-sm flex flex-col min-h-[250px]">
-                        <div className="flex bg-[#0078d4]/5 border-b border-[#0078d4]/20 text-[11px] font-bold text-[#0078d4] uppercase tracking-wide">
-                            <div className="flex-[2] py-1.5 px-3 border-r border-[#0078d4]/20 truncate">Product Name</div>
-                            <div className="flex-[0.8] py-1.5 px-3 border-r border-[#0078d4]/20 text-center">Unit</div>
-                            <div className="flex-[1] py-1.5 px-3 border-r border-[#0078d4]/20 text-center">Qty</div>
-                            <div className="flex-[1] py-1.5 px-3 border-r border-[#0078d4]/20 text-right">Price</div>
-                            <div className="flex-[1.2] py-1.5 px-3 border-r border-[#0078d4]/20 text-right">Amount</div>
+                    <div className="border border-[#0078d4]/30 rounded-sm bg-white shadow-sm flex flex-col min-h-[220px]">
+                        {/* Table header — columns exactly match product rows */}
+                        <div className="flex bg-[#0078d4]/5 border-b border-[#0078d4]/20 text-[11px] font-bold text-[#0078d4] uppercase tracking-wide items-center">
+                            <div className="flex-[2.5] py-2 px-3 border-r border-[#0078d4]/20 truncate flex items-center justify-between">
+                                <span>Product Name</span>
+                                <button
+                                    onClick={() => {
+                                        setEntry({ prodCode: '', prodName: '', unit: '', packSize: 1, qty: '', purchasePrice: '', amount: '0.00' });
+                                        purchOrderService.getLookups(formData.company).then(data => setLookups(prev => ({ ...prev, products: data.products })));
+                                        setShowAddProductModal(true);
+                                    }}
+                                    className="w-8 h-7 bg-[#0078d4] text-white flex items-center justify-center hover:bg-[#005a9e] rounded-sm transition-colors shadow-sm shrink-0"
+                                    title="Add Product"
+                                ><Plus size={14} /></button>
+                            </div>
+                            <div className="w-16 py-2 px-3 border-r border-[#0078d4]/20 text-center">Unit</div>
+                            <div className="w-24 py-2 px-3 border-r border-[#0078d4]/20 text-right">Price</div>
+                            <div className="w-16 py-2 px-3 border-r border-[#0078d4]/20 text-center">Qty</div>
+                            <div className="w-28 py-2 px-3 text-right">Amount</div>
                             <div className="w-10"></div>
                         </div>
 
-                        <div className="flex bg-[#ffffe6] border-b border-orange-200 text-[12px] p-1 gap-1 items-center">
-                            <div className="flex-[2] px-1 flex gap-1">
-                                <input
-                                    type="text"
-                                    readOnly
-                                    value={entry.prodName || 'Select Product...'}
-                                    className="flex-1 h-7 border border-orange-300 bg-white font-bold px-2 outline-none rounded-sm focus:border-blue-500 text-[12px]"
-                                />
-                                <button onClick={() => setShowProductSearch(true)} className="w-8 h-7 bg-orange-500 text-white flex items-center justify-center hover:bg-orange-600 rounded-sm transition-colors shadow-sm">
-                                    <Search size={14} />
-                                </button>
-                            </div>
-                            <div className="flex-[0.8] px-1">
-                                <input type="text" readOnly value={entry.unit} className="w-full h-7 border border-orange-200 bg-orange-50/50 px-2 text-center outline-none rounded-sm text-gray-500 font-semibold" />
-                            </div>
-                            <div className="flex-[1] px-1">
-                                <input type="text" name="qty" ref={qtyRef} value={entry.qty} onChange={handleEntryInput} onKeyDown={e => e.key === 'Enter' && addProduct()} className="w-full h-7 border border-orange-300 bg-white px-2 text-center outline-none rounded-sm font-bold focus:border-blue-500" placeholder="Qty" />
-                            </div>
-                            <div className="flex-[1] px-1">
-                                <input type="text" name="purchasePrice" value={entry.purchasePrice} onChange={handleEntryInput} onKeyDown={e => e.key === 'Enter' && addProduct()} className="w-full h-7 border border-orange-300 bg-white px-2 text-right outline-none rounded-sm font-semibold focus:border-blue-500" />
-                            </div>
-                            <div className="flex-[1.2] px-1">
-                                <input type="text" readOnly value={entry.amount} className="w-full h-7 border border-orange-200 bg-white px-2 text-right outline-none rounded-sm font-bold text-[#b91c1c]" />
-                            </div>
-                            <div className="w-10 flex justify-center">
-                                <button onClick={addProduct} className="w-7 h-7 bg-orange-500 text-white rounded-sm hover:bg-orange-600 flex items-center justify-center font-bold pb-0.5">+</button>
-                            </div>
-                        </div>
-
-                        <div className="flex-1 bg-white overflow-y-auto max-h-[160px]">
+                        <div className="flex-1 bg-white overflow-y-auto max-h-[200px]">
                             {products.map((p, idx) => (
-                                <div key={idx} className="flex border-b border-gray-100 text-[12px] font-semibold text-gray-600 hover:bg-gray-50 items-center">
-                                    <div className="flex-[2] py-1.5 px-3 border-r border-gray-100 truncate" title={p.prodName}>{p.prodName} [{p.prodCode}]</div>
-                                    <div className="flex-[0.8] py-1.5 px-3 border-r border-gray-100 text-center">{p.unit}</div>
-                                    <div className="flex-[1] py-1.5 px-3 border-r border-gray-100 text-center font-bold">{p.qty}</div>
-                                    <div className="flex-[1] py-1.5 px-3 border-r border-gray-100 text-right">{parseFloat(p.purchasePrice).toFixed(2)}</div>
-                                    <div className="flex-[1.2] py-1.5 px-3 border-r border-gray-100 text-right font-bold text-[#000080]">{parseFloat(p.amount).toFixed(2)}</div>
+                                <div key={idx} className="flex border-b border-gray-100 text-[12px] font-semibold text-gray-600 hover:bg-gray-50/50 items-center">
+                                    <div className="flex-[2.5] py-1.5 px-3 border-r border-gray-100 truncate" title={p.prodName}>{p.prodName} [{p.prodCode}]</div>
+                                    <div className="w-16 py-1.5 px-3 border-r border-gray-100 text-center">{p.unit}</div>
+                                    <div className="w-24 border-r border-gray-100 px-1 py-1">
+                                        <input
+                                            type="text"
+                                            value={p.purchasePrice}
+                                            onChange={(e) => {
+                                                const newPrice = e.target.value;
+                                                const newAmount = (parseFloat(p.qty) || 0) * (parseFloat(newPrice) || 0);
+                                                setProducts(products.map((item, i) =>
+                                                    i === idx ? { ...item, purchasePrice: newPrice, amount: newAmount.toFixed(2) } : item
+                                                ));
+                                            }}
+                                            className="w-full h-6 bg-transparent text-right text-[12px] font-semibold outline-none focus:bg-blue-50/60 border border-transparent focus:border-gray-300 rounded-sm px-1"
+                                        />
+                                    </div>
+                                    <div className="w-16 border-r border-gray-100 px-1 py-1">
+                                        <input
+                                            type="text"
+                                            value={p.qty}
+                                            onChange={(e) => {
+                                                const newQty = e.target.value;
+                                                const newAmount = (parseFloat(newQty) || 0) * (parseFloat(p.purchasePrice) || 0);
+                                                setProducts(products.map((item, i) =>
+                                                    i === idx ? { ...item, qty: newQty, amount: newAmount.toFixed(2) } : item
+                                                ));
+                                            }}
+                                            className="w-full h-6 bg-transparent text-center text-[12px] font-black outline-none focus:bg-blue-50/60 border border-transparent focus:border-gray-300 rounded-sm px-1"
+                                        />
+                                    </div>
+                                    <div className="w-28 py-1.5 px-3 text-right font-bold text-[#000080]">{parseFloat(p.amount).toFixed(2)}</div>
                                     <div className="w-10 flex justify-center py-1">
                                         <button onClick={() => removeProduct(idx)} className="text-red-400 hover:text-red-600 p-1">
                                             <Trash2 size={14} />
@@ -633,9 +652,102 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
             </SimpleModal>
 
             {/* Product Search Modal */}
+            {/* ── Add Product Modal ──────────────────────────────────── */}
+            <SimpleModal isOpen={showAddProductModal} onClose={() => { setShowAddProductModal(false); setProductSearchQuery(''); }} title="Add Product to PO" maxWidth="max-w-[580px]">
+                <div className="space-y-3 px-1">
+                    {/* Product search */}
+                    <div className="relative">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
+                        <input
+                            type="text"
+                            placeholder="Search 58,000+ products by code or name..."
+                            className="w-full h-9 pl-9 pr-4 border border-gray-200 rounded-md outline-none text-[12px]"
+                            value={productSearchQuery}
+                            onChange={async (e) => {
+                                const val = e.target.value; setProductSearchQuery(val);
+                                if (val.length >= 2) { try { const r = await purchOrderService.searchProducts(val); setLookups(prev => ({ ...prev, products: r })); } catch (_) {} }
+                                else if (val.length === 0) { const init = await purchOrderService.getLookups(formData.company); setLookups(prev => ({ ...prev, products: init.products })); }
+                            }}
+                            autoFocus
+                        />
+                    </div>
+                    {/* Product list */}
+                    <div className="border border-gray-100 rounded-md overflow-hidden">
+                        <div className="max-h-[200px] overflow-y-auto no-scrollbar">
+                            <table className="w-full text-[11px]">
+                                <thead className="bg-slate-50 sticky top-0 border-b border-gray-200">
+                                    <tr>
+                                        <th className="px-3 py-2 text-left font-bold text-gray-500 uppercase">Code</th>
+                                        <th className="px-3 py-2 text-left font-bold text-gray-500 uppercase">Product Name</th>
+                                        <th className="px-3 py-2 text-right font-bold text-gray-500 uppercase">Price</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {(lookups.products || []).map(p => (
+                                        <tr key={p.code}
+                                            onClick={() => {
+                                                setEntry(prev => ({
+                                                    ...prev,
+                                                    prodCode: p.code, prodName: p.name, unit: p.unit || '',
+                                                    packSize: p.packSize || 1,
+                                                    purchasePrice: parseFloat(p.price || 0).toFixed(2),
+                                                    qty: prev.qty || '',
+                                                    amount: ((parseFloat(prev.qty) || 0) * parseFloat(p.price || 0)).toFixed(2)
+                                                }));
+                                                setProductSearchQuery('');
+                                            }}
+                                            className={`border-b border-gray-50 cursor-pointer transition-colors ${
+                                                entry.prodCode === p.code ? 'bg-orange-50 border-l-2 border-l-orange-400' : 'hover:bg-orange-50/50'
+                                            }`}
+                                        >
+                                            <td className="px-3 py-1.5 font-bold text-orange-600">{p.code}</td>
+                                            <td className="px-3 py-1.5 text-gray-700 font-medium">{p.name}</td>
+                                            <td className="px-3 py-1.5 text-right font-bold text-gray-600">{parseFloat(p.price || 0).toFixed(2)}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    {/* Selected product detail + qty entry */}
+                    {entry.prodCode && (
+                        <div className="bg-blue-50/40 border border-[#0078d4]/20 rounded-md p-3 space-y-2">
+                            <div className="text-[11px] font-black text-[#000080] uppercase tracking-tight">
+                                {entry.prodName} <span className="text-orange-500">[{entry.prodCode}]</span>
+                            </div>
+                            <div className="grid grid-cols-2 gap-2">
+                                <div className="flex flex-col gap-1">
+                                    <label className="text-[10px] font-bold text-gray-500 uppercase">Price</label>
+                                    <input type="text" name="purchasePrice" value={entry.purchasePrice} onChange={handleEntryInput}
+                                        className="h-7 border border-gray-300 px-2 text-right text-[12px] font-bold rounded-sm outline-none focus:border-[#0078d4]" />
+                                </div>
+                                <div className="flex flex-col gap-1">
+                                    <label className="text-[10px] font-bold text-gray-500 uppercase">Qty</label>
+                                    <input type="text" name="qty" value={entry.qty} onChange={handleEntryInput}
+                                        onKeyDown={e => { if (e.key === 'Enter') { addProduct(); setShowAddProductModal(false); setProductSearchQuery(''); } }}
+                                        className="h-7 border border-[#0078d4]/50 px-2 text-center text-[12px] font-black rounded-sm outline-none focus:border-[#0078d4] bg-blue-50/30" autoFocus />
+                                </div>
+                            </div>
+                            <div className="flex justify-between items-center pt-1">
+                                <span className="text-[11px] text-gray-500">Amount: <strong className="text-[#b91c1c] text-[13px]">{parseFloat(entry.amount || 0).toFixed(2)}</strong></span>
+                                <button
+                                    onClick={() => { addProduct(); setShowAddProductModal(false); setProductSearchQuery(''); }}
+                                    className="px-5 h-8 bg-[#0078d4] text-white text-[12px] font-black rounded-md hover:bg-[#005a9e] transition-colors active:scale-95 flex items-center gap-2"
+                                >
+                                    + Add to PO
+                                </button>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            </SimpleModal>
+
             <SimpleModal
                 isOpen={showProductSearch}
-                onClose={() => setShowProductSearch(false)}
+                onClose={() => {
+                    setShowProductSearch(false);
+                    setProductSearchQuery('');
+                }}
                 title="Select Product"
                 maxWidth="max-w-[600px]"
             >
@@ -644,10 +756,23 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
                         <input
                             type="text"
-                            placeholder="Search product name or code..."
+                            placeholder="Enter product name or code to search (58,000+ items)..."
                             className="w-full h-10 pl-10 pr-4 border border-gray-200 rounded-md outline-none focus:border-orange-500 text-sm"
                             value={productSearchQuery}
-                            onChange={(e) => setProductSearchQuery(e.target.value)}
+                            onChange={async (e) => {
+                                const val = e.target.value;
+                                setProductSearchQuery(val);
+                                if (val.length >= 2) {
+                                    try {
+                                        const results = await purchOrderService.searchProducts(val);
+                                        setLookups(prev => ({ ...prev, products: results }));
+                                    } catch (err) {}
+                                } else if (val.length === 0) {
+                                    // Optionally reset to top 50
+                                    const init = await purchOrderService.getLookups(formData.company);
+                                    setLookups(prev => ({ ...prev, products: init.products }));
+                                }
+                            }}
                             autoFocus
                         />
                     </div>
@@ -662,18 +787,21 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {lookups.products
-                                    .filter(p => p.name.toLowerCase().includes(productSearchQuery.toLowerCase()) || p.code.toLowerCase().includes(productSearchQuery.toLowerCase()))
-                                    .map(p => (
-                                        <tr key={p.code} className="border-t border-gray-50 hover:bg-orange-50 transition-colors cursor-pointer" onClick={() => handleSelectProduct(p)}>
-                                            <td className="px-4 py-2 font-bold text-orange-600">{p.code}</td>
-                                            <td className="px-4 py-2 text-gray-700 font-medium">{p.name}</td>
-                                            <td className="px-4 py-2 text-right font-bold text-gray-600">{p.price?.toFixed(2)}</td>
-                                            <td className="px-4 py-2 text-center">
-                                                <button className="text-[10px] font-bold text-orange-500 hover:underline">SELECT</button>
-                                            </td>
-                                        </tr>
-                                    ))}
+                                {(lookups.products || []).map(p => (
+                                    <tr key={p.code} className="border-t border-gray-50 hover:bg-orange-50 transition-colors cursor-pointer" onClick={() => handleSelectProduct(p)}>
+                                        <td className="px-4 py-2 font-bold text-orange-600">{p.code}</td>
+                                        <td className="px-4 py-2 text-gray-700 font-medium">{p.name}</td>
+                                        <td className="px-4 py-2 text-right font-bold text-gray-600">{p.price?.toFixed(2)}</td>
+                                        <td className="px-4 py-2 text-center">
+                                            <button className="text-[10px] font-bold text-orange-500 hover:underline">SELECT</button>
+                                        </td>
+                                    </tr>
+                                ))}
+                                {lookups.products?.length === 0 && (
+                                    <tr>
+                                        <td colSpan={4} className="py-8 text-center text-gray-400 italic">No products found. Try typing a search term.</td>
+                                    </tr>
+                                )}
                             </tbody>
                         </table>
                     </div>
@@ -760,6 +888,16 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
                     </button>
                 </div>
             </SimpleModal>
+
+            <ConfirmModal 
+                isOpen={showConfirmModal}
+                onClose={() => setShowConfirmModal(false)}
+                onConfirm={confirmApply}
+                title="Create Purchase Order"
+                message={`Are you sure you want to save and apply this Purchase Order (${formData.docNo})? This action will finalize the transaction.`}
+                loading={isApplying}
+                confirmText="Apply Order"
+            />
         </>
     );
 };

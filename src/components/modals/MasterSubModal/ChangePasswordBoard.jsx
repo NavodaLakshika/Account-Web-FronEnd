@@ -193,7 +193,7 @@ const ChangePasswordBoard = ({ isOpen, onClose }) => {
 
             {/* User Search Modal */}
             {showUserModal && (
-                <div className="fixed inset-0 z-[350] flex items-center justify-center p-4 font-['Plus_Jakarta_Sans']">
+                <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4 font-['Plus_Jakarta_Sans']">
                     <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setShowUserModal(false)} />
                     <div className="relative w-full max-w-lg bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col max-h-[80vh]">
                         <div className="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-50">
@@ -246,7 +246,7 @@ const ChangePasswordBoard = ({ isOpen, onClose }) => {
 
             {/* Save Confirmation Modal */}
             {showSaveConfirm && (
-                <div className="fixed inset-0 z-[700] flex items-center justify-center p-4 font-['Plus_Jakarta_Sans']">
+                <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4 font-['Plus_Jakarta_Sans']">
                     <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setShowSaveConfirm(false)} />
                     <div className="relative w-full max-w-md bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden animate-in zoom-in-95 duration-200">
                         <div className="p-8 text-center">

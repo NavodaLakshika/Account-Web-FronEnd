@@ -595,7 +595,7 @@ const Dashboard = () => {
 
             {/* AI Thinking Overlay (Robot Animation centered) */}
             {isAIThinking && (
-                <div className="fixed inset-0 z-[200] flex items-center justify-center bg-white transition-all duration-500">
+                <div className="fixed inset-0 z-[1100] flex items-center justify-center bg-white transition-all duration-500">
                     <div className="flex flex-col items-center">
                         <DotLottiePlayer
                             src="/images/Ai Robot Vector Art.lottie"

@@ -261,8 +261,42 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
 
     return (
         <>
-            <SimpleModal isOpen={isOpen} onClose={onClose} title="Customer Master File" maxWidth="max-w-[1000px]" footer={footer}>
-                <div className="py-2 font-['Plus_Jakarta_Sans'] select-none">
+            <SimpleModal isOpen={isOpen} onClose={onClose} title={showSearchModal ? `Search Customers - ${customersList.length} Found` : "Customer Master File"} maxWidth="max-w-[1000px]" footer={showSearchModal ? null : footer}>
+                {showSearchModal ? (
+                    <div className="flex flex-col h-[60vh] -m-2">
+                        <div className="flex justify-between items-center p-2 mb-4 bg-slate-50 border border-gray-200 rounded-md">
+                            <input type="text" placeholder="Search by name, code..." className="h-8 border border-gray-300 px-3 text-sm rounded-md w-64 focus:border-[#0078d4] outline-none" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
+                            <button onClick={() => setShowSearchModal(false)} className="px-4 h-8 bg-[#0078d4] text-white text-sm font-bold rounded-md hover:bg-[#005a9e] transition-colors shadow-sm">
+                                Back to Form
+                            </button>
+                        </div>
+                        <div className="overflow-y-auto bg-white border border-gray-200 flex-1 rounded-md">
+                            <table className="w-full text-[13px] text-left">
+                                <thead className="bg-slate-50 sticky top-0 text-gray-700 font-bold uppercase text-[11px] tracking-wider h-9 shadow-sm">
+                                    <tr>
+                                        <th className="px-3 border-b border-gray-300 text-center w-24">Code</th>
+                                        <th className="px-3 border-b border-gray-300">Customer Name</th>
+                                        <th className="px-3 border-b border-gray-300">Phone</th>
+                                        <th className="px-3 border-b border-gray-300 text-center w-32">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {customersList.filter(c => (c.cust_Name || '').toLowerCase().includes(searchQuery.toLowerCase()) || (c.code || '').toLowerCase().includes(searchQuery.toLowerCase())).map(c => (
+                                        <tr key={c.code} className="hover:bg-blue-50 transition-colors h-9 border-b border-gray-100 last:border-0">
+                                            <td className="px-3 text-center font-bold text-[#0078d4]">{c.code || c.Code}</td>
+                                            <td className="px-3 font-medium uppercase text-gray-700">{c.cust_Name || c.Cust_Name}</td>
+                                            <td className="px-3 text-gray-500 font-medium">{c.phone || c.Phone}</td>
+                                            <td className="px-3 text-center">
+                                                <button onClick={() => selectCustomer(c.code || c.Code)} className="bg-[#0078d4] text-white text-[10px] px-4 py-1.5 rounded-sm font-bold hover:bg-[#005a9e] shadow-sm">SELECT</button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                ) : (
+                    <div className="py-2 font-['Plus_Jakarta_Sans'] select-none">
                     <h2 className="text-base font-bold text-black mb-6 flex items-center gap-2">
                         Enter New Customer Details & Update
                     </h2>
@@ -412,11 +446,12 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
                         </div>
                     </div>
                 </div>
+                )}
             </SimpleModal>
 
             {/* Area Search Modal */}
             {showAreaSearch && (
-                <div className="fixed inset-0 z-[400] flex items-center justify-center p-4">
+                <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4">
                     <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowAreaSearch(false)} />
                     <div className="relative w-full max-w-md bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col max-h-[70vh]">
                         <div className="p-3 border-b border-gray-300 flex justify-between items-center bg-white">
@@ -460,7 +495,7 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
 
             {/* Route Search Modal */}
             {showRouteSearch && (
-                <div className="fixed inset-0 z-[400] flex items-center justify-center p-4">
+                <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4">
                     <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowRouteSearch(false)} />
                     <div className="relative w-full max-w-md bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col max-h-[70vh]">
                         <div className="p-3 border-b border-gray-300 flex justify-between items-center bg-white">
@@ -504,7 +539,7 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
 
             {/* Bank Search Modal */}
             {showBankSearch && (
-                <div className="fixed inset-0 z-[400] flex items-center justify-center p-4">
+                <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4">
                     <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowBankSearch(false)} />
                     <div className="relative w-full max-w-md bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col max-h-[70vh]">
                         <div className="p-3 border-b border-gray-300 flex justify-between items-center bg-white font-['Plus_Jakarta_Sans']">
@@ -549,45 +584,6 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
                 </div>
             )}
 
-            {/* Customer Search Modal */}
-            {showSearchModal && (
-                <div className="fixed inset-0 z-[300] flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowSearchModal(false)} />
-                    <div className="relative w-full max-w-4xl bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col max-h-[85vh]">
-                        <div className="p-3 border-b border-gray-300 flex justify-between items-center bg-white font-['Plus_Jakarta_Sans']">
-                            <h3 className="font-bold text-gray-700 text-sm">Search Customers - {customersList.length} Found</h3>
-                            <div className="flex gap-4">
-                                <input type="text" placeholder="Search by name, code..." className="h-8 border border-gray-300 px-3 text-sm rounded-md w-64 focus:border-[#0078d4] outline-none" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
-                                <button onClick={() => setShowSearchModal(false)} className="text-gray-400 hover:text-gray-600"><X size={24} /></button>
-                            </div>
-                        </div>
-                        <div className="overflow-y-auto p-2 font-['Plus_Jakarta_Sans'] bg-white m-1 border border-gray-300">
-                            <table className="w-full text-[13px] text-left">
-                                <thead className="bg-slate-50 sticky top-0 text-gray-700 font-bold uppercase text-[11px] tracking-wider h-9">
-                                    <tr>
-                                        <th className="px-3 border-b border-gray-300 text-center w-24">Code</th>
-                                        <th className="px-3 border-b border-gray-300">Customer Name</th>
-                                        <th className="px-3 border-b border-gray-300">Phone</th>
-                                        <th className="px-3 border-b border-gray-300 text-center w-32">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {customersList.filter(c => (c.cust_Name || '').toLowerCase().includes(searchQuery.toLowerCase()) || (c.code || '').toLowerCase().includes(searchQuery.toLowerCase())).map(c => (
-                                        <tr key={c.code} className="hover:bg-blue-50 transition-colors h-9">
-                                            <td className="px-3 border-b border-gray-200 text-center font-bold text-[#0078d4]">{c.code || c.Code}</td>
-                                            <td className="px-3 border-b border-gray-200 font-medium uppercase text-gray-700">{c.cust_Name || c.Cust_Name}</td>
-                                            <td className="px-3 border-b border-gray-200 text-gray-500 font-medium">{c.phone || c.Phone}</td>
-                                            <td className="px-3 border-b border-gray-200 text-center">
-                                                <button onClick={() => selectCustomer(c.code || c.Code)} className="bg-[#0078d4] text-white text-[10px] px-4 py-1.5 rounded-sm font-bold hover:bg-[#005a9e]">SELECT</button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            )}
         </>
     );
 };

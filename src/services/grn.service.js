@@ -28,6 +28,15 @@ export const grnService = {
     }
   },
 
+  async searchProducts(query) {
+    try {
+      const response = await api.get('/search-products', { params: { query } });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || 'Failed to search products';
+    }
+  },
+
   async generateDocNo(company) {
     try {
       const response = await api.get('/generate-doc', { params: { company } });
@@ -52,6 +61,15 @@ export const grnService = {
       return response.data;
     } catch (error) {
       throw error.response?.data || 'Failed to fetch GRN details';
+    }
+  },
+
+  async getPODetails(docNo, company) {
+    try {
+      const response = await api.get(`/po-details/${docNo}`, { params: { company } });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || 'Failed to fetch PO details';
     }
   },
 

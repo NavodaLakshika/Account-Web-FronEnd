@@ -27,6 +27,15 @@ export const purchOrderService = {
       throw error.response?.data || 'Failed to fetch lookups';
     }
   },
+  
+  async searchProducts(query) {
+    try {
+      const response = await api.get('/search-products', { params: { query } });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || 'Failed to search products';
+    }
+  },
 
   async generateDocNo(company) {
     try {

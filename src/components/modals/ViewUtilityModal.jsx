@@ -7,6 +7,7 @@ import SendFileBoard from './ViewAndUtilityModels/SendFileBoard';
 import FindBoard from './ViewAndUtilityModels/FindBoard';
 import CalculatorBoard from './ViewAndUtilityModels/CalculatorBoard';
 import ChangeBackgroundBoard from './ViewAndUtilityModels/ChangeBackgroundBoard';
+import CustomizeIconBarBoard from './ViewAndUtilityModels/CustomizeIconBarBoard';
 
 const ViewUtilityModal = ({ isOpen, onClose, onToggleSideBar, onOpenReminder, onOpenCalculator, onOpenNotepad, onOpenPrinter, currentTopBarColor, onColorSelect }) => {
     const [showLetterEnvelopesModal, setShowLetterEnvelopesModal] = useState(false);

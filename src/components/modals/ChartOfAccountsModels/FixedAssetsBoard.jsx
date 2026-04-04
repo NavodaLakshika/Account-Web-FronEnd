@@ -364,7 +364,7 @@ const FixedAssetsBoard = ({ isOpen, onClose }) => {
             </SimpleModal>
 
             {showSearchModal && (
-                <div className="fixed inset-0 z-[300] flex items-center justify-center p-4">
+                <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4">
                     <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setShowSearchModal(false)} />
                     <div className="relative w-full max-w-3xl bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col max-h-[80vh] border border-gray-300 animate-in fade-in zoom-in-95 duration-200">
                         <div className="px-6 py-4 flex items-center justify-between border-b border-gray-100 bg-white select-none">
