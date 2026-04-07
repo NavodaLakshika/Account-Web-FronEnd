@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import SimpleModal from '../components/SimpleModal';
-import { Landmark, Search, RotateCcw, Save, Calendar, Plus, X, Loader2, Wallet, Banknote, ListFilter } from 'lucide-react';
+import CalendarModal from '../components/CalendarModal';
+import { Landmark, Search, RotateCcw, Save, Calendar, Plus, X, Loader2, Wallet, Banknote, ListFilter, Users } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
 const MakeDepositBoard = ({ isOpen, onClose }) => {
@@ -23,6 +24,7 @@ const MakeDepositBoard = ({ isOpen, onClose }) => {
     const [showAccountModal, setShowAccountModal] = useState(false);
     const [accountSearch, setAccountSearch] = useState('');
     const [activeRowIndex, setActiveRowIndex] = useState(null);
+    const [showCalendar, setShowCalendar] = useState(false);
 
     // Dummy Lookups (These should be fetched from API in production)
     const lookups = {
@@ -85,6 +87,11 @@ const MakeDepositBoard = ({ isOpen, onClose }) => {
         setAccountSearch('');
     };
 
+    const handleDateSelect = (date) => {
+        setFormData({ ...formData, depositDate: date });
+        setShowCalendar(false);
+    };
+
     return (
         <>
             <SimpleModal
@@ -93,21 +100,18 @@ const MakeDepositBoard = ({ isOpen, onClose }) => {
                 title="Make Deposit"
                 maxWidth="max-w-5xl"
                 footer={
-                    <div className="bg-slate-50 px-6 py-4 w-full flex justify-end gap-3 border-t border-gray-100 rounded-b-xl">
-                        <button onClick={handleReset} className="px-6 h-10 bg-slate-100 text-slate-600 text-sm font-bold rounded-md hover:bg-slate-200 transition-all active:scale-95 flex items-center gap-2 border-none">
-                            <RotateCcw size={14} /> Reset
+                    <div className="bg-slate-50 px-6 py-4 w-full flex justify-end items-center border-t border-gray-100 rounded-b-xl gap-3">
+                        <button onClick={handleReset} className="px-6 h-10 bg-[#00adff] text-white text-sm font-bold rounded-[5px] hover:bg-[#0099e6] transition-all active:scale-95 flex items-center gap-2 border-none">
+                            <RotateCcw size={14} /> CLEAR FORM
                         </button>
-                        <button onClick={handleSave} disabled={loading} className={`px-6 h-10 bg-[#0078d4] text-white text-sm font-bold rounded-md shadow-md shadow-blue-200 hover:bg-[#005a9e] transition-all active:scale-95 flex items-center gap-2 ${loading ? 'opacity-50' : ''}`}>
+                        <button onClick={handleSave} disabled={loading} className={`px-6 h-10 bg-[#50af60] text-white text-sm font-bold rounded-[5px] shadow-md hover:bg-[#24db4e] transition-all active:scale-95 flex items-center gap-2 ${loading ? 'opacity-50' : ''}`}>
                             {loading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
-                            Submit Deposit
-                        </button>
-                        <button onClick={onClose} className="px-6 h-10 bg-slate-100 text-slate-600 text-sm font-bold rounded-md hover:bg-slate-200 transition-all active:scale-95 flex items-center gap-2 border-none">
-                            <X size={14} /> Exit
+                            SAVE DEPOSIT
                         </button>
                     </div>
                 }
             >
-                <div className="space-y-6 font-['Inter'] relative">
+                <div className="space-y-6 font-['Tahoma'] relative select-none">
                     {/* Header Branding Icon */}
                     <div className="absolute top-0 right-0 p-4 opacity-[0.03] pointer-events-none">
                         <Banknote size={140} />
@@ -122,23 +126,24 @@ const MakeDepositBoard = ({ isOpen, onClose }) => {
                                         type="text"
                                         readOnly
                                         value={formData.depositTo ? `${formData.depositTo} - ${lookups.banks.find(b => b.code === formData.depositTo)?.name || ''}` : ''}
-                                        placeholder="Select Destination Bank..."
-                                        className="flex-1 h-8 border border-gray-300 px-3 text-[12px] bg-slate-50 font-bold text-slate-700 rounded-sm outline-none"
+                                        className="flex-1 h-8 border border-gray-300 px-3 text-[12px] bg-slate-50 font-bold text-slate-700 rounded-[5px] outline-none"
                                     />
-                                    <button onClick={() => setShowBankModal(true)} className="w-9 h-8 bg-[#0078d4] text-white flex items-center justify-center hover:bg-[#005a9e] rounded-sm transition-colors shadow-sm">
+                                    <button onClick={() => setShowBankModal(true)} className="w-9 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-90">
                                         <Search size={16} />
                                     </button>
                                 </div>
                             </FormRow>
                             <FormRow label="Deposit Date">
-                                <div className="flex-1 flex items-center px-3 h-8 border border-gray-300 bg-white shadow-sm rounded-sm hover:border-blue-400 transition-colors">
+                                <div className="flex h-8 gap-1">
                                     <input
-                                        type="date"
+                                        type="text"
+                                        readOnly
                                         value={formData.depositDate}
-                                        onChange={(e) => setFormData({ ...formData, depositDate: e.target.value })}
-                                        className="flex-1 text-[12px] font-bold text-slate-700 outline-none bg-transparent"
+                                        className="w-[110px] px-2 text-[12px] border border-gray-300 rounded-[5px] outline-none text-slate-700 font-bold bg-white text-center shadow-sm"
                                     />
-                                    <Calendar size={14} className="text-blue-500" />
+                                    <button onClick={() => setShowCalendar(true)} className="w-9 h-8 bg-white border border-gray-300 text-[#0285fd] flex items-center justify-center hover:bg-blue-50 rounded-[5px] transition-all shadow-sm active:scale-90">
+                                        <Calendar size={14} />
+                                    </button>
                                 </div>
                             </FormRow>
                         </div>
@@ -149,15 +154,13 @@ const MakeDepositBoard = ({ isOpen, onClose }) => {
                                     type="text"
                                     value={formData.memo}
                                     onChange={(e) => setFormData({ ...formData, memo: e.target.value })}
-                                    className="flex-1 h-8 border border-gray-300 px-3 text-[12px] rounded-sm outline-none hover:border-blue-300 focus:border-blue-500 transition-colors"
-                                    placeholder="Deposit source description..."
+                                    className="flex-1 h-8 border border-gray-300 px-3 text-[12px] rounded-[5px] outline-none hover:border-blue-300 focus:border-blue-500 transition-colors"
                                 />
                             </FormRow>
                             <div className="bg-blue-50/50 p-4 border border-blue-100 rounded-sm flex justify-between items-center shadow-sm">
                                 <div className="flex flex-col">
                                     <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest leading-none mb-1">Total Deposit Amount</span>
                                     <div className="text-2xl font-black text-[#0078d4] tabular-nums tracking-tighter">
-                                        <span className="text-[10px] font-bold text-slate-400 mr-1 italic">LKR</span>
                                         {totalAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                     </div>
                                 </div>
@@ -195,8 +198,7 @@ const MakeDepositBoard = ({ isOpen, onClose }) => {
                                                     type="text"
                                                     value={entry.receivedFrom}
                                                     onChange={(e) => handleEntryUpdate(entry.id, 'receivedFrom', e.target.value)}
-                                                    className="w-full h-8 px-2 outline-none border border-transparent focus:border-blue-200 rounded-sm font-semibold text-slate-700 bg-transparent"
-                                                    placeholder="Payer name..."
+                                                    className="w-full h-8 px-2 outline-none border border-transparent focus:border-blue-200 rounded-[5px] font-semibold text-slate-700 bg-transparent"
                                                 />
                                             </td>
                                             <td className="p-1.5 border-r border-gray-100">
@@ -205,10 +207,9 @@ const MakeDepositBoard = ({ isOpen, onClose }) => {
                                                         type="text"
                                                         readOnly
                                                         value={lookups.accounts.find(a => a.code === entry.accountId)?.name || ''}
-                                                        placeholder="Select Account Mapping..."
-                                                        className="flex-1 h-8 px-2 outline-none bg-white border border-gray-200 rounded-sm font-medium text-slate-600"
+                                                        className="flex-1 h-8 px-2 outline-none bg-white border border-gray-200 rounded-[5px] font-medium text-slate-600"
                                                     />
-                                                    <button onClick={() => { setActiveRowIndex(idx); setShowAccountModal(true); }} className="w-8 h-8 bg-blue-50 text-[#0078d4] flex items-center justify-center hover:bg-blue-100 rounded-sm transition-colors border border-blue-100/50">
+                                                    <button onClick={() => { setActiveRowIndex(idx); setShowAccountModal(true); }} className="w-8 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-90">
                                                         <Search size={14} />
                                                     </button>
                                                 </div>
@@ -218,8 +219,7 @@ const MakeDepositBoard = ({ isOpen, onClose }) => {
                                                     type="text"
                                                     value={entry.memo}
                                                     onChange={(e) => handleEntryUpdate(entry.id, 'memo', e.target.value)}
-                                                    className="w-full h-8 px-2 outline-none border border-transparent focus:border-blue-200 rounded-sm font-medium text-slate-500 italic bg-transparent"
-                                                    placeholder="..."
+                                                    className="w-full h-8 px-2 outline-none border border-transparent focus:border-blue-200 rounded-[5px] font-medium text-slate-500 italic bg-transparent"
                                                 />
                                             </td>
                                             <td className="p-1.5">
@@ -299,6 +299,13 @@ const MakeDepositBoard = ({ isOpen, onClose }) => {
                     }}
                 />
             )}
+
+            <CalendarModal 
+                isOpen={showCalendar} 
+                onClose={() => setShowCalendar(false)} 
+                onDateSelect={handleDateSelect}
+                initialDate={formData.depositDate}
+            />
         </>
     );
 };
@@ -313,7 +320,7 @@ const FormRow = ({ label, children }) => (
 const SearchModal = ({ title, query, setQuery, onClose, data, columns, onSelect }) => (
     <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4">
         <div className="absolute inset-0 bg-slate-500/30 backdrop-blur-[2px]" onClick={onClose} />
-        <div className="relative w-full max-w-2xl bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col max-h-[85vh] font-['Inter']">
+        <div className="relative w-full max-w-2xl bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col max-h-[85vh] font-['Tahoma']">
             <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-slate-50/50">
                 <h3 className="text-base font-black text-slate-800 tracking-tight uppercase tracking-[0.05em]">{title}</h3>
                 <div className="flex gap-4">
@@ -343,7 +350,7 @@ const SearchModal = ({ title, query, setQuery, onClose, data, columns, onSelect 
                                     </td>
                                 ))}
                                 <td className="p-4 border-b border-slate-50 text-center">
-                                    <button className="bg-white text-[#0078d4] text-[10px] px-4 py-1.5 rounded-md font-black border border-blue-200 shadow-sm transition-all hover:bg-[#0078d4] hover:text-white uppercase tracking-tighter">SELECT</button>
+                                    <button className="bg-blue-50/50 backdrop-blur-md border border-blue-200 text-[#0078d4] text-[10px] uppercase tracking-wider px-3 py-1 rounded-sm font-bold hover:bg-blue-100/80 shadow-sm transition-all active:scale-95">SELECT</button>
                                 </td>
                             </tr>
                         ))}

@@ -2,11 +2,13 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 import SimpleModal from '../components/SimpleModal';
 import ConfirmModal from '../components/modals/ConfirmModal';
 import { Search, Calendar, ChevronDown, CheckCircle, Trash2, Printer, X, Save, RotateCcw, ChevronLeft, ChevronRight, Plus } from 'lucide-react';
+import CalendarModal from '../components/CalendarModal';
 import { purchOrderService } from '../services/purchOrder.service';
+import { paymentMethodService } from '../services/paymentMethod.service';
 import { toast } from 'react-hot-toast';
 
 const PurchaseOrderBoard = ({ isOpen, onClose }) => {
-    const [lookups, setLookups] = useState({ suppliers: [], products: [] });
+    const [lookups, setLookups] = useState({ suppliers: [], products: [], paymentMethods: [] });
 
     const [formData, setFormData] = useState({
         docNo: '',
@@ -33,9 +35,10 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
     const [showAddProductModal, setShowAddProductModal] = useState(false);
     const [supplierSearchQuery, setSupplierSearchQuery] = useState('');
     const [productSearchQuery, setProductSearchQuery] = useState('');
+    const [showPayMethodSearch, setShowPayMethodSearch] = useState(false);
+    const [payMethodSearchQuery, setPayMethodSearchQuery] = useState('');
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [datePickerField, setDatePickerField] = useState('postDate');
-    const [viewDate, setViewDate] = useState(new Date());
 
     const [entry, setEntry] = useState({
         prodCode: '',
@@ -73,7 +76,8 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
     const fetchLookups = async (company) => {
         try {
             const data = await purchOrderService.getLookups(company);
-            setLookups(data);
+            const methods = await paymentMethodService.getAll(company).catch(() => []);
+            setLookups(prev => ({ ...prev, ...data, paymentMethods: methods }));
         } catch (error) {
             toast.error('Failed to load suppliers/products.');
         }
@@ -272,25 +276,10 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
         setTimeout(() => qtyRef.current?.focus(), 50);
     };
 
-    const handleDateSelect = (day) => {
-        const d = new Date(viewDate.getFullYear(), viewDate.getMonth(), day);
-        // Correct for timezone offset to ensure the local date string's YYYY-MM-DD is correct
-        const offset = d.getTimezoneOffset() * 60000;
-        const localDate = new Date(d.getTime() - offset).toISOString().split('T')[0];
-        setFormData(prev => ({ ...prev, [datePickerField]: localDate }));
+    const handleDateSelect = (formattedDate) => {
+        setFormData(prev => ({ ...prev, [datePickerField]: formattedDate }));
         setShowDatePicker(false);
     };
-
-    const calendarDays = useMemo(() => {
-        const year = viewDate.getFullYear();
-        const month = viewDate.getMonth();
-        const days = new Date(year, month + 1, 0).getDate();
-        const startDay = new Date(year, month, 1).getDay();
-        const res = [];
-        for (let i = 0; i < startDay; i++) res.push(null);
-        for (let i = 1; i <= days; i++) res.push(i);
-        return res;
-    }, [viewDate]);
 
     const preparePayload = () => {
         return {
@@ -340,166 +329,179 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
                 isOpen={isOpen}
                 onClose={onClose}
                 title="Purchase Order"
-                maxWidth="max-w-[1000px]"
+                maxWidth="max-w-[1050px]"
                 footer={
-                    <>
-                        <div className="flex-1 flex gap-2">
+                    <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-gray-100 rounded-b-xl">
+                        <div className="flex gap-3">
                             <button
                                 onClick={handleDelete}
-                                className="px-6 h-10 bg-red-50 text-red-600 text-sm font-bold rounded-md hover:bg-red-100 transition-all active:scale-95 flex items-center gap-2 border border-red-100 uppercase"
+                                className="px-6 h-10 bg-[#ff3b30] text-white text-sm font-black rounded-[5px] shadow-md shadow-red-100 hover:bg-[#e03127] transition-all active:scale-95 flex items-center gap-2 border-none"
                             >
-                                <Trash2 size={14} /> Delete
+                                <Trash2 size={14} /> DELETE DOC
+                            </button>
+                             <button
+                                onClick={handleClear}
+                                className="px-6 h-10 bg-[#00adff] text-white text-sm font-black rounded-[5px] hover:bg-[#0099e6] transition-all active:scale-95 flex items-center gap-2 border-none"
+                            >
+                                <RotateCcw size={14} /> CLEAR FORM
                             </button>
                         </div>
                         <div className="flex gap-3">
                             <button
-                                onClick={handleClear}
-                                className="px-6 h-10 bg-slate-100 text-slate-600 text-sm font-bold rounded-md hover:bg-slate-200 transition-all active:scale-95 flex items-center gap-2 border-none"
-                            >
-                                <RotateCcw size={14} /> Clear
-                            </button>
-                            <button
                                 onClick={handleSave}
-                                className="px-6 h-10 bg-white text-[#0078d4] text-sm font-bold rounded-md border border-[#0078d4] hover:bg-blue-50 transition-all active:scale-95 flex items-center gap-2"
+                                className="px-6 h-10 bg-white text-[#0285fd] text-sm font-black rounded-[5px] border-2 border-[#0285fd] hover:bg-blue-50 transition-all active:scale-95 flex items-center gap-2"
                             >
-                                <Save size={14} /> Save Draft
+                                <Save size={14} /> SAVE DRAFT
                             </button>
                             <button
                                 onClick={handleApply}
-                                className="px-6 h-10 bg-[#0078d4] text-white text-sm font-bold rounded-md shadow-md shadow-blue-200 hover:bg-[#005a9e] transition-all active:scale-95 flex items-center gap-2"
+                                className="px-6 h-10 bg-[#2bb744] text-white text-sm font-black rounded-[5px] shadow-md shadow-green-100 hover:bg-[#259b3a] transition-all active:scale-95 flex items-center gap-2 border-none"
                             >
-                                <CheckCircle size={14} /> Save & Apply
-                            </button>
-                            <button
-                                onClick={onClose}
-                                className="px-6 h-10 bg-slate-100 text-slate-600 text-sm font-bold rounded-md hover:bg-slate-200 transition-all active:scale-95 flex items-center gap-2 border-none"
-                            >
-                                <X size={14} /> Exit
+                                <CheckCircle size={14} /> SAVE & APPLY
                             </button>
                         </div>
-                    </>
+                    </div>
                 }
             >
-                <div className="space-y-4 overflow-y-auto no-scrollbar font-['Inter']">
-                    <div className="bg-white p-3 border border-gray-200 rounded-sm shadow-sm space-y-3">
-                        <div className="grid grid-cols-12 gap-x-8 gap-y-2.5">
-                            {/* PO Number */}
-                            <div className="col-span-4 flex items-center gap-3">
-                                <label className="text-[12px] font-bold text-gray-700 w-20 shrink-0">PO No</label>
-                                <div className="flex-1 flex gap-1">
-                                    <input type="text" name="docNo" value={formData.docNo} onChange={handleInput} onKeyDown={(e) => e.key === 'Enter' && handleSelectOrder(formData.docNo)} className="flex-1 h-7 border border-[#0078d4]/50 px-2 text-[12px] font-bold text-[#000080] bg-blue-50/20 rounded-sm outline-none focus:border-blue-500" />
-                                    <button onClick={handleSearch} className="w-8 h-7 bg-[#0078d4] text-white flex items-center justify-center hover:bg-[#005a9e] rounded-sm transition-colors">
-                                        <Search size={14} />
+                <div className="space-y-4 overflow-y-auto no-scrollbar font-['Tahoma']">
+                    <div className="bg-white p-4 border border-gray-100 rounded-lg shadow-sm space-y-4">
+                        <div className="grid grid-cols-12 gap-x-6 gap-y-3.5">
+                            {/* PO Number - Column 1 */}
+                            <div className="col-span-4 flex items-center gap-2">
+                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Document ID</label>
+                                <div className="flex-1 flex gap-1 h-8 min-w-0">
+                                    <input type="text" name="docNo" value={formData.docNo} onChange={handleInput} onKeyDown={(e) => e.key === 'Enter' && handleSelectOrder(formData.docNo)} className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-blue-600 bg-gray-50 rounded-[5px] outline-none focus:border-[#0285fd] shadow-sm" />
+                                    <button onClick={handleSearch} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
+                                        <Search size={16} />
                                     </button>
                                 </div>
                             </div>
 
-                            {/* PO Date */}
-                            <div className="col-span-4 flex items-center gap-3">
-                                <label className="text-[12px] font-bold text-gray-700 w-20 shrink-0">PO Date</label>
-                                <div className="flex-1 flex gap-1">
+                            {/* PO Date - Column 2 */}
+                            <div className="col-span-4 flex items-center gap-2">
+                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Post Date</label>
+                                <div className="flex-1 flex gap-1 h-8 min-w-0">
                                     <input
                                         type="text"
                                         readOnly
                                         value={formData.postDate}
-                                        className="flex-1 h-7 border border-gray-300 rounded-sm px-2 text-[12px] outline-none bg-gray-50 text-gray-700 font-bold cursor-pointer ml-[-30px]"
-                                        onClick={() => { setDatePickerField('postDate'); setViewDate(new Date(formData.postDate)); setShowDatePicker(true); }}
+                                        className="flex-1 min-w-0 h-8 border border-gray-300 rounded-[5px] px-3 text-[12px] outline-none bg-white text-gray-700 font-bold cursor-pointer shadow-sm"
+                                        onClick={() => { setDatePickerField('postDate'); setShowDatePicker(true); }}
                                     />
                                     <button
-                                        onClick={() => { setDatePickerField('postDate'); setViewDate(new Date(formData.postDate)); setShowDatePicker(true); }}
-                                        className="w-8 h-7 bg-[#0078d4] text-white flex items-center justify-center hover:bg-[#005a9e] rounded-sm transition-colors shadow-sm"
+                                        onClick={() => { setDatePickerField('postDate'); setShowDatePicker(true); }}
+                                        className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0"
                                     >
-                                        <Calendar size={14} />
+                                        <Calendar size={16} />
                                     </button>
                                 </div>
                             </div>
 
-                            {/* Expected Date */}
-                            <div className="col-span-4 flex items-center gap-3">
-                                <label className="text-[12px] font-bold text-gray-700 w-28 shrink-0">Expected Date</label>
-                                <div className="flex-1 flex gap-1">
+                            {/* Expected Date - Column 3 */}
+                            <div className="col-span-4 flex items-center gap-2">
+                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">EDD Timeline</label>
+                                <div className="flex-1 flex gap-1 h-8 min-w-0">
                                     <input
                                         type="text"
                                         readOnly
                                         value={formData.expectedDate}
-                                        className="flex-1 w-7 h-7 border border-gray-300 rounded-sm px-2 text-[12px] outline-none bg-gray-50 text-gray-700 font-bold cursor-pointer"
-                                        onClick={() => { setDatePickerField('expectedDate'); setViewDate(new Date(formData.expectedDate)); setShowDatePicker(true); }}
+                                        className="flex-1 min-w-0 h-8 border border-gray-300 rounded-[5px] px-3 text-[12px] outline-none bg-white text-gray-700 font-bold cursor-pointer shadow-sm"
+                                        onClick={() => { setDatePickerField('expectedDate'); setShowDatePicker(true); }}
                                     />
                                     <button
-                                        onClick={() => { setDatePickerField('expectedDate'); setViewDate(new Date(formData.expectedDate)); setShowDatePicker(true); }}
-                                        className="w-8 h-7 bg-[#0078d4] text-white flex items-center justify-center hover:bg-[#005a9e] rounded-sm transition-colors shadow-sm"
+                                        onClick={() => { setDatePickerField('expectedDate'); setShowDatePicker(true); }}
+                                        className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0"
                                     >
-                                        <Calendar size={14} />
+                                        <Calendar size={16} />
                                     </button>
                                 </div>
                             </div>
 
-                            <div className="col-span-8 flex items-center gap-3">
-                                <label className="text-[12px] font-bold text-gray-700 w-20 shrink-0">Supplier</label>
-                                <div className="flex-1 flex gap-1">
+                            {/* Supplier - Column 1 & 2 */}
+                            <div className="col-span-8 flex items-center gap-2">
+                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Supplier</label>
+                                <div className="flex-1 flex gap-1 h-8 min-w-0">
                                     <input
                                         type="text"
                                         readOnly
                                         value={lookups.suppliers.find(s => s.code === formData.vendorId)?.name || 'Select Supplier...'}
-                                        className="flex-1 h-7 border border-gray-300 px-2 text-[12px] font-bold text-[#b91c1c] bg-gray-50 rounded-sm outline-none"
+                                        className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-red-600 bg-gray-50 rounded-[5px] outline-none shadow-sm cursor-pointer"
+                                        onClick={() => setShowSupplierSearch(true)}
                                     />
-                                    <button onClick={() => setShowSupplierSearch(true)} className="w-8 h-7 bg-[#0078d4] text-white flex items-center justify-center hover:bg-[#005a9e] rounded-sm transition-colors shadow-sm">
-                                        <Search size={14} />
+                                    <button onClick={() => setShowSupplierSearch(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
+                                        <Search size={16} />
                                     </button>
                                 </div>
                             </div>
 
-                            <div className="col-span-4 flex items-center gap-3">
-                                <label className="text-[12px] font-bold text-gray-700 w-28 shrink-0">Payment By</label>
-                                <select name="payType" value={formData.payType} onChange={handleInput} className="flex-1 h-7 border border-gray-300 px-2 text-[12px] font-bold bg-white rounded-sm outline-none">
-                                    <option value="">Select...</option>
-                                    <option value="Cash">Cash</option>
-                                    <option value="Cheque">Cheque</option>
-                                    <option value="Credit">Credit</option>
-                                </select>
+                            {/* Payment Method - Column 3 */}
+                            <div className="col-span-4 flex items-center gap-2">
+                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Pay Method</label>
+                                <div className="flex-1 flex gap-1 h-8 min-w-0">
+                                    <input
+                                        type="text"
+                                        readOnly
+                                        value={lookups.paymentMethods?.find(m => m.code === formData.payType)?.name || formData.payType || 'Select...'}
+                                        className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-gray-700 bg-white rounded-[5px] outline-none shadow-sm cursor-pointer"
+                                        onClick={() => setShowPayMethodSearch(true)}
+                                    />
+                                    <button onClick={() => setShowPayMethodSearch(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
+                                        <Search size={16} />
+                                    </button>
+                                </div>
                             </div>
 
-                            <div className="col-span-6 flex items-center gap-3">
-                                <label className="text-[12px] font-bold text-gray-700 w-24 shrink-0">Remarks</label>
-                                <input type="text" name="remarks" value={formData.remarks} onChange={handleInput} className="flex-1 h-7 border border-gray-300 rounded-sm px-2 text-[12px] outline-none bg-white text-gray-700 ml-[-16px]" />
+                            {/* Remarks - Column 1 & 2 */}
+                            <div className="col-span-8 flex items-center gap-2">
+                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Brief Remarks</label>
+                                <input type="text" name="remarks" value={formData.remarks} onChange={handleInput} className="flex-1 min-w-0 h-8 border border-gray-300 rounded-[5px] px-3 font-mono text-[12px] outline-none bg-white text-gray-700 shadow-sm focus:border-[#0285fd]" />
                             </div>
 
-                            <div className="col-span-6 flex items-center gap-3">
-                                <label className="text-[12px] font-bold text-gray-700 w-24 shrink-0">B.Ref / Shift</label>
-                                <input type="text" name="reference" value={formData.reference} onChange={handleInput} className="flex-1  h-7 border border-gray-300 rounded-sm px-2 text-[12px] outline-none bg-white text-gray-700" />
+                            {/* B.Ref / Shift - Column 3 */}
+                            <div className="col-span-4 flex items-center gap-2">
+                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">B.Ref / Shift</label>
+                                <input type="text" name="reference" value={formData.reference} onChange={handleInput} className="flex-1 min-w-0 h-8 border border-gray-300 rounded-[5px] px-3 font-mono text-[12px] outline-none bg-white text-gray-700 shadow-sm focus:border-[#0285fd]" />
                             </div>
-
                         </div>
                     </div>
 
-                    <div className="border border-[#0078d4]/30 rounded-sm bg-white shadow-sm flex flex-col min-h-[220px]">
-                        {/* Table header — columns exactly match product rows */}
-                        <div className="flex bg-[#0078d4]/5 border-b border-[#0078d4]/20 text-[11px] font-bold text-[#0078d4] uppercase tracking-wide items-center">
-                            <div className="flex-[2.5] py-2 px-3 border-r border-[#0078d4]/20 truncate flex items-center justify-between">
-                                <span>Product Name</span>
+                    <div className="border border-gray-100 rounded-lg bg-white shadow-sm flex flex-col min-h-[250px] overflow-hidden">
+                        {/* Table header */}
+                        <div className="flex bg-slate-50/80 border-b border-gray-100 text-[10px] font-black text-gray-400 uppercase tracking-widest items-center">
+                            <div className="flex-[2.5] py-2.5 px-4 border-r border-gray-100 truncate flex items-center justify-between">
+                                <span>Item Selection Portfolio</span>
                                 <button
                                     onClick={() => {
                                         setEntry({ prodCode: '', prodName: '', unit: '', packSize: 1, qty: '', purchasePrice: '', amount: '0.00' });
                                         purchOrderService.getLookups(formData.company).then(data => setLookups(prev => ({ ...prev, products: data.products })));
                                         setShowAddProductModal(true);
                                     }}
-                                    className="w-8 h-7 bg-[#0078d4] text-white flex items-center justify-center hover:bg-[#005a9e] rounded-sm transition-colors shadow-sm shrink-0"
+                                    className="w-8 h-7 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0"
                                     title="Add Product"
                                 ><Plus size={14} /></button>
                             </div>
-                            <div className="w-16 py-2 px-3 border-r border-[#0078d4]/20 text-center">Unit</div>
-                            <div className="w-24 py-2 px-3 border-r border-[#0078d4]/20 text-right">Price</div>
-                            <div className="w-16 py-2 px-3 border-r border-[#0078d4]/20 text-center">Qty</div>
-                            <div className="w-28 py-2 px-3 text-right">Amount</div>
+                            <div className="w-16 py-2.5 px-3 border-r border-gray-100 text-center">UM</div>
+                            <div className="w-28 py-2.5 px-3 border-r border-gray-100 text-right">Unit Rate</div>
+                            <div className="w-16 py-2.5 px-3 border-r border-gray-100 text-center">Usage</div>
+                            <div className="w-32 py-2.5 px-4 text-right">Extended Net</div>
                             <div className="w-10"></div>
                         </div>
 
-                        <div className="flex-1 bg-white overflow-y-auto max-h-[200px]">
-                            {products.map((p, idx) => (
-                                <div key={idx} className="flex border-b border-gray-100 text-[12px] font-semibold text-gray-600 hover:bg-gray-50/50 items-center">
-                                    <div className="flex-[2.5] py-1.5 px-3 border-r border-gray-100 truncate" title={p.prodName}>{p.prodName} [{p.prodCode}]</div>
-                                    <div className="w-16 py-1.5 px-3 border-r border-gray-100 text-center">{p.unit}</div>
-                                    <div className="w-24 border-r border-gray-100 px-1 py-1">
+                        <div className="flex-1 bg-white overflow-y-auto max-h-[220px] divide-y divide-gray-50">
+                            {products.length === 0 ? (
+                                <div className="h-24 flex items-center justify-center text-gray-300 text-[11px] font-bold uppercase tracking-widest italic">
+                                    No items allocated to this document
+                                </div>
+                            ) : products.map((p, idx) => (
+                                <div key={idx} className="flex border-b border-gray-100 text-[11px] font-bold text-slate-700 hover:bg-blue-50/30 items-center transition-colors group">
+                                    <div className="flex-[2.5] py-2 px-4 border-r border-gray-100 truncate" title={p.prodName}>
+                                        <div className="flex flex-col">
+                                            <span className="text-blue-600 font-mono text-[10px]">{p.prodCode}</span>
+                                            <span className="truncate">{p.prodName}</span>
+                                        </div>
+                                    </div>
+                                    <div className="w-16 py-2 px-3 border-r border-gray-100 text-center text-gray-400">{p.unit}</div>
+                                    <div className="w-28 border-r border-gray-100 px-1 py-1 bg-white group-hover:bg-transparent">
                                         <input
                                             type="text"
                                             value={p.purchasePrice}
@@ -510,10 +512,10 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
                                                     i === idx ? { ...item, purchasePrice: newPrice, amount: newAmount.toFixed(2) } : item
                                                 ));
                                             }}
-                                            className="w-full h-6 bg-transparent text-right text-[12px] font-semibold outline-none focus:bg-blue-50/60 border border-transparent focus:border-gray-300 rounded-sm px-1"
+                                            className="w-full h-7 bg-transparent text-right text-[12px] font-mono font-bold text-slate-800 outline-none focus:bg-white border-none px-2"
                                         />
                                     </div>
-                                    <div className="w-16 border-r border-gray-100 px-1 py-1">
+                                    <div className="w-16 border-r border-gray-100 px-1 py-1 bg-white group-hover:bg-transparent">
                                         <input
                                             type="text"
                                             value={p.qty}
@@ -524,13 +526,15 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
                                                     i === idx ? { ...item, qty: newQty, amount: newAmount.toFixed(2) } : item
                                                 ));
                                             }}
-                                            className="w-full h-6 bg-transparent text-center text-[12px] font-black outline-none focus:bg-blue-50/60 border border-transparent focus:border-gray-300 rounded-sm px-1"
+                                            className="w-full h-7 bg-transparent text-center text-[12px] font-mono font-black text-slate-900 outline-none focus:bg-white border-none px-1"
                                         />
                                     </div>
-                                    <div className="w-28 py-1.5 px-3 text-right font-bold text-[#000080]">{parseFloat(p.amount).toFixed(2)}</div>
+                                    <div className="w-32 py-1.5 px-4 text-right font-mono font-black text-slate-800">
+                                        {parseFloat(p.amount).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                    </div>
                                     <div className="w-10 flex justify-center py-1">
-                                        <button onClick={() => removeProduct(idx)} className="text-red-400 hover:text-red-600 p-1">
-                                            <Trash2 size={14} />
+                                        <button onClick={() => removeProduct(idx)} className="text-red-300 hover:text-red-500 transition-all p-1.5 hover:bg-red-50 rounded-[5px]">
+                                            <Trash2 size={13} />
                                         </button>
                                     </div>
                                 </div>
@@ -540,30 +544,31 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
 
                     <div className="flex flex-row justify-between items-end gap-x-12">
                         <div className="flex-1 space-y-2">
-                            <label className="text-[12px] font-bold text-gray-700">Comment</label>
-                            <textarea name="comment" value={formData.comment} onChange={handleInput} className="w-full h-[80px] border border-gray-300 rounded-sm p-2 text-[12px] outline-none focus:border-blue-500 resize-none" placeholder="Add additional comments..."></textarea>
+                            <label className="text-[12.5px] font-bold text-gray-700">Internal Remarks & Comments</label>
+                            <textarea name="comment" value={formData.comment} onChange={handleInput} className="w-full h-[100px] border border-gray-300 rounded-lg p-3 text-[12.5px] font-mono outline-none focus:border-[#0285fd] resize-none shadow-sm bg-gray-50/30" placeholder="Add additional comments..."></textarea>
                         </div>
 
-                        <div className="w-[300px] bg-blue-50/40 border border-[#0078d4]/20 rounded-sm p-3 space-y-2">
+                        <div className="w-[320px] bg-white border border-gray-100 rounded-lg p-4 space-y-3 shadow-sm">
                             <div className="flex items-center justify-between">
-                                <span className="text-[12px] font-bold text-gray-700">Total Amount</span>
-                                <div className="flex items-center gap-2">
-                                    <span className="text-[10px] font-black text-gray-400">Rs.</span>
-                                    <input type="text" readOnly value={totals.sum.toFixed(2)} className="w-[100px] h-6 bg-white border border-gray-300 px-2 text-right text-[12px] font-bold text-[#000080] rounded-sm outline-none" />
+                                <span className="text-[12.5px] font-bold text-gray-500 uppercase tracking-tight">Portfolio Total</span>
+                                <div className="text-[15px] font-mono font-black text-slate-800">
+                                    {totals.sum.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                 </div>
                             </div>
-                            <div className="flex items-center justify-between">
-                                <span className="text-[12px] font-bold text-gray-700">NBT %</span>
-                                <input type="text" name="nbtAmnt" value={formData.nbtAmnt} onChange={handleInput} className="w-[125px] h-6 bg-white border border-gray-300 px-2 text-right text-[12px] rounded-sm outline-none focus:border-blue-500" />
+                            <div className="flex items-center justify-between gap-4">
+                                <span className="text-[12.5px] font-bold text-gray-500 uppercase tracking-tight">NBT Levy %</span>
+                                <input type="text" name="nbtAmnt" value={formData.nbtAmnt} onChange={handleInput} className="w-24 h-7 bg-white border border-gray-200 px-2 text-right text-[13px] font-mono font-bold rounded-[5px] outline-none focus:border-[#0285fd] shadow-sm" />
                             </div>
-                            <div className="flex items-center justify-between">
-                                <span className="text-[12px] font-bold text-gray-700">Tax Amt / %</span>
-                                <input type="text" name="taxPer" value={formData.taxPer} onChange={handleInput} className="w-[125px] h-6 bg-white border border-gray-300 px-2 text-right text-[12px] rounded-sm outline-none focus:border-blue-500" />
+                            <div className="flex items-center justify-between gap-4">
+                                <span className="text-[12.5px] font-bold text-gray-500 uppercase tracking-tight">Tax Value %</span>
+                                <input type="text" name="taxPer" value={formData.taxPer} onChange={handleInput} className="w-24 h-7 bg-white border border-gray-200 px-2 text-right text-[13px] font-mono font-bold rounded-[5px] outline-none focus:border-[#0285fd] shadow-sm" />
                             </div>
-                            <div className="h-[1px] bg-gray-300 my-1" />
-                            <div className="flex items-center justify-between">
-                                <span className="text-[14px] font-black text-gray-900">Net Amount</span>
-                                <input type="text" readOnly value={totals.netAmount.toFixed(2)} className="w-[125px] h-7 bg-[#e6f2ff] border border-[#0078d4] px-2 text-right text-[14px] font-black text-[#000080] rounded-sm outline-none shadow-[inset_0_1px_2px_rgba(0,0,0,0.1)]" />
+                            <div className="h-[1px] bg-gray-100 my-1" />
+                            <div className="flex items-center justify-between bg-slate-50 p-2 rounded-md">
+                                <span className="text-[13px] font-black text-slate-900 uppercase">Net Liability</span>
+                                <div className="text-[18px] font-mono font-black text-blue-700 tracking-tighter">
+                                    {totals.netAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -574,34 +579,103 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
             <SimpleModal
                 isOpen={showSearchModal}
                 onClose={() => setShowSearchModal(false)}
-                title="Select Saved Purchase Order"
-                maxWidth="max-w-[500px]"
+                title="Historical Document Directory"
+                maxWidth="max-w-[700px]"
             >
-                <div className="space-y-2 p-2 max-h-[400px] overflow-y-auto">
-                    {orders.length === 0 ? (
-                        <div className="text-center py-4 text-gray-400 text-[13px]">No saved orders found.</div>
-                    ) : (
-                        <table className="w-full text-[13px] border-collapse">
-                            <thead className="bg-gray-50 text-gray-600 border-b">
+                <div className="space-y-4 font-['Tahoma']">
+                    <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-lg border border-gray-100 mb-2">
+                        <span className="text-[12px] font-bold text-gray-500 uppercase tracking-widest">Global Archive Search</span>
+                        <div className="relative flex-1">
+                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
+                             <input type="text" placeholder="Filter by document id or creation date..." className="w-full h-9 pl-10 pr-4 border border-gray-300 rounded-[5px] outline-none text-sm focus:border-[#0285fd] bg-white shadow-sm" />
+                        </div>
+                    </div>
+
+                    <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm">
+                        <table className="w-full text-left">
+                            <thead className="bg-[#f8fafd] text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">
                                 <tr>
-                                    <th className="py-2 px-3 text-left">Doc No</th>
-                                    <th className="py-2 px-3 text-left">Date</th>
-                                    <th className="w-16"></th>
+                                    <th className="px-5 py-3">Reference ID</th>
+                                    <th className="px-5 py-3">Ledger Posting Date</th>
+                                    <th className="px-5 py-3 text-right">Interaction</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                {orders.map((order, i) => (
-                                    <tr key={i} className="border-b hover:bg-blue-50 transition-colors cursor-pointer" onClick={() => handleSelectOrder(order.docNo)}>
-                                        <td className="py-2.5 px-3 font-bold text-[#000080]">{order.docNo}</td>
-                                        <td className="py-2.5 px-3 text-gray-600">{order.date?.split('T')[0]}</td>
-                                        <td className="py-2.5 px-3 text-right">
-                                            <button className="text-[#0078d4] font-bold hover:underline">Select</button>
+                            <tbody className="divide-y divide-gray-50">
+                                {orders.length === 0 ? (
+                                    <tr>
+                                        <td colSpan="3" className="text-center py-10 text-gray-300 text-[12px] font-bold uppercase tracking-widest">Archive is currently empty</td>
+                                    </tr>
+                                ) : orders.map((order, i) => (
+                                    <tr key={i} className="group hover:bg-blue-50/50 cursor-pointer transition-colors" onClick={() => handleSelectOrder(order.docNo)}>
+                                        <td className="px-5 py-3 font-mono text-[13px] font-black text-blue-700">{order.docNo}</td>
+                                        <td className="px-5 py-3 text-[13px] font-bold text-gray-600 uppercase italic">{order.date?.split('T')[0]}</td>
+                                        <td className="px-5 py-3 text-right">
+                                             <button className="bg-[#0285fd] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#0073ff] shadow-md transition-all active:scale-95">RETRIEVE</button>
                                         </td>
                                     </tr>
                                 ))}
                             </tbody>
                         </table>
-                    )}
+                    </div>
+                </div>
+            </SimpleModal>
+
+            {/* Payment Method Modal */}
+            <SimpleModal
+                isOpen={showPayMethodSearch}
+                onClose={() => {
+                    setShowPayMethodSearch(false);
+                    setPayMethodSearchQuery('');
+                }}
+                title="Payment Method Lookup"
+                maxWidth="max-w-[450px]"
+            >
+                <div className="space-y-4 font-['Tahoma']">
+                    <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-lg border border-gray-100 mb-2">
+                        <span className="text-[12px] font-bold text-gray-500 uppercase tracking-widest">Search Facility</span>
+                        <div className="relative flex-1">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
+                            <input
+                                type="text"
+                                placeholder="Filter payment methods..."
+                                className="w-full h-9 pl-10 pr-4 border border-gray-300 rounded-[5px] outline-none text-sm focus:border-[#0285fd] bg-white shadow-sm"
+                                value={payMethodSearchQuery}
+                                onChange={(e) => setPayMethodSearchQuery(e.target.value)}
+                                autoFocus
+                            />
+                        </div>
+                    </div>
+                    <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm">
+                        <div className="max-h-[300px] overflow-y-auto no-scrollbar">
+                            <table className="w-full text-left">
+                                <thead className="bg-[#f8fafd] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">
+                                    <tr>
+                                        <th className="px-5 py-3">Code</th>
+                                        <th className="px-5 py-3">Method Title</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-gray-50">
+                                    {(lookups.paymentMethods || [])
+                                        .filter(m => !payMethodSearchQuery || m.name.toLowerCase().includes(payMethodSearchQuery.toLowerCase()) || m.code.toLowerCase().includes(payMethodSearchQuery.toLowerCase()))
+                                        .map(m => (
+                                            <tr key={m.code} className="group hover:bg-blue-50/50 cursor-pointer transition-colors" onClick={() => {
+                                                setFormData(prev => ({ ...prev, payType: m.code }));
+                                                setShowPayMethodSearch(false);
+                                                setPayMethodSearchQuery('');
+                                            }}>
+                                                <td className="px-5 py-3 font-mono text-[13px] font-black text-blue-700">{m.code}</td>
+                                                <td className="px-5 py-3 text-[13px] font-bold text-gray-600 uppercase group-hover:text-blue-600">{m.name}</td>
+                                            </tr>
+                                        ))}
+                                    {(lookups.paymentMethods || []).length === 0 && (
+                                        <tr>
+                                            <td colSpan="2" className="text-center py-6 text-gray-300 text-[12px] font-bold uppercase tracking-widest">No methods found</td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </SimpleModal>
 
@@ -609,80 +683,89 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
             <SimpleModal
                 isOpen={showSupplierSearch}
                 onClose={() => setShowSupplierSearch(false)}
-                title="Select Supplier"
-                maxWidth="max-w-[500px]"
+                title="Supplier Directory Lookup"
+                maxWidth="max-w-[600px]"
             >
-                <div className="space-y-4">
-                    <div className="relative">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
-                        <input
-                            type="text"
-                            placeholder="Search supplier name or code..."
-                            className="w-full h-10 pl-10 pr-4 border border-gray-200 rounded-md outline-none focus:border-[#0078d4] text-sm"
-                            value={supplierSearchQuery}
-                            onChange={(e) => setSupplierSearchQuery(e.target.value)}
-                            autoFocus
-                        />
+                <div className="space-y-4 font-['Tahoma']">
+                    <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-lg border border-gray-100 mb-2">
+                        <span className="text-[12px] font-bold text-gray-500 uppercase tracking-widest">Search Facility</span>
+                        <div className="relative flex-1">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
+                            <input
+                                type="text"
+                                placeholder="Find supplier by legal name or code..."
+                                className="w-full h-9 pl-10 pr-4 border border-gray-300 rounded-[5px] outline-none text-sm focus:border-[#0285fd] bg-white shadow-sm"
+                                value={supplierSearchQuery}
+                                onChange={(e) => setSupplierSearchQuery(e.target.value)}
+                                autoFocus
+                            />
+                        </div>
                     </div>
-                    <div className="max-h-[400px] overflow-y-auto border border-gray-100 rounded-md">
-                        <table className="w-full text-sm">
-                            <thead className="bg-slate-50 sticky top-0">
-                                <tr>
-                                    <th className="px-4 py-2.5 text-left font-bold text-gray-600 text-[11px] uppercase">Code</th>
-                                    <th className="px-4 py-2.5 text-left font-bold text-gray-600 text-[11px] uppercase">Name</th>
-                                    <th className="px-4 py-2.5 text-center font-bold text-gray-600 text-[11px] uppercase">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {lookups.suppliers
-                                    .filter(s => s.name.toLowerCase().includes(supplierSearchQuery.toLowerCase()) || s.code.toLowerCase().includes(supplierSearchQuery.toLowerCase()))
-                                    .map(s => (
-                                        <tr key={s.code} className="border-t border-gray-50 hover:bg-blue-50 transition-colors cursor-pointer" onClick={() => handleSelectSupplier(s)}>
-                                            <td className="px-4 py-2 font-bold text-[#0078d4]">{s.code}</td>
-                                            <td className="px-4 py-2 text-gray-700 font-medium">{s.name}</td>
-                                            <td className="px-4 py-2 text-center">
-                                                <button className="text-[10px] font-bold text-[#0078d4] hover:underline">SELECT</button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                            </tbody>
-                        </table>
+                    <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm">
+                        <div className="max-h-[400px] overflow-y-auto no-scrollbar">
+                            <table className="w-full text-left">
+                                <thead className="bg-[#f8fafd] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">
+                                    <tr>
+                                        <th className="px-5 py-3">Code</th>
+                                        <th className="px-5 py-3">Credential / Supplier Name</th>
+                                        <th className="px-5 py-3 text-right">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-gray-50">
+                                    {lookups.suppliers
+                                        .filter(s => s.name.toLowerCase().includes(supplierSearchQuery.toLowerCase()) || s.code.toLowerCase().includes(supplierSearchQuery.toLowerCase()))
+                                        .map(s => (
+                                            <tr key={s.code} className="group hover:bg-blue-50/50 cursor-pointer transition-all" onClick={() => handleSelectSupplier(s)}>
+                                                <td className="px-5 py-3 font-mono text-[12px] font-bold text-blue-600">{s.code}</td>
+                                                <td className="px-5 py-3 text-[13px] font-bold text-gray-700 uppercase group-hover:text-blue-600 transition-colors">{s.name}</td>
+                                                <td className="px-5 py-3 text-right">
+                                                    <button className="bg-[#0285fd] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#0073ff] shadow-md transition-all active:scale-95">SELECT</button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </SimpleModal>
 
             {/* Product Search Modal */}
             {/* ── Add Product Modal ──────────────────────────────────── */}
-            <SimpleModal isOpen={showAddProductModal} onClose={() => { setShowAddProductModal(false); setProductSearchQuery(''); }} title="Add Product to PO" maxWidth="max-w-[580px]">
-                <div className="space-y-3 px-1">
-                    {/* Product search */}
-                    <div className="relative">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
-                        <input
-                            type="text"
-                            placeholder="Search 58,000+ products by code or name..."
-                            className="w-full h-9 pl-9 pr-4 border border-gray-200 rounded-md outline-none text-[12px]"
-                            value={productSearchQuery}
-                            onChange={async (e) => {
-                                const val = e.target.value; setProductSearchQuery(val);
-                                if (val.length >= 2) { try { const r = await purchOrderService.searchProducts(val); setLookups(prev => ({ ...prev, products: r })); } catch (_) {} }
-                                else if (val.length === 0) { const init = await purchOrderService.getLookups(formData.company); setLookups(prev => ({ ...prev, products: init.products })); }
-                            }}
-                            autoFocus
-                        />
+            <SimpleModal isOpen={showAddProductModal} onClose={() => { setShowAddProductModal(false); setProductSearchQuery(''); }} title="Inventory Acquisition Portal" maxWidth="max-w-[650px]">
+                <div className="space-y-4 px-1 font-['Tahoma']">
+                    {/* Search Facility Header */}
+                    <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-lg border border-gray-100 mb-2">
+                        <span className="text-[12px] font-bold text-gray-500 uppercase tracking-widest">Product Catalog</span>
+                        <div className="relative flex-1">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+                            <input
+                                type="text"
+                                placeholder="Search inventory by title or SKU..."
+                                className="w-full h-9 pl-10 pr-4 border border-gray-300 rounded-[5px] outline-none text-sm focus:border-[#0285fd] bg-white shadow-sm"
+                                value={productSearchQuery}
+                                onChange={async (e) => {
+                                    const val = e.target.value; setProductSearchQuery(val);
+                                    if (val.length >= 2) { try { const r = await purchOrderService.searchProducts(val); setLookups(prev => ({ ...prev, products: r })); } catch (_) {} }
+                                    else if (val.length === 0) { const init = await purchOrderService.getLookups(formData.company); setLookups(prev => ({ ...prev, products: init.products })); }
+                                }}
+                                autoFocus
+                            />
+                        </div>
                     </div>
-                    {/* Product list */}
-                    <div className="border border-gray-100 rounded-md overflow-hidden">
-                        <div className="max-h-[200px] overflow-y-auto no-scrollbar">
-                            <table className="w-full text-[11px]">
-                                <thead className="bg-slate-50 sticky top-0 border-b border-gray-200">
+
+                    {/* Product Selection List */}
+                    <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm">
+                        <div className="max-h-[250px] overflow-y-auto no-scrollbar">
+                            <table className="w-full text-left">
+                                <thead className="bg-[#f8fafd] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">
                                     <tr>
-                                        <th className="px-3 py-2 text-left font-bold text-gray-500 uppercase">Code</th>
-                                        <th className="px-3 py-2 text-left font-bold text-gray-500 uppercase">Product Name</th>
-                                        <th className="px-3 py-2 text-right font-bold text-gray-500 uppercase">Price</th>
+                                        <th className="px-4 py-3">Code</th>
+                                        <th className="px-4 py-3">Item Description</th>
+                                        <th className="px-4 py-3 text-right">Base Price</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody className="divide-y divide-gray-50">
                                     {(lookups.products || []).map(p => (
                                         <tr key={p.code}
                                             onClick={() => {
@@ -696,45 +779,56 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
                                                 }));
                                                 setProductSearchQuery('');
                                             }}
-                                            className={`border-b border-gray-50 cursor-pointer transition-colors ${
-                                                entry.prodCode === p.code ? 'bg-orange-50 border-l-2 border-l-orange-400' : 'hover:bg-orange-50/50'
+                                            className={`group hover:bg-blue-50/50 cursor-pointer transition-colors ${
+                                                entry.prodCode === p.code ? 'bg-blue-50/80 ring-1 ring-inset ring-blue-200' : ''
                                             }`}
                                         >
-                                            <td className="px-3 py-1.5 font-bold text-orange-600">{p.code}</td>
-                                            <td className="px-3 py-1.5 text-gray-700 font-medium">{p.name}</td>
-                                            <td className="px-3 py-1.5 text-right font-bold text-gray-600">{parseFloat(p.price || 0).toFixed(2)}</td>
+                                            <td className="px-4 py-2 font-mono text-[12px] font-bold text-blue-600">{p.code}</td>
+                                            <td className="px-4 py-2 text-[13px] font-bold text-gray-700 uppercase group-hover:text-blue-600 transition-colors">{p.name}</td>
+                                            <td className="px-4 py-2 text-right font-mono font-black text-slate-600">{parseFloat(p.price || 0).toFixed(2)}</td>
                                         </tr>
                                     ))}
                                 </tbody>
                             </table>
                         </div>
                     </div>
-                    {/* Selected product detail + qty entry */}
+
+                    {/* Quantity Entry Section */}
                     {entry.prodCode && (
-                        <div className="bg-blue-50/40 border border-[#0078d4]/20 rounded-md p-3 space-y-2">
-                            <div className="text-[11px] font-black text-[#000080] uppercase tracking-tight">
-                                {entry.prodName} <span className="text-orange-500">[{entry.prodCode}]</span>
-                            </div>
-                            <div className="grid grid-cols-2 gap-2">
-                                <div className="flex flex-col gap-1">
-                                    <label className="text-[10px] font-bold text-gray-500 uppercase">Price</label>
-                                    <input type="text" name="purchasePrice" value={entry.purchasePrice} onChange={handleEntryInput}
-                                        className="h-7 border border-gray-300 px-2 text-right text-[12px] font-bold rounded-sm outline-none focus:border-[#0078d4]" />
+                        <div className="bg-slate-50 border border-gray-100 rounded-xl p-5 space-y-4 shadow-sm animate-in fade-in slide-in-from-bottom-2">
+                             <div className="flex items-center justify-between border-b border-gray-200 pb-2">
+                                <div className="text-[13px] font-black text-slate-800 uppercase tracking-tight">
+                                    {entry.prodName} <span className="text-blue-500 font-mono text-[12px]">[{entry.prodCode}]</span>
                                 </div>
-                                <div className="flex flex-col gap-1">
-                                    <label className="text-[10px] font-bold text-gray-500 uppercase">Qty</label>
+                                <div className="text-[10px] font-black text-gray-400 uppercase">Input Required</div>
+                             </div>
+
+                            <div className="grid grid-cols-2 gap-6">
+                                <div className="space-y-1.5 focus-within:text-blue-600 transition-colors">
+                                    <label className="text-[11px] font-black text-gray-500 uppercase tracking-widest pl-1">Adjusted Unit Price</label>
+                                    <input type="text" name="purchasePrice" value={entry.purchasePrice} onChange={handleEntryInput}
+                                        className="w-full h-10 border border-gray-300 px-4 text-right text-[14px] font-mono font-black rounded-lg outline-none focus:border-[#0285fd] bg-white shadow-sm" />
+                                </div>
+                                <div className="space-y-1.5 focus-within:text-blue-600 transition-colors">
+                                    <label className="text-[11px] font-black text-gray-500 uppercase tracking-widest pl-1">Acquisition Qty</label>
                                     <input type="text" name="qty" value={entry.qty} onChange={handleEntryInput}
                                         onKeyDown={e => { if (e.key === 'Enter') { addProduct(); setShowAddProductModal(false); setProductSearchQuery(''); } }}
-                                        className="h-7 border border-[#0078d4]/50 px-2 text-center text-[12px] font-black rounded-sm outline-none focus:border-[#0078d4] bg-blue-50/30" autoFocus />
+                                        className="w-full h-10 border border-[#0285fd] px-4 text-center text-[14px] font-mono font-black rounded-lg outline-none bg-blue-50/20 shadow-sm" autoFocus />
                                 </div>
                             </div>
-                            <div className="flex justify-between items-center pt-1">
-                                <span className="text-[11px] text-gray-500">Amount: <strong className="text-[#b91c1c] text-[13px]">{parseFloat(entry.amount || 0).toFixed(2)}</strong></span>
+
+                            <div className="flex items-center justify-between pt-2">
+                                <div className="flex flex-col">
+                                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Line Item Extension</span>
+                                    <span className="text-[18px] font-mono font-black text-blue-700 tracking-tighter">
+                                        Rs. {parseFloat(entry.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                    </span>
+                                </div>
                                 <button
                                     onClick={() => { addProduct(); setShowAddProductModal(false); setProductSearchQuery(''); }}
-                                    className="px-5 h-8 bg-[#0078d4] text-white text-[12px] font-black rounded-md hover:bg-[#005a9e] transition-colors active:scale-95 flex items-center gap-2"
+                                    className="px-8 h-10 bg-[#0285fd] text-white text-sm font-black rounded-lg hover:bg-[#0073ff] shadow-lg shadow-blue-100 transition-all active:scale-95 flex items-center gap-2"
                                 >
-                                    + Add to PO
+                                    <Plus size={16} /> ADD TO LISTING
                                 </button>
                             </div>
                         </div>
@@ -742,152 +836,84 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
                 </div>
             </SimpleModal>
 
+            {/* ── Global Itemized Search ──────────────────────────────────── */}
             <SimpleModal
                 isOpen={showProductSearch}
                 onClose={() => {
                     setShowProductSearch(false);
                     setProductSearchQuery('');
                 }}
-                title="Select Product"
-                maxWidth="max-w-[600px]"
+                title="Global Itemized Lookup"
+                maxWidth="max-w-[700px]"
             >
-                <div className="space-y-4">
-                    <div className="relative">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
-                        <input
-                            type="text"
-                            placeholder="Enter product name or code to search (58,000+ items)..."
-                            className="w-full h-10 pl-10 pr-4 border border-gray-200 rounded-md outline-none focus:border-orange-500 text-sm"
-                            value={productSearchQuery}
-                            onChange={async (e) => {
-                                const val = e.target.value;
-                                setProductSearchQuery(val);
-                                if (val.length >= 2) {
-                                    try {
-                                        const results = await purchOrderService.searchProducts(val);
-                                        setLookups(prev => ({ ...prev, products: results }));
-                                    } catch (err) {}
-                                } else if (val.length === 0) {
-                                    // Optionally reset to top 50
-                                    const init = await purchOrderService.getLookups(formData.company);
-                                    setLookups(prev => ({ ...prev, products: init.products }));
-                                }
-                            }}
-                            autoFocus
-                        />
+                <div className="space-y-4 font-['Tahoma']">
+                    <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-lg border border-gray-100 mb-2">
+                        <span className="text-[12px] font-bold text-gray-500 uppercase tracking-widest">Search Facility</span>
+                        <div className="relative flex-1">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
+                            <input
+                                type="text"
+                                placeholder="Scan items by generic title or reference code..."
+                                className="w-full h-9 pl-10 pr-4 border border-gray-300 rounded-[5px] outline-none text-sm focus:border-[#0285fd] bg-white shadow-sm"
+                                value={productSearchQuery}
+                                onChange={async (e) => {
+                                    const val = e.target.value;
+                                    setProductSearchQuery(val);
+                                    if (val.length >= 2) {
+                                        try {
+                                            const results = await purchOrderService.searchProducts(val);
+                                            setLookups(prev => ({ ...prev, products: results }));
+                                        } catch (err) {}
+                                    } else if (val.length === 0) {
+                                        const init = await purchOrderService.getLookups(formData.company);
+                                        setLookups(prev => ({ ...prev, products: init.products }));
+                                    }
+                                }}
+                                autoFocus
+                            />
+                        </div>
                     </div>
-                    <div className="max-h-[400px] overflow-y-auto border border-gray-100 rounded-md">
-                        <table className="w-full text-sm">
-                            <thead className="bg-slate-50 sticky top-0">
-                                <tr>
-                                    <th className="px-4 py-2.5 text-left font-bold text-gray-600 text-[11px] uppercase">Code</th>
-                                    <th className="px-4 py-2.5 text-left font-bold text-gray-600 text-[11px] uppercase">Name</th>
-                                    <th className="px-4 py-2.5 text-right font-bold text-gray-600 text-[11px] uppercase">Price</th>
-                                    <th className="px-4 py-2.5 text-center font-bold text-gray-600 text-[11px] uppercase">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {(lookups.products || []).map(p => (
-                                    <tr key={p.code} className="border-t border-gray-50 hover:bg-orange-50 transition-colors cursor-pointer" onClick={() => handleSelectProduct(p)}>
-                                        <td className="px-4 py-2 font-bold text-orange-600">{p.code}</td>
-                                        <td className="px-4 py-2 text-gray-700 font-medium">{p.name}</td>
-                                        <td className="px-4 py-2 text-right font-bold text-gray-600">{p.price?.toFixed(2)}</td>
-                                        <td className="px-4 py-2 text-center">
-                                            <button className="text-[10px] font-bold text-orange-500 hover:underline">SELECT</button>
-                                        </td>
-                                    </tr>
-                                ))}
-                                {lookups.products?.length === 0 && (
+                    <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm">
+                        <div className="max-h-[400px] overflow-y-auto no-scrollbar">
+                            <table className="w-full text-left">
+                                <thead className="bg-[#f8fafd] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">
                                     <tr>
-                                        <td colSpan={4} className="py-8 text-center text-gray-400 italic">No products found. Try typing a search term.</td>
+                                        <th className="px-5 py-3">Code</th>
+                                        <th className="px-5 py-3">Acquisition Title</th>
+                                        <th className="px-5 py-3 text-right">Acq. Price</th>
+                                        <th className="px-5 py-3 text-right">Action</th>
                                     </tr>
-                                )}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody className="divide-y divide-gray-50">
+                                    {(lookups.products || []).map(p => (
+                                        <tr key={p.code} className="group hover:bg-blue-50/50 cursor-pointer transition-all" onClick={() => handleSelectProduct(p)}>
+                                            <td className="px-5 py-3 font-mono text-[12px] font-bold text-blue-600">{p.code}</td>
+                                            <td className="px-5 py-3 text-[13px] font-bold text-gray-700 uppercase group-hover:text-blue-600 transition-colors">{p.name}</td>
+                                            <td className="px-5 py-3 text-right font-mono font-black text-gray-400">{p.price?.toFixed(2)}</td>
+                                            <td className="px-5 py-3 text-right">
+                                                 <button className="bg-[#0285fd] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#0073ff] shadow-md transition-all active:scale-95">SELECT</button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                    {lookups.products?.length === 0 && (
+                                         <tr>
+                                             <td colSpan={4} className="py-10 text-center text-gray-300 font-bold uppercase tracking-widest">No products available for capture</td>
+                                         </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </SimpleModal>
 
             {/* Date Selection Modal */}
-            <SimpleModal
+            <CalendarModal
                 isOpen={showDatePicker}
                 onClose={() => setShowDatePicker(false)}
-                title={`Select ${datePickerField === 'postDate' ? 'PO Date' : 'Expected Date'}`}
-                maxWidth="max-w-[320px]"
-            >
-                <div className="p-1 px-2">
-                    {/* Header: Month & Year selection */}
-                    <div className="flex items-center justify-between mb-4">
-                        <button
-                            onClick={() => setViewDate(new Date(viewDate.getFullYear(), viewDate.getMonth() - 1, 1))}
-                            className="p-1.5 hover:bg-slate-100 rounded-md text-slate-500 transition-all active:scale-90"
-                        >
-                            <ChevronLeft size={18} />
-                        </button>
-                        <div className="flex gap-2">
-                            <select
-                                value={viewDate.getMonth()}
-                                onChange={(e) => setViewDate(new Date(viewDate.getFullYear(), parseInt(e.target.value), 1))}
-                                className="text-[14px] font-bold text-slate-700 outline-none bg-transparent hover:text-[#0078d4] cursor-pointer appearance-none px-1"
-                            >
-                                {['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'].map((m, i) => <option key={i} value={i}>{m}</option>)}
-                            </select>
-                            <select
-                                value={viewDate.getFullYear()}
-                                onChange={(e) => setViewDate(new Date(parseInt(e.target.value), viewDate.getMonth(), 1))}
-                                className="text-[14px] font-bold text-slate-700 outline-none bg-transparent hover:text-[#0078d4] cursor-pointer appearance-none px-1"
-                            >
-                                {Array.from({ length: 20 }, (_, i) => new Date().getFullYear() - 10 + i).map(y => <option key={y} value={y}>{y}</option>)}
-                            </select>
-                        </div>
-                        <button
-                            onClick={() => setViewDate(new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 1))}
-                            className="p-1.5 hover:bg-slate-100 rounded-md text-slate-500 transition-all active:scale-90"
-                        >
-                            <ChevronRight size={18} />
-                        </button>
-                    </div>
-
-                    {/* Week Header */}
-                    <div className="grid grid-cols-7 mb-2">
-                        {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map(d => (
-                            <div key={d} className="text-center text-[10px] font-black text-slate-400 uppercase tracking-tighter">{d}</div>
-                        ))}
-                    </div>
-
-                    {/* Days Grid */}
-                    <div className="grid grid-cols-7 gap-1">
-                        {calendarDays.map((day, i) => {
-                            if (!day) return <div key={i} className="h-8" />;
-
-                            const isSelected = formData[datePickerField] === new Date(viewDate.getFullYear(), viewDate.getMonth(), day).toISOString().split('T')[0];
-                            const isToday = new Date().toDateString() === new Date(viewDate.getFullYear(), viewDate.getMonth(), day).toDateString();
-
-                            return (
-                                <button
-                                    key={i}
-                                    onClick={() => handleDateSelect(day)}
-                                    className={`h-8 w-8 text-[12px] font-bold rounded-md flex items-center justify-center transition-all ${isSelected
-                                        ? 'bg-[#0078d4] text-white shadow-md'
-                                        : isToday
-                                            ? 'bg-blue-50 text-[#0078d4]'
-                                            : 'hover:bg-slate-100 text-slate-700'
-                                        }`}
-                                >
-                                    {day}
-                                </button>
-                            );
-                        })}
-                    </div>
-
-                    <button
-                        onClick={() => { setViewDate(new Date()); handleDateSelect(new Date().getDate()); }}
-                        className="w-full mt-4 py-1.5 text-[11px] font-bold text-[#0078d4] hover:bg-blue-50 rounded-md transition-colors"
-                    >
-                        GO TO TODAY
-                    </button>
-                </div>
-            </SimpleModal>
+                onDateSelect={handleDateSelect}
+                initialDate={formData[datePickerField]}
+            />
 
             <ConfirmModal 
                 isOpen={showConfirmModal}

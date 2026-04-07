@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import SimpleModal from '../components/SimpleModal';
+import CalendarModal from '../components/CalendarModal';
 import { BookOpen, Search, RotateCcw, Save, Calendar, Plus, X, Loader2, ListFilter, Scale, ArrowRightLeft } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
@@ -20,6 +21,7 @@ const JournalEntryBoard = ({ isOpen, onClose }) => {
     const [showAccountModal, setShowAccountModal] = useState(false);
     const [accountSearch, setAccountSearch] = useState('');
     const [activeRowIndex, setActiveRowIndex] = useState(null);
+    const [showCalendar, setShowCalendar] = useState(false);
 
     // Dummy Ledger Accounts
     const ledgerAccounts = [
@@ -81,6 +83,11 @@ const JournalEntryBoard = ({ isOpen, onClose }) => {
         setAccountSearch('');
     };
 
+    const handleDateSelect = (date) => {
+        setFormData({ ...formData, entryDate: date });
+        setShowCalendar(false);
+    };
+
     return (
         <>
             <SimpleModal
@@ -90,20 +97,17 @@ const JournalEntryBoard = ({ isOpen, onClose }) => {
                 maxWidth="max-w-[1100px]"
                 footer={
                     <div className="bg-slate-50 px-6 py-4 w-full flex justify-end gap-3 border-t border-gray-100 rounded-b-xl">
-                        <button onClick={handleReset} className="px-6 h-10 bg-slate-100 text-slate-600 text-sm font-bold rounded-md hover:bg-slate-200 transition-all active:scale-95 flex items-center gap-2 border-none">
-                            <RotateCcw size={14} /> Clear Entry
+                        <button onClick={handleReset} className="px-6 h-10 bg-[#00adff] text-white text-sm font-bold rounded-[5px] hover:bg-[#0099e6] transition-all active:scale-95 flex items-center gap-2 border-none">
+                            <RotateCcw size={14} /> CLEAR ENTRY
                         </button>
-                        <button onClick={handleSave} disabled={loading} className={`px-6 h-10 bg-[#0078d4] text-white text-sm font-bold rounded-md shadow-md shadow-blue-200 hover:bg-[#005a9e] transition-all active:scale-95 flex items-center gap-2 ${loading ? 'opacity-50' : ''}`}>
+                        <button onClick={handleSave} disabled={loading} className={`px-6 h-10 bg-[#50af60] text-white text-sm font-bold rounded-[5px] shadow-md hover:bg-[#24db4e] transition-all active:scale-95 flex items-center gap-2 ${loading ? 'opacity-50' : ''}`}>
                             {loading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
-                            Post Journal Entry
-                        </button>
-                        <button onClick={onClose} className="px-6 h-10 bg-slate-100 text-slate-600 text-sm font-bold rounded-md hover:bg-slate-200 transition-all active:scale-95 flex items-center gap-2 border-none">
-                            <X size={14} /> Exit
+                            POST JOURNAL
                         </button>
                     </div>
                 }
             >
-                <div className="space-y-6 font-['Inter'] relative">
+                <div className="space-y-6 font-['Tahoma'] relative select-none">
                     {/* Branding Icon */}
                     <div className="absolute top-0 right-0 p-4 opacity-[0.03] pointer-events-none">
                         <BookOpen size={160} />
@@ -113,17 +117,19 @@ const JournalEntryBoard = ({ isOpen, onClose }) => {
                     <div className="grid grid-cols-12 gap-10 bg-white p-5 border border-gray-200 rounded shadow-sm">
                         <div className="col-span-12 lg:col-span-4 space-y-4">
                             <FormRow label="Entry ID">
-                                <input type="text" className="flex-1 h-8 border border-gray-300 px-3 text-[12px] bg-slate-50 font-black text-slate-700 rounded-sm" value={formData.entryId} readOnly />
+                                <input type="text" className="flex-1 h-8 border border-gray-300 px-3 text-[12px] bg-slate-50 font-black text-slate-700 rounded-[5px]" value={formData.entryId} readOnly />
                             </FormRow>
-                            <FormRow label="Entry Date">
-                                <div className="flex-1 flex items-center px-3 h-8 border border-gray-300 bg-white shadow-sm rounded-sm hover:border-blue-400 transition-colors">
+                             <FormRow label="Entry Date">
+                                <div className="flex h-8 gap-1">
                                     <input
-                                        type="date"
+                                        type="text"
+                                        readOnly
                                         value={formData.entryDate}
-                                        onChange={(e) => setFormData({ ...formData, entryDate: e.target.value })}
-                                        className="flex-1 text-[12px] font-bold text-slate-700 outline-none bg-transparent"
+                                        className="w-[110px] px-2 text-[12px] border border-gray-300 rounded-[5px] outline-none text-slate-700 font-bold bg-white text-center shadow-sm"
                                     />
-                                    <Calendar size={14} className="text-blue-500" />
+                                    <button onClick={() => setShowCalendar(true)} className="w-9 h-8 bg-white border border-gray-300 text-[#0285fd] flex items-center justify-center hover:bg-blue-50 rounded-[5px] transition-all shadow-sm active:scale-90">
+                                        <Calendar size={14} />
+                                    </button>
                                 </div>
                             </FormRow>
                         </div>
@@ -133,8 +139,7 @@ const JournalEntryBoard = ({ isOpen, onClose }) => {
                                 <textarea
                                     value={formData.internalNote}
                                     onChange={(e) => setFormData({ ...formData, internalNote: e.target.value })}
-                                    className="flex-1 min-h-[72px] border border-gray-300 p-3 text-[12px] rounded-sm outline-none hover:border-blue-300 focus:border-blue-500 transition-all resize-none"
-                                    placeholder="Describe the purpose of this adjustment or transaction..."
+                                    className="flex-1 min-h-[72px] border border-gray-300 p-3 text-[12px] rounded-[5px] outline-none hover:border-blue-300 focus:border-blue-500 transition-all resize-none"
                                 />
                             </FormRow>
                         </div>
@@ -150,7 +155,7 @@ const JournalEntryBoard = ({ isOpen, onClose }) => {
                             {difference > 0 && (
                                 <div className="flex items-center gap-2 bg-red-50 text-red-600 px-3 py-1 rounded-full border border-red-100 animate-pulse">
                                     <Scale size={12} />
-                                    <span className="text-[10px] font-black uppercase tracking-tighter">Difference: LKR {difference.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                                    <span className="text-[10px] font-black uppercase tracking-tighter">Difference: {difference.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                                 </div>
                             )}
                         </div>
@@ -180,11 +185,10 @@ const JournalEntryBoard = ({ isOpen, onClose }) => {
                                                             type="text"
                                                             readOnly
                                                             value={line.accountName}
-                                                            placeholder="Select Ledger Account..."
-                                                            className="h-6 outline-none bg-transparent font-bold text-slate-700 placeholder:font-normal placeholder:text-slate-300"
+                                                            className="h-6 outline-none bg-transparent font-bold text-slate-700"
                                                         />
                                                     </div>
-                                                    <button onClick={() => { setActiveRowIndex(idx); setShowAccountModal(true); }} className="w-9 h-9 bg-blue-50 text-[#0078d4] flex items-center justify-center hover:bg-blue-100 rounded-sm transition-colors border border-blue-100/50">
+                                                    <button onClick={() => { setActiveRowIndex(idx); setShowAccountModal(true); }} className="w-9 h-9 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-90">
                                                         <Search size={16} />
                                                     </button>
                                                 </div>
@@ -194,8 +198,7 @@ const JournalEntryBoard = ({ isOpen, onClose }) => {
                                                     type="number"
                                                     value={line.debit || ''}
                                                     onChange={(e) => handleLineUpdate(line.id, 'debit', parseFloat(e.target.value) || 0)}
-                                                    className={`w-full h-9 px-3 text-right text-[14px] font-black outline-none border border-transparent focus:border-blue-200 rounded-sm tabular-nums bg-transparent transition-all ${line.debit > 0 ? 'text-[#0078d4]' : 'text-slate-200'}`}
-                                                    placeholder="0.00"
+                                                    className={`w-full h-9 px-3 text-right text-[14px] font-black outline-none border border-transparent focus:border-blue-200 rounded-[5px] tabular-nums bg-transparent transition-all ${line.debit > 0 ? 'text-[#0078d4]' : 'text-slate-200'}`}
                                                 />
                                             </td>
                                             <td className="p-1.5 border-r border-gray-100">
@@ -203,8 +206,7 @@ const JournalEntryBoard = ({ isOpen, onClose }) => {
                                                     type="number"
                                                     value={line.credit || ''}
                                                     onChange={(e) => handleLineUpdate(line.id, 'credit', parseFloat(e.target.value) || 0)}
-                                                    className={`w-full h-9 px-3 text-right text-[14px] font-black outline-none border border-transparent focus:border-slate-200 rounded-sm tabular-nums bg-transparent transition-all ${line.credit > 0 ? 'text-slate-600' : 'text-slate-200'}`}
-                                                    placeholder="0.00"
+                                                    className={`w-full h-9 px-3 text-right text-[14px] font-black outline-none border border-transparent focus:border-slate-200 rounded-[5px] tabular-nums bg-transparent transition-all ${line.credit > 0 ? 'text-slate-600' : 'text-slate-200'}`}
                                                 />
                                             </td>
                                             <td className="p-1.5">
@@ -212,8 +214,7 @@ const JournalEntryBoard = ({ isOpen, onClose }) => {
                                                     type="text"
                                                     value={line.memo}
                                                     onChange={(e) => handleLineUpdate(line.id, 'memo', e.target.value)}
-                                                    className="w-full h-9 px-3 outline-none border border-transparent focus:border-blue-200 rounded-sm font-medium text-slate-500 italic bg-transparent"
-                                                    placeholder="Transaction detail..."
+                                                    className="w-full h-9 px-3 outline-none border border-transparent focus:border-blue-200 rounded-[5px] font-medium text-slate-500 italic bg-transparent"
                                                 />
                                             </td>
                                         </tr>
@@ -237,14 +238,12 @@ const JournalEntryBoard = ({ isOpen, onClose }) => {
                                 <div className="flex flex-col">
                                     <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-2">Aggregate Debit</span>
                                     <div className="text-4xl font-black text-[#0078d4] tabular-nums tracking-tighter flex items-baseline gap-1">
-                                        <span className="text-[12px] font-bold text-slate-300">LKR</span>
                                         {totalDebit.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                     </div>
                                 </div>
                                 <div className="flex flex-col">
                                     <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-2">Aggregate Credit</span>
                                     <div className="text-4xl font-black text-slate-700 tabular-nums tracking-tighter flex items-baseline gap-1">
-                                        <span className="text-[12px] font-bold text-slate-300">LKR</span>
                                         {totalCredit.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                     </div>
                                 </div>
@@ -281,6 +280,13 @@ const JournalEntryBoard = ({ isOpen, onClose }) => {
                     }}
                 />
             )}
+
+            <CalendarModal 
+                isOpen={showCalendar} 
+                onClose={() => setShowCalendar(false)} 
+                onDateSelect={handleDateSelect}
+                initialDate={formData.entryDate}
+            />
         </>
     );
 };
@@ -295,7 +301,7 @@ const FormRow = ({ label, children }) => (
 const SearchModal = ({ title, query, setQuery, onClose, data, columns, onSelect }) => (
     <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4">
         <div className="absolute inset-0 bg-slate-500/30 backdrop-blur-[2px]" onClick={onClose} />
-        <div className="relative w-full max-w-2xl bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col max-h-[85vh] font-['Inter']">
+        <div className="relative w-full max-w-2xl bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col max-h-[85vh] font-['Tahoma']">
             <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-slate-50/50">
                 <h3 className="text-base font-black text-slate-800 tracking-tight uppercase tracking-[0.05em]">{title}</h3>
                 <div className="flex gap-4">
@@ -325,7 +331,7 @@ const SearchModal = ({ title, query, setQuery, onClose, data, columns, onSelect 
                                     </td>
                                 ))}
                                 <td className="p-4 border-b border-slate-50 text-center">
-                                    <button className="bg-white text-[#0078d4] text-[10px] px-4 py-1.5 rounded-md font-black border border-blue-200 shadow-sm transition-all hover:bg-[#0078d4] hover:text-white uppercase tracking-tighter">SELECT</button>
+                                    <button className="bg-blue-50/50 backdrop-blur-md border border-blue-200 text-[#0078d4] text-[10px] uppercase tracking-wider px-3 py-1 rounded-sm font-bold hover:bg-blue-100/80 shadow-sm transition-all active:scale-95">SELECT</button>
                                 </td>
                             </tr>
                         ))}

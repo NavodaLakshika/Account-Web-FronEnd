@@ -24,7 +24,7 @@ const ItemMasterBoard = ({ isOpen, onClose }) => {
     const initialFormData = {
         code: '',
         prodName: '',
-        unit: 'NOS',
+        unit: '',
         packSize: 1,
         purchasePrice: 0,
         sellingPrice: 0,
@@ -33,7 +33,7 @@ const ItemMasterBoard = ({ isOpen, onClose }) => {
         categoryCode: '',
         brandName: '',
         discPrice: 0,
-        businessType: 'Product',
+        businessType: '',
         expenseAccount: '',
         incomeAccount: '',
         taxId: '',
@@ -121,11 +121,30 @@ const ItemMasterBoard = ({ isOpen, onClose }) => {
         setIsSaving(true);
         try {
             const payload = {
-                ...formData,
-                purchase_price: parseFloat(formData.purchasePrice) || 0,
-                selling_price: parseFloat(formData.sellingPrice) || 0,
-                disc_Price: parseFloat(formData.discPrice) || 0,
-                discount: parseFloat(formData.discount) || 0,
+                Code: formData.code,
+                Prod_Name: formData.prodName,
+                Unit: formData.unit,
+                Pack_Size: formData.packSize,
+                Purchase_price: parseFloat(formData.purchasePrice) || 0,
+                Selling_Price: parseFloat(formData.sellingPrice) || 0,
+                Supplier_Code: formData.supplierCode,
+                Dept_Code: formData.deptCode,
+                Category_Code: formData.categoryCode,
+                Brand_Name: formData.brandName,
+                Disc_Price: parseFloat(formData.discPrice) || 0,
+                Business_Type: formData.businessType,
+                Expense_Account: formData.expenseAccount,
+                Income_Account: formData.incomeAccount,
+                Tax_ID: formData.taxId,
+                Vat_Rate: formData.vatRate,
+                Minus_Allow: formData.minusAllow,
+                Under_Cost_Allow: formData.underCostAllow,
+                Is_Inactive: formData.isInactive,
+                Available_Stock: formData.availableStock,
+                Last_Purch_Qty: formData.lastPurchQty,
+                Discount: parseFloat(formData.discount) || 0,
+                Company_Code: formData.companyCode,
+                ImageSv: productImage || ''
             };
             await productService.save(payload);
             toast.success('Product saved successfully.');
@@ -162,23 +181,23 @@ const ItemMasterBoard = ({ isOpen, onClose }) => {
         } catch (error) { toast.error('Search failed.'); }
     };
 
-    const handleSelectResult = async (item) => {
+    const handleSelectResult = async (selectedItem) => {
         try {
-            const data = await productService.get(item.code, formData.companyCode);
+            const data = await productService.get(selectedItem.code, formData.companyCode);
             setFormData({
                 ...formData,
                 code: data.code,
                 prodName: data.prod_Name || '',
-                unit: data.unit || 'NOS',
+                unit: data.unit || '',
                 packSize: data.pack_Size || 1,
-                purchasePrice: data.purchase_price || 0,
-                sellingPrice: data.selling_price || 0,
+                purchasePrice: data.purchase_price ?? 0,
+                sellingPrice: data.selling_Price ?? data.selling_price ?? 0,
                 supplierCode: data.supplier_Code || '',
                 deptCode: data.dept_Code || '',
                 categoryCode: data.category_Code || '',
                 brandName: data.brand_Name || '',
                 discPrice: data.disc_Price || 0,
-                businessType: data.business_Type || 'Product',
+                businessType: data.business_Type || '',
                 expenseAccount: data.expense_Acc || '',
                 incomeAccount: data.income_Acc || '',
                 taxId: data.tax_Id || '',
@@ -192,6 +211,7 @@ const ItemMasterBoard = ({ isOpen, onClose }) => {
                 modifiedDate: data.modified_Date || formData.modifiedDate,
                 discount: data.discount || 0
             });
+            setProductImage(data.imageSv ? 'data:image/jpeg;base64,' + data.imageSv : null);
             fetchStockInfo(data.code);
             setShowSearchModal(false);
         } catch (error) { toast.error('Failed to load record.'); }
@@ -212,69 +232,79 @@ const ItemMasterBoard = ({ isOpen, onClose }) => {
         const file = e.target.files?.[0];
         if (file) {
             const reader = new FileReader();
-            reader.onloadend = () => setProductImage(reader.result);
+            reader.onload = (event) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    let width = img.width;
+                    let height = img.height;
+                    const max_size = 500;
+
+                    if (width > height) {
+                        if (width > max_size) {
+                            height *= max_size / width;
+                            width = max_size;
+                        }
+                    } else {
+                        if (height > max_size) {
+                            width *= max_size / height;
+                            height = max_size;
+                        }
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    const compressedBase64 = canvas.toDataURL('image/jpeg', 0.5);
+                    setProductImage(compressedBase64);
+                };
+                img.src = event.target.result;
+            };
             reader.readAsDataURL(file);
         }
     };
 
-    const ModalField = ({ label, value, onClick, placeholder, displayValue }) => (
-        <div className="flex items-center gap-3">
-            <label className="text-[12px] font-bold text-gray-600 w-32 shrink-0">{label}</label>
-            <div className="flex-1 flex gap-1">
-                <input type="text" readOnly value={displayValue || value} className="flex-1 h-8 bg-gray-50 border border-gray-200 rounded-sm px-2 text-[12px] text-gray-700 font-bold outline-none" placeholder={placeholder} />
-                <button onClick={onClick} className="h-8 w-8 bg-slate-100 text-[#0078d4] hover:bg-slate-200 flex items-center justify-center rounded-sm transition-colors border border-gray-200"><Search size={14}/></button>
-            </div>
-        </div>
-    );
-
-    const InputField = ({ label, name, value, onChange, type = "text", readOnly = false, alignment = "text-left" }) => (
-        <div className="flex items-center gap-3">
-            <label className="text-[12px] font-bold text-gray-600 w-32 shrink-0">{label}</label>
-            <input name={name} type={type} value={value} onChange={onChange} readOnly={readOnly}
-                className={`flex-1 h-8 border ${readOnly ? 'bg-gray-50 border-gray-200' : 'border-gray-300'} rounded-sm px-2 text-[12px] ${alignment} font-bold text-gray-700 outline-none focus:border-[#0078d4]`} 
-            />
-        </div>
-    );
-
     return (
         <>
-            <SimpleModal isOpen={isOpen} onClose={onClose} title="Item Master File" maxWidth="max-w-[1000px]"
+            <SimpleModal isOpen={isOpen} onClose={onClose} title="Item Master Database" maxWidth="max-w-[1050px]"
                 footer={
-                    <>
-                        <div className="flex-1 flex gap-2">
-                            <button onClick={handleDelete} className="px-6 h-10 bg-red-50 text-red-600 text-sm font-bold rounded-md hover:bg-red-100 uppercase flex items-center gap-2 border border-red-100"><Trash2 size={14} /> Delete</button>
+                    <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-gray-100 rounded-b-xl">
+                        <div className="flex gap-3">
+                            <button onClick={handleDelete} className="px-6 h-10 bg-[#ff3b30] text-white text-sm font-black rounded-[5px] shadow-md shadow-red-100 hover:bg-[#e03127] transition-all active:scale-95 flex items-center gap-2 border-none"><Trash2 size={14} /> DELETE ITEM</button>
+                            <button onClick={handleClear} className="px-6 h-10 bg-[#00adff] text-white text-sm font-black rounded-[5px] hover:bg-[#0099e6] transition-all active:scale-95 flex items-center gap-2 border-none"><RotateCcw size={14} /> CLEAR FORM</button>
                         </div>
                         <div className="flex gap-3">
-                            <button onClick={handleClear} className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-md hover:bg-gray-100 uppercase flex items-center gap-2 border border-gray-100"><Plus size={14} /> New</button>
-                            <button onClick={handleSave} disabled={isSaving} className="px-8 h-10 bg-[#0078d4] text-white text-sm font-bold rounded-md hover:bg-[#005a9e] uppercase flex items-center gap-2 shadow-sm">{isSaving ? 'Saving...' : <><Save size={14} /> Save</>}</button>
+                            <button onClick={handleSave} disabled={isSaving} className="px-10 h-10 bg-[#2bb744] text-white text-sm font-black rounded-[5px] shadow-md shadow-green-100 hover:bg-[#259b3a] transition-all active:scale-95 flex items-center gap-2 border-none disabled:opacity-50">{isSaving ? 'SAVING...' : <><Save size={14} /> SAVE RECORD</>}</button>
                         </div>
-                    </>
+                    </div>
                 }
             >
-                <div className="flex gap-6">
-                    <div className="flex-1 space-y-2">
-                        <div className="grid grid-cols-2 gap-x-8 gap-y-2">
-                            <div className="flex items-center gap-3">
-                                <label className="text-[12px] font-bold text-gray-600 w-32 shrink-0">Item ID & Name</label>
-                                <div className="flex-1 flex gap-1">
-                                    <input name="code" value={formData.code} onChange={handleInput} className="w-24 h-8 border border-gray-300 rounded-sm px-2 text-[12px] font-bold text-[#0078d4]" placeholder="ID" />
-                                    <button onClick={() => setShowSearchModal(true)} className="h-8 w-8 bg-slate-100 text-[#0078d4] border border-gray-300 rounded-sm flex items-center justify-center hover:bg-slate-200"><Search size={14}/></button>
-                                    <input name="prodName" value={formData.prodName} onChange={handleInput} className="flex-1 h-8 border border-gray-300 rounded-sm px-2 text-[12px] font-bold text-gray-700" placeholder="Product Name" />
-                                </div>
+                <div className="flex gap-6 font-['Tahoma']">
+                    <div className="flex-1 bg-white p-5 border border-gray-100 rounded-lg shadow-sm space-y-4">
+                        <div className="grid grid-cols-2 gap-x-8 gap-y-3">
+                            <div className="flex items-center gap-2 col-span-2">
+                                <label className="text-[12.5px] font-bold text-gray-700 w-28 shrink-0">Item ID & Title</label>
+                                <div className="flex-1 flex gap-1 h-8 min-w-0">
+                                    <input name="code" value={formData.code} onChange={handleInput} className="w-[138px] min-w-0 h-8 border border-gray-300 rounded-[5px] px-3 font-mono text-[12px] font-black text-[#0285fd] bg-blue-50/20 outline-none shadow-sm focus:border-[#0285fd]" placeholder="ID" />
+                                    <button onClick={() => setShowSearchModal(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0"><Search size={16}/></button>
+                                    <input name="prodName" value={formData.prodName} onChange={handleInput} className="flex ml-7 w-[300px] min-w-0 h-8 border border-gray-300 rounded-[5px] px-3 font-mono text-[12px] font-bold text-gray-800 outline-none shadow-sm focus:border-[#0285fd]" placeholder="Enter Product Name..." />
+                             </div>
                             </div>
-                            <ModalField label="Category" value={formData.categoryCode} displayValue={lookups.categories.find(c => c.code === formData.categoryCode)?.name} onClick={() => setActiveLookup({ title: 'Select Category', field: 'categoryCode', data: lookups.categories })} />
+                            <ModalField label="Category Group" value={formData.categoryCode} displayValue={lookups.categories.find(c => c.code === formData.categoryCode)?.name} onClick={() => setActiveLookup({ title: 'Select Category', field: 'categoryCode', data: lookups.categories })}  />
                             
                             <ModalField label="Department" value={formData.deptCode} displayValue={lookups.departments.find(d => d.code === formData.deptCode)?.name} onClick={() => setActiveLookup({ title: 'Select Department', field: 'deptCode', data: lookups.departments })} />
                             <InputField label="Brand" name="brandName" value={formData.brandName} onChange={handleInput} />
 
                             <ModalField label="Supplier" value={formData.supplierCode} displayValue={lookups.suppliers.find(s => s.code === formData.supplierCode)?.name} onClick={() => setActiveLookup({ title: 'Select Supplier', field: 'supplierCode', data: lookups.suppliers })} />
-                            <InputField label="Selling Price" name="sellingPrice" value={formData.sellingPrice} onChange={handleInput} type="number" alignment="text-right" />
+                            <InputField label="Selling Price" name="sellingPrice" value={formData.sellingPrice} onChange={handleInput} alignment="text-right" />
 
-                            <InputField label="Purchase Price" name="purchasePrice" value={formData.purchasePrice} onChange={handleInput} type="number" alignment="text-right" />
-                            <InputField label="Discount (%)" name="discount" value={formData.discount} onChange={handleInput} type="number" alignment="text-right" />
+                            <InputField label="Purchase Price" name="purchasePrice" value={formData.purchasePrice} onChange={handleInput} alignment="text-right" />
+                            <InputField label="Discount (%)" name="discount" value={formData.discount} onChange={handleInput} alignment="text-right" />
 
-                            <InputField label="Disc. Price" name="discPrice" value={formData.discPrice} onChange={handleInput} type="number" alignment="text-right" />
-                            <InputField label="Pack Size" name="packSize" value={formData.packSize} onChange={handleInput} type="number" alignment="text-right" />
+                            <InputField label="Disc. Price" name="discPrice" value={formData.discPrice} onChange={handleInput} alignment="text-right" />
+                            <InputField label="Pack Size" name="packSize" value={formData.packSize} onChange={handleInput} alignment="text-right" />
 
                             <ModalField label="Unit of Measure" value={formData.unit} displayValue={lookups.units.find(u => u.code === formData.unit)?.name} onClick={() => setActiveLookup({ title: 'Select Unit', field: 'unit', data: lookups.units })} />
                             <ModalField label="Tax ID" value={formData.taxId} displayValue={lookups.taxIds.find(t => t.code === formData.taxId)?.name} onClick={() => setActiveLookup({ title: 'Select Tax ID', field: 'taxId', data: lookups.taxIds })} />
@@ -285,26 +315,31 @@ const ItemMasterBoard = ({ isOpen, onClose }) => {
                             <ModalField label="Expense Account" value={formData.expenseAccount} displayValue={lookups.expenseAccounts.find(a => a.code === formData.expenseAccount)?.name} onClick={() => setActiveLookup({ title: 'Select Expense Account', field: 'expenseAccount', data: lookups.expenseAccounts })} />
                             <ModalField label="Income Account" value={formData.incomeAccount} displayValue={lookups.incomeAccounts.find(a => a.code === formData.incomeAccount)?.name} onClick={() => setActiveLookup({ title: 'Select Income Account', field: 'incomeAccount', data: lookups.incomeAccounts })} />
 
-                            <div className="flex items-center gap-6 mt-2">
+                            <div className="flex items-center gap-6 mt-1.5 pl-32 col-span-2">
                                 <label className="flex items-center gap-2 cursor-pointer select-none">
-                                    <input type="checkbox" name="underCostAllow" checked={formData.underCostAllow} onChange={handleInput} className="w-4 h-4 rounded border-gray-300 text-[#0078d4]" />
-                                    <span className="text-[11px] font-bold text-gray-600 uppercase">Under Cost Allow</span>
+                                    <input type="checkbox" name="underCostAllow" checked={formData.underCostAllow} onChange={handleInput} className="w-4 h-4 text-[#0285fd] rounded border-gray-300 focus:ring-[#0285fd]" />
+                                    <span className="text-[11px] font-black text-gray-500 uppercase tracking-widest">ALLOW UNDERCOST</span>
                                 </label>
                                 <label className="flex items-center gap-2 cursor-pointer select-none">
-                                    <input type="checkbox" name="minusAllow" checked={formData.minusAllow} onChange={handleInput} className="w-4 h-4 rounded border-gray-300 text-[#0078d4]" />
-                                    <span className="text-[11px] font-bold text-gray-600 uppercase">Minus Allow</span>
+                                    <input type="checkbox" name="minusAllow" checked={formData.minusAllow} onChange={handleInput} className="w-4 h-4 text-[#0285fd] rounded border-gray-300 focus:ring-[#0285fd]" />
+                                    <span className="text-[11px] font-black text-gray-500 uppercase tracking-widest">MINUS ALLOWED</span>
                                 </label>
                             </div>
+                            
+                            <div className="col-span-2 my-2 border-t border-gray-100" />
+                            
                             <InputField label="Last Purch Qty" value={formData.lastPurchQty} readOnly alignment="text-right" />
 
                             <InputField label="Available Stock" value={formData.availableStock} readOnly alignment="text-right" />
                             <InputField label="Modified User/Date" value={`${formData.modifiedUser} / ${formData.modifiedDate}`} readOnly />
 
                             <InputField label="Create User/Date" value={`${formData.createUser} / ${formData.createDate}`} readOnly />
-                            <label className="flex items-center gap-2 cursor-pointer select-none">
-                                <input type="checkbox" name="isInactive" checked={formData.isInactive} onChange={handleInput} className="w-4 h-4 rounded border-gray-300 text-red-600" />
-                                <span className="text-[11px] font-bold text-red-600 uppercase">Inactive Item</span>
-                            </label>
+                            <div className="flex items-center gap-6 mt-1.5 pl-32 col-span-2">
+                                <label className="flex items-center gap-2 cursor-pointer select-none">
+                                    <input type="checkbox" name="isInactive" checked={formData.isInactive} onChange={handleInput} className="w-4 h-4 text-red-500 rounded border-red-300 focus:ring-red-500" />
+                                    <span className="text-[11px] font-black text-red-500 uppercase tracking-widest">DEACTIVATE ITEM</span>
+                                </label>
+                            </div>
                         </div>
                     </div>
 
@@ -327,48 +362,87 @@ const ItemMasterBoard = ({ isOpen, onClose }) => {
                 </div>
 
                 {activeLookup && (
-                    <SimpleModal isOpen={!!activeLookup} onClose={() => setActiveLookup(null)} title={activeLookup.title} maxWidth="max-w-[500px]">
-                        <div className="space-y-4 pt-2">
-                            <div className="relative">
-                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
-                                <input type="text" autoFocus placeholder="Search..." className="w-full h-10 pl-10 pr-4 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:border-blue-500 outline-none" value={lookupQuery} onChange={(e) => setLookupQuery(e.target.value)} />
+                    <SimpleModal isOpen={!!activeLookup} onClose={() => setActiveLookup(null)} title={`${activeLookup.title} Directory`} maxWidth="max-w-[500px]">
+                        <div className="space-y-4 font-['Tahoma']">
+                            <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-lg border border-gray-100 mb-2">
+                                <span className="text-[12px] font-bold text-gray-500 uppercase tracking-widest">Directory Search</span>
+                                <div className="relative flex-1">
+                                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
+                                    <input type="text" autoFocus placeholder="Filter records..." className="w-full h-9 pl-10 pr-4 border border-gray-300 rounded-[5px] outline-none text-sm focus:border-[#0285fd] bg-white shadow-sm" value={lookupQuery} onChange={(e) => setLookupQuery(e.target.value)} />
+                                </div>
                             </div>
-                            <div className="max-h-[400px] overflow-y-auto border border-gray-100 rounded-lg divide-y divide-gray-50">
-                                {activeLookup.data.filter(item => 
-                                    item.name?.toLowerCase().includes(lookupQuery.toLowerCase()) || 
-                                    item.code?.toLowerCase().includes(lookupQuery.toLowerCase())
-                                ).map((item, idx) => (
-                                    <button key={idx} onClick={() => handleInputPick(activeLookup.field, item)} className="w-full flex items-center justify-between p-4 hover:bg-blue-50 transition-colors text-left group">
-                                        <div><div className="text-sm font-bold text-gray-700 group-hover:text-blue-700">{item.name}</div><div className="text-[10px] text-gray-400 font-mono">{item.code}</div></div>
-                                        <Plus size={14} className="text-gray-300 group-hover:text-blue-500" />
-                                    </button>
-                                ))}
+                            <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm">
+                                <div className="max-h-[350px] overflow-y-auto no-scrollbar">
+                                    <table className="w-full text-left">
+                                        <thead className="bg-[#f8fafd] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">
+                                            <tr>
+                                                <th className="px-5 py-3">Reference Code</th>
+                                                <th className="px-5 py-3">Detailed Description</th>
+                                                <th className="px-5 py-3 text-right">Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-gray-50">
+                                            {activeLookup.data.filter(item => 
+                                                item.name?.toLowerCase().includes(lookupQuery.toLowerCase()) || 
+                                                item.code?.toLowerCase().includes(lookupQuery.toLowerCase())
+                                            ).map((item, idx) => (
+                                                <tr key={idx} className="group hover:bg-blue-50/50 cursor-pointer transition-colors" onClick={() => handleInputPick(activeLookup.field, item)}>
+                                                    <td className="px-5 py-3 font-mono text-[13px] font-black text-blue-700">{item.code}</td>
+                                                    <td className="px-5 py-3 text-[13px] font-bold text-gray-700 uppercase group-hover:text-blue-600 transition-colors">{item.name}</td>
+                                                    <td className="px-5 py-3 text-right">
+                                                        <button className="bg-[#0285fd] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#0073ff] shadow-md transition-all active:scale-95">SELECT</button>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                            {activeLookup.data.filter(item => 
+                                                item.name?.toLowerCase().includes(lookupQuery.toLowerCase()) || 
+                                                item.code?.toLowerCase().includes(lookupQuery.toLowerCase())
+                                            ).length === 0 && <tr><td colSpan="3" className="py-10 text-center text-gray-300 font-bold uppercase tracking-widest">No matching records found</td></tr>}
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                     </SimpleModal>
                 )}
 
                 {showSearchModal && (
-                    <SimpleModal isOpen={showSearchModal} onClose={() => setShowSearchModal(false)} title="Search Products" maxWidth="max-w-[700px]">
-                        <div className="space-y-4 pt-2">
-                            <div className="flex gap-2">
+                    <SimpleModal isOpen={showSearchModal} onClose={() => setShowSearchModal(false)} title="Global Reference Database" maxWidth="max-w-[700px]">
+                        <div className="space-y-4 font-['Tahoma']">
+                            <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-lg border border-gray-100 mb-2">
+                                <span className="text-[12px] font-bold text-gray-500 uppercase tracking-widest">Master Search</span>
                                 <div className="relative flex-1">
-                                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-                                    <input type="text" autoFocus placeholder="Enter product name or code..." className="w-full h-11 pl-11 pr-4 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:border-blue-500 outline-none" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleMainSearch()} />
+                                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
+                                    <input type="text" autoFocus placeholder="Enter item code, name, or properties..." className="w-full h-9 pl-10 pr-4 border border-gray-300 rounded-[5px] outline-none text-sm focus:border-[#0285fd] bg-white shadow-sm" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleMainSearch()} />
                                 </div>
-                                <button onClick={handleMainSearch} className="px-8 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition-all active:scale-95 shadow-md">Search</button>
+                                <button onClick={handleMainSearch} className="px-8 h-9 bg-[#0285fd] text-white rounded-[5px] font-black hover:bg-[#0073ff] transition-all active:scale-95 shadow-md text-xs tracking-widest uppercase">Perform Query</button>
                             </div>
-                            <div className="max-h-[450px] overflow-y-auto rounded-xl border border-gray-100 divide-y divide-gray-50">
-                                {searchResults.map((item, idx) => (
-                                    <div key={idx} onClick={() => handleSelectResult(item)} className="p-4 hover:bg-blue-50 cursor-pointer flex items-center justify-between group transition-colors">
-                                        <div>
-                                            <div className="text-sm font-bold text-gray-800 group-hover:text-blue-700">{item.prod_Name}</div>
-                                            <div className="text-xs text-gray-500 font-medium">Code: <span className="text-gray-700">{item.code}</span> | Price: <span className="text-green-600 font-bold">Rs. {item.selling_Price?.toLocaleString()}</span></div>
-                                        </div>
-                                        <RotateCcw size={16} className="text-gray-300 group-hover:text-blue-500 transition-colors" />
-                                    </div>
-                                ))}
-                                {searchResults.length === 0 && searchQuery && <div className="p-12 text-center text-gray-400 italic">No products found for "{searchQuery}"</div>}
+                            <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm">
+                                <div className="max-h-[400px] overflow-y-auto no-scrollbar">
+                                    <table className="w-full text-left">
+                                        <thead className="bg-[#f8fafd] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">
+                                            <tr>
+                                                <th className="px-5 py-3">Item Code</th>
+                                                <th className="px-5 py-3">Technical Title</th>
+                                                <th className="px-5 py-3 text-right">Standard M.R.P</th>
+                                                <th className="px-5 py-3 text-right">Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-gray-50">
+                                            {searchResults.map((item, idx) => (
+                                                <tr key={idx} className="group hover:bg-blue-50/50 cursor-pointer transition-colors" onClick={() => handleSelectResult(item)}>
+                                                    <td className="px-5 py-3 font-mono text-[13px] font-black text-blue-700">{item.code}</td>
+                                                    <td className="px-5 py-3 text-[13px] font-bold text-gray-700 uppercase group-hover:text-blue-600 transition-colors">{item.prod_Name}</td>
+                                                    <td className="px-5 py-3 text-right font-mono font-black text-gray-600">Rs. {(item.selling_Price || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                                                    <td className="px-5 py-3 text-right">
+                                                        <button className="bg-[#0285fd] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#0073ff] shadow-md transition-all active:scale-95">RETRIEVE ITEM</button>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                            {searchResults.length === 0 && <tr className="h-32"><td colSpan="4" className="text-center text-gray-300 font-bold uppercase tracking-widest">{searchQuery ? `No records found matching "${searchQuery}"` : "Initialize a query to view results"}</td></tr>}
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                     </SimpleModal>
@@ -377,5 +451,49 @@ const ItemMasterBoard = ({ isOpen, onClose }) => {
         </>
     );
 };
+
+// --- SUBSIDIARY COMPONENTS ---
+
+const InputField = ({ label, name, value, onChange, type = "text", readOnly = false, alignment = "text-left" }) => {
+    // Standardise value to prevent uncontrolled input conversion
+    const displayValue = value === null || value === undefined ? '' : value;
+    
+    return (
+        <div className="flex items-center gap-2">
+            <label className="text-[12.5px] font-bold text-gray-700 w-28 shrink-0 tracking-tight">{label}</label>
+            <input 
+                name={name} 
+                type={type} 
+                value={displayValue} 
+                onChange={onChange} 
+                readOnly={readOnly}
+                autoComplete="off"
+                spellCheck="false"
+                className={`flex-1 min-w-0 h-8 border ${readOnly ? 'border-transparent bg-transparent text-gray-500' : 'border-gray-300 bg-white text-gray-700 focus:border-[#0285fd] hover:border-gray-400 shadow-sm'} font-mono font-bold rounded-[5px] px-3 text-[12px] ${alignment} outline-none transition-colors`} 
+            />
+        </div>
+    );
+};
+
+const ModalField = ({ label, value, placeholder, onClick, displayValue }) => (
+    <div className="flex items-center gap-2">
+        <label className="text-[12.5px] font-bold text-gray-700 w-28 shrink-0 tracking-tight">{label}</label>
+        <div className="flex-1 flex gap-1 h-8 min-w-0 overflow-hidden">
+            <input 
+                type="text" 
+                readOnly 
+                value={displayValue || value || placeholder || ''} 
+                className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-mono font-bold text-gray-600 bg-gray-50 rounded-[5px] outline-none shadow-sm cursor-pointer hover:border-gray-400 transition-colors truncate" 
+                onClick={onClick} 
+            />
+            <button 
+                onClick={onClick} 
+                className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0"
+            >
+                <Search size={16}/>
+            </button>
+        </div>
+    </div>
+);
 
 export default ItemMasterBoard;

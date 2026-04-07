@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import SimpleModal from '../components/SimpleModal';
+import CalendarModal from '../components/CalendarModal';
 import { BarChart3, Search, Calendar, RotateCcw, Printer, Download, X, Loader2, ListFilter, FileText, PieChart, TrendingUp, ChevronRight } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
@@ -15,6 +16,8 @@ const TrialBalanceBoard = ({ isOpen, onClose }) => {
     // Modal States
     const [showCCModal, setShowCCModal] = useState(false);
     const [ccSearch, setCcSearch] = useState('');
+    const [showCalendarFrom, setShowCalendarFrom] = useState(false);
+    const [showCalendarTo, setShowCalendarTo] = useState(false);
 
     // Dummy Cost Centers
     const costCenters = [
@@ -36,6 +39,16 @@ const TrialBalanceBoard = ({ isOpen, onClose }) => {
         }
     };
 
+    const handleDateFromSelect = (date) => {
+        setFormData({ ...formData, dateFrom: date });
+        setShowCalendarFrom(false);
+    };
+
+    const handleDateToSelect = (date) => {
+        setFormData({ ...formData, dateTo: date });
+        setShowCalendarTo(false);
+    };
+
     return (
         <>
             <SimpleModal
@@ -45,19 +58,16 @@ const TrialBalanceBoard = ({ isOpen, onClose }) => {
                 maxWidth="max-w-[1100px]"
                 footer={
                     <div className="bg-slate-50 px-6 py-4 w-full flex justify-end gap-3 border-t border-gray-100 rounded-b-xl">
-                        <button className="px-6 h-10 bg-slate-100 text-slate-600 text-sm font-bold rounded-md hover:bg-slate-200 transition-all active:scale-95 flex items-center gap-2 border-none">
-                            <Download size={14} /> Export CSV
+                        <button className="px-6 h-10 bg-indigo-50/50 backdrop-blur-md border border-indigo-200 text-indigo-700 text-sm font-bold rounded-[5px] shadow-sm hover:bg-indigo-100/80 transition-all active:scale-95 flex items-center gap-2">
+                            <Download size={14} /> EXPORT DATA
                         </button>
-                        <button className="px-6 h-10 bg-slate-100 text-slate-600 text-sm font-bold rounded-md hover:bg-slate-200 transition-all active:scale-95 flex items-center gap-2 border-none">
-                            <Printer size={14} /> Print Report
-                        </button>
-                        <button onClick={onClose} className="px-6 h-10 bg-slate-100 text-slate-600 text-sm font-bold rounded-md hover:bg-slate-200 transition-all active:scale-95 flex items-center gap-2 border-none">
-                            <X size={14} /> Exit
+                        <button className="px-6 h-10 bg-teal-50/50 backdrop-blur-md border border-teal-200 text-teal-700 text-sm font-bold rounded-[5px] shadow-sm hover:bg-teal-100/80 transition-all active:scale-95 flex items-center gap-2">
+                            <Printer size={14} /> PRINT REPORT
                         </button>
                     </div>
                 }
             >
-                <div className="space-y-6 font-['Inter'] relative">
+                <div className="space-y-6 font-['Tahoma'] relative select-none">
                     {/* Branding Icon */}
                     <div className="absolute top-0 right-0 p-4 opacity-[0.03] pointer-events-none">
                         <TrendingUp size={160} />
@@ -69,48 +79,54 @@ const TrialBalanceBoard = ({ isOpen, onClose }) => {
                         <div className="grid grid-cols-12 gap-8 items-end">
                             <div className="col-span-12 lg:col-span-3 space-y-2">
                                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none pl-1">Report Date From</label>
-                                <div className="flex items-center px-3 h-10 border border-gray-200 bg-slate-50 shadow-sm rounded-md hover:border-blue-400 transition-all">
+                                <div className="flex h-10 gap-1">
                                     <input
-                                        type="date"
+                                        type="text"
+                                        readOnly
                                         value={formData.dateFrom}
-                                        onChange={(e) => setFormData({ ...formData, dateFrom: e.target.value })}
-                                        className="flex-1 text-[13px] font-bold text-slate-700 outline-none bg-transparent"
+                                        className="flex-1 px-3 text-[13px] border border-gray-200 bg-white rounded-[5px] outline-none text-slate-700 font-bold shadow-sm"
                                     />
-                                    <Calendar size={16} className="text-slate-400" />
+                                    <button onClick={() => setShowCalendarFrom(true)} className="w-10 h-10 bg-white border border-gray-300 text-[#0285fd] flex items-center justify-center hover:bg-blue-50 rounded-[5px] transition-all shadow-sm active:scale-90">
+                                        <Calendar size={16} />
+                                    </button>
                                 </div>
                             </div>
                             <div className="col-span-12 lg:col-span-3 space-y-2">
                                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none pl-1">Report Date To</label>
-                                <div className="flex items-center px-3 h-10 border border-gray-200 bg-slate-50 shadow-sm rounded-md hover:border-blue-400 transition-all">
+                                <div className="flex h-10 gap-1">
                                     <input
-                                        type="date"
+                                        type="text"
+                                        readOnly
                                         value={formData.dateTo}
-                                        onChange={(e) => setFormData({ ...formData, dateTo: e.target.value })}
-                                        className="flex-1 text-[13px] font-bold text-slate-700 outline-none bg-transparent"
+                                        className="flex-1 px-3 text-[13px] border border-gray-200 bg-white rounded-[5px] outline-none text-slate-700 font-bold shadow-sm"
                                     />
-                                    <Calendar size={16} className="text-slate-400" />
+                                    <button onClick={() => setShowCalendarTo(true)} className="w-10 h-10 bg-white border border-gray-300 text-[#0285fd] flex items-center justify-center hover:bg-blue-50 rounded-[5px] transition-all shadow-sm active:scale-90">
+                                        <Calendar size={16} />
+                                    </button>
                                 </div>
                             </div>
                             <div className="col-span-12 lg:col-span-4 space-y-2">
                                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none pl-1">Cost Center Context</label>
                                 <div className="flex gap-1 items-center">
-                                    <div className="flex-1 h-10 border border-gray-200 bg-slate-50 rounded-md px-4 flex items-center group cursor-pointer hover:border-blue-300 transition-all" onClick={() => setShowCCModal(true)}>
+                                    <div className="flex-1 h-10 border border-gray-200 bg-slate-50 rounded-[5px] px-4 flex items-center group cursor-pointer hover:border-blue-300 transition-all font-['Tahoma']" onClick={() => setShowCCModal(true)}>
                                         <div className="flex flex-col flex-1 pointer-events-none">
                                             <span className="text-[9px] font-black text-[#0078d4] leading-none mb-0.5">{formData.costCenterCode}</span>
                                             <span className="text-[12px] font-bold text-slate-600 truncate">{formData.costCenterName}</span>
                                         </div>
                                         <ChevronRight size={16} className="text-slate-300 group-hover:text-[#0078d4] transition-colors" />
                                     </div>
-                                    <button onClick={() => setShowCCModal(true)} className="w-10 h-10 bg-[#0078d4] text-white flex items-center justify-center hover:bg-[#005a9e] rounded-md transition-colors shadow-sm">
+                                    <button onClick={() => setShowCCModal(true)} className="w-10 h-10 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-90">
                                         <Search size={18} />
                                     </button>
                                 </div>
                             </div>
                             <div className="col-span-12 lg:col-span-2">
-                                <button onClick={runReport} disabled={loading} className={`w-full h-10 bg-[#0078d4] text-white text-[11px] font-black uppercase tracking-widest rounded-md hover:bg-[#005a9e] shadow-lg shadow-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 ${loading ? 'opacity-50' : ''}`}>
+                            <div className="col-span-12 lg:col-span-2">
+                                <button onClick={runReport} disabled={loading} className={`w-full h-10 bg-[#50af60] text-white text-[11px] font-black uppercase tracking-widest rounded-[5px] hover:bg-[#24db4e] shadow-lg shadow-green-100 transition-all active:scale-95 flex items-center justify-center gap-2 ${loading ? 'opacity-50' : ''}`}>
                                     {loading ? <Loader2 size={16} className="animate-spin" /> : <TrendingUp size={16} />}
-                                    Run Analysis
+                                    RUN ANALYSIS
                                 </button>
+                            </div>
                             </div>
                         </div>
                     </div>
@@ -207,6 +223,18 @@ const TrialBalanceBoard = ({ isOpen, onClose }) => {
                     }}
                 />
             )}
+            <CalendarModal 
+                isOpen={showCalendarFrom} 
+                onClose={() => setShowCalendarFrom(false)} 
+                onDateSelect={handleDateFromSelect}
+                initialDate={formData.dateFrom}
+            />
+            <CalendarModal 
+                isOpen={showCalendarTo} 
+                onClose={() => setShowCalendarTo(false)} 
+                onDateSelect={handleDateToSelect}
+                initialDate={formData.dateTo}
+            />
         </>
     );
 };
@@ -214,7 +242,7 @@ const TrialBalanceBoard = ({ isOpen, onClose }) => {
 const SearchModal = ({ title, query, setQuery, onClose, data, columns, onSelect }) => (
     <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4">
         <div className="absolute inset-0 bg-slate-500/30 backdrop-blur-[2px]" onClick={onClose} />
-        <div className="relative w-full max-w-2xl bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col max-h-[85vh] font-['Inter']">
+        <div className="relative w-full max-w-2xl bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col max-h-[85vh] font-['Tahoma']">
             <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-slate-50/50">
                 <h3 className="text-base font-black text-slate-800 tracking-tight uppercase tracking-[0.05em]">{title}</h3>
                 <div className="flex gap-4">
@@ -244,7 +272,7 @@ const SearchModal = ({ title, query, setQuery, onClose, data, columns, onSelect 
                                     </td>
                                 ))}
                                 <td className="p-4 border-b border-slate-50 text-center">
-                                    <button className="bg-white text-[#0078d4] text-[10px] px-4 py-1.5 rounded-md font-black border border-blue-200 shadow-sm transition-all hover:bg-[#0078d4] hover:text-white uppercase tracking-tighter">SELECT</button>
+                                    <button className="bg-blue-50/50 backdrop-blur-md border border-blue-200 text-[#0078d4] text-[10px] uppercase tracking-wider px-3 py-1 rounded-sm font-bold hover:bg-blue-100/80 shadow-sm transition-all active:scale-95">SELECT</button>
                                 </td>
                             </tr>
                         ))}

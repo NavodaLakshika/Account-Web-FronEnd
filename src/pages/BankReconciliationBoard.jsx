@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import SimpleModal from '../components/SimpleModal';
+import CalendarModal from '../components/CalendarModal';
 import { Landmark, Search, Calendar, RotateCcw, Save, X, Loader2, ListFilter, CheckCircle2, History, Scale, LandmarkIcon } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
@@ -17,6 +18,7 @@ const BankReconciliationBoard = ({ isOpen, onClose }) => {
     // Modal States
     const [showBankModal, setShowBankModal] = useState(false);
     const [bankSearch, setBankSearch] = useState('');
+    const [showCalendar, setShowCalendar] = useState(false);
 
     // Dummy Banks
     const banks = [
@@ -37,6 +39,11 @@ const BankReconciliationBoard = ({ isOpen, onClose }) => {
         });
         setClearedBalance(0);
         setBankSearch('');
+    };
+
+    const handleDateSelect = (date) => {
+        setFormData({ ...formData, statementDate: date });
+        setShowCalendar(false);
     };
 
     const handleFinish = async () => {
@@ -64,20 +71,17 @@ const BankReconciliationBoard = ({ isOpen, onClose }) => {
                 maxWidth="max-w-[1100px]"
                 footer={
                     <div className="bg-slate-50 px-6 py-4 w-full flex justify-end gap-3 border-t border-gray-100 rounded-b-xl">
-                        <button onClick={handleReset} className="px-6 h-10 bg-slate-100 text-slate-600 text-sm font-bold rounded-md hover:bg-slate-200 transition-all active:scale-95 flex items-center gap-2 border-none">
-                            <RotateCcw size={14} /> Reset Work
+                        <button onClick={handleReset} className="px-6 h-10 bg-[#00adff] text-white text-sm font-bold rounded-[5px] hover:bg-[#0099e6] transition-all active:scale-95 flex items-center gap-2 border-none">
+                            <RotateCcw size={14} /> RESET PROGRESS
                         </button>
-                        <button onClick={handleFinish} disabled={loading} className={`px-6 h-10 bg-[#0078d4] text-white text-sm font-bold rounded-md shadow-md shadow-blue-200 hover:bg-[#005a9e] transition-all active:scale-95 flex items-center gap-2 ${loading ? 'opacity-50' : ''}`}>
+                        <button onClick={handleFinish} disabled={loading} className={`px-6 h-10 bg-[#50af60] text-white text-sm font-bold rounded-[5px] shadow-md hover:bg-[#24db4e] transition-all active:scale-95 flex items-center gap-2 ${loading ? 'opacity-50' : ''}`}>
                             {loading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
-                            Finish Reconciliation
-                        </button>
-                        <button onClick={onClose} className="px-6 h-10 bg-slate-100 text-slate-600 text-sm font-bold rounded-md hover:bg-slate-200 transition-all active:scale-95 flex items-center gap-2 border-none">
-                            <X size={14} /> Exit
+                            FINISH RECONCILIATION
                         </button>
                     </div>
                 }
             >
-                <div className="space-y-6 font-['Inter'] relative">
+                <div className="space-y-6 font-['Tahoma'] relative select-none">
                     {/* Branding Icon */}
                     <div className="absolute top-0 right-0 p-4 opacity-[0.03] pointer-events-none">
                         <LandmarkIcon size={160} />
@@ -88,39 +92,39 @@ const BankReconciliationBoard = ({ isOpen, onClose }) => {
                         <div className="col-span-12 lg:col-span-4 space-y-4">
                             <FormRow label="Statement Bank">
                                 <div className="flex-1 flex gap-1 items-center">
-                                    <div className="flex-1 flex flex-col pointer-events-none bg-slate-50 border border-gray-200 px-3 py-1 rounded-sm">
+                                    <div className="flex-1 flex flex-col pointer-events-none bg-slate-50 border border-gray-200 px-3 py-1 rounded-[5px]">
                                         <span className="text-[9px] font-black text-slate-400 leading-none mb-0.5">{formData.bankCode || 'CODE'}</span>
                                         <input
                                             type="text"
                                             readOnly
                                             value={formData.bankName}
-                                            placeholder="Select Source Bank..."
-                                            className="h-5 outline-none bg-transparent font-bold text-slate-700 text-[12px] placeholder:font-normal"
+                                            className="h-5 outline-none bg-transparent font-bold text-slate-700 text-[12px]"
                                         />
                                     </div>
-                                    <button onClick={() => setShowBankModal(true)} className="w-10 h-10 bg-[#0078d4] text-white flex items-center justify-center hover:bg-[#005a9e] rounded-sm transition-colors shadow-sm">
+                                    <button onClick={() => setShowBankModal(true)} className="w-10 h-10 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-90">
                                         <Search size={18} />
                                     </button>
                                 </div>
                             </FormRow>
                             <FormRow label="Statement Date">
-                                <div className="flex-1 flex items-center px-3 h-10 border border-gray-200 bg-white shadow-sm rounded-sm hover:border-blue-400 transition-colors">
+                                <div className="flex h-10 gap-1">
                                     <input
-                                        type="date"
+                                        type="text"
+                                        readOnly
                                         value={formData.statementDate}
-                                        onChange={(e) => setFormData({ ...formData, statementDate: e.target.value })}
-                                        className="flex-1 text-[13px] font-bold text-slate-700 outline-none bg-transparent"
+                                        className="w-[120px] px-2 text-[13px] border border-gray-200 rounded-[5px] outline-none text-slate-700 font-bold bg-white text-center shadow-sm"
                                     />
-                                    <Calendar size={16} className="text-blue-500" />
+                                    <button onClick={() => setShowCalendar(true)} className="w-10 h-10 bg-white border border-gray-300 text-[#0285fd] flex items-center justify-center hover:bg-blue-50 rounded-[5px] transition-all shadow-sm active:scale-90">
+                                        <Calendar size={16} />
+                                    </button>
                                 </div>
                             </FormRow>
                         </div>
 
                         <div className="col-span-12 lg:col-span-8 grid grid-cols-3 gap-4 border-l border-slate-100 pl-8">
-                            <div className="flex flex-col justify-center bg-blue-50/30 p-4 rounded-sm border border-blue-100/50">
+                             <div className="flex flex-col justify-center bg-blue-50/30 p-4 rounded-[5px] border border-blue-100/50">
                                 <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-2">Statement Ending Balance</span>
                                 <div className="flex items-baseline gap-1">
-                                    <span className="text-[12px] font-bold text-slate-400 italic">LKR</span>
                                     <input
                                         type="number"
                                         value={formData.endingBalance}
@@ -129,10 +133,9 @@ const BankReconciliationBoard = ({ isOpen, onClose }) => {
                                     />
                                 </div>
                             </div>
-                            <div className="flex flex-col justify-center bg-slate-50/50 p-4 rounded-sm border border-slate-100">
+                             <div className="flex flex-col justify-center bg-slate-50/50 p-4 rounded-[5px] border border-slate-100">
                                 <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-2">Cleared Balance</span>
                                 <div className="text-2xl font-black text-slate-700 tabular-nums flex items-baseline gap-1">
-                                    <span className="text-[12px] font-bold text-slate-300">LKR</span>
                                     {clearedBalance.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                 </div>
                             </div>
@@ -141,8 +144,7 @@ const BankReconciliationBoard = ({ isOpen, onClose }) => {
                                 <span className={`text-[10px] font-black uppercase tracking-widest leading-none mb-2 relative z-10 ${isMatched ? 'text-green-600' : 'text-slate-400'}`}>
                                     {isMatched ? 'Perfectly Matched' : 'Reconciliation Delta'}
                                 </span>
-                                <div className={`text-2xl font-black tabular-nums tracking-tighter relative z-10 flex items-baseline gap-1 ${isMatched ? 'text-green-600' : 'text-[#0078d4]'}`}>
-                                    <span className="text-[12px] font-bold opacity-30 text-slate-400">LKR</span>
+                                 <div className={`text-2xl font-black tabular-nums tracking-tighter relative z-10 flex items-baseline gap-1 ${isMatched ? 'text-green-600' : 'text-[#0078d4]'}`}>
                                     {delta.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                     {isMatched && <CheckCircle2 size={24} className="ml-auto text-green-600" />}
                                 </div>
@@ -268,6 +270,13 @@ const BankReconciliationBoard = ({ isOpen, onClose }) => {
                     }}
                 />
             )}
+
+            <CalendarModal 
+                isOpen={showCalendar} 
+                onClose={() => setShowCalendar(false)} 
+                onDateSelect={handleDateSelect}
+                initialDate={formData.statementDate}
+            />
         </>
     );
 };
@@ -282,7 +291,7 @@ const FormRow = ({ label, children }) => (
 const SearchModal = ({ title, query, setQuery, onClose, data, columns, onSelect }) => (
     <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4">
         <div className="absolute inset-0 bg-slate-500/30 backdrop-blur-[2px]" onClick={onClose} />
-        <div className="relative w-full max-w-2xl bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col max-h-[85vh] font-['Inter']">
+        <div className="relative w-full max-w-2xl bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col max-h-[85vh] font-['Tahoma']">
             <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-slate-50/50">
                 <h3 className="text-base font-black text-slate-800 tracking-tight uppercase tracking-[0.05em]">{title}</h3>
                 <div className="flex gap-4">
@@ -312,7 +321,7 @@ const SearchModal = ({ title, query, setQuery, onClose, data, columns, onSelect 
                                     </td>
                                 ))}
                                 <td className="p-4 border-b border-slate-50 text-center">
-                                    <button className="bg-white text-[#0078d4] text-[10px] px-4 py-1.5 rounded-md font-black border border-blue-200 shadow-sm transition-all hover:bg-[#0078d4] hover:text-white uppercase tracking-tighter">SELECT</button>
+                                    <button className="bg-blue-50/50 backdrop-blur-md border border-blue-200 text-[#0078d4] text-[10px] uppercase tracking-wider px-3 py-1 rounded-sm font-bold hover:bg-blue-100/80 shadow-sm transition-all active:scale-95">SELECT</button>
                                 </td>
                             </tr>
                         ))}

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import SimpleModal from '../components/SimpleModal';
-import { Search, Calendar, ChevronDown, RefreshCw , X, Save, RotateCcw, Loader2} from 'lucide-react';
+import CalendarModal from '../components/CalendarModal';
+import { Search, Calendar, ChevronDown, RefreshCw, X, Save, RotateCcw, Loader2, CreditCard, Trash2 } from 'lucide-react';
 import { payBillService } from '../services/payBill.service';
 import { toast } from 'react-hot-toast';
 
@@ -37,6 +38,8 @@ const PayBillBoard = ({ isOpen, onClose }) => {
     const [showPayTypeModal, setShowPayTypeModal] = useState(false);
     const [showAccModal, setShowAccModal] = useState(false);
     const [accSearch, setAccSearch] = useState('');
+    const [showCalendar, setShowCalendar] = useState(false);
+    const [calendarField, setCalendarField] = useState(null);
 
     useEffect(() => {
         if (isOpen) {
@@ -209,400 +212,410 @@ const PayBillBoard = ({ isOpen, onClose }) => {
         }
     };
 
+    const openCalendar = (field) => {
+        setCalendarField(field);
+        setShowCalendar(true);
+    };
+
+    const handleDateSelect = (date) => {
+        if (calendarField) {
+            setFormData(prev => ({ ...prev, [calendarField]: date }));
+        }
+        setShowCalendar(false);
+    };
+
     return (
         <>
         <SimpleModal
             isOpen={isOpen}
             onClose={onClose}
-            title="Pay Bill"
-            maxWidth="max-w-[1000px]"
+            title="Pay Supplier Bills"
+            maxWidth="max-w-[950px]"
             footer={
                 <div className="bg-slate-50 px-6 py-4 w-full flex justify-end gap-3 border-t border-gray-100 rounded-b-xl">
-                    <button onClick={handleSave} disabled={loading} className={`px-6 h-10 bg-[#0078d4] text-white text-sm font-bold rounded-md shadow-md shadow-blue-200 hover:bg-[#005a9e] transition-all active:scale-95 flex items-center justify-center gap-2 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                    <button onClick={handleSave} disabled={loading} className={`px-6 h-10 bg-[#2bb744] text-white text-sm font-black rounded-[5px] shadow-md shadow-green-100 hover:bg-[#259b3a] transition-all active:scale-95 flex items-center justify-center gap-2 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}>
                         {loading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />} 
-                        Pay Bill
+                        PAY BILL
                     </button>
-                    <button onClick={handleClear} disabled={loading} className="px-6 h-10 bg-slate-100 text-slate-600 text-sm font-bold rounded-md hover:bg-slate-200 transition-all active:scale-95 flex items-center justify-center gap-2 border-none">
-                        <RotateCcw size={14} /> Clear
-                    </button>
-                    <button onClick={onClose} className="px-6 h-10 bg-slate-100 text-slate-600 text-sm font-bold rounded-md hover:bg-slate-200 transition-all active:scale-95 flex items-center justify-center gap-2 border-none">
-                        <X size={14} /> Exit
+                    <button onClick={handleClear} disabled={loading} className="px-6 h-10 bg-[#00adff] text-white text-sm font-black rounded-[5px] hover:bg-[#0099e6] transition-all active:scale-95 flex items-center justify-center gap-2 border-none">
+                        <RotateCcw size={14} /> CLEAR FORM
                     </button>
                 </div>
             }
         >
-            <div className="space-y-4 overflow-y-auto no-scrollbar font-['Inter']">
-                {/* 1. Top Header Configuration */}
-                <div className="bg-white p-2 border border-gray-200 rounded-sm shadow-sm space-y-2">
-                    <div className="grid grid-cols-12 gap-x-6 gap-y-2 items-center">
-                        <div className="col-span-4 flex items-center gap-2">
-                             <label className="text-[12px] font-bold text-gray-700 w-20 shrink-0">Voucher No</label>
-                             <div className="flex-1">
-                                <input type="text" name="payDoc" value={formData.payDoc} readOnly className="w-full h-7 border border-[#0078d4]/30 px-2 text-[12px] font-bold text-[#0078d4] bg-blue-50/30 rounded-sm outline-none" />
+            <div className="space-y-3 overflow-y-auto no-scrollbar font-['Tahoma'] select-none px-1">
+                {/* 1. Header Detail Configuration Section */}
+                <div className="bg-white p-3 border border-gray-100 rounded-lg shadow-sm space-y-3">
+                    <div className="flex items-center justify-between border-b border-gray-100 pb-3 mb-2">
+                        <div className="flex items-center gap-3">
+                             <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Doc Number</label>
+                             <div className="flex items-center">
+                                <input type="text" name="payDoc" value={formData.payDoc} readOnly className="w-32 h-8 font-mono border border-gray-300 px-3 text-[12px] font-bold text-blue-600 bg-gray-50 rounded-[5px] outline-none text-center shadow-inner" />
                              </div>
                         </div>
 
-                        <div className="col-span-6 flex items-center gap-2">
-                             <label className="text-[12px] font-bold text-gray-700 w-16 shrink-0">Vender</label>
-                             <div className="flex-1 flex gap-1 px-4">
+                        <div className="flex items-center gap-3">
+                             <label className="text-[12.5px] font-bold text-gray-700">Transaction Date</label>
+                             <div className="flex h-8 gap-1">
+                                <input 
+                                    type="text" 
+                                    readOnly 
+                                    value={formData.payDate} 
+                                    className="w-[110px] px-2 text-[12px] border border-gray-300 rounded-[5px] outline-none text-gray-700 font-mono font-bold bg-gray-50 text-center shadow-sm" 
+                                />
+                                <button onClick={() => openCalendar('payDate')} className="w-9 h-8 bg-white border border-gray-300 text-blue-600 flex items-center justify-center hover:bg-blue-50 rounded-[5px] transition-all shadow-sm active:scale-90">
+                                    <Calendar size={14} />
+                                </button>
+                             </div>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-12 gap-x-10 gap-y-4">
+                        <div className="col-span-12 flex items-center gap-4">
+                             <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Vendor Name</label>
+                             <div className="flex-1 flex gap-2">
                                 <input 
                                     type="text" 
                                     readOnly 
                                     value={lookups.vendors.find(v => v.code === formData.vendorId)?.name || ''} 
-                                    placeholder="Select Vendor..." 
-                                    className="flex-1 h-7 border border-gray-300 px-2 text-[12px] rounded-sm outline-none font-bold text-[#b91c1c] bg-gray-50" 
+                                    className="flex-1 h-8 font-mono border border-gray-300 px-3 text-[12px] rounded-[5px] outline-none font-bold text-blue-700 bg-gray-50 shadow-sm truncate" 
                                 />
-                                <button onClick={() => setShowVendorModal(true)} className="w-8 h-7 bg-[#0078d4] text-white flex items-center justify-center hover:bg-[#005a9e] rounded-sm transition-colors shadow-sm">
-                                    <Search size={14} />
+                                <button onClick={() => setShowVendorModal(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95">
+                                    <Search size={16} />
                                 </button>
                              </div>
                         </div>
 
-                        <div className="col-span-2 flex items-center justify-end gap-2">
-                             <label className="text-[12px] font-bold text-gray-700">Date</label>
-                             <input type="date" name="payDate" value={formData.payDate} onChange={handleInput} className="w-[100px] h-7 border border-gray-300 rounded-sm px-2 text-[12px] outline-none bg-white text-gray-700" />
-                        </div>
-
-                        <div className="col-span-4 flex items-center gap-2">
-                             <label className="text-[12px] font-bold text-gray-700 w-20 shrink-0">Cost Center</label>
-                             <div className="flex-1 flex gap-1">
+                        <div className="col-span-6 flex items-center gap-4 text-center">
+                             <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Cost Center</label>
+                             <div className="flex-1 flex gap-2">
                                 <input 
                                     type="text" 
                                     readOnly 
                                     value={lookups.costCenters.find(c => c.code === formData.costCenter)?.name || ''} 
-                                    placeholder="Select Cost Center..." 
-                                    className="flex-1 h-7 border border-gray-300 px-2 text-[12px] bg-gray-50 rounded-sm outline-none" 
+                                    className="flex-1 h-8 font-mono border border-gray-300 px-3 text-[12px] bg-gray-50 rounded-[5px] font-bold text-gray-600 outline-none truncate shadow-sm" 
                                 />
-                                <button onClick={() => { setCcSource('header'); setShowCCModal(true); }} className="w-8 h-7 bg-[#0078d4] text-white flex items-center justify-center hover:bg-[#005a9e] rounded-sm transition-colors shadow-sm">
-                                    <Search size={14} />
+                                <button onClick={() => { setCcSource('header'); setShowCCModal(true); }} className="w-10 h-8 bg-white border border-gray-300 text-gray-500 flex items-center justify-center hover:bg-gray-50 rounded-[5px] transition-all shadow-sm active:scale-90">
+                                    <Search size={16} />
                                 </button>
                              </div>
                         </div>
 
-                        <div className="col-span-8 flex items-center gap-2">
-                             <label className="text-[12px] font-bold text-gray-700 w-32 shrink-0 text-right pr-2">Manual Vou. No</label>
-                             <input type="text" name="voucherNo" value={formData.voucherNo} onChange={handleInput} className="flex-1 h-7 border border-gray-300 px-2 text-[12px] rounded-sm outline-none focus:border-blue-500" />
+                        <div className="col-span-6 flex items-center gap-4">
+                             <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0 px-4">Manual Vou.</label>
+                             <input type="text" name="voucherNo" value={formData.voucherNo} onChange={handleInput} className="flex-1 h-8 font-mono border border-gray-300 px-3 text-[12px] rounded-[5px] outline-none focus:border-blue-400 bg-white shadow-sm transition-all text-gray-800" />
                         </div>
                     </div>
                 </div>
 
-                {/* 2. Main Bills Table */}
-                <div className="border border-gray-300 rounded-sm bg-white shadow-sm flex flex-col min-h-[200px]">
-                    <div className="flex bg-[#f8fafd] border-b border-gray-300 text-[11px] font-bold text-gray-700 uppercase tracking-wide">
-                        <div className="w-10 py-1.5 px-3 border-r border-gray-300 flex items-center justify-center">
-                            <input type="checkbox" onChange={handleSelectAll} checked={bills.length > 0 && bills.every(b => b.selected)} className="w-3.5 h-3.5" />
+                {/* 2. Main Bills Table - Refined Distributions */}
+                <div className="bg-white border border-gray-100 rounded-xl shadow-xl overflow-hidden flex flex-col min-h-[250px]">
+                    <div className="flex bg-[#f8fafc] border-b border-gray-100 text-[10px] font-black text-gray-400 uppercase tracking-widest leading-10">
+                        <div className="w-12 px-4 border-r border-gray-100 flex items-center justify-center">
+                            <input type="checkbox" onChange={handleSelectAll} checked={bills.length > 0 && bills.every(b => b.selected)} className="w-4 h-4 rounded-md border-gray-300 text-blue-600 focus:ring-blue-500" />
                         </div>
-                        <div className="flex-[0.8] py-1.5 px-3 border-r border-gray-300">Date Due</div>
-                        <div className="flex-[1.2] py-1.5 px-3 border-r border-gray-300">Doc No</div>
-                        <div className="flex-[2] py-1.5 px-3 border-r border-gray-300">Amount Due</div>
-                        <div className="flex-[1] py-1.5 px-3 border-r border-gray-300">Balance</div>
-                        <div className="flex-[1] py-1.5 px-3 border-r border-gray-300">Discount</div>
-                        <div className="flex-[1] py-1.5 px-3 border-r border-gray-300">Set Of Use</div>
-                        <div className="flex-[1.2] py-1.5 px-3 text-right">Amt. To Pay</div>
+                        <div className="flex-[0.8] px-4 border-r border-gray-100">Date Due</div>
+                        <div className="flex-[1.2] px-4 border-r border-gray-100">Doc No</div>
+                        <div className="flex-[1.5] px-4 border-r border-gray-100">Amount Due</div>
+                        <div className="flex-[1] px-4 border-r border-gray-100">Balance</div>
+                        <div className="flex-[1] px-4 border-r border-gray-100">Discount</div>
+                        <div className="flex-[1] px-4 border-r border-gray-100">Set Of Use</div>
+                        <div className="flex-[1.2] px-4 text-right">Amt. To Pay</div>
                     </div>
                     
-                    <div className="flex-1 bg-white overflow-y-auto max-h-[140px]">
-                        {loading && <div className="p-4 text-center text-gray-500 font-bold text-[12px]">Loading Bills...</div>}
-                        {!loading && bills.length === 0 && <div className="p-4 text-center text-gray-400 font-semibold text-[12px]">No open bills for this vendor.</div>}
+                    <div className="flex-1 bg-white overflow-y-auto max-h-[250px] custom-scrollbar">
+                        {loading && <div className="p-12 text-center text-gray-300 font-black italic text-[11px] uppercase tracking-widest animate-pulse">Fetching Vendor Ledgers...</div>}
+                        {!loading && bills.length === 0 && <div className="p-12 text-center text-gray-300 font-black italic text-[11px] uppercase tracking-widest">No outstanding bills found.</div>}
                         
                         {bills.map((bill, idx) => (
-                            <div key={idx} className={`flex border-b border-gray-100 text-[12px] font-semibold text-gray-600 ${bill.selected ? 'bg-blue-50/50' : 'hover:bg-gray-50/50'}`}>
-                                <div className="w-10 py-1.5 px-3 flex items-center justify-center border-r border-gray-100">
-                                    <input type="checkbox" checked={bill.selected} onChange={(e) => handleRowUpdate(idx, 'selected', e.target.checked)} className="w-3.5 h-3.5" />
+                            <div key={idx} className={`flex border-b border-gray-50 text-[12px] font-bold text-gray-700 transition-colors ${bill.selected ? 'bg-blue-50/30' : 'hover:bg-slate-50/50'}`}>
+                                <div className="w-12 px-4 flex items-center justify-center border-r border-gray-50">
+                                    <input type="checkbox" checked={bill.selected} onChange={(e) => handleRowUpdate(idx, 'selected', e.target.checked)} className="w-4 h-4 rounded-md border-gray-300 text-blue-600 focus:ring-blue-500" />
                                 </div>
-                                <div className="flex-[0.8] py-1.5 px-3 flex items-center border-r border-gray-100">{bill.date?.split('T')[0]}</div>
-                                <div className="flex-[1.2] py-1.5 px-3 flex items-center border-r border-gray-100">{bill.docNo}</div>
-                                <div className="flex-[2] py-1.5 px-3 flex items-center border-r border-gray-100">{parseFloat(bill.amount || 0).toFixed(2)}</div>
-                                <div className="flex-[1] py-1.5 px-3 flex items-center justify-end font-bold text-[#b91c1c] border-r border-gray-100">{parseFloat(bill.balance || 0).toFixed(2)}</div>
-                                <div className="flex-[1] py-1 px-1 border-r border-gray-100">
-                                    <input type="text" disabled={!bill.selected} value={bill.discount || ''} onChange={(e) => handleRowUpdate(idx, 'discount', e.target.value)} className="w-full h-full border border-gray-200 px-1 text-right text-[11px] outline-none disabled:bg-gray-50 focus:border-blue-400" />
+                                <div className="flex-[0.8] px-4 flex items-center border-r border-gray-50 font-mono text-gray-500">{bill.date?.split('T')[0]}</div>
+                                <div className="flex-[1.2] px-4 flex items-center border-r border-gray-50 font-mono text-blue-700 uppercase">{bill.docNo}</div>
+                                <div className="flex-[1.5] px-4 flex items-center border-r border-gray-50 font-mono text-gray-700">{parseFloat(bill.amount || 0).toLocaleString(undefined, {minimumFractionDigits: 2})}</div>
+                                <div className="flex-[1] px-4 flex items-center justify-end font-mono font-black text-red-600 bg-red-50/10 border-r border-gray-50">{parseFloat(bill.balance || 0).toLocaleString(undefined, {minimumFractionDigits: 2})}</div>
+                                <div className="flex-[1] p-1 border-r border-gray-50">
+                                    <input type="text" disabled={!bill.selected} value={bill.discount || ''} onChange={(e) => handleRowUpdate(idx, 'discount', e.target.value)} className="w-full h-8 font-mono border border-gray-200 px-2 text-right text-[11px] outline-none rounded-[5px] bg-white focus:border-blue-400 disabled:bg-gray-50/50 shadow-inner" />
                                 </div>
-                                <div className="flex-[1] py-1 px-1 border-r border-gray-100">
-                                    <input type="text" disabled={!bill.selected} value={bill.setOfUse || ''} onChange={(e) => handleRowUpdate(idx, 'setOfUse', e.target.value)} className="w-full h-full border border-gray-200 px-1 text-right text-[11px] outline-none disabled:bg-gray-50 focus:border-blue-400" />
+                                <div className="flex-[1] p-1 border-r border-gray-50">
+                                    <input type="text" disabled={!bill.selected} value={bill.setOfUse || ''} onChange={(e) => handleRowUpdate(idx, 'setOfUse', e.target.value)} className="w-full h-8 font-mono border border-gray-200 px-2 text-right text-[11px] outline-none rounded-[5px] bg-white focus:border-blue-400 disabled:bg-gray-50/50 shadow-inner" />
                                 </div>
-                                <div className="flex-[1.2] py-1 px-1">
-                                    <input type="text" disabled={!bill.selected} value={bill.toPay || ''} onChange={(e) => handleRowUpdate(idx, 'toPay', e.target.value)} className="w-full h-full border text-[#0078d4] font-bold border-[#0078d4]/30 bg-blue-50/30 px-2 text-right text-[11px] outline-none disabled:bg-gray-50 disabled:text-gray-400 disabled:border-transparent focus:border-[#0078d4]" />
+                                <div className="flex-[1.2] p-1">
+                                    <input type="text" disabled={!bill.selected} value={bill.toPay || ''} onChange={(e) => handleRowUpdate(idx, 'toPay', e.target.value)} className="w-full h-8 font-mono text-blue-700 font-bold border border-blue-200/50 bg-blue-50/30 px-2 text-right text-[12px] outline-none rounded-[5px] focus:border-blue-400 disabled:bg-transparent shadow-sm" />
                                 </div>
                             </div>
                         ))}
                     </div>
                 </div>
 
-                {/* 3. Summary Stats Section */}
-                <div className="bg-blue-50/30 border border-[#0078d4]/20 p-2 rounded-sm space-y-2">
-                    <div className="flex flex-col md:flex-row items-start md:items-center justify-between text-[13px] font-bold gap-2">
-                        <div className="flex items-center gap-3">
-                            <label className="text-gray-800">Total Outstanding Balance</label>
-                            <input type="text" value={totals.balance.toFixed(2)} readOnly className="w-32 h-7 bg-white border border-gray-300 text-right px-2 text-[#b91c1c] font-black rounded-sm outline-none" />
+                {/* 3. Global Totals & Payment Summary Section */}
+                <div className="grid grid-cols-12 gap-x-10 items-start">
+                    <div className="col-span-8 bg-white border border-gray-100 p-3 rounded-xl shadow-sm space-y-3">
+                        <div className="flex items-center gap-4">
+                            <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Outstanding</label>
+                            <div className="flex-1 h-8 font-mono border border-red-100 bg-red-50/50 px-4 text-[15px] font-black text-red-600 text-right flex items-center justify-end rounded-[5px] shadow-inner">
+                                {totals.balance.toLocaleString(undefined, {minimumFractionDigits: 2})}
+                            </div>
+                        </div>
+
+                        <div className="flex items-center gap-4">
+                            <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">General Memo</label>
+                            <input type="text" name="memo" value={formData.memo} onChange={handleInput} className="flex-1 h-8 font-mono border border-gray-300 px-3 text-[13px] rounded-[5px] outline-none focus:border-blue-400 bg-white shadow-sm transition-all text-gray-800" />
+                        </div>
+
+                        <div className="flex items-center gap-3 pt-0.5">
+                            <button onClick={handleClearSelection} className="px-5 h-7 bg-white border border-gray-300 text-gray-500 text-[10px] font-black uppercase tracking-widest rounded-md hover:bg-gray-50 shadow-sm transition-all active:scale-95 leading-none">Reset Selection</button>
+                            <div className="h-4 w-[1px] bg-gray-200"></div>
+                            <span className="text-[10px] font-bold text-gray-400 flex items-center gap-2"><CreditCard size={11} /> {bills.filter(b => b.selected).length} Active Invoices Selected</span>
                         </div>
                     </div>
 
-                    <div className="flex items-center gap-3">
-                        <label className="text-[13px] font-bold text-gray-800 w-16 shrink-0">Memo</label>
-                        <input type="text" name="memo" value={formData.memo} onChange={handleInput} className="flex-1 h-7 border border-gray-300 px-2 text-[12px] focus:border-blue-500 bg-white rounded-sm outline-none" />
-                    </div>
-
-                    {/* Action Buttons Row */}
-                    <div className="flex items-center gap-2 pt-1 overflow-x-auto no-scrollbar">
-                        <ActionButton label="Clear Selection" onClick={handleClearSelection} />
-                        <ActionButton label="Recalculate Totals" />
-                    </div>
-                </div>
-
-                {/* 4. Fine Grain Stats Grid */}
-                <div className="bg-white border border-gray-200 p-2 rounded-sm">
-                    <div className="grid grid-cols-12 gap-x-12 gap-y-2">
-                        {/* Column 1 */}
-                        <div className="col-span-4 space-y-1.5">
-                            <StatRow label="Sum of Amount Due" value={totals.amountDue.toFixed(2)} />
-                            <StatRow label="Sum of Discount Value" value={totals.discount.toFixed(2)} />
-                        </div>
-                        {/* Column 2 */}
-                        <div className="col-span-4 space-y-1.5">
-                            <StatRow label="Sum of Credit Setoff" value={totals.setOfUse.toFixed(2)} />
-                            <StatRow label="Sum of Total Value" value={totals.toPay.toFixed(2)} emphasized />
-                        </div>
-                        {/* Column 3 */}
-                        <div className="col-span-4 space-y-1.5">
-                            <StatRow label="Payable Count" value={bills.filter(b => b.selected).length.toString()} isEmpty />
+                    <div className="col-span-4 space-y-1.5 bg-slate-50/50 p-3 rounded-xl border border-dashed border-slate-200">
+                        <StatRow label="Gross Amount" value={totals.amountDue.toLocaleString(undefined, {minimumFractionDigits: 2})} />
+                        <StatRow label="Trade Discount" value={totals.discount.toLocaleString(undefined, {minimumFractionDigits: 2})} />
+                        <StatRow label="Credit Setoffs" value={totals.setOfUse.toLocaleString(undefined, {minimumFractionDigits: 2})} />
+                        <div className="pt-1.5 border-t border-slate-200 mt-1">
+                             <StatRow label="NET TO PAY" value={totals.toPay.toLocaleString(undefined, {minimumFractionDigits: 2})} emphasized />
                         </div>
                     </div>
                 </div>
 
-                {/* 5. Payment Finalization */}
-                <div className="bg-white p-2 border border-gray-200 rounded-sm space-y-1.5">
-                    <div className="grid grid-cols-12 gap-x-8 gap-y-1.5">
-                        <div className="col-span-4 flex items-center gap-3">
-                             <label className="text-[12px] font-bold text-gray-700 w-28 shrink-0">Payment Method</label>
-                             <div className="flex-1 flex gap-1">
-                                <input 
-                                    type="text" 
-                                    readOnly 
-                                    value={formData.payType || ''} 
-                                    placeholder="Select..." 
-                                    className="flex-1 h-7 border border-gray-300 px-2 text-[12px] font-bold text-[#b91c1c] bg-gray-50 rounded-sm outline-none" 
-                                />
-                                <button onClick={() => setShowPayTypeModal(true)} className="w-8 h-7 bg-[#0078d4] text-white flex items-center justify-center hover:bg-[#005a9e] rounded-sm transition-colors shadow-sm">
-                                    <Search size={14} />
-                                </button>
+                {/* 5. Payment Finalization Execution Section */}
+                <div className="bg-white p-3 border border-gray-100 rounded-xl shadow-sm mb-2">
+                    <div className="grid grid-cols-12 gap-x-10 gap-y-3">
+                        <div className="col-span-12">
+                             <div className="flex items-center gap-3 mb-1">
+                                 <div className="h-4 w-1.5 bg-blue-600 rounded-full"></div>
+                                 <h4 className="text-[11px] font-black text-gray-500 uppercase tracking-widest leading-none">Financial Settlement Details</h4>
                              </div>
                         </div>
 
-                        <div className="col-span-8 flex items-center gap-3">
-                             <label className="text-[12px] font-bold text-gray-700 w-32 shrink-0">Payment Account</label>
-                             <div className="flex-1 flex gap-1">
-                                 <input 
-                                    type="text" 
-                                    readOnly 
-                                    value={availableAccounts.find(a => a.code === formData.accId)?.name ? `${formData.accId} - ${availableAccounts.find(a => a.code === formData.accId).name}` : ''} 
-                                    placeholder="Select Account..." 
-                                    className="flex-1 h-7 border border-gray-300 px-2 text-[12px] font-semibold bg-gray-50 rounded-sm outline-none" 
-                                 />
-                                 <button onClick={() => setShowAccModal(true)} className="w-8 h-7 bg-[#0078d4] text-white flex items-center justify-center hover:bg-[#005a9e] rounded-sm transition-colors shadow-sm">
-                                    <Search size={14} />
-                                 </button>
-                             </div>
-                        </div>
-
-                        <div className="col-span-4 flex items-center gap-3">
-                             <label className="text-[12px] font-bold text-gray-700 w-28 shrink-0">Payment Date</label>
-                             <input type="date" value={formData.payDate} readOnly className="flex-1 h-7 border border-gray-300 rounded-sm px-2 text-[12px] outline-none bg-gray-50 text-gray-700" />
-                        </div>
-
-                        <div className="col-span-8 flex items-center gap-3">
-                             <label className="text-[12px] font-bold text-gray-700 w-32 shrink-0">Payment Cost Center</label>
-                             <div className="flex-1 flex gap-1 items-center">
-                                 <input 
-                                    type="text" 
-                                    readOnly 
-                                    value={lookups.costCenters.find(c => c.code === formData.payCostCenter)?.name || ''} 
-                                    placeholder="Select Cost Center..." 
-                                    className="flex-1 h-7 border border-gray-300 px-2 text-[12px] bg-gray-50 rounded-sm outline-none" 
-                                 />
-                                 <button onClick={() => { setCcSource('payment'); setShowCCModal(true); }} className="w-8 h-7 bg-[#0078d4] text-white flex items-center justify-center hover:bg-[#005a9e] rounded-sm transition-colors shadow-sm">
-                                    <Search size={14} />
-                                 </button>
-                             </div>
-                        </div>
-
-                        <div className="col-span-12 grid grid-cols-12 gap-x-4">
-                             <div className="col-span-4 flex items-center gap-3">
-                                <label className="text-[12px] font-bold text-gray-700 w-28 shrink-0">Chque No</label>
-                                <div className="flex-1 flex items-center gap-2">
-                                    <input type="text" name="chqNo" value={formData.chqNo} onChange={handleInput} disabled={formData.payType !== 'Cheque'} className="flex-1 h-7 border border-gray-300 px-2 text-[12px] rounded-sm outline-none disabled:bg-gray-100 disabled:border-transparent focus:border-blue-500" />
+                        <div className="col-span-12 grid grid-cols-12 gap-x-10">
+                            <div className="col-span-5 space-y-2">
+                                <div className="flex items-center gap-4">
+                                    <label className="text-[12.5px] font-bold text-gray-700 w-32 shrink-0">Settlement Ledger</label>
+                                    <div className="flex-1 flex gap-2">
+                                        <input 
+                                            type="text" 
+                                            readOnly 
+                                            value={formData.payType || ''} 
+                                            className="flex-1 h-8 font-mono border border-gray-300 px-3 text-[12px] font-black text-blue-700 bg-gray-50 rounded-[5px] outline-none shadow-sm" 
+                                        />
+                                        <button onClick={() => setShowPayTypeModal(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95">
+                                            <Search size={16} />
+                                        </button>
+                                    </div>
                                 </div>
-                             </div>
-
-                             <div className="col-span-8 flex items-center gap-x-6 invisible">
-                                 {/* Invisible Spacer matching original layout structure */}
-                             </div>
-
-                             <div className="col-span-12 flex justify-center mt-1">
-                                <div className="flex items-center gap-3 w-[350px]">
-                                    <label className="text-[12px] font-bold text-gray-700 w-32 text-right">Payment Applied</label>
-                                    <input type="text" value={totals.toPay.toFixed(2)} readOnly className="flex-1 h-7 bg-white border border-gray-300 px-2 text-[14px] text-right text-[#000080] font-bold rounded-sm outline-none shadow-[inset_0_1px_2px_rgba(0,0,0,0.1)]" />
+                                <div className="flex items-center gap-4">
+                                    <label className="text-[12.5px] font-bold text-gray-700 w-32 shrink-0">Cheque Ref No</label>
+                                    <input type="text" name="chqNo" value={formData.chqNo} onChange={handleInput} disabled={formData.payType !== 'Cheque'} className="flex-1 h-8 font-mono border border-gray-300 px-3 text-[12px] font-bold rounded-[5px] outline-none bg-white focus:border-blue-400 shadow-sm disabled:bg-gray-50 disabled:border-transparent transition-all" />
                                 </div>
-                             </div>
+                                <div className="flex items-center gap-4">
+                                    <label className="text-[12.5px] font-bold text-gray-700 w-32 shrink-0">Settlement Date</label>
+                                    <input type="text" value={formData.payDate} readOnly className="flex-1 h-8 font-mono border border-gray-300 px-3 text-[12px] font-bold bg-gray-50 rounded-[5px] outline-none shadow-sm text-center text-gray-600" />
+                                </div>
+                            </div>
+
+                            <div className="col-span-7 space-y-2">
+                                <div className="flex items-center gap-4">
+                                    <label className="text-[12.5px] font-bold text-gray-700 w-32 shrink-0">Payment Option</label>
+                                    <div className="flex-1 flex gap-2">
+                                        <input 
+                                            type="text" 
+                                            readOnly 
+                                            value={availableAccounts.find(a => a.code === formData.accId)?.name ? `${formData.accId} - ${availableAccounts.find(a => a.code === formData.accId).name}` : ''} 
+                                            className="flex-1 h-8 font-mono border border-gray-300 px-3 text-[11px] font-bold bg-gray-50 rounded-[5px] outline-none truncate shadow-sm text-gray-600" 
+                                        />
+                                        <button onClick={() => setShowAccModal(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95">
+                                            <Search size={16} />
+                                        </button>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-4">
+                                    <label className="text-[12.5px] font-bold text-gray-700 w-32 shrink-0">Voucher No</label>
+                                    <div className="flex-1 flex gap-2">
+                                        <input 
+                                            type="text" 
+                                            readOnly 
+                                            value={lookups.costCenters.find(c => c.code === formData.payCostCenter)?.name || ''} 
+                                            className="flex-1 h-8 font-mono border border-gray-300 px-3 text-[12px] bg-gray-50 rounded-[5px] font-bold text-gray-600 outline-none truncate shadow-sm" 
+                                        />
+                                        <button onClick={() => { setCcSource('payment'); setShowCCModal(true); }} className="w-10 h-8 bg-white border border-gray-300 text-gray-500 flex items-center justify-center hover:bg-gray-50 rounded-[5px] transition-all shadow-sm active:scale-90">
+                                            <Search size={16} />
+                                        </button>
+                                    </div>
+                                </div>
+                                <div className="pt-0.5">
+                                    <div className="flex items-center gap-4 bg-blue-50/50 p-1.5 rounded-lg border border-blue-100">
+                                        <label className="text-[12px] font-black text-blue-800 w-32 shrink-0 uppercase tracking-tighter">Funds Applied</label>
+                                        <div className="flex-1 h-8 font-mono bg-white border border-blue-200 px-3 text-[18px] font-black text-blue-700 text-right flex items-center justify-end rounded-[5px] shadow-sm">
+                                            {totals.toPay.toLocaleString(undefined, {minimumFractionDigits: 2})}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </SimpleModal>
 
+        <CalendarModal 
+            isOpen={showCalendar} 
+            onClose={() => setShowCalendar(false)} 
+            onDateSelect={handleDateSelect}
+            initialDate={formData[calendarField]}
+        />
+
         {/* Vendor Search Modal */}
-        {showVendorModal && (
-            <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4">
-                <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setShowVendorModal(false)} />
-                <div className="relative w-full max-w-2xl bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col max-h-[85vh]">
-                    <div className="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-50 font-['Plus_Jakarta_Sans']">
-                        <h3 className="text-lg font-bold text-slate-800 tracking-tight">Search Vendors</h3>
-                        <div className="flex gap-4">
-                            <input type="text" placeholder="Search by name or code..." className="h-9 border border-gray-300 px-3 text-sm rounded-md w-64 focus:border-blue-500 outline-none" value={vendorSearch} onChange={(e) => setVendorSearch(e.target.value)} />
-                            <button onClick={() => setShowVendorModal(false)} className="w-8 h-8 flex items-center justify-center hover:bg-red-50 text-slate-400 hover:text-red-500 transition-colors rounded-full"><X size={24} /></button>
-                        </div>
-                    </div>
-                    <div className="overflow-y-auto p-2 font-['Inter']">
-                        <table className="w-full text-sm text-left">
-                            <thead className="bg-slate-50 sticky top-0 text-gray-600 font-bold uppercase text-[11px] tracking-wider">
-                                <tr>
-                                    <th className="p-3 border-b">Code</th>
-                                    <th className="p-3 border-b">Vendor Name</th>
-                                    <th className="p-3 border-b text-center">Action</th>
+        <SimpleModal isOpen={showVendorModal} onClose={() => setShowVendorModal(false)} title={`Search Vendors - ${lookups.vendors.length} Found`} maxWidth="max-w-xl">
+             <div className="flex flex-col h-full font-['Tahoma']">
+                <div className="p-4 bg-slate-50 border-b border-gray-100 flex items-center justify-between mb-2">
+                    <span className="text-[12px] font-bold text-gray-500 uppercase tracking-wider">Search Facility</span>
+                    <input 
+                        type="text" 
+                        placeholder="Find vendor by name or ID" 
+                        className="h-9 border border-gray-300 px-3 text-sm rounded-[5px] w-72 focus:border-[#0285fd] outline-none shadow-sm" 
+                        value={vendorSearch} 
+                        onChange={(e) => setVendorSearch(e.target.value)} 
+                    />
+                </div>
+                <div className="overflow-y-auto max-h-[50vh] custom-scrollbar">
+                    <table className="w-full text-sm text-left">
+                        <thead className="bg-[#f8fafc] sticky top-0 text-gray-600 font-bold uppercase text-[11px] tracking-wider z-10 shadow-sm leading-8">
+                            <tr>
+                                <th className="px-3 border-b">Code</th>
+                                <th className="px-3 border-b">Vendor Name</th>
+                                <th className="px-3 border-b text-center w-24">Select</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-100">
+                            {lookups.vendors.filter(v => (v.name || '').toLowerCase().includes(vendorSearch.toLowerCase()) || (v.code || '').toLowerCase().includes(vendorSearch.toLowerCase())).map((v, idx) => (
+                                <tr key={idx} className="hover:bg-blue-50/50 transition-colors border-b border-gray-50">
+                                    <td className="p-3 font-mono font-bold text-gray-700">{v.code}</td>
+                                    <td className="p-3 font-mono uppercase text-blue-800">{v.name}</td>
+                                    <td className="p-3 text-center">
+                                        <button onClick={() => {
+                                            handleInput({ target: { name: 'vendorId', value: v.code } });
+                                            setShowVendorModal(false);
+                                        }} className="bg-[#0078d4] text-white text-[10px] px-3 py-1 rounded-sm font-bold hover:bg-[#005a9e] shadow-sm transition-all active:scale-95 uppercase tracking-wider">SELECT</button>
+                                    </td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                {lookups.vendors.filter(v => (v.name || '').toLowerCase().includes(vendorSearch.toLowerCase()) || (v.code || '').toLowerCase().includes(vendorSearch.toLowerCase())).map((v, idx) => (
-                                    <tr key={idx} className="hover:bg-blue-50 transition-colors cursor-pointer" onClick={() => {
-                                        handleInput({ target: { name: 'vendorId', value: v.code } });
-                                        setShowVendorModal(false);
-                                    }}>
-                                        <td className="p-3 border-b font-medium text-gray-700">{v.code}</td>
-                                        <td className="p-3 border-b font-medium uppercase text-blue-600">{v.name}</td>
-                                        <td className="p-3 border-b text-center">
-                                            <button className="bg-[#0078d4] text-white text-[10px] px-3 py-1.5 rounded-sm font-bold hover:bg-[#005a9e]">SELECT</button>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
+                            ))}
+                        </tbody>
+                    </table>
                 </div>
             </div>
-        )}
+        </SimpleModal>
 
         {/* Cost Center Search Modal */}
-        {showCCModal && (
-            <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4">
-                <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setShowCCModal(false)} />
-                <div className="relative w-full max-w-2xl bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col max-h-[85vh]">
-                    <div className="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-50 font-['Plus_Jakarta_Sans']">
-                        <h3 className="text-lg font-bold text-slate-800 tracking-tight">Search Cost Centers</h3>
-                        <div className="flex gap-4">
-                            <input type="text" placeholder="Search by name or code..." className="h-9 border border-gray-300 px-3 text-sm rounded-md w-64 focus:border-blue-500 outline-none" value={ccSearch} onChange={(e) => setCcSearch(e.target.value)} />
-                            <button onClick={() => setShowCCModal(false)} className="w-8 h-8 flex items-center justify-center hover:bg-red-50 text-slate-400 hover:text-red-500 transition-colors rounded-full"><X size={24} /></button>
-                        </div>
-                    </div>
-                    <div className="overflow-y-auto p-2 font-['Inter']">
-                        <table className="w-full text-sm text-left">
-                            <thead className="bg-slate-50 sticky top-0 text-gray-600 font-bold uppercase text-[11px] tracking-wider">
-                                <tr>
-                                    <th className="p-3 border-b">Code</th>
-                                    <th className="p-3 border-b">Cost Center</th>
-                                    <th className="p-3 border-b text-center">Action</th>
+        <SimpleModal isOpen={showCCModal} onClose={() => setShowCCModal(false)} title={`Search Cost Centers - ${lookups.costCenters.length} Found`} maxWidth="max-w-xl">
+             <div className="flex flex-col h-full font-['Tahoma']">
+                <div className="p-4 bg-slate-50 border-b border-gray-100 flex items-center justify-between mb-2">
+                    <span className="text-[12px] font-bold text-gray-500 uppercase tracking-wider">Search Facility</span>
+                    <input 
+                        type="text" 
+                        placeholder="Find cost center" 
+                        className="h-9 border border-gray-300 px-3 text-sm rounded-[5px] w-72 focus:border-[#0285fd] outline-none shadow-sm" 
+                        value={ccSearch} 
+                        onChange={(e) => setCcSearch(e.target.value)} 
+                    />
+                </div>
+                <div className="overflow-y-auto max-h-[50vh] custom-scrollbar">
+                    <table className="w-full text-sm text-left">
+                        <thead className="bg-[#f8fafc] sticky top-0 text-gray-600 font-bold uppercase text-[11px] tracking-wider z-10 shadow-sm leading-8">
+                            <tr>
+                                <th className="px-3 border-b">Code</th>
+                                <th className="px-3 border-b">Center Description</th>
+                                <th className="px-3 border-b text-center w-24">Select</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-100">
+                            {lookups.costCenters.filter(c => (c.name || '').toLowerCase().includes(ccSearch.toLowerCase()) || (c.code || '').toLowerCase().includes(ccSearch.toLowerCase())).map((c, idx) => (
+                                <tr key={idx} className="hover:bg-blue-50/50 transition-colors border-b border-gray-50">
+                                    <td className="p-3 font-mono font-bold text-gray-700">{c.code}</td>
+                                    <td className="p-3 font-mono uppercase text-gray-700">{c.name}</td>
+                                    <td className="p-3 text-center">
+                                        <button onClick={() => {
+                                            const field = ccSource === 'header' ? 'costCenter' : 'payCostCenter';
+                                            setFormData(prev => ({ ...prev, [field]: c.code }));
+                                            setShowCCModal(false);
+                                        }} className="bg-[#0078d4] text-white text-[10px] px-3 py-1 rounded-sm font-bold hover:bg-[#005a9e] shadow-sm transition-all active:scale-95 uppercase tracking-wider">SELECT</button>
+                                    </td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                {lookups.costCenters.filter(c => (c.name || '').toLowerCase().includes(ccSearch.toLowerCase()) || (c.code || '').toLowerCase().includes(ccSearch.toLowerCase())).map((c, idx) => (
-                                    <tr key={idx} className="hover:bg-blue-50 transition-colors cursor-pointer" onClick={() => {
-                                        const field = ccSource === 'header' ? 'costCenter' : 'payCostCenter';
-                                        setFormData(prev => ({ ...prev, [field]: c.code }));
-                                        setShowCCModal(false);
-                                    }}>
-                                        <td className="p-3 border-b font-medium text-gray-700">{c.code}</td>
-                                        <td className="p-3 border-b font-medium uppercase text-blue-600">{c.name}</td>
-                                        <td className="p-3 border-b text-center">
-                                            <button className="bg-[#0078d4] text-white text-[10px] px-3 py-1.5 rounded-sm font-bold hover:bg-[#005a9e]">SELECT</button>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
+                            ))}
+                        </tbody>
+                    </table>
                 </div>
             </div>
-        )}
+        </SimpleModal>
 
         {/* Payment Method Search Modal */}
-        {showPayTypeModal && (
-            <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4">
-                <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setShowPayTypeModal(false)} />
-                <div className="relative w-full max-w-md bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col">
-                    <div className="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-50 font-['Plus_Jakarta_Sans']">
-                        <h3 className="text-lg font-bold text-slate-800 tracking-tight">Select Payment Method</h3>
-                        <button onClick={() => setShowPayTypeModal(false)} className="w-8 h-8 flex items-center justify-center hover:bg-red-50 text-slate-400 hover:text-red-500 transition-colors rounded-full"><X size={24} /></button>
-                    </div>
-                    <div className="p-2 space-y-1">
-                        {['Cash', 'Cheque', 'Online', 'Petty Cash', 'Settlement'].map((type, idx) => (
-                            <button 
-                                key={idx} 
-                                onClick={() => {
-                                    setFormData(prev => ({ ...prev, payType: type, accId: '' }));
-                                    setShowPayTypeModal(false);
-                                }}
-                                className="w-full text-left px-4 py-3 text-sm font-bold text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-md transition-colors flex items-center justify-between group"
-                            >
+        <SimpleModal isOpen={showPayTypeModal} onClose={() => setShowPayTypeModal(false)} title="Select Settlement Mode" maxWidth="max-w-md">
+            <div className="p-4 font-['Tahoma'] space-y-2">
+                <div className="grid grid-cols-1 gap-2">
+                    {['Cash', 'Cheque', 'Online', 'Petty Cash', 'Settlement'].map((type, idx) => (
+                        <button 
+                            key={idx} 
+                            onClick={() => {
+                                setFormData(prev => ({ ...prev, payType: type, accId: '' }));
+                                setShowPayTypeModal(false);
+                            }}
+                            className="w-full h-12 flex items-center justify-between px-6 border border-gray-100 rounded-xl hover:bg-blue-50/50 hover:border-blue-200 transition-all group font-bold text-gray-700"
+                        >
+                            <span className="flex items-center gap-4">
+                                <span className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-[10px] text-gray-400 group-hover:bg-blue-100 group-hover:text-blue-600 transition-colors">{idx + 1}</span>
                                 {type}
-                                <ChevronDown size={14} className="opacity-0 group-hover:opacity-100 -rotate-90 transition-all" />
-                            </button>
-                        ))}
-                    </div>
+                            </span>
+                            <ChevronDown size={16} className="-rotate-90 text-gray-300 group-hover:text-blue-400 transition-all" />
+                        </button>
+                    ))}
                 </div>
             </div>
-        )}
+        </SimpleModal>
 
         {/* Payment Account Search Modal */}
-        {showAccModal && (
-            <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4">
-                <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setShowAccModal(false)} />
-                <div className="relative w-full max-w-2xl bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col max-h-[85vh]">
-                    <div className="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-50 font-['Plus_Jakarta_Sans']">
-                        <h3 className="text-lg font-bold text-slate-800 tracking-tight">Search Payment Accounts ({formData.payType})</h3>
-                        <div className="flex gap-4">
-                            <input type="text" placeholder="Search accounts..." className="h-9 border border-gray-300 px-3 text-sm rounded-md w-64 focus:border-blue-500 outline-none" value={accSearch} onChange={(e) => setAccSearch(e.target.value)} />
-                            <button onClick={() => setShowAccModal(false)} className="w-8 h-8 flex items-center justify-center hover:bg-red-50 text-slate-400 hover:text-red-500 transition-colors rounded-full"><X size={24} /></button>
-                        </div>
-                    </div>
-                    <div className="overflow-y-auto p-2 font-['Inter']">
-                        <table className="w-full text-sm text-left">
-                            <thead className="bg-slate-50 sticky top-0 text-gray-600 font-bold uppercase text-[11px] tracking-wider">
-                                <tr>
-                                    <th className="p-3 border-b">Code</th>
-                                    <th className="p-3 border-b">Account Name</th>
-                                    <th className="p-3 border-b text-center">Action</th>
+        <SimpleModal isOpen={showAccModal} onClose={() => setShowAccModal(false)} title={`Origin Accounts (${formData.payType})`} maxWidth="max-w-xl">
+             <div className="flex flex-col h-full font-['Tahoma']">
+                <div className="p-4 bg-slate-50 border-b border-gray-100 flex items-center justify-between mb-2">
+                    <span className="text-[12px] font-bold text-gray-500 uppercase tracking-tight">Search Available Ledgers</span>
+                    <input 
+                        type="text" 
+                        placeholder="Filter accounts" 
+                        className="h-9 border border-gray-300 px-3 text-sm rounded-[5px] w-72 focus:border-[#0285fd] outline-none shadow-sm" 
+                        value={accSearch} 
+                        onChange={(e) => setAccSearch(e.target.value)} 
+                    />
+                </div>
+                <div className="overflow-y-auto max-h-[50vh] custom-scrollbar">
+                    <table className="w-full text-sm text-left">
+                        <thead className="bg-[#f8fafc] sticky top-0 text-gray-600 font-bold uppercase text-[11px] tracking-wider z-10 shadow-sm leading-8">
+                            <tr>
+                                <th className="px-3 border-b">Code</th>
+                                <th className="px-3 border-b">Account Descriptor</th>
+                                <th className="px-3 border-b text-center w-24">Select</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-100">
+                            {availableAccounts.filter(a => (a.name || '').toLowerCase().includes(accSearch.toLowerCase()) || (a.code || '').toLowerCase().includes(accSearch.toLowerCase())).map((a, idx) => (
+                                <tr key={idx} className="hover:bg-blue-50/50 transition-colors border-b border-gray-50">
+                                    <td className="p-3 font-mono font-bold text-gray-700">{a.code}</td>
+                                    <td className="p-3 font-mono uppercase text-gray-700">{a.name}</td>
+                                    <td className="p-3 text-center">
+                                        <button onClick={() => {
+                                            setFormData(prev => ({ ...prev, accId: a.code }));
+                                            setShowAccModal(false);
+                                        }} className="bg-[#0078d4] text-white text-[10px] px-3 py-1 rounded-sm font-bold hover:bg-[#005a9e] shadow-sm transition-all active:scale-95 uppercase tracking-wider">SELECT</button>
+                                    </td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                {availableAccounts.filter(a => (a.name || '').toLowerCase().includes(accSearch.toLowerCase()) || (a.code || '').toLowerCase().includes(accSearch.toLowerCase())).map((a, idx) => (
-                                    <tr key={idx} className="hover:bg-blue-50 transition-colors cursor-pointer" onClick={() => {
-                                        setFormData(prev => ({ ...prev, accId: a.code }));
-                                        setShowAccModal(false);
-                                    }}>
-                                        <td className="p-3 border-b font-medium text-gray-700">{a.code}</td>
-                                        <td className="p-3 border-b font-medium uppercase text-blue-600">{a.name}</td>
-                                        <td className="p-3 border-b text-center">
-                                            <button className="bg-[#0078d4] text-white text-[10px] px-3 py-1.5 rounded-sm font-bold hover:bg-[#005a9e]">SELECT</button>
-                                        </td>
-                                    </tr>
-                                ))}
-                                {availableAccounts.length === 0 && (
-                                    <tr><td colSpan="3" className="p-8 text-center text-gray-400 font-medium">Please select a Payment Method first.</td></tr>
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
+                            ))}
+                        </tbody>
+                    </table>
                 </div>
             </div>
-        )}
+        </SimpleModal>
         </>
     );
 };
@@ -615,7 +628,7 @@ const ActionButton = ({ label, onClick }) => (
 
 const StatRow = ({ label, value, isEmpty, emphasized }) => (
     <div className="flex items-center justify-between gap-4">
-        <label className="text-[12px] font-bold text-gray-700 whitespace-nowrap">{label}</label>
+        <label className="text-[12.5px] font-bold text-gray-700 whitespace-nowrap">{label}</label>
         <input 
             type="text" 
             value={value}

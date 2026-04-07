@@ -3,6 +3,9 @@ import SimpleModal from '../components/SimpleModal';
 import { Search, Calendar, RefreshCw, X, Save, RotateCcw, Loader2, Landmark, Wallet, Layers, Users } from 'lucide-react';
 import { pettyCashService } from '../services/pettyCash.service';
 import { toast } from 'react-hot-toast';
+import CalendarModal from '../components/CalendarModal';
+import CustomerMasterBoard from '../components/modals/MasterSubModal/CustomerMasterBoard';
+import NewAccountBoard from '../pages/NewAccountBoard';
 
 const PettyCashBoard = ({ isOpen, onClose }) => {
     const company = localStorage.getItem('companyCode') || 'C002';
@@ -52,6 +55,18 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
     const [showExpAccModal, setShowExpAccModal] = useState(false);
     const [expAccSearch, setExpAccSearch] = useState('');
     const [expIndex, setExpIndex] = useState(null);
+
+    const [showDateModal, setShowDateModal] = useState(false);
+    const [showDueDateModal, setShowDueDateModal] = useState(false);
+
+    const [showCustomerMasterBoard, setShowCustomerMasterBoard] = useState(false);
+    const [showAccountBoard, setShowAccountBoard] = useState(false);
+
+    const formatDate = (dateString) => {
+        if (!dateString) return '';
+        const d = new Date(dateString);
+        return d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+    };
 
     const fetchBalance = useCallback(async () => {
         if (formData.account && formData.costCenter) {
@@ -154,33 +169,32 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                 title="Petty Cash Entry"
                 maxWidth="max-w-[1100px]"
                 footer={
-                    <div className="bg-slate-50 px-6 py-4 w-full flex justify-end gap-3 border-t border-gray-100 rounded-b-xl">
-                        <button onClick={() => { fetchLookups(); handleGenerateDoc(); }} className="px-6 h-10 bg-slate-100 text-slate-600 text-sm font-bold rounded-md hover:bg-slate-200 transition-all active:scale-95 flex items-center justify-center gap-2 border-none">
-                            <RefreshCw size={14} className="text-[#0078d4]" />
-                            Refresh
-                        </button>
-                        <button onClick={handleSave} disabled={loading} className={`px-6 h-10 bg-[#0078d4] text-white text-sm font-bold rounded-md shadow-md shadow-blue-200 hover:bg-[#005a9e] transition-all active:scale-95 flex items-center justify-center gap-2 ${loading ? 'opacity-50' : ''}`}>
-                            {loading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
-                            Save
-                        </button>
-                        <button onClick={handleClear} className="px-6 h-10 bg-slate-100 text-slate-600 text-sm font-bold rounded-md hover:bg-slate-200 transition-all active:scale-95 flex items-center gap-2 border-none">
-                            <RotateCcw size={14} /> Clear
-                        </button>
-                        <button onClick={onClose} className="px-6 h-10 bg-slate-100 text-slate-600 text-sm font-bold rounded-md hover:bg-slate-200 transition-all active:scale-95 flex items-center gap-2 border-none">
-                            <X size={14} /> Exit
-                        </button>
+                    <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-gray-100 rounded-b-xl gap-3">
+                        <div className="flex gap-3">
+                            <button onClick={() => setShowCustomerMasterBoard(true)} className="px-6 h-10 bg-indigo-50/50 backdrop-blur-md border border-indigo-200 text-indigo-700 text-sm font-bold rounded-[5px] shadow-sm hover:bg-indigo-100/80 transition-all active:scale-95 flex items-center gap-2">
+                                <Users size={14} /> NEW CUSTOMER
+                            </button>
+                            <button onClick={() => setShowAccountBoard(true)} className="px-6 h-10 bg-teal-50/50 backdrop-blur-md border border-teal-200 text-teal-700 text-sm font-bold rounded-[5px] shadow-sm hover:bg-teal-100/80 transition-all active:scale-95 flex items-center gap-2">
+                                <Layers size={14} /> NEW ACCOUNT
+                            </button>
+                        </div>
+                        <div className="flex gap-3">
+                            <button onClick={handleClear} className="px-6 h-10 bg-[#00adff] text-white text-sm font-bold rounded-[5px] hover:bg-[#0099e6] transition-all active:scale-95 flex items-center gap-2 border-none">
+                                <RotateCcw size={14} /> CLEAR FORM
+                            </button>
+                            <button onClick={handleSave} disabled={loading} className={`px-6 h-10 bg-[#2bb744] text-white text-sm font-bold rounded-[5px] shadow-md shadow-green-100 hover:bg-[#259b3a] transition-all active:scale-95 flex items-center justify-center gap-2 ${loading ? 'opacity-50' : ''}`}>
+                                {loading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
+                                SAVE TRANSACTION
+                            </button>
+                        </div>
                     </div>
                 }
             >
-                <div className="space-y-4 p-1 font-['Inter'] text-slate-700">
+                <div className="space-y-4 p-1 font-['Tahoma',_sans-serif] text-slate-700">
                     {/* 1. Header Information Section */}
-                    <div className="grid grid-cols-12 gap-x-10 gap-y-2.5 bg-white p-5 border border-gray-200 rounded shadow-sm relative overflow-hidden">
-                        <div className="absolute top-0 right-0 p-4 opacity-[0.03] pointer-events-none">
-                            <Wallet size={120} />
-                        </div>
-
+                    <div className="grid grid-cols-12 gap-x-10 gap-y-4 bg-white p-5 border border-gray-200 rounded-[5px] shadow-sm relative overflow-hidden">
                         {/* Left & Middle Column Fields */}
-                        <div className="col-span-8 space-y-2.5">
+                        <div className="col-span-8 space-y-4">
                             <div className="flex items-center justify-between gap-4">
                                 <FormRow label="Doc No" width="w-24">
                                     <div className="flex gap-1 w-48">
@@ -188,22 +202,20 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                                             type="text"
                                             value={formData.docNo}
                                             readOnly
-                                            className="flex-1 h-7 border border-[#0078d4]/30 px-2 text-[12px] font-black text-[#0078d4] outline-none bg-blue-50/30 rounded-sm"
+                                            className="flex-1 h-9 border border-gray-200 px-2 text-sm font-bold text-[#0285fd] outline-none bg-gray-50 rounded-[5px]"
                                         />
-                                        <button className="w-8 h-7 bg-[#0078d4] text-white flex items-center justify-center hover:bg-[#005a9e] rounded-sm transition-colors shadow-sm">
+                                        <button className="w-9 h-9 shrink-0 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-colors border-none shadow-sm">
                                             <Search size={14} />
                                         </button>
                                     </div>
                                 </FormRow>
                                 <FormRow label="Date">
-                                    <div className="flex items-center border border-gray-300 bg-white h-7 w-44 rounded-sm shadow-sm px-2 hover:border-blue-400 transition-colors">
-                                        <input
-                                            type="date"
-                                            value={formData.date}
-                                            onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                                            className="flex-1 text-[12px] outline-none bg-transparent font-bold text-slate-700"
-                                        />
-                                        <Calendar size={12} className="text-blue-500" />
+                                    <div
+                                        className="flex items-center border border-gray-300 bg-white h-9 w-[180px] rounded-[5px] px-3 hover:border-[#0285fd] transition-colors cursor-pointer group shadow-sm"
+                                        onClick={() => setShowDateModal(true)}
+                                    >
+                                        <span className="flex-1 text-[13px] font-bold text-gray-700 capitalize">{formatDate(formData.date)}</span>
+                                        <Calendar size={14} className="text-gray-400 group-hover:text-[#0285fd]" />
                                     </div>
                                 </FormRow>
                             </div>
@@ -214,18 +226,17 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                                         type="text"
                                         readOnly
                                         value={formData.account ? `${formData.account} - ${lookups.pettyAccounts.find(a => a.code === formData.account)?.name || ''}` : ''}
-                                        placeholder="Select Petty Cash Account..."
-                                        className="flex-1 h-7 border border-gray-300 px-2 text-[12px] bg-gray-50 outline-none rounded-sm font-bold text-slate-700"
+                                        className="flex-1 h-9 border border-gray-300 px-2 text-sm bg-gray-50 outline-none rounded-[5px] font-medium text-slate-700"
                                     />
-                                    <button onClick={() => setShowAccModal(true)} className="w-8 h-7 bg-[#0078d4] text-white flex items-center justify-center hover:bg-[#005a9e] rounded-sm transition-colors shadow-sm">
+                                    <button onClick={() => setShowAccModal(true)} className="w-9 h-9 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-colors shadow-sm">
                                         <Search size={14} />
                                     </button>
                                 </div>
                             </FormRow>
 
-                            <div className="bg-slate-50/50 p-3 border border-gray-200 space-y-2.5 rounded shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]">
-                                <FormRow label="Vender" width="w-24">
-                                    <div className="flex-1 flex gap-2 items-center">
+                            <div className="bg-gray-50/50 p-4 border border-gray-200 space-y-3 rounded-[5px]">
+                                <FormRow label="Vendor" width="w-24">
+                                    <div className="flex-1 flex gap-3 items-center">
                                         <label className="flex items-center gap-2 cursor-pointer select-none">
                                             <input
                                                 type="checkbox"
@@ -233,28 +244,27 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                                                 onChange={(e) => setFormData({ ...formData, isVendor: e.target.checked, vendorId: '', payee: '' })}
                                                 className="w-4 h-4 rounded border-gray-300 text-[#0078d4] focus:ring-blue-500 transition-all"
                                             />
-                                            <span className="text-[10px] font-black text-slate-500 uppercase tracking-tight">Active Vendor</span>
+                                            <span className="text-xs font-bold text-slate-600 uppercase tracking-tight">Active Vendor</span>
                                         </label>
                                         <div className="flex-1 flex gap-1">
                                             <input
                                                 type="text"
                                                 readOnly
                                                 value={formData.vendorId || ''}
-                                                placeholder="Vendor ID..."
-                                                className="w-48 h-7 border border-gray-300 px-2 text-[12px] outline-none bg-gray-100 font-bold rounded-sm"
+                                                placeholder="ID"
+                                                className="w-24 h-8 border border-gray-300 px-2 text-sm outline-none bg-gray-50 rounded-[5px] font-mono"
                                             />
                                             <input
                                                 type="text"
                                                 readOnly={formData.isVendor}
                                                 value={formData.payee}
                                                 onChange={(e) => setFormData({ ...formData, payee: e.target.value })}
-                                                placeholder="Payee Name..."
-                                                className={`flex-1 h-7 border border-gray-300 px-2 text-[12px] outline-none rounded-sm ${formData.isVendor ? 'bg-gray-50 font-bold text-slate-800' : 'bg-white'}`}
+                                                className={`flex-1 h-9 border border-gray-300 px-2 text-sm outline-none rounded-[5px] ${formData.isVendor ? 'bg-gray-50 font-bold text-slate-800' : 'bg-white shadow-inner'}`}
                                             />
                                             <button
                                                 disabled={!formData.isVendor}
                                                 onClick={() => setShowVendorModal(true)}
-                                                className={`w-8 h-7 flex items-center justify-center rounded-sm transition-colors shadow-sm ${formData.isVendor ? 'bg-[#0078d4] text-white hover:bg-[#005a9e]' : 'bg-gray-100 text-gray-400'}`}
+                                                className={`w-9 h-9 flex items-center justify-center rounded-[5px] transition-colors ${formData.isVendor ? 'bg-[#0285fd] text-white hover:bg-[#0073ff]' : 'bg-gray-100 text-gray-400'}`}
                                             >
                                                 <Search size={14} />
                                             </button>
@@ -263,69 +273,65 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                                 </FormRow>
                             </div>
 
-                            <FormRow label="Cost Center" width="w-24">
-                                <div className="flex-1 flex gap-1 items-center">
-                                    <input
-                                        type="text"
-                                        readOnly
-                                        value={lookups.costCenters.find(c => c.code === formData.costCenter)?.name || ''}
-                                        placeholder="Select Cost Center..."
-                                        className="flex-1 h-7 border border-gray-300 px-2 text-[12px] bg-gray-50 rounded-sm outline-none"
-                                    />
-                                    <button onClick={() => { setCcSource('header'); setShowCCModal(true); }} className="w-8 h-7 bg-[#0078d4] text-white flex items-center justify-center hover:bg-[#005a9e] rounded-sm transition-colors shadow-sm">
-                                        <Search size={14} />
-                                    </button>
-                                </div>
-                            </FormRow>
-
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-2 gap-6">
+                                <FormRow label="Cost Center">
+                                    <div className="flex-1 flex gap-1 items-center">
+                                        <input
+                                            type="text"
+                                            readOnly
+                                            value={lookups.costCenters.find(c => c.code === formData.costCenter)?.name || ''}
+                                            className="flex-1 h-9 border border-gray-300 px-2 text-sm bg-gray-50 rounded-[5px]"
+                                        />
+                                        <button onClick={() => { setCcSource('header'); setShowCCModal(true); }} className="w-9 h-9 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] border-none shadow-sm">
+                                            <Search size={14} />
+                                        </button>
+                                    </div>
+                                </FormRow>
                                 <FormRow label="Location">
                                     <input
                                         type="text"
                                         value={formData.location}
                                         onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                                        className="flex-1 h-7 border border-gray-300 px-2 text-[12px] outline-none rounded-sm hover:border-blue-300 focus:border-blue-500 transition-colors"
-                                    />
-                                </FormRow>
-                                <FormRow label="Memo">
-                                    <input
-                                        type="text"
-                                        value={formData.memo}
-                                        onChange={(e) => setFormData({ ...formData, memo: e.target.value })}
-                                        className="flex-1 h-7 border border-gray-300 px-2 text-[12px] outline-none rounded-sm hover:border-blue-300 focus:border-blue-500 transition-colors"
+                                        className="flex-1 h-9 border border-gray-300 px-2 text-sm outline-none rounded-[5px] focus:border-blue-500 bg-white"
                                     />
                                 </FormRow>
                             </div>
+
+                            <FormRow label="Memo/Rem" width="w-24">
+                                <input
+                                    type="text"
+                                    value={formData.memo}
+                                    onChange={(e) => setFormData({ ...formData, memo: e.target.value })}
+                                    className="flex-1 h-9 border border-gray-300 px-2 text-sm outline-none rounded-[5px] focus:border-blue-500 bg-white"
+                                />
+                            </FormRow>
                         </div>
 
                         {/* Right Column Fields */}
-                        <div className="col-span-4 space-y-3 pl-6 border-l border-slate-100 flex flex-col justify-center">
-                            <div className="flex items-center justify-between bg-blue-50/50 p-2 rounded-sm border border-blue-100/50">
-                                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest leading-none">Account Balance</label>
-                                <div className="text-lg font-black text-[#0078d4] tabular-nums leading-none">
-                                    <span className="text-[10px] font-bold text-slate-400 mr-1 italic">LKR</span>
+                        <div className="col-span-4 space-y-4 pl-6 border-l border-gray-100 flex flex-col justify-center">
+                            <div className="bg-blue-50/50 p-3 rounded-[5px] border border-blue-100">
+                                <label className="text-xs font-bold text-blue-600 uppercase tracking-tight mb-1 block text-center">Petty A/C Balance</label>
+                                <div className="text-2xl font-bold text-[#0285fd] text-center tabular-nums">
                                     {balance.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                 </div>
                             </div>
 
-                            <div className="space-y-2 pt-2">
+                            <div className="space-y-3 pt-2">
                                 <FormRow label="Vouch No">
                                     <input
                                         type="text"
                                         value={formData.vouchNo}
                                         onChange={(e) => setFormData({ ...formData, vouchNo: e.target.value })}
-                                        className="w-full h-7 border border-gray-300 px-2 text-[12px] outline-none rounded-sm shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]"
+                                        className="w-full h-9 border border-gray-300 px-2 text-sm outline-none rounded-[5px] bg-white font-bold"
                                     />
                                 </FormRow>
                                 <FormRow label="Due Date">
-                                    <div className="flex items-center border border-gray-300 bg-white h-7 w-full rounded-sm px-2">
-                                        <input
-                                            type="date"
-                                            value={formData.dueDate}
-                                            onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
-                                            className="flex-1 text-[12px] outline-none bg-transparent"
-                                        />
-                                        <Calendar size={12} className="text-slate-400" />
+                                    <div
+                                        className="flex items-center border border-gray-300 bg-white h-9 w-full rounded-[5px] px-3 hover:border-[#0285fd] transition-colors cursor-pointer group shadow-sm mt-1"
+                                        onClick={() => setShowDueDateModal(true)}
+                                    >
+                                        <span className="flex-1 text-[13px] font-bold text-gray-700 capitalize">{formatDate(formData.dueDate)}</span>
+                                        <Calendar size={14} className="text-gray-400 group-hover:text-[#0285fd]" />
                                     </div>
                                 </FormRow>
                                 <FormRow label="Ref No">
@@ -333,16 +339,16 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                                         type="text"
                                         value={formData.refNo}
                                         onChange={(e) => setFormData({ ...formData, refNo: e.target.value })}
-                                        className="w-full h-7 border border-gray-300 px-2 text-[12px] outline-none rounded-sm shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]"
+                                        className="w-full h-9 border border-gray-300 px-2 text-sm outline-none rounded-[5px] bg-white"
                                     />
                                 </FormRow>
-                                <FormRow label="Vou. Amount">
+                                <FormRow label="Pay. Amount">
                                     <div className="flex-1 relative flex items-center">
                                         <input
                                             type="number"
                                             value={formData.billAmount}
                                             onChange={(e) => setFormData({ ...formData, billAmount: e.target.value })}
-                                            className="w-full h-8 border border-blue-200 px-2 text-right text-[14px] font-black text-[#0078d4] outline-none bg-blue-50/20 rounded-sm shadow-sm"
+                                            className="w-full h-10 border-2 border-[#0285fd] px-3 text-right text-lg font-bold text-[#0285fd] outline-none bg-white rounded-[5px]"
                                         />
                                     </div>
                                 </FormRow>
@@ -351,24 +357,24 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                     </div>
 
                     {/* 2. Tabs & Items Table Section */}
-                    <div className="space-y-0">
-                        <div className="flex">
+                    <div className="space-y-2">
+                        <div className="flex gap-1">
                             {['Expenses', 'Cost Center'].map(tab => (
                                 <button
                                     key={tab}
                                     onClick={() => setSelectedTab(tab)}
-                                    className={`px-10 py-2.5 text-[11px] font-black border-t border-x rounded-t-md transition-all uppercase tracking-widest ${selectedTab === tab ? 'bg-white border-gray-300 text-[#0078d4] shadow-sm z-10' : 'bg-slate-50 border-transparent text-slate-400 hover:bg-white hover:text-slate-600'}`}
+                                    className={`px-12 py-2.5 text-xs font-bold border rounded-t-[8px] transition-all uppercase tracking-tight ${selectedTab === tab ? 'bg-[#ecc913] border-[#ecc913] text-white shadow-md z-10' : 'bg-gray-50 border-gray-200 text-slate-500 hover:bg-white hover:text-[#0285fd]'}`}
                                 >
                                     {tab}
                                 </button>
                             ))}
                         </div>
 
-                        <div className="border border-gray-300 rounded-b-lg shadow-sm bg-white overflow-hidden -mt-[1px]">
+                        <div className="border border-gray-200 rounded-[5px] shadow-sm bg-white overflow-hidden">
                             <table className="w-full text-left border-collapse">
-                                <thead className="bg-[#f8fafd] border-b border-gray-200 text-slate-600 text-[10px] font-black uppercase tracking-[0.1em] sticky top-0">
+                                <thead className="bg-slate-50 border-b border-gray-200 text-slate-600 text-xs font-bold uppercase tracking-tight sticky top-0">
                                     <tr>
-                                        <th className="px-4 py-3 border-r border-gray-200">#</th>
+                                        <th className="px-4 py-3 border-r border-gray-200 w-16 text-center">#</th>
                                         <th className="px-4 py-3 border-r border-gray-200">Expense Account</th>
                                         <th className="px-4 py-3 border-r border-gray-200 w-64">Cost Center</th>
                                         <th className="px-4 py-3 border-r border-gray-200 w-44 text-right">Amount</th>
@@ -377,33 +383,31 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                                 </thead>
                                 <tbody className="divide-y divide-gray-100 min-h-[160px]">
                                     {rows.map((row, idx) => (
-                                        <tr key={row.id} className="border-b border-gray-100 hover:bg-blue-50/30 transition-colors">
-                                            <td className="px-4 py-2 text-center text-[11px] font-black text-slate-300">{idx + 1}</td>
+                                        <tr key={row.id} className="border-b border-gray-50 hover:bg-slate-50/50 transition-colors">
+                                            <td className="px-4 py-2 text-center text-xs font-bold text-slate-400">{idx + 1}</td>
                                             <td className="px-1 py-1 border-r border-gray-100">
-                                                <div className="flex gap-1 items-center">
+                                                <div className="flex gap-2 items-center px-1">
                                                     <input
                                                         type="text"
                                                         readOnly
                                                         value={lookups.expenseAccounts.find(e => e.code === row.accCode)?.name || ''}
-                                                        placeholder="Select Account..."
-                                                        className="flex-1 h-7 px-2 text-[12px] outline-none bg-white border border-gray-200 rounded-sm font-semibold text-slate-700"
+                                                        className="flex-1 h-8 px-2 text-sm outline-none bg-white border border-gray-200 rounded-[5px] font-medium text-slate-700 focus:border-blue-400"
                                                     />
-                                                    <button onClick={() => { setExpIndex(idx); setShowExpAccModal(true); }} className="w-7 h-7 bg-blue-50 text-[#0078d4] flex items-center justify-center hover:bg-blue-100 rounded-sm transition-colors border border-blue-100/50">
-                                                        <Search size={12} />
+                                                    <button onClick={() => { setExpIndex(idx); setShowExpAccModal(true); }} className="w-8 h-8 bg-blue-50/50 backdrop-blur-md border border-blue-200 text-[#0078d4] flex items-center justify-center hover:bg-blue-100/80 rounded-[5px] transition-all shadow-sm active:scale-90">
+                                                        <Search size={14} />
                                                     </button>
                                                 </div>
                                             </td>
                                             <td className="px-1 py-1 border-r border-gray-100">
-                                                <div className="flex gap-1 items-center">
+                                                <div className="flex gap-2 items-center px-1">
                                                     <input
                                                         type="text"
                                                         readOnly
                                                         value={lookups.costCenters.find(cc => cc.code === row.costCode)?.name || ''}
-                                                        placeholder="Default Cost Center..."
-                                                        className="flex-1 h-7 border border-gray-200 px-2 text-[12px] outline-none bg-white rounded-sm font-medium text-slate-600"
+                                                        className="flex-1 h-8 border border-gray-200 px-2 text-sm outline-none bg-white rounded-[5px] font-medium text-slate-600"
                                                     />
-                                                    <button onClick={() => { setCcSource('line'); setCcIndex(idx); setShowCCModal(true); }} className="w-7 h-7 bg-blue-50 text-[#0078d4] flex items-center justify-center hover:bg-blue-100 rounded-sm transition-colors border border-blue-100/50">
-                                                        <Search size={12} />
+                                                    <button onClick={() => { setCcSource('line'); setCcIndex(idx); setShowCCModal(true); }} className="w-8 h-8 bg-blue-50/50 backdrop-blur-md border border-blue-200 text-[#0078d4] flex items-center justify-center hover:bg-blue-100/80 rounded-[5px] transition-all shadow-sm active:scale-90">
+                                                        <Search size={14} />
                                                     </button>
                                                 </div>
                                             </td>
@@ -415,7 +419,7 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                                                         handleRowUpdate(row.id, 'amount', e.target.value);
                                                         if (idx === rows.length - 1 && e.target.value > 0) addRow();
                                                     }}
-                                                    className="w-full h-7 px-2 text-[12px] text-right outline-none font-bold text-slate-800 border border-transparent focus:border-blue-300 rounded-sm tabular-nums"
+                                                    className="w-full h-8 px-2 text-sm text-right outline-none font-bold text-slate-800 border-transparent focus:border-blue-400 focus:bg-white rounded-[5px] tabular-nums"
                                                 />
                                             </td>
                                             <td className="px-1 py-1">
@@ -423,16 +427,15 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                                                     type="text"
                                                     value={row.memo}
                                                     onChange={(e) => handleRowUpdate(row.id, 'memo', e.target.value)}
-                                                    className="w-full h-7 px-2 text-[12px] outline-none text-slate-600 italic border border-transparent focus:border-blue-300 rounded-sm"
-                                                    placeholder="Enter line details..."
+                                                    className="w-full h-8 px-2 text-sm outline-none text-slate-600 italic border-transparent focus:border-blue-400 focus:bg-white rounded-[5px]"
                                                 />
                                             </td>
                                         </tr>
                                     ))}
-                                    <tr className="h-12 bg-slate-50/10">
+                                    <tr className="h-10">
                                         <td colSpan={5}>
-                                            <button onClick={addRow} className="w-full h-full text-[10px] font-black text-blue-500 uppercase tracking-widest hover:bg-blue-50 transition-colors flex items-center justify-center gap-2">
-                                                + ADD NEW TRANSACTION LINE
+                                            <button onClick={addRow} className="w-full h-full text-xs font-bold text-slate-400 uppercase tracking-widest hover:bg-slate-50 hover:text-slate-800 transition-colors flex items-center justify-center gap-2">
+                                                + Click to Add Another Line Item
                                             </button>
                                         </td>
                                     </tr>
@@ -442,39 +445,27 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                     </div>
 
                     {/* 3. Bottom Actions & Totals Area */}
-                    <div className="flex items-center justify-between pt-2 border-t border-slate-100 mt-2">
-                        <div className="flex gap-4 items-center">
-                            <div className="flex items-center gap-1 group cursor-pointer transition-all hover:translate-x-1">
-                                <Users size={14} className="text-blue-400" />
-                                <span className="text-[10px] font-black text-blue-600 uppercase tracking-tight">New Customer</span>
-                            </div>
-                            <div className="h-4 w-[1px] bg-slate-200" />
-                            <div className="flex items-center gap-1 group cursor-pointer transition-all hover:translate-x-1">
-                                <Layers size={14} className="text-blue-400" />
-                                <span className="text-[10px] font-black text-blue-600 uppercase tracking-tight">New Account</span>
-                            </div>
-                        </div>
+                    <div className="flex items-center justify-end pt-2 border-t border-slate-100 mt-2">
 
                         <div className="flex items-center gap-10">
                             <label className="flex items-center gap-3 cursor-pointer group">
                                 <div className="relative flex items-center justify-center">
                                     <input type="checkbox" className="w-5 h-5 rounded border-gray-300 text-[#0078d4] focus:ring-blue-500 shadow-sm transition-all" />
                                 </div>
-                                <span className="text-[11px] font-black text-slate-500 uppercase tracking-tight group-hover:text-[#0078d4] transition-colors">Queue for Printing</span>
+                                <span className="text-xs font-bold text-slate-600 uppercase tracking-tight group-hover:text-[#0078d4] transition-colors">Queue for Printing</span>
                             </label>
 
                             <div className="flex items-center gap-6 bg-blue-50/50 px-6 py-3 rounded-sm border border-blue-100 shadow-sm">
                                 <div className="flex flex-col items-end">
-                                    <span className="text-[9px] font-black text-slate-500 uppercase tracking-[0.2em] leading-none mb-1">Difference</span>
-                                    <div className={`text-sm font-black tabular-nums tracking-tighter ${difference === 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                    <span className="text-xs font-bold text-slate-500 uppercase tracking-tight leading-none mb-1">Difference</span>
+                                    <div className={`text-sm font-bold tabular-nums tracking-tighter ${difference === 0 ? 'text-green-600' : 'text-red-600'}`}>
                                         {difference.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                     </div>
                                 </div>
                                 <div className="h-8 w-[1px] bg-blue-200/50 mx-2" />
                                 <div className="flex flex-col items-end">
-                                    <span className="text-[9px] font-black text-[#0078d4] uppercase tracking-[0.2em] leading-none mb-1">Total Distribution</span>
-                                    <div className="text-2xl font-black text-[#0078d4] tabular-nums tracking-tighter flex items-baseline gap-1">
-                                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">LKR</span>
+                                    <span className="text-xs font-bold text-[#0078d4] uppercase tracking-tight leading-none mb-1">Total Distribution</span>
+                                    <div className="text-2xl font-bold text-[#0285fd] tabular-nums tracking-tighter flex items-baseline gap-1">
                                         {totalAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                     </div>
                                 </div>
@@ -487,76 +478,253 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
             {/* --- MODALS --- */}
 
             {/* Petty Account Search Modal */}
-            {showAccModal && (
-                <SearchModal
-                    title="Search Petty Cash Accounts"
-                    query={accSearch}
-                    setQuery={setAccSearch}
-                    onClose={() => setShowAccModal(false)}
-                    data={lookups.pettyAccounts}
-                    columns={[{ label: 'Code', key: 'code' }, { label: 'Account Name', key: 'name' }]}
-                    onSelect={(a) => {
-                        setFormData({ ...formData, account: a.code });
-                        setShowAccModal(false);
-                    }}
-                />
-            )}
+            <SimpleModal
+                isOpen={showAccModal}
+                onClose={() => setShowAccModal(false)}
+                title="Petty Cash Account Directory"
+                maxWidth="max-w-[650px]"
+            >
+                <div className="space-y-4 font-['Tahoma']">
+                    <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-lg border border-gray-100 mb-2">
+                        <span className="text-[12px] font-bold text-gray-500 uppercase tracking-widest">Global Search Facility</span>
+                        <div className="relative flex-1">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
+                            <input
+                                type="text"
+                                className="w-full h-9 pl-10 pr-4 border border-gray-300 rounded-[5px] outline-none text-sm focus:border-[#0285fd] bg-white shadow-sm"
+                                value={accSearch}
+                                onChange={(e) => setAccSearch(e.target.value)}
+                                autoFocus
+                            />
+                        </div>
+                    </div>
+
+                    <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm">
+                        <div className="max-h-[300px] overflow-y-auto no-scrollbar">
+                            <table className="w-full text-left">
+                                <thead className="bg-[#f8fafd] sticky top-0 text-[11px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-100">
+                                    <tr>
+                                        <th className="px-5 py-3">Account Code</th>
+                                        <th className="px-5 py-3">Account Title</th>
+                                        <th className="px-5 py-3 text-right">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-gray-50">
+                                    {lookups.pettyAccounts.filter(a => a.name?.toLowerCase().includes(accSearch.toLowerCase()) || a.code?.toLowerCase().includes(accSearch.toLowerCase())).map((a, i) => (
+                                        <tr key={i} className="group hover:bg-blue-50/50 cursor-pointer transition-colors" onClick={() => { setFormData({ ...formData, account: a.code }); setShowAccModal(false); }}>
+                                            <td className="px-5 py-3 font-mono text-[13px] font-bold text-[#0285fd]">{a.code}</td>
+                                            <td className="px-5 py-3 text-[13px] font-bold text-gray-600 uppercase italic transition-colors group-hover:text-blue-600">{a.name}</td>
+                                            <td className="px-5 py-3 text-right">
+                                                <button className="bg-blue-50/50 backdrop-blur-md border border-blue-200 text-[#0078d4] text-[10px] uppercase tracking-wider px-3 py-1 rounded-sm font-bold hover:bg-blue-100/80 shadow-sm transition-all active:scale-95">SELECT ACCOUNT</button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </SimpleModal>
 
             {/* Vendor Search Modal */}
-            {showVendorModal && (
-                <SearchModal
-                    title="Search Active Vendors"
-                    query={vendorSearch}
-                    setQuery={setVendorSearch}
-                    onClose={() => setShowVendorModal(false)}
-                    data={lookups.suppliers}
-                    columns={[{ label: 'Code', key: 'code' }, { label: 'Vendor Name', key: 'name' }]}
-                    onSelect={(v) => {
-                        setFormData({ ...formData, vendorId: v.code, payee: v.name });
-                        setShowVendorModal(false);
-                    }}
-                />
-            )}
+            <SimpleModal
+                isOpen={showVendorModal}
+                onClose={() => setShowVendorModal(false)}
+                title="Active Vendor Directory"
+                maxWidth="max-w-[650px]"
+            >
+                <div className="space-y-4 font-['Tahoma']">
+                    <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-lg border border-gray-100 mb-2">
+                        <span className="text-[12px] font-bold text-gray-500 uppercase tracking-widest">Vendor Search Facility</span>
+                        <div className="relative flex-1">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
+                            <input
+                                type="text"
+                                className="w-full h-9 pl-10 pr-4 border border-gray-300 rounded-[5px] outline-none text-sm focus:border-[#0285fd] bg-white shadow-sm"
+                                value={vendorSearch}
+                                onChange={(e) => setVendorSearch(e.target.value)}
+                                autoFocus
+                            />
+                        </div>
+                    </div>
+
+                    <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm">
+                        <div className="max-h-[300px] overflow-y-auto no-scrollbar">
+                            <table className="w-full text-left">
+                                <thead className="bg-[#f8fafd] sticky top-0 text-[11px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-100">
+                                    <tr>
+                                        <th className="px-5 py-3">Vendor ID</th>
+                                        <th className="px-5 py-3">Legal Name</th>
+                                        <th className="px-5 py-3 text-right">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-gray-50">
+                                    {lookups.suppliers.filter(v => v.name?.toLowerCase().includes(vendorSearch.toLowerCase()) || v.code?.toLowerCase().includes(vendorSearch.toLowerCase())).map((v, i) => (
+                                        <tr key={i} className="group hover:bg-blue-50/50 cursor-pointer transition-colors" onClick={() => { setFormData({ ...formData, vendorId: v.code, payee: v.name }); setShowVendorModal(false); }}>
+                                            <td className="px-5 py-3 font-mono text-[13px] font-bold text-[#0285fd]">{v.code}</td>
+                                            <td className="px-5 py-3 text-[13px] font-bold text-gray-600 uppercase italic group-hover:text-blue-600 transition-colors">{v.name}</td>
+                                            <td className="px-5 py-3 text-right">
+                                                <button className="bg-blue-50/50 backdrop-blur-md border border-blue-200 text-[#0078d4] text-[10px] uppercase tracking-wider px-3 py-1 rounded-sm font-bold hover:bg-blue-100/80 shadow-sm transition-all active:scale-95">SELECT VENDOR</button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </SimpleModal>
 
             {/* Cost Center Search Modal */}
-            {showCCModal && (
-                <SearchModal
-                    title="Search Cost Centers"
-                    query={ccSearch}
-                    setQuery={setCcSearch}
-                    onClose={() => setShowCCModal(false)}
-                    data={lookups.costCenters}
-                    columns={[{ label: 'Code', key: 'code' }, { label: 'Center Name', key: 'name' }]}
-                    onSelect={(c) => {
-                        if (ccSource === 'header') {
-                            setFormData({ ...formData, costCenter: c.code });
-                        } else if (ccIndex !== null) {
-                            const newRows = [...rows];
-                            newRows[ccIndex].costCode = c.code;
-                            setRows(newRows);
-                        }
-                        setShowCCModal(false);
+            <SimpleModal
+                isOpen={showCCModal}
+                onClose={() => setShowCCModal(false)}
+                title="Operational Cost Centers"
+                maxWidth="max-w-[650px]"
+            >
+                <div className="space-y-4 font-['Tahoma']">
+                    <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-lg border border-gray-100 mb-2">
+                        <span className="text-[12px] font-bold text-gray-500 uppercase tracking-widest">Search Facility</span>
+                        <div className="relative flex-1">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
+                            <input
+                                type="text"
+                                className="w-full h-9 pl-10 pr-4 border border-gray-300 rounded-[5px] outline-none text-sm focus:border-[#0285fd] bg-white shadow-sm"
+                                value={ccSearch}
+                                onChange={(e) => setCcSearch(e.target.value)}
+                                autoFocus
+                            />
+                        </div>
+                    </div>
+
+                    <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm">
+                        <div className="max-h-[300px] overflow-y-auto no-scrollbar">
+                            <table className="w-full text-left">
+                                <thead className="bg-[#f8fafd] sticky top-0 text-[11px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-100">
+                                    <tr>
+                                        <th className="px-5 py-3">Code</th>
+                                        <th className="px-5 py-3">Center Name</th>
+                                        <th className="px-5 py-3 text-right">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-gray-50">
+                                    {lookups.costCenters.filter(c => c.name?.toLowerCase().includes(ccSearch.toLowerCase()) || c.code?.toLowerCase().includes(ccSearch.toLowerCase())).map((c, i) => (
+                                        <tr key={i} className="group hover:bg-blue-50/50 cursor-pointer transition-colors" onClick={() => {
+                                            if (ccSource === 'header') {
+                                                setFormData({ ...formData, costCenter: c.code });
+                                            } else if (ccIndex !== null) {
+                                                const newRows = [...rows];
+                                                newRows[ccIndex].costCode = c.code;
+                                                setRows(newRows);
+                                            }
+                                            setShowCCModal(false);
+                                        }}>
+                                            <td className="px-5 py-3 font-mono text-[13px] font-bold text-[#0285fd]">{c.code}</td>
+                                            <td className="px-5 py-3 text-[13px] font-bold text-gray-700 uppercase italic group-hover:text-blue-600 transition-colors">{c.name}</td>
+                                            <td className="px-5 py-3 text-right">
+                                                <button className="bg-blue-50/50 backdrop-blur-md border border-blue-200 text-[#0078d4] text-[10px] uppercase tracking-wider px-3 py-1 rounded-sm font-bold hover:bg-blue-100/80 shadow-sm transition-all active:scale-95">SELECT CENTER</button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </SimpleModal>
+
+            {/* Expense Account Search Modal */}
+            <SimpleModal
+                isOpen={showExpAccModal}
+                onClose={() => setShowExpAccModal(false)}
+                title="GL Expense Account Directory"
+                maxWidth="max-w-[650px]"
+            >
+                <div className="space-y-4 font-['Tahoma']">
+                    <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-lg border border-gray-100 mb-2">
+                        <span className="text-[12px] font-bold text-gray-500 uppercase tracking-widest">Search Facility</span>
+                        <div className="relative flex-1">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
+                            <input
+                                type="text"
+                                className="w-full h-9 pl-10 pr-4 border border-gray-300 rounded-[5px] outline-none text-sm focus:border-[#0285fd] bg-white shadow-sm"
+                                value={expAccSearch}
+                                onChange={(e) => setExpAccSearch(e.target.value)}
+                                autoFocus
+                            />
+                        </div>
+                    </div>
+
+                    <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm">
+                        <div className="max-h-[300px] overflow-y-auto no-scrollbar">
+                            <table className="w-full text-left">
+                                <thead className="bg-[#f8fafd] sticky top-0 text-[11px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-100">
+                                    <tr>
+                                        <th className="px-5 py-3">GL Code</th>
+                                        <th className="px-5 py-3">Interaction Title</th>
+                                        <th className="px-5 py-3 text-right">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-gray-50">
+                                    {lookups.expenseAccounts.filter(e => e.name?.toLowerCase().includes(expAccSearch.toLowerCase()) || e.code?.toLowerCase().includes(expAccSearch.toLowerCase())).map((e, i) => (
+                                        <tr key={i} className="group hover:bg-blue-50/50 cursor-pointer transition-colors" onClick={() => {
+                                            if (expIndex !== null) {
+                                                const newRows = [...rows];
+                                                newRows[expIndex].accCode = e.code;
+                                                setRows(newRows);
+                                            }
+                                            setShowExpAccModal(false);
+                                        }}>
+                                            <td className="px-5 py-3 font-mono text-[13px] font-bold text-[#0285fd]">{e.code}</td>
+                                            <td className="px-5 py-3 text-[13px] font-bold text-gray-700 uppercase italic group-hover:text-blue-600 transition-colors">{e.name}</td>
+                                            <td className="px-5 py-3 text-right">
+                                                <button className="bg-blue-50/50 backdrop-blur-md border border-blue-200 text-[#0078d4] text-[10px] uppercase tracking-wider px-3 py-1 rounded-sm font-bold hover:bg-blue-100/80 shadow-sm transition-all active:scale-95">SELECT ACCOUNT</button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </SimpleModal>
+            {showDateModal && (
+                <CalendarModal
+                    isOpen={showDateModal}
+                    onClose={() => setShowDateModal(false)}
+                    currentDate={formData.date}
+                    onDateChange={(d) => {
+                        setFormData({ ...formData, date: d });
+                        setShowDateModal(false);
                     }}
+                    title="Select Ledger Posting Date"
                 />
             )}
 
-            {/* Expense Account Search Modal (Lines) */}
-            {showExpAccModal && (
-                <SearchModal
-                    title="Search Expense Accounts"
-                    query={expAccSearch}
-                    setQuery={setExpAccSearch}
-                    onClose={() => setShowExpAccModal(false)}
-                    data={lookups.expenseAccounts}
-                    columns={[{ label: 'Code', key: 'code' }, { label: 'Account Name', key: 'name' }]}
-                    onSelect={(e) => {
-                        if (expIndex !== null) {
-                            const newRows = [...rows];
-                            newRows[expIndex].accCode = e.code;
-                            setRows(newRows);
-                        }
-                        setShowExpAccModal(false);
+            {showDueDateModal && (
+                <CalendarModal
+                    isOpen={showDueDateModal}
+                    onClose={() => setShowDueDateModal(false)}
+                    currentDate={formData.dueDate}
+                    onDateChange={(d) => {
+                        setFormData({ ...formData, dueDate: d });
+                        setShowDueDateModal(false);
                     }}
+                    title="Select Document Due Date"
+                />
+            )}
+
+            {showCustomerMasterBoard && (
+                <CustomerMasterBoard
+                    isOpen={showCustomerMasterBoard}
+                    onClose={() => setShowCustomerMasterBoard(false)}
+                />
+            )}
+
+            {showAccountBoard && (
+                <NewAccountBoard
+                    isOpen={showAccountBoard}
+                    onClose={() => setShowAccountBoard(false)}
                 />
             )}
         </>
@@ -565,53 +733,11 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
 
 const FormRow = ({ label, children, width = "w-24" }) => (
     <div className="flex items-center min-h-[32px] gap-3">
-        <label className={`${width} shrink-0 text-[10px] font-black text-slate-500 uppercase tracking-widest leading-none`}>{label}</label>
+        <label className={`${width} shrink-0 text-xs font-bold text-gray-700 uppercase tracking-tight leading-none`}>{label}</label>
         {children}
     </div>
 );
 
-const SearchModal = ({ title, query, setQuery, onClose, data, columns, onSelect }) => (
-    <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4">
-        <div className="absolute inset-0 bg-slate-500/30 backdrop-blur-[2px]" onClick={onClose} />
-        <div className="relative w-full max-w-2xl bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col max-h-[85vh] font-['Inter']">
-            <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-slate-50/50">
-                <h3 className="text-base font-black text-slate-800 tracking-tight uppercase tracking-[0.05em]">{title}</h3>
-                <div className="flex gap-4">
-                    <div className="relative">
-                        <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                        <input type="text" placeholder="Search..." className="h-9 border border-gray-200 pl-9 pr-3 text-sm rounded-lg w-64 focus:border-blue-500 outline-none shadow-sm transition-all" value={query} onChange={(e) => setQuery(e.target.value)} autoFocus />
-                    </div>
-                    <button onClick={onClose} className="w-8 h-8 flex items-center justify-center hover:bg-white text-slate-400 hover:text-red-500 transition-all rounded-full border border-transparent hover:border-gray-200"><X size={20} /></button>
-                </div>
-            </div>
-            <div className="overflow-y-auto p-2">
-                <table className="w-full text-sm text-left">
-                    <thead className="bg-slate-50/50 sticky top-0 text-slate-400 font-black uppercase text-[10px] tracking-widest">
-                        <tr>
-                            {columns.map((col, idx) => <th key={idx} className="p-4 border-b border-slate-100">{col.label}</th>)}
-                            <th className="p-4 border-b border-slate-100 text-center">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {data.filter(item =>
-                            columns.some(col => (item[col.key] || '').toLowerCase().includes(query.toLowerCase()))
-                        ).map((item, idx) => (
-                            <tr key={idx} className="hover:bg-blue-50/50 transition-colors cursor-pointer group" onClick={() => onSelect(item)}>
-                                {columns.map((col, cIdx) => (
-                                    <td key={cIdx} className={`p-4 border-b border-slate-50 text-[13px] ${cIdx === 0 ? 'font-black text-slate-700' : 'font-medium text-slate-600'}`}>
-                                        {item[col.key]}
-                                    </td>
-                                ))}
-                                <td className="p-4 border-b border-slate-50 text-center">
-                                    <button className="bg-white text-[#0078d4] text-[10px] px-4 py-1.5 rounded-md font-black border border-blue-200 shadow-sm transition-all hover:bg-[#0078d4] hover:text-white uppercase tracking-tighter">SELECT</button>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-);
+
 
 export default PettyCashBoard;
