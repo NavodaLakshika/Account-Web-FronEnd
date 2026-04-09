@@ -607,10 +607,10 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
                                     </tr>
                                 ) : orders.map((order, i) => (
                                     <tr key={i} className="group hover:bg-blue-50/50 cursor-pointer transition-colors" onClick={() => handleSelectOrder(order.docNo)}>
-                                        <td className="px-5 py-3 font-mono text-[13px] font-black text-blue-700">{order.docNo}</td>
-                                        <td className="px-5 py-3 text-[13px] font-bold text-gray-600 uppercase italic">{order.date?.split('T')[0]}</td>
+                                        <td className="px-5 py-3 font-mono text-[13px] font-mono text-gray-600 ">{order.docNo}</td>
+                                        <td className="px-5 py-3 text-[13px] font-mono text-gray-600 ">{order.date?.split('T')[0]}</td>
                                         <td className="px-5 py-3 text-right">
-                                             <button className="bg-[#0285fd] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#0073ff] shadow-md transition-all active:scale-95">RETRIEVE</button>
+                                             <button className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95">RETRIEVE</button>
                                         </td>
                                     </tr>
                                 ))}
@@ -663,8 +663,8 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
                                                 setShowPayMethodSearch(false);
                                                 setPayMethodSearchQuery('');
                                             }}>
-                                                <td className="px-5 py-3 font-mono text-[13px] font-black text-blue-700">{m.code}</td>
-                                                <td className="px-5 py-3 text-[13px] font-bold text-gray-600 uppercase group-hover:text-blue-600">{m.name}</td>
+                                                <td className="px-5 py-3 font-mono text-[12px] font-mono text-gray-700">{m.code}</td>
+                                                <td className="px-5 py-3 text-[12px] font-mono text-gray-700 uppercase group-hover:text-blue-600">{m.name}</td>
                                             </tr>
                                         ))}
                                     {(lookups.paymentMethods || []).length === 0 && (
@@ -716,10 +716,10 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
                                         .filter(s => s.name.toLowerCase().includes(supplierSearchQuery.toLowerCase()) || s.code.toLowerCase().includes(supplierSearchQuery.toLowerCase()))
                                         .map(s => (
                                             <tr key={s.code} className="group hover:bg-blue-50/50 cursor-pointer transition-all" onClick={() => handleSelectSupplier(s)}>
-                                                <td className="px-5 py-3 font-mono text-[12px] font-bold text-blue-600">{s.code}</td>
-                                                <td className="px-5 py-3 text-[13px] font-bold text-gray-700 uppercase group-hover:text-blue-600 transition-colors">{s.name}</td>
+                                                <td className="px-5 py-3 font-mono text-[12px] font-mono text-gray-700">{s.code}</td>
+                                                <td className="px-5 py-3 text-[12px] font-mono text-gray-700 uppercase group-hover:text-blue-600 transition-colors">{s.name}</td>
                                                 <td className="px-5 py-3 text-right">
-                                                    <button className="bg-[#0285fd] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#0073ff] shadow-md transition-all active:scale-95">SELECT</button>
+                                                    <button className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95">SELECT</button>
                                                 </td>
                                             </tr>
                                         ))}
@@ -783,8 +783,8 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
                                                 entry.prodCode === p.code ? 'bg-blue-50/80 ring-1 ring-inset ring-blue-200' : ''
                                             }`}
                                         >
-                                            <td className="px-4 py-2 font-mono text-[12px] font-bold text-blue-600">{p.code}</td>
-                                            <td className="px-4 py-2 text-[13px] font-bold text-gray-700 uppercase group-hover:text-blue-600 transition-colors">{p.name}</td>
+                                            <td className="px-4 py-2 font-mono text-[12px]  text-gray-600">{p.code}</td>
+                                            <td className="px-4 py-2 text-[12px]  text-gray-700 uppercase group-hover:text-blue-600 transition-colors">{p.name}</td>
                                             <td className="px-4 py-2 text-right font-mono font-black text-slate-600">{parseFloat(p.price || 0).toFixed(2)}</td>
                                         </tr>
                                     ))}

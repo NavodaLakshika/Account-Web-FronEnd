@@ -2,7 +2,6 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import AuthPage from './pages/AuthPage';
-import SelectCompanyPage from './pages/SelectCompanyPage';
 import Dashboard from './pages/Dashboard';
 
 function App() {
@@ -38,7 +37,6 @@ function App() {
         <Routes>
           {/* AuthPage handles login only */}
           <Route path="/login" element={<AuthPage />} />
-          <Route path="/select-company" element={<SelectCompanyPage />} />
           <Route path="/dashboard" element={<Dashboard />} />
           
           {/* Default Route */}

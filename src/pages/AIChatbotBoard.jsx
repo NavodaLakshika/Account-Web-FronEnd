@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { X, Send, Bot, User, Maximize2, Minimize2, Trash2, Shield, Zap, Cpu } from 'lucide-react';
+import { X, Send, Bot, User, Maximize2, Minimize2, Trash2, Shield, Zap, Cpu, Plus, ChevronLeft, ChevronRight } from 'lucide-react';
 
 import { DotLottiePlayer } from '@dotlottie/react-player';
 
@@ -11,6 +11,7 @@ const AIChatbotBoard = ({ isOpen, onClose }) => {
     const [isTyping, setIsTyping] = useState(false);
     const [isMaximized, setIsMaximized] = useState(false);
     const [showIntro, setShowIntro] = useState(false);
+    const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
     const messagesEndRef = useRef(null);
 
@@ -69,92 +70,120 @@ const AIChatbotBoard = ({ isOpen, onClose }) => {
 
     return (
         <>
-            <div className={`fixed inset-0 z-[1100] flex items-center justify-center p-6 transition-all duration-700 ${isOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'}`}>
+            <div className={`fixed inset-0 z-[1100] flex items-center justify-center p-0 md:p-6 transition-all duration-700 ${isOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'}`}>
                 {!showIntro && (
-                    <div className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-all duration-700" onClick={onClose} />
+                    <div className="absolute inset-0 bg-black/80 backdrop-blur-md transition-all duration-700" onClick={onClose} />
                 )}
 
                 {/* Technical Blueprint Chat Container */}
-                <div className={`relative overflow-hidden flex transition-all duration-500 ease-out ${isMaximized ? 'w-full h-full' : 'w-full max-w-6xl h-[800px]'} ${showIntro ? 'bg-transparent border-none shadow-none' : 'bg-[#011e41] border border-white/20 rounded-2xl shadow-[0_0_80px_rgba(255,255,255,0.05)]'}`}>
-
-
+                <div className={`relative overflow-hidden flex transition-all duration-500 ease-out ${isMaximized ? 'w-full h-full' : 'w-full md:max-w-6xl h-full md:h-[85vh] md:max-h-[850px]'} ${showIntro ? 'bg-transparent border-none shadow-none' : 'bg-[#011e41] border-0 md:border md:border-white/20 rounded-none md:rounded-2xl shadow-[0_0_80px_rgba(255,255,255,0.05)]'}`}>
 
                     {/* Blueprint Grid Overlay for Entire Modal */}
                     {!showIntro && (
-                        <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: 'linear-gradient(white 1px, transparent 1px), linear-gradient(90deg, white 1px, transparent 1px)', backgroundSize: '60px 60px' }} />
+                        <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: 'linear-gradient(white 1px, transparent 1px), linear-gradient(90deg, white 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
                     )}
 
-
-
                     {/* Left Sidebar: Technical Robot Identity */}
-                    <div className="hidden md:flex w-[350px] flex-col border-r border-white/20 relative z-10 bg-transparent">
-
-
-                        <div className="p-8 flex flex-col h-full relative">
-                            <div className="flex-1 flex flex-col items-center justify-center -mt-10">
-                                {/* The Robot Lottie Animation */}
-                                <div className="w-64 h-64 flex items-center justify-center relative mb-6">
-                                    <DotLottiePlayer
-                                        src="/images/Ai Robot Vector Art.lottie"
-                                        autoplay
-                                        loop
-                                        className="w-full h-full"
-                                    />
-                                </div>
-                                <div className="text-center">
-                                    <h2 className="text-white text-xl font-black tracking-widest mb-4">BOOT ASSISTANT</h2>
-                                </div>
+                    <div className={`hidden lg:flex flex-col border-r border-white/10 relative z-10 bg-[#011e41]/50 backdrop-blur-xl transition-all duration-500 ease-in-out ${sidebarCollapsed ? 'w-[80px] p-4' : 'w-[300px] p-8'}`}>
+                        {/* Session Status Section */}
+                        <div className={`mb-8 flex flex-col ${sidebarCollapsed ? 'hidden' : 'items-start'}`}>
+                            <div className="flex items-center gap-2">
+                                <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                                <span className="text-[#00BFDE] text-[8px] font-black uppercase tracking-[0.4em] opacity-50">Session Active</span>
                             </div>
+                            <h3 className="text-white text-xl font-black uppercase tracking-tight leading-none mt-2">
+                                Hello, {localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')).empName.split(' ')[0] : 'Operator'}
+                            </h3>
+                        </div>
 
-                            <div className="text-white/60 text-[9px] font-medium leading-relaxed uppercase tracking-wider mt-auto text-center px-4">
-                                LOREM IPSUM DOLOR SIT AMET, CONSECTETUR ADIPISCING ELIT,
-                                SED DO EIUSMOD TEMPOR INCIDIDUNT UT LABORE ET DOLORE MAGNA ALIQUA.
-                                UT ENIM AD MINIM VENIAM, QUIS NOSTRUD EXERCITATION ULLAMCO.
+                        <div className={`flex-1 flex flex-col items-center justify-center ${sidebarCollapsed ? 'hidden' : ''}`}>
+                            {/* The Robot Lottie Animation */}
+                            <div className="w-48 h-48 flex items-center justify-center relative mb-6">
+                                <DotLottiePlayer
+                                    src="/images/Ai Robot Vector Art.lottie"
+                                    autoplay
+                                    loop
+                                    className="w-full h-full"
+                                />
+                                <div className="absolute inset-x-0 bottom-0 h-4 bg-gradient-to-t from-[#011e41] to-transparent z-10" />
                             </div>
+                            <div className="text-center">
+                                <h2 className="text-white text-[15px] font-black tracking-[0.4em] mb-2">BOOT ASSISTANT</h2>
+                                <p className="text-white/20 text-[7px] font-bold uppercase tracking-[0.2em]">Neural Processing v4.2</p>
+                            </div>
+                        </div>
+
+                        {/* Sidebar Controls */}
+                        <div className={`mt-auto pt-8 space-y-4 border-t border-white/10 flex flex-col ${sidebarCollapsed ? 'items-center' : ''}`}>
+                            <button 
+                                onClick={handleClearChat}
+                                title="New Session"
+                                className={`flex items-center justify-center gap-3 transition-all group rounded-xl ${sidebarCollapsed ? 'w-12 h-12 bg-[#00BFDE]' : 'w-full py-3 px-4 bg-[#00BFDE]'} text-[#011e41] shadow-[0_0_20px_rgba(0,191,222,0.2)]`}
+                            >
+                                <Plus size={sidebarCollapsed ? 20 : 16} strokeWidth={3} />
+                                {!sidebarCollapsed && <span className="text-[10px] font-black uppercase tracking-widest">New Session</span>}
+                            </button>
+
+                            <button 
+                                onClick={handleClearChat}
+                                title="Clear Log"
+                                className={`flex items-center justify-center gap-3 transition-all group rounded-xl border border-white/5 bg-white/5 hover:bg-white/10 ${sidebarCollapsed ? 'w-12 h-12' : 'w-full py-3 px-4'} text-white/40 hover:text-white`}
+                            >
+                                <Trash2 size={sidebarCollapsed ? 18 : 14} className="group-hover:text-red-400" />
+                                {!sidebarCollapsed && <span className="text-[9px] font-black uppercase tracking-widest">Clear Log</span>}
+                            </button>
+
+                            <button 
+                                onClick={onClose}
+                                title="Terminate"
+                                className={`flex items-center justify-center gap-3 transition-all group rounded-xl border border-red-500/20 bg-red-500/10 hover:bg-red-500/20 ${sidebarCollapsed ? 'w-12 h-12' : 'w-full py-3 px-4'} text-red-500`}
+                            >
+                                <X size={sidebarCollapsed ? 18 : 14} />
+                                {!sidebarCollapsed && <span className="text-[9px] font-black uppercase tracking-widest">Terminate</span>}
+                            </button>
                         </div>
                     </div>
 
                     {/* Right Panel: Chat Area */}
-                    <div className="flex-1 flex flex-col relative z-10 bg-transparent">
-                        {/* Top Navigation Frame */}
-                        <div className="h-12 border-b border-white/20 flex items-center justify-end px-6 space-x-4 bg-transparent">
-
-                            <button onClick={handleClearChat} title="Clear Chat History" className="text-white/40 hover:text-red-400 transition-colors flex items-center gap-2">
-                                <Trash2 size={18} />
-                                <span className="text-[10px] font-black uppercase tracking-widest hidden sm:inline">Delete Log</span>
-                            </button>
-
-                            <button onClick={() => setIsMaximized(!isMaximized)} className="text-white/40 hover:text-white transition-colors">
-                                {isMaximized ? <Minimize2 size={18} /> : <Maximize2 size={18} />}
-                            </button>
-                            <button onClick={onClose} className="text-white/40 hover:text-red-400 transition-colors">
-                                <X size={20} />
-                            </button>
-                        </div>
-
+                    <div className="flex-1 flex flex-col relative z-20 bg-transparent min-w-0">
+                        {/* Sidebar Toggle Trigger (Floating on Divider) */}
+                        <button 
+                            onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+                            className="hidden lg:flex absolute top-1/2 -left-3 -translate-y-1/2 w-6 h-12 bg-[#011e41] border border-white/20 text-white/40 hover:text-white items-center justify-center rounded-r-lg z-[30] transition-colors group"
+                        >
+                            {sidebarCollapsed ? <ChevronRight size={14} className="group-hover:scale-125 transition-transform" /> : <ChevronLeft size={14} className="group-hover:scale-125 transition-transform" />}
+                        </button>
                         {/* Messages Area */}
-                        <div className="flex-1 overflow-y-auto p-10 space-y-12 custom-scrollbar">
+                        <div className="flex-1 overflow-y-auto p-4 md:p-10 space-y-8 md:space-y-12 custom-scrollbar">
                             {messages.map((msg) => (
                                 <div key={msg.id} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'} animate-in fade-in slide-in-from-bottom-4 duration-500`}>
-                                    <div className={`flex gap-6 items-end max-w-[75%] ${msg.sender === 'user' ? 'flex-row-reverse' : ''}`}>
+                                    <div className={`flex gap-3 md:gap-6 items-end max-w-[90%] md:max-w-[75%] ${msg.sender === 'user' ? 'flex-row-reverse' : ''}`}>
 
                                         {/* Avatar Bubble */}
-                                        <div className="w-12 h-12 rounded-full border-2 border-white/20 flex items-center justify-center flex-shrink-0 bg-white/5">
-                                            {msg.sender === 'user' ? <User size={24} className="text-white" /> : <Bot size={24} className="text-white" />}
-
+                                        <div className="w-8 h-8 md:w-12 md:h-12 rounded-full border border-white/10 flex items-center justify-center flex-shrink-0 bg-white/5 overflow-hidden">
+                                            {msg.sender === 'user' ? (
+                                                <div className="w-full h-full bg-white/10 flex items-center justify-center">
+                                                    <User size={18} className="text-white md:hidden" />
+                                                    <User size={26} className="text-white hidden md:block" />
+                                                </div>
+                                            ) : (
+                                                <div className="w-full h-full bg-[#00BFDE]/20 flex items-center justify-center">
+                                                    <Bot size={20} className="text-[#00BFDE] md:hidden" />
+                                                    <Bot size={28} className="text-[#00BFDE] hidden md:block" />
+                                                </div>
+                                            )}
                                         </div>
-
 
                                         {/* Chat Bubble */}
                                         <div className="relative mb-2">
-                                            <div className="px-5 py-3 text-[12px] font-bold leading-relaxed bg-white/10 border border-white/20 text-white rounded-xl relative shadow-lg backdrop-blur-sm">
-                                                {/* Custom Fin Tail matching the image */}
+                                            <div className={`px-4 py-3 md:px-5 md:py-3 text-[10px] md:text-[11px] font-mono leading-relaxed border backdrop-blur-sm rounded-xl relative shadow-lg ${msg.sender === 'user' ? 'bg-white/5 border-white/20 text-white' : 'bg-white/10 border-white/30 text-white'}`}>
+                                                {/* Custom Fin Tail */}
                                                 {msg.sender === 'user' ? (
-                                                    <svg className="absolute -right-6 bottom-0 w-8 h-10 text-white/10" viewBox="0 0 24 32" fill="none" preserveAspectRatio="none">
+                                                    <svg className="absolute -right-4 bottom-0 w-6 h-8 text-white/5" viewBox="0 0 24 32" fill="none" preserveAspectRatio="none">
                                                         <path d="M0 0V32H24C12 32 6 20 0 0Z" fill="currentColor" />
                                                     </svg>
                                                 ) : (
-                                                    <svg className="absolute -left-6 bottom-0 w-8 h-10 text-white/10" viewBox="0 0 24 32" fill="none" preserveAspectRatio="none">
+                                                    <svg className="absolute -left-4 bottom-0 w-6 h-8 text-white/10" viewBox="0 0 24 32" fill="none" preserveAspectRatio="none">
                                                         <path d="M24 0V32H0C12 32 18 20 24 0Z" fill="currentColor" />
                                                     </svg>
                                                 )}
@@ -167,20 +196,22 @@ const AIChatbotBoard = ({ isOpen, onClose }) => {
 
                             {isTyping && (
                                 <div className="flex justify-start">
-                                    <div className="flex gap-6 items-end">
-                                        <div className="w-12 h-12 rounded-full border-2 border-white/20 flex items-center justify-center flex-shrink-0 bg-white/5">
-                                            <Bot size={24} className="text-white" />
-
+                                    <div className="flex gap-3 md:gap-6 items-end">
+                                        <div className="w-8 h-8 md:w-12 md:h-12 rounded-full border border-white/10 flex items-center justify-center flex-shrink-0 bg-white/5 overflow-hidden">
+                                            <div className="w-full h-full bg-[#00BFDE]/20 flex items-center justify-center">
+                                                <Bot size={16} className="text-[#00BFDE] md:hidden" />
+                                                <Bot size={24} className="text-[#00BFDE] hidden md:block" />
+                                            </div>
                                         </div>
 
                                         <div className="relative mb-2">
-                                            <div className="px-6 py-4 bg-white/10 border border-white/20 rounded-xl flex items-center gap-2 backdrop-blur-sm">
-                                                <svg className="absolute -left-6 bottom-0 w-8 h-10 text-white/10" viewBox="0 0 24 32" fill="none" preserveAspectRatio="none">
+                                            <div className="px-5 py-3 bg-white/10 border border-white/20 rounded-xl flex items-center gap-2 backdrop-blur-sm">
+                                                <svg className="absolute -left-4 bottom-0 w-6 h-8 text-white/10" viewBox="0 0 24 32" fill="none" preserveAspectRatio="none">
                                                     <path d="M24 0V32H0C12 32 18 20 24 0Z" fill="currentColor" />
                                                 </svg>
-                                                <span className="w-2 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                                                <span className="w-2 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                                                <span className="w-2 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                                                <span className="w-1.5 h-1.5 bg-white rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                                                <span className="w-1.5 h-1.5 bg-white rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                                                <span className="w-1.5 h-1.5 bg-white rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
                                             </div>
                                         </div>
                                     </div>
@@ -190,23 +221,21 @@ const AIChatbotBoard = ({ isOpen, onClose }) => {
                         </div>
 
                         {/* Input Area */}
-                        <div className="p-8 border-t border-white/20 bg-transparent">
-                            <form onSubmit={handleSendMessage} className="relative flex items-center gap-4">
-
-
+                        <div className="p-4 md:p-8 border-t border-white/10 bg-white/5 backdrop-blur-md">
+                            <form onSubmit={handleSendMessage} className="relative flex items-center gap-3 md:gap-4">
                                 <input
                                     type="text"
                                     value={inputValue}
                                     onChange={(e) => setInputValue(e.target.value)}
-                                    placeholder="Write your message here..."
-                                    className="flex-1 bg-transparent border-2 border-white/20 rounded-xl px-5 py-3 text-[12px] text-white focus:outline-none focus:bg-white/5 transition-colors placeholder:text-white/30 placeholder:text-[12px] tracking-wide"
+                                    placeholder="Write your message..."
+                                    className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[10px] md:text-[11px] font-mono text-white focus:outline-none focus:border-white/40 focus:bg-white/10 transition-all placeholder:text-white/20 placeholder:font-mono"
                                 />
                                 <button
                                     type="submit"
                                     disabled={!inputValue.trim()}
-                                    className="bg-white text-[#011e41] p-3 rounded-xl hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-95"
+                                    className="bg-white text-[#011e41] p-3 rounded-xl hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed transition-all active:scale-95 shadow-lg"
                                 >
-                                    <Send size={20} strokeWidth={2.5} />
+                                    <Send size={18} strokeWidth={2.5} />
                                 </button>
                             </form>
                         </div>

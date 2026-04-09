@@ -387,10 +387,10 @@ const ItemMasterBoard = ({ isOpen, onClose }) => {
                                                 item.code?.toLowerCase().includes(lookupQuery.toLowerCase())
                                             ).map((item, idx) => (
                                                 <tr key={idx} className="group hover:bg-blue-50/50 cursor-pointer transition-colors" onClick={() => handleInputPick(activeLookup.field, item)}>
-                                                    <td className="px-5 py-3 font-mono text-[13px] font-black text-blue-700">{item.code}</td>
-                                                    <td className="px-5 py-3 text-[13px] font-bold text-gray-700 uppercase group-hover:text-blue-600 transition-colors">{item.name}</td>
+                                                    <td className="px-5 py-3 font-mono text-[12px] font-bold text-gray-700">{item.code}</td>
+                                                    <td className="px-5 py-3 text-[12px] font-mono font-bold text-gray-700 uppercase group-hover:text-blue-600 transition-colors">{item.name}</td>
                                                     <td className="px-5 py-3 text-right">
-                                                        <button className="bg-[#0285fd] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#0073ff] shadow-md transition-all active:scale-95">SELECT</button>
+                                                        <button className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95">SELECT</button>
                                                     </td>
                                                 </tr>
                                             ))}
@@ -431,11 +431,11 @@ const ItemMasterBoard = ({ isOpen, onClose }) => {
                                         <tbody className="divide-y divide-gray-50">
                                             {searchResults.map((item, idx) => (
                                                 <tr key={idx} className="group hover:bg-blue-50/50 cursor-pointer transition-colors" onClick={() => handleSelectResult(item)}>
-                                                    <td className="px-5 py-3 font-mono text-[13px] font-black text-blue-700">{item.code}</td>
-                                                    <td className="px-5 py-3 text-[13px] font-bold text-gray-700 uppercase group-hover:text-blue-600 transition-colors">{item.prod_Name}</td>
+                                                    <td className="px-5 py-3 font-mono text-[12px] font-bold text-gray-700">{item.code}</td>
+                                                    <td className="px-5 py-3 text-[12px] font-mono font-bold text-gray-700 uppercase group-hover:text-blue-600 transition-colors">{item.prod_Name}</td>
                                                     <td className="px-5 py-3 text-right font-mono font-black text-gray-600">Rs. {(item.selling_Price || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
                                                     <td className="px-5 py-3 text-right">
-                                                        <button className="bg-[#0285fd] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#0073ff] shadow-md transition-all active:scale-95">RETRIEVE ITEM</button>
+                                                        <button className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95">RETRIEVE ITEM</button>
                                                     </td>
                                                 </tr>
                                             ))}

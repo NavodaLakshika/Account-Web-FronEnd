@@ -202,7 +202,7 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                                             type="text"
                                             value={formData.docNo}
                                             readOnly
-                                            className="flex-1 h-9 border border-gray-200 px-2 text-sm font-bold text-[#0285fd] outline-none bg-gray-50 rounded-[5px]"
+                                            className="flex-1 h-9 border border-gray-200 px-2 text-[13px] font-mono font-black text-[#0285fd] outline-none bg-gray-50 rounded-[5px]"
                                         />
                                         <button className="w-9 h-9 shrink-0 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-colors border-none shadow-sm">
                                             <Search size={14} />
@@ -214,7 +214,7 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                                         className="flex items-center border border-gray-300 bg-white h-9 w-[180px] rounded-[5px] px-3 hover:border-[#0285fd] transition-colors cursor-pointer group shadow-sm"
                                         onClick={() => setShowDateModal(true)}
                                     >
-                                        <span className="flex-1 text-[13px] font-bold text-gray-700 capitalize">{formatDate(formData.date)}</span>
+                                        <span className="flex-1 text-[13px] font-mono font-bold text-gray-700 capitalize">{formatDate(formData.date)}</span>
                                         <Calendar size={14} className="text-gray-400 group-hover:text-[#0285fd]" />
                                     </div>
                                 </FormRow>
@@ -226,7 +226,7 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                                         type="text"
                                         readOnly
                                         value={formData.account ? `${formData.account} - ${lookups.pettyAccounts.find(a => a.code === formData.account)?.name || ''}` : ''}
-                                        className="flex-1 h-9 border border-gray-300 px-2 text-sm bg-gray-50 outline-none rounded-[5px] font-medium text-slate-700"
+                                        className="flex-1 h-9 border border-gray-300 px-2 text-[13px] font-mono font-bold bg-gray-50 outline-none rounded-[5px] text-slate-700"
                                     />
                                     <button onClick={() => setShowAccModal(true)} className="w-9 h-9 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-colors shadow-sm">
                                         <Search size={14} />
@@ -252,14 +252,14 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                                                 readOnly
                                                 value={formData.vendorId || ''}
                                                 placeholder="ID"
-                                                className="w-24 h-8 border border-gray-300 px-2 text-sm outline-none bg-gray-50 rounded-[5px] font-mono"
+                                                className="w-24 h-8 border border-gray-300 px-2 text-[12px] outline-none bg-gray-50 rounded-[5px] font-mono font-bold text-[#0285fd]"
                                             />
                                             <input
                                                 type="text"
                                                 readOnly={formData.isVendor}
                                                 value={formData.payee}
                                                 onChange={(e) => setFormData({ ...formData, payee: e.target.value })}
-                                                className={`flex-1 h-9 border border-gray-300 px-2 text-sm outline-none rounded-[5px] ${formData.isVendor ? 'bg-gray-50 font-bold text-slate-800' : 'bg-white shadow-inner'}`}
+                                                className={`flex-1 h-9 border border-gray-300 px-2 text-[13px] font-mono font-bold outline-none rounded-[5px] ${formData.isVendor ? 'bg-gray-50 text-slate-800' : 'bg-white shadow-inner'}`}
                                             />
                                             <button
                                                 disabled={!formData.isVendor}
@@ -280,7 +280,7 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                                             type="text"
                                             readOnly
                                             value={lookups.costCenters.find(c => c.code === formData.costCenter)?.name || ''}
-                                            className="flex-1 h-9 border border-gray-300 px-2 text-sm bg-gray-50 rounded-[5px]"
+                                            className="flex-1 h-9 border border-gray-300 px-2 text-[13px] font-mono font-bold bg-gray-50 rounded-[5px] text-slate-700"
                                         />
                                         <button onClick={() => { setCcSource('header'); setShowCCModal(true); }} className="w-9 h-9 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] border-none shadow-sm">
                                             <Search size={14} />
@@ -292,7 +292,7 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                                         type="text"
                                         value={formData.location}
                                         onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                                        className="flex-1 h-9 border border-gray-300 px-2 text-sm outline-none rounded-[5px] focus:border-blue-500 bg-white"
+                                        className="flex-1 h-9 border border-gray-300 px-2 text-[13px] font-mono font-bold outline-none rounded-[5px] focus:border-blue-500 bg-white"
                                     />
                                 </FormRow>
                             </div>
@@ -302,7 +302,7 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                                     type="text"
                                     value={formData.memo}
                                     onChange={(e) => setFormData({ ...formData, memo: e.target.value })}
-                                    className="flex-1 h-9 border border-gray-300 px-2 text-sm outline-none rounded-[5px] focus:border-blue-500 bg-white"
+                                    className="flex-1 h-9 border border-gray-300 px-2 text-[13px] font-mono font-bold outline-none rounded-[5px] focus:border-blue-500 bg-white"
                                 />
                             </FormRow>
                         </div>
@@ -311,7 +311,7 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                         <div className="col-span-4 space-y-4 pl-6 border-l border-gray-100 flex flex-col justify-center">
                             <div className="bg-blue-50/50 p-3 rounded-[5px] border border-blue-100">
                                 <label className="text-xs font-bold text-blue-600 uppercase tracking-tight mb-1 block text-center">Petty A/C Balance</label>
-                                <div className="text-2xl font-bold text-[#0285fd] text-center tabular-nums">
+                                <div className="text-2xl font-mono font-bold text-[#0285fd] text-center tabular-nums">
                                     {balance.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                 </div>
                             </div>
@@ -322,7 +322,7 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                                         type="text"
                                         value={formData.vouchNo}
                                         onChange={(e) => setFormData({ ...formData, vouchNo: e.target.value })}
-                                        className="w-full h-9 border border-gray-300 px-2 text-sm outline-none rounded-[5px] bg-white font-bold"
+                                        className="w-full h-9 border border-gray-300 px-2 text-[13px] font-mono font-black outline-none rounded-[5px] bg-white text-gray-700"
                                     />
                                 </FormRow>
                                 <FormRow label="Due Date">
@@ -330,7 +330,7 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                                         className="flex items-center border border-gray-300 bg-white h-9 w-full rounded-[5px] px-3 hover:border-[#0285fd] transition-colors cursor-pointer group shadow-sm mt-1"
                                         onClick={() => setShowDueDateModal(true)}
                                     >
-                                        <span className="flex-1 text-[13px] font-bold text-gray-700 capitalize">{formatDate(formData.dueDate)}</span>
+                                        <span className="flex-1 text-[13px] font-mono font-bold text-gray-700 capitalize">{formatDate(formData.dueDate)}</span>
                                         <Calendar size={14} className="text-gray-400 group-hover:text-[#0285fd]" />
                                     </div>
                                 </FormRow>
@@ -339,7 +339,7 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                                         type="text"
                                         value={formData.refNo}
                                         onChange={(e) => setFormData({ ...formData, refNo: e.target.value })}
-                                        className="w-full h-9 border border-gray-300 px-2 text-sm outline-none rounded-[5px] bg-white"
+                                        className="w-full h-9 border border-gray-300 px-2 text-[13px] font-mono font-bold outline-none rounded-[5px] bg-white"
                                     />
                                 </FormRow>
                                 <FormRow label="Pay. Amount">
@@ -348,7 +348,7 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                                             type="number"
                                             value={formData.billAmount}
                                             onChange={(e) => setFormData({ ...formData, billAmount: e.target.value })}
-                                            className="w-full h-10 border-2 border-[#0285fd] px-3 text-right text-lg font-bold text-[#0285fd] outline-none bg-white rounded-[5px]"
+                                            className="w-full h-10 border-2 border-[#0285fd] px-3 text-right text-lg font-mono font-black text-[#0285fd] outline-none bg-white rounded-[5px]"
                                         />
                                     </div>
                                 </FormRow>
@@ -391,7 +391,7 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                                                         type="text"
                                                         readOnly
                                                         value={lookups.expenseAccounts.find(e => e.code === row.accCode)?.name || ''}
-                                                        className="flex-1 h-8 px-2 text-sm outline-none bg-white border border-gray-200 rounded-[5px] font-medium text-slate-700 focus:border-blue-400"
+                                                        className="flex-1 h-8 px-2 text-[12px] font-mono font-bold outline-none bg-white border border-gray-200 rounded-[5px] text-slate-700 focus:border-blue-400"
                                                     />
                                                     <button onClick={() => { setExpIndex(idx); setShowExpAccModal(true); }} className="w-8 h-8 bg-blue-50/50 backdrop-blur-md border border-blue-200 text-[#0078d4] flex items-center justify-center hover:bg-blue-100/80 rounded-[5px] transition-all shadow-sm active:scale-90">
                                                         <Search size={14} />
@@ -404,7 +404,7 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                                                         type="text"
                                                         readOnly
                                                         value={lookups.costCenters.find(cc => cc.code === row.costCode)?.name || ''}
-                                                        className="flex-1 h-8 border border-gray-200 px-2 text-sm outline-none bg-white rounded-[5px] font-medium text-slate-600"
+                                                        className="flex-1 h-8 border border-gray-200 px-2 text-[12px] font-mono font-bold outline-none bg-white rounded-[5px] text-slate-600"
                                                     />
                                                     <button onClick={() => { setCcSource('line'); setCcIndex(idx); setShowCCModal(true); }} className="w-8 h-8 bg-blue-50/50 backdrop-blur-md border border-blue-200 text-[#0078d4] flex items-center justify-center hover:bg-blue-100/80 rounded-[5px] transition-all shadow-sm active:scale-90">
                                                         <Search size={14} />
@@ -419,7 +419,7 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                                                         handleRowUpdate(row.id, 'amount', e.target.value);
                                                         if (idx === rows.length - 1 && e.target.value > 0) addRow();
                                                     }}
-                                                    className="w-full h-8 px-2 text-sm text-right outline-none font-bold text-slate-800 border-transparent focus:border-blue-400 focus:bg-white rounded-[5px] tabular-nums"
+                                                    className="w-full h-8 px-2 text-[12px] font-mono font-black text-right outline-none text-slate-800 border-transparent focus:border-blue-400 focus:bg-white rounded-[5px] tabular-nums"
                                                 />
                                             </td>
                                             <td className="px-1 py-1">
@@ -427,7 +427,7 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                                                     type="text"
                                                     value={row.memo}
                                                     onChange={(e) => handleRowUpdate(row.id, 'memo', e.target.value)}
-                                                    className="w-full h-8 px-2 text-sm outline-none text-slate-600 italic border-transparent focus:border-blue-400 focus:bg-white rounded-[5px]"
+                                                    className="w-full h-8 px-2 text-[12px] font-mono font-bold outline-none text-slate-600 italic border-transparent focus:border-blue-400 focus:bg-white rounded-[5px]"
                                                 />
                                             </td>
                                         </tr>
@@ -458,14 +458,14 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                             <div className="flex items-center gap-6 bg-blue-50/50 px-6 py-3 rounded-sm border border-blue-100 shadow-sm">
                                 <div className="flex flex-col items-end">
                                     <span className="text-xs font-bold text-slate-500 uppercase tracking-tight leading-none mb-1">Difference</span>
-                                    <div className={`text-sm font-bold tabular-nums tracking-tighter ${difference === 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                    <div className={`text-sm font-mono font-black tabular-nums tracking-tighter ${difference === 0 ? 'text-green-600' : 'text-red-600'}`}>
                                         {difference.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                     </div>
                                 </div>
                                 <div className="h-8 w-[1px] bg-blue-200/50 mx-2" />
                                 <div className="flex flex-col items-end">
                                     <span className="text-xs font-bold text-[#0078d4] uppercase tracking-tight leading-none mb-1">Total Distribution</span>
-                                    <div className="text-2xl font-bold text-[#0285fd] tabular-nums tracking-tighter flex items-baseline gap-1">
+                                    <div className="text-2xl font-mono font-black text-[#0285fd] tabular-nums tracking-tighter flex items-baseline gap-1">
                                         {totalAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                     </div>
                                 </div>
@@ -733,7 +733,7 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
 
 const FormRow = ({ label, children, width = "w-24" }) => (
     <div className="flex items-center min-h-[32px] gap-3">
-        <label className={`${width} shrink-0 text-xs font-bold text-gray-700 uppercase tracking-tight leading-none`}>{label}</label>
+        <label className={`${width} shrink-0 text-[12.5px] font-bold text-gray-700 uppercase tracking-tight leading-none`}>{label}</label>
         {children}
     </div>
 );

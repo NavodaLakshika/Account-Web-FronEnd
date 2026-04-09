@@ -592,11 +592,11 @@ const GRNBoard = ({ isOpen, onClose }) => {
                                 <tbody className="divide-y divide-gray-50">
                                     {orders.map((o, i) => (
                                         <tr key={i} className="group hover:bg-blue-50/50 cursor-pointer transition-colors" onClick={() => handleSelectRow(o.docNo)}>
-                                            <td className="px-5 py-3 font-mono text-[13px] font-black text-blue-700">{o.docNo}</td>
-                                            <td className="px-5 py-3 text-[13px] font-bold text-gray-600 uppercase italic">{o.date?.split('T')[0]}</td>
-                                            <td className="px-5 py-3 text-[13px] font-bold text-gray-700 uppercase group-hover:text-blue-600 transition-colors">{o.supplier}</td>
+                                            <td className="px-5 py-3 font-mono text-[12px] font-bold text-gray-700">{o.docNo}</td>
+                                            <td className="px-5 py-3 text-[12px] font-mono font-bold text-gray-600 uppercase ">{o.date?.split('T')[0]}</td>
+                                            <td className="px-5 py-3 text-[12px] font-mono font-bold text-gray-700 uppercase group-hover:text-blue-600 transition-colors">{o.supplier}</td>
                                             <td className="px-5 py-3 text-right">
-                                                <button className="bg-[#0285fd] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#0073ff] shadow-md transition-all active:scale-95">RETRIEVE</button>
+                                                <button className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95">RETRIEVE</button>
                                             </td>
                                         </tr>
                                     ))}
@@ -836,9 +836,9 @@ const GRNBoard = ({ isOpen, onClose }) => {
                                 <tbody className="divide-y divide-gray-50">
                                     {lookups.pos.filter(p => p.docNo.toLowerCase().includes(poSearchQuery.toLowerCase())).map((p) => (
                                         <tr key={p.docNo} className="group hover:bg-blue-50/50 cursor-pointer transition-colors" onClick={() => handleSelectPO(p.docNo)}>
-                                            <td className="px-5 py-3 font-mono text-[13px] font-black text-blue-700">{p.docNo}</td>
+                                            <td className="px-5 py-3 font-mono text-[12px] font-bold text-gray-700">{p.docNo}</td>
                                             <td className="px-5 py-3 text-right">
-                                                <button className="bg-[#0285fd] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#0073ff] shadow-md transition-all active:scale-95">SELECT ORDER</button>
+                                                <button className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95">SELECT ORDER</button>
                                             </td>
                                         </tr>
                                     ))}
@@ -903,8 +903,8 @@ const GRNBoard = ({ isOpen, onClose }) => {
                                                 setShowPayMethodSearch(false);
                                                 setPayMethodSearchQuery('');
                                             }}>
-                                                <td className="px-5 py-3 font-mono text-[13px] font-black text-blue-700">{m.code}</td>
-                                                <td className="px-5 py-3 text-[13px] font-bold text-gray-600 uppercase group-hover:text-blue-600">{m.name}</td>
+                                                <td className="px-5 py-3 font-mono text-[12px] font-bold text-gray-700">{m.code}</td>
+                                                <td className="px-5 py-3 text-[12px] font-mono font-bold text-gray-600 uppercase group-hover:text-blue-600">{m.name}</td>
                                             </tr>
                                         ))}
                                     {(lookups.paymentMethods || []).length === 0 && (

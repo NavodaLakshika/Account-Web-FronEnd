@@ -47,94 +47,85 @@ const ThankYouModal = ({ isOpen, onClose }) => {
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-[1000] flex items-center justify-center font-['Outfit'] overflow-hidden">
-            {/* Background Video - Exact Match to Auth Page Background Style */}
-            <div className="absolute -inset-8 z-0">
-                <video
-                    ref={videoRef}
-                    autoPlay
-                    loop
-                    muted
-                    playsInline
-                    className="absolute w-full h-full object-cover scale-110"
-                    style={{ filter: 'blur(4px) brightness(0.5)' }}
-                >
-                    <source src="/Video/thankyou2.mp4" type="video/mp4" />
-                </video>
-            </div>
+        <div className="fixed inset-0 z-[1000] flex items-center justify-center p-6 font-mono overflow-hidden">
+            {/* Minimal Light Backdrop */}
+            <div className="absolute inset-0 bg-slate-200/40 backdrop-blur-md" />
             
-            {/* Top Logo Section - Exact Match to Auth Page */}
-            <div className="absolute top-8 left-8 flex items-center gap-3 z-10 scale-90">
-                <div className="bg-white p-1 rounded-full shadow-lg">
-                    <img src="/logo-removebg.png" alt="Logo" className="w-8 h-8 object-contain" />
-                </div>
-                <span className="text-white text-xs tracking-[0.2em] opacity-70 uppercase font-medium">Onimta Financial System</span>
-            </div>
+            {/* Browser Window Modal */}
+            <div className="relative w-full max-w-2xl bg-white rounded-[15px] shadow-[0_20px_50px_rgba(0,0,0,0.1)] overflow-hidden animate-in fade-in zoom-in-95 duration-500 border border-slate-200">
+                <div className="p-8 flex flex-col items-center text-center relative">
 
-            {/* Main Content Container - Reduced to 75% for a smaller look */}
-            <div className="relative z-10 w-full max-w-2xl px-8 py-12 flex flex-col items-center text-center animate-in fade-in zoom-in-95 duration-500 scale-75 origin-center">
+                    <style>
+                        {`
+                            @import url('https://fonts.googleapis.com/css2?family=Satisfy&display=swap');
+                        `}
+                    </style>
+                    
 
-                <div className="flex flex-col items-center">
-                    {/* Big Mail Icon in White with Shadow */}
-                    <div className="mb-6">
-                        <Mail size={100} strokeWidth={1.5} className="text-white fill-white/10 drop-shadow-[0_0_20px_rgba(255,255,255,0.3)]" />
-                    </div>
+                    {/* Thank You Message - Extra Big Script Font Style */}
+                    <h2 className="text-[80px] font-['Satisfy',_cursive] text-slate-700 pt-6 mb-4 leading-none">
+                        Thank you!
+                    </h2>
+                    
+                    <p className="text-slate-500 font-mono text-sm mb-6 max-w-md leading-relaxed">
+                        Thank you for using our Financial System. <br/>
+                        We hope you had a productive session with <br/>
+                        <span className="font-bold font-mono text-[#0388cc]">Onimta Information Technology Pvt Ltd</span>. <br/>
+                        You have been successfully logged out.
+                    </p>
 
-                    {/* Bold Heading */}
-                    <h1 className="text-[64px] font-black text-white mb-4 tracking-[0.05em] uppercase leading-none drop-shadow-xl font-['Outfit']">
-                        THANK YOU!
-                    </h1>
-
-                    {/* Subtext with User Info */}
-                    <div className="space-y-4 mb-14">
-                        <p className="text-white/60 text-lg font-medium opacity-90 max-w-lg mx-auto leading-relaxed uppercase tracking-widest">
-                            You have been successfully logged out
-                        </p>
-                        <div className="inline-block px-8 py-2.5 bg-white/10 backdrop-blur-xl rounded-full border border-white/20 shadow-2xl">
-                            <span className="text-white font-bold tracking-widest uppercase text-sm">
-                                Session ended: <span className="text-[#00acee] ml-2">{user?.EmpName || user?.empName || user?.Emp_Name || 'SYSTEM USER'}</span>
-                            </span>
+                    {/* Single Line Footer Branding - Now above buttons */}
+                    <div className="flex items-center gap-3  mb-6 animate-in fade-in slide-in-from-bottom-2 duration-1000">
+                        <img src="/logo-removebg.png" alt="Logo" className="w-5 h-5 object-contain" />
+                        <div className="flex items-center gap-2">
+                            <span className="text-slate-700 font-mono tracking-[0.2em] text-[9px] font-black uppercase whitespace-nowrap">Onimta Financial</span>
+                            <span className="text-slate-300">|</span>
+                            <span className="text-slate-400 font-mono tracking-[0.1em] text-[8px] uppercase whitespace-nowrap">Secure Banking Protocol</span>
                         </div>
                     </div>
 
-                    {/* VINTAGE SEGMENTED LOADING BAR (Matches reference image) */}
-                    <div className="w-full max-w-[500px] space-y-5">
-                        <div className="flex justify-between items-end px-1">
-                            <span className="text-xl font-black text-white/50 tracking-[0.3em] uppercase">Loading</span>
-                            <span className="text-xl font-black text-white tabular-nums tracking-tighter">{progress}%</span>
-                        </div>
-
-                        {/* Outlined Container */}
-                        <div className="w-full h-11 border-[5px] border-white p-1.5 flex items-center gap-1.5 overflow-hidden bg-black/50 backdrop-blur-md shadow-2xl">
-                            {/* Segmented blocks */}
-                            {[...Array(20)].map((_, i) => {
-                                const threshold = (i + 1) * 5;
-                                const isActive = progress >= threshold;
-                                return (
-                                    <div
-                                        key={i}
-                                        className={`h-full flex-1 transition-all duration-100 ${isActive ? 'bg-white shadow-[0_0_15px_rgba(255,255,255,0.4)]' : 'bg-transparent'}`}
-                                    />
-                                );
-                            })}
-                        </div>
-                    </div>
-
-                    {/* Footer Branding */}
-                    <div className="mt-20 border-t border-white/5 pt-8 w-full">
-                        <p className="text-[10px] font-bold text-white/20 uppercase tracking-[0.6em] font-['Outfit']">
-                            Powered by Onimta Information Technology
-                        </p>
+                    {/* Action Buttons - Now at the bottom */}
+                    <div className="flex gap-4 mb-4">
+                        <button 
+                            onClick={() => window.location.href = '/login'}
+                            className="px-8 py-2.5 border border-slate-300 rounded-full text-sm font-bold text-slate-600 hover:bg-slate-50 hover:border-slate-400 transition-all active:scale-95"
+                        >
+                            Log In Again
+                        </button>
+                        <button 
+                            className="px-8 py-2.5 border border-slate-300 rounded-full text-sm font-bold text-slate-600 hover:bg-slate-50 hover:border-slate-400 transition-all active:scale-95"
+                        >
+                            Visit Website
+                        </button>
                     </div>
                 </div>
+
+                {/* All Around Multichromatic Perimeter Loading System */}
+                <div className="absolute inset-0 pointer-events-none rounded-[15px] overflow-hidden">
+                    {/* Top Bar (0-25%) - Blue */}
+                    <div 
+                        className="absolute top-0 left-0 h-[6px] bg-[#0388cc] shadow-[0_0_10px_rgba(3,136,204,0.5)] transition-all duration-100" 
+                        style={{ width: `${Math.min(100, Math.max(0, (progress / 25) * 100))}%` }} 
+                    />
+                    {/* Right Bar (25-50%) - Emerald */}
+                    <div 
+                        className="absolute top-0 right-0 w-[6px] bg-[#10b981] shadow-[0_0_10px_rgba(16,185,129,0.5)] transition-all duration-100" 
+                        style={{ height: `${Math.min(100, Math.max(0, ((progress - 25) / 25) * 100))}%` }} 
+                    />
+                    {/* Bottom Bar (50-75%) - Amber */}
+                    <div 
+                        className="absolute bottom-0 right-0 h-[6px] bg-[#f59e0b] shadow-[0_0_10px_rgba(245,158,11,0.5)] transition-all duration-100" 
+                        style={{ width: `${Math.min(100, Math.max(0, ((progress - 50) / 25) * 100))}%` }} 
+                    />
+                    {/* Left Bar (75-100%) - Red */}
+                    <div 
+                        className="absolute bottom-0 left-0 w-[6px] bg-[#ef4444] shadow-[0_0_10px_rgba(239,68,68,0.5)] transition-all duration-100" 
+                        style={{ height: `${Math.min(100, Math.max(0, ((progress - 75) / 25) * 100))}%` }} 
+                    />
+                </div>
             </div>
-            
-            <style>{`
-                @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
-            `}</style>
         </div>
     );
 };
 
 export default ThankYouModal;
-;

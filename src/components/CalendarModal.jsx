@@ -1,14 +1,13 @@
 import React, { useState } from 'react';
-import SimpleModal from './SimpleModal';
-import { ChevronLeft, ChevronRight, Calendar as CalendarIcon } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, X } from 'lucide-react';
 
 const CalendarModal = ({ isOpen, onClose, onDateSelect, initialDate }) => {
     const [viewDate, setViewDate] = useState(initialDate ? new Date(initialDate) : new Date());
 
-    const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const daysOfWeek = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
     const months = [
-        'January', 'February', 'March', 'April', 'May', 'June',
-        'July', 'August', 'September', 'October', 'November', 'December'
+        'JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE',
+        'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER'
     ];
 
     const getDaysInMonth = (year, month) => new Date(year, month + 1, 0).getDate();
@@ -23,10 +22,18 @@ const CalendarModal = ({ isOpen, onClose, onDateSelect, initialDate }) => {
     const prevMonth = () => setViewDate(new Date(currentYear, currentMonth - 1, 1));
     const nextMonth = () => setViewDate(new Date(currentYear, currentMonth + 1, 1));
 
-    const handleDateClick = (day) => {
-        const selected = new Date(currentYear, currentMonth, day);
-        // Format as YYYY-MM-DD for consistency with <input type="date">
-        const formatted = selected.toISOString().split('T')[0];
+    React.useEffect(() => {
+        if (isOpen) {
+            setViewDate(initialDate ? new Date(initialDate) : new Date());
+        }
+    }, [isOpen, initialDate]);
+
+    const handleDateClick = (day, specificDate = null) => {
+        const selected = specificDate || new Date(currentYear, currentMonth, day);
+        const yyyy = selected.getFullYear();
+        const mm = String(selected.getMonth() + 1).padStart(2, '0');
+        const dd = String(selected.getDate()).padStart(2, '0');
+        const formatted = `${yyyy}-${mm}-${dd}`;
         onDateSelect(formatted);
         onClose();
     };
@@ -36,7 +43,6 @@ const CalendarModal = ({ isOpen, onClose, onDateSelect, initialDate }) => {
         return today.getDate() === day && today.getMonth() === currentMonth && today.getFullYear() === currentYear;
     };
 
-    // Calculate grid
     const calendarDays = [];
     for (let i = 0; i < firstDay; i++) {
         calendarDays.push(null);
@@ -45,52 +51,91 @@ const CalendarModal = ({ isOpen, onClose, onDateSelect, initialDate }) => {
         calendarDays.push(i);
     }
 
+    if (!isOpen) return null;
+
     return (
-        <SimpleModal isOpen={isOpen} onClose={onClose} title="Select System Date" maxWidth="max-w-[340px]">
-            <div className="p-4 font-['Tahoma'] select-none">
-                <div className="flex items-center justify-between mb-6 bg-slate-50 p-2 rounded-lg border border-gray-100">
-                    <button onClick={prevMonth} className="p-1 hover:bg-white hover:shadow-sm rounded-md transition-all active:scale-90"><ChevronLeft size={20} className="text-gray-600" /></button>
-                    <div className="flex flex-col items-center">
-                        <span className="text-[14px] font-black text-blue-600 uppercase tracking-widest">{months[currentMonth]}</span>
-                        <span className="text-[11px] font-bold text-gray-400">{currentYear}</span>
+        <div 
+            className="fixed inset-0 z-[2000] flex items-center justify-center p-4 backdrop-blur-sm bg-slate-900/10"
+            onClick={onClose}
+        >
+            <style>
+                {`
+                    @keyframes calendarSlideUp {
+                        from { opacity: 0; transform: translateY(20px) scale(0.98); }
+                        to { opacity: 1; transform: translateY(0) scale(1); }
+                    }
+                    .calendar-animate {
+                        animation: calendarSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+                    }
+                `}
+            </style>
+            
+            <div 
+                className="relative w-full max-w-[360px] bg-white rounded-[15px] shadow-2xl overflow-hidden calendar-animate font-['Tahoma',_sans-serif]"
+                onClick={(e) => e.stopPropagation()}
+            >
+                {/* Blue Header */}
+                <div className="bg-[#0388cc] pt-8 pb-4 px-6 text-white relative">
+                    
+                    <div className="flex items-center justify-between mb-4">
+                        <button onClick={prevMonth} className="hover:bg-white/10 p-1 rounded-full transition-all active:scale-90"><ChevronLeft size={20} /></button>
+                        <h2 className="text-[30px] font-mono font-bold tracking-tighter uppercase">{months[currentMonth]}</h2>
+                        <button onClick={nextMonth} className="hover:bg-white/10 p-1 rounded-full transition-all active:scale-90"><ChevronRight size={20} /></button>
                     </div>
-                    <button onClick={nextMonth} className="p-1 hover:bg-white hover:shadow-sm rounded-md transition-all active:scale-90"><ChevronRight size={20} className="text-gray-600" /></button>
-                </div>
-
-                <div className="grid grid-cols-7 gap-1 mb-2">
-                    {daysOfWeek.map(day => (
-                        <div key={day} className="h-8 flex items-center justify-center text-[10px] font-black text-gray-400 uppercase">{day}</div>
-                    ))}
-                </div>
-
-                <div className="grid grid-cols-7 gap-1">
-                    {calendarDays.map((day, idx) => (
-                        <div key={idx} className="h-10 flex items-center justify-center">
-                            {day ? (
-                                <button
-                                    onClick={() => handleDateClick(day)}
-                                    className={`w-9 h-9 flex items-center justify-center rounded-lg text-[13px] font-bold transition-all
-                                        ${isToday(day) ? 'bg-blue-50 text-blue-600 border border-blue-200' : 'hover:bg-slate-100 text-gray-700'}
-                                        active:scale-95 shadow-sm hover:shadow-md
-                                    `}
-                                >
-                                    {day}
-                                </button>
-                            ) : (
-                                <div className="w-9 h-9" />
-                            )}
+                    
+                    <div className="flex justify-between items-end">
+                        <div className="bg-white/10 px-3 py-1 rounded-[6px] border border-white/20">
+                            <span className="text-[16px]  font-mono font-bold tracking-widest">{currentYear}</span>
                         </div>
-                    ))}
+                        <span className="text-[11px] font-mono text-white/60 tracking-[0.2em]">ACCOUNTING REGISTER</span>
+                    </div>
                 </div>
 
-                <div className="mt-8 pt-4 border-t border-gray-100 flex justify-between items-center">
-                    <div className="flex items-center gap-2 text-[11px] font-bold text-gray-400 uppercase ">
-                        <CalendarIcon size={12} /> Financial Period 2026/27
+                {/* Calendar Grid */}
+                <div className="p-4 bg-white">
+                    <div className="grid grid-cols-7 gap-1 mb-3">
+                        {daysOfWeek.map((day, idx) => (
+                            <div key={day} className={`h-8 flex items-center justify-center text-[13px] font-mono font-bold tracking-widest ${idx === 0 ? 'text-[#f04e3e]' : 'text-[#0388cc]'}`}>
+                                {day}
+                            </div>
+                        ))}
                     </div>
-                    <button onClick={() => handleDateClick(new Date().getDate())} className="text-[11px] font-black text-blue-600 hover:text-blue-800 transition-colors uppercase tracking-widest">Today</button>
+
+                    <div className="grid grid-cols-7 gap-1">
+                        {calendarDays.map((day, idx) => (
+                            <div key={idx} className="h-10 flex items-center justify-center">
+                                {day ? (
+                                    <button
+                                        onClick={() => handleDateClick(day)}
+                                        className={`w-9 h-9 flex items-center justify-center rounded-[5px] text-[14px] font-mono font-bold transition-all relative group
+                                            ${idx % 7 === 0 ? 'text-[#f04e3e]' : 'text-[#0388cc]'}
+                                            ${isToday(day) ? 'bg-blue-50 text-[#0388cc] border border-[#0388cc]/30 shadow-sm' : 'hover:bg-slate-100'}
+                                            active:scale-90
+                                        `}
+                                    >
+                                        {day}
+                                        {isToday(day) && <div className="absolute bottom-1 w-1 h-1 bg-[#0388cc] rounded-full" />}
+                                    </button>
+                                ) : (
+                                    <div className="w-9 h-9 opacity-10" />
+                                )}
+                            </div>
+                        ))}
+                    </div>
+
+                    <div className="mt-6 pt-4 border-t border-gray-100 flex justify-between items-center px-2">
+                        <div className="flex items-center gap-2 text-[12px] font-mono text-slate-300 uppercase tracking-widest"> Onimta IT Solutions
+                        </div>
+                        <button 
+                            onClick={() => handleDateClick(null, new Date())}
+                            className="text-[11px] font-black text-white bg-[#0388cc] hover:bg-[#0276a1] transition-colors uppercase tracking-widest px-4 py-1.5 rounded-[5px] shadow-md active:scale-95"
+                        >
+                            Today
+                        </button>   
+                    </div>
                 </div>
             </div>
-        </SimpleModal>
+        </div>
     );
 };
 
