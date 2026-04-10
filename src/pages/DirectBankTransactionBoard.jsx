@@ -250,7 +250,13 @@ const DirectBankTransactionBoard = ({ isOpen, onClose }) => {
                     <div className="relative w-full max-w-xl bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col max-h-[80vh] font-['Plus_Jakarta_Sans']">
                         <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
                             <h3 className="text-lg font-bold text-slate-800 tracking-tight uppercase">Search {activeModal === 'bank' ? 'Bank Accounts' : activeModal === 'ap' ? 'A/P Accounts' : 'Cost Centers'}</h3>
-                            <button onClick={() => setActiveModal(null)} className="w-10 h-10 flex items-center justify-center hover:bg-red-50 text-slate-400 hover:text-red-500 transition-colors rounded-full transition-all"><X size={28} /></button>
+                            <button 
+                                onClick={() => setActiveModal(null)} 
+                                className="w-10 h-10 flex items-center justify-center bg-[#ff3b30] hover:bg-[#e03127] text-white rounded-[8px] shadow-[0_4px_12px_rgba(255,59,48,0.3)] hover:shadow-[0_6px_20px_rgba(255,59,48,0.4)] transition-all active:scale-90 outline-none border-none group"
+                                title="Close"
+                            >
+                                <X size={20} strokeWidth={4} className="group-hover:scale-110 transition-transform" />
+                            </button>
                         </div>
                         <div className="p-4 border-b border-gray-100 bg-white">
                             <div className="relative">

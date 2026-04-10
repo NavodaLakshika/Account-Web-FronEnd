@@ -254,7 +254,13 @@ const ReversalEntryBoard = ({ isOpen, onClose }) => {
                             <h3 className="text-lg font-bold text-slate-800 tracking-tight uppercase">
                                 Search {activeModal === 'type' ? 'Transaction Types' : 'Authorized Users'}
                             </h3>
-                            <button onClick={() => setActiveModal(null)} className="w-10 h-10 flex items-center justify-center hover:bg-red-50 text-slate-400 hover:text-red-500 transition-colors rounded-full"><X size={28} /></button>
+                            <button 
+                                onClick={() => setActiveModal(null)} 
+                                className="w-10 h-10 flex items-center justify-center bg-[#ff3b30] hover:bg-[#e03127] text-white rounded-[8px] shadow-[0_4px_12px_rgba(255,59,48,0.3)] hover:shadow-[0_6px_20px_rgba(255,59,48,0.4)] transition-all active:scale-90 outline-none border-none group"
+                                title="Close"
+                            >
+                                <X size={20} strokeWidth={4} className="group-hover:scale-110 transition-transform" />
+                            </button>
                         </div>
                         <div className="p-4 border-b border-gray-100 bg-white">
                             <div className="relative">

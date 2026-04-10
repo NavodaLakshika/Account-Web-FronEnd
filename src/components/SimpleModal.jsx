@@ -1,7 +1,7 @@
 import React from 'react';
 import { X, HelpCircle, Layout } from 'lucide-react';
 
-const SimpleModal = ({ isOpen, onClose, title, children, footer, maxWidth = "max-w-4xl", zoom = 1, showHeaderClose = true }) => {
+const SimpleModal = ({ isOpen, onClose, title, children, footer, maxWidth = "max-w-4xl", zoom = 1, showHeaderClose = true, accentColor = localStorage.getItem('topBarColor') || "#0285fd" }) => {
     if (!isOpen) return null;
 
     return (
@@ -18,7 +18,10 @@ const SimpleModal = ({ isOpen, onClose, title, children, footer, maxWidth = "max
                 {/* Header */}
                 <div className="bg-white px-6 h-14 flex items-center border-b border-gray-100 select-none relative overflow-hidden">
                     {/* System Color Left Accent */}
-                    <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#0285fd]" />
+                    <div 
+                        className="absolute left-0 top-0 bottom-0 w-1.5 transition-colors duration-500" 
+                        style={{ backgroundColor: accentColor }}
+                    />
                     
                     <div className="flex-1 flex items-center">
                         <span className="text-[15px] font-[700] text-slate-900 uppercase tracking-[3px] font-mono truncate">

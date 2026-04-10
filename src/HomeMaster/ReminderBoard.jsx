@@ -16,11 +16,11 @@ import {
 import { reminderService } from '../services/reminder.service';
 import toast from 'react-hot-toast';
 import ConfirmModal from '../components/modals/ConfirmModal';
+import CalendarModal from '../components/CalendarModal';
 
 const ReminderBoard = ({ isOpen, onClose, onViewAll, taskToEdit }) => {
     const [showConfirm, setShowConfirm] = useState(false);
     const [showDatePicker, setShowDatePicker] = useState(false);
-    const [viewDate, setViewDate] = useState(new Date());
 
     const [formData, setFormData] = useState({
         task: '',
@@ -72,14 +72,49 @@ const ReminderBoard = ({ isOpen, onClose, onViewAll, taskToEdit }) => {
                     ...formData,
                     date: formattedDate
                 });
-                toast.success('Task Updated Successfully..');
             } else {
                 await reminderService.addReminder({
                     ...formData,
                     date: formattedDate
                 });
-                toast.success('Task Saved Successfully..');
             }
+
+            // High-fidelity Success Toast (Mirrors AuthPage Login Success)
+            toast.custom((t) => (
+                <div className={`${t.visible ? 'animate-in slide-in-from-right-10 fade-in duration-500' : 'animate-out slide-out-to-right-10 fade-out duration-300'} 
+                    max-w-[320px] w-full bg-white/90 backdrop-blur-3xl border border-white/20 shadow-2xl rounded-[5px] flex flex-col pointer-events-auto overflow-hidden`}>
+                    <div className="px-4 py-2 flex items-center gap-3">
+                        <div className="w-12 h-12 shrink-0">
+                            <DotLottiePlayer
+                                src="/lottiefile/Successffull.lottie"
+                                autoplay
+                                loop={false}
+                            />
+                        </div>
+                        <div className="flex-grow text-left">
+                            <h3 className="text-slate-800 text-[12px] font-bold tracking-wider uppercase font-tahoma truncate">Task Processed</h3>
+                            <div className="flex items-center gap-1.5 mt-0.5">
+                                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.3)]" />
+                                <span className="text-emerald-600 text-[8px] font-mono font-bold tracking-widest uppercase">Saved Successfully</span>
+                            </div>
+                        </div>
+                        <button onClick={() => toast.dismiss(t.id)} className="text-slate-300 hover:text-slate-500 transition-colors">
+                            <X size={14} />
+                        </button>
+                    </div>
+                    {/* Progress Bar Timer */}
+                    <div className="h-[2px] w-full bg-emerald-50">
+                        <div 
+                            className="h-full bg-emerald-500"
+                            style={{ animation: 'toastProgress 3s linear forwards' }}
+                        />
+                    </div>
+                </div>
+            ), {
+                duration: 3000,
+                position: 'top-right'
+            });
+
             onClose();
         } catch (error) {
             console.error('Error saving reminder:', error);
@@ -87,22 +122,8 @@ const ReminderBoard = ({ isOpen, onClose, onViewAll, taskToEdit }) => {
         }
     };
 
-    const calendarDays = useMemo(() => {
-        const firstDay = new Date(viewDate.getFullYear(), viewDate.getMonth(), 1).getDay();
-        const daysInMonth = new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 0).getDate();
-        const days = [];
-        for (let i = 0; i < firstDay; i++) days.push(null);
-        for (let i = 1; i <= daysInMonth; i++) days.push(i);
-        return days;
-    }, [viewDate]);
-
-    const handleDateSelect = (day) => {
-        const y = viewDate.getFullYear();
-        const m = String(viewDate.getMonth() + 1).padStart(2, '0');
-        const d = String(day).padStart(2, '0');
-        const dateStr = `${y}-${m}-${d}`;
+    const handleDateSelect = (dateStr) => {
         setFormData(prev => ({ ...prev, date: dateStr }));
-        setShowDatePicker(false);
     };
 
     const formatDateForDisplay = (dateStr) => {
@@ -233,35 +254,12 @@ const ReminderBoard = ({ isOpen, onClose, onViewAll, taskToEdit }) => {
                 message={taskToEdit ? "Are you sure you want to update this task?" : "Are you sure you want to save this Task?"}
             />
 
-            <SimpleModal isOpen={showDatePicker} onClose={() => setShowDatePicker(false)} title="Select Task Date" maxWidth="max-w-[320px]">
-                <div className="p-1 px-2">
-                    <div className="flex items-center justify-between mb-4">
-                        <button onClick={() => setViewDate(new Date(viewDate.getFullYear(), viewDate.getMonth() - 1, 1))} className="p-1.5 hover:bg-slate-100 rounded-md text-slate-500 transition-all"><ChevronLeft size={18} /></button>
-                        <span className="text-[14px] font-bold text-slate-700">{viewDate.toLocaleString('default', { month: 'long' })} {viewDate.getFullYear()}</span>
-                        <button onClick={() => setViewDate(new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 1))} className="p-1.5 hover:bg-slate-100 rounded-md text-slate-500 transition-all"><ChevronRight size={18} /></button>
-                    </div>
-                    <div className="grid grid-cols-7 mb-2">
-                        {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map(d => <div key={d} className="text-center text-[10px] font-black text-slate-400 uppercase tracking-tighter">{d}</div>)}
-                    </div>
-                    <div className="grid grid-cols-7 gap-1">
-                        {calendarDays.map((day, i) => {
-                            if (!day) return <div key={i} className="h-8" />;
-                            // Fix: Use local date components to avoid ISO timezone shift
-                            const y = viewDate.getFullYear();
-                            const m = String(viewDate.getMonth() + 1).padStart(2, '0');
-                            const d = String(day).padStart(2, '0');
-                            const currentDayStr = `${y}-${m}-${d}`;
-                            const isSelected = formData.date === currentDayStr;
-                            
-                            return (
-                                <button key={i} onClick={() => handleDateSelect(day)} className={`h-8 w-8 text-[12px] font-bold rounded-md flex items-center justify-center transition-all ${isSelected ? 'bg-[#0078d4] text-white' : 'hover:bg-slate-100'}`}>
-                                    {day}
-                                </button>
-                            );
-                        })}
-                    </div>
-                </div>
-            </SimpleModal>
+            <CalendarModal 
+                isOpen={showDatePicker} 
+                onClose={() => setShowDatePicker(false)} 
+                onDateSelect={handleDateSelect}
+                initialDate={formData.date}
+            />
         </SimpleModal>
     );
 };

@@ -272,7 +272,13 @@ const handleSave = async () => {
                             <h3 className="text-lg font-bold text-slate-800 tracking-tight">Search Bank Account</h3>
                             <div className="flex gap-4">
                                 <input type="text" placeholder="Search accounts..." className="h-9 border border-gray-300 px-3 text-sm rounded-md w-64 focus:border-blue-500 outline-none" value={bankSearchQuery} onChange={(e) => setBankSearchQuery(e.target.value)} />
-                                <button onClick={() => setShowBankModal(false)} className="w-8 h-8 flex items-center justify-center hover:bg-red-50 text-slate-400 hover:text-red-500 transition-colors rounded-full outline-none"><X size={24} /></button>
+                                <button
+                                    onClick={() => setShowBankModal(false)}
+                                    className="w-9 h-8 flex items-center justify-center bg-[#ff3b30] hover:bg-[#e03127] text-white rounded-[8px] shadow-[0_4px_12px_rgba(255,59,48,0.3)] hover:shadow-[0_6px_20px_rgba(255,59,48,0.4)] transition-all active:scale-90 outline-none border-none group"
+                                    title="Close"
+                                >
+                                    <X size={18} strokeWidth={4} className="group-hover:scale-110 transition-transform" />
+                                </button>
                             </div>
                         </div>
                         <div className="overflow-y-auto p-2 font-['Plus_Jakarta_Sans']">
@@ -310,7 +316,13 @@ const handleSave = async () => {
                             <h3 className="text-lg font-bold text-slate-800 tracking-tight">Search Card Type</h3>
                             <div className="flex gap-4">
                                 <input type="text" placeholder="Search cards..." className="h-9 border border-gray-300 px-3 text-sm rounded-md w-64 focus:border-blue-500 outline-none" value={cardSearchQuery} onChange={(e) => setCardSearchQuery(e.target.value)} />
-                                <button onClick={() => setShowCardModal(false)} className="w-8 h-8 flex items-center justify-center hover:bg-red-50 text-slate-400 hover:text-red-500 transition-colors rounded-full outline-none"><X size={24} /></button>
+                                <button
+                                    onClick={() => setShowCardModal(false)}
+                                    className="w-9 h-8 flex items-center justify-center bg-[#ff3b30] hover:bg-[#e03127] text-white rounded-[8px] shadow-[0_4px_12px_rgba(255,59,48,0.3)] hover:shadow-[0_6px_20px_rgba(255,59,48,0.4)] transition-all active:scale-90 outline-none border-none group"
+                                    title="Close"
+                                >
+                                    <X size={18} strokeWidth={4} className="group-hover:scale-110 transition-transform" />
+                                </button>
                             </div>
                         </div>
                         <div className="overflow-y-auto p-2 font-['Plus_Jakarta_Sans']">

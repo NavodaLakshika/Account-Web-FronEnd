@@ -1,8 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, Lock, Loader2, Facebook, Linkedin, Globe, X, ChevronRight } from 'lucide-react';
+import { User, Lock, Loader2, Facebook, Linkedin, Globe, X, ChevronRight, Settings } from 'lucide-react';
 import { authService } from '../services/auth.service';
 import CompanySelectModal from '../components/modals/CompanySelectModal';
+import AboutUsModal from '../components/modals/AboutUsModal';
+import ContactModal from '../components/modals/ContactModal';
+import HelpModal from '../components/modals/HelpModal';
 import toast from 'react-hot-toast';
 
 import { DotLottiePlayer } from '@dotlottie/react-player';
@@ -18,6 +21,10 @@ const AuthPage = () => {
     const [currentUser, setCurrentUser] = useState(null);
     const [showForgot, setShowForgot] = useState(false);
     const [forgotEmail, setForgotEmail] = useState('');
+    const [showSocialLinks, setShowSocialLinks] = useState(false);
+    const [showAboutUs, setShowAboutUs] = useState(false);
+    const [showContact, setShowContact] = useState(false);
+    const [showHelp, setShowHelp] = useState(false);
 
     const translations = {
         EN: {
@@ -214,7 +221,6 @@ const AuthPage = () => {
                         </div>
                     </div>
                     <p className="text-white text-xl font-bold tracking-widest uppercase mb-4 opacity-90">{t.systemTitle}</p>
-                    <a href="#" className="text-white/60 text-sm hover:text-white transition-all uppercase tracking-widest font-bold">Create New Account</a>
                 </div>
 
                 {/* Vertical Divider */}
@@ -317,24 +323,96 @@ const AuthPage = () => {
                 </div>
             </div>
 
-            {/* Social Icons (Top Right) */}
-            <div className="absolute top-8 right-12 flex gap-6 text-white/40 z-20">
-                <a href="#" className="hover:text-white transition-all transform hover:scale-110"><Facebook size={20} /></a>
-                <a href="#" className="hover:text-white transition-all transform hover:scale-110"><Linkedin size={20} /></a>
-                <a href="#" className="hover:text-white transition-all transform hover:scale-110"><Globe size={20} /></a>
+            {/* Social Media Icons (Top Left) - Appears on Toggle */}
+            <div 
+                className={`absolute top-8 left-12 z-20 flex items-center transition-all duration-700 ${
+                    showSocialLinks 
+                    ? 'opacity-100 translate-x-0' 
+                    : 'opacity-0 -translate-x-10 pointer-events-none'
+                }`}
+            >
+                <ul className="flex items-center gap-4 list-none m-0 p-0">
+                    {/* Facebook */}
+                    <li className="relative group flex flex-col items-center">
+                        <span className="absolute top-[50px] px-3 py-1.5 bg-[#4267B2] text-white text-[12px] font-bold rounded-[5px] opacity-0 group-hover:opacity-100 group-hover:top-[55px] transition-all duration-300 pointer-events-none shadow-lg shadow-[#4267B2]/30 after:content-[''] after:absolute after:top-[-5px] after:left-1/2 after:-translate-x-1/2 after:border-l-[6px] after:border-l-transparent after:border-r-[6px] after:border-r-transparent after:border-b-[6px] after:border-b-[#4267B2]">
+                            Facebook
+                        </span>
+                        <a href="https://www.facebook.com/onimta" target="_blank" rel="noreferrer" className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center text-white/60 hover:text-white hover:bg-[#4267B2] transition-all duration-300 shadow-xl group-hover:scale-110">
+                            <Facebook size={18} />
+                        </a>
+                    </li>
+
+                    {/* LinkedIn */}
+                    <li className="relative group flex flex-col items-center">
+                        <span className="absolute top-[50px] px-3 py-1.5 bg-[#0077b5] text-white text-[12px] font-bold rounded-[5px] opacity-0 group-hover:opacity-100 group-hover:top-[55px] transition-all duration-300 pointer-events-none shadow-lg shadow-[#0077b5]/30 after:content-[''] after:absolute after:top-[-5px] after:left-1/2 after:-translate-x-1/2 after:border-l-[6px] after:border-l-transparent after:border-r-[6px] after:border-r-transparent after:border-b-[6px] after:border-b-[#0077b5]">
+                            LinkedIn
+                        </span>
+                        <a href="https://www.linkedin.com/company/onimta" target="_blank" rel="noreferrer" className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center text-white/60 hover:text-white hover:bg-[#0077b5] transition-all duration-300 shadow-xl group-hover:scale-110">
+                            <Linkedin size={18} />
+                        </a>
+                    </li>
+
+                    {/* Web Link (Globe) */}
+                    <li className="relative group flex flex-col items-center">
+                        <span className="absolute top-[50px] px-3 py-1.5 bg-[#00acee] text-white text-[12px] font-bold rounded-[5px] opacity-0 group-hover:opacity-100 group-hover:top-[55px] transition-all duration-300 pointer-events-none shadow-lg shadow-[#00acee]/30 after:content-[''] after:absolute after:top-[-5px] after:left-1/2 after:-translate-x-1/2 after:border-l-[6px] after:border-l-transparent after:border-r-[6px] after:border-r-transparent after:border-b-[6px] after:border-b-[#00acee]">
+                            Website
+                        </span>
+                        <a href="https://www.onimta.com" target="_blank" rel="noreferrer" className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center text-white/60 hover:text-white hover:bg-[#00acee] transition-all duration-300 shadow-xl group-hover:scale-110">
+                            <Globe size={18} />
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            {/* Toggle Button (Top Right) */}
+            <div className="absolute top-8 right-12 z-20">
+                <button 
+                    onClick={() => setShowSocialLinks(!showSocialLinks)}
+                    className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-500 shadow-2xl relative z-30 ${
+                        showSocialLinks 
+                        ? 'bg-white/20 text-white rotate-[360deg]' 
+                        : 'bg-white/10 text-white/40 hover:text-white hover:bg-white/20'
+                    }`}
+                >
+                    {showSocialLinks ? <X size={20} /> : <Settings size={20} className="animate-[spin_4s_linear_infinite]" />}
+                </button>
             </div>
 
             {/* Bottom Footer Section */}
-            <div className="absolute bottom-6 left-10 text-[12px] text-white/40 font-mono tracking-wide">
-                Powered by Onimta Information Technology Pvt Ltd
+            {/* Bottom Footer Section (Right Side Links Connected to Toggle) */}
+            <div className="absolute bottom-6 right-10 z-20 overflow-hidden">
+                <div 
+                    className={`flex items-center gap-6 text-[12px] text-white/40 font-mono transition-all duration-700 ${
+                        showSocialLinks 
+                        ? 'opacity-100 translate-y-0' 
+                        : 'opacity-0 translate-y-10 pointer-events-none'
+                    }`}
+                >
+                    <button 
+                        onClick={() => setShowAboutUs(true)}
+                        className="cursor-pointer hover:text-white transition-colors"
+                    >
+                        About us
+                    </button>
+                    <span>|</span>
+                    <button 
+                        onClick={() => setShowContact(true)}
+                        className="cursor-pointer hover:text-white transition-colors "
+                    >
+                        Contact
+                    </button>
+                    <span>|</span>
+                    <button 
+                        onClick={() => setShowHelp(true)}
+                        className="hover:text-white transition-colors "
+                    >
+                        Help
+                    </button>
+                </div>
             </div>
 
-            <div className="absolute bottom-6 right-10 flex gap-6 text-[12px] text-white/40 font-mono">
-                <a href="#" className="hover:text-white transition-colors">About us</a>
-                <span>|</span>
-                <a href="#" className="hover:text-white transition-colors">Contact</a>
-                <span>|</span>
-                <a href="#" className="hover:text-white transition-colors">Help</a>
+            <div className="absolute bottom-6 left-10 text-[12px] text-white/40 font-mono tracking-wide">
+                Powered by Onimta Information Technology Pvt Ltd
             </div>
 
             {/* Company Selection Modal */}
@@ -343,6 +421,24 @@ const AuthPage = () => {
                 onClose={() => setShowSelection(false)} 
                 onSelect={handleCompanySelected}
                 user={currentUser}
+            />
+
+            {/* About Us Sidebar Modal */}
+            <AboutUsModal 
+                isOpen={showAboutUs} 
+                onClose={() => setShowAboutUs(false)} 
+            />
+
+            {/* Contact Bottom Modal */}
+            <ContactModal 
+                isOpen={showContact} 
+                onClose={() => setShowContact(false)} 
+            />
+
+            {/* Help Side Drawer Modal */}
+            <HelpModal 
+                isOpen={showHelp} 
+                onClose={() => setShowHelp(false)} 
             />
         </div>
     );

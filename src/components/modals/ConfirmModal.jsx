@@ -23,12 +23,13 @@ const ConfirmModal = ({
             />
             
             <div className="relative w-full max-w-md bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden animate-in zoom-in-95 duration-200">
-                <button 
+                <button
                     onClick={onClose}
                     disabled={loading}
-                    className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 transition-colors"
+                    className="absolute top-4 right-4 w-9 h-8 flex items-center justify-center bg-[#ff3b30] hover:bg-[#e03127] text-white rounded-[8px] shadow-[0_4px_12px_rgba(255,59,48,0.3)] hover:shadow-[0_6px_20px_rgba(255,59,48,0.4)] transition-all active:scale-90 outline-none border-none group"
+                    title="Close"
                 >
-                    <X size={20} />
+                    <X size={18} strokeWidth={4} className="group-hover:scale-110 transition-transform" />
                 </button>
 
                 <div className="p-8 text-center">

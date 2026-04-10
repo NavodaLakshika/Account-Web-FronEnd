@@ -25,13 +25,14 @@ const ReportsModal = ({ isOpen, onClose }) => {
                 <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-100 select-none">
                     <div className="flex items-center gap-2">
                         <BarChart3 size={14} className="text-[#0078d4]" />
-                        <span className="text-lg font-bold text-slate-800 tracking-tight">System Reports Center</span>
+                        <span className="text-lg font-bold text-slate-800 tracking-tight">System Reports</span>
                     </div>
                     <button 
                         onClick={onClose} 
-                        className="w-8 h-8 flex items-center justify-center hover:bg-red-50 text-slate-400 hover:text-red-500 transition-colors rounded-full group outline-none"
+                        className="w-9 h-8 flex items-center justify-center bg-[#ff3b30] hover:bg-[#e03127] text-white rounded-[8px] shadow-[0_4px_12px_rgba(255,59,48,0.3)] hover:shadow-[0_6px_20px_rgba(255,59,48,0.4)] transition-all active:scale-90 outline-none border-none group"
+                        title="Close"
                     >
-                        <X size={12} className="group-hover:stroke-white" />
+                        <X size={18} strokeWidth={4} className="group-hover:scale-110 transition-transform" />
                     </button>
                 </div>
 

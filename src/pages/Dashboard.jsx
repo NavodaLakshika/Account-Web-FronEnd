@@ -160,9 +160,26 @@ const Dashboard = () => {
 
     const [isTopBarCollapsed, setIsTopBarCollapsed] = useState(false);
     const [isAIThinking, setIsAIThinking] = useState(false);
+    const [activeLoadingIdx, setActiveLoadingIdx] = useState(0);
+    const [isLoaderStopped, setIsLoaderStopped] = useState(false);
+
+    // Strictly Sequential Loading Logic
+    useEffect(() => {
+        if (isLoaderStopped) return;
+        
+        const filteredCount = navItems.filter(item => item.label !== 'Search').length;
+        if (filteredCount === 0) return;
+
+        const interval = setInterval(() => {
+            setActiveLoadingIdx(prev => (prev + 1) % filteredCount);
+        }, 3000); // 3 seconds per card (matches animation)
+        
+        return () => clearInterval(interval);
+    }, [isLoaderStopped]);
 
     // Reminder Alarm Logic
     const [activeAlarmTask, setActiveAlarmTask] = useState(null);
+    const [pendingJobsCount, setPendingJobsCount] = useState(0);
     const [currentTime, setCurrentTime] = useState(new Date());
 
 
@@ -186,6 +203,14 @@ const Dashboard = () => {
             if (savedIcons) setRibbonIcons(JSON.parse(savedIcons));
         }
     }, [navigate]);
+
+    // Reset reminder states when user or company changes to prevent leaks across sessions
+    useEffect(() => {
+        setPendingJobsCount(0);
+        setPendingSnoozeTask(null);
+        setActiveAlarmTask(null);
+        setSnoozedReminders({});
+    }, [user?.id_No, user?.Id_No, selectedCompany?.id]);
 
     // Persistent set of task IDs that have already alerted today
     const [alertedTaskIds, setAlertedTaskIds] = useState(() => {
@@ -302,9 +327,24 @@ const Dashboard = () => {
                     return false;
                 });
 
+                const allDueTasks = reminders.filter(r => {
+                    const rId = r.id_No || r.Id_No || r.idNo;
+                    const rDate = (r.date || r.Date || '').trim();
+                    const rExpire = (r.expire || r.Expire || 'F').trim();
+                    return rExpire === 'F' && rDate === todayStr && !alertedTaskIds.has(rId);
+                });
+
+                setPendingJobsCount(allDueTasks.length);
+
+                // Ensure a task is always set for the bubble if we have pending jobs
+                if (allDueTasks.length > 0 && !pendingSnoozeTask) {
+                    setPendingSnoozeTask(allDueTasks[0]);
+                } else if (allDueTasks.length === 0) {
+                    setPendingSnoozeTask(null);
+                }
+
                 if (dueTask) {
                     setActiveAlarmTask(dueTask);
-                    // Persistent banner stays until finished or new snooze replaces it in dismiss logic
                 }
             } catch (error) {
                 console.error('Error checking reminders:', error);
@@ -656,11 +696,11 @@ const Dashboard = () => {
 
             {/* 2. Top Ribbon Navigation (Matches Reference Image) */}
             <header 
-                className={`z-50 text-white shadow-md transition-all duration-500 ease-in-out overflow-hidden ${isTopBarCollapsed ? 'h-8' : 'h-[120px]'}`}
+                className={`z-50 text-white shadow-md transition-all duration-500 ease-in-out overflow-hidden ${isTopBarCollapsed ? 'h-8' : 'h-[145px]'}`}
                 style={{ backgroundColor: topBarColor }}
             >
                 {/* Row 1: Text Menu */}
-                <div className={`flex items-center gap-6 px-4 py-1.5 border-b border-white/10 overflow-x-auto no-scrollbar transition-opacity duration-300 ${isTopBarCollapsed ? 'h-full flex items-center' : ''}`}>
+                <div className={`flex items-center h-7 gap-6 px-4 py-1.5 border-b border-white/10 overflow-x-auto no-scrollbar transition-opacity duration-300 mt-3 ${isTopBarCollapsed ? 'h-full flex items-center' : ''}`}>
                     {menuBar.map((item, idx) => (
                         <button
                             key={idx}
@@ -717,6 +757,20 @@ const Dashboard = () => {
                     )}
                 </div>
 
+                {/* Vertical Separator Gap - Dynamic Alert Bar (Fixed Persistence) */}
+                {!isTopBarCollapsed && (
+                    <div className="h-[4px] w-full bg-slate-100 shadow-[inset_0_1px_2px_rgba(0,0,0,0.1)] my-1 overflow-hidden relative">
+                        {pendingJobsCount > 0 && (
+                            <div 
+                                className="absolute inset-0 bg-gradient-to-r from-[#f05252] via-[#f05252] to-[#f05252] animate-[cardLoading_2s_ease-in-out_infinite]"
+                                style={{ 
+                                    boxShadow: '0 0 10px rgba(234, 7, 7, 0.4)',
+                                    backgroundSize: '200% 100%'
+                                }}
+                            />
+                        )}
+                    </div>
+                )}
 
                 {/* Row 2: Icon Ribbon */}
                 <div className={`flex items-center px-2 py-1 gap-1  overflow-x-auto no-scrollbar transition-all duration-500 ${isTopBarCollapsed ? 'opacity-0 -translate-y-10 scale-95 pointer-events-none' : 'opacity-100 translate-y-0 scale-100'}`}>
@@ -736,7 +790,7 @@ const Dashboard = () => {
                             bank_rec: { icon: RefreshCcw, label: 'Bank Rec', onClick: () => setShowBankRecModal(true), active: showBankRecModal },
                             trial_balance: { icon: BarChart2, label: 'Trial Balance', onClick: () => setShowTrialBalanceModal(true), active: showTrialBalanceModal },
                             search: { icon: Search, label: 'Search', onClick: () => setShowSearchModal(true), active: showSearchModal },
-                            ai_chat: { icon: Bot, label: 'AI Chat', onClick: handleAIClick, active: showAIChatbotModal, iconColor: 'text-blue-500' },
+                            ai_chat: { icon: Bot, label: 'AI Chat', onClick: handleAIClick, active: showAIChatbotModal },
                             department: { icon: Building2, label: 'Dept.', onClick: () => setShowDepartmentModal(true), active: showDepartmentModal },
                             calculator: { icon: Calculator, label: 'Calculator', onClick: () => window.open('ms-calculator:'), active: showCalculatorModal },
                             help: { icon: HelpCircle, label: 'Help', onClick: () => { } },
@@ -809,7 +863,12 @@ const Dashboard = () => {
                             return (
                                 <div key={idx} className="flex flex-col items-center gap-3 group">
                                     <button
-                                        onClick={item.onClick}
+                                        onMouseEnter={() => setIsLoaderStopped(true)}
+                                        onMouseLeave={() => setIsLoaderStopped(false)}
+                                        onClick={() => {
+                                            item.onClick();
+                                            setIsLoaderStopped(true);
+                                        }}
                                         className="w-full flex flex-col items-center justify-center p-6 bg-white border border-slate-200 rounded-[20px] shadow-sm hover:shadow-[0_20px_40px_-10px_rgba(0,120,212,0.2)] hover:border-[#0078d4]/50 hover:scale-[1.04] hover:-translate-y-2 active:scale-95 transition-all duration-500 ease-out relative overflow-hidden aspect-square"
                                     >
                                         {/* Focus Glow Effect */}
@@ -850,6 +909,19 @@ const Dashboard = () => {
                                                     )
                                                 )}
                                             </div>
+                                        </div>
+
+                                        {/* Premium Sequential Load Bar */}
+                                        <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-slate-50 overflow-hidden">
+                                            {(!isLoaderStopped && activeLoadingIdx === idx) && (
+                                                <div 
+                                                    className="h-full animate-[cardLoading_3s_ease-in-out_forwards]"
+                                                    style={{ 
+                                                        backgroundColor: topBarColor,
+                                                        opacity: 0.8,
+                                                    }}
+                                                />
+                                            )}
                                         </div>
                                     </button>
                                     <span className="text-[12px] font-medium text-slate-500 group-hover:text-[#0078d4] uppercase tracking-wider transition-colors duration-300 text-center leading-tight">
@@ -898,8 +970,8 @@ const Dashboard = () => {
 
             {/* Floating AI Assistant with Dynamic Positioning (Status-Based) */}
             <div className={`fixed bottom-16 z-[60] flex flex-col pointer-events-none transition-all duration-700 ease-in-out ${pendingSnoozeTask ? 'left-10 items-start' : 'right-10 items-end'}`}>
-                {/* Minimalist Red Quote Frame Speech Bubble for Task Alert */}
-                {pendingSnoozeTask && (
+                {/* Minimalist Red Quote Frame Speech Bubble (Persistent Alert) */}
+                {pendingJobsCount > 0 && pendingSnoozeTask && (
                     <div className="mb-4 ml-6 relative animate-in fade-in slide-in-from-bottom-2 duration-500 pointer-events-auto">
                         
                         {/* The Quote Frame Bubble */}
@@ -926,7 +998,7 @@ const Dashboard = () => {
                                      </div>
                                     
                                     <p className="text-[13px] font-medium leading-none text-slate-800 whitespace-nowrap">
-                                        Navoda, You have one pending job.
+                                        Navoda, You have {pendingJobsCount} pending {pendingJobsCount === 1 ? 'job' : 'jobs'}.
                                     </p>
                                  </div>
                                 
@@ -986,6 +1058,11 @@ const Dashboard = () => {
                     100% { transform: translateX(-50%); }
                 }
 
+                @keyframes cardLoading {
+                    0% { width: 0%; opacity: 1; }
+                    50% { width: 100%; opacity: 0.8; }
+                    100% { width: 100%; opacity: 0; }
+                }
                 .animate-marquee {
                     display: inline-flex;
                     animation: marquee 40s linear infinite;

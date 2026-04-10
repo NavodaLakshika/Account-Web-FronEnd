@@ -419,15 +419,25 @@ const CustomerBoard = ({ isOpen, onClose }) => {
                 <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4">
                     <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setShowSearchModal(false)} />
                     <div className="relative w-full max-w-2xl bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col max-h-[80vh]">
-                        <div className="px-6 py-4 flex items-center justify-between border-b border-gray-100 bg-white select-none">
+                        <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50 font-['Plus_Jakarta_Sans']">
                             <h3 className="text-lg font-bold text-slate-800 tracking-tight">Search Customers</h3>
-                            <input
-                                type="text"
-                                placeholder="Search by name or code..."
-                                className="h-9 border border-gray-300 px-3 text-sm rounded-md w-64"
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                            />
+                            <div className="flex gap-4">
+                                <input
+                                    type="text"
+                                    placeholder="Search by name or code..."
+                                    className="h-9 border border-gray-300 px-3 text-sm rounded-md w-64 focus:border-blue-500 outline-none shadow-sm"
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    autoFocus
+                                />
+                                <button 
+                                    onClick={() => setShowSearchModal(false)} 
+                                    className="w-9 h-8 flex items-center justify-center bg-[#ff3b30] hover:bg-[#e03127] text-white rounded-[8px] shadow-[0_4px_12px_rgba(255,59,48,0.3)] hover:shadow-[0_6px_20px_rgba(255,59,48,0.4)] transition-all active:scale-90 outline-none border-none group"
+                                    title="Close"
+                                >
+                                    <X size={18} strokeWidth={4} className="group-hover:scale-110 transition-transform" />
+                                </button>
+                            </div>
                         </div>
                         <div className="overflow-y-auto p-2">
                             <table className="w-full text-sm text-left">
@@ -463,9 +473,7 @@ const CustomerBoard = ({ isOpen, onClose }) => {
                                 </tbody>
                             </table>
                         </div>
-                        <div className="bg-slate-50 px-6 py-4 flex justify-end gap-3 border-t border-gray-100">
-                            <button onClick={() => setShowSearchModal(false)} className="px-6 h-10 flex items-center justify-center bg-slate-100 text-slate-600 text-sm font-bold rounded-md hover:bg-slate-200 transition-all active:scale-95">Close</button>
-                        </div>
+
                     </div>
                 </div>
             )}

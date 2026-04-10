@@ -512,8 +512,12 @@ const CompanyBoard = ({ isOpen, onClose }) => {
                                 <Building2 size={16} />
                                 <span className="text-sm font-bold">Search Company Lookup</span>
                             </div>
-                            <button onClick={() => setShowLookup(false)} className="hover:bg-white/20 p-1 rounded transition-colors">
-                                <X size={16} />
+                            <button
+                                onClick={() => setShowLookup(false)}
+                                className="w-9 h-8 flex items-center justify-center bg-[#ff3b30] hover:bg-[#e03127] text-white rounded-[8px] shadow-[0_4px_12px_rgba(255,59,48,0.3)] hover:shadow-[0_6px_20px_rgba(255,59,48,0.4)] transition-all active:scale-90 outline-none border-none group"
+                                title="Close"
+                            >
+                                <X size={18} strokeWidth={4} className="group-hover:scale-110 transition-transform" />
                             </button>
                         </div>
 
@@ -607,8 +611,12 @@ const CompanyBoard = ({ isOpen, onClose }) => {
                                 <Globe size={16} />
                                 <span className="text-sm font-bold">Search Country Lookup</span>
                             </div>
-                            <button onClick={() => setShowCountryLookup(false)} className="hover:bg-white/20 p-1 rounded transition-colors">
-                                <X size={16} />
+                            <button
+                                onClick={() => setShowCountryLookup(false)}
+                                className="w-9 h-8 flex items-center justify-center bg-[#ff3b30] hover:bg-[#e03127] text-white rounded-[8px] shadow-[0_4px_12px_rgba(255,59,48,0.3)] hover:shadow-[0_6px_20px_rgba(255,59,48,0.4)] transition-all active:scale-90 outline-none border-none group"
+                                title="Close"
+                            >
+                                <X size={18} strokeWidth={4} className="group-hover:scale-110 transition-transform" />
                             </button>
                         </div>
 
@@ -662,8 +670,12 @@ const CompanyBoard = ({ isOpen, onClose }) => {
                                 <Briefcase size={16} />
                                 <span className="text-sm font-bold">Search Industry Lookup</span>
                             </div>
-                            <button onClick={() => setShowIndustryLookup(false)} className="hover:bg-white/20 p-1 rounded transition-colors">
-                                <X size={16} />
+                            <button
+                                onClick={() => setShowIndustryLookup(false)}
+                                className="w-9 h-8 flex items-center justify-center bg-[#ff3b30] hover:bg-[#e03127] text-white rounded-[8px] shadow-[0_4px_12px_rgba(255,59,48,0.3)] hover:shadow-[0_6px_20px_rgba(255,59,48,0.4)] transition-all active:scale-90 outline-none border-none group"
+                                title="Close"
+                            >
+                                <X size={18} strokeWidth={4} className="group-hover:scale-110 transition-transform" />
                             </button>
                         </div>
 

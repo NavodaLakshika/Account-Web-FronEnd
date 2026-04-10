@@ -23,7 +23,7 @@ const AlarmAlertModal = ({ isOpen, onClose, task, onComplete }) => {
             />
             
             {/* Modal Container (Compact small size) */}
-            <div className="relative w-full max-w-[340px] bg-white rounded-[32px] shadow-[0_20px_40px_-10px_rgba(0,0,0,0.3)] overflow-hidden animate-in zoom-in-95 duration-300">
+            <div className="relative w-full max-w-[340px] bg-white rounded-[10px] shadow-[0_20px_40px_-10px_rgba(0,0,0,0.3)] overflow-hidden animate-in zoom-in-95 duration-300">
                 
                 {/* Header Section (Flat Red - Compact) */}
                 <div className="bg-[#f05252] h-[150px] flex items-center justify-center relative overflow-hidden">
@@ -70,14 +70,14 @@ const AlarmAlertModal = ({ isOpen, onClose, task, onComplete }) => {
                                 if (onComplete) onComplete(task);
                                 onClose();
                             }}
-                            className="w-full h-[48px] bg-[#f05252] text-white text-[13px] font-black rounded-full hover:bg-red-600 shadow-lg shadow-red-100 transition-all active:scale-95 flex items-center justify-center gap-2 uppercase tracking-widest"
+                            className="w-full h-[48px] bg-[#f05252] text-white text-[13px] font-black rounded-[10px] hover:bg-red-600 shadow-lg shadow-red-100 transition-all active:scale-95 flex items-center justify-center gap-2 uppercase tracking-widest"
                         >
                             <Check size={16} /> Mark Done
                         </button>
                         
                         <button 
                             onClick={onClose}
-                            className="w-full h-[48px] bg-white border-2 border-slate-200 text-slate-500 text-[13px] font-black rounded-full hover:bg-slate-50 transition-all active:scale-95 flex items-center justify-center gap-2 uppercase tracking-widest"
+                            className="w-full h-[48px] bg-white border-2 border-slate-200 text-slate-500 text-[13px] font-black rounded-[10px] hover:bg-slate-50 transition-all active:scale-95 flex items-center justify-center gap-2 uppercase tracking-widest"
                         >
                             <X size={16} /> Dismiss (30m)
                         </button>

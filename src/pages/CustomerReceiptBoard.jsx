@@ -433,7 +433,13 @@ const CustomerReceiptBoard = ({ isOpen, onClose }) => {
                                     onChange={(e) => setSearchTerm(e.target.value)} 
                                     autoFocus
                                 />
-                                <button onClick={() => setActiveModal(null)} className="w-8 h-8 flex items-center justify-center hover:bg-red-50 text-slate-400 hover:text-red-500 transition-colors rounded-full"><X size={24} /></button>
+                                <button 
+                                    onClick={() => setActiveModal(null)} 
+                                    className="w-9 h-8 flex items-center justify-center bg-[#ff3b30] hover:bg-[#e03127] text-white rounded-[8px] shadow-[0_4px_12px_rgba(255,59,48,0.3)] hover:shadow-[0_6px_20px_rgba(255,59,48,0.4)] transition-all active:scale-90 outline-none border-none group"
+                                    title="Close"
+                                >
+                                    <X size={18} strokeWidth={4} className="group-hover:scale-110 transition-transform" />
+                                </button>
                             </div>
                         </div>
                         <div className="overflow-y-auto p-2 font-['Plus_Jakarta_Sans']">

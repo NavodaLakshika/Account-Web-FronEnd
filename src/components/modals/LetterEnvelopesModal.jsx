@@ -21,16 +21,23 @@ const LetterEnvelopesModal = ({ isOpen, onClose }) => {
             <div className="relative w-full max-w-[280px] bg-white border border-gray-100 rounded-xl shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
                 
                 {/* Header */}
-                <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-100 select-none">
+                <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-100 select-none relative overflow-hidden">
+                    {/* System Color Left Accent */}
+                    <div 
+                        className="absolute left-0 top-0 bottom-0 w-1.5 transition-colors duration-500" 
+                        style={{ backgroundColor: localStorage.getItem('topBarColor') || '#0078d4' }}
+                    />
+                    
                     <div className="flex items-center gap-2">
                         <Briefcase size={14} className="text-[#0078d4]" />
                         <span className="text-lg font-bold text-slate-800 tracking-tight">Letters and Envelopes</span>
                     </div>
                     <button 
                         onClick={onClose} 
-                        className="w-8 h-8 flex items-center justify-center hover:bg-red-50 text-slate-400 hover:text-red-500 transition-colors rounded-full group outline-none"
+                        className="w-9 h-8 flex items-center justify-center bg-[#ff3b30] hover:bg-[#e03127] text-white rounded-[8px] shadow-[0_4px_12px_rgba(255,59,48,0.3)] hover:shadow-[0_6px_20px_rgba(255,59,48,0.4)] transition-all active:scale-90 outline-none border-none group"
+                        title="Close"
                     >
-                        <X size={12} className="group-hover:stroke-white" />
+                        <X size={18} strokeWidth={4} className="group-hover:scale-110 transition-transform" />
                     </button>
                 </div>
 
