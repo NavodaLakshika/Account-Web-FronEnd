@@ -962,8 +962,9 @@ const Dashboard = () => {
                 {/* Right: Company Credits (Above Ticker) */}
                 <div className="flex items-center gap-1.5 group relative z-20 bg-white pl-6">
                     <span className="text-[10px] font-medium text-slate-400 uppercase tracking-tighter">Powered by</span>
-                    <span className="text-[#0078d4] text-[12px] font-black tracking-tight group-hover:scale-105 transition-transform cursor-default uppercase">
-                        {selectedCompany?.CompanyName || selectedCompany?.companyName || "ONIMTA"}
+                    <span className="text-[#ef1022] text-[12px] font-black tracking-tight group-hover:scale-105 transition-transform cursor-default uppercase">
+                        {/*selectedCompany?.CompanyName || selectedCompany?.companyName || "ONIMTA"*/}
+                        ONIMTA
                     </span>
                 </div>
             </footer>
