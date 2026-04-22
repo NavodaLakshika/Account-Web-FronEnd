@@ -211,23 +211,27 @@ const FixedAssetsBoard = ({ isOpen, onClose }) => {
                 title="New Fixed Assets Item"
                 maxWidth="max-w-4xl"
                 footer={
-                    <div className="flex justify-center gap-3 w-full border-t pt-3 mt-2">
-                        <button onClick={handleSave} disabled={loading} className="px-8 h-8 bg-[#0078d4] text-white text-sm font-medium rounded-sm border hover:bg-[#005a9e] flex items-center gap-2">
+                    <div className="bg-slate-50 px-6 py-4 w-full flex justify-end gap-3 border-t border-gray-100 mt-4 rounded-b-xl">
+                        <button 
+                            onClick={handleSave} 
+                            disabled={loading} 
+                            className={`px-6 h-10 bg-[#50af60] text-white text-[13px] font-bold rounded-[5px] shadow-md shadow-green-200 hover:bg-[#24db4e] transition-all active:scale-95 flex items-center justify-center gap-2 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        >
                             {loading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />} 
                             {isEditMode ? 'Update' : 'Save'}
                         </button>
-                        <button onClick={handleClear} className="px-6 h-10 bg-slate-100 text-slate-600 text-sm font-bold rounded-md hover:bg-slate-200 transition-all active:scale-95 flex items-center gap-2">
+                        <button onClick={handleClear} className="px-6 h-10 bg-[#00adff] text-white text-[13px] font-bold rounded-[5px] hover:bg-[#0099e6] shadow-md shadow-blue-200 transition-all active:scale-95 flex items-center justify-center gap-2 border-none">
                             <RotateCcw size={14} /> Clear
                         </button>
-                        <button onClick={onClose} className="px-6 h-10 bg-slate-100 text-slate-600 text-sm font-bold rounded-md hover:bg-slate-200 transition-all active:scale-95 flex items-center gap-2">
+                        <button onClick={onClose} className="px-6 h-10 bg-[#d13438] text-white text-[13px] font-bold rounded-[5px] shadow-md shadow-red-200 hover:bg-[#a4262c] transition-all active:scale-95 flex items-center justify-center gap-2">
                             <X size={14} /> Exit
                         </button>
                     </div>
                 }
             >
-                <div className="space-y-4 py-2 font-['Plus_Jakarta_Sans']">
+                <div className="py-2 select-none font-['Tahoma'] space-y-4">
                     {/* Info Header */}
-                    <div className="bg-[#f0f9ff] border border-[#bae6fd] p-3 rounded-sm shadow-sm">
+                    <div className="bg-[#f0f9ff] border border-[#bae6fd] p-3 rounded-[5px] shadow-sm">
                         <p className="text-[12px] font-bold text-[#0369a1] text-center leading-relaxed italic">
                             Use for property you purchase, track, and may eventually sell. Fixed assets are
                             long-lived assets, such as land, buildings, furniture, equipment, and vehicles.
@@ -235,21 +239,21 @@ const FixedAssetsBoard = ({ isOpen, onClose }) => {
                     </div>
 
                     {/* Top Section */}
-                    <div className="bg-white p-4 border border-gray-200 rounded-sm space-y-3 shadow-sm">
+                    <div className="bg-white p-4 border border-gray-200 rounded-[5px] space-y-3 shadow-sm">
                         <div className="flex items-center gap-3">
-                            <label className="text-[12px] font-extrabold text-gray-700 w-[140px] shrink-0 uppercase">Asset Number / Name</label>
+                            <label className="text-[12px] font-bold text-gray-700 w-[140px] shrink-0 uppercase">Asset Number / Name</label>
                             <div className="flex flex-1 gap-2">
-                                <input type="text" name="AssetsCode" value={formData.AssetsCode} onChange={handleInputChange} readOnly className="w-32 h-8 border border-gray-300 px-2 text-sm bg-gray-50 font-bold text-blue-600 rounded-sm" />
+                                <input type="text" name="AssetsCode" value={formData.AssetsCode} onChange={handleInputChange} readOnly className="w-32 h-8 border border-gray-300 px-2 text-sm bg-gray-50 font-bold text-blue-600 rounded-[5px] text-center" />
                                 <div className="flex-1 flex gap-1">
-                                    <input type="text" name="AssetsName" value={formData.AssetsName} onChange={handleInputChange} className="flex-1 h-8 border border-gray-300 px-2 text-sm focus:border-blue-500 outline-none rounded-sm bg-white font-medium" placeholder="Enter asset display name" />
-                                    <button onClick={openSearch} className="w-9 h-8 bg-[#0078d4] text-white flex items-center justify-center hover:bg-[#005a9e] rounded-sm transition-all shadow-sm"><Search size={16} /></button>
+                                    <input type="text" name="AssetsName" value={formData.AssetsName} onChange={handleInputChange} className="flex-1 h-8 border border-gray-300 px-3 text-[12.5px] focus:border-blue-500 outline-none rounded-[5px] bg-white font-bold text-gray-700 shadow-sm" placeholder="Enter asset display name" />
+                                    <button onClick={openSearch} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95"><Search size={18} /></button>
                                 </div>
                             </div>
                         </div>
 
                         <div className="flex items-center gap-3">
-                            <label className="text-[12px] font-extrabold text-gray-700 w-[140px] shrink-0 uppercase">Asset Accounts of</label>
-                            <select name="AccCode" value={formData.AccCode} onChange={handleInputChange} className="flex-1 h-8 border border-gray-300 px-2 text-sm focus:border-blue-500 outline-none rounded-sm bg-white font-medium">
+                            <label className="text-[12px] font-bold text-gray-700 w-[140px] shrink-0 uppercase">Asset Accounts of</label>
+                            <select name="AccCode" value={formData.AccCode} onChange={handleInputChange} className="flex-1 h-8 border border-gray-300 px-2 text-[12.5px] focus:border-blue-400 outline-none rounded-[5px] bg-white font-bold text-gray-700 shadow-sm">
                                 <option value="">&lt; Select Account &gt;</option>
                                 {accounts.map((acc, idx) => (
                                     <option key={idx} value={acc.code} disabled={acc.code === '300-100'}>{acc.name}</option>
@@ -261,12 +265,12 @@ const FixedAssetsBoard = ({ isOpen, onClose }) => {
                     {/* Middle Grid */}
                     <div className="grid grid-cols-2 gap-4">
                         {/* Purchase Information */}
-                        <div className="border border-gray-200 rounded-sm p-4 relative pt-6 bg-slate-50/30">
-                            <span className="absolute -top-3 left-3 bg-white px-2 py-0.5 border border-gray-200 rounded-full text-[10px] font-black text-[#0078d4] uppercase tracking-wider shadow-sm">Purchase Information</span>
+                        <div className="border border-gray-200 rounded-[5px] p-4 relative pt-6 bg-slate-50/30">
+                            <span className="absolute -top-3 left-3 bg-white px-2 py-0.5 border border-gray-200 rounded-full text-[10px] font-bold text-[#0078d4] uppercase tracking-wider shadow-sm">Purchase Information</span>
                             <div className="space-y-3">
                                 <div>
                                     <label className="text-[11px] font-bold text-gray-500 uppercase block mb-1">Purchase Description</label>
-                                    <input type="text" name="PurchDescription" value={formData.PurchDescription} onChange={handleInputChange} className="w-full h-8 border border-gray-300 px-2 text-sm focus:border-blue-500 outline-none rounded-sm bg-white" />
+                                    <input type="text" name="PurchDescription" value={formData.PurchDescription} onChange={handleInputChange} className="w-full h-8 border border-gray-300 px-3 text-[12.5px] focus:border-blue-400 outline-none rounded-[5px] bg-white shadow-sm" />
                                 </div>
                                 <div className="flex items-center gap-6">
                                     <label className="text-[11px] font-bold text-gray-500 uppercase">Asset is</label>
@@ -284,47 +288,47 @@ const FixedAssetsBoard = ({ isOpen, onClose }) => {
                                 <div className="grid grid-cols-2 gap-3">
                                     <div>
                                         <label className="text-[11px] font-bold text-gray-500 uppercase block mb-1">Date</label>
-                                        <input type="date" name="PurchDate" value={formData.PurchDate} onChange={handleInputChange} className="w-full h-8 border border-gray-300 px-2 text-sm focus:border-blue-500 outline-none rounded-sm bg-white" />
+                                        <input type="date" name="PurchDate" value={formData.PurchDate} onChange={handleInputChange} className="w-full h-8 border border-gray-300 px-3 text-[12.5px] focus:border-blue-400 outline-none rounded-[5px] bg-white shadow-sm" />
                                     </div>
                                     <div>
                                         <label className="text-[11px] font-bold text-gray-500 uppercase block mb-1">Cost</label>
-                                        <input type="number" name="PurchCost" value={formData.PurchCost} onChange={handleInputChange} className="w-full h-8 border border-gray-300 px-2 text-sm focus:border-blue-500 outline-none rounded-sm bg-white text-right font-bold text-blue-600" step="0.01" />
+                                        <input type="number" name="PurchCost" value={formData.PurchCost} onChange={handleInputChange} className="w-full h-8 border border-gray-300 px-3 text-[12.5px] focus:border-blue-400 outline-none rounded-[5px] bg-white text-right font-bold text-blue-600 shadow-sm" step="0.01" />
                                     </div>
                                 </div>
                                 <div>
                                     <label className="text-[11px] font-bold text-gray-500 uppercase block mb-1">Vendor / Payee</label>
-                                    <input type="text" name="Vendor" value={formData.Vendor} onChange={handleInputChange} className="w-full h-8 border border-gray-300 px-2 text-sm focus:border-blue-500 outline-none rounded-sm bg-white" />
+                                    <input type="text" name="Vendor" value={formData.Vendor} onChange={handleInputChange} className="w-full h-8 border border-gray-300 px-3 text-[12.5px] focus:border-blue-400 outline-none rounded-[5px] bg-white shadow-sm" />
                                 </div>
                             </div>
                         </div>
 
                         {/* Sales Information */}
-                        <div className="border border-gray-200 rounded-sm p-4 relative pt-6 bg-slate-50/30">
-                            <span className="absolute -top-3 left-3 bg-white px-2 py-0.5 border border-gray-200 rounded-full text-[10px] font-black text-[#d13438] uppercase tracking-wider shadow-sm">Sales Information</span>
+                        <div className="border border-gray-200 rounded-[5px] p-4 relative pt-6 bg-slate-50/30">
+                            <span className="absolute -top-3 left-3 bg-white px-2 py-0.5 border border-gray-200 rounded-full text-[10px] font-bold text-[#d13438] uppercase tracking-wider shadow-sm">Sales Information</span>
                             <div className="space-y-3">
                                 <div>
                                     <label className="text-[11px] font-bold text-gray-500 uppercase block mb-1">Sales Description</label>
-                                    <input type="text" name="SalesDescription" value={formData.SalesDescription} onChange={handleInputChange} className="w-full h-8 border border-gray-300 px-2 text-sm focus:border-blue-500 outline-none rounded-sm bg-white" />
+                                    <input type="text" name="SalesDescription" value={formData.SalesDescription} onChange={handleInputChange} className="w-full h-8 border border-gray-300 px-3 text-[12.5px] focus:border-blue-400 outline-none rounded-[5px] bg-white shadow-sm" />
                                 </div>
                                 <div className="flex items-center justify-between">
                                     <label className="flex items-center gap-2 cursor-pointer group">
-                                        <input type="checkbox" name="AssetSold" checked={formData.AssetSold === 'Sold'} onChange={handleInputChange} className="w-4 h-4 rounded-sm border-gray-300 text-red-600 focus:ring-red-500" />
-                                        <span className="text-xs font-black text-red-600 group-hover:underline">ASSET IS SOLD</span>
+                                        <input type="checkbox" name="AssetSold" checked={formData.AssetSold === 'Sold'} onChange={handleInputChange} className="w-4 h-4 rounded-[5px] border-gray-300 text-red-600 focus:ring-red-500" />
+                                        <span className="text-xs font-bold text-red-600 group-hover:underline uppercase tracking-tight">Asset is Sold</span>
                                     </label>
                                 </div>
                                 <div className="grid grid-cols-2 gap-3">
                                     <div>
                                         <label className="text-[11px] font-bold text-gray-500 uppercase block mb-1">Sales Date</label>
-                                        <input type="date" name="SalesDate" value={formData.SalesDate} onChange={handleInputChange} disabled={formData.AssetSold !== 'Sold'} className="w-full h-8 border border-gray-300 px-2 text-sm focus:border-blue-500 outline-none rounded-sm bg-white disabled:bg-gray-100 opacity-80" />
+                                        <input type="date" name="SalesDate" value={formData.SalesDate} onChange={handleInputChange} disabled={formData.AssetSold !== 'Sold'} className="w-full h-8 border border-gray-300 px-3 text-[12.5px] focus:border-blue-400 outline-none rounded-[5px] bg-white disabled:bg-gray-100 shadow-sm" />
                                     </div>
                                     <div>
                                         <label className="text-[11px] font-bold text-gray-500 uppercase block mb-1">Sales Price</label>
-                                        <input type="number" name="SellingPrice" value={formData.SellingPrice} onChange={handleInputChange} disabled={formData.AssetSold !== 'Sold'} className="w-full h-8 border border-gray-300 px-2 text-sm focus:border-blue-500 outline-none rounded-sm bg-white text-right font-bold text-red-600 disabled:bg-gray-100" step="0.01" />
+                                        <input type="number" name="SellingPrice" value={formData.SellingPrice} onChange={handleInputChange} disabled={formData.AssetSold !== 'Sold'} className="w-full h-8 border border-gray-300 px-3 text-[12.5px] focus:border-blue-400 outline-none rounded-[5px] bg-white text-right font-bold text-red-600 disabled:bg-gray-100 shadow-sm" step="0.01" />
                                     </div>
                                 </div>
                                 <div>
                                     <label className="text-[11px] font-bold text-gray-500 uppercase block mb-1">Sales Expense</label>
-                                    <input type="number" name="SalesExpense" value={formData.SalesExpense} onChange={handleInputChange} disabled={formData.AssetSold !== 'Sold'} className="w-full h-8 border border-gray-300 px-2 text-sm focus:border-blue-500 outline-none rounded-sm bg-white text-right disabled:bg-gray-100" step="0.01" />
+                                    <input type="number" name="SalesExpense" value={formData.SalesExpense} onChange={handleInputChange} disabled={formData.AssetSold !== 'Sold'} className="w-full h-8 border border-gray-300 px-3 text-[12.5px] focus:border-blue-400 outline-none rounded-[5px] bg-white text-right disabled:bg-gray-100 shadow-sm" step="0.01" />
                                 </div>
                             </div>
                         </div>
@@ -364,57 +368,73 @@ const FixedAssetsBoard = ({ isOpen, onClose }) => {
             </SimpleModal>
 
             {showSearchModal && (
-                <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4">
+                <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4 font-['Tahoma']">
                     <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setShowSearchModal(false)} />
-                    <div className="relative w-full max-w-3xl bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col max-h-[80vh] border border-gray-300 animate-in fade-in zoom-in-95 duration-200">
-                        <div className="px-6 py-4 flex items-center justify-between border-b border-gray-100 bg-white select-none">
-                            <div className="flex items-center gap-3">
-                                <PlusCircle size={20} className="text-[#0078d4]" />
-                                <h3 className="font-black text-gray-700 uppercase tracking-tight">Fixed Asset Registry Search</h3>
+                    <div className="relative w-full max-w-3xl bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
+                        {/* Header */}
+                        <div className="bg-[#0078d4] px-4 py-2 flex items-center justify-between text-white">
+                            <div className="flex items-center gap-2">
+                                <Search size={16} />
+                                <span className="text-sm font-bold uppercase tracking-tight">Fixed Asset Registry Lookup</span>
                             </div>
-                            <div className="flex gap-4">
-                                <div className="relative">
-                                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={14} />
-                                    <input 
-                                        type="text" 
-                                        placeholder="Search asset..." 
-                                        className="h-9 border border-gray-300 pl-9 pr-3 text-sm rounded-md w-64 focus:border-blue-500 outline-none shadow-sm"
-                                        value={searchQuery}
-                                        onChange={(e) => setSearchQuery(e.target.value)}
-                                    />
-                                </div>
-                                <button onClick={() => setShowSearchModal(false)} className="text-gray-400 hover:text-[#d13438] transition-colors"><X size={24} /></button>
+                            <button
+                                onClick={() => setShowSearchModal(false)}
+                                className="w-9 h-8 flex items-center justify-center bg-[#ff3b30] hover:bg-[#e03127] text-white rounded-[8px] shadow-[0_4px_12px_rgba(255,59,48,0.3)] hover:shadow-[0_6px_20px_rgba(255,59,48,0.4)] transition-all active:scale-90 outline-none border-none group"
+                                title="Close"
+                            >
+                                <X size={18} strokeWidth={4} className="group-hover:scale-110 transition-transform" />
+                            </button>
+                        </div>
+
+                        {/* Search Input Area */}
+                        <div className="p-3 bg-slate-50 border-b border-gray-100 flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                <Search size={14} className="text-gray-400" />
+                                <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest text-center">Search Facility</span>
+                            </div>
+                            <input 
+                                type="text" 
+                                placeholder="Find by Asset Name or ID..." 
+                                className="h-9 border border-gray-300 px-3 text-xs rounded-md w-72 focus:border-[#0285fd] outline-none shadow-sm transition-all" 
+                                value={searchQuery} 
+                                onChange={(e) => setSearchQuery(e.target.value)} 
+                            />
+                        </div>
+
+                        {/* Results List */}
+                        <div className="p-2">
+                            <div className="bg-gray-100 px-3 py-1.5 flex text-[10px] font-bold text-gray-600 border-b border-gray-200 uppercase tracking-wider">
+                                <span className="w-32 text-center">Asset ID</span>
+                                <span className="flex-1 px-3">Asset Description</span>
+                            </div>
+                            <div className="max-h-[400px] overflow-y-auto custom-scrollbar">
+                                {assetsList.filter(a => (a.assets_Name || '').toLowerCase().includes(searchQuery.toLowerCase()) || (a.assets_Code || '').toLowerCase().includes(searchQuery.toLowerCase())).map((asset, idx) => (
+                                    <button 
+                                        key={idx} 
+                                        onClick={() => selectAsset(asset.assets_Code)}
+                                        className="w-full flex items-center justify-between px-3 py-2 text-xs border-b border-gray-100 hover:bg-blue-50 transition-all text-left group"
+                                    >
+                                        <div className="flex items-center gap-2 flex-1">
+                                            <span className="w-32 text-center font-mono text-[11px] font-bold text-[#0078d4]">
+                                                {asset.assets_Code}
+                                            </span>
+                                            <span className="flex-1 px-3 font-mono font-medium text-gray-700 uppercase">
+                                                {asset.assets_Name}
+                                            </span>
+                                        </div>
+                                        <div className="bg-[#e49e1b] text-white text-[10px] px-5 py-1.5 rounded-md font-bold hover:bg-[#cb9b34] shadow-sm transition-all active:scale-95 uppercase">Select</div>
+                                    </button>
+                                ))}
+                                {assetsList.length === 0 && (
+                                    <div className="p-8 text-center text-gray-400 italic text-sm">No assets found in registry.</div>
+                                )}
                             </div>
                         </div>
-                        <div className="overflow-y-auto p-2 font-['Plus_Jakarta_Sans']">
-                            <table className="w-full text-sm text-left border-collapse">
-                                <thead className="bg-[#f8fafd] border-b text-[11px] font-black text-gray-500 uppercase tracking-widest sticky top-0 z-10">
-                                    <tr>
-                                        <th className="p-3 text-center w-32 border-r">Asset ID</th>
-                                        <th className="p-3">Asset Description</th>
-                                        <th className="p-3 text-center w-24">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {assetsList.filter(a => (a.assets_Name || '').toLowerCase().includes(searchQuery.toLowerCase()) || (a.assets_Code || '').toLowerCase().includes(searchQuery.toLowerCase())).map((asset, idx) => (
-                                        <tr key={idx} className="hover:bg-blue-50/50 transition-colors border-b last:border-0 group">
-                                            <td className="p-3 text-center font-bold text-blue-600 border-r">{asset.assets_Code}</td>
-                                            <td className="p-3 font-semibold text-gray-700 uppercase">{asset.assets_Name}</td>
-                                            <td className="p-3 text-center">
-                                                <button onClick={() => selectAsset(asset.assets_Code)} className="bg-white border border-[#0078d4] text-[#0078d4] text-[10px] px-3 py-1.5 rounded-sm font-black hover:bg-[#0078d4] hover:text-white transition-all">SELECT</button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                    {assetsList.length === 0 && (
-                                        <tr>
-                                            <td colSpan="3" className="p-12 text-center text-gray-400 italic font-medium">No assets found in registry</td>
-                                        </tr>
-                                    )}
-                                </tbody>
-                            </table>
-                        </div>
-                        <div className="p-3 bg-gray-50 border-t border-gray-200 text-[10px] font-bold text-gray-400 text-center uppercase tracking-widest leading-none">
-                            Found {assetsList.length} Active Asset Registrations
+
+                        {/* Footer */}
+                        <div className="bg-gray-50 px-4 py-2 border-t border-gray-200 flex justify-between items-center text-[10px] text-gray-400">
+                            <span>{assetsList.length} Result(s)</span>
+                            <span className="italic font-bold text-[#0078d4]">ACCOUNT CLOUD INFRASTRUCTURE</span>
                         </div>
                     </div>
                 </div>

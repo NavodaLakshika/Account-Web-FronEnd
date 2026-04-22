@@ -141,42 +141,46 @@ const handleSave = async () => {
                     <button 
                         onClick={handleSave} 
                         disabled={loading} 
-                        className={`px-6 h-10 bg-[#0078d4] text-white text-sm font-bold rounded-md shadow-md shadow-blue-200 hover:bg-[#005a9e] transition-all active:scale-95 flex items-center justify-center gap-2 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        className={`px-6 h-10 bg-[#50af60] text-white text-[13px] font-bold rounded-[5px] shadow-md shadow-green-200 hover:bg-[#24db4e] transition-all active:scale-95 flex items-center justify-center gap-2 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                     >
                         {loading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />} 
                         Save
                     </button>
                     <button 
                         onClick={handleClear} 
-                        className="px-6 h-10 bg-slate-100 text-slate-600 text-sm font-bold rounded-md hover:bg-slate-200 transition-all active:scale-95 flex items-center justify-center gap-2 border-none"
+                        className="px-6 h-10 bg-[#00adff] text-white text-[13px] font-bold rounded-[5px] hover:bg-[#0099e6] shadow-md shadow-blue-200 transition-all active:scale-95 flex items-center justify-center gap-2 border-none"
                     >
                         <RotateCcw size={14} /> Clear
                     </button>
                     <button 
                         onClick={onClose} 
-                        className="px-6 h-10 bg-slate-100 text-slate-600 text-sm font-bold rounded-md hover:bg-slate-200 transition-all active:scale-95 flex items-center justify-center gap-2 border-none"
+                        className="px-6 h-10 bg-[#d13438] text-white text-[13px] font-bold rounded-[5px] shadow-md shadow-red-200 hover:bg-[#a4262c] transition-all active:scale-95 flex items-center justify-center gap-2"
                     >
                         <X size={14} /> Exit
                     </button>
                 </div>
             }
         >
-            <div className="space-y-6 py-4 font-['Plus_Jakarta_Sans']">
-                <div className="space-y-3">
+            <div className="py-2 select-none font-['Tahoma'] space-y-4 text-[12.5px] mt-4 min-h-[300px]">
+                <div className="border-b border-gray-200 pb-4 mb-4 flex items-center justify-center">
+                    <h2 className="text-[17px] font-bold text-black uppercase tracking-tight">Commission Rate Profile & Update</h2>
+                </div>
+
+                <div className="space-y-4">
                     {/* Bank Selection */}
-                    <div className="flex items-center gap-3">
-                        <label className="text-[12.5px] font-bold text-gray-700 w-32 shrink-0">Bank Account</label>
-                        <div className="flex-1 flex gap-2">
+                    <div className="flex items-center gap-6">
+                        <label className="w-32 font-bold text-gray-700">Bank Account</label>
+                        <div className="flex-1 flex gap-3">
                             <input 
                                 type="text" 
                                 value={formData.BankAccName || formData.BankAccCode} 
                                 readOnly 
                                 placeholder="Search Bank Account..." 
-                                className="flex-1 h-8 border border-gray-300 px-2 text-[12.5px] bg-gray-50 rounded-sm outline-none font-bold text-blue-600" 
+                                className="flex-1 h-8 border border-gray-300 px-3 text-[12.5px] bg-gray-50 rounded-[5px] outline-none font-bold text-blue-600 shadow-sm cursor-default" 
                             />
                             <button 
                                 onClick={() => setShowBankModal(true)} 
-                                className="w-9 h-8 bg-[#0078d4] text-white flex items-center justify-center hover:bg-[#005a9e] rounded-sm transition-colors shadow-sm"
+                                className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95"
                             >
                                 <Search size={18} />
                             </button>
@@ -184,19 +188,19 @@ const handleSave = async () => {
                     </div>
 
                     {/* Card Type Selection */}
-                    <div className="flex items-center gap-3">
-                        <label className="text-[12.5px] font-bold text-gray-700 w-32 shrink-0">Card Type</label>
-                        <div className="flex-1 flex gap-2">
+                    <div className="flex items-center gap-6">
+                        <label className="w-32 font-bold text-gray-700">Card Type</label>
+                        <div className="flex-1 flex gap-3">
                             <input 
                                 type="text" 
                                 value={formData.CardType || formData.CardID} 
                                 readOnly 
                                 placeholder="Search Card Type..." 
-                                className="flex-1 h-8 border border-gray-300 px-2 text-[12.5px] bg-gray-50 rounded-sm outline-none font-medium text-gray-700" 
+                                className="flex-1 h-8 border border-gray-300 px-3 text-[12.5px] bg-gray-50 rounded-[5px] outline-none font-bold text-gray-700 shadow-sm cursor-default" 
                             />
                             <button 
                                 onClick={() => setShowCardModal(true)} 
-                                className="w-9 h-8 bg-[#0078d4] text-white flex items-center justify-center hover:bg-[#005a9e] rounded-sm transition-colors shadow-sm"
+                                className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95"
                             >
                                 <Search size={18} />
                             </button>
@@ -204,18 +208,18 @@ const handleSave = async () => {
                     </div>
 
                     {/* Commission Rate Input */}
-                    <div className="flex items-center gap-3 pt-2">
-                        <label className="text-[12.5px] font-bold text-gray-700 w-32 shrink-0">Commission Rate</label>
-                        <div className="flex items-center gap-2 flex-1">
+                    <div className="flex items-center gap-6 pt-2">
+                        <label className="w-32 font-bold text-gray-700">Commission Rate</label>
+                        <div className="flex items-center gap-3 flex-1">
                             <input 
                                 type="number" 
                                 step="0.1"
                                 value={formData.Rate}
                                 onChange={(e) => setFormData(prev => ({ ...prev, Rate: e.target.value }))}
-                                className="w-32 h-8 border border-gray-300 px-3 text-[12.5px] text-right outline-none focus:border-blue-400 rounded-sm bg-white font-bold"
+                                className="w-32 h-8 border border-gray-300 px-3 text-[12.5px] text-right outline-none focus:border-blue-400 rounded-[5px] bg-white font-bold shadow-sm transition-all focus:shadow-md"
                                 placeholder="0.0"
                             />
-                            <span className="text-sm font-black text-gray-700">%</span>
+                            <span className="text-sm font-black text-[#0078d4]">% Percentage</span>
                         </div>
                     </div>
                 </div>
@@ -265,43 +269,73 @@ const handleSave = async () => {
 
             {/* Bank Search Modal */}
             {showBankModal && (
-                <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4">
+                <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4 font-['Tahoma']">
                     <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setShowBankModal(false)} />
-                    <div className="relative w-full max-w-2xl bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col max-h-[85vh]">
-                        <div className="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-50 font-['Plus_Jakarta_Sans']">
-                            <h3 className="text-lg font-bold text-slate-800 tracking-tight">Search Bank Account</h3>
-                            <div className="flex gap-4">
-                                <input type="text" placeholder="Search accounts..." className="h-9 border border-gray-300 px-3 text-sm rounded-md w-64 focus:border-blue-500 outline-none" value={bankSearchQuery} onChange={(e) => setBankSearchQuery(e.target.value)} />
-                                <button
-                                    onClick={() => setShowBankModal(false)}
-                                    className="w-9 h-8 flex items-center justify-center bg-[#ff3b30] hover:bg-[#e03127] text-white rounded-[8px] shadow-[0_4px_12px_rgba(255,59,48,0.3)] hover:shadow-[0_6px_20px_rgba(255,59,48,0.4)] transition-all active:scale-90 outline-none border-none group"
-                                    title="Close"
-                                >
-                                    <X size={18} strokeWidth={4} className="group-hover:scale-110 transition-transform" />
-                                </button>
+                    <div className="relative w-full max-w-2xl bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
+                        {/* Header */}
+                        <div className="bg-[#0078d4] px-4 py-2 flex items-center justify-between text-white">
+                            <div className="flex items-center gap-2">
+                                <Search size={16} />
+                                <span className="text-sm font-bold uppercase tracking-tight">Bank Account Lookup</span>
+                            </div>
+                            <button
+                                onClick={() => setShowBankModal(false)}
+                                className="w-9 h-8 flex items-center justify-center bg-[#ff3b30] hover:bg-[#e03127] text-white rounded-[8px] shadow-[0_4px_12px_rgba(255,59,48,0.3)] hover:shadow-[0_6px_20px_rgba(255,59,48,0.4)] transition-all active:scale-90 outline-none border-none group"
+                                title="Close"
+                            >
+                                <X size={18} strokeWidth={4} className="group-hover:scale-110 transition-transform" />
+                            </button>
+                        </div>
+
+                        {/* Search Input Area */}
+                        <div className="p-3 bg-slate-50 border-b border-gray-100 flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                <Search size={14} className="text-gray-400" />
+                                <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest text-center">Search Facility</span>
+                            </div>
+                            <input 
+                                type="text" 
+                                placeholder="Find by Name or Code..." 
+                                className="h-9 border border-gray-300 px-3 text-xs rounded-md w-72 focus:border-[#0285fd] outline-none shadow-sm transition-all" 
+                                value={bankSearchQuery} 
+                                onChange={(e) => setBankSearchQuery(e.target.value)} 
+                            />
+                        </div>
+
+                        {/* Results List */}
+                        <div className="p-2">
+                            <div className="bg-gray-100 px-3 py-1.5 flex text-[10px] font-bold text-gray-600 border-b border-gray-200 uppercase tracking-wider">
+                                <span className="w-32 text-center">Sub Code</span>
+                                <span className="flex-1 px-3">Account Name</span>
+                            </div>
+                            <div className="max-h-[400px] overflow-y-auto custom-scrollbar">
+                                {bankAccounts.filter(b => (b.sub_Acc_Name || '').toLowerCase().includes(bankSearchQuery.toLowerCase()) || (b.sub_Code || '').toLowerCase().includes(bankSearchQuery.toLowerCase())).map(b => (
+                                    <button 
+                                        key={b.sub_Code} 
+                                        onClick={() => handleBankSelect(b.sub_Code, b.sub_Acc_Name)}
+                                        className="w-full flex items-center justify-between px-3 py-2 text-xs border-b border-gray-100 hover:bg-blue-50 transition-all text-left group"
+                                    >
+                                        <div className="flex items-center gap-2 flex-1">
+                                            <span className="w-32 text-center font-mono text-[11px] font-bold text-[#0078d4]">
+                                                {b.sub_Code}
+                                            </span>
+                                            <span className="flex-1 px-3 font-mono font-medium text-gray-700 uppercase">
+                                                {b.sub_Acc_Name}
+                                            </span>
+                                        </div>
+                                        <div className="bg-[#e49e1b] text-white text-[10px] px-5 py-1.5 rounded-md font-bold hover:bg-[#cb9b34] shadow-sm transition-all active:scale-95 uppercase">Select</div>
+                                    </button>
+                                ))}
+                                {bankAccounts.length === 0 && (
+                                    <div className="p-8 text-center text-gray-400 italic text-sm">No accounts found.</div>
+                                )}
                             </div>
                         </div>
-                        <div className="overflow-y-auto p-2 font-['Plus_Jakarta_Sans']">
-                            <table className="w-full text-sm text-left">
-                                <thead className="bg-slate-50 sticky top-0 text-gray-600 font-bold uppercase text-[11px] tracking-wider">
-                                    <tr>
-                                        <th className="p-3 border-b text-center w-32">Sub Code</th>
-                                        <th className="p-3 border-b">Account Name</th>
-                                        <th className="p-3 border-b text-center w-24">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {bankAccounts.filter(b => (b.sub_Acc_Name || '').toLowerCase().includes(bankSearchQuery.toLowerCase()) || (b.sub_Code || '').toLowerCase().includes(bankSearchQuery.toLowerCase())).map(b => (
-                                        <tr key={b.sub_Code} className="hover:bg-blue-50 transition-colors">
-                                            <td className="p-3 border-b text-center font-bold text-gray-600">{b.sub_Code}</td>
-                                            <td className="p-3 border-b font-medium text-blue-600">{b.sub_Acc_Name}</td>
-                                            <td className="p-3 border-b text-center">
-                                                <button onClick={() => handleBankSelect(b.sub_Code, b.sub_Acc_Name)} className="bg-[#0078d4] text-white text-[10px] px-3 py-1.5 rounded-sm font-bold hover:bg-[#005a9e]">SELECT</button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
+
+                        {/* Footer */}
+                        <div className="bg-gray-50 px-4 py-2 border-t border-gray-200 flex justify-between items-center text-[10px] text-gray-400">
+                            <span>{bankAccounts.length} Result(s)</span>
+                            <span className="italic font-bold text-[#0078d4]">ACCOUNT CLOUD INFRASTRUCTURE</span>
                         </div>
                     </div>
                 </div>
@@ -309,43 +343,73 @@ const handleSave = async () => {
 
             {/* Card Search Modal */}
             {showCardModal && (
-                <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4">
+                <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4 font-['Tahoma']">
                     <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setShowCardModal(false)} />
-                    <div className="relative w-full max-w-2xl bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col max-h-[85vh]">
-                        <div className="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-50 font-['Plus_Jakarta_Sans']">
-                            <h3 className="text-lg font-bold text-slate-800 tracking-tight">Search Card Type</h3>
-                            <div className="flex gap-4">
-                                <input type="text" placeholder="Search cards..." className="h-9 border border-gray-300 px-3 text-sm rounded-md w-64 focus:border-blue-500 outline-none" value={cardSearchQuery} onChange={(e) => setCardSearchQuery(e.target.value)} />
-                                <button
-                                    onClick={() => setShowCardModal(false)}
-                                    className="w-9 h-8 flex items-center justify-center bg-[#ff3b30] hover:bg-[#e03127] text-white rounded-[8px] shadow-[0_4px_12px_rgba(255,59,48,0.3)] hover:shadow-[0_6px_20px_rgba(255,59,48,0.4)] transition-all active:scale-90 outline-none border-none group"
-                                    title="Close"
-                                >
-                                    <X size={18} strokeWidth={4} className="group-hover:scale-110 transition-transform" />
-                                </button>
+                    <div className="relative w-full max-w-2xl bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
+                        {/* Header */}
+                        <div className="bg-[#0078d4] px-4 py-2 flex items-center justify-between text-white">
+                            <div className="flex items-center gap-2">
+                                <Search size={16} />
+                                <span className="text-sm font-bold uppercase tracking-tight">Card Type Lookup</span>
+                            </div>
+                            <button
+                                onClick={() => setShowCardModal(false)}
+                                className="w-9 h-8 flex items-center justify-center bg-[#ff3b30] hover:bg-[#e03127] text-white rounded-[8px] shadow-[0_4px_12px_rgba(255,59,48,0.3)] hover:shadow-[0_6px_20px_rgba(255,59,48,0.4)] transition-all active:scale-90 outline-none border-none group"
+                                title="Close"
+                            >
+                                <X size={18} strokeWidth={4} className="group-hover:scale-110 transition-transform" />
+                            </button>
+                        </div>
+
+                        {/* Search Input Area */}
+                        <div className="p-3 bg-slate-50 border-b border-gray-100 flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                <Search size={14} className="text-gray-400" />
+                                <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest text-center">Search Facility</span>
+                            </div>
+                            <input 
+                                type="text" 
+                                placeholder="Find by Card Name or ID..." 
+                                className="h-9 border border-gray-300 px-3 text-xs rounded-md w-72 focus:border-[#0285fd] outline-none shadow-sm transition-all" 
+                                value={cardSearchQuery} 
+                                onChange={(e) => setCardSearchQuery(e.target.value)} 
+                            />
+                        </div>
+
+                        {/* Results List */}
+                        <div className="p-2">
+                            <div className="bg-gray-100 px-3 py-1.5 flex text-[10px] font-bold text-gray-600 border-b border-gray-200 uppercase tracking-wider">
+                                <span className="w-32 text-center">Card ID</span>
+                                <span className="flex-1 px-3">Card Name</span>
+                            </div>
+                            <div className="max-h-[400px] overflow-y-auto custom-scrollbar">
+                                {cardTypes.filter(c => (c.cardName || '').toLowerCase().includes(cardSearchQuery.toLowerCase()) || (c.cardID || '').toLowerCase().includes(cardSearchQuery.toLowerCase())).map(c => (
+                                    <button 
+                                        key={c.cardID} 
+                                        onClick={() => handleCardSelect(c.cardID, c.cardName)}
+                                        className="w-full flex items-center justify-between px-3 py-2 text-xs border-b border-gray-100 hover:bg-blue-50 transition-all text-left group"
+                                    >
+                                        <div className="flex items-center gap-2 flex-1">
+                                            <span className="w-32 text-center font-mono text-[11px] font-bold text-[#0078d4]">
+                                                {c.cardID}
+                                            </span>
+                                            <span className="flex-1 px-3 font-mono font-medium text-gray-700 uppercase">
+                                                {c.cardName}
+                                            </span>
+                                        </div>
+                                        <div className="bg-[#e49e1b] text-white text-[10px] px-5 py-1.5 rounded-md font-bold hover:bg-[#cb9b34] shadow-sm transition-all active:scale-95 uppercase">Select</div>
+                                    </button>
+                                ))}
+                                {cardTypes.length === 0 && (
+                                    <div className="p-8 text-center text-gray-400 italic text-sm">No card types found.</div>
+                                )}
                             </div>
                         </div>
-                        <div className="overflow-y-auto p-2 font-['Plus_Jakarta_Sans']">
-                            <table className="w-full text-sm text-left">
-                                <thead className="bg-slate-50 sticky top-0 text-gray-600 font-bold uppercase text-[11px] tracking-wider">
-                                    <tr>
-                                        <th className="p-3 border-b text-center w-32">Card ID</th>
-                                        <th className="p-3 border-b">Card Name</th>
-                                        <th className="p-3 border-b text-center w-24">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {cardTypes.filter(c => (c.cardName || '').toLowerCase().includes(cardSearchQuery.toLowerCase()) || (c.cardID || '').toLowerCase().includes(cardSearchQuery.toLowerCase())).map(c => (
-                                        <tr key={c.cardID} className="hover:bg-blue-50 transition-colors">
-                                            <td className="p-3 border-b text-center font-bold text-gray-600">{c.cardID}</td>
-                                            <td className="p-3 border-b font-medium text-blue-600">{c.cardName}</td>
-                                            <td className="p-3 border-b text-center">
-                                                <button onClick={() => handleCardSelect(c.cardID, c.cardName)} className="bg-[#0078d4] text-white text-[10px] px-3 py-1.5 rounded-sm font-bold hover:bg-[#005a9e]">SELECT</button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
+
+                        {/* Footer */}
+                        <div className="bg-gray-50 px-4 py-2 border-t border-gray-200 flex justify-between items-center text-[10px] text-gray-400">
+                            <span>{cardTypes.length} Result(s)</span>
+                            <span className="italic font-bold text-[#0078d4]">ACCOUNT CLOUD INFRASTRUCTURE</span>
                         </div>
                     </div>
                 </div>

@@ -27,7 +27,12 @@ const BankingSubModal = ({ isOpen, onClose, onOpenCollectionDeposit, onOpenDirec
             {/* Modal */}
             <div className="relative w-full max-w-[280px] bg-white border border-gray-100 rounded-xl shadow-2xl overflow-hidden flex flex-col animate-in slide-in-from-bottom-4 duration-300">
                 {/* Header */}
-                <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-100 select-none">
+                <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-100 select-none relative overflow-hidden">
+                    {/* System Color Left Accent */}
+                    <div 
+                        className="absolute left-0 top-0 bottom-0 w-1.5 transition-colors duration-500" 
+                        style={{ backgroundColor: localStorage.getItem('topBarColor') || '#0285fd' }}
+                    />
                     <div className="flex items-center gap-2">
                         <Landmark size={14} className="text-[#0078d4]" />
                         <span className="text-lg font-bold text-slate-800 tracking-tight">Banking Center</span>

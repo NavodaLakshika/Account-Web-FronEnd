@@ -160,22 +160,8 @@ const Dashboard = () => {
 
     const [isTopBarCollapsed, setIsTopBarCollapsed] = useState(false);
     const [isAIThinking, setIsAIThinking] = useState(false);
-    const [activeLoadingIdx, setActiveLoadingIdx] = useState(0);
     const [isLoaderStopped, setIsLoaderStopped] = useState(false);
 
-    // Strictly Sequential Loading Logic
-    useEffect(() => {
-        if (isLoaderStopped) return;
-        
-        const filteredCount = navItems.filter(item => item.label !== 'Search').length;
-        if (filteredCount === 0) return;
-
-        const interval = setInterval(() => {
-            setActiveLoadingIdx(prev => (prev + 1) % filteredCount);
-        }, 3000); // 3 seconds per card (matches animation)
-        
-        return () => clearInterval(interval);
-    }, [isLoaderStopped]);
 
     // Reminder Alarm Logic
     const [activeAlarmTask, setActiveAlarmTask] = useState(null);
@@ -695,56 +681,59 @@ const Dashboard = () => {
             />
 
             {/* 2. Top Ribbon Navigation (Matches Reference Image) */}
-            <header 
-                className={`z-50 text-white shadow-md transition-all duration-500 ease-in-out overflow-hidden ${isTopBarCollapsed ? 'h-8' : 'h-[145px]'}`}
-                style={{ backgroundColor: topBarColor }}
+            <header
+                className={`z-50 text-white shadow-md transition-all duration-500 ease-in-out overflow-hidden backdrop-blur-md ${isTopBarCollapsed ? 'h-12' : 'h-[155px]'}`}
+                style={{ backgroundColor: `${topBarColor}F2` }} // Slightly transparent for glass effect
             >
                 {/* Row 1: Text Menu */}
-                <div className={`flex items-center h-7 gap-6 px-4 py-1.5 border-b border-white/10 overflow-x-auto no-scrollbar transition-opacity duration-300 mt-3 ${isTopBarCollapsed ? 'h-full flex items-center' : ''}`}>
-                    {menuBar.map((item, idx) => (
-                        <button
-                            key={idx}
-                            onClick={() => {
-                                if (item === 'Master File') setShowMasterFileModal(true);
-                                if (item === 'View and Utility') setShowViewUtilityModal(true);
-                                if (item === 'Transaction') setShowTransactionModal(true);
-                                if (item === 'Reports') setShowReportsModal(true);
-                                if (item === 'System Admin') setShowSystemAdminModal(true);
-                            }}
-                            className="text-[12.5px]  hover:text-white/80 whitespace-nowrap transition-colors"
-                        >
-                            {item}
-                        </button>
-                    ))}
-
-                    <div className="flex items-center gap-4 ml-auto h-[26px] bg-white/10 px-3 rounded-[8px] border border-white/20 transition-all hover:bg-white/20">
-                        <div className="flex items-center gap-2">
-                            <div className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse shadow-[0_0_5px_rgba(74,222,128,0.5)]" />
-                            <ShieldCheck size={12} className="text-blue-100" />
-                            <span className="text-[10px] font-black uppercase tracking-wider text-white">
-                                {user?.EmpName || user?.empName || user?.Emp_Name || user?.username || 'Admin'}
-                            </span>
-                        </div>
-                        <div className="w-[1px] h-3 bg-white/20" />
-                        <div className="flex items-center gap-2">
-                            <Building2 size={12} className="text-blue-100" />
-                            <span className="text-[10px] font-bold text-blue-50/80 tracking-wide">
-                                {selectedCompany?.CompanyName || selectedCompany?.companyName || selectedCompany?.name || 'No Company Selected'}
-                            </span>
-                        </div>
+                <div className={`flex items-center gap-8 px-6 border-b border-white/10 overflow-x-auto no-scrollbar transition-opacity duration-300 ${isTopBarCollapsed ? 'h-full mt-0 border-transparent' : 'h-8 py-2 mt-4'}`}>
+                    <div className="flex items-center gap-6">
+                        {menuBar.map((item, idx) => (
+                            <button
+                                key={idx}
+                                onClick={() => {
+                                    if (item === 'Master File') setShowMasterFileModal(true);
+                                    if (item === 'View and Utility') setShowViewUtilityModal(true);
+                                    if (item === 'Transaction') setShowTransactionModal(true);
+                                    if (item === 'Reports') setShowReportsModal(true);
+                                    if (item === 'System Admin') setShowSystemAdminModal(true);
+                                }}
+                                className="text-[12px] font-medium text-white/90 hover:text-white whitespace-nowrap transition-all hover:scale-105 active:scale-95 flex items-center gap-1 group"
+                            >
+                                {item}
+                                <div className="w-0 h-[1.5px] bg-white absolute bottom-[-4px] left-0 group-hover:w-full transition-all duration-300" />
+                            </button>
+                        ))}
                     </div>
 
-                    <div className="w-[1px] h-4 bg-white/20 mx-3" />
-                    <button
-                        onClick={() => setShowSideBar(!showSideBar)}
-                        className={`p-1.5 rounded-md transition-all flex items-center justify-center ${showSideBar ? 'bg-white/30 text-white shadow-lg' : 'text-white/70 hover:bg-white/10 hover:text-white'}`}
-                    >
-                        <Menu size={18} />
-                    </button>
+                    <div className="flex items-center gap-3 ml-auto">
+                        <div className="flex items-center gap-4 h-[28px] bg-white/15 backdrop-blur-md px-4 rounded-[10px] border border-white/20 shadow-sm transition-all hover:bg-white/25 mb-1">
+                            <div className="flex items-center gap-2 border-r border-white/10 pr-4">
+                                <div className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse shadow-[0_0_8px_rgba(74,222,128,0.6)]" />
+                                <span className="text-[10px] font-black uppercase tracking-widest text-white drop-shadow-sm">
+                                    {user?.EmpName || user?.empName || user?.Emp_Name || user?.username || 'Admin'}
+                                </span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <Building2 size={12} className="text-white/80" />
+                                <span className="text-[10px] font-bold text-white/90 tracking-tight">
+                                    {selectedCompany?.CompanyName || selectedCompany?.companyName || selectedCompany?.name || 'Enterprise'}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div className="w-[1px] h-4 bg-white/20 mx-1" />
+                        <button
+                            onClick={() => setShowSideBar(!showSideBar)}
+                            className={`p-2 rounded-lg transition-all flex items-center justify-center ${showSideBar ? 'bg-white/30 text-white shadow-[0_0_15px_rgba(255,255,255,0.2)]' : 'text-white/80 hover:bg-white/10 hover:text-white'}`}
+                        >
+                            <Menu size={18} />
+                        </button>
+                    </div>
 
                     {/* Expand Trigger when collapsed */}
                     {isTopBarCollapsed && (
-                        <div className="ml-auto pr-4 flex items-center">
+                        <div className="ml-4 pr-0 flex items-center">
                             <ChevronRight
                                 size={16}
                                 className="text-white/50 cursor-pointer hover:text-white transition-all transform rotate-90"
@@ -827,17 +816,31 @@ const Dashboard = () => {
             </header>
 
             {/* 3. Main Workspace Area - Professional Console */}
-            <main className="flex-1 relative overflow-y-auto">
-                {/* Visual Watermark Background - HD Vector Quality */}
+            <main className="flex-1 relative overflow-y-auto bg-[#f8fafc]">
+                {/* Visual Watermark Background - Custom Mesh Gradient */}
                 <div
-                    className="fixed inset-0 z-0 bg-cover bg-center bg-no-repeat pointer-events-none"
-                    style={{ backgroundImage: `url('/')` }}
+                    className="fixed inset-0 z-0 bg-cover bg-center bg-no-repeat pointer-events-none opacity-[0.15]"
+                    style={{ backgroundImage: `url('/images/dashboard_bg_premium.png')` }}
+                />
+
+                {/* Animated Background Elements */}
+                <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
+                    <div className="absolute top-[-10%] left-[-10%] w-[45%] h-[45%] rounded-full bg-blue-500/[0.08] blur-[100px] animate-blob" />
+                    <div className="absolute bottom-[-10%] right-[-10%] w-[55%] h-[55%] rounded-full bg-indigo-500/[0.08] blur-[130px] animate-blob animation-delay-2000" />
+                    <div className="absolute top-[20%] right-[10%] w-[35%] h-[35%] rounded-full bg-sky-400/[0.08] blur-[80px] animate-blob animation-delay-4000" />
+                </div>
+
+                {/* Technical Dot Grid Overlay */}
+                <div 
+                    className="fixed inset-0 z-0 pointer-events-none opacity-[0.05]"
+                    style={{ 
+                        backgroundImage: `radial-gradient(${topBarColor} 1.5px, transparent 1.5px)`,
+                        backgroundSize: '36px 36px'
+                    }}
                 />
 
                 {/* Glassmorphism Frosted Overlay */}
-                <div className="fixed inset-0 z-0 bg-white/40 backdrop-blur-[10px] pointer-events-none" />
-
-                {/* Dashboard Center Watermark - Coins Image */}
+                <div className="fixed inset-0 z-0 bg-white/20 backdrop-blur-[60px] pointer-events-none" />
 
 
                 <div className="relative z-10 p-12 max-w-7xl mx-auto flex flex-col gap-20">
@@ -845,7 +848,7 @@ const Dashboard = () => {
 
 
                     {/* Integrated Search Bar (Transformed from Search Card) */}
-                    <div className="w-full flex justify-center">
+                    <div className="w-full flex justify-center mt-10">
                         <button
                             onClick={() => setShowSearchModal(true)}
                             className="w-full max-w-2xl flex items-center gap-4 px-6 h-14 bg-white border border-slate-200 rounded-[8px] shadow-sm hover:shadow-md hover:border-[#0078d4]/30 transition-all group text-left"
@@ -911,18 +914,6 @@ const Dashboard = () => {
                                             </div>
                                         </div>
 
-                                        {/* Premium Sequential Load Bar */}
-                                        <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-slate-50 overflow-hidden">
-                                            {(!isLoaderStopped && activeLoadingIdx === idx) && (
-                                                <div 
-                                                    className="h-full animate-[cardLoading_3s_ease-in-out_forwards]"
-                                                    style={{ 
-                                                        backgroundColor: topBarColor,
-                                                        opacity: 0.8,
-                                                    }}
-                                                />
-                                            )}
-                                        </div>
                                     </button>
                                     <span className="text-[12px] font-medium text-slate-500 group-hover:text-[#0078d4] uppercase tracking-wider transition-colors duration-300 text-center leading-tight">
                                         {item.label}
@@ -937,38 +928,47 @@ const Dashboard = () => {
             </main>
 
             {/* Unified One-Line Professional Footer (Ticker + Company Info) */}
-            <footer className="h-9 bg-white border-t border-slate-200 flex items-center justify-between px-6 z-50 overflow-hidden relative">
+            <footer 
+                className="h-12 border-t border-white/10 flex items-center justify-between px-6 z-50 overflow-hidden relative shadow-[0_-4px_20px_rgba(0,0,0,0.1)]"
+                style={{ backgroundColor: topBarColor }}
+            >
                 {/* Left: Branding/License (Above Ticker) */}
-                <div className="flex items-center gap-2 relative z-20 bg-white pr-6">
-                    <span className="text-[10px] font-black text-red-600 uppercase tracking-tight">Licensed</span>
+                <div 
+                    className="flex items-center gap-2 relative z-20 pr-6"
+                    style={{ backgroundColor: topBarColor }}
+                > 
+                    <span className="text-[#ef1022] text-[12px] font-black tracking-tight group-hover:text-red-400 transition-all cursor-default uppercase drop-shadow-sm">
+                        LICENSED 
+                    </span>
                 </div>
 
                 {/* Center: Animated Information Ticker (Middle Layer) */}
                 <div className="flex-1 overflow-hidden relative mx-4">
                     {/* Fade Edges for Professional Look */}
-                    <div className="absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-white to-transparent z-10" />
-                    <div className="absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-white to-transparent z-10" />
+                    <div className="absolute inset-y-0 left-0 w-12 z-10" style={{ background: `linear-gradient(to right, ${topBarColor}, transparent)` }} />
+                    <div className="absolute inset-y-0 right-0 w-12 z-10" style={{ background: `linear-gradient(to left, ${topBarColor}, transparent)` }} />
                     
                     <div className="whitespace-nowrap animate-marquee flex items-center gap-12">
                         {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-                            <span key={i} className="text-[9px] font-bold text-slate-400 uppercase tracking-[0.25em] flex items-center gap-2">
+                            <span key={i} className="text-[9px] font-bold text-white/70 uppercase tracking-[0.25em] flex items-center gap-3">
                                 ONIMTA INFORMATION TECHNOLOGY (PVT) LTD
-                                <div className="h-1 w-1 bg-[#0078d4]/40 rounded-full" />
+                                <div className="h-1 w-1 bg-white/40 rounded-full" />
                             </span>
                         ))}
                     </div>
                 </div>
 
                 {/* Right: Company Credits (Above Ticker) */}
-                <div className="flex items-center gap-1.5 group relative z-20 bg-white pl-6">
-                    <span className="text-[10px] font-medium text-slate-400 uppercase tracking-tighter">Powered by</span>
-                    <span className="text-[#ef1022] text-[12px] font-black tracking-tight group-hover:scale-105 transition-transform cursor-default uppercase">
-                        {/*selectedCompany?.CompanyName || selectedCompany?.companyName || "ONIMTA"*/}
+                <div 
+                    className="flex items-center gap-2 group relative z-20 pl-6"
+                    style={{ backgroundColor: topBarColor }}
+                >
+                    <span className="text-[9px] font-medium text-white/60 uppercase tracking-tight">Powered by</span>
+                    <span className="text-[#ef1022] text-[12px] mt-[-1px] font-black tracking-tight group-hover:text-red-400 transition-all cursor-default uppercase drop-shadow-sm">
                         ONIMTA
                     </span>
                 </div>
             </footer>
-
             {/* Floating AI Assistant with Dynamic Positioning (Status-Based) */}
             <div className={`fixed bottom-16 z-[60] flex flex-col pointer-events-none transition-all duration-700 ease-in-out ${pendingSnoozeTask ? 'left-10 items-start' : 'right-10 items-end'}`}>
                 {/* Minimalist Red Quote Frame Speech Bubble (Persistent Alert) */}
@@ -1021,7 +1021,7 @@ const Dashboard = () => {
                 {/* Robot Lottie Button (Dynamic Alignment) */}
                 <button
                     onClick={handleAIClick}
-                    className="w-32 h-32 flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 group drop-shadow-2xl pointer-events-auto"
+                    className="w-32 h-32 mr-10 mb-10 flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 group drop-shadow-2xl pointer-events-auto"
                 >
                     <DotLottiePlayer
                         src="/images/Ai Robot Vector Art.lottie"
@@ -1057,6 +1057,22 @@ const Dashboard = () => {
                 @keyframes marquee {
                     0% { transform: translateX(0); }
                     100% { transform: translateX(-50%); }
+                }
+
+                @keyframes blob {
+                    0% { transform: translate(0px, 0px) scale(1); }
+                    33% { transform: translate(30px, -50px) scale(1.1); }
+                    66% { transform: translate(-20px, 20px) scale(0.9); }
+                    100% { transform: translate(0px, 0px) scale(1); }
+                }
+                .animate-blob {
+                    animation: blob 20s infinite alternate cubic-bezier(0.45, 0, 0.55, 1);
+                }
+                .animation-delay-2000 {
+                    animation-delay: 2s;
+                }
+                .animation-delay-4000 {
+                    animation-delay: 4s;
                 }
 
                 @keyframes cardLoading {
@@ -1108,28 +1124,31 @@ const CustomCard = ({ icon: Icon, label, subtitle, onClick, className, iconSize 
 const RibbonButton = ({ icon: Icon, label, onClick, active, hasBadge, isHighlighted, gif, iconColor }) => (
     <button
         onClick={onClick}
-        className={`flex flex-col items-center justify-center min-w-[80px] h-[80px] relative transition-all duration-200 group
-            ${isHighlighted ? 'bg-white/20' : 'hover:bg-white/10'}
-            ${active ? 'bg-white/30 text-white' : 'text-white/90 hover:text-white'}
+        className={`flex flex-col items-center justify-center min-w-[75px] h-[75px] m-0.5 rounded-xl relative transition-all duration-300 group
+            ${active 
+                ? 'bg-white/20 text-white shadow-[0_4px_12px_rgba(0,0,0,0.1)] backdrop-blur-sm' 
+                : 'text-white/80 hover:bg-white/10 hover:text-white hover:shadow-lg'}
         `}
     >
-        <div className="relative">
+        <div className="relative z-10">
             {gif ? (
-                <img src={gif} alt={label} className="w-8 h-8 object-contain group-hover:scale-110 transition-transform" />
+                <img src={gif} alt={label} className="w-7 h-7 object-contain group-hover:scale-110 transition-transform" />
             ) : (
-                <Icon size={30} strokeWidth={2} className={`group-hover:scale-110 transition-transform ${iconColor || ''}`} />
+                <Icon size={26} strokeWidth={1.8} className={`group-hover:scale-110 transition-all duration-300 ${iconColor || 'drop-shadow-[0_2px_4px_rgba(0,0,0,0.2)]'}`} />
             )}
-
-
-
         </div>
 
-        <span className="text-[10px] font-bold mt-2 tracking-tight leading-none text-center">
-            {label.length > 8 ? <>{label.split(' ')[0]}<br />{label.split(' ')[1]}</> : label}
+        <span className="text-[9.5px] font-bold mt-2 tracking-wide leading-none text-center relative z-10 px-1 opacity-90 group-hover:opacity-100">
+            {label.length > 9 ? <>{label.split(' ')[0]}<br />{label.split(' ')[1]}</> : label}
         </span>
 
-        {/* Highlight line for active items */}
-        {active && <div className="absolute bottom-0 left-0 right-0 h-1 bg-white" />}
+        {/* Premium Active Indicator */}
+        {active && (
+            <div className="absolute bottom-1 left-1/2 -translate-x-1/2 w-8 h-1 bg-white rounded-full shadow-[0_0_10px_rgba(255,255,255,0.8)]" />
+        )}
+        
+        {/* Subtle Hover Glow Overlay */}
+        <div className="absolute inset-0 bg-white/0 group-hover:bg-white/5 rounded-xl transition-colors duration-300" />
     </button>
 );
 

@@ -170,23 +170,27 @@ const LongTermLiabilityBoard = ({ isOpen, onClose }) => {
                 title="Long Term Liability Registry"
                 maxWidth="max-w-4xl"
                 footer={
-                    <div className="flex justify-center gap-3 w-full border-t pt-3 mt-2">
-                        <button onClick={handleSave} disabled={loading} className="px-8 h-8 bg-[#0078d4] text-white text-sm font-medium rounded-sm border hover:bg-[#005a9e] flex items-center gap-2">
+                    <div className="bg-slate-50 px-6 py-4 w-full flex justify-end gap-3 border-t border-gray-100 mt-4 rounded-b-xl">
+                        <button 
+                            onClick={handleSave} 
+                            disabled={loading} 
+                            className={`px-6 h-10 bg-[#50af60] text-white text-[13px] font-bold rounded-[5px] shadow-md shadow-green-200 hover:bg-[#24db4e] transition-all active:scale-95 flex items-center justify-center gap-2 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        >
                             {loading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />} 
                             {isEditMode ? 'Update' : 'Save'}
                         </button>
-                        <button onClick={handleClear} className="px-6 h-10 bg-slate-100 text-slate-600 text-sm font-bold rounded-md hover:bg-slate-200 transition-all active:scale-95 flex items-center gap-2">
+                        <button onClick={handleClear} className="px-6 h-10 bg-[#00adff] text-white text-[13px] font-bold rounded-[5px] hover:bg-[#0099e6] shadow-md shadow-blue-200 transition-all active:scale-95 flex items-center justify-center gap-2 border-none">
                             <RotateCcw size={14} /> Clear
                         </button>
-                        <button onClick={onClose} className="px-6 h-10 bg-slate-100 text-slate-600 text-sm font-bold rounded-md hover:bg-slate-200 transition-all active:scale-95 flex items-center gap-2">
+                        <button onClick={onClose} className="px-6 h-10 bg-[#d13438] text-white text-[13px] font-bold rounded-[5px] shadow-md shadow-red-200 hover:bg-[#a4262c] transition-all active:scale-95 flex items-center justify-center gap-2">
                             <X size={14} /> Exit
                         </button>
                     </div>
                 }
             >
-                <div className="space-y-4 py-2 font-['Inter']">
+                <div className="py-2 select-none font-['Tahoma'] space-y-4">
                     {/* Info Header */}
-                    <div className="bg-[#f0f9ff] border border-[#bae6fd] p-3 rounded-sm shadow-sm transition-all">
+                    <div className="bg-[#f0f9ff] border border-[#bae6fd] p-3 rounded-[5px] shadow-sm transition-all">
                         <p className="text-[12px] font-bold text-[#0369a1] text-center leading-relaxed italic">
                             Long term liability: Obligations spanning over one year, 
                             including Bank Loans, Leases, and Third Party financing.
@@ -194,29 +198,29 @@ const LongTermLiabilityBoard = ({ isOpen, onClose }) => {
                     </div>
 
                     {/* Main Identity Section */}
-                    <div className="bg-white p-4 border border-gray-200 rounded-sm space-y-3 shadow-sm border-l-4 border-l-[#0078d4]">
+                    <div className="bg-white p-4 border border-gray-200 rounded-[5px] space-y-3 shadow-sm border-l-4 border-l-[#0078d4]">
                         <div className="flex items-center gap-3">
-                            <label className="text-[11px] font-black text-gray-500 uppercase w-[160px] shrink-0">Liability Number / Name</label>
+                            <label className="text-[11px] font-bold text-gray-700 uppercase w-[160px] shrink-0">Liability Number / Name</label>
                             <div className="flex flex-1 gap-2">
                                 <input 
                                     name="LiabCode" value={formData.LiabCode} onChange={handleInputChange}
-                                    type="text" className="w-40 h-8 border border-gray-300 px-2 text-sm focus:ring-1 focus:ring-blue-500 outline-none rounded-sm font-bold text-blue-700" 
+                                    type="text" className="w-40 h-8 border border-gray-300 px-3 bg-white rounded-[5px] outline-none focus:border-blue-400 font-bold text-blue-600 shadow-sm text-center" 
                                     placeholder="LIAB-001"
                                 />
                                 <div className="flex-1 flex gap-1">
                                     <input 
                                         name="LiabName" value={formData.LiabName} onChange={handleInputChange}
-                                        type="text" className="flex-1 h-8 border border-gray-300 px-2 text-sm focus:border-blue-500 outline-none rounded-sm bg-white font-medium" 
+                                        type="text" className="flex-1 h-8 border border-gray-300 px-3 text-[12.5px] bg-white rounded-[5px] outline-none focus:border-blue-400 font-bold text-gray-700 shadow-sm" 
                                         placeholder="Liability registry name"
                                     />
-                                    <button onClick={openSearch} className="w-9 h-8 bg-[#0078d4] text-white flex items-center justify-center hover:bg-[#005a9e] rounded-sm transition-all shadow-md active:scale-95"><Search size={16} /></button>
+                                    <button onClick={openSearch} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95"><Search size={18} /></button>
                                 </div>
                             </div>
                         </div>
 
                         <div className="flex items-center gap-3">
-                            <label className="text-[11px] font-black text-gray-500 uppercase w-[160px] shrink-0">Linked Account</label>
-                            <select name="LiabAccCode" value={formData.LiabAccCode} onChange={handleInputChange} className="flex-1 h-8 border border-gray-300 px-2 text-sm focus:border-blue-500 outline-none rounded-sm bg-white font-medium">
+                            <label className="text-[11px] font-bold text-gray-700 uppercase w-[160px] shrink-0">Linked Account</label>
+                            <select name="LiabAccCode" value={formData.LiabAccCode} onChange={handleInputChange} className="flex-1 h-8 border border-gray-300 px-2 text-[12.5px] bg-white rounded-[5px] outline-none focus:border-blue-400 font-bold text-gray-700 shadow-sm">
                                 <option value="">&lt; Select G/L Account &gt;</option>
                                 {lookups.accounts.map((acc, idx) => (
                                     <option key={idx} value={acc.sub_Code} disabled={acc.sub_Code === '850-100'}>
@@ -227,8 +231,8 @@ const LongTermLiabilityBoard = ({ isOpen, onClose }) => {
                         </div>
 
                         <div className="flex items-center gap-3">
-                            <label className="text-[11px] font-black text-gray-500 uppercase w-[160px] shrink-0">Lender / Institution</label>
-                            <select name="LenderCode" value={formData.LenderCode} onChange={handleInputChange} className="flex-1 h-8 border border-gray-300 px-2 text-sm focus:border-blue-500 outline-none rounded-sm bg-white font-medium">
+                            <label className="text-[11px] font-bold text-gray-700 uppercase w-[160px] shrink-0">Lender / Institution</label>
+                            <select name="LenderCode" value={formData.LenderCode} onChange={handleInputChange} className="flex-1 h-8 border border-gray-300 px-2 text-[12.5px] bg-white rounded-[5px] outline-none focus:border-blue-400 font-bold text-gray-700 shadow-sm">
                                 <option value="">&lt; Select Service Provider &gt;</option>
                                 {lookups.lenders.map((lender, idx) => (
                                     <option key={idx} value={lender.code}>{lender.supplier_Name}</option>
@@ -238,12 +242,12 @@ const LongTermLiabilityBoard = ({ isOpen, onClose }) => {
                     </div>
 
                     {/* Financial Terms Section */}
-                    <div className="border border-gray-200 rounded-sm p-4 space-y-4 bg-slate-50/20 relative pt-7">
-                        <span className="absolute -top-3 left-3 bg-white px-2 py-0.5 border text-[#0078d4] border-gray-200 rounded-full text-[10px] font-black uppercase tracking-widest shadow-sm">Financial Terms & Repayment</span>
+                    <div className="border border-gray-200 rounded-[5px] p-4 space-y-4 bg-slate-50/20 relative pt-7">
+                        <span className="absolute -top-3 left-3 bg-white px-2 py-0.5 border text-[#0078d4] border-gray-200 rounded-full text-[10px] font-bold uppercase tracking-widest shadow-sm">Financial Terms & Repayment</span>
                         
                         <div className="flex items-center gap-4">
-                            <label className="text-[11px] font-black text-gray-500 uppercase w-[110px] shrink-0">Description</label>
-                            <input name="Description" value={formData.Description} onChange={handleInputChange} type="text" className="flex-1 h-8 border border-gray-300 px-2 text-sm focus:border-blue-500 outline-none rounded-sm font-medium" placeholder="E.g. Bank of Ceylon Five Year Loan" />
+                            <label className="text-[11px] font-bold text-gray-500 uppercase w-[110px] shrink-0">Description</label>
+                            <input name="Description" value={formData.Description} onChange={handleInputChange} type="text" className="flex-1 h-8 border border-gray-300 px-3 text-[12.5px] bg-white rounded-[5px] outline-none focus:border-blue-400 font-bold text-gray-700 shadow-sm" placeholder="E.g. Bank of Ceylon Five Year Loan" />
                         </div>
 
                         <div className="grid grid-cols-12 gap-x-6 gap-y-4">
@@ -297,61 +301,73 @@ const LongTermLiabilityBoard = ({ isOpen, onClose }) => {
             </SimpleModal>
 
             {showSearchModal && (
-                <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4">
+                <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4 font-['Tahoma']">
                     <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setShowSearchModal(false)} />
-                    <div className="relative w-full max-w-3xl bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col max-h-[85vh] border border-gray-300 animate-in fade-in zoom-in-95 duration-200">
-                        <div className="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-50 font-['Inter']">
-                            <div className="flex items-center gap-3">
-                                <PlusCircle size={22} className="text-[#0078d4]" />
-                                <h3 className="font-black text-gray-800 uppercase tracking-tight text-base">Liability Registry Search</h3>
+                    <div className="relative w-full max-w-3xl bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
+                        {/* Header */}
+                        <div className="bg-[#0078d4] px-4 py-2 flex items-center justify-between text-white">
+                            <div className="flex items-center gap-2">
+                                <Search size={16} />
+                                <span className="text-sm font-bold uppercase tracking-tight">Liability Registry Lookup</span>
                             </div>
-                            <div className="flex gap-4">
-                                <div className="relative">
-                                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={14} />
-                                    <input 
-                                        type="text" 
-                                        placeholder="Search code or name..." 
-                                        className="h-10 border border-gray-300 pl-9 pr-3 text-sm rounded-md w-72 focus:border-blue-500 outline-none shadow-sm transition-all"
-                                        value={searchQuery}
-                                        onChange={(e) => setSearchQuery(e.target.value)}
-                                        onKeyUp={(e) => e.key === 'Enter' && openSearch()}
-                                    />
-                                </div>
-                                <button onClick={() => setShowSearchModal(false)} className="text-gray-400 hover:text-[#d13438] transition-colors active:scale-95"><X size={24} /></button>
+                            <button
+                                onClick={() => setShowSearchModal(false)}
+                                className="w-9 h-8 flex items-center justify-center bg-[#ff3b30] hover:bg-[#e03127] text-white rounded-[8px] shadow-[0_4px_12px_rgba(255,59,48,0.3)] hover:shadow-[0_6px_20px_rgba(255,59,48,0.4)] transition-all active:scale-90 outline-none border-none group"
+                                title="Close"
+                            >
+                                <X size={18} strokeWidth={4} className="group-hover:scale-110 transition-transform" />
+                            </button>
+                        </div>
+
+                        {/* Search Input Area */}
+                        <div className="p-3 bg-slate-50 border-b border-gray-100 flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                <Search size={14} className="text-gray-400" />
+                                <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest text-center">Search Facility</span>
+                            </div>
+                            <input 
+                                type="text" 
+                                placeholder="Find by Liability Name or ID..." 
+                                className="h-9 border border-gray-300 px-3 text-xs rounded-md w-72 focus:border-[#0285fd] outline-none shadow-sm transition-all" 
+                                value={searchQuery} 
+                                onChange={(e) => setSearchQuery(e.target.value)} 
+                            />
+                        </div>
+
+                        {/* Results List */}
+                        <div className="p-2">
+                            <div className="bg-gray-100 px-3 py-1.5 flex text-[10px] font-bold text-gray-600 border-b border-gray-200 uppercase tracking-wider">
+                                <span className="w-32 text-center">Liability ID</span>
+                                <span className="flex-1 px-3">Registry Name</span>
+                            </div>
+                            <div className="max-h-[400px] overflow-y-auto custom-scrollbar">
+                                {searchList.map((liab, idx) => (
+                                    <button 
+                                        key={idx} 
+                                        onClick={() => selectLiability(liab.liabCode)}
+                                        className="w-full flex items-center justify-between px-3 py-2 text-xs border-b border-gray-100 hover:bg-blue-50 transition-all text-left group"
+                                    >
+                                        <div className="flex items-center gap-2 flex-1">
+                                            <span className="w-32 text-center font-mono text-[11px] font-bold text-[#0078d4]">
+                                                {liab.liabCode}
+                                            </span>
+                                            <span className="flex-1 px-3 font-mono font-medium text-gray-700 uppercase">
+                                                {liab.liabName}
+                                            </span>
+                                        </div>
+                                        <div className="bg-[#e49e1b] text-white text-[10px] px-5 py-1.5 rounded-md font-bold hover:bg-[#cb9b34] shadow-sm transition-all active:scale-95 uppercase">Select</div>
+                                    </button>
+                                ))}
+                                {searchList.length === 0 && (
+                                    <div className="p-8 text-center text-gray-400 italic text-sm">No recorded liabilities found.</div>
+                                )}
                             </div>
                         </div>
-                        <div className="overflow-y-auto p-2">
-                            <table className="w-full text-sm text-left border-collapse">
-                                <thead className="bg-[#f8fafd] border-b text-[11px] font-black text-gray-500 uppercase tracking-widest sticky top-0 z-10">
-                                    <tr>
-                                        <th className="p-4 text-center w-40 border-r">Liability ID</th>
-                                        <th className="p-4">Registry Name</th>
-                                        <th className="p-4 text-center w-28">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {searchList.map((liab, idx) => (
-                                        <tr key={idx} className="hover:bg-blue-50/70 transition-colors border-b last:border-0 group cursor-default">
-                                            <td className="p-4 text-center font-black text-blue-700 border-r bg-slate-50/50 group-hover:bg-blue-100/50">{liab.liabCode}</td>
-                                            <td className="p-4 font-bold text-gray-700 uppercase">{liab.liabName}</td>
-                                            <td className="p-4 text-center">
-                                                <button onClick={() => selectLiability(liab.liabCode)} className="bg-white border-2 border-[#0078d4] text-[#0078d4] text-[10px] px-4 py-1.5 rounded-full font-black hover:bg-[#0078d4] hover:text-white transition-all shadow-sm transform hover:-translate-y-0.5 active:translate-y-0">SELECT</button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                    {searchList.length === 0 && (
-                                        <tr>
-                                            <td colSpan="3" className="p-16 text-center text-gray-400 italic font-medium flex flex-col items-center gap-3">
-                                                <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center"><Search size={24} /></div>
-                                                Search above to find recorded liabilities
-                                            </td>
-                                        </tr>
-                                    )}
-                                </tbody>
-                            </table>
-                        </div>
-                        <div className="p-4 bg-gray-50 border-t border-gray-200 text-[10px] font-black text-gray-400 text-center uppercase tracking-[0.2em]">
-                            End of Results • Verified Ledger Data
+
+                        {/* Footer */}
+                        <div className="bg-gray-50 px-4 py-2 border-t border-gray-200 flex justify-between items-center text-[10px] text-gray-400">
+                            <span>{searchList.length} Result(s)</span>
+                            <span className="italic font-bold text-[#0078d4]">ACCOUNT CLOUD INFRASTRUCTURE</span>
                         </div>
                     </div>
                 </div>

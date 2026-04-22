@@ -7,60 +7,52 @@ const SideBar = ({ isOpen, onClose, onOpenCalculator, onOpenReminder, onOpenWord
     if (!isOpen) return null;
 
     return (
-        <div className={`fixed right-0 ${isTopBarCollapsed ? 'top-8' : 'top-[120px]'} bottom-9 w-[80px] z-[100] animate-in slide-in-from-right duration-300 ease-out flex flex-col bg-white shadow-[-5px_0_20px_rgba(0,0,0,0.1)] border-l border-gray-200 ${isFocusMode ? 'brightness-[0.98]' : ''}`}>
-            {/* 1. Toggle Handle */}
+        <div className={`fixed right-0 ${isTopBarCollapsed ? 'top-12' : 'top-[155px]'} bottom-12 w-[85px] z-[100] animate-in slide-in-from-right duration-500 ease-out flex flex-col bg-white/80 backdrop-blur-xl shadow-[-10px_0_30px_rgba(0,0,0,0.08)] border-l border-white/40 ${isFocusMode ? 'brightness-[0.98]' : ''}`}>
+            {/* 1. Toggle Handle - Modernized */}
             <button
                 onClick={onClose}
-                className="absolute -left-5 top-1/2 -translate-y-1/2 w-5 h-20 bg-white border border-gray-200 border-r-0 rounded-l-lg flex items-center justify-center hover:bg-gray-50 transition-colors shadow-[-2px_0_5px_rgba(0,0,0,0.05)] group"
+                className="absolute -left-6 top-1/2 -translate-y-1/2 w-6 h-24 bg-white/90 backdrop-blur-md border border-white/50 border-r-0 rounded-l-2xl flex items-center justify-center hover:bg-white transition-all shadow-[-4px_0_15px_rgba(0,0,0,0.05)] group active:scale-90"
             >
-                <ChevronLeft size={16} className="text-[#0078d4] group-hover:translate-x-[-1px] transition-transform" />
+                <ChevronLeft size={18} className="text-[#0078d4] group-hover:translate-x-[-2px] transition-transform" />
             </button>
 
             {/* 3. Icons Container */}
-            <div className="flex-1 overflow-y-auto no-scrollbar py-6 flex flex-col items-center gap-6">
+            <div className="flex-1 overflow-y-auto no-scrollbar py-8 flex flex-col items-center gap-8">
 
                 {/* Office Document Group */}
-                <div className="flex flex-col items-center gap-5">
+                <div className="flex flex-col items-center gap-6">
                     <SidebarButton icon={FileText} color="text-blue-600" label="Word" onClick={onOpenWord} />
                     <SidebarButton icon={FileSpreadsheet} color="text-green-600" label="Excel" onClick={onOpenExcel} />
                     <SidebarButton icon={Mail} color="text-[#0078d4]" label="Email" badge="3" onClick={onOpenEmail} />
                 </div>
 
-                {/* Separator */}
-                <div className="w-10 h-[1px] bg-gray-100" />
+                {/* Glassy Separator */}
+                <div className="w-12 h-[1px] bg-gradient-to-r from-transparent via-gray-200 to-transparent opacity-50" />
 
                 {/* Utility Group */}
-                <div className="flex flex-col items-center gap-5">
-                    <SidebarButton icon={Calculator} color="text-gray-600" label="Calc" onClick={onOpenCalculator} />
-                    <SidebarButton icon={PenLine} color="text-gray-600" label="Note" onClick={onOpenNotepad} />
-                    <SidebarButton icon={Printer} color="text-gray-600" label="Print" onClick={onOpenPrinter} />
+                <div className="flex flex-col items-center gap-6">
+                    <SidebarButton icon={Calculator} color="text-slate-600" label="Calc" onClick={onOpenCalculator} />
+                    <SidebarButton icon={PenLine} color="text-slate-600" label="Note" onClick={onOpenNotepad} />
+                    <SidebarButton icon={Printer} color="text-slate-600" label="Print" onClick={onOpenPrinter} />
                 </div>
-
-                {/* Focus Mode Switch (Minimalist) */}
-                {/* <div className="mt-4 flex flex-col items-center gap-1.5 pt-4 border-t border-gray-100 w-full">
-                    <button
-                        onClick={() => setIsFocusMode(!isFocusMode)}
-                        className={`w-8 h-4 rounded-full transition-all relative ${isFocusMode ? 'bg-[#0078d4]' : 'bg-gray-200'}`}
-                    >
-                        <div className={`absolute top-0.5 w-3 h-3 bg-white rounded-full transition-all shadow-sm ${isFocusMode ? 'left-4.5' : 'left-0.5'}`} />
-                    </button>
-                    <span className="text-[8px] font-bold text-gray-400 uppercase tracking-widest">Focus</span>
-                </div> */}
             </div>
 
-            {/* 4. Bottom Actions */}
-            <div className="p-4 border-t border-gray-100 flex flex-col items-center gap-4 bg-gray-50/50">
-                <button className="text-gray-400 hover:text-[#0078d4] transition-colors group">
-                    <ShieldCheck size={20} className="group-active:scale-90 transition-transform" />
-                </button>
-                <button className="text-gray-400 hover:text-[#0078d4] transition-colors">
-                    <Settings size={20} />
-                </button>
+            {/* 4. Bottom Actions - Premium Group */}
+            <div className="p-5 border-t border-white/30 flex flex-col items-center gap-5 bg-white/10">
+                <div className="flex gap-4">
+                    <button className="text-slate-400 hover:text-[#0078d4] transition-all hover:scale-110 active:scale-90">
+                        <ShieldCheck size={20} />
+                    </button>
+                    <button className="text-slate-400 hover:text-[#0078d4] transition-all hover:scale-110 active:scale-90">
+                        <Settings size={20} />
+                    </button>
+                </div>
                 <button
                     onClick={onClose}
-                    className="w-10 h-10 flex items-center justify-center bg-white border border-red-100 rounded-lg text-red-400 hover:bg-red-50 hover:text-red-500 transition-all shadow-sm active:scale-95 group"
+                    className="w-12 h-12 flex items-center justify-center bg-white border border-red-50 rounded-xl text-[#ef1022] hover:bg-red-50 hover:text-red-600 transition-all shadow-[0_4px_12px_rgba(239,16,34,0.1)] hover:shadow-[0_6px_20px_rgba(239,16,34,0.2)] active:scale-95 group"
+                    title="System Logout"
                 >
-                    <Power size={18} />
+                    <Power size={20} className="group-hover:rotate-12 transition-transform" />
                 </button>
             </div>
         </div>
@@ -71,18 +63,18 @@ const SideBar = ({ isOpen, onClose, onOpenCalculator, onOpenReminder, onOpenWord
 const SidebarButton = ({ icon: Icon, color, label, onClick, badge }) => (
     <button
         onClick={onClick}
-        className="group relative flex flex-col items-center gap-1.5"
+        className="group relative flex flex-col items-center gap-2"
     >
-        <div className="w-11 h-11 bg-white border border-gray-100 rounded-xl flex items-center justify-center shadow-sm hover:shadow-md hover:border-[#0078d4]/30 hover:-translate-y-0.5 active:translate-y-0 transition-all">
-            <Icon size={20} className={`${color} group-hover:scale-110 transition-transform`} />
+        <div className="w-12 h-12 bg-white/40 backdrop-blur-md border border-white/60 rounded-2xl flex items-center justify-center shadow-sm hover:shadow-xl hover:bg-white hover:border-[#0078d4]/40 hover:-translate-y-1 active:scale-95 transition-all duration-300">
+            <Icon size={22} className={`${color} group-hover:scale-110 transition-transform drop-shadow-sm`} />
 
             {badge && (
-                <div className="absolute -top-1 -right-1 bg-red-500 text-white text-[8px] font-black w-4 h-4 rounded-full flex items-center justify-center border-2 border-white shadow-sm animate-in zoom-in duration-300">
+                <div className="absolute -top-1.5 -right-1.5 bg-[#ef1022] text-white text-[9px] font-black w-5 h-5 rounded-full flex items-center justify-center border-2 border-white shadow-md animate-in zoom-in duration-500">
                     {badge}
                 </div>
             )}
         </div>
-        <span className="text-[9px] font-bold text-gray-400 group-hover:text-[#0078d4] uppercase tracking-tighter transition-colors">
+        <span className="text-[9px] font-extrabold text-slate-500 group-hover:text-slate-900 uppercase tracking-wider transition-colors">
             {label}
         </span>
     </button>

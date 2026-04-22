@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import SimpleModal from '../../SimpleModal';
-import { Search, RotateCcw, Plus, Edit, Trash2, X, Building2, Loader2, AlertTriangle, Globe, Briefcase } from 'lucide-react';
+import { Search, RotateCcw, Plus, Edit, Trash2, X, Building2, Loader2, AlertTriangle, Globe, Briefcase, Calendar } from 'lucide-react';
+import CalendarModal from '../../CalendarModal';
 import { authService } from '../../../services/auth.service';
 import toast from 'react-hot-toast';
 
@@ -46,6 +47,17 @@ const CompanyBoard = ({ isOpen, onClose }) => {
     const [showIndustryLookup, setShowIndustryLookup] = useState(false);
     const [industryResults, setIndustryResults] = useState([]);
     const [searchingIndustry, setSearchingIndustry] = useState(false);
+
+    // Organizational Type Lookup State
+    const [showOrgLookup, setShowOrgLookup] = useState(false);
+    const orgTypes = [
+        { code: 'CORP', name: 'Corporation' },
+        { code: 'PART', name: 'Partnership' },
+        { code: 'SOLE', name: 'Sole Proprietorship' }
+    ];
+
+    // Calendar State
+    const [showCalendar, setShowCalendar] = useState(false);
 
     // Fetch master data on component mount
     useEffect(() => {
@@ -191,6 +203,15 @@ const CompanyBoard = ({ isOpen, onClose }) => {
         setShowIndustryLookup(false);
     };
 
+    const handleSelectOrg = (org) => {
+        setFormData(prev => ({ ...prev, Organiz: org.name }));
+        setShowOrgLookup(false);
+    };
+
+    const handleDateSelect = (date) => {
+        setFormData(prev => ({ ...prev, Start_Date: date }));
+    };
+
     const handleAddNew = async () => {
         if (!formData.Comp_Name) {
             toast.error('Company Name is required.');
@@ -259,50 +280,51 @@ const CompanyBoard = ({ isOpen, onClose }) => {
                         <button 
                             onClick={handleAddNew}
                             disabled={loading || !!formData.Code}
-                            className={`px-6 h-10 bg-[#0078d4] text-white text-sm font-bold rounded-md shadow-md shadow-blue-200 hover:bg-[#005a9e] transition-all active:scale-95 flex items-center gap-2 ${(loading || !!formData.Code) ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            className={`px-6 h-10 bg-[#50af60] text-white text-[13px] font-bold rounded-[5px] shadow-md shadow-green-200 hover:bg-[#24db4e] transition-all active:scale-95 flex items-center justify-center gap-2 ${(loading || !!formData.Code) ? 'opacity-50 cursor-not-allowed' : ''}`}
                         >
                             <Plus size={14} /> Add New
                         </button>
                         <button 
                             onClick={handleEdit}
                             disabled={loading || !formData.Code}
-                            className={`px-6 h-10 bg-slate-100 text-slate-600 text-sm font-bold rounded-md hover:bg-slate-200 transition-all active:scale-95 flex items-center gap-2 ${(loading || !formData.Code) ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            className={`px-6 h-10 bg-[#00adff] text-white text-[13px] font-bold rounded-[5px] hover:bg-[#0099e6] shadow-md shadow-blue-200 transition-all active:scale-95 flex items-center justify-center gap-2 ${(loading || !formData.Code) ? 'opacity-50 cursor-not-allowed' : ''}`}
                         >
                             <Edit size={14} /> {loading ? 'Saving...' : 'Edit'}
                         </button>
                         <button 
                             onClick={handleDelete}
                             disabled={loading || !formData.Code}
-                            className={`px-6 h-10 bg-[#d13438] text-white text-sm font-bold rounded-md shadow-md shadow-red-200 hover:bg-[#a4262c] transition-all active:scale-95 flex items-center gap-2 ${(loading || !formData.Code) ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            className={`px-6 h-10 bg-[#d13438] text-white text-[13px] font-bold rounded-[5px] shadow-md shadow-red-200 hover:bg-[#a4262c] transition-all active:scale-95 flex items-center justify-center gap-2 ${(loading || !formData.Code) ? 'opacity-50 cursor-not-allowed' : ''}`}
                         >
                             <Trash2 size={14} /> Delete
                         </button>
-                        <button onClick={handleClear} className="px-6 h-10 bg-slate-100 text-slate-600 text-sm font-bold rounded-md hover:bg-slate-200 transition-all active:scale-95 flex items-center gap-2">
+                        <button onClick={handleClear} className="px-6 h-10 bg-[#00adff] text-white text-[13px] font-bold rounded-[5px] hover:bg-[#0099e6] shadow-md shadow-blue-200 transition-all active:scale-95 flex items-center justify-center gap-2 border-none">
                             <RotateCcw size={14} /> Clear
                         </button>
-                        <button onClick={onClose} className="px-6 h-10 bg-[#0078d4] text-white text-sm font-bold rounded-md shadow-md shadow-blue-200 hover:bg-[#005a9e] transition-all active:scale-95">
-                            <X size={14} /> Exit
-                        </button>
+                       
                     </>
                 }
             >
-                <div className="space-y-4 min-h-[500px]">
-                    <div className="border-b border-gray-200 pb-2 mb-4 flex justify-between items-center">
-                        <h2 className="text-sm font-bold text-gray-800">Enter New Company Details & Update</h2>
+                <div className="py-2 select-none font-['Tahoma'] space-y-4 text-[12.5px] mt-4 min-h-[500px]">
+                    <div className="border-b border-gray-200 pb-4 mb-4 flex items-center justify-center">
+                        <h2 className="text-[17px] font-bold text-black uppercase tracking-tight">Enter New Company Details & Update</h2>
                     </div>
 
                     <div className="space-y-3">
-                        <div className="flex items-center gap-2">
-                            <label className="text-xs font-semibold text-gray-600 w-[150px] shrink-0">Company ID</label>
-                            <div className="flex-1 flex gap-2">
-                                <div className="w-[120px] h-7 bg-gray-50 border border-gray-200 px-2 text-[10px] flex items-center text-gray-600 font-bold rounded-sm select-none">
-                                    {formData.Code || <span className="text-gray-400 italic">AUTO-GEN</span>}
-                                </div>
+                        <div className="flex items-center gap-6">
+                            <label className="w-32 font-bold text-gray-700">Company ID</label>
+                            <div className="flex-1 flex gap-3">
+                                <input 
+                                    type="text" 
+                                    value={formData.Code || 'AUTO-GEN'} 
+                                    readOnly 
+                                    className="w-32 h-8 border border-gray-300 px-2 bg-white rounded-[5px] outline-none font-bold text-blue-600 shadow-sm text-center" 
+                                />
                                 <button 
                                     onClick={handleSearch}
-                                    className="w-7 h-7 bg-[#0078d4] text-white flex items-center justify-center hover:bg-[#005a9e] rounded-sm shadow-sm transition-colors"
+                                    className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95"
                                 >
-                                    <Search size={14} />
+                                    <Search size={18} />
                                 </button>
                             </div>
                         </div>
@@ -314,8 +336,7 @@ const CompanyBoard = ({ isOpen, onClose }) => {
                                 value={formData.Comp_Name}
                                 onChange={handleInputChange}
                                 maxLength={50}
-                                placeholder="Company Name"
-                                className="flex-1 h-7 border border-gray-300 px-2 text-sm focus:border-blue-500 outline-none" 
+                                className="flex-1 h-8 font-mono border border-gray-300 px-3 bg-white rounded-[5px] outline-none focus:border-blue-400 shadow-sm transition-all focus:shadow-md" 
                             />
                         </FormRow>
 
@@ -325,7 +346,7 @@ const CompanyBoard = ({ isOpen, onClose }) => {
                                 name="Legal_Name"
                                 value={formData.Legal_Name}
                                 onChange={handleInputChange}
-                                className="flex-1 h-7 border border-gray-300 px-2 text-sm focus:border-blue-500 outline-none" 
+                                className="flex-1 h-8 font-mono border border-gray-300 px-3 bg-white rounded-[5px] outline-none focus:border-blue-400 shadow-sm transition-all focus:shadow-md" 
                             />
                         </FormRow>
 
@@ -335,7 +356,7 @@ const CompanyBoard = ({ isOpen, onClose }) => {
                                 name="Address1"
                                 value={formData.Address1}
                                 onChange={handleInputChange}
-                                className="flex-1 h-7 border border-gray-300 px-2 text-sm focus:border-blue-500 outline-none" 
+                                className="flex-1 h-8 font-mono border border-gray-300 px-3 bg-white rounded-[5px] outline-none focus:border-blue-400 shadow-sm transition-all focus:shadow-md" 
                             />
                         </FormRow>
 
@@ -345,44 +366,35 @@ const CompanyBoard = ({ isOpen, onClose }) => {
                                 name="Address2"
                                 value={formData.Address2}
                                 onChange={handleInputChange}
-                                className="flex-1 h-7 border border-gray-300 px-2 text-sm focus:border-blue-500 outline-none" 
+                                className="flex-1 h-8 font-mono border border-gray-300 px-3 bg-white rounded-[5px] outline-none focus:border-blue-400 shadow-sm transition-all focus:shadow-md" 
                             />
                         </FormRow>
 
                         <FormRow label="Country">
-                            <div className="flex-1 flex gap-1">
-                                <select 
+                            <div className="flex-1 flex gap-3">
+                                <input 
+                                    type="text"
                                     name="Country"
                                     value={formData.Country}
-                                    onChange={handleInputChange}
-                                    className="flex-1 h-7 border border-gray-300 px-1 text-sm bg-white focus:border-blue-500 outline-none"
-                                >
-                                    <option value="">&lt; Select Country... &gt;</option>
-                                    {countries.map((c, idx) => (
-                                        <option key={idx} value={c.countryName}>
-                                            {c.countryName}
-                                        </option>
-                                    ))}
-                                    {formData.Country && !countries.find(c => c.countryName === formData.Country) && (
-                                        <option value={formData.Country}>{formData.Country}</option>
-                                    )}
-                                </select>
+                                    readOnly
+                                    className="flex-1 h-8 font-mono border border-gray-300 px-3 bg-gray-50 rounded-[5px] outline-none shadow-sm cursor-default"
+                                />
                                 <button 
                                     onClick={handleCountrySearch}
-                                    className="w-7 h-7 bg-[#0078d4] text-white flex items-center justify-center hover:bg-[#005a9e] rounded-sm shadow-sm transition-colors"
+                                    className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95"
                                 >
-                                    <Globe size={14} />
+                                    <Globe size={18} />
                                 </button>
                             </div>
                         </FormRow>
 
-                        <FormRow label="Phone No:">
+                        <FormRow label="Phone No">
                             <input 
                                 type="text" 
                                 name="Phone"
                                 value={formData.Phone}
                                 onChange={handleInputChange}
-                                className="flex-1 h-7 border border-gray-300 px-2 text-sm focus:border-blue-500 outline-none" 
+                                className="flex-1 h-8 font-mono border border-gray-300 px-3 bg-white rounded-[5px] outline-none focus:border-blue-400 shadow-sm transition-all focus:shadow-md" 
                             />
                         </FormRow>
 
@@ -392,7 +404,7 @@ const CompanyBoard = ({ isOpen, onClose }) => {
                                 name="Email"
                                 value={formData.Email}
                                 onChange={handleInputChange}
-                                className="flex-1 h-7 border border-gray-300 px-2 text-sm focus:border-blue-500 outline-none" 
+                                className="flex-1 h-8 font-mono border border-gray-300 px-3 bg-white rounded-[5px] outline-none focus:border-blue-400 shadow-sm transition-all focus:shadow-md" 
                             />
                         </FormRow>
 
@@ -402,58 +414,63 @@ const CompanyBoard = ({ isOpen, onClose }) => {
                                 name="Web"
                                 value={formData.Web}
                                 onChange={handleInputChange}
-                                className="flex-1 h-7 border border-gray-300 px-2 text-sm focus:border-blue-500 outline-none" 
+                                className="flex-1 h-8 font-mono border border-gray-300 px-3 bg-white rounded-[5px] outline-none focus:border-blue-400 shadow-sm transition-all focus:shadow-md" 
                             />
                         </FormRow>
 
                         <FormRow label="Industry">
-                            <div className="flex-1 flex gap-1">
-                                <select 
+                            <div className="flex-1 flex gap-3">
+                                <input 
+                                    type="text"
                                     name="Industry"
                                     value={formData.Industry}
-                                    onChange={handleInputChange}
-                                    className="flex-1 h-7 border border-gray-300 px-1 text-sm bg-white focus:border-blue-500 outline-none"
-                                >
-                                    <option value="">&lt; Select Industry... &gt;</option>
-                                    {industries.map((ind, idx) => (
-                                        <option key={idx} value={ind.indName}>{ind.indName}</option>
-                                    ))}
-                                    {formData.Industry && !industries.find(i => i.indName === formData.Industry) && (
-                                        <option value={formData.Industry}>{formData.Industry}</option>
-                                    )}
-                                </select>
+                                    readOnly
+                                    className="flex-1 h-8 font-mono border border-gray-300 px-3 bg-gray-50 rounded-[5px] outline-none shadow-sm cursor-default"
+                                />
                                 <button 
                                     onClick={handleIndustrySearch}
-                                    className="w-7 h-7 bg-[#0078d4] text-white flex items-center justify-center hover:bg-[#005a9e] rounded-sm shadow-sm transition-colors"
+                                    className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95"
                                 >
-                                    <Briefcase size={14} />
+                                    <Briefcase size={18} />
                                 </button>
                             </div>
                         </FormRow>
 
                         <FormRow label="Company Organized">
-                            <select 
-                                name="Organiz"
-                                value={formData.Organiz}
-                                onChange={handleInputChange}
-                                className="flex-1 h-7 border border-gray-300 px-1 text-sm bg-white focus:border-blue-500 outline-none"
-                            >
-                                <option value="">&lt; Select Company Organized... &gt;</option>
-                                <option value="Corporation">Corporation</option>
-                                <option value="Partnership">Partnership</option>
-                                <option value="Sole Proprietorship">Sole Proprietorship</option>
-                            </select>
+                            <div className="flex-1 flex gap-3">
+                                <input 
+                                    type="text"
+                                    name="Organiz"
+                                    value={formData.Organiz}
+                                    readOnly
+                                    className="flex-1 h-8 font-mono border border-gray-300 px-3 bg-gray-50 rounded-[5px] outline-none shadow-sm cursor-default"
+                                />
+                                <button 
+                                    onClick={() => setShowOrgLookup(true)}
+                                    className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95"
+                                >
+                                    <Search size={18} />
+                                </button>
+                            </div>
                         </FormRow>
 
-                        <div className="flex items-center gap-2">
-                            <label className="text-xs font-semibold text-gray-600 w-[150px] shrink-0">Business Start Date</label>
-                            <input 
-                                type="date" 
-                                name="Start_Date"
-                                value={formData.Start_Date}
-                                onChange={handleInputChange}
-                                className="w-[180px] h-7 border border-gray-300 px-2 text-sm focus:border-blue-500 outline-none" 
-                            />
+                        <div className="flex items-center gap-6">
+                            <label className="w-32 font-bold text-gray-700">Business Start Date</label>
+                            <div className="flex gap-3">
+                                <input 
+                                    type="text" 
+                                    name="Start_Date"
+                                    value={formData.Start_Date}
+                                    readOnly
+                                    className="w-[127px] h-8 font-mono border border-gray-300 px-3 bg-gray-50 rounded-[5px] outline-none shadow-sm cursor-default" 
+                                />
+                                <button 
+                                    onClick={() => setShowCalendar(true)}
+                                    className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95"
+                                >
+                                    <Calendar size={18} />
+                                </button>
+                            </div>
                         </div>
 
                         <FormRow label="Fin. Year From">
@@ -462,8 +479,7 @@ const CompanyBoard = ({ isOpen, onClose }) => {
                                 name="Acc_Year"
                                 value={formData.Acc_Year}
                                 onChange={handleInputChange}
-                                placeholder="DD/MM"
-                                className="w-[180px] h-7 border border-gray-300 px-2 text-sm focus:border-blue-500 outline-none" 
+                                className="w-[180px] h-8 font-mono border border-gray-300 px-3 bg-white rounded-[5px] outline-none focus:border-blue-400 shadow-sm transition-all focus:shadow-md" 
                             />
                         </FormRow>
 
@@ -473,8 +489,7 @@ const CompanyBoard = ({ isOpen, onClose }) => {
                                 name="To_Year"
                                 value={formData.To_Year}
                                 onChange={handleInputChange}
-                                placeholder="DD/MM"
-                                className="w-[180px] h-7 border border-gray-300 px-2 text-sm focus:border-blue-500 outline-none" 
+                                className="w-[180px] h-8 font-mono border border-gray-300 px-3 bg-white rounded-[5px] outline-none focus:border-blue-400 shadow-sm transition-all focus:shadow-md" 
                             />
                         </FormRow>
 
@@ -484,7 +499,7 @@ const CompanyBoard = ({ isOpen, onClose }) => {
                                 name="Reg_Number"
                                 value={formData.Reg_Number}
                                 onChange={handleInputChange}
-                                className="flex-1 h-7 border border-gray-300 px-2 text-sm focus:border-blue-500 outline-none" 
+                                className="flex-1 h-8 font-mono border border-gray-300 px-3 bg-white rounded-[5px] outline-none focus:border-blue-400 shadow-sm transition-all focus:shadow-md" 
                             />
                         </FormRow>
 
@@ -494,7 +509,7 @@ const CompanyBoard = ({ isOpen, onClose }) => {
                                 name="Tax_ID"
                                 value={formData.Tax_ID}
                                 onChange={handleInputChange}
-                                className="flex-1 h-7 border border-gray-300 px-2 text-sm focus:border-blue-500 outline-none" 
+                                className="flex-1 h-8 font-mono border border-gray-300 px-3 bg-white rounded-[5px] outline-none focus:border-blue-400 shadow-sm transition-all focus:shadow-md" 
                             />
                         </FormRow>
                     </div>
@@ -535,14 +550,17 @@ const CompanyBoard = ({ isOpen, onClose }) => {
                                         <button
                                             key={idx}
                                             onClick={() => handleSelectCompany(company)}
-                                            className="w-full flex items-center px-3 py-2 text-xs border-b border-gray-100 hover:bg-[#0078d4] hover:text-white group transition-all text-left"
+                                            className="w-full flex items-center justify-between px-3 py-2 text-xs border-b border-gray-100 hover:bg-blue-50 transition-all text-left"
                                         >
-                                            <span className="w-[120px] font-mono text-[11px] font-bold text-[#0078d4] group-hover:text-white">
-                                                {company.companyCode}
-                                            </span>
-                                            <span className="flex-1 font-medium group-hover:text-white uppercase">
-                                                {company.companyName}
-                                            </span>
+                                            <div className="flex items-center gap-2 flex-1">
+                                                <span className="w-[120px] font-mono text-[11px] font-bold text-[#0078d4]">
+                                                    {company.companyCode}
+                                                </span>
+                                                <span className="flex-1 font-mono font-medium text-gray-700 uppercase">
+                                                    {company.companyName}
+                                                </span>
+                                            </div>
+                                            <div className="bg-[#e49e1b] text-white text-[10px] px-5 py-1.5 rounded-md font-bold hover:bg-[#cb9b34] shadow-sm transition-all active:scale-95 uppercase">Select</div>
                                         </button>
                                     ))
                                 ) : (
@@ -634,14 +652,17 @@ const CompanyBoard = ({ isOpen, onClose }) => {
                                         <button
                                             key={idx}
                                             onClick={() => handleSelectCountry(country)}
-                                            className="w-full flex items-center px-3 py-2 text-xs border-b border-gray-100 hover:bg-[#0078d4] hover:text-white group transition-all text-left"
+                                            className="w-full flex items-center justify-between px-3 py-2 text-xs border-b border-gray-100 hover:bg-blue-50 transition-all text-left"
                                         >
-                                            <span className="w-[100px] font-mono text-[11px] font-bold text-[#0078d4] group-hover:text-white">
-                                                {country.countryCode}
-                                            </span>
-                                            <span className="flex-1 font-medium group-hover:text-white uppercase text-gray-700">
-                                                {country.countryName}
-                                            </span>
+                                            <div className="flex items-center gap-2 flex-1">
+                                                <span className="w-[100px] font-mono text-[11px] font-bold text-[#0078d4]">
+                                                    {country.countryCode}
+                                                </span>
+                                                <span className="flex-1 font-mono font-medium text-gray-700 uppercase">
+                                                    {country.countryName}
+                                                </span>
+                                            </div>
+                                            <div className="bg-[#e49e1b] text-white text-[10px] px-5 py-1.5 rounded-md font-bold hover:bg-[#cb9b34] shadow-sm transition-all active:scale-95 uppercase">Select</div>
                                         </button>
                                     ))
                                 ) : (
@@ -693,14 +714,17 @@ const CompanyBoard = ({ isOpen, onClose }) => {
                                         <button
                                             key={idx}
                                             onClick={() => handleSelectIndustry(industry)}
-                                            className="w-full flex items-center px-3 py-2 text-xs border-b border-gray-100 hover:bg-[#0078d4] hover:text-white group transition-all text-left"
+                                            className="w-full flex items-center justify-between px-3 py-2 text-xs border-b border-gray-100 hover:bg-blue-50 transition-all text-left"
                                         >
-                                            <span className="w-[100px] font-mono text-[11px] font-bold text-[#0078d4] group-hover:text-white">
-                                                {industry.indCode}
-                                            </span>
-                                            <span className="flex-1 font-medium group-hover:text-white uppercase text-gray-700">
-                                                {industry.indName}
-                                            </span>
+                                            <div className="flex items-center gap-2 flex-1">
+                                                <span className="w-[100px] font-mono text-[11px] font-bold text-[#0078d4]">
+                                                    {industry.indCode}
+                                                </span>
+                                                <span className="flex-1 font-mono font-medium text-gray-700 uppercase">
+                                                    {industry.indName}
+                                                </span>
+                                            </div>
+                                            <div className="bg-[#e49e1b] text-white text-[10px] px-5 py-1.5 rounded-md font-bold hover:bg-[#cb9b34] shadow-sm transition-all active:scale-95 uppercase">Select</div>
                                         </button>
                                     ))
                                 ) : (
@@ -717,13 +741,76 @@ const CompanyBoard = ({ isOpen, onClose }) => {
                     </div>
                 </div>
             )}
+
+            {/* Organizational Type Lookup Modal */}
+            {showOrgLookup && (
+                <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4">
+                    <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setShowOrgLookup(false)} />
+                    <div className="relative w-full max-w-md bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden animate-in zoom-in-95 duration-200">
+                        {/* Header */}
+                        <div className="bg-[#0078d4] px-4 py-2 flex items-center justify-between text-white">
+                            <div className="flex items-center gap-2">
+                                <Search size={16} />
+                                <span className="text-sm font-bold">Organization Type Lookup</span>
+                            </div>
+                            <button
+                                onClick={() => setShowOrgLookup(false)}
+                                className="w-9 h-8 flex items-center justify-center bg-[#ff3b30] hover:bg-[#e03127] text-white rounded-[8px] shadow-[0_4px_12px_rgba(255,59,48,0.3)] hover:shadow-[0_6px_20_rgba(255,59,48,0.4)] transition-all active:scale-90 outline-none border-none group"
+                                title="Close"
+                            >
+                                <X size={18} strokeWidth={4} className="group-hover:scale-110 transition-transform" />
+                            </button>
+                        </div>
+
+                        {/* Search List */}
+                        <div className="p-2">
+                            <div className="bg-gray-100 px-3 py-1.5 flex text-[10px] font-bold text-gray-600 border-b border-gray-200">
+                                <span className="w-[100px]">CODE</span>
+                                <span className="flex-1">TYPE NAME</span>
+                            </div>
+                            <div className="max-h-[300px] overflow-y-auto overflow-x-hidden custom-scrollbar">
+                                {orgTypes.map((org, idx) => (
+                                    <button
+                                        key={idx}
+                                        onClick={() => handleSelectOrg(org)}
+                                        className="w-full flex items-center justify-between px-3 py-2 text-xs border-b border-gray-100 hover:bg-blue-50 transition-all text-left"
+                                    >
+                                        <div className="flex items-center gap-2 flex-1">
+                                            <span className="w-[100px] font-mono text-[11px] font-bold text-[#0078d4]">
+                                                {org.code}
+                                            </span>
+                                            <span className="flex-1 font-mono font-medium text-gray-700 uppercase">
+                                                {org.name}
+                                            </span>
+                                        </div>
+                                        <div className="bg-[#e49e1b] text-white text-[10px] px-5 py-1.5 rounded-md font-bold hover:bg-[#cb9b34] shadow-sm transition-all active:scale-95 uppercase">Select</div>
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Footer */}
+                        <div className="bg-gray-50 px-4 py-2 border-t border-gray-200 flex justify-between items-center text-[10px] text-gray-400">
+                            <span>{orgTypes.length} Result(s)</span>
+                            <span className="italic font-bold text-[#0078d4]">ACCOUNT CLOUD DATA</span>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            <CalendarModal 
+                isOpen={showCalendar}
+                onClose={() => setShowCalendar(false)}
+                onDateSelect={handleDateSelect}
+                initialDate={formData.Start_Date}
+            />
         </>
     );
 };
 
 const FormRow = ({ label, children }) => (
-    <div className="flex items-center">
-        <label className="text-xs font-semibold text-gray-600 w-[150px] shrink-0">{label}</label>
+    <div className="flex items-center gap-6">
+        <label className="w-32 font-bold text-gray-700">{label}</label>
         {children}
     </div>
 );

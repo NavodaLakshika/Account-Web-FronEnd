@@ -88,46 +88,46 @@ const ViewUtilityModal = ({ isOpen, onClose, onToggleSideBar, onOpenReminder, on
                     </div>
 
                     {/* Menu Content */}
-                    <div className="p-6 bg-white flex-1 overflow-y-auto max-h-[75vh] no-scrollbar">
-                        {menuItems.map((item, idx) => {
-                            if (item.type === 'separator') {
-                                return <div key={idx} className="my-1.5 h-[1px] bg-gray-200 mx-2" />;
-                            }
+                    <div className="p-2 bg-white flex-1 overflow-y-auto max-h-[75vh] no-scrollbar">
+                    {menuItems.map((item, idx) => {
+                        if (item.type === 'separator') {
+                            return <div key={idx} className="my-1.5 h-[1px] bg-gray-200 mx-2" />;
+                        }
 
-                            const Icon = item.icon;
-                            return (
-                                <button
-                                    key={idx}
-                                    onClick={item.onClick}
-                                    className="w-full flex items-center justify-between px-3 py-2.5 rounded-sm hover:bg-[#0078d4] group transition-all"
-                                >
-                                    <div className="flex items-center gap-3">
-                                        <Icon size={16} className={`text-gray-500 group-hover:text-white transition-colors`} />
-                                        <span className={`text-[13px] font-medium text-gray-700 group-hover:text-white transition-colors`}>
-                                            {item.label}
+                        const Icon = item.icon;
+                        return (
+                            <button
+                                key={idx}
+                                onClick={item.onClick}
+                                className="w-full flex items-center justify-between px-4 py-3 rounded-xl hover:bg-slate-50 group transition-all relative overflow-hidden text-left"
+                            >
+                                {/* Hover Indicator Bar */}
+                                <div 
+                                    className="absolute left-0 top-0 bottom-0 w-1 opacity-0 group-hover:opacity-100 transition-all duration-300"
+                                    style={{ backgroundColor: currentTopBarColor || '#0078d4' }}
+                                />
+
+                                <div className="flex items-center gap-3 relative z-10">
+                                    <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center group-hover:bg-white transition-colors shadow-sm group-hover:shadow-md">
+                                        <Icon size={16} className="text-slate-500 group-hover:text-[#0078d4] transition-colors" />
+                                    </div>
+                                    <span className="text-[13px] font-semibold text-slate-700 group-hover:text-slate-900 transition-colors">
+                                        {item.label}
+                                    </span>
+                                </div>
+                                
+                                <div className="flex items-center gap-3 relative z-10">
+                                    {item.shortcut && (
+                                        <span className="text-[10px] font-bold text-slate-300 group-hover:text-slate-400 bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100">
+                                            {item.shortcut}
                                         </span>
-                                    </div>
-                                    
-                                    <div className="flex items-center gap-3">
-                                        {item.shortcut && (
-                                            <span className="text-[10px] text-gray-400 group-hover:text-white/80">
-                                                {item.shortcut}
-                                            </span>
-                                        )}
-                                        {item.hasSubmenu && (
-                                            <ChevronRight size={14} className="text-gray-400 group-hover:text-white group-hover:translate-x-0.5 transition-all" />
-                                        )}
-                                    </div>
-                                </button>
-                            );
-                        })}
-                    </div>
-
-                    {/* Footer */}
-                    <div className="bg-slate-50 px-6 py-4 border-t border-gray-100 flex justify-between items-center">
-                        <span className="text-[10px] text-gray-500 font-medium">{menuItems.filter(i => i.type !== 'separator').length} Items</span>
-                        <span className="text-[10px] text-[#0078d4] font-bold uppercase tracking-widest italic">Management Tools</span>
-                    </div>
+                                    )}
+                                    <ChevronRight size={14} className="text-slate-300 group-hover:text-slate-500 group-hover:translate-x-0.5 transition-all" />
+                                </div>
+                            </button>
+                        );
+                    })}
+                    </div>              
                 </div>
             </div>
 

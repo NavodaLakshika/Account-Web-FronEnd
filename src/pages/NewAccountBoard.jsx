@@ -64,9 +64,9 @@ const NewAccountBoard = ({ isOpen, onClose }) => {
             title="Create New Account"
             maxWidth="max-w-2xl"
             footer={
-                <>
+                <div className="bg-slate-50 px-6 py-4 w-full flex justify-end gap-3 border-t border-gray-100 mt-4 rounded-b-xl">
                     <button
-                        className="px-6 h-10 bg-[#0078d4] text-white text-sm font-bold rounded-md shadow-md shadow-blue-200 hover:bg-[#005a9e] transition-all active:scale-95 flex items-center gap-2"
+                        className="px-6 h-10 bg-[#50af60] text-white text-[13px] font-bold rounded-[5px] shadow-md shadow-green-200 hover:bg-[#24db4e] transition-all active:scale-95 flex items-center gap-2"
                         onClick={() => {
                             console.log('Creating account:', selectedType === 'Other' ? otherAccountType : selectedType);
                             onClose();
@@ -74,13 +74,13 @@ const NewAccountBoard = ({ isOpen, onClose }) => {
                     >
                         <PlusCircle size={14} /> Create Account
                     </button>
-                    <button onClick={onClose} className="px-6 h-10 bg-slate-100 text-slate-600 text-sm font-bold rounded-md hover:bg-slate-200 transition-all active:scale-95">
+                    <button onClick={onClose} className="px-6 h-10 bg-[#d13438] text-white text-[13px] font-bold rounded-[5px] shadow-md shadow-red-200 hover:bg-[#a4262c] transition-all active:scale-95 flex items-center justify-center gap-2">
                         <X size={14} /> Exit
                     </button>
-                </>
+                </div>
             }
         >
-            <div className="space-y-6">
+            <div className="py-2 select-none font-['Tahoma'] space-y-6">
                 <h2 className="text-sm font-bold text-blue-800 uppercase border-b border-blue-100 pb-2">Select One Account Type and Click Create</h2>
 
                 <div className="flex gap-6">

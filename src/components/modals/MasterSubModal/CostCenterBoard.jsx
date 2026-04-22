@@ -125,7 +125,7 @@ const CostCenterBoard = ({ isOpen, onClose }) => {
             <button 
                 onClick={handleSave}
                 disabled={loading}
-                className={`w-32 h-8 bg-[#0078d4] text-white text-sm font-medium rounded-sm border border-[#005a9e] hover:bg-[#005a9e] flex items-center justify-center gap-2 ${loading ? 'opacity-50' : ''}`}
+                className={`px-6 h-10 bg-[#50af60] text-white text-[13px] font-bold rounded-[5px] shadow-md shadow-green-200 hover:bg-[#24db4e] transition-all active:scale-95 flex items-center justify-center gap-2 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
                 {loading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />} 
                 {isEditMode ? 'Update' : 'Save'}
@@ -133,21 +133,15 @@ const CostCenterBoard = ({ isOpen, onClose }) => {
             <button 
                 onClick={handleDelete}
                 disabled={!isEditMode || loading}
-                className={`w-32 h-8 bg-[#d13438] text-white text-sm font-medium rounded-sm border border-[#a4262c] hover:bg-[#a4262c] flex items-center justify-center gap-2 ${(!isEditMode || loading) ? 'opacity-50' : ''}`}
+                className={`px-6 h-10 bg-[#d13438] text-white text-[13px] font-bold rounded-[5px] shadow-md shadow-red-200 hover:bg-[#a4262c] transition-all active:scale-95 flex items-center justify-center gap-2 ${(!isEditMode || loading) ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
                 <Trash2 size={14} /> Delete
             </button>
             <button 
                 onClick={handleClear}
-                className="px-6 h-10 bg-slate-100 text-slate-600 text-sm font-bold rounded-md hover:bg-slate-200 transition-all active:scale-95 border-none flex items-center justify-center gap-2"
+                className="px-6 h-10 bg-[#00adff] text-white text-[13px] font-bold rounded-[5px] hover:bg-[#0099e6] shadow-md shadow-blue-200 transition-all active:scale-95 flex items-center justify-center gap-2 border-none"
             >
                 <RotateCcw size={14} /> Clear
-            </button>
-            <button 
-                onClick={onClose} 
-                className="px-6 h-10 bg-slate-100 text-slate-600 text-sm font-bold rounded-md hover:bg-slate-200 transition-all active:scale-95 border-none flex items-center justify-center gap-2"
-            >
-                <X size={14} /> Exit
             </button>
         </div>
     );
@@ -161,57 +155,57 @@ const CostCenterBoard = ({ isOpen, onClose }) => {
                 maxWidth="max-w-xl"
                 footer={footer}
             >
-                <div className="space-y-4 py-2 font-['Plus_Jakarta_Sans']">
-                    <h2 className="text-sm font-bold text-gray-800 border-b pb-2 mb-4">Enter New Cost Center Details & Update</h2>
+                <div className="py-2 select-none font-['Tahoma'] space-y-4 text-[12.5px] mt-4 min-h-[300px]">
+                    <div className="border-b border-gray-200 pb-4 mb-4 flex items-center justify-center">
+                        <h2 className="text-[17px] font-bold text-black uppercase tracking-tight">Enter New Cost Center Details & Update</h2>
+                    </div>
                     
                     <div className="space-y-3">
                         {/* Cost Center ID Row */}
-                        <div className="flex items-center gap-3">
-                            <label className="text-xs font-semibold text-gray-600 w-32 shrink-0">Cost Center ID</label>
-                            <div className="flex-1 flex gap-2">
+                        <div className="flex items-center gap-6">
+                            <label className="w-32 font-bold text-gray-700">Cost Center ID</label>
+                            <div className="flex-1 flex gap-3">
                                 <input 
                                     type="text" 
                                     name="Code"
-                                    value={formData.Code}
-                                    placeholder="Auto Generated"
+                                    value={formData.Code || 'AUTO-GEN'}
                                     readOnly
-                                    className="w-32 h-8 border border-gray-300 px-2 text-sm bg-gray-50 focus:border-blue-500 outline-none rounded-sm"
+                                    className="w-32 h-8 border border-gray-300 px-2 bg-white rounded-[5px] outline-none font-bold text-blue-600 shadow-sm text-center"
                                 />
                                 <button 
                                     onClick={openSearch}
-                                    className="w-8 h-8 bg-[#0078d4] text-white flex items-center justify-center hover:bg-[#005a9e] rounded-sm transition-colors shadow-sm"
+                                    className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95"
                                 >
-                                    <Search size={14} />
+                                    <Search size={18} />
                                 </button>
                             </div>
                         </div>
 
                         {/* Cost Center Name Row - Single Line */}
-                        <div className="flex items-center gap-3">
-                            <label className="text-xs font-semibold text-gray-600 w-32 shrink-0">Cost Center Name</label>
+                        <div className="flex items-center gap-6">
+                            <label className="w-32 font-bold text-gray-700">Cost Center Name</label>
                             <input 
                                 type="text" 
                                 name="Name"
                                 value={formData.Name}
                                 onChange={handleInputChange}
-                                placeholder="Enter Cost Center Name"
-                                className="flex-1 h-8 border border-gray-300 px-2 text-sm focus:border-blue-500 outline-none rounded-sm"
+                                className="flex-1 h-8 font-mono border border-gray-300 px-3 bg-white rounded-[5px] outline-none focus:border-blue-400 shadow-sm transition-all focus:shadow-md"
                             />
                         </div>
 
                         {/* Inactive Row */}
-                        <div className="flex items-center gap-3">
-                            <label className="text-xs font-semibold text-gray-600 w-32 shrink-0"></label>
-                            <div className="flex items-center gap-2 cursor-pointer group">
+                        <div className="flex items-center gap-6 pt-2">
+                            <label className="w-32 font-bold text-gray-700"></label>
+                            <div className="flex items-center gap-3 cursor-pointer group">
                                 <input 
                                     type="checkbox" 
                                     id="cc-inactive"
                                     name="Inactive"
                                     checked={formData.Inactive}
                                     onChange={handleInputChange}
-                                    className="w-4 h-4 rounded-sm border-gray-300 text-[#0078d4] focus:ring-[#0078d4]" 
+                                    className="w-5 h-5 rounded-[5px] border-gray-300 text-[#0078d4] focus:ring-[#0078d4] shadow-sm transition-all" 
                                 />
-                                <label htmlFor="cc-inactive" className="text-xs font-semibold text-gray-600 group-hover:text-blue-600 transition-colors cursor-pointer">
+                                <label htmlFor="cc-inactive" className={`font-bold transition-colors ${formData.Inactive ? 'text-red-500' : 'text-gray-700'} cursor-pointer`}>
                                     Cost Center Inactive
                                 </label>
                             </div>
@@ -222,61 +216,74 @@ const CostCenterBoard = ({ isOpen, onClose }) => {
 
             {/* Search Modal */}
             {showSearchModal && (
-                <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4">
+                <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4 font-['Tahoma']">
                     <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setShowSearchModal(false)} />
-                    <div className="relative w-full max-w-lg bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col max-h-[80vh] font-['Plus_Jakarta_Sans']">
-                        <div className="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-50/50">
-                            <h3 className="text-lg font-bold text-slate-800 tracking-tight">Search Cost Centers</h3>
-                            <div className="flex gap-2">
-                                <input 
-                                    type="text" 
-                                    placeholder="Name or ID..."
-                                    className="h-8 border border-gray-300 px-3 text-sm rounded-md w-48 focus:border-blue-500 outline-none"
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                />
-                                <button
-                                    onClick={() => setShowSearchModal(false)}
-                                    className="w-9 h-8 flex items-center justify-center bg-[#ff3b30] hover:bg-[#e03127] text-white rounded-[8px] shadow-[0_4px_12px_rgba(255,59,48,0.3)] hover:shadow-[0_6px_20px_rgba(255,59,48,0.4)] transition-all active:scale-90 outline-none border-none group"
-                                    title="Close"
-                                >
-                                    <X size={18} strokeWidth={4} className="group-hover:scale-110 transition-transform" />
-                                </button>
+                    <div className="relative w-full max-w-lg bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
+                        {/* Header */}
+                        <div className="bg-[#0078d4] px-4 py-2 flex items-center justify-between text-white">
+                            <div className="flex items-center gap-2">
+                                <Search size={16} />
+                                <span className="text-sm font-bold uppercase tracking-tight">Search Cost Centers Lookup</span>
+                            </div>
+                            <button
+                                onClick={() => setShowSearchModal(false)}
+                                className="w-9 h-8 flex items-center justify-center bg-[#ff3b30] hover:bg-[#e03127] text-white rounded-[8px] shadow-[0_4px_12px_rgba(255,59,48,0.3)] hover:shadow-[0_6px_20px_rgba(255,59,48,0.4)] transition-all active:scale-90 outline-none border-none group"
+                                title="Close"
+                            >
+                                <X size={18} strokeWidth={4} className="group-hover:scale-110 transition-transform" />
+                            </button>
+                        </div>
+
+                        {/* Search Input Area */}
+                        <div className="p-3 bg-slate-50 border-b border-gray-100 flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                <Search size={14} className="text-gray-400" />
+                                <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Search Facility</span>
+                            </div>
+                            <input 
+                                type="text" 
+                                className="h-8 border border-gray-300 px-3 text-xs rounded-md w-60 focus:border-[#0285fd] outline-none shadow-sm transition-all"
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                            />
+                        </div>
+
+                        {/* Results List */}
+                        <div className="p-2">
+                            <div className="bg-gray-100 px-3 py-1.5 flex text-[10px] font-bold text-gray-600 border-b border-gray-200 uppercase tracking-wider">
+                                <span className="w-20 text-center">Code</span>
+                                <span className="flex-1 px-3">Cost Center Name</span>
+                            </div>
+                            <div className="max-h-[300px] overflow-y-auto custom-scrollbar">
+                                {costCentersList
+                                    .filter(s => (s.name || s.Name)?.toLowerCase().includes(searchQuery.toLowerCase()) || (s.code || s.Code)?.toLowerCase().includes(searchQuery.toLowerCase()))
+                                    .map(s => (
+                                    <button 
+                                        key={s.code || s.Code} 
+                                        onClick={() => selectCostCenter(s)}
+                                        className="w-full flex items-center justify-between px-3 py-2 text-xs border-b border-gray-100 hover:bg-blue-50 transition-all text-left group"
+                                    >
+                                        <div className="flex items-center gap-2 flex-1">
+                                            <span className="w-20 text-center font-mono text-[11px] font-bold text-[#0078d4]">
+                                                {s.code || s.Code}
+                                            </span>
+                                            <span className="flex-1 px-3 font-mono font-medium text-gray-700 uppercase">
+                                                {s.name || s.Name}
+                                            </span>
+                                        </div>
+                                        <div className="bg-[#e49e1b] text-white text-[10px] px-5 py-1.5 rounded-md font-bold hover:bg-[#cb9b34] shadow-sm transition-all active:scale-95 uppercase">Select</div>
+                                    </button>
+                                ))}
+                                {costCentersList.length === 0 && (
+                                    <div className="p-8 text-center text-gray-400 italic text-sm">No cost centers found.</div>
+                                )}
                             </div>
                         </div>
-                        <div className="overflow-y-auto p-2">
-                            <table className="w-full text-sm text-left">
-                                <thead className="bg-[#f8f9fa] sticky top-0 font-bold text-gray-600">
-                                    <tr>
-                                        <th className="p-3 border-b text-center w-20">Code</th>
-                                        <th className="p-3 border-b">Cost Center Name</th>
-                                        <th className="p-3 border-b w-24 text-center">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {costCentersList
-                                        .filter(s => (s.name || s.Name)?.toLowerCase().includes(searchQuery.toLowerCase()) || (s.code || s.Code)?.toLowerCase().includes(searchQuery.toLowerCase()))
-                                        .map(s => (
-                                        <tr key={s.code || s.Code} className="hover:bg-blue-50 transition-colors group">
-                                            <td className="p-3 border-b text-center font-mono text-xs">{s.code || s.Code}</td>
-                                            <td className="p-3 border-b text-gray-700">{s.name || s.Name}</td>
-                                            <td className="p-3 border-b text-center">
-                                                <button 
-                                                    onClick={() => selectCostCenter(s)}
-                                                    className="bg-[#0078d4] text-white text-[10px] uppercase tracking-wider px-3 py-1 rounded-sm font-bold hover:bg-[#005a9e]"
-                                                >
-                                                    Select
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                    {costCentersList.length === 0 && (
-                                        <tr>
-                                            <td colSpan="3" className="p-8 text-center text-gray-400 italic">No cost centers found.</td>
-                                        </tr>
-                                    )}
-                                </tbody>
-                            </table>
+
+                        {/* Footer */}
+                        <div className="bg-gray-50 px-4 py-2 border-t border-gray-200 flex justify-between items-center text-[10px] text-gray-400">
+                            <span>{costCentersList.length} Result(s)</span>
+                            <span className="italic font-bold text-[#0078d4]">ACCOUNT CLOUD DATA CENTER</span>
                         </div>
                     </div>
                 </div>

@@ -97,7 +97,7 @@ const AuthPage = () => {
     const handleLoginErrorToast = (message) => {
         toast.custom((t) => (
             <div className={`${t.visible ? 'animate-in slide-in-from-right-10 fade-in duration-500' : 'animate-out slide-out-to-right-10 fade-out duration-300'} 
-                max-w-[320px] w-full bg-white/90 backdrop-blur-3xl border border-white/20 shadow-2xl rounded-[5px] flex flex-col pointer-events-auto overflow-hidden`}>
+                max-w-[420px] w-full bg-white/90 backdrop-blur-3xl border border-white/20 shadow-2xl rounded-[5px] flex flex-col pointer-events-auto overflow-hidden`}>
                 <div className="px-4 py-2 flex items-center gap-3">
                     <div className="w-12 h-12 shrink-0">
                         <DotLottiePlayer

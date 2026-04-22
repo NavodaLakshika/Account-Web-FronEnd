@@ -125,42 +125,46 @@ const VendorTypesBoard = ({ isOpen, onClose }) => {
                         <button 
                             onClick={handleSave} 
                             disabled={loading} 
-                            className={`px-6 h-10 bg-[#0078d4] text-white text-sm font-bold rounded-md shadow-md shadow-blue-200 hover:bg-[#005a9e] transition-all active:scale-95 flex items-center justify-center gap-2 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            className={`px-6 h-10 bg-[#50af60] text-white text-[13px] font-bold rounded-[5px] shadow-md shadow-green-200 hover:bg-[#24db4e] transition-all active:scale-95 flex items-center justify-center gap-2 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                         >
                             {loading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />} 
                             Save
                         </button>
                         <button 
                             onClick={handleClear} 
-                            className="px-6 h-10 bg-slate-100 text-slate-600 text-sm font-bold rounded-md hover:bg-slate-200 transition-all active:scale-95 flex items-center justify-center gap-2 border-none"
+                            className="px-6 h-10 bg-[#00adff] text-white text-[13px] font-bold rounded-[5px] hover:bg-[#0099e6] shadow-md shadow-blue-200 transition-all active:scale-95 flex items-center justify-center gap-2 border-none"
                         >
                             <RotateCcw size={14} /> Clear
                         </button>
                         <button 
                             onClick={onClose} 
-                            className="px-6 h-10 bg-slate-100 text-slate-600 text-sm font-bold rounded-md hover:bg-slate-200 transition-all active:scale-95 flex items-center justify-center gap-2 border-none"
+                            className="px-6 h-10 bg-[#d13438] text-white text-[13px] font-bold rounded-[5px] shadow-md shadow-red-200 hover:bg-[#a4262c] transition-all active:scale-95 flex items-center justify-center gap-2"
                         >
                             <X size={14} /> Exit
                         </button>
                     </div>
                 }
             >
-                <div className="space-y-4 py-4 font-['Plus_Jakarta_Sans']">
+                <div className="py-2 select-none font-['Tahoma'] space-y-4 text-[12.5px] mt-4 min-h-[300px]">
+                    <div className="border-b border-gray-200 pb-4 mb-4 flex items-center justify-center">
+                        <h2 className="text-[17px] font-bold text-black uppercase tracking-tight">Vendor Type Profile & Update</h2>
+                    </div>
+
                     <div className="space-y-4">
                         {/* Vendor Type Selection */}
-                        <div className="flex items-center gap-3">
-                            <label className="text-[12.5px] font-bold text-gray-700 w-32 shrink-0">Vendor Type</label>
-                            <div className="flex-1 flex gap-2">
+                        <div className="flex items-center gap-6">
+                            <label className="w-32 font-bold text-gray-700">Vendor Type</label>
+                            <div className="flex-1 flex gap-3">
                                 <input 
                                     type="text" 
                                     value={formData.VendorType} 
                                     onChange={(e) => setFormData(prev => ({ ...prev, VendorType: e.target.value }))}
                                     placeholder="Enter or Search Vendor Type..." 
-                                    className="flex-1 h-8 border border-gray-300 px-2 text-[12.5px] bg-white rounded-sm outline-none focus:border-blue-400 font-medium text-gray-700 shadow-sm" 
+                                    className="flex-1 h-8 border border-gray-300 px-3 text-[12.5px] bg-white rounded-[5px] outline-none focus:border-blue-400 font-bold text-gray-700 shadow-sm transition-all focus:shadow-md" 
                                 />
                                 <button 
                                     onClick={() => setShowVendorModal(true)} 
-                                    className="w-9 h-8 bg-[#0078d4] text-white flex items-center justify-center hover:bg-[#005a9e] rounded-sm transition-colors shadow-sm"
+                                    className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95"
                                 >
                                     <Search size={18} />
                                 </button>
@@ -168,28 +172,28 @@ const VendorTypesBoard = ({ isOpen, onClose }) => {
                         </div>
 
                         {/* Account Selection */}
-                        <div className="flex items-start gap-3">
-                            <label className="text-[12.5px] font-bold text-gray-700 w-32 shrink-0 mt-2">Payable Account</label>
-                            <div className="flex-1 space-y-2">
-                                <div className="flex gap-2">
+                        <div className="flex items-start gap-6">
+                            <label className="w-32 font-bold text-gray-700 mt-2">Payable Account</label>
+                            <div className="flex-1 space-y-3">
+                                <div className="flex gap-3">
                                     <input 
                                         type="text" 
                                         value={formData.PaybleAccCode} 
                                         readOnly
                                         placeholder="Acc Code" 
-                                        className="w-32 h-8 border border-gray-300 px-2 text-[12.5px] bg-gray-50 rounded-sm outline-none font-bold text-blue-600 shadow-sm" 
+                                        className="w-32 h-8 border border-gray-300 px-2 bg-white rounded-[5px] outline-none font-bold text-blue-600 shadow-sm text-center cursor-default" 
                                     />
-                                    <div className="flex-1 flex gap-2">
+                                    <div className="flex-1 flex gap-3">
                                         <input 
                                             type="text" 
                                             value={formData.PaybleAccName} 
                                             readOnly 
                                             placeholder="Account Name..." 
-                                            className="flex-1 h-8 border border-gray-300 px-2 text-[12.5px] bg-gray-50 rounded-sm outline-none text-gray-600 font-medium shadow-sm" 
+                                            className="flex-1 h-8 border border-gray-300 px-3 bg-gray-50 rounded-[5px] outline-none text-gray-600 font-bold shadow-sm cursor-default" 
                                         />
                                         <button 
                                             onClick={() => setShowAccModal(true)} 
-                                            className="w-9 h-8 bg-[#0078d4] text-white flex items-center justify-center hover:bg-[#005a9e] rounded-sm transition-colors shadow-sm"
+                                            className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95"
                                         >
                                             <Search size={18} />
                                         </button>
@@ -203,11 +207,15 @@ const VendorTypesBoard = ({ isOpen, onClose }) => {
 
             {/* Vendor List Modal */}
             {showVendorModal && (
-                <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4 font-['Plus_Jakarta_Sans']">
+                <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4 font-['Tahoma']">
                     <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setShowVendorModal(false)} />
-                    <div className="relative w-full max-w-lg bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col max-h-[80vh]">
-                        <div className="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-50">
-                            <h3 className="text-lg font-bold text-slate-800 tracking-tight">Search Vendor Types</h3>
+                    <div className="relative w-full max-w-lg bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
+                        {/* Header */}
+                        <div className="bg-[#0078d4] px-4 py-2 flex items-center justify-between text-white">
+                            <div className="flex items-center gap-2">
+                                <Search size={16} />
+                                <span className="text-sm font-bold uppercase tracking-tight">Vendor Type Lookup</span>
+                            </div>
                             <button
                                 onClick={() => setShowVendorModal(false)}
                                 className="w-9 h-8 flex items-center justify-center bg-[#ff3b30] hover:bg-[#e03127] text-white rounded-[8px] shadow-[0_4px_12px_rgba(255,59,48,0.3)] hover:shadow-[0_6px_20px_rgba(255,59,48,0.4)] transition-all active:scale-90 outline-none border-none group"
@@ -216,28 +224,52 @@ const VendorTypesBoard = ({ isOpen, onClose }) => {
                                 <X size={18} strokeWidth={4} className="group-hover:scale-110 transition-transform" />
                             </button>
                         </div>
-                        <div className="p-4 bg-white border-b border-gray-100">
-                           <input type="text" placeholder="Search vendor types..." className="w-full h-10 border border-gray-300 px-3 text-sm rounded-md focus:border-blue-500 outline-none" value={vendorSearchQuery} onChange={(e) => setVendorSearchQuery(e.target.value)} />
+
+                        {/* Search Input Area */}
+                        <div className="p-3 bg-slate-50 border-b border-gray-100 flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                <Search size={14} className="text-gray-400" />
+                                <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest text-center">Search Facility</span>
+                            </div>
+                            <input 
+                                type="text" 
+                                placeholder="Find by Vendor Type..." 
+                                className="h-9 border border-gray-300 px-3 text-xs rounded-md w-72 focus:border-[#0285fd] outline-none shadow-sm transition-all" 
+                                value={vendorSearchQuery} 
+                                onChange={(e) => setVendorSearchQuery(e.target.value)} 
+                            />
                         </div>
-                        <div className="overflow-y-auto p-2">
-                            <table className="w-full text-sm text-left">
-                                <thead className="bg-slate-50 sticky top-0 text-gray-500 font-bold uppercase text-[11px]">
-                                    <tr>
-                                        <th className="p-3 border-b">Vendor Type</th>
-                                        <th className="p-3 border-b text-center">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {vendors.filter(v => v.vendorTypes.toLowerCase().includes(vendorSearchQuery.toLowerCase())).map((v, i) => (
-                                        <tr key={i} className="hover:bg-blue-50 transition-colors">
-                                            <td className="p-3 border-b font-medium text-gray-700 uppercase">{v.vendorTypes}</td>
-                                            <td className="p-3 border-b text-center">
-                                                <button onClick={() => handleVendorSelect(v)} className="bg-[#0078d4] text-white text-[10px] px-3 py-1 rounded-sm font-bold">SELECT</button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
+
+                        {/* Results List */}
+                        <div className="p-2">
+                            <div className="bg-gray-100 px-3 py-1.5 flex text-[10px] font-bold text-gray-600 border-b border-gray-200 uppercase tracking-wider">
+                                <span className="flex-1 px-3">Vendor Type</span>
+                            </div>
+                            <div className="max-h-[400px] overflow-y-auto custom-scrollbar">
+                                {vendors.filter(v => v.vendorTypes.toLowerCase().includes(vendorSearchQuery.toLowerCase())).map((v, i) => (
+                                    <button 
+                                        key={i} 
+                                        onClick={() => handleVendorSelect(v)}
+                                        className="w-full flex items-center justify-between px-3 py-2 text-xs border-b border-gray-100 hover:bg-blue-50 transition-all text-left group"
+                                    >
+                                        <div className="flex items-center gap-2 flex-1">
+                                            <span className="flex-1 px-3 font-mono font-medium text-gray-700 uppercase">
+                                                {v.vendorTypes}
+                                            </span>
+                                        </div>
+                                        <div className="bg-[#e49e1b] text-white text-[10px] px-5 py-1.5 rounded-md font-bold hover:bg-[#cb9b34] shadow-sm transition-all active:scale-95 uppercase">Select</div>
+                                    </button>
+                                ))}
+                                {vendors.length === 0 && (
+                                    <div className="p-8 text-center text-gray-400 italic text-sm">No vendor types found.</div>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Footer */}
+                        <div className="bg-gray-50 px-4 py-2 border-t border-gray-200 flex justify-between items-center text-[10px] text-gray-400">
+                            <span>{vendors.length} Result(s)</span>
+                            <span className="italic font-bold text-[#0078d4]">ACCOUNT CLOUD INFRASTRUCTURE</span>
                         </div>
                     </div>
                 </div>
@@ -245,11 +277,15 @@ const VendorTypesBoard = ({ isOpen, onClose }) => {
 
             {/* Account List Modal */}
             {showAccModal && (
-                <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4 font-['Plus_Jakarta_Sans']">
+                <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4 font-['Tahoma']">
                     <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setShowAccModal(false)} />
-                    <div className="relative w-full max-w-xl bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col max-h-[80vh]">
-                        <div className="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-50">
-                            <h3 className="text-lg font-bold text-slate-800 tracking-tight">Search Chart of Accounts</h3>
+                    <div className="relative w-full max-w-xl bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
+                        {/* Header */}
+                        <div className="bg-[#0078d4] px-4 py-2 flex items-center justify-between text-white">
+                            <div className="flex items-center gap-2">
+                                <Search size={16} />
+                                <span className="text-sm font-bold uppercase tracking-tight">Chart of Accounts Lookup</span>
+                            </div>
                             <button
                                 onClick={() => setShowAccModal(false)}
                                 className="w-9 h-8 flex items-center justify-center bg-[#ff3b30] hover:bg-[#e03127] text-white rounded-[8px] shadow-[0_4px_12px_rgba(255,59,48,0.3)] hover:shadow-[0_6px_20px_rgba(255,59,48,0.4)] transition-all active:scale-90 outline-none border-none group"
@@ -258,30 +294,56 @@ const VendorTypesBoard = ({ isOpen, onClose }) => {
                                 <X size={18} strokeWidth={4} className="group-hover:scale-110 transition-transform" />
                             </button>
                         </div>
-                        <div className="p-4 bg-white border-b border-gray-100">
-                           <input type="text" placeholder="Search by name or code..." className="w-full h-10 border border-gray-300 px-3 text-sm rounded-md focus:border-blue-500 outline-none" value={accSearchQuery} onChange={(e) => setAccSearchQuery(e.target.value)} />
+
+                        {/* Search Input Area */}
+                        <div className="p-3 bg-slate-50 border-b border-gray-100 flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                <Search size={14} className="text-gray-400" />
+                                <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest text-center">Search Facility</span>
+                            </div>
+                            <input 
+                                type="text" 
+                                placeholder="Search by name or code..." 
+                                className="h-9 border border-gray-300 px-3 text-xs rounded-md w-72 focus:border-[#0285fd] outline-none shadow-sm transition-all" 
+                                value={accSearchQuery} 
+                                onChange={(e) => setAccSearchQuery(e.target.value)} 
+                            />
                         </div>
-                        <div className="overflow-y-auto p-2">
-                            <table className="w-full text-sm text-left">
-                                <thead className="bg-slate-50 sticky top-0 text-gray-500 font-bold uppercase text-[11px]">
-                                    <tr>
-                                        <th className="p-3 border-b">Code</th>
-                                        <th className="p-3 border-b">Account Name</th>
-                                        <th className="p-3 border-b text-center">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {accounts.filter(a => a.sub_Acc_Name.toLowerCase().includes(accSearchQuery.toLowerCase()) || a.sub_Code.includes(accSearchQuery)).map((a, i) => (
-                                        <tr key={i} className="hover:bg-blue-50 transition-colors">
-                                            <td className="p-3 border-b font-bold text-gray-600">{a.sub_Code}</td>
-                                            <td className="p-3 border-b font-medium text-blue-600">{a.sub_Acc_Name}</td>
-                                            <td className="p-3 border-b text-center">
-                                                <button onClick={() => handleAccSelect(a)} className="bg-[#0078d4] text-white text-[10px] px-3 py-1 rounded-sm font-bold">SELECT</button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
+
+                        {/* Results List */}
+                        <div className="p-2">
+                            <div className="bg-gray-100 px-3 py-1.5 flex text-[10px] font-bold text-gray-600 border-b border-gray-200 uppercase tracking-wider">
+                                <span className="w-32 text-center">Code</span>
+                                <span className="flex-1 px-3">Account Name</span>
+                            </div>
+                            <div className="max-h-[400px] overflow-y-auto custom-scrollbar">
+                                {accounts.filter(a => a.sub_Acc_Name.toLowerCase().includes(accSearchQuery.toLowerCase()) || a.sub_Code.includes(accSearchQuery)).map((a, i) => (
+                                    <button 
+                                        key={i} 
+                                        onClick={() => handleAccSelect(a)}
+                                        className="w-full flex items-center justify-between px-3 py-2 text-xs border-b border-gray-100 hover:bg-blue-50 transition-all text-left group"
+                                    >
+                                        <div className="flex items-center gap-2 flex-1">
+                                            <span className="w-32 text-center font-mono text-[11px] font-bold text-[#0078d4]">
+                                                {a.sub_Code}
+                                            </span>
+                                            <span className="flex-1 px-3 font-mono font-medium text-gray-700 uppercase">
+                                                {a.sub_Acc_Name}
+                                            </span>
+                                        </div>
+                                        <div className="bg-[#e49e1b] text-white text-[10px] px-5 py-1.5 rounded-md font-bold hover:bg-[#cb9b34] shadow-sm transition-all active:scale-95 uppercase">Select</div>
+                                    </button>
+                                ))}
+                                {accounts.length === 0 && (
+                                    <div className="p-8 text-center text-gray-400 italic text-sm">No accounts found.</div>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Footer */}
+                        <div className="bg-gray-50 px-4 py-2 border-t border-gray-200 flex justify-between items-center text-[10px] text-gray-400">
+                            <span>{accounts.length} Result(s)</span>
+                            <span className="italic font-bold text-[#0078d4]">ACCOUNT CLOUD INFRASTRUCTURE</span>
                         </div>
                     </div>
                 </div>

@@ -24,6 +24,15 @@
   .auth-transition {
     transition: all 0.6s ease-in-out;
   }
+
+  /* Hide scrollbar for elements with the .no-scrollbar class */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
 }
 
 @keyframes slide-left {

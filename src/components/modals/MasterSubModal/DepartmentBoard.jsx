@@ -157,50 +157,97 @@ const DepartmentBoard = ({ isOpen, onClose }) => {
 
     const footer = (
         <div className="bg-slate-50 px-6 py-4 w-full flex justify-end gap-3 border-t border-gray-100 mt-4 rounded-b-xl">
-            <button onClick={handleSave} disabled={loading} className={`px-6 h-10 bg-[#0078d4] text-white text-sm font-bold rounded-md shadow-md shadow-blue-200 hover:bg-[#005a9e] transition-all active:scale-95 flex items-center justify-center gap-2 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}>
+            <button 
+                onClick={handleSave} 
+                disabled={loading} 
+                className={`px-6 h-10 bg-[#50af60] text-white text-[13px] font-bold rounded-[5px] shadow-md shadow-green-200 hover:bg-[#24db4e] transition-all active:scale-95 flex items-center justify-center gap-2 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+            >
                 {loading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
                 {isEditMode ? 'Update' : 'Save'}
             </button>
-            <button onClick={handleDelete} disabled={!isEditMode || loading} className={`px-6 h-10 bg-[#d13438] text-white text-sm font-bold rounded-md shadow-md shadow-red-200 hover:bg-[#a4262c] transition-all active:scale-95 flex items-center justify-center gap-2 ${(!isEditMode || loading) ? 'opacity-50 cursor-not-allowed' : ''}`}>
+            <button 
+                onClick={handleDelete} 
+                disabled={!isEditMode || loading} 
+                className={`px-6 h-10 bg-[#d13438] text-white text-[13px] font-bold rounded-[5px] shadow-md shadow-red-200 hover:bg-[#a4262c] transition-all active:scale-95 flex items-center justify-center gap-2 ${(!isEditMode || loading) ? 'opacity-50 cursor-not-allowed' : ''}`}
+            >
                 <Trash2 size={14} /> Delete
             </button>
-            <button onClick={handleClear} className="px-6 h-10 bg-slate-100 text-slate-600 text-sm font-bold rounded-md hover:bg-slate-200 transition-all active:scale-95 border-none flex items-center justify-center gap-2">
+            <button 
+                onClick={handleClear} 
+                className="px-6 h-10 bg-[#00adff] text-white text-[13px] font-bold rounded-[5px] hover:bg-[#0099e6] shadow-md shadow-blue-200 transition-all active:scale-95 border-none flex items-center justify-center gap-2"
+            >
                 <RotateCcw size={14} /> Clear
             </button>
-            <button onClick={onClose} className="px-6 h-10 bg-slate-100 text-slate-600 text-sm font-bold rounded-md hover:bg-slate-200 transition-all active:scale-95 border-none flex items-center justify-center gap-2"><X size={14} /> Exit</button>
         </div>
     );
 
     return (
         <>
             <SimpleModal isOpen={isOpen} onClose={onClose} title="Department Selection" maxWidth="max-w-xl" footer={footer}>
-                <div className="space-y-4 py-2 font-['Plus_Jakarta_Sans']">
-                    <h2 className="text-sm font-bold text-gray-800 border-b pb-2 mb-4 uppercase">Department Details Profile</h2>
+                <div className="py-2 select-none font-['Tahoma'] space-y-4 text-[12.5px] mt-4 min-h-[300px]">
+                    <div className="border-b border-gray-200 pb-4 mb-4 flex items-center justify-center">
+                        <h2 className="text-[17px] font-bold text-black uppercase tracking-tight">Department Details Profile & Update</h2>
+                    </div>
 
                     <div className="space-y-3">
                         {/* Location ID Row */}
-                        <div className="flex items-center gap-3">
-                            <label className="text-xs font-semibold text-gray-600 w-32 shrink-0">Location ID</label>
-                            <div className="flex-1 flex gap-2">
-                                <input type="text" name="Loca_Id" value={formData.Loca_Id} readOnly className="w-32 h-8 border border-gray-300 px-2 text-sm bg-gray-50 focus:border-blue-500 outline-none rounded-sm" />
-                                <button onClick={openLocaSearch} className="w-8 h-8 bg-[#0078d4] text-white flex items-center justify-center hover:bg-[#005a9e] rounded-sm transition-colors"><Search size={14} /></button>
-                                <input type="text" value={formData.Loca_Name} readOnly className="flex-1 h-8 border border-gray-300 px-2 text-sm bg-gray-50 text-gray-500 rounded-sm" placeholder="Location Name" />
+                        <div className="flex items-center gap-6">
+                            <label className="w-32 font-bold text-gray-700">Location ID</label>
+                            <div className="flex-1 flex gap-3">
+                                <input 
+                                    type="text" 
+                                    name="Loca_Id" 
+                                    value={formData.Loca_Id} 
+                                    readOnly 
+                                    className="w-32 h-8 border border-gray-300 px-2 bg-white rounded-[5px] outline-none font-bold text-blue-600 shadow-sm text-center" 
+                                />
+                                <button 
+                                    onClick={openLocaSearch} 
+                                    className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95"
+                                >
+                                    <Search size={18} />
+                                </button>
+                                <input 
+                                    type="text" 
+                                    value={formData.Loca_Name} 
+                                    readOnly 
+                                    className="flex-1 h-8 font-mono border border-gray-300 px-3 bg-gray-50 rounded-[5px] outline-none shadow-sm cursor-default" 
+                                    placeholder="Location Name" 
+                                />
                             </div>
                         </div>
 
                         {/* Department ID Row */}
-                        <div className="flex items-center gap-3">
-                            <label className="text-xs font-semibold text-gray-600 w-32 shrink-0">Department ID</label>
-                            <div className="flex-1 flex gap-2">
-                                <input type="text" name="Code" value={formData.Code} readOnly className="w-32 h-8 border border-gray-300 px-2 text-sm bg-gray-50 rounded-sm" placeholder="Auto Generated" />
-                                <button onClick={openDeptSearch} className="w-8 h-8 bg-[#0078d4] text-white flex items-center justify-center hover:bg-[#005a9e] rounded-sm transition-colors"><Search size={14} /></button>
+                        <div className="flex items-center gap-6">
+                            <label className="w-32 font-bold text-gray-700">Department ID</label>
+                            <div className="flex-1 flex gap-3">
+                                <input 
+                                    type="text" 
+                                    name="Code" 
+                                    value={formData.Code || 'AUTO-GEN'} 
+                                    readOnly 
+                                    className="w-32 h-8 border border-gray-300 px-2 bg-white rounded-[5px] outline-none font-bold text-blue-600 shadow-sm text-center" 
+                                />
+                                <button 
+                                    onClick={openDeptSearch} 
+                                    className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95"
+                                >
+                                    <Search size={18} />
+                                </button>
                             </div>
                         </div>
 
                         {/* Department Name Row */}
-                        <div className="flex items-center gap-3">
-                            <label className="text-xs font-semibold text-gray-600 w-32 shrink-0">Department Name</label>
-                            <input type="text" name="Dept_Name" value={formData.Dept_Name} onChange={handleInputChange} className="flex-1 h-8 border border-gray-300 px-2 text-sm focus:border-blue-500 outline-none rounded-sm" placeholder="Enter Department Name" />
+                        <div className="flex items-center gap-6">
+                            <label className="w-32 font-bold text-gray-700">Department Name</label>
+                            <input 
+                                type="text" 
+                                name="Dept_Name" 
+                                value={formData.Dept_Name} 
+                                onChange={handleInputChange} 
+                                className="flex-1 h-8 font-mono border border-gray-300 px-3 bg-white rounded-[5px] outline-none focus:border-blue-400 shadow-sm transition-all focus:shadow-md" 
+                                placeholder="Enter Department Name" 
+                            />
                         </div>
                     </div>
                 </div>
@@ -234,37 +281,73 @@ const DepartmentBoard = ({ isOpen, onClose }) => {
 const SearchModal = ({ title, list, onSelect, onClose, placeholder }) => {
     const [query, setQuery] = useState('');
     return (
-        <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4 font-['Tahoma']">
             <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={onClose} />
-            <div className="relative w-full max-w-lg bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col max-h-[80vh]">
-                <div className="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-50/50">
-                    <h3 className="text-lg font-bold text-slate-800 tracking-tight">{title}</h3>
-                    <div className="flex gap-2">
-                        <input type="text" placeholder={placeholder} className="h-8 border border-gray-300 px-3 text-sm rounded-md w-48 focus:border-blue-500 outline-none" value={query} onChange={(e) => setQuery(e.target.value)} />
-                        <button
-                            onClick={onClose}
-                            className="w-9 h-8 flex items-center justify-center bg-[#ff3b30] hover:bg-[#e03127] text-white rounded-[8px] shadow-[0_4px_12px_rgba(255,59,48,0.3)] hover:shadow-[0_6px_20px_rgba(255,59,48,0.4)] transition-all active:scale-90 outline-none border-none group"
-                            title="Close"
-                        >
-                            <X size={18} strokeWidth={4} className="group-hover:scale-110 transition-transform" />
-                        </button>
+            <div className="relative w-full max-w-lg bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
+                {/* Header */}
+                <div className="bg-[#0078d4] px-4 py-2 flex items-center justify-between text-white">
+                    <div className="flex items-center gap-2">
+                        <Search size={16} />
+                        <span className="text-sm font-bold uppercase tracking-tight">{title} Lookup</span>
+                    </div>
+                    <button
+                        onClick={onClose}
+                        className="w-9 h-8 flex items-center justify-center bg-[#ff3b30] hover:bg-[#e03127] text-white rounded-[8px] shadow-[0_4px_12px_rgba(255,59,48,0.3)] hover:shadow-[0_6px_20px_rgba(255,59,48,0.4)] transition-all active:scale-90 outline-none border-none group"
+                        title="Close"
+                    >
+                        <X size={18} strokeWidth={4} className="group-hover:scale-110 transition-transform" />
+                    </button>
+                </div>
+
+                {/* Search Input Area */}
+                <div className="p-3 bg-slate-50 border-b border-gray-100 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                        <Search size={14} className="text-gray-400" />
+                        <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Search Facility</span>
+                    </div>
+                    <input 
+                        type="text" 
+                        placeholder={placeholder} 
+                        className="h-8 border border-gray-300 px-3 text-xs rounded-md w-60 focus:border-[#0285fd] outline-none shadow-sm transition-all" 
+                        value={query} 
+                        onChange={(e) => setQuery(e.target.value)} 
+                    />
+                </div>
+
+                {/* Results List */}
+                <div className="p-2">
+                    <div className="bg-gray-100 px-3 py-1.5 flex text-[10px] font-bold text-gray-600 border-b border-gray-200 uppercase tracking-wider">
+                        <span className="w-24 text-center">Code</span>
+                        <span className="flex-1 px-3">Display Name</span>
+                    </div>
+                    <div className="max-h-[300px] overflow-y-auto custom-scrollbar">
+                        {list.filter(x => (x.name || '').toLowerCase().includes(query.toLowerCase()) || (x.code || '').toLowerCase().includes(query.toLowerCase())).map(x => (
+                            <button 
+                                key={x.code} 
+                                onClick={() => onSelect(x)}
+                                className="w-full flex items-center justify-between px-3 py-2 text-xs border-b border-gray-100 hover:bg-blue-50 transition-all text-left group"
+                            >
+                                <div className="flex items-center gap-2 flex-1">
+                                    <span className="w-24 text-center font-mono text-[11px] font-bold text-[#0078d4]">
+                                        {x.code}
+                                    </span>
+                                    <span className="flex-1 px-3 font-mono font-medium text-gray-700 uppercase">
+                                        {x.name}
+                                    </span>
+                                </div>
+                                <div className="bg-[#e49e1b] text-white text-[10px] px-5 py-1.5 rounded-md font-bold hover:bg-[#cb9b34] shadow-sm transition-all active:scale-95 uppercase">Select</div>
+                            </button>
+                        ))}
+                        {list.length === 0 && (
+                            <div className="p-8 text-center text-gray-400 italic text-sm">No results found.</div>
+                        )}
                     </div>
                 </div>
-                <div className="overflow-y-auto p-2">
-                    <table className="w-full text-sm text-left">
-                        <thead className="bg-[#f8f9fa] sticky top-0 font-bold text-gray-600 font-mono">
-                            <tr><th className="p-3 border-b text-center w-24">Code</th><th className="p-3 border-b">Display Name</th><th className="p-3 border-b text-center w-24">Action</th></tr>
-                        </thead>
-                        <tbody>
-                            {list.filter(x => (x.name || '').toLowerCase().includes(query.toLowerCase()) || (x.code || '').toLowerCase().includes(query.toLowerCase())).map(x => (
-                                <tr key={x.code} className="hover:bg-blue-50 transition-colors group">
-                                    <td className="p-3 border-b text-center font-bold text-[#0078d4] text-[11px]">{x.code}</td>
-                                    <td className="p-3 border-b text-gray-700 font-semibold uppercase">{x.name}</td>
-                                    <td className="p-3 border-b text-center"><button onClick={() => onSelect(x)} className="bg-[#0078d4] text-white text-[10px] px-3 py-1 rounded-sm font-bold hover:bg-[#005a9e]">Select</button></td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+
+                {/* Footer */}
+                <div className="bg-gray-50 px-4 py-2 border-t border-gray-200 flex justify-between items-center text-[10px] text-gray-400">
+                    <span>{list.length} Result(s)</span>
+                    <span className="italic font-bold text-[#0078d4]">ACCOUNT CLOUD INFRASTRUCTURE</span>
                 </div>
             </div>
         </div>

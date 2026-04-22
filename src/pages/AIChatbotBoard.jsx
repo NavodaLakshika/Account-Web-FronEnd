@@ -12,6 +12,8 @@ const AIChatbotBoard = ({ isOpen, onClose }) => {
     const [isMaximized, setIsMaximized] = useState(false);
     const [showIntro, setShowIntro] = useState(false);
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+    
+    const topBarColor = localStorage.getItem('topBarColor') || '#0285fd';
 
     const messagesEndRef = useRef(null);
 
@@ -72,26 +74,46 @@ const AIChatbotBoard = ({ isOpen, onClose }) => {
         <>
             <div className={`fixed inset-0 z-[1100] flex items-center justify-center p-0 md:p-6 transition-all duration-700 ${isOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'}`}>
                 {!showIntro && (
-                    <div className="absolute inset-0 bg-black/80 backdrop-blur-md transition-all duration-700" onClick={onClose} />
+                    <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md transition-all duration-700" onClick={onClose} />
                 )}
 
-                {/* Technical Blueprint Chat Container */}
-                <div className={`relative overflow-hidden flex transition-all duration-500 ease-out ${isMaximized ? 'w-full h-full' : 'w-full md:max-w-6xl h-full md:h-[85vh] md:max-h-[850px]'} ${showIntro ? 'bg-transparent border-none shadow-none' : 'bg-[#011e41] border-0 md:border md:border-white/20 rounded-none md:rounded-2xl shadow-[0_0_80px_rgba(255,255,255,0.05)]'}`}>
+                {/* Chat Container */}
+                <div 
+                    className={`relative overflow-hidden flex transition-all duration-500 ease-out ${isMaximized ? 'w-full h-full' : 'w-full md:max-w-6xl h-full md:h-[85vh] md:max-h-[850px]'} ${showIntro ? 'bg-transparent border-none shadow-none' : 'bg-white border-0 md:border md:border-gray-100 rounded-none md:rounded-2xl shadow-2xl'}`}
+                >
+                    {/* System Color Left Accent */}
+                    {!showIntro && (
+                        <div 
+                            className="absolute left-0 top-0 bottom-0 w-1.5 transition-colors duration-500 z-[120]" 
+                            style={{ backgroundColor: topBarColor }}
+                        />
+                    )}
+                    
+                    {/* Top Close Button (System Unique) */}
+                    {!showIntro && (
+                        <button
+                            onClick={onClose}
+                            className="absolute top-4 right-4 z-[100] w-9 h-8 flex items-center justify-center bg-[#ff3b30] hover:bg-[#e03127] text-white rounded-[8px] shadow-[0_4px_12px_rgba(255,59,48,0.3)] hover:shadow-[0_6px_20px_rgba(255,59,48,0.4)] transition-all active:scale-90 outline-none border-none group"
+                            title="Close"
+                        >
+                            <X size={18} strokeWidth={4} className="group-hover:scale-110 transition-transform" />
+                        </button>
+                    )}
 
                     {/* Blueprint Grid Overlay for Entire Modal */}
                     {!showIntro && (
-                        <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: 'linear-gradient(white 1px, transparent 1px), linear-gradient(90deg, white 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
+                        <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'linear-gradient(rgba(0,0,0,1) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,1) 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
                     )}
 
-                    {/* Left Sidebar: Technical Robot Identity */}
-                    <div className={`hidden lg:flex flex-col border-r border-white/10 relative z-10 bg-[#011e41]/50 backdrop-blur-xl transition-all duration-500 ease-in-out ${sidebarCollapsed ? 'w-[80px] p-4' : 'w-[300px] p-8'}`}>
+                    {/* Left Sidebar: Robot Identity */}
+                    <div className={`hidden lg:flex flex-col border-r border-gray-100 relative z-10 bg-slate-50 transition-all duration-500 ease-in-out ${sidebarCollapsed ? 'w-[80px] p-4' : 'w-[300px] p-8'}`}>
                         {/* Session Status Section */}
                         <div className={`mb-8 flex flex-col ${sidebarCollapsed ? 'hidden' : 'items-start'}`}>
                             <div className="flex items-center gap-2">
-                                <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                                <span className="text-[#00BFDE] text-[8px] font-black uppercase tracking-[0.4em] opacity-50">Session Active</span>
+                                <div className="w-2 h-2 rounded-full animate-pulse shadow-[0_0_8px_currentColor]" style={{ backgroundColor: topBarColor, color: topBarColor }} />
+                                <span className="text-[8px] font-black uppercase tracking-[0.4em] opacity-80" style={{ color: topBarColor }}>Session Active</span>
                             </div>
-                            <h3 className="text-white text-xl font-black uppercase tracking-tight leading-none mt-2">
+                            <h3 className="text-slate-900 text-xl font-black uppercase tracking-tight leading-none mt-2">
                                 Hello, {localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')).empName.split(' ')[0] : 'Operator'}
                             </h3>
                         </div>
@@ -105,20 +127,21 @@ const AIChatbotBoard = ({ isOpen, onClose }) => {
                                     loop
                                     className="w-full h-full"
                                 />
-                                <div className="absolute inset-x-0 bottom-0 h-4 bg-gradient-to-t from-[#011e41] to-transparent z-10" />
+                                <div className="absolute inset-x-0 bottom-0 h-8 bg-gradient-to-t from-slate-50 to-transparent z-10" />
                             </div>
                             <div className="text-center">
-                                <h2 className="text-white text-[15px] font-black tracking-[0.4em] mb-2">BOOT ASSISTANT</h2>
-                                <p className="text-white/20 text-[7px] font-bold uppercase tracking-[0.2em]">Neural Processing v4.2</p>
+                                <h2 className="text-slate-900 text-[15px] font-black tracking-[0.4em] mb-2" style={{ textShadow: `0 0 20px ${topBarColor}40` }}>BOOT ASSISTANT</h2>
+                                <p className="text-slate-400 text-[7px] font-bold uppercase tracking-[0.2em]">Neural Processing v4.2</p>
                             </div>
                         </div>
 
                         {/* Sidebar Controls */}
-                        <div className={`mt-auto pt-8 space-y-4 border-t border-white/10 flex flex-col ${sidebarCollapsed ? 'items-center' : ''}`}>
+                        <div className={`mt-auto pt-8 space-y-4 border-t border-gray-200 flex flex-col ${sidebarCollapsed ? 'items-center' : ''}`}>
                             <button 
                                 onClick={handleClearChat}
                                 title="New Session"
-                                className={`flex items-center justify-center gap-3 transition-all group rounded-xl ${sidebarCollapsed ? 'w-12 h-12 bg-[#00BFDE]' : 'w-full py-3 px-4 bg-[#00BFDE]'} text-[#011e41] shadow-[0_0_20px_rgba(0,191,222,0.2)]`}
+                                className={`flex items-center justify-center gap-3 transition-all group rounded-xl ${sidebarCollapsed ? 'w-12 h-12' : 'w-full py-3 px-4'} text-white shadow-lg hover:brightness-110 active:scale-95 border-none`}
+                                style={{ backgroundColor: topBarColor, boxShadow: `0 4px 15px ${topBarColor}40` }}
                             >
                                 <Plus size={sidebarCollapsed ? 20 : 16} strokeWidth={3} />
                                 {!sidebarCollapsed && <span className="text-[10px] font-black uppercase tracking-widest">New Session</span>}
@@ -127,16 +150,16 @@ const AIChatbotBoard = ({ isOpen, onClose }) => {
                             <button 
                                 onClick={handleClearChat}
                                 title="Clear Log"
-                                className={`flex items-center justify-center gap-3 transition-all group rounded-xl border border-white/5 bg-white/5 hover:bg-white/10 ${sidebarCollapsed ? 'w-12 h-12' : 'w-full py-3 px-4'} text-white/40 hover:text-white`}
+                                className={`flex items-center justify-center gap-3 transition-all group rounded-xl border border-gray-200 bg-white hover:bg-gray-50 ${sidebarCollapsed ? 'w-12 h-12' : 'w-full py-3 px-4'} text-slate-500 hover:text-slate-800 shadow-sm`}
                             >
-                                <Trash2 size={sidebarCollapsed ? 18 : 14} className="group-hover:text-red-400" />
+                                <Trash2 size={sidebarCollapsed ? 18 : 14} className="group-hover:text-red-500 transition-colors" />
                                 {!sidebarCollapsed && <span className="text-[9px] font-black uppercase tracking-widest">Clear Log</span>}
                             </button>
 
                             <button 
                                 onClick={onClose}
                                 title="Terminate"
-                                className={`flex items-center justify-center gap-3 transition-all group rounded-xl border border-red-500/20 bg-red-500/10 hover:bg-red-500/20 ${sidebarCollapsed ? 'w-12 h-12' : 'w-full py-3 px-4'} text-red-500`}
+                                className={`flex items-center justify-center gap-3 transition-all group rounded-xl border border-red-100 bg-red-50 hover:bg-red-100 ${sidebarCollapsed ? 'w-12 h-12' : 'w-full py-3 px-4'} text-red-600 shadow-sm`}
                             >
                                 <X size={sidebarCollapsed ? 18 : 14} />
                                 {!sidebarCollapsed && <span className="text-[9px] font-black uppercase tracking-widest">Terminate</span>}
@@ -147,10 +170,11 @@ const AIChatbotBoard = ({ isOpen, onClose }) => {
                     {/* Right Panel: Chat Area */}
                     <div className="flex-1 flex flex-col relative z-20 bg-transparent min-w-0">
                         {/* Sidebar Toggle Trigger (Floating on Divider) */}
-                        <button 
-                            onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-                            className="hidden lg:flex absolute top-1/2 -left-3 -translate-y-1/2 w-6 h-12 bg-[#011e41] border border-white/20 text-white/40 hover:text-white items-center justify-center rounded-r-lg z-[30] transition-colors group"
-                        >
+                            <button 
+                                onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+                                className="hidden lg:flex absolute top-1/2 -left-3 -translate-y-1/2 w-6 h-12 border border-gray-200 text-white items-center justify-center rounded-r-lg z-[30] transition-colors group shadow-md"
+                                style={{ backgroundColor: topBarColor }}
+                            >
                             {sidebarCollapsed ? <ChevronRight size={14} className="group-hover:scale-125 transition-transform" /> : <ChevronLeft size={14} className="group-hover:scale-125 transition-transform" />}
                         </button>
                         {/* Messages Area */}
@@ -160,31 +184,33 @@ const AIChatbotBoard = ({ isOpen, onClose }) => {
                                     <div className={`flex gap-3 md:gap-6 items-end max-w-[90%] md:max-w-[75%] ${msg.sender === 'user' ? 'flex-row-reverse' : ''}`}>
 
                                         {/* Avatar Bubble */}
-                                        <div className="w-8 h-8 md:w-12 md:h-12 rounded-full border border-white/10 flex items-center justify-center flex-shrink-0 bg-white/5 overflow-hidden">
+                                        <div className={`w-8 h-8 md:w-12 md:h-12 rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden shadow-sm border ${msg.sender === 'user' ? 'bg-slate-100 border-gray-200' : 'bg-white'}`} style={msg.sender === 'ai' ? { borderColor: `${topBarColor}40`, backgroundColor: `${topBarColor}10` } : {}}>
                                             {msg.sender === 'user' ? (
-                                                <div className="w-full h-full bg-white/10 flex items-center justify-center">
-                                                    <User size={18} className="text-white md:hidden" />
-                                                    <User size={26} className="text-white hidden md:block" />
+                                                <div className="w-full h-full flex items-center justify-center">
+                                                    <User size={18} className="text-slate-500 md:hidden" />
+                                                    <User size={24} className="text-slate-500 hidden md:block" />
                                                 </div>
                                             ) : (
-                                                <div className="w-full h-full bg-[#00BFDE]/20 flex items-center justify-center">
-                                                    <Bot size={20} className="text-[#00BFDE] md:hidden" />
-                                                    <Bot size={28} className="text-[#00BFDE] hidden md:block" />
+                                                <div className="w-full h-full flex items-center justify-center">
+                                                    <Bot size={20} className="md:hidden" style={{ color: topBarColor }} />
+                                                    <Bot size={28} className="hidden md:block" style={{ color: topBarColor }} />
                                                 </div>
                                             )}
                                         </div>
 
                                         {/* Chat Bubble */}
-                                        <div className="relative mb-2">
-                                            <div className={`px-4 py-3 md:px-5 md:py-3 text-[10px] md:text-[11px] font-mono leading-relaxed border backdrop-blur-sm rounded-xl relative shadow-lg ${msg.sender === 'user' ? 'bg-white/5 border-white/20 text-white' : 'bg-white/10 border-white/30 text-white'}`}>
+                                        <div className="relative mb-2 shadow-sm rounded-xl">
+                                            <div className={`px-4 py-3 md:px-5 md:py-3 font-mono text-[10.5px] md:text-[11.5px] font-mono leading-relaxed border rounded-xl relative ${msg.sender === 'user' ? 'bg-white border-gray-200 text-slate-800' : 'bg-slate-50 border-gray-100 text-slate-800'}`} style={msg.sender === 'ai' ? { borderLeft: `2px solid ${topBarColor}` } : {}}>
                                                 {/* Custom Fin Tail */}
                                                 {msg.sender === 'user' ? (
-                                                    <svg className="absolute -right-4 bottom-0 w-6 h-8 text-white/5" viewBox="0 0 24 32" fill="none" preserveAspectRatio="none">
+                                                    <svg className="absolute -right-4 bottom-0 w-6 h-8 text-white" viewBox="0 0 24 32" fill="none" preserveAspectRatio="none">
                                                         <path d="M0 0V32H24C12 32 6 20 0 0Z" fill="currentColor" />
+                                                        <path d="M0 0V32H24C12 32 6 20 0 0Z" stroke="#e5e7eb" strokeWidth="1" />
                                                     </svg>
                                                 ) : (
-                                                    <svg className="absolute -left-4 bottom-0 w-6 h-8 text-white/10" viewBox="0 0 24 32" fill="none" preserveAspectRatio="none">
+                                                    <svg className="absolute -left-4 bottom-0 w-6 h-8 text-slate-50" viewBox="0 0 24 32" fill="none" preserveAspectRatio="none">
                                                         <path d="M24 0V32H0C12 32 18 20 24 0Z" fill="currentColor" />
+                                                        <path d="M24 0V32H0C12 32 18 20 24 0Z" stroke="#f3f4f6" strokeWidth="1" />
                                                     </svg>
                                                 )}
                                                 {msg.text}
@@ -197,21 +223,20 @@ const AIChatbotBoard = ({ isOpen, onClose }) => {
                             {isTyping && (
                                 <div className="flex justify-start">
                                     <div className="flex gap-3 md:gap-6 items-end">
-                                        <div className="w-8 h-8 md:w-12 md:h-12 rounded-full border border-white/10 flex items-center justify-center flex-shrink-0 bg-white/5 overflow-hidden">
-                                            <div className="w-full h-full bg-[#00BFDE]/20 flex items-center justify-center">
-                                                <Bot size={16} className="text-[#00BFDE] md:hidden" />
-                                                <Bot size={24} className="text-[#00BFDE] hidden md:block" />
-                                            </div>
+                                        <div className="w-8 h-8 md:w-12 md:h-12 rounded-full border flex items-center justify-center flex-shrink-0 overflow-hidden shadow-sm" style={{ borderColor: `${topBarColor}40`, backgroundColor: `${topBarColor}10` }}>
+                                            <Bot size={16} className="md:hidden" style={{ color: topBarColor }} />
+                                            <Bot size={24} className="hidden md:block" style={{ color: topBarColor }} />
                                         </div>
 
-                                        <div className="relative mb-2">
-                                            <div className="px-5 py-3 bg-white/10 border border-white/20 rounded-xl flex items-center gap-2 backdrop-blur-sm">
-                                                <svg className="absolute -left-4 bottom-0 w-6 h-8 text-white/10" viewBox="0 0 24 32" fill="none" preserveAspectRatio="none">
+                                        <div className="relative mb-2 shadow-sm rounded-xl">
+                                            <div className="px-5 py-3 bg-slate-50 border border-gray-100 rounded-xl flex items-center gap-2" style={{ borderLeft: `2px solid ${topBarColor}` }}>
+                                                <svg className="absolute -left-4 bottom-0 w-6 h-8 text-slate-50" viewBox="0 0 24 32" fill="none" preserveAspectRatio="none">
                                                     <path d="M24 0V32H0C12 32 18 20 24 0Z" fill="currentColor" />
+                                                    <path d="M24 0V32H0C12 32 18 20 24 0Z" stroke="#f3f4f6" strokeWidth="1" />
                                                 </svg>
-                                                <span className="w-1.5 h-1.5 bg-white rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                                                <span className="w-1.5 h-1.5 bg-white rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                                                <span className="w-1.5 h-1.5 bg-white rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                                                <span className="w-1.5 h-1.5 rounded-full animate-bounce" style={{ backgroundColor: topBarColor, animationDelay: '0ms' }} />
+                                                <span className="w-1.5 h-1.5 rounded-full animate-bounce" style={{ backgroundColor: topBarColor, animationDelay: '150ms' }} />
+                                                <span className="w-1.5 h-1.5 rounded-full animate-bounce" style={{ backgroundColor: topBarColor, animationDelay: '300ms' }} />
                                             </div>
                                         </div>
                                     </div>
@@ -221,19 +246,20 @@ const AIChatbotBoard = ({ isOpen, onClose }) => {
                         </div>
 
                         {/* Input Area */}
-                        <div className="p-4 md:p-8 border-t border-white/10 bg-white/5 backdrop-blur-md">
+                        <div className="p-4 md:p-8 border-t border-gray-100 bg-white">
                             <form onSubmit={handleSendMessage} className="relative flex items-center gap-3 md:gap-4">
                                 <input
                                     type="text"
                                     value={inputValue}
                                     onChange={(e) => setInputValue(e.target.value)}
                                     placeholder="Write your message..."
-                                    className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[10px] md:text-[11px] font-mono text-white focus:outline-none focus:border-white/40 focus:bg-white/10 transition-all placeholder:text-white/20 placeholder:font-mono"
+                                    className="flex-1 bg-white border border-gray-200 rounded-xl px-4 py-3 text-[10.5px] md:text-[11.5px] font-mono text-slate-900 focus:outline-none focus:border-gray-400 transition-all placeholder:text-slate-400 shadow-sm"
                                 />
                                 <button
                                     type="submit"
                                     disabled={!inputValue.trim()}
-                                    className="bg-white text-[#011e41] p-3 rounded-xl hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed transition-all active:scale-95 shadow-lg"
+                                    className="p-3 rounded-xl hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-95 shadow-md border-none text-white"
+                                    style={{ backgroundColor: topBarColor }}
                                 >
                                     <Send size={18} strokeWidth={2.5} />
                                 </button>

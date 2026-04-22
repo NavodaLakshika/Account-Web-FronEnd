@@ -27,13 +27,18 @@ const TransactionModal = ({ isOpen, onClose, onOpenEnterBill, onOpenPayBill, onO
                 <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={onClose} />
                 
                 {/* Modal Container */}
-                <div className="relative w-full max-w-[280px] bg-white border border-gray-100 rounded-xl shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
+                <div className="relative w-full max-w-sm bg-white border border-gray-100 rounded-xl shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
                     
                     {/* Header */}
-                    <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-100 select-none">
+                    <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-100 select-none relative overflow-hidden">
+                        {/* System Color Left Accent */}
+                        <div 
+                            className="absolute left-0 top-0 bottom-0 w-1.5 transition-colors duration-500" 
+                            style={{ backgroundColor: localStorage.getItem('topBarColor') || '#0078d4' }}
+                        />
                         <div className="flex items-center gap-2">
                             <ShieldCheck size={14} className="text-[#0078d4]" />
-                            <span className="text-lg font-bold text-slate-800 tracking-tight">Transaction Hub</span>
+                            <span className="text-lg font-bold text-slate-800 tracking-tight">Transaction Management</span>
                         </div>
                         <button 
                             onClick={onClose} 
@@ -45,27 +50,30 @@ const TransactionModal = ({ isOpen, onClose, onOpenEnterBill, onOpenPayBill, onO
                     </div>
 
                     {/* Menu Content */}
-                    <div className="p-6 bg-white flex-1 flex flex-col gap-1.5 overflow-y-auto max-h-[75vh] no-scrollbar">
+                    <div className="p-2 bg-white flex-1 flex flex-col overflow-y-auto max-h-[75vh] no-scrollbar">
                         {menuItems.map((item, idx) => (
                             <button
                                 key={idx}
                                 onClick={item.onClick}
-                                className="w-full flex items-center justify-between px-3 py-2.5 rounded-sm hover:bg-[#0078d4] group transition-all text-left"
+                                className="w-full flex items-center justify-between px-4 py-3 rounded-xl hover:bg-slate-50 group transition-all relative overflow-hidden text-left"
                             >
-                                <div className="flex items-center gap-3">
-                                    <item.icon size={16} className={`text-gray-500 group-hover:text-white transition-colors`} />
-                                    <span className={`text-[13px] font-medium text-gray-700 group-hover:text-white transition-colors`}>
+                                {/* Hover Indicator Bar */}
+                                <div 
+                                    className="absolute left-0 top-0 bottom-0 w-1 opacity-0 group-hover:opacity-100 transition-all duration-300"
+                                    style={{ backgroundColor: localStorage.getItem('topBarColor') || '#0078d4' }}
+                                />
+                                
+                                <div className="flex items-center gap-3 relative z-10">
+                                    <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center group-hover:bg-white transition-colors shadow-sm group-hover:shadow-md">
+                                        <item.icon size={16} className="text-slate-500 group-hover:text-[#0078d4] transition-colors" />
+                                    </div>
+                                    <span className="text-[13px] font-semibold text-slate-700 group-hover:text-slate-900 transition-colors">
                                         {item.label}
                                     </span>
                                 </div>
-                                <ChevronRight size={10} className="text-gray-300 group-hover:text-white transition-colors" />
+                                <ChevronRight size={14} className="text-slate-300 group-hover:text-slate-500 group-hover:translate-x-0.5 transition-all relative z-10" />
                             </button>
                         ))}
-                    </div>
-
-                    {/* Footer */}
-                    <div className="bg-slate-50 px-6 py-4 flex justify-end gap-3 border-t border-gray-100 italic">
-                        <span className="text-[10px] text-[#0078d4] font-bold uppercase tracking-widest italic font-sans font-black">Center Navigation</span>
                     </div>
                 </div>
             </div>
