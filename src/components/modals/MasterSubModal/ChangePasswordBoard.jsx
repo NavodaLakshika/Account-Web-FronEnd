@@ -108,7 +108,7 @@ const ChangePasswordBoard = ({ isOpen, onClose }) => {
                 title="Change Password"
                 maxWidth="max-w-xl"
                 footer={
-                    <div className="bg-slate-50 px-6 py-4 w-full flex justify-end gap-3 border-t border-gray-100 mt-4 rounded-b-xl">
+                    <div className="bg-slate-50 px-6  w-full flex justify-end gap-3 border-t border-gray-100 mt-4 rounded-b-xl">
                         <button
                             onClick={handleSave}
                             disabled={loading}
@@ -120,17 +120,10 @@ const ChangePasswordBoard = ({ isOpen, onClose }) => {
                         <button onClick={handleClear} className="px-6 h-10 bg-[#00adff] text-white text-[13px] font-bold rounded-[5px] hover:bg-[#0099e6] shadow-md shadow-blue-200 transition-all active:scale-95 flex items-center justify-center gap-2 border-none">
                             <RotateCcw size={14} /> Clear
                         </button>
-                        <button onClick={onClose} className="px-6 h-10 bg-[#d13438] text-white text-[13px] font-bold rounded-[5px] shadow-md shadow-red-200 hover:bg-[#a4262c] transition-all active:scale-95 flex items-center justify-center gap-2">
-                            <X size={14} /> Exit
-                        </button>
                     </div>
                 }
             >
-                <div className="py-2 select-none font-['Tahoma'] space-y-4 text-[12.5px] mt-4 min-h-[300px]">
-                    <div className="border-b border-gray-200 pb-4 mb-4 flex items-center justify-center">
-                        <h2 className="text-[17px] font-bold text-black uppercase tracking-tight">System Security & Password Update</h2>
-                    </div>
-
+                <div className="py-2 select-none font-['Tahoma'] space-y-4 text-[12.5px] mt-1">
                     <div className="space-y-4">
                         {/* User Name */}
                         <div className="flex items-center gap-6">
@@ -140,7 +133,6 @@ const ChangePasswordBoard = ({ isOpen, onClose }) => {
                                     type="text"
                                     value={formData.UserName}
                                     readOnly
-                                    placeholder="Click to search user..."
                                     onClick={() => setShowUserModal(true)}
                                     className="flex-1 h-8 border border-gray-300 px-3 bg-white rounded-[5px] outline-none focus:border-blue-400 font-bold text-blue-600 shadow-sm cursor-pointer transition-all"
                                 />
@@ -157,37 +149,43 @@ const ChangePasswordBoard = ({ isOpen, onClose }) => {
                         {/* Current Password */}
                         <div className="flex items-center gap-6">
                             <label className="w-32 font-bold text-gray-700">Current Password</label>
-                            <input
-                                type="password"
-                                value={formData.CurrentPassword}
-                                onChange={(e) => setFormData(prev => ({ ...prev, CurrentPassword: e.target.value }))}
-                                className="flex-1 h-8 border border-gray-300 px-3 bg-white rounded-[5px] outline-none focus:border-blue-400 shadow-sm transition-all focus:shadow-md max-w-[280px]"
-                                placeholder="Enter current password"
-                            />
+                            <div className="flex-1 flex gap-3">
+                                <input
+                                    type="password"
+                                    value={formData.CurrentPassword}
+                                    onChange={(e) => setFormData(prev => ({ ...prev, CurrentPassword: e.target.value }))}
+                                    className="flex-1 h-8 border border-gray-300 px-3 bg-white rounded-[5px] outline-none focus:border-blue-400 shadow-sm transition-all focus:shadow-md"
+                                />
+                                <div className="w-10" /> {/* Spacer to align with search button above */}
+                            </div>
                         </div>
 
                         {/* New Password */}
                         <div className="flex items-center gap-6">
                             <label className="w-32 font-bold text-gray-700">New Password</label>
-                            <input
-                                type="password"
-                                value={formData.NewPassword}
-                                onChange={(e) => setFormData(prev => ({ ...prev, NewPassword: e.target.value }))}
-                                className="flex-1 h-8 border border-gray-300 px-3 bg-white rounded-[5px] outline-none focus:border-blue-400 shadow-sm transition-all focus:shadow-md max-w-[280px]"
-                                placeholder="Enter new password"
-                            />
+                            <div className="flex-1 flex gap-3">
+                                <input
+                                    type="password"
+                                    value={formData.NewPassword}
+                                    onChange={(e) => setFormData(prev => ({ ...prev, NewPassword: e.target.value }))}
+                                    className="flex-1 h-8 border border-gray-300 px-3 bg-white rounded-[5px] outline-none focus:border-blue-400 shadow-sm transition-all focus:shadow-md"
+                                />
+                                <div className="w-10" /> {/* Spacer to align with search button above */}
+                            </div>
                         </div>
 
                         {/* Confirm Password */}
                         <div className="flex items-center gap-6">
                             <label className="w-32 font-bold text-gray-700">Confirm Password</label>
-                            <input
-                                type="password"
-                                value={formData.ConfirmPassword}
-                                onChange={(e) => setFormData(prev => ({ ...prev, ConfirmPassword: e.target.value }))}
-                                className={`flex-1 h-8 border ${formData.ConfirmPassword && formData.NewPassword === formData.ConfirmPassword ? 'border-green-500 bg-green-50/30' : 'border-gray-300 bg-white'} px-3 rounded-[5px] outline-none focus:border-blue-400 shadow-sm transition-all focus:shadow-md max-w-[280px]`}
-                                placeholder="Re-enter new password"
-                            />
+                            <div className="flex-1 flex gap-3">
+                                <input
+                                    type="password"
+                                    value={formData.ConfirmPassword}
+                                    onChange={(e) => setFormData(prev => ({ ...prev, ConfirmPassword: e.target.value }))}
+                                    className={`flex-1 h-8 border ${formData.ConfirmPassword && formData.NewPassword === formData.ConfirmPassword ? 'border-green-500 bg-green-50/30' : 'border-gray-300 bg-white'} px-3 rounded-[5px] outline-none focus:border-blue-400 shadow-sm transition-all focus:shadow-md`}
+                                />
+                                <div className="w-10" /> {/* Spacer to align with search button above */}
+                            </div>
                         </div>
                     </div>
                 </div>

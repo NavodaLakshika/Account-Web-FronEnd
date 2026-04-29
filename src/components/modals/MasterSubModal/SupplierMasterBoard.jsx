@@ -212,7 +212,7 @@ const SupplierMasterBoard = ({ isOpen, onClose }) => {
     };
 
     const footer = (
-        <div className="bg-slate-50 px-6 py-4 w-full flex justify-end gap-3 border-t border-gray-100 mt-4 rounded-b-xl">
+        <div className="bg-slate-50 px-6 py-4 w-full flex justify-end gap-3 border-t border-gray-100 mt-1 rounded-b-xl">
             <button onClick={handleSave} disabled={loading} className={`px-6 h-10 bg-[#50af60] text-white text-sm font-bold rounded-md shadow-md shadow-blue-200 hover:bg-[#24db4e] transition-all active:scale-95 flex items-center justify-center gap-2 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}>
                 {loading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />} 
                 {isEditMode ? 'Update' : 'Save'}
@@ -229,7 +229,7 @@ const SupplierMasterBoard = ({ isOpen, onClose }) => {
     return (
         <>
             <SimpleModal isOpen={isOpen} onClose={onClose} title="Supplier Master File" maxWidth="max-w-[780px]" footer={footer} showHeaderClose={true}>
-                <div className="py-2 select-none font-['Tahoma'] space-y-4 text-[12.5px] mt-2 min-h-[500px]">
+                <div className="py-2 select-none font-['Tahoma'] space-y-4 text-[12.5px] mt-1 min-h-[500px]">
                     <div className="border-b border-gray-200 pb-4 flex items-center justify-center gap-3">
                         <Truck size={20} className="text-[#0078d4]" />
                         <h2 className="text-[17px] font-bold text-black uppercase tracking-tight">Enter New Supplier Details & Update</h2>
@@ -240,8 +240,8 @@ const SupplierMasterBoard = ({ isOpen, onClose }) => {
                         <div className="flex items-center gap-6">
                             <label className="w-32 font-bold text-gray-700">Supplier ID / Name</label>
                             <div className="flex-1 flex gap-3">
-                                <input type="text" name="Code" value={formData.Code} readOnly className="w-32 h-8 border border-gray-300 px-2 bg-white rounded-[5px] outline-none focus:border-blue-400 font-bold text-blue-600 shadow-sm" placeholder="ID" />
-                                <input type="text" name="Supplier_Name" value={formData.Supplier_Name} onChange={handleInputChange} placeholder="Enter Supplier Name" className="flex-1 h-8 font-mono border border-gray-300 px-3 bg-white rounded-[5px] outline-none focus:border-blue-400 shadow-sm transition-all focus:shadow-md" />
+                                <input type="text" name="Code" value={formData.Code} readOnly className="w-32 h-8 border border-gray-300 px-2 bg-white rounded-[5px] outline-none focus:border-blue-400 font-bold text-blue-600 shadow-sm" placeholder="" />
+                                <input type="text" name="Supplier_Name" value={formData.Supplier_Name} onChange={handleInputChange} placeholder="" className="flex-1 h-8 font-mono border border-gray-300 px-3 bg-white rounded-[5px] outline-none focus:border-blue-400 shadow-sm transition-all focus:shadow-md" />
                                 <button onClick={openSearch} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95">
                                     <Search size={18} />
                                 </button>
@@ -350,7 +350,7 @@ const SupplierMasterBoard = ({ isOpen, onClose }) => {
                                     </button>
                                 </div>
                                 <label className="w-20 font-bold text-gray-700 text-center">Branch</label>
-                                <input type="text" name="Brunch" value={formData.Brunch} onChange={handleInputChange} placeholder="Branch Name" className="flex-1 h-8 font-mono border border-gray-300 px-3 bg-white rounded-[5px] outline-none focus:border-blue-400 shadow-sm transition-all focus:shadow-md" />
+                                <input type="text" name="Brunch" value={formData.Brunch} onChange={handleInputChange} placeholder="" className="flex-1 h-8 font-mono border border-gray-300 px-3 bg-white rounded-[5px] outline-none focus:border-blue-400 shadow-sm transition-all focus:shadow-md" />
                             </div>
                         </div>
 
@@ -369,10 +369,15 @@ const SupplierMasterBoard = ({ isOpen, onClose }) => {
                     <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setShowVTModal(false)} />
                     <div className="relative w-full max-w-2xl bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
                         {/* Header */}
-                        <div className="bg-[#0078d4] px-4 py-2 flex items-center justify-between text-white">
+                        <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-100 select-none relative overflow-hidden">
+                            {/* System Color Left Accent */}
+                            <div 
+                                className="absolute left-0 top-0 bottom-0 w-1.5 transition-colors duration-500" 
+                                style={{ backgroundColor: localStorage.getItem('topBarColor') || '#0285fd' }}
+                            />
                             <div className="flex items-center gap-2">
-                                <Search size={16} />
-                                <span className="text-sm font-bold uppercase tracking-tight">Vendor Type Directory</span>
+                                <Search size={16} className="text-[#0078d4]" />
+                                <span className="text-[15px] font-[700] text-slate-900 uppercase tracking-[3px] font-mono truncate">Vendor Type Directory Lookup</span>
                             </div>
                             <button
                                 onClick={() => setShowVTModal(false)}
@@ -400,10 +405,10 @@ const SupplierMasterBoard = ({ isOpen, onClose }) => {
 
                         {/* Results List */}
                         <div className="p-2">
-                            <div className="bg-gray-100 px-3 py-1.5 flex text-[10px] font-bold text-gray-600 border-b border-gray-200 uppercase tracking-wider">
+                            <div className=" px-3 py-1.5 flex text-[10px] font-bold text-gray-600 border-b border-gray-200 uppercase tracking-wider">
                                 <span className="w-24 text-center">ID</span>
                                 <span className="flex-1 px-3">Vendor Type</span>
-                                <span className="w-40 px-3">Payable A/C</span>
+                                <span className="pr-40">Payable A/C</span>
                             </div>
                             <div className="max-h-[350px] overflow-y-auto custom-scrollbar">
                                 {vendorTypes.filter(v => (v.vendorTypes || v.VendorTypes || '').toLowerCase().includes(vtSearchQuery.toLowerCase())).map((v, idx) => (
@@ -435,7 +440,6 @@ const SupplierMasterBoard = ({ isOpen, onClose }) => {
                         {/* Footer */}
                         <div className="bg-gray-50 px-4 py-2 border-t border-gray-200 flex justify-between items-center text-[10px] text-gray-400">
                             <span>{vendorTypes.length} Types Available</span>
-                            <span className="italic font-bold text-[#0078d4]">ACCOUNT CLOUD INFRASTRUCTURE</span>
                         </div>
                     </div>
                 </div>
@@ -447,14 +451,19 @@ const SupplierMasterBoard = ({ isOpen, onClose }) => {
                     <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setShowBankModal(false)} />
                     <div className="relative w-full max-w-xl bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
                         {/* Header */}
-                        <div className="bg-[#0078d4] px-4 py-2 flex items-center justify-between text-white">
+                        <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-100 select-none relative overflow-hidden">
+                            {/* System Color Left Accent */}
+                            <div 
+                                className="absolute left-0 top-0 bottom-0 w-1.5 transition-colors duration-500" 
+                                style={{ backgroundColor: localStorage.getItem('topBarColor') || '#0285fd' }}
+                            />
                             <div className="flex items-center gap-2">
-                                <Search size={16} />
-                                <span className="text-sm font-bold uppercase tracking-tight">Bank Directory Lookup</span>
+                                <Search size={16} className="text-[#0078d4]" />
+                                <span className="text-[15px] font-[700] text-slate-900 uppercase tracking-[3px] font-mono truncate">Bank Directory Lookup</span>
                             </div>
                             <button
                                 onClick={() => setShowBankModal(false)}
-                                className="w-9 h-8 flex items-center justify-center bg-[#ff3b30] hover:bg-[#e03127] text-white rounded-[8px] shadow-[0_4px_12px_rgba(255,59,48,0.3)] hover:shadow-[0_6px_200px_rgba(255,59,48,0.4)] transition-all active:scale-90 outline-none border-none group"
+                                className="w-9 h-8 flex items-center justify-center bg-[#ff3b30] hover:bg-[#e03127] text-white rounded-[8px] shadow-[0_4px_12px_rgba(255,59,48,0.3)] hover:shadow-[0_6px_20px_rgba(255,59,48,0.4)] transition-all active:scale-90 outline-none border-none group"
                                 title="Close"
                             >
                                 <X size={18} strokeWidth={4} className="group-hover:scale-110 transition-transform" />
@@ -478,7 +487,7 @@ const SupplierMasterBoard = ({ isOpen, onClose }) => {
 
                         {/* Results List */}
                         <div className="p-2">
-                            <div className="bg-gray-100 px-3 py-1.5 flex text-[10px] font-bold text-gray-600 border-b border-gray-200 uppercase tracking-wider">
+                            <div className=" px-3 py-1.5 flex text-[10px] font-bold text-gray-600 border-b border-gray-200 uppercase tracking-wider">
                                 <span className="w-24 text-center">Code</span>
                                 <span className="flex-1 px-3">Bank Name</span>
                             </div>
@@ -509,7 +518,6 @@ const SupplierMasterBoard = ({ isOpen, onClose }) => {
                         {/* Footer */}
                         <div className="bg-gray-50 px-4 py-2 border-t border-gray-200 flex justify-between items-center text-[10px] text-gray-400">
                             <span>{banks.length} Banks Registered</span>
-                            <span className="italic font-bold text-[#0078d4]">ACCOUNT CLOUD INFRASTRUCTURE</span>
                         </div>
                     </div>
                 </div>
@@ -521,10 +529,15 @@ const SupplierMasterBoard = ({ isOpen, onClose }) => {
                     <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setShowSearchModal(false)} />
                     <div className="relative w-full max-w-2xl bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
                         {/* Header */}
-                        <div className="bg-[#0078d4] px-4 py-2 flex items-center justify-between text-white">
+                        <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-100 select-none relative overflow-hidden">
+                            {/* System Color Left Accent */}
+                            <div 
+                                className="absolute left-0 top-0 bottom-0 w-1.5 transition-colors duration-500" 
+                                style={{ backgroundColor: localStorage.getItem('topBarColor') || '#0285fd' }}
+                            />
                             <div className="flex items-center gap-2">
-                                <Search size={16} />
-                                <span className="text-sm font-bold uppercase tracking-tight">Supplier Records Lookup</span>
+                                <Search size={16} className="text-[#0078d4]" />
+                                <span className="text-[15px] font-[700] text-slate-900 uppercase tracking-[3px] font-mono truncate">Supplier Records Lookup</span>
                             </div>
                             <button
                                 onClick={() => setShowSearchModal(false)}
@@ -552,10 +565,10 @@ const SupplierMasterBoard = ({ isOpen, onClose }) => {
 
                         {/* Results List */}
                         <div className="p-2">
-                            <div className="bg-gray-100 px-3 py-1.5 flex text-[10px] font-bold text-gray-600 border-b border-gray-200 uppercase tracking-wider">
+                            <div className=" px-3 py-1.5 flex text-[10px] font-bold text-gray-600 border-b border-gray-200 uppercase tracking-wider">
                                 <span className="w-24 text-center">Code</span>
-                                <span className="flex-1 px-3">Supplier Name</span>
-                                <span className="w-32 px-3">Phone</span>
+                                <span className="flex-1 px-5">Supplier Name</span>
+                                <span className="pr-40">Phone</span>
                             </div>
                             <div className="max-h-[400px] overflow-y-auto custom-scrollbar">
                                 {suppliersList.filter(s => (s.supplier_Name || s.Supplier_Name || '').toLowerCase().includes(searchQuery.toLowerCase()) || (s.code || s.Code || '').toLowerCase().includes(searchQuery.toLowerCase())).map(s => (
@@ -584,7 +597,6 @@ const SupplierMasterBoard = ({ isOpen, onClose }) => {
                         {/* Footer */}
                         <div className="bg-gray-50 px-4 py-2 border-t border-gray-200 flex justify-between items-center text-[10px] text-gray-400">
                             <span>{suppliersList.length} Result(s) Found</span>
-                            <span className="italic font-bold text-[#0078d4]">ACCOUNT CLOUD INFRASTRUCTURE</span>
                         </div>
                     </div>
                 </div>

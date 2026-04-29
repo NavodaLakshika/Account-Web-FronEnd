@@ -29,7 +29,7 @@ const ViewUtilityModal = ({ isOpen, onClose, onToggleSideBar, onOpenReminder, on
         } },
         { icon: Send, label: 'Send File', shortcut: '', onClick: () => setShowSendFileBoard(true) },
         { icon: Mail, label: 'Use E-Mail', shortcut: '' },
-        { icon: Search, label: 'Find', shortcut: 'Ctrl+F', onClick: () => setShowFindBoard(true) },
+        { icon: Search, label: 'Find', shortcut: '', onClick: () => setShowFindBoard(true) },
         { icon: Search, label: 'Search', shortcut: '', onClick: () => setShowFindBoard(true) },
         { icon: Calculator, label: 'Use Calculator', shortcut: '', onClick: () => {
              onOpenCalculator();
@@ -48,12 +48,12 @@ const ViewUtilityModal = ({ isOpen, onClose, onToggleSideBar, onOpenReminder, on
             setShowOfficeDocumentModal(true);
         }},
         { icon: Briefcase, label: 'Prepare Letter with Envelopes', hasSubmenu: true, onClick: () => setShowLetterEnvelopesModal(true) },
-        { icon: Sidebar, label: 'View Side Bar..', shortcut: '', onClick: () => {
+        { icon: Sidebar, label: 'View Side Bar', shortcut: '', onClick: () => {
             onToggleSideBar();
             onClose();
         }},
         { type: 'separator' },
-        { icon: Image, label: 'Change Background...', shortcut: '', onClick: () => setShowChangeBackgroundBoard(true) },
+        { icon: Image, label: 'Change Background', shortcut: '', onClick: () => setShowChangeBackgroundBoard(true) },
     ];
 
     return (
@@ -76,7 +76,7 @@ const ViewUtilityModal = ({ isOpen, onClose, onToggleSideBar, onOpenReminder, on
                         
                         <div className="flex items-center gap-2">
                             <Layout size={14} className="text-[#0078d4]" />
-                            <span className="text-lg font-bold text-slate-800 tracking-tight">View and Utility</span>
+                            <span className="text-[15px] font-[700] text-slate-900 uppercase tracking-[3px] font-mono truncate">View and Utility Hub</span>
                         </div>
                         <button 
                             onClick={onClose} 
@@ -111,7 +111,7 @@ const ViewUtilityModal = ({ isOpen, onClose, onToggleSideBar, onOpenReminder, on
                                     <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center group-hover:bg-white transition-colors shadow-sm group-hover:shadow-md">
                                         <Icon size={16} className="text-slate-500 group-hover:text-[#0078d4] transition-colors" />
                                     </div>
-                                    <span className="text-[13px] font-semibold text-slate-700 group-hover:text-slate-900 transition-colors">
+                                    <span className="text-[14px] font-bold text-slate-700 group-hover:text-slate-900 transition-colors">
                                         {item.label}
                                     </span>
                                 </div>
@@ -122,7 +122,6 @@ const ViewUtilityModal = ({ isOpen, onClose, onToggleSideBar, onOpenReminder, on
                                             {item.shortcut}
                                         </span>
                                     )}
-                                    <ChevronRight size={14} className="text-slate-300 group-hover:text-slate-500 group-hover:translate-x-0.5 transition-all" />
                                 </div>
                             </button>
                         );

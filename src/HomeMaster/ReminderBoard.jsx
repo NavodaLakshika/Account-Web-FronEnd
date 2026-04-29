@@ -144,7 +144,7 @@ const ReminderBoard = ({ isOpen, onClose, onViewAll, taskToEdit }) => {
                     {!taskToEdit && (
                         <button 
                             onClick={onViewAll}
-                            className="flex items-center gap-2 px-5 h-10 bg-white border border-slate-300 text-[#0078d4] text-sm font-bold rounded-md hover:bg-blue-50 hover:border-blue-200 transition-all active:scale-95 whitespace-nowrap min-w-fit"
+                            className="flex items-center gap-2 px-5 h-10 bg-[#07D10D] border border-slate-300 text-white text-sm font-bold rounded-md hover:bg-green-500 hover:border-green-100 transition-all active:scale-95 whitespace-nowrap min-w-fit"
                         >
                             <List size={16} /> All Task
                         </button>
@@ -158,7 +158,7 @@ const ReminderBoard = ({ isOpen, onClose, onViewAll, taskToEdit }) => {
                         </button>
                         <button 
                             onClick={onClose} 
-                            className="px-6 h-10 bg-white border border-slate-300 text-slate-600 text-sm font-bold rounded-md hover:bg-slate-50 transition-all active:scale-95 flex items-center gap-2 whitespace-nowrap min-w-fit"
+                            className="px-6 h-10 bg-[#E6160A] border border-slate-300 text-white text-sm font-bold rounded-md hover:bg-[#CC140A] hover:border-red-100 transition-all active:scale-95 flex items-center gap-2 whitespace-nowrap min-w-fit"
                         >
                             <X size={16} /> Exit
                         </button>

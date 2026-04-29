@@ -305,7 +305,7 @@ const CompanyBoard = ({ isOpen, onClose }) => {
                     </>
                 }
             >
-                <div className="py-2 select-none font-['Tahoma'] space-y-4 text-[12.5px] mt-4 min-h-[500px]">
+                <div className="py-2 select-none font-['Tahoma'] space-y-4 text-[12.5px] mt-1 min-h-[500px]">
                     <div className="border-b border-gray-200 pb-4 mb-4 flex items-center justify-center">
                         <h2 className="text-[17px] font-bold text-black uppercase tracking-tight">Enter New Company Details & Update</h2>
                     </div>
@@ -316,7 +316,7 @@ const CompanyBoard = ({ isOpen, onClose }) => {
                             <div className="flex-1 flex gap-3">
                                 <input 
                                     type="text" 
-                                    value={formData.Code || 'AUTO-GEN'} 
+                                    value={formData.Code || ''} 
                                     readOnly 
                                     className="w-32 h-8 border border-gray-300 px-2 bg-white rounded-[5px] outline-none font-bold text-blue-600 shadow-sm text-center" 
                                 />
@@ -522,10 +522,15 @@ const CompanyBoard = ({ isOpen, onClose }) => {
                     <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setShowLookup(false)} />
                     <div className="relative w-full max-w-lg bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden animate-in zoom-in-95 duration-200">
                         {/* Header */}
-                        <div className="bg-[#0078d4] px-4 py-2 flex items-center justify-between text-white">
+                        <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-100 select-none relative overflow-hidden">
+                            {/* System Color Left Accent */}
+                            <div 
+                                className="absolute left-0 top-0 bottom-0 w-1.5 transition-colors duration-500" 
+                                style={{ backgroundColor: localStorage.getItem('topBarColor') || '#0285fd' }}
+                            />
                             <div className="flex items-center gap-2">
-                                <Building2 size={16} />
-                                <span className="text-sm font-bold">Search Company Lookup</span>
+                                <Building2 size={16} className="text-[#0078d4]" />
+                                <span className="text-[15px] font-[700] text-slate-900 uppercase tracking-[3px] font-mono truncate">Company Search Lookup</span>
                             </div>
                             <button
                                 onClick={() => setShowLookup(false)}
@@ -538,7 +543,7 @@ const CompanyBoard = ({ isOpen, onClose }) => {
 
                         {/* Search List */}
                         <div className="p-2">
-                            <div className="bg-gray-100 px-3 py-1.5 flex text-[10px] font-bold text-gray-600 border-b border-gray-200">
+                            <div className=" px-3 py-1.5 flex text-[10px] font-bold text-gray-600 border-b border-gray-200">
                                 <span className="w-[120px]">CODE</span>
                                 <span className="flex-1">COMPANY NAME</span>
                             </div>
@@ -572,7 +577,6 @@ const CompanyBoard = ({ isOpen, onClose }) => {
                         {/* Footer */}
                         <div className="bg-gray-50 px-4 py-2 border-t border-gray-200 flex justify-between items-center text-[10px] text-gray-400">
                             <span>{lookupResults.length} Result(s)</span>
-                            <span className="italic font-bold text-[#0078d4]">ACCOUNT CLOUD LOOKUP</span>
                         </div>
                     </div>
                 </div>
@@ -624,10 +628,15 @@ const CompanyBoard = ({ isOpen, onClose }) => {
                     <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setShowCountryLookup(false)} />
                     <div className="relative w-full max-w-md bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden animate-in zoom-in-95 duration-200">
                         {/* Header */}
-                        <div className="bg-[#0078d4] px-4 py-2 flex items-center justify-between text-white">
+                        <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-100 select-none relative overflow-hidden">
+                            {/* System Color Left Accent */}
+                            <div 
+                                className="absolute left-0 top-0 bottom-0 w-1.5 transition-colors duration-500" 
+                                style={{ backgroundColor: localStorage.getItem('topBarColor') || '#0285fd' }}
+                            />
                             <div className="flex items-center gap-2">
-                                <Globe size={16} />
-                                <span className="text-sm font-bold">Search Country Lookup</span>
+                                <Globe size={16} className="text-[#0078d4]" />
+                                <span className="text-[15px] font-[700] text-slate-900 uppercase tracking-[3px] font-mono truncate">Country Search Lookup</span>
                             </div>
                             <button
                                 onClick={() => setShowCountryLookup(false)}
@@ -640,7 +649,7 @@ const CompanyBoard = ({ isOpen, onClose }) => {
 
                         {/* Search List */}
                         <div className="p-2">
-                            <div className="bg-gray-100 px-3 py-1.5 flex text-[10px] font-bold text-gray-600 border-b border-gray-200">
+                            <div className=" px-3 py-1.5 flex text-[10px] font-bold text-gray-600 border-b border-gray-200">
                                 <span className="w-[100px]">CODE</span>
                                 <span className="flex-1">COUNTRY NAME</span>
                             </div>
@@ -674,7 +683,6 @@ const CompanyBoard = ({ isOpen, onClose }) => {
                         {/* Footer */}
                         <div className="bg-gray-50 px-4 py-2 border-t border-gray-200 flex justify-between items-center text-[10px] text-gray-400">
                             <span>{countryResults.length} Result(s)</span>
-                            <span className="italic font-bold text-[#0078d4]">ACCOUNT CLOUD DATA</span>
                         </div>
                     </div>
                 </div>
@@ -686,10 +694,15 @@ const CompanyBoard = ({ isOpen, onClose }) => {
                     <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setShowIndustryLookup(false)} />
                     <div className="relative w-full max-w-md bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden animate-in zoom-in-95 duration-200">
                         {/* Header */}
-                        <div className="bg-[#0078d4] px-4 py-2 flex items-center justify-between text-white">
+                        <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-100 select-none relative overflow-hidden">
+                            {/* System Color Left Accent */}
+                            <div 
+                                className="absolute left-0 top-0 bottom-0 w-1.5 transition-colors duration-500" 
+                                style={{ backgroundColor: localStorage.getItem('topBarColor') || '#0285fd' }}
+                            />
                             <div className="flex items-center gap-2">
-                                <Briefcase size={16} />
-                                <span className="text-sm font-bold">Search Industry Lookup</span>
+                                <Briefcase size={16} className="text-[#0078d4]" />
+                                <span className="text-[15px] font-[700] text-slate-900 uppercase tracking-[3px] font-mono truncate">Industry Search Lookup</span>
                             </div>
                             <button
                                 onClick={() => setShowIndustryLookup(false)}
@@ -702,7 +715,7 @@ const CompanyBoard = ({ isOpen, onClose }) => {
 
                         {/* Search List */}
                         <div className="p-2">
-                            <div className="bg-gray-100 px-3 py-1.5 flex text-[10px] font-bold text-gray-600 border-b border-gray-200">
+                            <div className=" px-3 py-1.5 flex text-[10px] font-bold text-gray-600 border-b border-gray-200">
                                 <span className="w-[100px]">CODE</span>
                                 <span className="flex-1">INDUSTRY NAME</span>
                             </div>
@@ -736,7 +749,6 @@ const CompanyBoard = ({ isOpen, onClose }) => {
                         {/* Footer */}
                         <div className="bg-gray-50 px-4 py-2 border-t border-gray-200 flex justify-between items-center text-[10px] text-gray-400">
                             <span>{industryResults.length} Result(s)</span>
-                            <span className="italic font-bold text-[#0078d4]">ACCOUNT CLOUD DATA</span>
                         </div>
                     </div>
                 </div>
@@ -748,14 +760,19 @@ const CompanyBoard = ({ isOpen, onClose }) => {
                     <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setShowOrgLookup(false)} />
                     <div className="relative w-full max-w-md bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden animate-in zoom-in-95 duration-200">
                         {/* Header */}
-                        <div className="bg-[#0078d4] px-4 py-2 flex items-center justify-between text-white">
+                        <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-100 select-none relative overflow-hidden">
+                            {/* System Color Left Accent */}
+                            <div 
+                                className="absolute left-0 top-0 bottom-0 w-1.5 transition-colors duration-500" 
+                                style={{ backgroundColor: localStorage.getItem('topBarColor') || '#0285fd' }}
+                            />
                             <div className="flex items-center gap-2">
-                                <Search size={16} />
-                                <span className="text-sm font-bold">Organization Type Lookup</span>
+                                <Building2 size={16} className="text-[#0078d4]" />
+                                <span className="text-[15px] font-[700] text-slate-900 uppercase tracking-[3px] font-mono truncate">Organization Type Lookup</span>
                             </div>
                             <button
                                 onClick={() => setShowOrgLookup(false)}
-                                className="w-9 h-8 flex items-center justify-center bg-[#ff3b30] hover:bg-[#e03127] text-white rounded-[8px] shadow-[0_4px_12px_rgba(255,59,48,0.3)] hover:shadow-[0_6px_20_rgba(255,59,48,0.4)] transition-all active:scale-90 outline-none border-none group"
+                                className="w-9 h-8 flex items-center justify-center bg-[#ff3b30] hover:bg-[#e03127] text-white rounded-[8px] shadow-[0_4px_12px_rgba(255,59,48,0.3)] hover:shadow-[0_6px_20px_rgba(255,59,48,0.4)] transition-all active:scale-90 outline-none border-none group"
                                 title="Close"
                             >
                                 <X size={18} strokeWidth={4} className="group-hover:scale-110 transition-transform" />
@@ -764,7 +781,7 @@ const CompanyBoard = ({ isOpen, onClose }) => {
 
                         {/* Search List */}
                         <div className="p-2">
-                            <div className="bg-gray-100 px-3 py-1.5 flex text-[10px] font-bold text-gray-600 border-b border-gray-200">
+                            <div className=" px-3 py-1.5 flex text-[10px] font-bold text-gray-600 border-b border-gray-200">
                                 <span className="w-[100px]">CODE</span>
                                 <span className="flex-1">TYPE NAME</span>
                             </div>
@@ -792,7 +809,6 @@ const CompanyBoard = ({ isOpen, onClose }) => {
                         {/* Footer */}
                         <div className="bg-gray-50 px-4 py-2 border-t border-gray-200 flex justify-between items-center text-[10px] text-gray-400">
                             <span>{orgTypes.length} Result(s)</span>
-                            <span className="italic font-bold text-[#0078d4]">ACCOUNT CLOUD DATA</span>
                         </div>
                     </div>
                 </div>

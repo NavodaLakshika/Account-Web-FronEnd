@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import SimpleModal from '../../SimpleModal';
+import CalendarModal from '../../CalendarModal';
 import { Search, RotateCcw, Save, Calendar, Loader2, X, PlusCircle } from 'lucide-react';
 import { fixedAssetService } from '../../../services/fixedAsset.service';
 import { toast } from 'react-hot-toast';
@@ -35,6 +36,11 @@ const FixedAssetsBoard = ({ isOpen, onClose }) => {
     const [showSearchModal, setShowSearchModal] = useState(false);
     const [assetsList, setAssetsList] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
+    const [showAccountSearch, setShowAccountSearch] = useState(false);
+    const [accSearchQuery, setAccSearchQuery] = useState('');
+    const [showPurchDateModal, setShowPurchDateModal] = useState(false);
+    const [showSalesDateModal, setShowSalesDateModal] = useState(false);
+    const [showWarrantyExpiryModal, setShowWarrantyExpiryModal] = useState(false);
 
     useEffect(() => {
         if (isOpen) {
@@ -112,6 +118,15 @@ const FixedAssetsBoard = ({ isOpen, onClose }) => {
         });
         setIsEditMode(false);
         fetchNextCode(formData.Company);
+    };
+
+    const handleAccountSelect = (code, name) => {
+        setFormData(prev => ({ ...prev, AccCode: code }));
+        setShowAccountSearch(false);
+    };
+
+    const handleDateSelect = (field, date) => {
+        setFormData(prev => ({ ...prev, [field]: date }));
     };
 
     const handleSave = async () => {
@@ -211,7 +226,7 @@ const FixedAssetsBoard = ({ isOpen, onClose }) => {
                 title="New Fixed Assets Item"
                 maxWidth="max-w-4xl"
                 footer={
-                    <div className="bg-slate-50 px-6 py-4 w-full flex justify-end gap-3 border-t border-gray-100 mt-4 rounded-b-xl">
+                    <div className="bg-slate-50 px-6 w-full flex justify-end gap-3 border-t border-gray-100 mt-1 rounded-b-xl">
                         <button 
                             onClick={handleSave} 
                             disabled={loading} 
@@ -223,16 +238,13 @@ const FixedAssetsBoard = ({ isOpen, onClose }) => {
                         <button onClick={handleClear} className="px-6 h-10 bg-[#00adff] text-white text-[13px] font-bold rounded-[5px] hover:bg-[#0099e6] shadow-md shadow-blue-200 transition-all active:scale-95 flex items-center justify-center gap-2 border-none">
                             <RotateCcw size={14} /> Clear
                         </button>
-                        <button onClick={onClose} className="px-6 h-10 bg-[#d13438] text-white text-[13px] font-bold rounded-[5px] shadow-md shadow-red-200 hover:bg-[#a4262c] transition-all active:scale-95 flex items-center justify-center gap-2">
-                            <X size={14} /> Exit
-                        </button>
                     </div>
                 }
             >
                 <div className="py-2 select-none font-['Tahoma'] space-y-4">
                     {/* Info Header */}
                     <div className="bg-[#f0f9ff] border border-[#bae6fd] p-3 rounded-[5px] shadow-sm">
-                        <p className="text-[12px] font-bold text-[#0369a1] text-center leading-relaxed italic">
+                        <p className="text-[12px] font-bold text-[#0369a1] text-center leading-relaxed ">
                             Use for property you purchase, track, and may eventually sell. Fixed assets are
                             long-lived assets, such as land, buildings, furniture, equipment, and vehicles.
                         </p>
@@ -244,21 +256,29 @@ const FixedAssetsBoard = ({ isOpen, onClose }) => {
                             <label className="text-[12px] font-bold text-gray-700 w-[140px] shrink-0 uppercase">Asset Number / Name</label>
                             <div className="flex flex-1 gap-2">
                                 <input type="text" name="AssetsCode" value={formData.AssetsCode} onChange={handleInputChange} readOnly className="w-32 h-8 border border-gray-300 px-2 text-sm bg-gray-50 font-bold text-blue-600 rounded-[5px] text-center" />
-                                <div className="flex-1 flex gap-1">
-                                    <input type="text" name="AssetsName" value={formData.AssetsName} onChange={handleInputChange} className="flex-1 h-8 border border-gray-300 px-3 text-[12.5px] focus:border-blue-500 outline-none rounded-[5px] bg-white font-bold text-gray-700 shadow-sm" placeholder="Enter asset display name" />
-                                    <button onClick={openSearch} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95"><Search size={18} /></button>
+                                <div className="flex-1 flex gap-1 items-center">
+                                    <input type="text" name="AssetsName" value={formData.AssetsName} onChange={handleInputChange} className="min-w-0 flex-1 h-8 border border-gray-300 px-3 text-[12.5px] focus:border-blue-500 outline-none rounded-[5px] bg-white font-bold text-gray-700 shadow-sm" placeholder="" />
+                                    <button onClick={openSearch} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0"><Search size={18} /></button>
                                 </div>
                             </div>
                         </div>
 
                         <div className="flex items-center gap-3">
                             <label className="text-[12px] font-bold text-gray-700 w-[140px] shrink-0 uppercase">Asset Accounts of</label>
-                            <select name="AccCode" value={formData.AccCode} onChange={handleInputChange} className="flex-1 h-8 border border-gray-300 px-2 text-[12.5px] focus:border-blue-400 outline-none rounded-[5px] bg-white font-bold text-gray-700 shadow-sm">
-                                <option value="">&lt; Select Account &gt;</option>
-                                {accounts.map((acc, idx) => (
-                                    <option key={idx} value={acc.code} disabled={acc.code === '300-100'}>{acc.name}</option>
-                                ))}
-                            </select>
+                            <div className="flex-1 flex gap-2">
+                                <input 
+                                    type="text" 
+                                    value={accounts.find(a => a.code === formData.AccCode)?.name?.trim() || formData.AccCode} 
+                                    readOnly 
+                                    className="min-w-0 flex-1 h-8 border border-gray-300 px-3 text-[12.5px] bg-gray-50 rounded-[5px] outline-none font-bold text-blue-600 shadow-sm cursor-default" 
+                                />
+                                <button 
+                                    onClick={() => setShowAccountSearch(true)} 
+                                    className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0"
+                                >
+                                    <Search size={18} />
+                                </button>
+                            </div>
                         </div>
                     </div>
 
@@ -266,7 +286,7 @@ const FixedAssetsBoard = ({ isOpen, onClose }) => {
                     <div className="grid grid-cols-2 gap-4">
                         {/* Purchase Information */}
                         <div className="border border-gray-200 rounded-[5px] p-4 relative pt-6 bg-slate-50/30">
-                            <span className="absolute -top-3 left-3 bg-white px-2 py-0.5 border border-gray-200 rounded-full text-[10px] font-bold text-[#0078d4] uppercase tracking-wider shadow-sm">Purchase Information</span>
+                            <span className="absolute -top-3 left-3 bg-white px-2 py-0.5 border border-gray-200 rounded-[5px] text-[10px] font-bold text-[#0078d4] uppercase tracking-wider shadow-sm">Purchase Information</span>
                             <div className="space-y-3">
                                 <div>
                                     <label className="text-[11px] font-bold text-gray-500 uppercase block mb-1">Purchase Description</label>
@@ -288,7 +308,20 @@ const FixedAssetsBoard = ({ isOpen, onClose }) => {
                                 <div className="grid grid-cols-2 gap-3">
                                     <div>
                                         <label className="text-[11px] font-bold text-gray-500 uppercase block mb-1">Date</label>
-                                        <input type="date" name="PurchDate" value={formData.PurchDate} onChange={handleInputChange} className="w-full h-8 border border-gray-300 px-3 text-[12.5px] focus:border-blue-400 outline-none rounded-[5px] bg-white shadow-sm" />
+                                        <div className="flex gap-1 items-center">
+                                            <input 
+                                                type="text" 
+                                                value={formData.PurchDate} 
+                                                readOnly 
+                                                className="min-w-0 flex-1 h-8 border border-gray-300 px-3 text-[12.5px] bg-white rounded-[5px] outline-none font-bold text-gray-700 shadow-sm" 
+                                            />
+                                            <button 
+                                                onClick={() => setShowPurchDateModal(true)} 
+                                                className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0"
+                                            >
+                                                <Calendar size={18} />
+                                            </button>
+                                        </div>
                                     </div>
                                     <div>
                                         <label className="text-[11px] font-bold text-gray-500 uppercase block mb-1">Cost</label>
@@ -304,7 +337,7 @@ const FixedAssetsBoard = ({ isOpen, onClose }) => {
 
                         {/* Sales Information */}
                         <div className="border border-gray-200 rounded-[5px] p-4 relative pt-6 bg-slate-50/30">
-                            <span className="absolute -top-3 left-3 bg-white px-2 py-0.5 border border-gray-200 rounded-full text-[10px] font-bold text-[#d13438] uppercase tracking-wider shadow-sm">Sales Information</span>
+                            <span className="absolute -top-3 left-3 bg-white px-2 py-0.5 border border-gray-200 rounded-[5px] text-[10px] font-bold text-[#d13438] uppercase tracking-wider shadow-sm">Sales Information</span>
                             <div className="space-y-3">
                                 <div>
                                     <label className="text-[11px] font-bold text-gray-500 uppercase block mb-1">Sales Description</label>
@@ -319,7 +352,22 @@ const FixedAssetsBoard = ({ isOpen, onClose }) => {
                                 <div className="grid grid-cols-2 gap-3">
                                     <div>
                                         <label className="text-[11px] font-bold text-gray-500 uppercase block mb-1">Sales Date</label>
-                                        <input type="date" name="SalesDate" value={formData.SalesDate} onChange={handleInputChange} disabled={formData.AssetSold !== 'Sold'} className="w-full h-8 border border-gray-300 px-3 text-[12.5px] focus:border-blue-400 outline-none rounded-[5px] bg-white disabled:bg-gray-100 shadow-sm" />
+                                        <div className="flex gap-1 items-center">
+                                            <input 
+                                                type="text" 
+                                                value={formData.SalesDate} 
+                                                readOnly 
+                                                disabled={formData.AssetSold !== 'Sold'}
+                                                className="min-w-0 flex-1 h-8 border border-gray-300 px-3 text-[12.5px] bg-white disabled:bg-gray-100 rounded-[5px] outline-none font-bold text-gray-700 shadow-sm" 
+                                            />
+                                            <button 
+                                                onClick={() => setShowSalesDateModal(true)} 
+                                                disabled={formData.AssetSold !== 'Sold'}
+                                                className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 disabled:opacity-50 shrink-0"
+                                            >
+                                                <Calendar size={18} />
+                                            </button>
+                                        </div>
                                     </div>
                                     <div>
                                         <label className="text-[11px] font-bold text-gray-500 uppercase block mb-1">Sales Price</label>
@@ -335,32 +383,45 @@ const FixedAssetsBoard = ({ isOpen, onClose }) => {
                     </div>
 
                     {/* Asset Detailed Information */}
-                    <div className="border border-gray-200 rounded-sm p-4 relative pt-6 bg-blue-50/10 shadow-sm">
-                        <span className="absolute -top-3 left-3 bg-white px-3 py-0.5 border border-gray-200 rounded-full text-[10px] font-black text-slate-600 uppercase tracking-wider flex items-center gap-2">
+                    <div className="border border-gray-200 rounded-[5px] p-4 relative pt-6 bg-blue-50/10 shadow-sm">
+                        <span className="absolute -top-3 left-3 bg-white px-3 py-0.5 border border-gray-200 rounded-[5px] text-[10px] font-black text-slate-600 uppercase tracking-wider flex items-center gap-2">
                              Detailed Info
                         </span>
                         <div className="space-y-4">
                             <div>
                                 <label className="text-[11px] font-bold text-gray-500 uppercase block mb-1">Asset Full Description</label>
-                                <input type="text" name="AssetLongDescription" value={formData.AssetLongDescription} onChange={handleInputChange} className="w-full h-8 border border-gray-300 px-2 text-sm focus:border-blue-500 outline-none rounded-sm bg-white" placeholder="Add serial numbers, model details, etc." />
+                                <input type="text" name="AssetLongDescription" value={formData.AssetLongDescription} onChange={handleInputChange} className="w-full h-8 border border-gray-300 px-2 text-sm focus:border-blue-500 outline-none rounded-[5px] bg-white" placeholder="" />
                             </div>
                             <div className="grid grid-cols-3 gap-4">
                                 <div>
                                     <label className="text-[11px] font-bold text-gray-500 uppercase block mb-1">Location / Office</label>
-                                    <input type="text" name="Location" value={formData.Location} onChange={handleInputChange} className="w-full h-8 border border-gray-300 px-2 text-sm focus:border-blue-500 outline-none rounded-sm bg-white" />
+                                    <input type="text" name="Location" value={formData.Location} onChange={handleInputChange} className="w-full h-8 border border-gray-300 px-2 text-sm focus:border-blue-500 outline-none rounded-[5px] bg-white" />
                                 </div>
                                 <div>
                                     <label className="text-[11px] font-bold text-gray-500 uppercase block mb-1">Registration / Serial No</label>
-                                    <input type="text" name="SerialNo" value={formData.SerialNo} onChange={handleInputChange} className="w-full h-8 border border-gray-300 px-2 text-sm focus:border-blue-500 outline-none rounded-sm bg-white" />
+                                    <input type="text" name="SerialNo" value={formData.SerialNo} onChange={handleInputChange} className="w-full h-8 border border-gray-300 px-2 text-sm focus:border-blue-500 outline-none rounded-[5px] bg-white" />
                                 </div>
                                 <div>
                                     <label className="text-[11px] font-bold text-gray-500 uppercase block mb-1">Warranty Expires</label>
-                                    <input type="date" name="WarrantyExpiry" value={formData.WarrantyExpiry} onChange={handleInputChange} className="w-full h-8 border border-gray-300 px-2 text-sm focus:border-blue-500 outline-none rounded-sm bg-white" />
+                                    <div className="flex gap-1 items-center">
+                                        <input 
+                                            type="text" 
+                                            value={formData.WarrantyExpiry} 
+                                            readOnly 
+                                            className="min-w-0 flex-1 h-8 border border-gray-300 px-3 text-[12.5px] bg-white rounded-[5px] outline-none font-bold text-gray-700 shadow-sm" 
+                                        />
+                                        <button 
+                                            onClick={() => setShowWarrantyExpiryModal(true)} 
+                                            className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-90 shrink-0"
+                                        >
+                                            <Calendar size={18} />
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                             <div>
                                 <label className="text-[11px] font-bold text-gray-500 uppercase block mb-1">Internal Reference Notes</label>
-                                <textarea name="Note" value={formData.Note} onChange={handleInputChange} className="w-full h-16 border border-gray-300 p-2 text-sm focus:border-blue-500 outline-none rounded-sm resize-none bg-white font-medium" placeholder="Add any special notes about this asset..." />
+                                <textarea name="Note" value={formData.Note} onChange={handleInputChange} className="w-full h-16 border border-gray-300 p-2 text-sm focus:border-blue-500 outline-none rounded-[5px] resize-none bg-white font-medium" placeholder="" />
                             </div>
                         </div>
                     </div>
@@ -372,10 +433,15 @@ const FixedAssetsBoard = ({ isOpen, onClose }) => {
                     <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setShowSearchModal(false)} />
                     <div className="relative w-full max-w-3xl bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
                         {/* Header */}
-                        <div className="bg-[#0078d4] px-4 py-2 flex items-center justify-between text-white">
+                        <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-100 select-none relative overflow-hidden">
+                            {/* System Color Left Accent */}
+                            <div 
+                                className="absolute left-0 top-0 bottom-0 w-1.5 transition-colors duration-500" 
+                                style={{ backgroundColor: localStorage.getItem('topBarColor') || '#0285fd' }}
+                            />
                             <div className="flex items-center gap-2">
-                                <Search size={16} />
-                                <span className="text-sm font-bold uppercase tracking-tight">Fixed Asset Registry Lookup</span>
+                                <Search size={16} className="text-[#0078d4]" />
+                                <span className="text-[15px] font-[700] text-slate-900 uppercase tracking-[3px] font-mono truncate">Asset Registry Lookup</span>
                             </div>
                             <button
                                 onClick={() => setShowSearchModal(false)}
@@ -403,7 +469,7 @@ const FixedAssetsBoard = ({ isOpen, onClose }) => {
 
                         {/* Results List */}
                         <div className="p-2">
-                            <div className="bg-gray-100 px-3 py-1.5 flex text-[10px] font-bold text-gray-600 border-b border-gray-200 uppercase tracking-wider">
+                            <div className=" px-3 py-1.5 flex text-[10px] font-bold text-gray-600 border-b border-gray-200 uppercase tracking-wider">
                                 <span className="w-32 text-center">Asset ID</span>
                                 <span className="flex-1 px-3">Asset Description</span>
                             </div>
@@ -433,12 +499,107 @@ const FixedAssetsBoard = ({ isOpen, onClose }) => {
 
                         {/* Footer */}
                         <div className="bg-gray-50 px-4 py-2 border-t border-gray-200 flex justify-between items-center text-[10px] text-gray-400">
-                            <span>{assetsList.length} Result(s)</span>
-                            <span className="italic font-bold text-[#0078d4]">ACCOUNT CLOUD INFRASTRUCTURE</span>
+                            <span>{assetsList.length} Result(s) Found</span>
                         </div>
                     </div>
                 </div>
             )}
+            {/* Account Search Modal */}
+            {showAccountSearch && (
+                <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4 font-['Tahoma']">
+                    <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setShowAccountSearch(false)} />
+                    <div className="relative w-full max-w-2xl bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
+                        {/* Header */}
+                        <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-100 select-none relative overflow-hidden">
+                            {/* System Color Left Accent */}
+                            <div 
+                                className="absolute left-0 top-0 bottom-0 w-1.5 transition-colors duration-500" 
+                                style={{ backgroundColor: localStorage.getItem('topBarColor') || '#0285fd' }}
+                            />
+                            <div className="flex items-center gap-2">
+                                <Search size={16} className="text-[#0078d4]" />
+                                <span className="text-[15px] font-[700] text-slate-900 uppercase tracking-[3px] font-mono truncate">General Ledger Accounts Lookup</span>
+                            </div>
+                            <button
+                                onClick={() => setShowAccountSearch(false)}
+                                className="w-9 h-8 flex items-center justify-center bg-[#ff3b30] hover:bg-[#e03127] text-white rounded-[8px] shadow-[0_4px_12px_rgba(255,59,48,0.3)] hover:shadow-[0_6px_20px_rgba(255,59,48,0.4)] transition-all active:scale-90 outline-none border-none group"
+                                title="Close"
+                            >
+                                <X size={18} strokeWidth={4} className="group-hover:scale-110 transition-transform" />
+                            </button>
+                        </div>
+
+                        {/* Search Input Area */}
+                        <div className="p-3 bg-slate-50 border-b border-gray-100 flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                <Search size={14} className="text-gray-400" />
+                                <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest text-center">Search Facility</span>
+                            </div>
+                            <input 
+                                type="text" 
+                                placeholder="Find by Account Name or Code..." 
+                                className="h-9 border border-gray-300 px-3 text-xs rounded-md w-72 focus:border-[#0285fd] outline-none shadow-sm transition-all" 
+                                value={accSearchQuery} 
+                                onChange={(e) => setAccSearchQuery(e.target.value)} 
+                            />
+                        </div>
+
+                        {/* Results List */}
+                        <div className="p-2">
+                            <div className=" px-3 py-1.5 flex text-[10px] font-bold text-gray-600 border-b border-gray-200 uppercase tracking-wider">
+                                <span className="w-32 text-center">Account Code</span>
+                                <span className="flex-1 px-3">Account Description</span>
+                            </div>
+                            <div className="max-h-[400px] overflow-y-auto custom-scrollbar">
+                                {accounts.filter(a => (a.name || '').toLowerCase().includes(accSearchQuery.toLowerCase()) || (a.code || '').toLowerCase().includes(accSearchQuery.toLowerCase())).map((acc, idx) => (
+                                    <button 
+                                        key={idx} 
+                                        onClick={() => handleAccountSelect(acc.code, acc.name)}
+                                        className="w-full flex items-center justify-between px-3 py-2 text-xs border-b border-gray-100 hover:bg-blue-50 transition-all text-left group"
+                                    >
+                                        <div className="flex items-center gap-2 flex-1">
+                                            <span className="w-32 text-center font-mono text-[11px] font-bold text-[#0078d4]">
+                                                {acc.code}
+                                            </span>
+                                            <span className={`flex-1 px-3 font-mono font-medium text-gray-700 uppercase ${acc.isMain ? 'font-black' : ''}`}>
+                                                {acc.name}
+                                            </span>
+                                        </div>
+                                        <div className="bg-[#e49e1b] text-white text-[10px] px-5 py-1.5 rounded-md font-bold hover:bg-[#cb9b34] shadow-sm transition-all active:scale-95 uppercase">Select</div>
+                                    </button>
+                                ))}
+                                {accounts.length === 0 && (
+                                    <div className="p-8 text-center text-gray-400 italic text-sm">No accounts found.</div>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Footer */}
+                        <div className="bg-gray-50 px-4 py-2 border-t border-gray-200 flex justify-between items-center text-[10px] text-gray-400">
+                            <span>{accounts.length} Account(s) Available</span>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {/* Date Modals */}
+            <CalendarModal 
+                isOpen={showPurchDateModal} 
+                onClose={() => setShowPurchDateModal(false)} 
+                onSelect={(date) => handleDateSelect('PurchDate', date)} 
+                currentDate={formData.PurchDate}
+            />
+            <CalendarModal 
+                isOpen={showSalesDateModal} 
+                onClose={() => setShowSalesDateModal(false)} 
+                onSelect={(date) => handleDateSelect('SalesDate', date)} 
+                currentDate={formData.SalesDate}
+            />
+            <CalendarModal 
+                isOpen={showWarrantyExpiryModal} 
+                onClose={() => setShowWarrantyExpiryModal(false)} 
+                onSelect={(date) => handleDateSelect('WarrantyExpiry', date)} 
+                currentDate={formData.WarrantyExpiry}
+            />
         </>
     );
 };

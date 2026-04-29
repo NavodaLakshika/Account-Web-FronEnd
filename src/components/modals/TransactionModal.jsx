@@ -38,7 +38,7 @@ const TransactionModal = ({ isOpen, onClose, onOpenEnterBill, onOpenPayBill, onO
                         />
                         <div className="flex items-center gap-2">
                             <ShieldCheck size={14} className="text-[#0078d4]" />
-                            <span className="text-lg font-bold text-slate-800 tracking-tight">Transaction Management</span>
+                            <span className="text-[15px] font-[700] text-slate-900 uppercase tracking-[3px] font-mono truncate">Transaction Management</span>
                         </div>
                         <button 
                             onClick={onClose} 
@@ -67,11 +67,10 @@ const TransactionModal = ({ isOpen, onClose, onOpenEnterBill, onOpenPayBill, onO
                                     <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center group-hover:bg-white transition-colors shadow-sm group-hover:shadow-md">
                                         <item.icon size={16} className="text-slate-500 group-hover:text-[#0078d4] transition-colors" />
                                     </div>
-                                    <span className="text-[13px] font-semibold text-slate-700 group-hover:text-slate-900 transition-colors">
+                                    <span className="text-[14px] font-semibold text-slate-700 group-hover:text-slate-900 transition-colors">
                                         {item.label}
                                     </span>
                                 </div>
-                                <ChevronRight size={14} className="text-slate-300 group-hover:text-slate-500 group-hover:translate-x-0.5 transition-all relative z-10" />
                             </button>
                         ))}
                     </div>

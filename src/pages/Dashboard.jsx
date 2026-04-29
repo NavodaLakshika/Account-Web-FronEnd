@@ -56,11 +56,12 @@ import ReminderListBoard from '../HomeMaster/ReminderListBoard';
 import MasterFileModal from '../components/modals/MasterFileModal';
 import ViewUtilityModal from '../components/modals/ViewUtilityModal';
 import TransactionModal from '../components/modals/TransactionModal';
-import ReportsModal from '../components/modals/ReportsModal';
-import SystemAdminModal from '../components/modals/SystemAdminModal';
+import ReportsModal from '../components/modals/AdminReports/ReportsModal';
+import SystemAdminModal from '../components/modals/SystemAdmin/SystemAdminModal';
 import SideBar from '../components/SideBar';
 import ChangePasswordBoard from '../components/modals/ChangePasswordBoard';
 import ThankYouModal from '../components/modals/ThankYouModal';
+import SoftwareAboutModal from '../components/modals/SoftwareAboutModal';
 import AdvancePayBoard from './AdvancePayBoard';
 import CustomerAdvanceBoard from './CustomerAdvanceBoard';
 import CustomerInvoiceBoard from './CustomerInvoiceBoard';
@@ -149,6 +150,7 @@ const Dashboard = () => {
     const [showCalculatorModal, setShowCalculatorModal] = useState(false);
     const [showReminderModal, setShowReminderModal] = useState(false);
     const [showReminderListModal, setShowReminderListModal] = useState(false);
+    const [showSoftwareAboutModal, setShowSoftwareAboutModal] = useState(false);
     const [editingTask, setEditingTask] = useState(null);
     const [showCategoryModal, setShowCategoryModal] = useState(false);
     const [ribbonIcons, setRibbonIcons] = useState(['logout', 'home', 'new_account', 'customer', 'vendor', 'reminder', 'enter_bill', 'pay_bill', 'write_chq', 'petty_cash', 'make_deposit', 'journal_entry', 'bank_rec', 'trial_balance', 'search', 'ai_chat']);
@@ -228,13 +230,13 @@ const Dashboard = () => {
             setActiveAlarmTask(null);
             return;
         }
-        
+
         const snoozeUntil = new Date(new Date().getTime() + 30 * 60000); // 30 minutes from now
         setSnoozedReminders(prev => ({
             ...prev,
             [taskId]: snoozeUntil
         }));
-        
+
         // Show persistent banner after dismissal
         setPendingSnoozeTask(activeAlarmTask);
         setActiveAlarmTask(null);
@@ -245,15 +247,15 @@ const Dashboard = () => {
         setAlertedTaskIds(prev => {
             const newSet = new Set(prev);
             newSet.add(taskId);
-            
+
             const now = new Date();
             const todayPrefix = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()}`;
             const saved = localStorage.getItem('alertedReminders');
             let parsed = {};
-            try { parsed = JSON.parse(saved) || {}; } catch(e) {}
+            try { parsed = JSON.parse(saved) || {}; } catch (e) { }
             parsed[`${todayPrefix}-${taskId}`] = taskId;
             localStorage.setItem('alertedReminders', JSON.stringify(parsed));
-            
+
             return newSet;
         });
 
@@ -271,12 +273,12 @@ const Dashboard = () => {
             try {
                 const reminders = await reminderService.getReminders();
                 const now = new Date();
-                
+
                 const dd = String(now.getDate()).padStart(2, '0');
                 const mm = String(now.getMonth() + 1).padStart(2, '0');
                 const yyyy = now.getFullYear();
                 const todayStr = `${dd}/${mm}/${yyyy}`;
-                
+
                 const curH = now.getHours();
                 const curM = now.getMinutes();
 
@@ -285,7 +287,7 @@ const Dashboard = () => {
                     const rDate = (r.date || r.Date || '').trim();
                     const rTime = (r.time || r.Time || '').trim();
                     const rExpire = (r.expire || r.Expire || 'F').trim();
-                    
+
                     if (rExpire !== 'F' || rDate !== todayStr || alertedTaskIds.has(rId)) return false;
 
                     // Snooze logic
@@ -298,7 +300,7 @@ const Dashboard = () => {
                         let h = parseInt(timeMatch[1]);
                         const m = parseInt(timeMatch[2]);
                         const p = timeMatch[3].toUpperCase();
-                        
+
                         if (p === 'PM' && h < 12) h += 12;
                         if (p === 'AM' && h === 12) h = 0;
 
@@ -471,9 +473,9 @@ const Dashboard = () => {
                     localStorage.setItem('topBarColor', color);
                 }}
             />
-            <TransactionModal 
-                isOpen={showTransactionModal} 
-                onClose={() => setShowTransactionModal(false)} 
+            <TransactionModal
+                isOpen={showTransactionModal}
+                onClose={() => setShowTransactionModal(false)}
                 onOpenEnterBill={() => {
                     setShowEnterBillModal(true);
                     setShowTransactionModal(false);
@@ -588,19 +590,19 @@ const Dashboard = () => {
             <AIChatbotBoard isOpen={showAIChatbotModal} onClose={() => setShowAIChatbotModal(false)} />
             <DepartmentBoard isOpen={showDepartmentModal} onClose={() => setShowDepartmentModal(false)} />
             <CalculatorBoard isOpen={showCalculatorModal} onClose={() => setShowCalculatorModal(false)} />
-            <ReminderBoard 
-                isOpen={showReminderModal} 
+            <ReminderBoard
+                isOpen={showReminderModal}
                 onClose={() => {
                     setShowReminderModal(false);
                     setEditingTask(null);
-                }} 
+                }}
                 onViewAll={() => {
                     setShowReminderModal(false);
                     setShowReminderListModal(true);
                 }}
                 taskToEdit={editingTask}
             />
-            <ReminderListBoard 
+            <ReminderListBoard
                 isOpen={showReminderListModal}
                 onClose={() => setShowReminderListModal(false)}
                 onEditTask={(task) => {
@@ -697,8 +699,9 @@ const Dashboard = () => {
                                     if (item === 'Transaction') setShowTransactionModal(true);
                                     if (item === 'Reports') setShowReportsModal(true);
                                     if (item === 'System Admin') setShowSystemAdminModal(true);
+                                    if (item === 'About') setShowSoftwareAboutModal(true);
                                 }}
-                                className="text-[12px] font-medium text-white/90 hover:text-white whitespace-nowrap transition-all hover:scale-105 active:scale-95 flex items-center gap-1 group"
+                                className="!text-[12px]  text-white/90 hover:text-white whitespace-nowrap transition-all hover:scale-105 active:scale-95 flex items-center gap-1 group"
                             >
                                 {item}
                                 <div className="w-0 h-[1.5px] bg-white absolute bottom-[-4px] left-0 group-hover:w-full transition-all duration-300" />
@@ -750,9 +753,9 @@ const Dashboard = () => {
                 {!isTopBarCollapsed && (
                     <div className="h-[4px] w-full bg-slate-100 shadow-[inset_0_1px_2px_rgba(0,0,0,0.1)] my-1 overflow-hidden relative">
                         {pendingJobsCount > 0 && (
-                            <div 
+                            <div
                                 className="absolute inset-0 bg-gradient-to-r from-[#f05252] via-[#f05252] to-[#f05252] animate-[cardLoading_2s_ease-in-out_infinite]"
-                                style={{ 
+                                style={{
                                     boxShadow: '0 0 10px rgba(234, 7, 7, 0.4)',
                                     backgroundSize: '200% 100%'
                                 }}
@@ -789,11 +792,11 @@ const Dashboard = () => {
 
                         if (!iconData) return null;
                         return (
-                            <RibbonButton 
+                            <RibbonButton
                                 key={iconId}
-                                icon={iconData.icon} 
-                                label={iconData.label} 
-                                onClick={iconData.onClick} 
+                                icon={iconData.icon}
+                                label={iconData.label}
+                                onClick={iconData.onClick}
                                 active={iconData.active}
                                 hasBadge={iconData.hasBadge}
                                 iconColor={iconData.iconColor}
@@ -823,43 +826,38 @@ const Dashboard = () => {
                     style={{ backgroundImage: `url('/images/dashboard_bg_premium.png')` }}
                 />
 
-                {/* Animated Background Elements */}
-                <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
-                    <div className="absolute top-[-10%] left-[-10%] w-[45%] h-[45%] rounded-full bg-blue-500/[0.08] blur-[100px] animate-blob" />
-                    <div className="absolute bottom-[-10%] right-[-10%] w-[55%] h-[55%] rounded-full bg-indigo-500/[0.08] blur-[130px] animate-blob animation-delay-2000" />
-                    <div className="absolute top-[20%] right-[10%] w-[35%] h-[35%] rounded-full bg-sky-400/[0.08] blur-[80px] animate-blob animation-delay-4000" />
-                </div>
+
 
                 {/* Technical Dot Grid Overlay */}
-                <div 
+                <div
                     className="fixed inset-0 z-0 pointer-events-none opacity-[0.05]"
-                    style={{ 
+                    style={{
                         backgroundImage: `radial-gradient(${topBarColor} 1.5px, transparent 1.5px)`,
                         backgroundSize: '36px 36px'
                     }}
                 />
 
                 {/* Glassmorphism Frosted Overlay */}
-                <div className="fixed inset-0 z-0 bg-white/20 backdrop-blur-[60px] pointer-events-none" />
+                <div className="fixed  inset-0 z-0 bg-white/20  backdrop-blur-[60px] pointer-events-none" />
 
 
-                <div className="relative z-10 p-12 max-w-7xl mx-auto flex flex-col gap-20">
+                <div className="relative mt-8 z-10 p-12 max-w-7xl mx-auto flex flex-col gap-20">
 
 
 
-                    {/* Integrated Search Bar (Transformed from Search Card) */}
-                    <div className="w-full flex justify-center mt-10">
+                    {/* New Sleek Search Trigger (Top Right Aligned) */}
+                    <div className="flex justify-end -mb-12 animate-in fade-in slide-in-from-right-10 duration-700">
                         <button
                             onClick={() => setShowSearchModal(true)}
-                            className="w-full max-w-2xl flex items-center gap-4 px-6 h-14 bg-white border border-slate-200 rounded-[8px] shadow-sm hover:shadow-md hover:border-[#0078d4]/30 transition-all group text-left"
+                            className="flex items-center gap-3 px-5 h-11 bg-white/40 backdrop-blur-md border border-white/20 rounded-[10px] shadow-lg hover:bg-white/60 hover:shadow-xl hover:scale-105 transition-all duration-300 group"
                         >
-                            <Search size={20} className="text-slate-400 group-hover:text-[#0078d4] transition-colors" />
-                            <span className="text-slate-400 font-medium group-hover:text-slate-500 transition-colors">Search...</span>
+                            <Search size={18} className="text-gray-400 group-hover:text-[#0078d4] transition-colors" />
+                            <span className="text-gray-500 text-sm font-semibold tracking-tight">Search System</span>
                         </button>
                     </div>
 
                     {/* Standard Icon Grid (Excluding Search) */}
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
+                    <div className="grid  grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
                         {navItems.filter(item => item.label !== 'Search').map((item, idx) => {
                             const Icon = item.icon;
                             const isAnimated = item.gif && (item.label === 'Home' || item.label === 'Accounts' || item.label === 'Customers' || item.label === 'Vendors' || item.label === 'Billing' || item.label === 'Pay Bills' || item.label === 'Cheques' || item.label === 'Cash' || item.label === 'Deposit' || item.label === 'Journal' || item.label === 'Rec.' || item.label === 'Report');
@@ -928,17 +926,17 @@ const Dashboard = () => {
             </main>
 
             {/* Unified One-Line Professional Footer (Ticker + Company Info) */}
-            <footer 
+            <footer
                 className="h-12 border-t border-white/10 flex items-center justify-between px-6 z-50 overflow-hidden relative shadow-[0_-4px_20px_rgba(0,0,0,0.1)]"
                 style={{ backgroundColor: topBarColor }}
             >
                 {/* Left: Branding/License (Above Ticker) */}
-                <div 
+                <div
                     className="flex items-center gap-2 relative z-20 pr-6"
                     style={{ backgroundColor: topBarColor }}
-                > 
+                >
                     <span className="text-[#ef1022] text-[12px] font-black tracking-tight group-hover:text-red-400 transition-all cursor-default uppercase drop-shadow-sm">
-                        LICENSED 
+                        LICENSED
                     </span>
                 </div>
 
@@ -947,7 +945,7 @@ const Dashboard = () => {
                     {/* Fade Edges for Professional Look */}
                     <div className="absolute inset-y-0 left-0 w-12 z-10" style={{ background: `linear-gradient(to right, ${topBarColor}, transparent)` }} />
                     <div className="absolute inset-y-0 right-0 w-12 z-10" style={{ background: `linear-gradient(to left, ${topBarColor}, transparent)` }} />
-                    
+
                     <div className="whitespace-nowrap animate-marquee flex items-center gap-12">
                         {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
                             <span key={i} className="text-[9px] font-bold text-white/70 uppercase tracking-[0.25em] flex items-center gap-3">
@@ -959,7 +957,7 @@ const Dashboard = () => {
                 </div>
 
                 {/* Right: Company Credits (Above Ticker) */}
-                <div 
+                <div
                     className="flex items-center gap-2 group relative z-20 pl-6"
                     style={{ backgroundColor: topBarColor }}
                 >
@@ -974,46 +972,46 @@ const Dashboard = () => {
                 {/* Minimalist Red Quote Frame Speech Bubble (Persistent Alert) */}
                 {pendingJobsCount > 0 && pendingSnoozeTask && (
                     <div className="mb-4 ml-6 relative animate-in fade-in slide-in-from-bottom-2 duration-500 pointer-events-auto">
-                        
+
                         {/* The Quote Frame Bubble */}
                         <div className="bg-white/95 backdrop-blur-sm p-4 px-8 border-2 border-[#f05252] rounded-[18px] max-w-[420px] relative shadow-xl">
-                             
-                             {/* Top Left Quote Marks */}
-                             <div className="absolute -top-3 -left-1 bg-white px-1 flex gap-1">
+
+                            {/* Top Left Quote Marks */}
+                            <div className="absolute -top-3 -left-1 bg-white px-1 flex gap-1">
                                 <span className="text-[#f05252] text-xl font-black rotate-180">„</span>
-                             </div>
+                            </div>
 
-                             {/* Bottom Right Quote Marks */}
-                             <div className="absolute -bottom-4 -right-1 bg-white px-1 flex gap-1">
+                            {/* Bottom Right Quote Marks */}
+                            <div className="absolute -bottom-4 -right-1 bg-white px-1 flex gap-1">
                                 <span className="text-[#f05252] text-xl font-black">“</span>
-                             </div>
+                            </div>
 
-                             {/* Content Inner */}
-                             <div className="flex items-center gap-6 relative z-10">
-                                 <div className="flex-1">
-                                     <div className="flex items-center gap-2 mb-1">
+                            {/* Content Inner */}
+                            <div className="flex items-center gap-6 relative z-10">
+                                <div className="flex-1">
+                                    <div className="flex items-center gap-2 mb-1">
                                         <div className="w-4 h-4 bg-[#f05252]/10 rounded-full flex items-center justify-center border border-[#f05252]/20">
                                             <Bell size={8} className="text-[#f05252]" />
                                         </div>
                                         <p className="text-[9px] font-medium uppercase tracking-[0.2em] text-[#f05252]/80">System Reminder</p>
-                                     </div>
-                                    
+                                    </div>
+
                                     <p className="text-[13px] font-medium leading-none text-slate-800 whitespace-nowrap">
                                         Navoda, You have {pendingJobsCount} pending {pendingJobsCount === 1 ? 'job' : 'jobs'}.
                                     </p>
-                                 </div>
-                                
-                                <button 
+                                </div>
+
+                                <button
                                     onClick={() => handleCompleteAlarm(pendingSnoozeTask)}
                                     className="px-5 py-2.5 bg-[#f05252] text-white text-[9px] font-black rounded-lg uppercase tracking-[0.2em] hover:bg-[#d43f3f] transition-all active:scale-95 shadow-lg shadow-red-500/20 shrink-0 whitespace-nowrap"
                                 >
                                     Finish Now
                                 </button>
-                             </div>
-                            
+                            </div>
+
                             {/* Pointy Tail matching the Red Frame (Left-Side Pointing) */}
                             <div className="absolute -bottom-2.5 left-6 w-6 h-6 bg-white rotate-[45deg] border-r-2 border-b-2 border-[#f05252]" />
-                            
+
                         </div>
                     </div>
                 )}
@@ -1041,7 +1039,7 @@ const Dashboard = () => {
                 onClose={() => setShowThankYouModal(false)}
             />
 
-            <AlarmAlertModal 
+            <AlarmAlertModal
                 isOpen={!!activeAlarmTask}
                 onClose={() => handleAlarmDismiss(activeAlarmTask?.id_No || activeAlarmTask?.Id_No || activeAlarmTask?.idNo)}
                 task={activeAlarmTask}
@@ -1059,21 +1057,7 @@ const Dashboard = () => {
                     100% { transform: translateX(-50%); }
                 }
 
-                @keyframes blob {
-                    0% { transform: translate(0px, 0px) scale(1); }
-                    33% { transform: translate(30px, -50px) scale(1.1); }
-                    66% { transform: translate(-20px, 20px) scale(0.9); }
-                    100% { transform: translate(0px, 0px) scale(1); }
-                }
-                .animate-blob {
-                    animation: blob 20s infinite alternate cubic-bezier(0.45, 0, 0.55, 1);
-                }
-                .animation-delay-2000 {
-                    animation-delay: 2s;
-                }
-                .animation-delay-4000 {
-                    animation-delay: 4s;
-                }
+
 
                 @keyframes cardLoading {
                     0% { width: 0%; opacity: 1; }
@@ -1088,6 +1072,10 @@ const Dashboard = () => {
                 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
                 * { font-family: 'Plus Jakarta Sans', sans-serif; }
             `}</style>
+            <SoftwareAboutModal
+                isOpen={showSoftwareAboutModal}
+                onClose={() => setShowSoftwareAboutModal(false)}
+            />
         </div>
     );
 };
@@ -1125,8 +1113,8 @@ const RibbonButton = ({ icon: Icon, label, onClick, active, hasBadge, isHighligh
     <button
         onClick={onClick}
         className={`flex flex-col items-center justify-center min-w-[75px] h-[75px] m-0.5 rounded-xl relative transition-all duration-300 group
-            ${active 
-                ? 'bg-white/20 text-white shadow-[0_4px_12px_rgba(0,0,0,0.1)] backdrop-blur-sm' 
+            ${active
+                ? 'bg-white/20 text-white shadow-[0_4px_12px_rgba(0,0,0,0.1)] backdrop-blur-sm'
                 : 'text-white/80 hover:bg-white/10 hover:text-white hover:shadow-lg'}
         `}
     >
@@ -1138,7 +1126,7 @@ const RibbonButton = ({ icon: Icon, label, onClick, active, hasBadge, isHighligh
             )}
         </div>
 
-        <span className="text-[9.5px] font-bold mt-2 tracking-wide leading-none text-center relative z-10 px-1 opacity-90 group-hover:opacity-100">
+        <span className="text-[11px] font-bold mt-2 tracking-wide leading-none text-center relative z-10 px-1 opacity-90 group-hover:opacity-100">
             {label.length > 9 ? <>{label.split(' ')[0]}<br />{label.split(' ')[1]}</> : label}
         </span>
 
@@ -1146,7 +1134,7 @@ const RibbonButton = ({ icon: Icon, label, onClick, active, hasBadge, isHighligh
         {active && (
             <div className="absolute bottom-1 left-1/2 -translate-x-1/2 w-8 h-1 bg-white rounded-full shadow-[0_0_10px_rgba(255,255,255,0.8)]" />
         )}
-        
+
         {/* Subtle Hover Glow Overlay */}
         <div className="absolute inset-0 bg-white/0 group-hover:bg-white/5 rounded-xl transition-colors duration-300" />
     </button>

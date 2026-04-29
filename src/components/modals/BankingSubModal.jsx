@@ -35,7 +35,7 @@ const BankingSubModal = ({ isOpen, onClose, onOpenCollectionDeposit, onOpenDirec
                     />
                     <div className="flex items-center gap-2">
                         <Landmark size={14} className="text-[#0078d4]" />
-                        <span className="text-lg font-bold text-slate-800 tracking-tight">Banking Center</span>
+                        <span className="text-[15px] font-[700] text-slate-900 uppercase tracking-[3px] font-mono truncate">Banking Center</span>
                     </div>
                     <button 
                         onClick={onClose} 
@@ -67,11 +67,10 @@ const BankingSubModal = ({ isOpen, onClose, onOpenCollectionDeposit, onOpenDirec
                             >
                                 <div className="flex items-center gap-3">
                                     <Icon size={16} className={`text-gray-500 group-hover:text-white transition-colors`} />
-                                    <span className={`text-[13px] font-medium text-gray-700 group-hover:text-white transition-colors`}>
+                                    <span className={`text-[14px] font-bold text-gray-700 group-hover:text-white transition-colors`}>
                                         {item.label}
                                     </span>
                                 </div>
-                                <ChevronRight size={10} className="text-gray-300 group-hover:text-white transition-colors" />
                             </button>
                         );
                     })}

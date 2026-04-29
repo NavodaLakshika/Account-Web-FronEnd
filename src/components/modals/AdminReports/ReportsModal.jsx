@@ -1,7 +1,10 @@
 import React from 'react';
 import { X, ChevronRight, BarChart3, PieChart, Landmark, ClipboardList, UserSquare, Users, ShieldAlert } from 'lucide-react';
+import AdminReportsModal from './AdminReportsModal';
 
 const ReportsModal = ({ isOpen, onClose }) => {
+    const [showAdminReports, setShowAdminReports] = React.useState(false);
+
     if (!isOpen) return null;
 
     const menuItems = [
@@ -10,7 +13,7 @@ const ReportsModal = ({ isOpen, onClose }) => {
         { icon: PieChart, label: 'Finance Management', hasSubmenu: true },
         { icon: UserSquare, label: 'Vender Center Reports', hasSubmenu: true },
         { icon: Users, label: 'Customer Center Reports', hasSubmenu: true },
-        { icon: ShieldAlert, label: 'Admin Reports', hasSubmenu: true },
+        { icon: ShieldAlert, label: 'Admin Reports', hasSubmenu: true, action: 'adminReports' },
     ];
 
     return (
@@ -30,7 +33,7 @@ const ReportsModal = ({ isOpen, onClose }) => {
                     />
                     <div className="flex items-center gap-2">
                         <BarChart3 size={14} className="text-[#0078d4]" />
-                        <span className="text-lg font-bold text-slate-800 tracking-tight">System Reports Hub</span>
+                        <span className="text-[15px] font-[700] text-slate-900 uppercase tracking-[3px] font-mono truncate">System Reports Hub</span>
                     </div>
                     <button 
                         onClick={onClose} 
@@ -48,6 +51,9 @@ const ReportsModal = ({ isOpen, onClose }) => {
                         return (
                             <button
                                 key={idx}
+                                onClick={() => {
+                                    if (item.action === 'adminReports') setShowAdminReports(true);
+                                }}
                                 className="w-full flex items-center justify-between px-4 py-3 rounded-xl hover:bg-slate-50 group transition-all relative overflow-hidden text-left"
                             >
                                 {/* Hover Indicator Bar */}
@@ -55,22 +61,24 @@ const ReportsModal = ({ isOpen, onClose }) => {
                                     className="absolute left-0 top-0 bottom-0 w-1 opacity-0 group-hover:opacity-100 transition-all duration-300"
                                     style={{ backgroundColor: localStorage.getItem('topBarColor') || '#0078d4' }}
                                 />
-
                                 <div className="flex items-center gap-3 relative z-10">
                                     <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center group-hover:bg-white transition-colors shadow-sm group-hover:shadow-md">
                                         <Icon size={16} className="text-slate-500 group-hover:text-[#0078d4] transition-colors" />
                                     </div>
-                                    <span className="text-[13px] font-semibold text-slate-700 group-hover:text-slate-900 transition-colors">
+                                    <span className="text-[14px] font-bold text-slate-700 group-hover:text-slate-900 transition-colors">
                                         {item.label}
                                     </span>
                                 </div>
-                                
-                                <ChevronRight size={14} className="text-slate-300 group-hover:text-slate-500 group-hover:translate-x-0.5 transition-all relative z-10" />
                             </button>
                         );
                     })}
                 </div>
             </div>
+
+            <AdminReportsModal 
+                isOpen={showAdminReports} 
+                onClose={() => setShowAdminReports(false)} 
+            />
         </div>
     );
 };

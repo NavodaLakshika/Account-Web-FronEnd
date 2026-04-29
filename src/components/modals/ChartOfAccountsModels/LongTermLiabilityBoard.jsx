@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import SimpleModal from '../../SimpleModal';
+import CalendarModal from '../../CalendarModal';
 import { Search, RotateCcw, Save, Calendar, Loader2, X, PlusCircle } from 'lucide-react';
 import { longTermLiabService } from '../../../services/longTermLiab.service';
 import { toast } from 'react-hot-toast';
@@ -30,6 +31,13 @@ const LongTermLiabilityBoard = ({ isOpen, onClose }) => {
     const [showSearchModal, setShowSearchModal] = useState(false);
     const [searchList, setSearchList] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
+    const [showAccountSearch, setShowAccountSearch] = useState(false);
+    const [accSearchQuery, setAccSearchQuery] = useState('');
+    const [showLenderSearch, setShowLenderSearch] = useState(false);
+    const [lenderSearchQuery, setLenderSearchQuery] = useState('');
+    const [showOrgDateModal, setShowOrgDateModal] = useState(false);
+    const [showPayTypeSearch, setShowPayTypeSearch] = useState(false);
+    const payTypes = ['Fixed', 'Variable', 'Balloon'];
 
     useEffect(() => {
         if (isOpen) {
@@ -75,6 +83,25 @@ const LongTermLiabilityBoard = ({ isOpen, onClose }) => {
             CreateUser: formData.CreateUser
         });
         setIsEditMode(false);
+    };
+
+    const handleAccountSelect = (code, name) => {
+        setFormData(prev => ({ ...prev, LiabAccCode: code }));
+        setShowAccountSearch(false);
+    };
+
+    const handleLenderSelect = (code, name) => {
+        setFormData(prev => ({ ...prev, LenderCode: code }));
+        setShowLenderSearch(false);
+    };
+
+    const handleDateSelect = (field, date) => {
+        setFormData(prev => ({ ...prev, [field]: date }));
+    };
+
+    const handlePayTypeSelect = (type) => {
+        setFormData(prev => ({ ...prev, PayType: type }));
+        setShowPayTypeSearch(false);
     };
 
     const handleSave = async () => {
@@ -170,7 +197,7 @@ const LongTermLiabilityBoard = ({ isOpen, onClose }) => {
                 title="Long Term Liability Registry"
                 maxWidth="max-w-4xl"
                 footer={
-                    <div className="bg-slate-50 px-6 py-4 w-full flex justify-end gap-3 border-t border-gray-100 mt-4 rounded-b-xl">
+                    <div className="bg-slate-50 px-6  w-full flex justify-end gap-3 border-t border-gray-100 mt-1 rounded-b-xl">
                         <button 
                             onClick={handleSave} 
                             disabled={loading} 
@@ -182,16 +209,13 @@ const LongTermLiabilityBoard = ({ isOpen, onClose }) => {
                         <button onClick={handleClear} className="px-6 h-10 bg-[#00adff] text-white text-[13px] font-bold rounded-[5px] hover:bg-[#0099e6] shadow-md shadow-blue-200 transition-all active:scale-95 flex items-center justify-center gap-2 border-none">
                             <RotateCcw size={14} /> Clear
                         </button>
-                        <button onClick={onClose} className="px-6 h-10 bg-[#d13438] text-white text-[13px] font-bold rounded-[5px] shadow-md shadow-red-200 hover:bg-[#a4262c] transition-all active:scale-95 flex items-center justify-center gap-2">
-                            <X size={14} /> Exit
-                        </button>
                     </div>
                 }
             >
-                <div className="py-2 select-none font-['Tahoma'] space-y-4">
+                <div className=" select-none font-['Tahoma'] space-y-4">
                     {/* Info Header */}
                     <div className="bg-[#f0f9ff] border border-[#bae6fd] p-3 rounded-[5px] shadow-sm transition-all">
-                        <p className="text-[12px] font-bold text-[#0369a1] text-center leading-relaxed italic">
+                        <p className="text-[12px] font-bold text-[#0369a1] text-center leading-relaxed ">
                             Long term liability: Obligations spanning over one year, 
                             including Bank Loans, Leases, and Third Party financing.
                         </p>
@@ -205,95 +229,135 @@ const LongTermLiabilityBoard = ({ isOpen, onClose }) => {
                                 <input 
                                     name="LiabCode" value={formData.LiabCode} onChange={handleInputChange}
                                     type="text" className="w-40 h-8 border border-gray-300 px-3 bg-white rounded-[5px] outline-none focus:border-blue-400 font-bold text-blue-600 shadow-sm text-center" 
-                                    placeholder="LIAB-001"
+                                    placeholder=""
                                 />
-                                <div className="flex-1 flex gap-1">
+                                <div className="flex-1 flex gap-1 items-center">
                                     <input 
                                         name="LiabName" value={formData.LiabName} onChange={handleInputChange}
-                                        type="text" className="flex-1 h-8 border border-gray-300 px-3 text-[12.5px] bg-white rounded-[5px] outline-none focus:border-blue-400 font-bold text-gray-700 shadow-sm" 
-                                        placeholder="Liability registry name"
+                                        type="text" className="min-w-0 flex-1 h-8 border border-gray-300 px-3 text-[12.5px] bg-white rounded-[5px] outline-none focus:border-blue-400 font-bold text-gray-700 shadow-sm" 
+                                        placeholder=""
                                     />
-                                    <button onClick={openSearch} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95"><Search size={18} /></button>
+                                    <button onClick={openSearch} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0"><Search size={18} /></button>
                                 </div>
                             </div>
                         </div>
 
                         <div className="flex items-center gap-3">
                             <label className="text-[11px] font-bold text-gray-700 uppercase w-[160px] shrink-0">Linked Account</label>
-                            <select name="LiabAccCode" value={formData.LiabAccCode} onChange={handleInputChange} className="flex-1 h-8 border border-gray-300 px-2 text-[12.5px] bg-white rounded-[5px] outline-none focus:border-blue-400 font-bold text-gray-700 shadow-sm">
-                                <option value="">&lt; Select G/L Account &gt;</option>
-                                {lookups.accounts.map((acc, idx) => (
-                                    <option key={idx} value={acc.sub_Code} disabled={acc.sub_Code === '850-100'}>
-                                        {acc.sub_Code} - {acc.sub_Acc_Name}
-                                    </option>
-                                ))}
-                            </select>
+                            <div className="flex-1 flex gap-2">
+                                <input 
+                                    type="text" 
+                                    value={lookups.accounts.find(a => a.sub_Code === formData.LiabAccCode)?.sub_Acc_Name?.trim() || formData.LiabAccCode} 
+                                    readOnly 
+                                    className="min-w-0 flex-1 h-8 border border-gray-300 px-3 text-[12.5px] bg-gray-50 rounded-[5px] outline-none font-bold text-blue-600 shadow-sm cursor-default" 
+                                />
+                                <button 
+                                    onClick={() => setShowAccountSearch(true)} 
+                                    className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0"
+                                >
+                                    <Search size={18} />
+                                </button>
+                            </div>
                         </div>
 
                         <div className="flex items-center gap-3">
                             <label className="text-[11px] font-bold text-gray-700 uppercase w-[160px] shrink-0">Lender / Institution</label>
-                            <select name="LenderCode" value={formData.LenderCode} onChange={handleInputChange} className="flex-1 h-8 border border-gray-300 px-2 text-[12.5px] bg-white rounded-[5px] outline-none focus:border-blue-400 font-bold text-gray-700 shadow-sm">
-                                <option value="">&lt; Select Service Provider &gt;</option>
-                                {lookups.lenders.map((lender, idx) => (
-                                    <option key={idx} value={lender.code}>{lender.supplier_Name}</option>
-                                ))}
-                            </select>
+                            <div className="flex-1 flex gap-2">
+                                <input 
+                                    type="text" 
+                                    value={lookups.lenders.find(l => l.code === formData.LenderCode)?.supplier_Name?.trim() || formData.LenderCode} 
+                                    readOnly 
+                                    className="min-w-0 flex-1 h-8 border border-gray-300 px-3 text-[12.5px] bg-gray-50 rounded-[5px] outline-none font-bold text-blue-600 shadow-sm cursor-default" 
+                                />
+                                <button 
+                                    onClick={() => setShowLenderSearch(true)} 
+                                    className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0"
+                                >
+                                    <Search size={18} />
+                                </button>
+                            </div>
                         </div>
                     </div>
 
                     {/* Financial Terms Section */}
                     <div className="border border-gray-200 rounded-[5px] p-4 space-y-4 bg-slate-50/20 relative pt-7">
-                        <span className="absolute -top-3 left-3 bg-white px-2 py-0.5 border text-[#0078d4] border-gray-200 rounded-full text-[10px] font-bold uppercase tracking-widest shadow-sm">Financial Terms & Repayment</span>
+                        <span className="absolute -top-3 left-3 bg-white px-2 py-0.5 border text-[#0078d4] border-gray-200 rounded-[5px] text-[10px] font-bold uppercase tracking-widest shadow-sm">Financial Terms & Repayment</span>
                         
-                        <div className="flex items-center gap-4">
-                            <label className="text-[11px] font-bold text-gray-500 uppercase w-[110px] shrink-0">Description</label>
-                            <input name="Description" value={formData.Description} onChange={handleInputChange} type="text" className="flex-1 h-8 border border-gray-300 px-3 text-[12.5px] bg-white rounded-[5px] outline-none focus:border-blue-400 font-bold text-gray-700 shadow-sm" placeholder="E.g. Bank of Ceylon Five Year Loan" />
-                        </div>
-
-                        <div className="grid grid-cols-12 gap-x-6 gap-y-4">
-                            <div className="col-span-5 flex items-center gap-4">
-                                <label className="text-[11px] font-black text-gray-500 uppercase w-[110px] shrink-0">Total Amount</label>
-                                <input name="Amount" value={formData.Amount} onChange={handleInputChange} type="number" className="flex-1 h-8 border border-gray-300 px-2 text-sm focus:border-blue-500 outline-none rounded-sm text-right font-black text-blue-600" step="0.01" />
-                            </div>
-                            <div className="col-span-3 flex items-center gap-2">
-                                <label className="text-[11px] font-black text-gray-500 uppercase shrink-0">Term</label>
-                                <input name="Term" value={formData.Term} onChange={handleInputChange} type="number" className="w-20 h-8 border border-gray-300 px-2 text-sm focus:border-blue-500 outline-none rounded-sm font-bold text-center" />
-                            </div>
-                            <div className="col-span-4 flex items-center gap-2">
-                                <label className="text-[11px] font-black text-gray-500 uppercase shrink-0">Payment</label>
-                                <select name="PayType" value={formData.PayType} onChange={handleInputChange} className="flex-1 h-8 border border-gray-300 px-1 text-sm bg-white focus:border-blue-500 outline-none rounded-sm font-medium">
-                                    <option value="">Select Type</option>
-                                    <option value="Fixed">Fixed</option>
-                                    <option value="Variable">Variable</option>
-                                    <option value="Balloon">Balloon</option>
-                                </select>
+                        <div className="flex flex-col gap-4">
+                            <div className="flex items-center gap-4">
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-[110px] shrink-0">Description</label>
+                                <input name="Description" value={formData.Description} onChange={handleInputChange} type="text" className="flex-1 h-8 border border-gray-300 px-3 text-[12.5px] bg-white rounded-[5px] outline-none focus:border-blue-400 font-bold text-gray-700 shadow-sm" placeholder="" />
                             </div>
 
-                            <div className="col-span-5 flex items-center gap-4">
-                                <label className="text-[11px] font-black text-gray-500 uppercase w-[110px] shrink-0">Origination</label>
-                                <input name="OrgDate" value={formData.OrgDate} onChange={handleInputChange} type="date" className="flex-1 h-8 border border-gray-300 px-2 text-sm focus:border-blue-500 outline-none rounded-sm" />
-                            </div>
-                            <div className="col-span-7 grid grid-cols-2 gap-3">
+                            <div className="grid grid-cols-3 gap-4">
                                 <div className="space-y-1">
-                                    <label className="text-[10px] font-black text-gray-400 uppercase">Installments (Qty)</label>
-                                    <input name="NoOfInstallment" value={formData.NoOfInstallment} onChange={handleInputChange} type="number" className="w-full h-8 border border-gray-300 px-2 text-sm focus:border-blue-500 outline-none rounded-sm font-bold text-center" />
+                                    <label className="text-[10px] font-bold text-gray-500 uppercase">Total Amount</label>
+                                    <input name="Amount" value={formData.Amount} onChange={handleInputChange} type="number" className="w-full h-8 border border-gray-300 px-3 text-sm focus:border-blue-500 outline-none rounded-[5px] text-right font-black text-blue-600 shadow-sm" step="0.01" />
                                 </div>
                                 <div className="space-y-1">
-                                    <label className="text-[10px] font-black text-gray-400 uppercase">Monthly Dues (Rs.)</label>
-                                    <input name="MonthlyIns" value={formData.MonthlyIns} onChange={handleInputChange} type="number" className="w-full h-8 border border-gray-300 px-2 text-sm focus:border-blue-500 outline-none rounded-sm font-black text-red-600 text-right" step="0.01" />
+                                    <label className="text-[10px] font-bold text-gray-500 uppercase">Term (Months)</label>
+                                    <input name="Term" value={formData.Term} onChange={handleInputChange} type="number" className="w-full h-8 border border-gray-300 px-3 text-sm focus:border-blue-500 outline-none rounded-[5px] font-bold text-center shadow-sm" />
+                                </div>
+                                <div className="space-y-1">
+                                    <label className="text-[10px] font-bold text-gray-500 uppercase">Payment Type</label>
+                                    <div className="flex gap-1 items-center">
+                                        <input 
+                                            type="text" 
+                                            value={formData.PayType} 
+                                            readOnly 
+                                            className="min-w-0 flex-1 h-8 border border-gray-300 px-3 text-[12.5px] bg-white rounded-[5px] outline-none font-bold text-gray-700 shadow-sm cursor-default" 
+                                            placeholder=""
+                                        />
+                                        <button 
+                                            onClick={() => setShowPayTypeSearch(true)} 
+                                            className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0"
+                                        >
+                                            <Search size={16} />
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
 
-                            <div className="col-span-5 flex items-center gap-4">
-                                <label className="text-[11px] font-black text-gray-500 uppercase w-[110px] shrink-0">Interest Rate</label>
-                                <div className="flex-1 flex items-center gap-2">
-                                    <input name="InterestRate" value={formData.InterestRate} onChange={handleInputChange} type="number" className="flex-1 h-8 border border-gray-300 px-2 text-sm focus:border-blue-500 outline-none rounded-sm font-bold text-center text-orange-600" step="0.1" />
-                                    <span className="text-sm font-black text-gray-600">%</span>
+                            <div className="grid grid-cols-3 gap-4">
+                                <div className="space-y-1">
+                                    <label className="text-[10px] font-bold text-gray-500 uppercase">Origination Date</label>
+                                    <div className="flex gap-1 items-center">
+                                        <input 
+                                            type="text" 
+                                            value={formData.OrgDate} 
+                                            readOnly 
+                                            className="min-w-0 flex-1 h-8 border border-gray-300 px-3 text-[12.5px] bg-white rounded-[5px] outline-none font-bold text-gray-700 shadow-sm cursor-default" 
+                                        />
+                                        <button 
+                                            onClick={() => setShowOrgDateModal(true)} 
+                                            className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0"
+                                        >
+                                            <Calendar size={16} />
+                                        </button>
+                                    </div>
+                                </div>
+                                <div className="space-y-1">
+                                    <label className="text-[10px] font-bold text-gray-400 uppercase">Installments (Qty)</label>
+                                    <input name="NoOfInstallment" value={formData.NoOfInstallment} onChange={handleInputChange} type="number" className="w-full h-8 border border-gray-300 px-3 text-sm focus:border-blue-500 outline-none rounded-[5px] font-bold text-center shadow-sm" />
+                                </div>
+                                <div className="space-y-1">
+                                    <label className="text-[10px] font-bold text-gray-400 uppercase">Monthly Dues (Rs.)</label>
+                                    <input name="MonthlyIns" value={formData.MonthlyIns} onChange={handleInputChange} type="number" className="w-full h-8 border border-gray-300 px-3 text-sm focus:border-blue-500 outline-none rounded-[5px] font-black text-red-600 text-right shadow-sm" step="0.01" />
                                 </div>
                             </div>
-                            <div className="col-span-7 flex items-center justify-end gap-3">
-                                <label className="text-[11px] font-black text-gray-500 uppercase">Payment Due Day</label>
-                                <input name="DueDate" value={formData.DueDate} onChange={handleInputChange} type="number" min="1" max="31" className="w-20 h-8 border border-gray-300 px-2 text-sm focus:border-blue-500 outline-none rounded-sm font-black text-center bg-blue-50 text-blue-700" />
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-1">
+                                    <label className="text-[10px] font-bold text-gray-500 uppercase">Interest Rate (%)</label>
+                                    <div className="flex items-center gap-2">
+                                        <input name="InterestRate" value={formData.InterestRate} onChange={handleInputChange} type="number" className="flex-1 h-8 border border-gray-300 px-3 text-sm focus:border-blue-500 outline-none rounded-[5px] font-bold text-center text-orange-600 shadow-sm" step="0.1" />
+                                        <span className="text-sm font-black text-gray-400">%</span>
+                                    </div>
+                                </div>
+                                <div className="space-y-1">
+                                    <label className="text-[10px] font-bold text-gray-500 uppercase">Payment Due Day</label>
+                                    <input name="DueDate" value={formData.DueDate} onChange={handleInputChange} type="number" min="1" max="31" className="w-full h-8 border border-gray-300 px-3 text-sm focus:border-blue-500 outline-none rounded-[5px] font-black text-center bg-blue-50 text-blue-700 shadow-sm" />
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -305,10 +369,15 @@ const LongTermLiabilityBoard = ({ isOpen, onClose }) => {
                     <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setShowSearchModal(false)} />
                     <div className="relative w-full max-w-3xl bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
                         {/* Header */}
-                        <div className="bg-[#0078d4] px-4 py-2 flex items-center justify-between text-white">
+                        <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-100 select-none relative overflow-hidden">
+                            {/* System Color Left Accent */}
+                            <div 
+                                className="absolute left-0 top-0 bottom-0 w-1.5 transition-colors duration-500" 
+                                style={{ backgroundColor: localStorage.getItem('topBarColor') || '#0285fd' }}
+                            />
                             <div className="flex items-center gap-2">
-                                <Search size={16} />
-                                <span className="text-sm font-bold uppercase tracking-tight">Liability Registry Lookup</span>
+                                <Search size={16} className="text-[#0078d4]" />
+                                <span className="text-[15px] font-[700] text-slate-900 uppercase tracking-[3px] font-mono truncate">Liability Registry Lookup</span>
                             </div>
                             <button
                                 onClick={() => setShowSearchModal(false)}
@@ -366,8 +435,127 @@ const LongTermLiabilityBoard = ({ isOpen, onClose }) => {
 
                         {/* Footer */}
                         <div className="bg-gray-50 px-4 py-2 border-t border-gray-200 flex justify-between items-center text-[10px] text-gray-400">
-                            <span>{searchList.length} Result(s)</span>
-                            <span className="italic font-bold text-[#0078d4]">ACCOUNT CLOUD INFRASTRUCTURE</span>
+                            <span>{searchList.length} Result(s) Found</span>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {/* Account Search Modal */}
+            {showAccountSearch && (
+                <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4 font-['Tahoma']">
+                    <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setShowAccountSearch(false)} />
+                    <div className="relative w-full max-w-2xl bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
+                        {/* Header */}
+                        <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-100 select-none relative overflow-hidden">
+                            <div className="absolute left-0 top-0 bottom-0 w-1.5 transition-colors duration-500" style={{ backgroundColor: localStorage.getItem('topBarColor') || '#0285fd' }} />
+                            <div className="flex items-center gap-2">
+                                <Search size={16} className="text-[#0078d4]" />
+                                <span className="text-[15px] font-[700] text-slate-900 uppercase tracking-[3px] font-mono truncate">General Ledger Accounts Lookup</span>
+                            </div>
+                            <button onClick={() => setShowAccountSearch(false)} className="w-9 h-8 flex items-center justify-center bg-[#ff3b30] hover:bg-[#e03127] text-white rounded-[8px] shadow-sm active:scale-90"><X size={18} strokeWidth={4} /></button>
+                        </div>
+                        <div className="p-3 bg-slate-50 border-b border-gray-100 flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                <Search size={14} className="text-gray-400" />
+                                <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Search Facility</span>
+                            </div>
+                            <input type="text" placeholder="Find by Account Name or Code..." className="h-9 border border-gray-300 px-3 text-xs rounded-md w-72 focus:border-[#0285fd] outline-none shadow-sm" value={accSearchQuery} onChange={(e) => setAccSearchQuery(e.target.value)} />
+                        </div>
+                        <div className="p-2">
+                            <div className="px-3 py-1.5 flex text-[10px] font-bold text-gray-600 border-b border-gray-200 uppercase">
+                                <span className="w-32 text-center">Account Code</span>
+                                <span className="flex-1 px-3">Account Description</span>
+                            </div>
+                            <div className="max-h-[400px] overflow-y-auto custom-scrollbar">
+                                {lookups.accounts.filter(a => (a.sub_Acc_Name || '').toLowerCase().includes(accSearchQuery.toLowerCase()) || (a.sub_Code || '').toLowerCase().includes(accSearchQuery.toLowerCase())).map((acc, idx) => (
+                                    <button key={idx} onClick={() => handleAccountSelect(acc.sub_Code, acc.sub_Acc_Name)} className="w-full flex items-center justify-between px-3 py-2 text-xs border-b border-gray-100 hover:bg-blue-50 transition-all text-left group">
+                                        <div className="flex items-center gap-2 flex-1">
+                                            <span className="w-32 text-center font-mono text-[11px] font-bold text-[#0078d4]">{acc.sub_Code}</span>
+                                            <span className="flex-1 px-3 font-mono font-medium text-gray-700 uppercase">{acc.sub_Acc_Name}</span>
+                                        </div>
+                                        <div className="bg-[#e49e1b] text-white text-[10px] px-5 py-1.5 rounded-md font-bold uppercase">Select</div>
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Lender Search Modal */}
+            {showLenderSearch && (
+                <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4 font-['Tahoma']">
+                    <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setShowLenderSearch(false)} />
+                    <div className="relative w-full max-w-2xl bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
+                        {/* Header */}
+                        <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-100 select-none relative overflow-hidden">
+                            <div className="absolute left-0 top-0 bottom-0 w-1.5 transition-colors duration-500" style={{ backgroundColor: localStorage.getItem('topBarColor') || '#0285fd' }} />
+                            <div className="flex items-center gap-2">
+                                <PlusCircle size={16} className="text-[#0078d4]" />
+                                <span className="text-[15px] font-[700] text-slate-900 uppercase tracking-[3px] font-mono truncate">Service Providers Lookup</span>
+                            </div>
+                            <button onClick={() => setShowLenderSearch(false)} className="w-9 h-8 flex items-center justify-center bg-[#ff3b30] hover:bg-[#e03127] text-white rounded-[8px] shadow-sm active:scale-90"><X size={18} strokeWidth={4} /></button>
+                        </div>
+                        <div className="p-3 bg-slate-50 border-b border-gray-100 flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                <Search size={14} className="text-gray-400" />
+                                <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Search Facility</span>
+                            </div>
+                            <input type="text" placeholder="Find by Lender Name or Code..." className="h-9 border border-gray-300 px-3 text-xs rounded-md w-72 focus:border-[#0285fd] outline-none shadow-sm" value={lenderSearchQuery} onChange={(e) => setLenderSearchQuery(e.target.value)} />
+                        </div>
+                        <div className="p-2">
+                            <div className="px-3 py-1.5 flex text-[10px] font-bold text-gray-600 border-b border-gray-200 uppercase">
+                                <span className="w-32 text-center">Provider Code</span>
+                                <span className="flex-1 px-3">Institution Name</span>
+                            </div>
+                            <div className="max-h-[400px] overflow-y-auto custom-scrollbar">
+                                {lookups.lenders.filter(l => (l.supplier_Name || '').toLowerCase().includes(lenderSearchQuery.toLowerCase()) || (l.code || '').toLowerCase().includes(lenderSearchQuery.toLowerCase())).map((lender, idx) => (
+                                    <button key={idx} onClick={() => handleLenderSelect(lender.code, lender.supplier_Name)} className="w-full flex items-center justify-between px-3 py-2 text-xs border-b border-gray-100 hover:bg-blue-50 transition-all text-left group">
+                                        <div className="flex items-center gap-2 flex-1">
+                                            <span className="w-32 text-center font-mono text-[11px] font-bold text-[#0078d4]">{lender.code}</span>
+                                            <span className="flex-1 px-3 font-mono font-medium text-gray-700 uppercase">{lender.supplier_Name}</span>
+                                        </div>
+                                        <div className="bg-[#e49e1b] text-white text-[10px] px-5 py-1.5 rounded-md font-bold uppercase">Select</div>
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Date Modal */}
+            <CalendarModal 
+                isOpen={showOrgDateModal} 
+                onClose={() => setShowOrgDateModal(false)} 
+                onSelect={(date) => handleDateSelect('OrgDate', date)} 
+                currentDate={formData.OrgDate}
+            />
+            {/* Payment Type Search Modal */}
+            {showPayTypeSearch && (
+                <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4 font-['Tahoma']">
+                    <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setShowPayTypeSearch(false)} />
+                    <div className="relative w-full max-w-sm bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
+                        {/* Header */}
+                        <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-100 select-none relative overflow-hidden">
+                            <div className="absolute left-0 top-0 bottom-0 w-1.5 transition-colors duration-500" style={{ backgroundColor: localStorage.getItem('topBarColor') || '#0285fd' }} />
+                            <div className="flex items-center gap-2">
+                                <Search size={16} className="text-[#0078d4]" />
+                                <span className="text-[15px] font-[700] text-slate-900 uppercase tracking-[3px] font-mono truncate">Payment Type</span>
+                            </div>
+                            <button onClick={() => setShowPayTypeSearch(false)} className="w-9 h-8 flex items-center justify-center bg-[#ff3b30] hover:bg-[#e03127] text-white rounded-[8px] shadow-sm active:scale-90"><X size={18} strokeWidth={4} /></button>
+                        </div>
+                        <div className="p-4 space-y-2">
+                            {payTypes.map((type, idx) => (
+                                <button 
+                                    key={idx} 
+                                    onClick={() => handlePayTypeSelect(type)}
+                                    className="w-full px-4 py-3 text-sm font-bold text-gray-700 hover:bg-blue-50 border border-gray-100 rounded-lg transition-all text-left flex justify-between items-center group"
+                                >
+                                    <span className="uppercase tracking-wider">{type}</span>
+                                    <PlusCircle size={16} className="text-gray-300 group-hover:text-[#0078d4] transition-colors" />
+                                </button>
+                            ))}
                         </div>
                     </div>
                 </div>

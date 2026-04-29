@@ -121,7 +121,7 @@ const VendorTypesBoard = ({ isOpen, onClose }) => {
                 title="Vendor Types Master"
                 maxWidth="max-w-xl"
                 footer={
-                    <div className="bg-slate-50 px-6 py-4 w-full flex justify-end gap-3 border-t border-gray-100 mt-4 rounded-b-xl">
+                    <div className="bg-slate-50 px-6  w-full flex justify-end gap-3 border-t border-gray-100 mt-4 rounded-b-xl">
                         <button 
                             onClick={handleSave} 
                             disabled={loading} 
@@ -136,30 +136,19 @@ const VendorTypesBoard = ({ isOpen, onClose }) => {
                         >
                             <RotateCcw size={14} /> Clear
                         </button>
-                        <button 
-                            onClick={onClose} 
-                            className="px-6 h-10 bg-[#d13438] text-white text-[13px] font-bold rounded-[5px] shadow-md shadow-red-200 hover:bg-[#a4262c] transition-all active:scale-95 flex items-center justify-center gap-2"
-                        >
-                            <X size={14} /> Exit
-                        </button>
                     </div>
                 }
             >
-                <div className="py-2 select-none font-['Tahoma'] space-y-4 text-[12.5px] mt-4 min-h-[300px]">
-                    <div className="border-b border-gray-200 pb-4 mb-4 flex items-center justify-center">
-                        <h2 className="text-[17px] font-bold text-black uppercase tracking-tight">Vendor Type Profile & Update</h2>
-                    </div>
-
+                <div className="py-2 select-none font-['Tahoma'] space-y-4 text-[12.5px] mt-1">
                     <div className="space-y-4">
                         {/* Vendor Type Selection */}
                         <div className="flex items-center gap-6">
-                            <label className="w-32 font-bold text-gray-700">Vendor Type</label>
+                            <label className="w-[119px] font-bold text-gray-700">Vendor Type</label>
                             <div className="flex-1 flex gap-3">
                                 <input 
                                     type="text" 
                                     value={formData.VendorType} 
                                     onChange={(e) => setFormData(prev => ({ ...prev, VendorType: e.target.value }))}
-                                    placeholder="Enter or Search Vendor Type..." 
                                     className="flex-1 h-8 border border-gray-300 px-3 text-[12.5px] bg-white rounded-[5px] outline-none focus:border-blue-400 font-bold text-gray-700 shadow-sm transition-all focus:shadow-md" 
                                 />
                                 <button 
@@ -172,15 +161,14 @@ const VendorTypesBoard = ({ isOpen, onClose }) => {
                         </div>
 
                         {/* Account Selection */}
-                        <div className="flex items-start gap-6">
-                            <label className="w-32 font-bold text-gray-700 mt-2">Payable Account</label>
+                        <div className="flex items-center gap-6">
+                            <label className="w-32 font-bold text-gray-700">Payable Account</label>
                             <div className="flex-1 space-y-3">
                                 <div className="flex gap-3">
                                     <input 
                                         type="text" 
                                         value={formData.PaybleAccCode} 
                                         readOnly
-                                        placeholder="Acc Code" 
                                         className="w-32 h-8 border border-gray-300 px-2 bg-white rounded-[5px] outline-none font-bold text-blue-600 shadow-sm text-center cursor-default" 
                                     />
                                     <div className="flex-1 flex gap-3">
@@ -188,7 +176,6 @@ const VendorTypesBoard = ({ isOpen, onClose }) => {
                                             type="text" 
                                             value={formData.PaybleAccName} 
                                             readOnly 
-                                            placeholder="Account Name..." 
                                             className="flex-1 h-8 border border-gray-300 px-3 bg-gray-50 rounded-[5px] outline-none text-gray-600 font-bold shadow-sm cursor-default" 
                                         />
                                         <button 

@@ -55,20 +55,19 @@ const MasterSubModal = ({ isOpen, onClose }) => {
     if (!isOpen) return null;
 
     const menuItems = [
-        { icon: Building2, label: 'Open Company...', shortcut: 'Ctrl+O', onClick: () => setShowCompanyBoard(true) },
+        { icon: Building2, label: 'Open Company', shortcut: '', onClick: () => setShowCompanyBoard(true) },
         { icon: Target, label: 'Cost Center Master', shortcut: '', onClick: () => setShowCostCenterBoard(true) },
-        { icon: Briefcase, label: 'Create Department...', shortcut: '', onClick: () => setShowDepartmentBoard(true) },
-        { icon: Layers, label: 'Create Category...', shortcut: '', onClick: () => setShowCategoryBoard(true) },
-        { icon: UserSquare, label: 'Supplier Master...', shortcut: '', onClick: () => setShowSupplierMasterBoard(true) },
-        { icon: Users, label: 'Customer Master...', shortcut: '', onClick: () => setShowCustomerMasterBoard(true) },
+        { icon: Briefcase, label: 'Create Department', shortcut: '', onClick: () => setShowDepartmentBoard(true) },
+        { icon: Layers, label: 'Create Category', shortcut: '', onClick: () => setShowCategoryBoard(true) },
+        { icon: UserSquare, label: 'Supplier Master', shortcut: '', onClick: () => setShowSupplierMasterBoard(true) },
+        { icon: Users, label: 'Customer Master', shortcut: '', onClick: () => setShowCustomerMasterBoard(true) },
         { icon: CreditCard, label: 'Card Sale Commission', shortcut: '', onClick: () => setShowCardCommissionBoard(true) },
         { icon: PieChart, label: 'Chart of Accountant', hasSubmenu: true, onClick: () => setShowChartOfAccountantModal(true) },
-        { icon: UserCog, label: 'User Profile Maintenance...', shortcut: '', onClick: () => setShowUserProfileBoard(true) },
+        { icon: UserCog, label: 'User Profile Maintenance', shortcut: '', onClick: () => setShowUserProfileBoard(true) },
         { icon: Settings, label: 'Vendor Types', shortcut: '', onClick: () => setShowVendorTypesBoard(true) },
         { icon: Key, label: 'Change Password', shortcut: '', onClick: () => setShowChangePasswordBoard(true) },
         { type: 'separator' },
-        { icon: LogOut, label: 'Log Off', shortcut: 'Alt+F4', color: 'text-red-600', onClick: handleLogOff },
-
+        { icon: LogOut, label: 'Log Off', shortcut: '', color: 'text-red-600', onClick: handleLogOff },
     ];
 
     return (
@@ -89,7 +88,7 @@ const MasterSubModal = ({ isOpen, onClose }) => {
                         />
                         <div className="flex items-center gap-2">
                             <Layers size={14} className="text-[#0078d4]" />
-                            <span className="text-lg font-bold text-slate-800 tracking-tight">Master File Management</span>
+                            <span className="text-[15px] font-[700] text-slate-900 uppercase tracking-[3px] font-mono truncate">Master File Management</span>
                         </div>
                         <button 
                             onClick={onClose} 
@@ -121,7 +120,7 @@ const MasterSubModal = ({ isOpen, onClose }) => {
                                         <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center group-hover:bg-white transition-colors shadow-sm group-hover:shadow-md">
                                             <Icon size={16} className={`text-slate-500 transition-colors ${item.color || 'group-hover:text-[#0078d4]'}`} style={{ color: !item.color ? undefined : undefined }} />
                                         </div>
-                                        <span className={`text-[13px] font-semibold ${item.color || 'text-slate-700'} group-hover:text-slate-900 transition-colors`}>
+                                        <span className={`text-[13px] font-bold ${item.color || 'text-slate-700'} group-hover:text-slate-900 transition-colors`}>
                                             {item.label}
                                         </span>
                                     </div>
@@ -132,7 +131,6 @@ const MasterSubModal = ({ isOpen, onClose }) => {
                                                 {item.shortcut}
                                             </span>
                                         )}
-                                        <ChevronRight size={14} className="text-slate-300 group-hover:text-slate-500 group-hover:translate-x-0.5 transition-all" />
                                     </div>
                                 </button>
                             );

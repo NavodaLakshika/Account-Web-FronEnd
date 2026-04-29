@@ -163,7 +163,7 @@ const CategoryBoard = ({ isOpen, onClose }) => {
     };
 
     const footer = (
-        <div className="bg-slate-50 px-6 py-4 w-full flex justify-end gap-3 border-t border-gray-100 mt-4 rounded-b-xl">
+        <div className="bg-slate-50 px-6  w-full flex justify-end gap-3 border-t border-gray-100 mt-4 rounded-b-xl">
             <button 
                 onClick={handleSave} 
                 disabled={loading} 
@@ -185,24 +185,13 @@ const CategoryBoard = ({ isOpen, onClose }) => {
             >
                 <RotateCcw size={14} /> Clear
             </button>
-            <button 
-                onClick={onClose} 
-                className="px-6 h-10 bg-[#d13438] text-white text-[13px] font-bold rounded-[5px] shadow-md shadow-red-200 hover:bg-[#a4262c] transition-all active:scale-95 flex items-center justify-center gap-2"
-            >
-                <X size={14} /> Exit
-            </button>
         </div>
     );
 
     return (
         <>
             <SimpleModal isOpen={isOpen} onClose={onClose} title="Category Selection" maxWidth="max-w-xl" footer={footer}>
-                <div className="py-2 select-none font-['Tahoma'] space-y-4 text-[12.5px] mt-4 min-h-[300px]">
-                    <div className="border-b border-gray-200 pb-4 mb-4 flex items-center justify-center gap-3">
-                        <Layers size={20} className="text-[#0078d4]" />
-                        <h2 className="text-[17px] font-bold text-black uppercase tracking-tight">Category Details Profile & Update</h2>
-                    </div>
-                    
+                <div className="py-2 select-none font-['Tahoma'] space-y-4 text-[12.5px] mt-1">
                     <div className="space-y-3">
                         {/* Department ID Row */}
                         <div className="flex items-center gap-6">
@@ -226,7 +215,7 @@ const CategoryBoard = ({ isOpen, onClose }) => {
                                     value={formData.Dept_Name} 
                                     readOnly 
                                     className="flex-1 h-8 font-mono border border-gray-300 px-3 bg-gray-50 rounded-[5px] outline-none shadow-sm cursor-default" 
-                                    placeholder="Department Name" 
+                                    placeholder="" 
                                 />
                             </div>
                         </div>
@@ -238,7 +227,7 @@ const CategoryBoard = ({ isOpen, onClose }) => {
                                 <input 
                                     type="text" 
                                     name="Code" 
-                                    value={formData.Code || 'AUTO-GEN'} 
+                                    value={formData.Code || ''} 
                                     readOnly 
                                     className="w-32 h-8 border border-gray-300 px-2 bg-white rounded-[5px] outline-none font-bold text-blue-600 shadow-sm text-center" 
                                 />
@@ -260,7 +249,7 @@ const CategoryBoard = ({ isOpen, onClose }) => {
                                 value={formData.Cat_Name} 
                                 onChange={handleInputChange} 
                                 className="flex-1 h-8 font-mono border border-gray-300 px-3 bg-white rounded-[5px] outline-none focus:border-blue-400 shadow-sm transition-all focus:shadow-md" 
-                                placeholder="Enter Category Name" 
+                                placeholder="" 
                             />
                         </div>
                     </div>
@@ -301,10 +290,15 @@ const SearchModal = ({ title, list, onSelect, onClose, placeholder, columns = ['
             <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={onClose} />
             <div className="relative w-full max-w-2xl bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
                 {/* Header */}
-                <div className="bg-[#0078d4] px-4 py-2 flex items-center justify-between text-white">
+                <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-100 select-none relative overflow-hidden">
+                    {/* System Color Left Accent */}
+                    <div 
+                        className="absolute left-0 top-0 bottom-0 w-1.5 transition-colors duration-500" 
+                        style={{ backgroundColor: localStorage.getItem('topBarColor') || '#0285fd' }}
+                    />
                     <div className="flex items-center gap-2">
-                        <Search size={16} />
-                        <span className="text-sm font-bold uppercase tracking-tight">{title} Lookup</span>
+                        <Search size={16} className="text-[#0078d4]" />
+                        <span className="text-[15px] font-[700] text-slate-900 uppercase tracking-[3px] font-mono truncate">{title} Lookup</span>
                     </div>
                     <button
                         onClick={onClose}
@@ -332,7 +326,7 @@ const SearchModal = ({ title, list, onSelect, onClose, placeholder, columns = ['
 
                 {/* Results List */}
                 <div className="p-2">
-                    <div className="bg-gray-100 px-3 py-1.5 flex text-[10px] font-bold text-gray-600 border-b border-gray-200 uppercase tracking-wider">
+                    <div className=" px-3 py-1.5 flex text-[10px] font-bold text-gray-600 border-b border-gray-200 uppercase tracking-wider">
                         <span className="w-24 text-center">Code</span>
                         <span className="flex-1 px-3">Display Name</span>
                     </div>
@@ -363,7 +357,6 @@ const SearchModal = ({ title, list, onSelect, onClose, placeholder, columns = ['
                 {/* Footer */}
                 <div className="bg-gray-50 px-4 py-2 border-t border-gray-200 flex justify-between items-center text-[10px] text-gray-400">
                     <span>{list.length} Result(s)</span>
-                    <span className="italic font-bold text-[#0078d4]">ACCOUNT CLOUD INFRASTRUCTURE</span>
                 </div>
             </div>
         </div>

@@ -59,7 +59,7 @@ const CustomerCenterModal = ({ isOpen, onClose, onOpenSalesOrder, onOpenCustomer
                 <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-100 select-none">
                     <div className="flex items-center gap-2">
                         <Users size={14} className="text-[#0078d4]" />
-                        <span className="text-lg font-bold text-slate-800 tracking-tight">Customer Center</span>
+                        <span className="text-[15px] font-[700] text-slate-900 uppercase tracking-[3px] font-mono truncate">Customer Center</span>
                     </div>
                     <button 
                         onClick={onClose} 
@@ -82,7 +82,7 @@ const CustomerCenterModal = ({ isOpen, onClose, onOpenSalesOrder, onOpenCustomer
                             >
                                 <div className="flex items-center gap-3">
                                     <Icon size={16} className={`text-gray-500 group-hover:text-white transition-colors`} />
-                                    <span className={`text-[13px] font-medium text-gray-700 group-hover:text-white transition-colors`}>
+                                    <span className={`text-[14px] font-bold text-gray-700 group-hover:text-white transition-colors`}>
                                         {item.label}
                                     </span>
                                 </div>

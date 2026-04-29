@@ -23,6 +23,22 @@ const CompanySelectModal = ({ isOpen, onClose, onSelect, user }) => {
     const [fetching, setFetching] = useState(true);
     const [companies, setCompanies] = useState([]);
     const [selectedCompanyId, setSelectedCompanyId] = useState(null);
+    const [displayedText, setDisplayedText] = useState('');
+    const fullText = "Select Your Company";
+
+    useEffect(() => {
+        if (isOpen) {
+            let i = 0;
+            const timer = setInterval(() => {
+                i++;
+                setDisplayedText(fullText.slice(0, i));
+                if (i >= fullText.length) clearInterval(timer);
+            }, 80); // 80ms per letter
+            return () => clearInterval(timer);
+        } else {
+            setDisplayedText('');
+        }
+    }, [isOpen]);
 
     const userName = user ? (user.EmpName || user.empName || user.Emp_Name || 'User') : 'Guest';
 
@@ -117,8 +133,9 @@ const CompanySelectModal = ({ isOpen, onClose, onSelect, user }) => {
             <div className="relative w-full max-w-[420px] flex flex-col items-center animate-in slide-in-from-bottom-20 fade-in duration-500">
                 
                 {/* External Heading (Matching Image Style) */}
-                <h3 className="text-white font-mono font-bold tracking-[0.15em] text-[32px] uppercase mb-8 drop-shadow-lg select-none">
-                    Select Your Company
+                <h3 className="text-white font-mono font-bold tracking-[0.15em] text-[32px] uppercase mb-8 drop-shadow-lg select-none min-h-[48px]">
+                    {displayedText}
+                    <span className="animate-[pulse_1s_ease-in-out_infinite] opacity-70 font-light ml-1">_</span>
                 </h3>
 
                 {/* Main Content Area (Separated Div) */}

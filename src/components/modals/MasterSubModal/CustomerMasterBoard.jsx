@@ -258,7 +258,7 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
     };
 
     const footer = (
-        <div className="bg-slate-50 px-6 py-4 w-full flex justify-end gap-3 border-t border-gray-100 mt-4 rounded-b-xl">
+        <div className="bg-slate-50 px-6  w-full flex justify-end gap-3 border-t border-gray-100 mt-1 rounded-b-xl">
             <button onClick={handleSave} disabled={loading} className={`px-6 h-10 bg-[#50af60] text-white text-sm font-bold rounded-md shadow-md shadow-blue-200 hover:bg-[#24db4e] transition-all active:scale-95 flex items-center justify-center gap-2 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}>
                 {loading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />} 
                 {isEditMode ? 'Update' : 'Save'}
@@ -286,7 +286,7 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
                                 <label className="w-32 font-bold text-gray-700">Customer ID / Name</label>
                                 <div className="flex-1 flex gap-3">
                                     <input type="text" name="Code" value={formData.Code} readOnly className="w-32 h-8 border border-gray-300 px-2 bg-white rounded-[5px] outline-none focus:border-blue-400 font-bold text-blue-600 shadow-sm" />
-                                    <input type="text" name="Cust_Name" value={formData.Cust_Name} onChange={handleInputChange} placeholder="Enter Customer Name" className="flex-1 h-8 font-mono border border-gray-300 px-3 bg-white rounded-[5px] outline-none focus:border-blue-400 shadow-sm transition-all focus:shadow-md" />
+                                    <input type="text" name="Cust_Name" value={formData.Cust_Name} onChange={handleInputChange} placeholder="" className="flex-1 h-8 font-mono border border-gray-300 px-3 bg-white rounded-[5px] outline-none focus:border-blue-400 shadow-sm transition-all focus:shadow-md" />
                                     <button onClick={openSearch} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95">
                                         <Search size={18} />
                                     </button>
@@ -354,7 +354,7 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
                                         type="text"
                                         value={formData.Bank_Name}
                                         readOnly
-                                        placeholder="Select Bank..."
+                                        placeholder=""
                                         className="flex-1 h-8 border border-gray-300 px-3 bg-gray-50 rounded-[5px] outline-none shadow-sm"
                                     />
                                     <button
@@ -370,9 +370,9 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
                             <div className="flex items-center gap-6">
                                 <label className="w-32 font-bold text-gray-700">Branch Detail</label>
                                 <div className="flex-1 flex items-center gap-10">
-                                    <input type="text" name="Brunch" value={formData.Brunch} onChange={handleInputChange} placeholder="Branch Name" className="flex-1 h-8 font-mono border border-gray-300 px-3 bg-white rounded-[5px] outline-none focus:border-blue-400 shadow-sm" />
+                                    <input type="text" name="Brunch" value={formData.Brunch} onChange={handleInputChange} placeholder="" className="flex-1 h-8 font-mono border border-gray-300 px-3 bg-white rounded-[5px] outline-none focus:border-blue-400 shadow-sm" />
                                     <label className="w-20 font-bold text-gray-700 text-center">A/C No</label>
-                                    <input type="text" name="AC_Number" value={formData.AC_Number} onChange={handleInputChange} placeholder="A/C Number" className="flex-1 h-8 font-mono border border-gray-300 px-3 bg-white rounded-[5px] outline-none focus:border-blue-400 shadow-sm" />
+                                    <input type="text" name="AC_Number" value={formData.AC_Number} onChange={handleInputChange} placeholder="" className="flex-1 h-8 font-mono border border-gray-300 px-3 bg-white rounded-[5px] outline-none focus:border-blue-400 shadow-sm" />
                                 </div>
                             </div>
 
@@ -388,7 +388,7 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
                                                 type="text" 
                                                 value={formData.Cust_Typ} 
                                                 readOnly 
-                                                placeholder="Select Type..." 
+                                                placeholder="" 
                                                 className="flex-1 h-8 border border-gray-300 px-3 bg-gray-50 rounded-[5px] outline-none shadow-sm" 
                                             />
                                             <button 
@@ -415,7 +415,7 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
                                 <div className="flex-1 flex gap-2 items-center">
                                     <button onClick={fetchLookups} className="w-10 h-8 bg-white border border-gray-300 flex items-center justify-center hover:bg-gray-50 rounded-[5px] text-[#0078d4] shadow-sm transition-all active:scale-95"><RefreshCcw size={16} /></button>
                                     <input type="text" value={formData.Area_Code} readOnly className="w-24 h-8 border border-gray-300 px-3 bg-gray-50 rounded-[5px] outline-none shadow-sm font-mono text-center" />
-                                    <input type="text" value={formData.Area_Name} readOnly placeholder="Select Area..." className="flex-1 h-8 border border-gray-300 px-3 bg-gray-50 rounded-[5px] outline-none shadow-sm" />
+                                    <input type="text" value={formData.Area_Name} readOnly placeholder="" className="flex-1 h-8 border border-gray-300 px-3 bg-gray-50 rounded-[5px] outline-none shadow-sm" />
                                     <button onClick={() => setShowAreaSearch(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] shadow-md transition-all active:scale-95"><Search size={18} /></button>
                                 </div>
                             </div>
@@ -426,7 +426,7 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
                                 <div className="flex-1 flex gap-2 items-center">
                                     <button onClick={fetchLookups} className="w-10 h-8 bg-white border border-gray-300 flex items-center justify-center hover:bg-gray-50 rounded-sm text-[#0078d4] shadow-sm transition-all active:scale-95"><RefreshCcw size={16} /></button>
                                     <input type="text" value={formData.Route_Code} readOnly className="w-24 h-8 border border-gray-300 px-3 bg-gray-50 rounded-sm outline-none shadow-sm font-mono text-center" />
-                                    <input type="text" value={formData.Route_Name} readOnly placeholder="Select Route..." className="flex-1 h-8 border border-gray-300 px-3 bg-gray-50 rounded-sm outline-none shadow-sm" />
+                                    <input type="text" value={formData.Route_Name} readOnly placeholder="" className="flex-1 h-8 border border-gray-300 px-3 bg-gray-50 rounded-sm outline-none shadow-sm" />
                                     <button onClick={() => setShowRouteSearch(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] shadow-md transition-all active:scale-95"><Search size={18} /></button>
                                 </div>
                             </div>
@@ -440,10 +440,15 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
                     <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setShowSearchModal(false)} />
                     <div className="relative w-full max-w-2xl bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
                         {/* Header */}
-                        <div className="bg-[#0078d4] px-4 py-2 flex items-center justify-between text-white">
+                        <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-100 select-none relative overflow-hidden">
+                            {/* System Color Left Accent */}
+                            <div 
+                                className="absolute left-0 top-0 bottom-0 w-1.5 transition-colors duration-500" 
+                                style={{ backgroundColor: localStorage.getItem('topBarColor') || '#0285fd' }}
+                            />
                             <div className="flex items-center gap-2">
-                                <Search size={16} />
-                                <span className="text-sm font-bold uppercase tracking-tight">Customer Records Lookup</span>
+                                <Search size={16} className="text-[#0078d4]" />
+                                <span className="text-[15px] font-[700] text-slate-900 uppercase tracking-[3px] font-mono truncate">Customer Records Lookup</span>
                             </div>
                             <button
                                 onClick={() => setShowSearchModal(false)}
@@ -471,10 +476,10 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
 
                         {/* Results List */}
                         <div className="p-2">
-                            <div className="bg-gray-100 px-3 py-1.5 flex text-[10px] font-bold text-gray-600 border-b border-gray-200 uppercase tracking-wider">
+                            <div className=" px-3 py-1.5 flex text-[10px] font-bold text-gray-600 border-b border-gray-200 uppercase tracking-wider">
                                 <span className="w-24 text-center">Code</span>
                                 <span className="flex-1 px-3">Customer Name</span>
-                                <span className="w-32 px-3">Phone</span>
+                                <span className="pr-40">Phone</span>
                             </div>
                             <div className="max-h-[400px] overflow-y-auto custom-scrollbar">
                                 {customersList.filter(c => (c.cust_Name || '').toLowerCase().includes(searchQuery.toLowerCase()) || (c.code || '').toLowerCase().includes(searchQuery.toLowerCase())).map(c => (
@@ -506,7 +511,6 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
                         {/* Footer */}
                         <div className="bg-gray-50 px-4 py-2 border-t border-gray-200 flex justify-between items-center text-[10px] text-gray-400">
                             <span>{customersList.length} Result(s) Found</span>
-                            <span className="italic font-bold text-[#0078d4]">ACCOUNT CLOUD INFRASTRUCTURE</span>
                         </div>
                     </div>
                 </div>
@@ -518,10 +522,15 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
                     <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setShowAreaSearch(false)} />
                     <div className="relative w-full max-w-lg bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
                         {/* Header */}
-                        <div className="bg-[#0078d4] px-4 py-2 flex items-center justify-between text-white">
+                        <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-100 select-none relative overflow-hidden">
+                            {/* System Color Left Accent */}
+                            <div 
+                                className="absolute left-0 top-0 bottom-0 w-1.5 transition-colors duration-500" 
+                                style={{ backgroundColor: localStorage.getItem('topBarColor') || '#0285fd' }}
+                            />
                             <div className="flex items-center gap-2">
-                                <Search size={16} />
-                                <span className="text-sm font-bold uppercase tracking-tight">Area Directory Lookup</span>
+                                <Search size={16} className="text-[#0078d4]" />
+                                <span className="text-[15px] font-[700] text-slate-900 uppercase tracking-[3px] font-mono truncate">Area Directory Lookup</span>
                             </div>
                             <button
                                 onClick={() => setShowAreaSearch(false)}
@@ -549,7 +558,7 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
 
                         {/* Results List */}
                         <div className="p-2">
-                            <div className="bg-gray-100 px-3 py-1.5 flex text-[10px] font-bold text-gray-600 border-b border-gray-200 uppercase tracking-wider">
+                            <div className=" px-3 py-1.5 flex text-[10px] font-bold text-gray-600 border-b border-gray-200 uppercase tracking-wider">
                                 <span className="w-24 text-center">Code</span>
                                 <span className="flex-1 px-3">Area Name</span>
                             </div>
@@ -577,7 +586,6 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
                         {/* Footer */}
                         <div className="bg-gray-50 px-4 py-2 border-t border-gray-200 flex justify-between items-center text-[10px] text-gray-400">
                             <span>{areas.length} Areas Available</span>
-                            <span className="italic font-bold text-[#0078d4]">ACCOUNT CLOUD INFRASTRUCTURE</span>
                         </div>
                     </div>
                 </div>
@@ -589,10 +597,15 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
                     <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setShowRouteSearch(false)} />
                     <div className="relative w-full max-w-lg bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
                         {/* Header */}
-                        <div className="bg-[#0078d4] px-4 py-2 flex items-center justify-between text-white">
+                        <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-100 select-none relative overflow-hidden">
+                            {/* System Color Left Accent */}
+                            <div 
+                                className="absolute left-0 top-0 bottom-0 w-1.5 transition-colors duration-500" 
+                                style={{ backgroundColor: localStorage.getItem('topBarColor') || '#0285fd' }}
+                            />
                             <div className="flex items-center gap-2">
-                                <Search size={16} />
-                                <span className="text-sm font-bold uppercase tracking-tight">Route Directory Lookup</span>
+                                <Search size={16} className="text-[#0078d4]" />
+                                <span className="text-[15px] font-[700] text-slate-900 uppercase tracking-[3px] font-mono truncate">Route Directory Lookup</span>
                             </div>
                             <button
                                 onClick={() => setShowRouteSearch(false)}
@@ -620,7 +633,7 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
 
                         {/* Results List */}
                         <div className="p-2">
-                            <div className="bg-gray-100 px-3 py-1.5 flex text-[10px] font-bold text-gray-600 border-b border-gray-200 uppercase tracking-wider">
+                            <div className=" px-3 py-1.5 flex text-[10px] font-bold text-gray-600 border-b border-gray-200 uppercase tracking-wider">
                                 <span className="w-24 text-center">Code</span>
                                 <span className="flex-1 px-3">Route Name</span>
                             </div>
@@ -648,7 +661,6 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
                         {/* Footer */}
                         <div className="bg-gray-50 px-4 py-2 border-t border-gray-200 flex justify-between items-center text-[10px] text-gray-400">
                             <span>{routes.length} Routes Available</span>
-                            <span className="italic font-bold text-[#0078d4]">ACCOUNT CLOUD INFRASTRUCTURE</span>
                         </div>
                     </div>
                 </div>
@@ -660,10 +672,15 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
                     <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setShowBankSearch(false)} />
                     <div className="relative w-full max-w-xl bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
                         {/* Header */}
-                        <div className="bg-[#0078d4] px-4 py-2 flex items-center justify-between text-white">
+                        <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-100 select-none relative overflow-hidden">
+                            {/* System Color Left Accent */}
+                            <div 
+                                className="absolute left-0 top-0 bottom-0 w-1.5 transition-colors duration-500" 
+                                style={{ backgroundColor: localStorage.getItem('topBarColor') || '#0285fd' }}
+                            />
                             <div className="flex items-center gap-2">
-                                <Search size={16} />
-                                <span className="text-sm font-bold uppercase tracking-tight">Bank Directory Lookup</span>
+                                <Search size={16} className="text-[#0078d4]" />
+                                <span className="text-[15px] font-[700] text-slate-900 uppercase tracking-[3px] font-mono truncate">Bank Directory Lookup</span>
                             </div>
                             <button
                                 onClick={() => setShowBankSearch(false)}
@@ -691,7 +708,7 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
 
                         {/* Results List */}
                         <div className="p-2">
-                            <div className="bg-gray-100 px-3 py-1.5 flex text-[10px] font-bold text-gray-600 border-b border-gray-200 uppercase tracking-wider">
+                            <div className=" px-3 py-1.5 flex text-[10px] font-bold text-gray-600 border-b border-gray-200 uppercase tracking-wider">
                                 <span className="w-24 text-center">Code</span>
                                 <span className="flex-1 px-3">Bank Name</span>
                             </div>
@@ -719,7 +736,6 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
                         {/* Footer */}
                         <div className="bg-gray-50 px-4 py-2 border-t border-gray-200 flex justify-between items-center text-[10px] text-gray-400">
                             <span>{banks.length} Banks Registered</span>
-                            <span className="italic font-bold text-[#0078d4]">ACCOUNT CLOUD INFRASTRUCTURE</span>
                         </div>
                     </div>
                 </div>
@@ -731,10 +747,15 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
                     <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setShowTypeSearch(false)} />
                     <div className="relative w-full max-w-lg bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
                         {/* Header */}
-                        <div className="bg-[#0078d4] px-4 py-2 flex items-center justify-between text-white">
+                        <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-100 select-none relative overflow-hidden">
+                            {/* System Color Left Accent */}
+                            <div 
+                                className="absolute left-0 top-0 bottom-0 w-1.5 transition-colors duration-500" 
+                                style={{ backgroundColor: localStorage.getItem('topBarColor') || '#0285fd' }}
+                            />
                             <div className="flex items-center gap-2">
-                                <Search size={16} />
-                                <span className="text-sm font-bold uppercase tracking-tight">Customer Type Directory</span>
+                                <Search size={16} className="text-[#0078d4]" />
+                                <span className="text-[15px] font-[700] text-slate-900 uppercase tracking-[3px] font-mono truncate">Customer Type Directory Lookup</span>
                             </div>
                             <button
                                 onClick={() => setShowTypeSearch(false)}
@@ -762,7 +783,7 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
 
                         {/* Results List */}
                         <div className="p-2">
-                            <div className="bg-gray-100 px-3 py-1.5 flex text-[10px] font-bold text-gray-600 border-b border-gray-200 uppercase tracking-wider">
+                            <div className=" px-3 py-1.5 flex text-[10px] font-bold text-gray-600 border-b border-gray-200 uppercase tracking-wider">
                                 <span className="flex-1 px-3">Type Name</span>
                             </div>
                             <div className="max-h-[300px] overflow-y-auto custom-scrollbar">
@@ -786,7 +807,6 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
                         {/* Footer */}
                         <div className="bg-gray-50 px-4 py-2 border-t border-gray-200 flex justify-between items-center text-[10px] text-gray-400">
                             <span>{customerTypes.length} Types Found</span>
-                            <span className="italic font-bold text-[#0078d4]">ACCOUNT CLOUD INFRASTRUCTURE</span>
                         </div>
                     </div>
                 </div>

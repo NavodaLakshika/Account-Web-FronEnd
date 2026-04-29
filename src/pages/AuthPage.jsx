@@ -6,6 +6,7 @@ import CompanySelectModal from '../components/modals/CompanySelectModal';
 import AboutUsModal from '../components/modals/AboutUsModal';
 import ContactModal from '../components/modals/ContactModal';
 import HelpModal from '../components/modals/HelpModal';
+import WelcomeModal from '../components/modals/WelcomeModal';
 import toast from 'react-hot-toast';
 
 import { DotLottiePlayer } from '@dotlottie/react-player';
@@ -25,6 +26,8 @@ const AuthPage = () => {
     const [showAboutUs, setShowAboutUs] = useState(false);
     const [showContact, setShowContact] = useState(false);
     const [showHelp, setShowHelp] = useState(false);
+    const [showWelcome, setShowWelcome] = useState(false);
+    const [displayedSignInText, setDisplayedSignInText] = useState('');
 
     const translations = {
         EN: {
@@ -54,6 +57,21 @@ const AuthPage = () => {
             videoRef.current.playbackRate = 0.75;
         }
     }, []);
+
+    const fullSignInText = lang === 'EN' ? 'SIGN IN' : t.login;
+
+    useEffect(() => {
+        if (!showForgot) {
+            let i = 0;
+            setDisplayedSignInText('');
+            const timer = setInterval(() => {
+                i++;
+                setDisplayedSignInText(fullSignInText.slice(0, i));
+                if (i >= fullSignInText.length) clearInterval(timer);
+            }, 80);
+            return () => clearInterval(timer);
+        }
+    }, [showForgot, lang, fullSignInText]);
 
     const handleLoginChange = (e) => setLoginData({ ...loginData, [e.target.name]: e.target.value });
 
@@ -141,9 +159,9 @@ const AuthPage = () => {
             
             handleLoginSuccessToast(result.message || 'Verification Successful');
             
-            // Directly show the selection modal after toast animation
+            // Show the welcome modal after toast animation starts
             setTimeout(() => {
-                setShowSelection(true);
+                setShowWelcome(true);
             }, 1000);
         } catch (err) {
             const errorMessage = typeof err === 'object' ? (err.message || err.Message || 'Invalid credentials') : err;
@@ -230,8 +248,9 @@ const AuthPage = () => {
                 <div className="flex-1 max-w-md w-full py-12">
                     {!showForgot ? (
                         <>
-                            <h2 className="text-white text-3xl font-tahoma font-bold mb-8 transition-opacity duration-500">
-                                {lang === 'EN' ? 'Sign In' : t.login}
+                            <h2 className="text-white text-3xl font-tahoma font-bold mb-8 transition-opacity duration-500 min-h-[40px]">
+                                {displayedSignInText}
+                                <span className="animate-[pulse_1s_ease-in-out_infinite] opacity-70 font-light ml-1">_</span>
                             </h2>
                             <form onSubmit={handleLogin} className="space-y-4">
                                 <div className="space-y-1">
@@ -414,6 +433,16 @@ const AuthPage = () => {
             <div className="absolute bottom-6 left-10 text-[12px] text-white/40 font-mono tracking-wide">
                 Powered by Onimta Information Technology Pvt Ltd
             </div>
+
+            {/* Welcome Modal */}
+            <WelcomeModal 
+                isOpen={showWelcome} 
+                user={currentUser}
+                onComplete={() => {
+                    setShowWelcome(false);
+                    setShowSelection(true);
+                }}
+            />
 
             {/* Company Selection Modal */}
             <CompanySelectModal 
