@@ -622,21 +622,60 @@ const Dashboard = () => {
             />
 
             {/* AI Thinking Overlay (Robot Animation centered) */}
-            {isAIThinking && (
-                <div className="fixed inset-0 z-[1100] flex items-center justify-center bg-white transition-all duration-500">
-                    <div className="flex flex-col items-center">
-                        <DotLottiePlayer
-                            src="/images/Ai Robot Vector Art.lottie"
-                            autoplay
-                            loop
-                            className="w-96 h-96"
-                        />
-                        <div className="mt-8 text-[#0078d4] text-[10px] font-black uppercase tracking-[0.8em] animate-pulse">
-                            Initializing Assistant
+            {isAIThinking && (() => {
+                const FULL_TEXT = 'Assistant';
+                const AITypingText = () => {
+                    const [displayed, setDisplayed] = React.useState('');
+                    React.useEffect(() => {
+                        let i = 0;
+                        setDisplayed('');
+                        const iv = setInterval(() => {
+                            i++;
+                            setDisplayed(FULL_TEXT.slice(0, i));
+                            if (i >= FULL_TEXT.length) { clearInterval(iv); }
+                        }, 80);
+                        return () => clearInterval(iv);
+                    }, []);
+                    return (
+                        <span>
+                            {displayed}
+                            <span className="inline-block w-[2px] h-[14px] bg-[#0285fd] ml-1 align-middle animate-[blink_1s_step-end_infinite]" />
+                        </span>
+                    );
+                };
+                return (
+                    <div className="fixed inset-0 z-[1100] flex items-center justify-center bg-white transition-all duration-500 overflow-hidden">
+                        {/* Giant ghost watermark text behind lottie */}
+                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
+                            <span
+                                className="text-[12vw] font-black uppercase tracking-[0.15em] text-[#0285fd]/[0.04] leading-none whitespace-nowrap"
+                                style={{ fontFamily: 'Tahoma, sans-serif' }}
+                            >
+                                A&nbsp;&nbsp;I
+                            </span>
                         </div>
+
+                        {/* Subtle radial glow behind lottie */}
+                        <div className="absolute w-[500px] h-[500px] rounded-full bg-[#0285fd]/5 blur-3xl pointer-events-none" />
+
+                        <div className="relative flex flex-col items-center z-10">
+                            <DotLottiePlayer
+                                src="/images/Ai Robot Vector Art.lottie"
+                                autoplay
+                                loop
+                                className="w-[320px] h-[320px]"
+                            />
+                            <div className="mt-2 text-[#0285fd] text-[13px] font-black uppercase tracking-[0.55em] font-mono">
+                                <AITypingText />
+                            </div>
+                        </div>
+
+                        <style>{`
+                            @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+                        `}</style>
                     </div>
-                </div>
-            )}
+                );
+            })()}
 
 
 

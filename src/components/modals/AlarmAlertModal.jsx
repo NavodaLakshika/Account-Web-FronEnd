@@ -43,23 +43,23 @@ const AlarmAlertModal = ({ isOpen, onClose, task, onComplete }) => {
 
                 {/* Content Section (White) */}
                 <div className="p-8 pt-6 flex flex-col items-center text-center">
-                    <h2 className="text-[26px] font-black text-slate-800 mb-1 tracking-tighter uppercase">
+                    <h2 className="text-[36px] font-mono font-bold text-slate-800 mb-1 tracking-tighter uppercase">
                         Reminder!
                     </h2>
                     
-                    <p className="text-slate-600 text-[14px] font-bold leading-snug mb-6 px-2">
+                    <p className="text-slate-600 text-[12px] font-mono font-bold leading-snug mb-6 px-2">
                         You have one pending job for today.
                     </p>
 
                     {/* Time/Date Info Inside Content */}
                     <div className="flex gap-3 mb-8 w-full">
                         <div className="flex-1 py-2.5 bg-slate-50 rounded-xl border border-slate-100 uppercase">
-                             <span className="text-[9px] font-black text-slate-400 block mb-0.5">Time</span>
-                             <span className="text-sm font-black text-[#000080]">{task.time || task.Time}</span>
+                             <span className="text-[12px] font-mono text-slate-400 block mb-0.5">Time</span>
+                             <span className="text-sm font-bold text-[#000080]">{task.time || task.Time}</span>
                         </div>
                         <div className="flex-1 py-2.5 bg-slate-50 rounded-xl border border-slate-100 uppercase">
-                             <span className="text-[9px] font-black text-slate-400 block mb-0.5">Date</span>
-                             <span className="text-sm font-black text-slate-700">{task.date || task.Date}</span>
+                             <span className="text-[12px] font-mono text-slate-400 block mb-0.5">Date</span>
+                             <span className="text-sm font-bold text-slate-700">{task.date || task.Date}</span>
                         </div>
                     </div>
 
@@ -72,14 +72,14 @@ const AlarmAlertModal = ({ isOpen, onClose, task, onComplete }) => {
                             }}
                             className="w-full h-[48px] bg-[#f05252] text-white text-[13px] font-black rounded-[10px] hover:bg-red-600 shadow-lg shadow-red-100 transition-all active:scale-95 flex items-center justify-center gap-2 uppercase tracking-widest"
                         >
-                            <Check size={16} /> Mark Done
+                         Mark Done
                         </button>
                         
                         <button 
                             onClick={onClose}
                             className="w-full h-[48px] bg-white border-2 border-slate-200 text-slate-500 text-[13px] font-black rounded-[10px] hover:bg-slate-50 transition-all active:scale-95 flex items-center justify-center gap-2 uppercase tracking-widest"
                         >
-                            <X size={16} /> Dismiss (30m)
+                             Dismiss 
                         </button>
                     </div>
                 </div>

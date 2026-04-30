@@ -230,7 +230,7 @@ const EnterBillBoard = ({ isOpen, onClose }) => {
                                         value={formData.postDate} 
                                         className="w-[110px] px-2 text-[13px] border border-gray-300 rounded-[5px] outline-none text-gray-700 font-mono font-bold bg-gray-50 text-center shadow-sm" 
                                     />
-                                    <button onClick={() => openCalendar('postDate')} className="w-9 h-8 bg-white border border-gray-300 text-blue-600 flex items-center justify-center hover:bg-blue-50 rounded-[5px] transition-all shadow-sm active:scale-90">
+                                    <button onClick={() => openCalendar('postDate')} className="w-9 h-8 bg-[#0285fd] border border-gray-300 text-white flex items-center justify-center hover:bg-blue-50 rounded-[5px] transition-all shadow-sm active:scale-90">
                                         <Calendar size={14} />
                                     </button>
                                 </div>
@@ -311,7 +311,7 @@ const EnterBillBoard = ({ isOpen, onClose }) => {
                                             value={formData.billDueDate}
                                             className="flex-1 h-8 font-mono border border-gray-300 px-3 text-[13px] outline-none rounded-[5px] font-bold text-blue-800 bg-gray-50 shadow-sm text-center"
                                         />
-                                        <button onClick={() => openCalendar('billDueDate')} className="w-9 h-8 bg-white border border-gray-300 text-blue-600 flex items-center justify-center hover:bg-blue-50 rounded-[5px] transition-all shadow-sm active:scale-90">
+                                        <button onClick={() => openCalendar('billDueDate')} className="w-9 h-8 bg-[#0285fd] border border-gray-300 text-white flex items-center justify-center hover:bg-blue-50 rounded-[5px] transition-all shadow-sm active:scale-90">
                                             <Calendar size={16} />
                                         </button>
                                     </div>

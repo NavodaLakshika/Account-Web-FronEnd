@@ -16,13 +16,13 @@ const LogoutConfirmModal = ({ isOpen, onClose, onConfirm, loading = false }) => 
             <div className="relative w-full max-w-md bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden animate-in zoom-in-95 duration-200">
                 
                 {/* Close button (optional, but keep for consistency with other modals) */}
-                <button 
+                {/* <button 
                     onClick={onClose}
                     disabled={loading}
                     className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 transition-colors"
                 >
                     <X size={20} />
-                </button>
+                </button> */}
 
                 <div className="p-8 text-center">
                     {/* Icon Container - Matching Red Circle Style */}

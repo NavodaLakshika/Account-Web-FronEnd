@@ -94,7 +94,7 @@ const WelcomeModal = ({ isOpen, onComplete, user }) => {
             <div className="absolute inset-0 bg-slate-900/80 backdrop-blur-md" />
 
 
-            
+
             {/* Stylish External Header (Outside Modal) */}
             <div className="relative mb-12 animate-in fade-in slide-in-from-top-8 duration-1000 flex flex-col items-center">
                 <div className="absolute -top-6 text-white/5 text-[120px] font-black tracking-[0.3em] uppercase whitespace-nowrap select-none pointer-events-none">
@@ -115,11 +115,11 @@ const WelcomeModal = ({ isOpen, onComplete, user }) => {
                             @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap');
                         `}
                     </style>
-                    
+
                     {/* Left Section: Welcome Text and Branding */}
                     <div className="flex flex-col items-start text-left flex-1">
                         {/* Dynamic Greeting Header */}
-                        <div className="mb-8 animate-in fade-in slide-in-from-left-4 duration-700 flex flex-col items-start"> 
+                        <div className="mb-8 animate-in fade-in slide-in-from-left-4 duration-700 flex flex-col items-start">
                             <h2 className="text-[54px] font-bold text-slate-800 tracking-[4px] leading-none mb-2">
                                 {greeting}
                             </h2>
@@ -148,7 +148,7 @@ const WelcomeModal = ({ isOpen, onComplete, user }) => {
                             </div>
                         </div>
                     </div>
-                    
+
                     {/* Right Section: Large Circular Loader */}
                     <div className="flex flex-col items-center min-w-[280px] animate-in fade-in slide-in-from-right-4 duration-700 delay-150 relative z-10">
                         <div className="relative w-44 h-44 flex items-center justify-center">
@@ -222,9 +222,8 @@ const WelcomeModal = ({ isOpen, onComplete, user }) => {
                     </div> */}
 
                     <div className="flex flex-col items-end text-right">
-                        <p className={`text-[11px] font-mono font-bold tracking-tight truncate max-w-[350px] ${
-                            visibleLogs[visibleLogs.length - 1]?.startsWith('[OK]') ? 'text-emerald-600' : 'text-[#00acee]'
-                        }`}>
+                        <p className={`text-[11px] font-mono font-bold tracking-tight truncate max-w-[350px] ${visibleLogs[visibleLogs.length - 1]?.startsWith('[OK]') ? 'text-emerald-600' : 'text-[#00acee]'
+                            }`}>
                             {visibleLogs[visibleLogs.length - 1] || 'INITIALIZING SECURE PROTOCOLS...'}
                         </p>
                     </div>
@@ -233,7 +232,7 @@ const WelcomeModal = ({ isOpen, onComplete, user }) => {
 
             {/* Dedicated White Load Bar (Ultra Low Profile) */}
             <div className="mt-2 w-full max-w-4xl bg-white/20 rounded-full h-1 overflow-hidden border border-white/5">
-                <div 
+                <div
                     className="h-full bg-white shadow-[0_0_15px_rgba(255,255,255,1)] transition-all duration-75 ease-linear"
                     style={{ width: `${progress}%` }}
                 />

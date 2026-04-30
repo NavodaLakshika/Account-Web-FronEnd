@@ -210,12 +210,16 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                                     </div>
                                 </FormRow>
                                 <FormRow label="Date">
-                                    <div
-                                        className="flex items-center border border-gray-300 bg-white h-9 w-[180px] rounded-[5px] px-3 hover:border-[#0285fd] transition-colors cursor-pointer group shadow-sm"
-                                        onClick={() => setShowDateModal(true)}
-                                    >
-                                        <span className="flex-1 text-[13px] font-mono font-bold text-gray-700 capitalize">{formatDate(formData.date)}</span>
-                                        <Calendar size={14} className="text-gray-400 group-hover:text-[#0285fd]" />
+                                    <div className="flex gap-1 w-[200px]">
+                                        <input
+                                            type="text"
+                                            readOnly
+                                            value={formatDate(formData.date)}
+                                            className="flex-1 h-9 border border-gray-300 px-2 text-[13px] font-mono font-bold bg-gray-50 outline-none rounded-[5px] text-slate-700"
+                                        />
+                                        <button onClick={() => setShowDateModal(true)} className="w-9 h-9 shrink-0 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-colors border-none shadow-sm">
+                                            <Calendar size={14} />
+                                        </button>
                                     </div>
                                 </FormRow>
                             </div>
@@ -326,12 +330,16 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                                     />
                                 </FormRow>
                                 <FormRow label="Due Date">
-                                    <div
-                                        className="flex items-center border border-gray-300 bg-white h-9 w-full rounded-[5px] px-3 hover:border-[#0285fd] transition-colors cursor-pointer group shadow-sm mt-1"
-                                        onClick={() => setShowDueDateModal(true)}
-                                    >
-                                        <span className="flex-1 text-[13px] font-mono font-bold text-gray-700 capitalize">{formatDate(formData.dueDate)}</span>
-                                        <Calendar size={14} className="text-gray-400 group-hover:text-[#0285fd]" />
+                                    <div className="flex gap-1 w-full mt-1">
+                                        <input
+                                            type="text"
+                                            readOnly
+                                            value={formatDate(formData.dueDate)}
+                                            className="w-full h-9 border border-gray-300 px-2 text-[13px] font-mono font-bold bg-gray-50 outline-none rounded-[5px] text-slate-700"
+                                        />
+                                        <button onClick={() => setShowDueDateModal(true)} className="w-9 h-9 shrink-0 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-colors border-none shadow-sm">
+                                            <Calendar size={14} />
+                                        </button>
                                     </div>
                                 </FormRow>
                                 <FormRow label="Ref No">
