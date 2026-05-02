@@ -96,7 +96,7 @@ const TrialBalanceBoard = ({ isOpen, onClose }) => {
                                         value={formData.dateFrom}
                                         className="flex-1 px-3 text-[12.5px] border border-gray-300 bg-gray-50/50 rounded-[3px] outline-none text-slate-800 font-mono font-bold shadow-sm"
                                     />
-                                    <button onClick={() => setShowCalendarFrom(true)} className="w-10 h-9 bg-white border border-gray-300 text-slate-500 flex items-center justify-center hover:bg-slate-50 rounded-[3px] transition-all shadow-sm active:scale-90 shrink-0">
+                                    <button onClick={() => setShowCalendarFrom(true)} className="w-10 h-9 bg-[#0285fd] text-white flex items-center justify-center rounded-[3px] transition-all shadow-sm active:scale-90 shrink-0">
                                         <Calendar size={15} />
                                     </button>
                                 </div>
@@ -111,7 +111,7 @@ const TrialBalanceBoard = ({ isOpen, onClose }) => {
                                         value={formData.dateTo}
                                         className="flex-1 px-3 text-[12.5px] border border-gray-300 bg-gray-50/50 rounded-[3px] outline-none text-slate-800 font-mono font-bold shadow-sm"
                                     />
-                                    <button onClick={() => setShowCalendarTo(true)} className="w-10 h-9 bg-white border border-gray-300 text-slate-500 flex items-center justify-center hover:bg-slate-50 rounded-[3px] transition-all shadow-sm active:scale-90 shrink-0">
+                                    <button onClick={() => setShowCalendarTo(true)} className="w-10 h-9 bg-[#0285fd] text-white flex items-center justify-center rounded-[3px] transition-all shadow-sm active:scale-90 shrink-0">
                                         <Calendar size={15} />
                                     </button>
                                 </div>

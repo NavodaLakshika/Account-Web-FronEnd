@@ -2,92 +2,68 @@ import axios from 'axios';
 
 const api = axios.create({
   baseURL: '/api/PettyCash',
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  headers: { 'Content-Type': 'application/json' },
 });
 
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
+    if (token) config.headers.Authorization = `Bearer ${token}`;
     return config;
   },
   (error) => Promise.reject(error)
 );
 
 export const pettyCashService = {
-  async getLookups(company) {
-    try {
-      const response = await api.get('/lookups', { params: { company } });
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching lookups:', error);
-      throw error;
-    }
+  getLookups: async (company) => {
+    const r = await api.get('/lookups', { params: { company } });
+    return r.data;
   },
 
   getBalance: async (accountCode, costCenter, company) => {
-    try {
-      const response = await api.get('/balance', {
-        params: { accountCode, costCenter, company }
-      });
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching balance:', error); // Added console.error for consistency
-      throw error;
-    }
+    const r = await api.get('/balance', { params: { accountCode, costCenter, company } });
+    return r.data;
   },
 
-  async generateDocNo(company) {
-    try {
-      const response = await api.get('/generate-doc', { params: { company } });
-      return response.data;
-    } catch (error) {
-       console.error('Error generating doc no:', error);
-       throw error;
-    }
+  generateDocNo: async (company) => {
+    const r = await api.get('/generate-doc', { params: { company } });
+    return r.data;
   },
 
-  async saveDraft(data) {
-    try {
-      const response = await api.post('/save', data);
-      return response.data;
-    } catch (error) {
-      console.error('Error saving draft:', error);
-      throw error;
-    }
+  addExpense: async (userName, data) => {
+    const r = await api.post('/add-expense', data, { params: { userName } });
+    return r.data;
   },
 
-  async applyPettyCash(data) {
-    try {
-      const response = await api.post('/apply', data);
-      return response.data;
-    } catch (error) {
-      console.error('Error applying petty cash:', error);
-      throw error;
-    }
+  deleteExpense: async (userName, data) => {
+    const r = await api.post('/delete-expense', data, { params: { userName } });
+    return r.data;
   },
 
-  async searchDocs(company) {
-    try {
-      const response = await api.get('/search', { params: { company } });
-      return response.data;
-    } catch (error) {
-      console.error('Error searching docs:', error);
-      throw error;
-    }
+  apply: async (userName, data) => {
+    const r = await api.post('/apply', data, { params: { userName } });
+    return r.data;
   },
 
-  async getOrder(docNo, company) {
-    try {
-      const response = await api.get(`/${docNo}`, { params: { company } });
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching order:', error);
-      throw error;
-    }
-  }
+  applyPettyCash: async (data) => {
+    // For HomeMaster compatibility, pass empty username or get from localStorage
+    const userName = localStorage.getItem('userName') || 'SYSTEM';
+    const r = await api.post('/apply', data, { params: { userName } });
+    return r.data;
+  },
+
+  searchDocs: async (company) => {
+    const r = await api.get('/search', { params: { company } });
+    return r.data;
+  },
+
+  getDraft: async (docNo, company) => {
+    const r = await api.get(`/${docNo}`, { params: { company } });
+    return r.data;
+  },
+
+  clearDraft: async (docNo, company) => {
+    const r = await api.delete('/clear', { params: { docNo, company } });
+    return r.data;
+  },
 };

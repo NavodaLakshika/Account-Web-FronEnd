@@ -127,7 +127,7 @@ const JournalEntryBoard = ({ isOpen, onClose }) => {
                                         value={formData.entryDate}
                                         className="w-[110px] px-2 text-[12px] border border-gray-300 rounded-[5px] outline-none text-slate-700 font-bold bg-white text-center shadow-sm"
                                     />
-                                    <button onClick={() => setShowCalendar(true)} className="w-9 h-8 bg-white border border-gray-300 text-[#0285fd] flex items-center justify-center hover:bg-blue-50 rounded-[5px] transition-all shadow-sm active:scale-90">
+                                    <button onClick={() => setShowCalendar(true)} className="w-9 h-8 bg-[#0285fd] text-white flex items-center justify-center rounded-[5px] transition-all shadow-sm active:scale-90">
                                         <Calendar size={14} />
                                     </button>
                                 </div>

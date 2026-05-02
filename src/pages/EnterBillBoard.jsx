@@ -8,7 +8,7 @@ import { toast } from 'react-hot-toast';
 const EnterBillBoard = ({ isOpen, onClose }) => {
     const [selectedTab, setSelectedTab] = useState('Expenses');
     const [billType, setBillType] = useState('Bill');
-    const [lookups, setLookups] = useState({ payAccounts: [], expAccounts: [], costCenters: [], vendors: [] });
+    const [lookups, setLookups] = useState({ payAccounts: [], expAccounts: [], costCenters: [], vendors: [], items: [] });
     const [loading, setLoading] = useState(false);
 
     // Modal States
@@ -20,9 +20,15 @@ const EnterBillBoard = ({ isOpen, onClose }) => {
     const [apSearch, setApSearch] = useState('');
     const [showExpModal, setShowExpModal] = useState(false);
     const [expSearch, setExpSearch] = useState('');
+    const [showItemModal, setShowItemModal] = useState(false);
+    const [itemSearch, setItemSearch] = useState('');
     const [ccSource, setCcSource] = useState('header'); // 'header' or 'line'
     const [showCalendar, setShowCalendar] = useState(false);
     const [calendarField, setCalendarField] = useState(null);
+
+    const [showSearchModal, setShowSearchModal] = useState(false);
+    const [billSearchQuery, setBillSearchQuery] = useState('');
+    const [billSearchResults, setBillSearchResults] = useState([]);
 
     const [formData, setFormData] = useState({
         docNo: '',
@@ -49,6 +55,15 @@ const EnterBillBoard = ({ isOpen, onClose }) => {
         memo: ''
     });
 
+    const [items, setItems] = useState([]);
+    const [currentItem, setCurrentItem] = useState({
+        itemId: '',
+        description: '',
+        qty: '',
+        cost: '',
+        custJob: ''
+    });
+
     useEffect(() => {
         if (isOpen) {
             fetchLookups();
@@ -56,7 +71,7 @@ const EnterBillBoard = ({ isOpen, onClose }) => {
 
             const companyData = localStorage.getItem('selectedCompany');
             const user = JSON.parse(localStorage.getItem('user') || '{}');
-            let companyCode = 'C001';
+            let companyCode = '';
 
             if (companyData) {
                 try {
@@ -68,10 +83,73 @@ const EnterBillBoard = ({ isOpen, onClose }) => {
             setFormData(prev => ({
                 ...prev,
                 company: companyCode,
-                createUser: user?.emp_Name || user?.empName || 'SYSTEM'
+                createUser: user?.emp_Name || user?.empName || ''
             }));
         }
     }, [isOpen]);
+
+    useEffect(() => {
+        if (showSearchModal) {
+            handleSearchBills();
+        }
+    }, [showSearchModal, billSearchQuery]);
+
+    const handleSearchBills = async () => {
+        try {
+            const results = await enterBillService.searchBills(billSearchQuery);
+            setBillSearchResults(results);
+        } catch (error) {
+            toast.error('Failed to search bills');
+        }
+    };
+
+    const loadBill = async (docNo) => {
+        setLoading(true);
+        try {
+            const data = await enterBillService.getBill(docNo);
+            setFormData(prev => ({
+                ...prev,
+                docNo: data.header.doc_No || data.header.docNo,
+                vendorId: data.header.vendor_Id || data.header.vendorId || '',
+                accId: data.header.acc_Id || data.header.accId || '',
+                terms: data.header.terms || '',
+                memo: data.header.memo || '',
+                billNo: data.header.bill_No || data.header.billNo || '',
+                refNo: data.header.ref_No || data.header.refNo || '',
+                postDate: (data.header.post_Date || data.header.postDate || '').split('T')[0],
+                billDueDate: (data.header.bill_Due_Date || data.header.billDueDate || '').split('T')[0],
+                costCenter: data.header.costCenter || '',
+                company: data.header.company || ''
+            }));
+            setBillType(data.header.bill_Type || data.header.billType || 'Bill');
+            
+            if (data.expenses) {
+                setExpenses(data.expenses.map(e => ({
+                    accCode: e.accCode || e.acc_Code || '',
+                    costCenter: e.costCenter || '',
+                    amount: e.amount || 0,
+                    memo: e.memo || ''
+                })));
+            } else { setExpenses([]); }
+
+            if (data.items) {
+                setItems(data.items.map(i => ({
+                    itemId: i.itemId || i.item_Id || '',
+                    description: i.description || i.discription || '',
+                    qty: i.qty || 0,
+                    cost: i.cost || 0,
+                    custJob: i.custJob || i.cust_Job || ''
+                })));
+            } else { setItems([]); }
+
+            setShowSearchModal(false);
+            toast.success('Bill loaded successfully');
+        } catch (error) {
+            toast.error('Failed to load bill details');
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const fetchLookups = async () => {
         try {
@@ -116,11 +194,41 @@ const EnterBillBoard = ({ isOpen, onClose }) => {
         setExpenses(expenses.filter((_, i) => i !== idx));
     };
 
-    const calculateTotal = () => expenses.reduce((sum, item) => sum + (parseFloat(item.amount) || 0), 0).toFixed(2);
+    const handleItemChange = (e) => {
+        const { name, value } = e.target;
+        setCurrentItem(prev => ({ ...prev, [name]: value }));
+    };
+
+    const handleAddItem = (e) => {
+        if (e.key === 'Enter' || e.type === 'click') {
+            if (!currentItem.itemId || !currentItem.qty || !currentItem.cost) {
+                toast.error('Please select an item and enter valid quantity and cost.');
+                return;
+            }
+            setItems([...items, { 
+                ...currentItem, 
+                qty: parseInt(currentItem.qty), 
+                cost: parseFloat(currentItem.cost) 
+            }]);
+            setCurrentItem({ itemId: '', description: '', qty: '', cost: '', custJob: '' });
+        }
+    };
+
+    const handleRemoveItem = (idx) => {
+        setItems(items.filter((_, i) => i !== idx));
+    };
+
+    const calculateTotal = () => {
+        const expTotal = expenses.reduce((sum, item) => sum + (parseFloat(item.amount) || 0), 0);
+        const itemTotal = items.reduce((sum, item) => sum + ((parseFloat(item.qty) || 0) * (parseFloat(item.cost) || 0)), 0);
+        return (expTotal + itemTotal).toFixed(2);
+    };
 
     const handleClear = () => {
         setExpenses([]);
+        setItems([]);
         setCurrentLine({ accCode: '', costCenter: '', amount: '', memo: '' });
+        setCurrentItem({ itemId: '', description: '', qty: '', cost: '', custJob: '' });
         setFormData({
             ...formData,
             vendorId: '',
@@ -141,7 +249,7 @@ const EnterBillBoard = ({ isOpen, onClose }) => {
     const handleSave = async () => {
         if (!formData.vendorId) return toast.error('Vendor is required.');
         if (!formData.accId) return toast.error('A/P Account (Payable) is required.');
-        if (expenses.length === 0) return toast.error('At least one expense line is required.');
+        if (expenses.length === 0 && items.length === 0) return toast.error('At least one expense or item line is required.');
 
         setLoading(true);
         try {
@@ -149,7 +257,8 @@ const EnterBillBoard = ({ isOpen, onClose }) => {
                 ...formData,
                 billType,
                 netAmount: parseFloat(calculateTotal()),
-                expenses: expenses
+                expenses: expenses,
+                items: items
             });
             toast.success('Bill saved successfully!');
             handleClear();
@@ -197,13 +306,18 @@ const EnterBillBoard = ({ isOpen, onClose }) => {
                         <div className="flex items-center justify-between border-b border-gray-100 pb-3 mb-2">
                              <div className="flex items-center gap-3">
                                 <label className="text-[12.5px] font-bold text-gray-700 w-20 shrink-0">Doc No</label>
-                                <input
-                                    type="text"
-                                    name="docNo"
-                                    value={formData.docNo}
-                                    readOnly
-                                    className="w-32 h-8 font-mono border border-gray-300 px-3 text-[13px] font-bold text-blue-600 bg-gray-50 rounded-[5px] outline-none text-center shadow-inner"
-                                />
+                                <div className="flex gap-2">
+                                    <input
+                                        type="text"
+                                        name="docNo"
+                                        value={formData.docNo}
+                                        readOnly
+                                        className="w-32 h-8 font-mono border border-gray-300 px-3 text-[13px] font-bold text-blue-600 bg-gray-50 rounded-[5px] outline-none text-center shadow-inner"
+                                    />
+                                    <button onClick={() => setShowSearchModal(true)} className="w-8 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95">
+                                        <Search size={14} />
+                                    </button>
+                                </div>
                             </div>
 
                             <div className="flex items-center bg-gray-100 p-1 rounded-lg shadow-inner">
@@ -230,7 +344,7 @@ const EnterBillBoard = ({ isOpen, onClose }) => {
                                         value={formData.postDate} 
                                         className="w-[110px] px-2 text-[13px] border border-gray-300 rounded-[5px] outline-none text-gray-700 font-mono font-bold bg-gray-50 text-center shadow-sm" 
                                     />
-                                    <button onClick={() => openCalendar('postDate')} className="w-9 h-8 bg-[#0285fd] border border-gray-300 text-white flex items-center justify-center hover:bg-blue-50 rounded-[5px] transition-all shadow-sm active:scale-90">
+                                    <button onClick={() => openCalendar('postDate')} className="w-9 h-8 bg-[#0285fd] border border-gray-300 text-white flex items-center justify-center  rounded-[5px] transition-all shadow-sm active:scale-90">
                                         <Calendar size={14} />
                                     </button>
                                 </div>
@@ -328,79 +442,161 @@ const EnterBillBoard = ({ isOpen, onClose }) => {
 
                     {/* Account Details Table Section */}
                     <div className="mt-4">
-                        <div className="flex items-center gap-3 mb-2 px-2">
-                             <div className="h-4 w-1.5 bg-blue-600 rounded-full"></div>
-                             <h4 className="text-[13px] font-black text-gray-600 uppercase tracking-widest">Expense Breakdown & Distributions</h4>
+                        <div className="flex items-center gap-3 mb-2 px-2 border-b border-gray-200 pb-2">
+                             <div className="flex gap-4">
+                                <button 
+                                    onClick={() => setSelectedTab('Expenses')}
+                                    className={`text-[13px] font-black uppercase tracking-widest pb-1 border-b-2 transition-all ${selectedTab === 'Expenses' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-400 hover:text-gray-600'}`}
+                                >
+                                    Expenses
+                                </button>
+                                <button 
+                                    onClick={() => setSelectedTab('Items')}
+                                    className={`text-[13px] font-black uppercase tracking-widest pb-1 border-b-2 transition-all ${selectedTab === 'Items' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-400 hover:text-gray-600'}`}
+                                >
+                                    Items Purchase
+                                </button>
+                             </div>
                         </div>
 
                         <div className="border border-gray-100 rounded-xl bg-white shadow-xl overflow-hidden flex flex-col min-h-[300px]">
-                            <table className="w-full text-sm text-left border-collapse">
-                                <thead className="bg-[#f8fafc] text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 leading-10">
-                                    <tr>
-                                        <th className="px-4 w-[30%]">Expense Account / Category</th>
-                                        <th className="px-4 w-[20%]">Cost Center</th>
-                                        <th className="px-4 w-[15%] text-right">Amount</th>
-                                        <th className="px-4 w-[30%]">Line Memo</th>
-                                        <th className="px-2 w-[5%] text-center">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {expenses.map((exp, idx) => (
-                                        <tr key={idx} className="border-b border-gray-50 text-[12px] font-bold text-gray-700 hover:bg-slate-50/50 transition-colors">
-                                            <td className="py-2.5 px-4 font-mono text-blue-700 uppercase">{lookups.expAccounts.find(a => a.code === exp.accCode)?.name || exp.accCode}</td>
-                                            <td className="py-2.5 px-4 font-mono text-gray-400">{lookups.costCenters.find(c => c.code === exp.costCenter)?.name || exp.costCenter || '---'}</td>
-                                            <td className="py-2.5 px-4 text-right font-mono font-black text-red-600 bg-red-50/10 tracking-tighter">{parseFloat(exp.amount).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                                            <td className="py-2.5 px-4 italic text-gray-400 font-medium">{exp.memo || '---'}</td>
-                                            <td className="py-2.5 px-2 text-center">
-                                                <button onClick={() => handleRemoveLine(idx)} className="text-red-300 hover:text-red-500 bg-red-50 p-1.5 rounded-md transition-all active:scale-95"><Trash2 size={14} /></button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                    {expenses.length === 0 && (
-                                        <tr>
-                                            <td colSpan="5" className="py-12 text-center text-gray-300 font-black italic text-[11px] uppercase tracking-widest">No expense items added.</td>
-                                        </tr>
-                                    )}
-                                </tbody>
-                            </table>
+                            {selectedTab === 'Expenses' ? (
+                                <>
+                                    <table className="w-full text-sm text-left border-collapse">
+                                        <thead className="bg-[#f8fafc] text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 leading-10">
+                                            <tr>
+                                                <th className="px-4 w-[30%]">Expense Account / Category</th>
+                                                <th className="px-4 w-[20%]">Cost Center</th>
+                                                <th className="px-4 w-[15%] text-right">Amount</th>
+                                                <th className="px-4 w-[30%]">Line Memo</th>
+                                                <th className="px-2 w-[5%] text-center">Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {expenses.map((exp, idx) => (
+                                                <tr key={idx} className="border-b border-gray-50 text-[12px] font-bold text-gray-700 hover:bg-slate-50/50 transition-colors">
+                                                    <td className="py-2.5 px-4 font-mono text-blue-700 uppercase">{lookups.expAccounts.find(a => a.code === exp.accCode)?.name || exp.accCode}</td>
+                                                    <td className="py-2.5 px-4 font-mono text-gray-400">{lookups.costCenters.find(c => c.code === exp.costCenter)?.name || exp.costCenter || '---'}</td>
+                                                    <td className="py-2.5 px-4 text-right font-mono font-black text-red-600 bg-red-50/10 tracking-tighter">{parseFloat(exp.amount).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                                                    <td className="py-2.5 px-4 italic text-gray-400 font-medium">{exp.memo || '---'}</td>
+                                                    <td className="py-2.5 px-2 text-center">
+                                                        <button onClick={() => handleRemoveLine(idx)} className="text-red-300 hover:text-red-500 bg-red-50 p-1.5 rounded-md transition-all active:scale-95"><Trash2 size={14} /></button>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                            {expenses.length === 0 && (
+                                                <tr>
+                                                    <td colSpan="5" className="py-12 text-center text-gray-300 font-black italic text-[11px] uppercase tracking-widest">No expense items added.</td>
+                                                </tr>
+                                            )}
+                                        </tbody>
+                                    </table>
 
-                            {/* Entry Input Row */}
-                            <div className="mt-auto border-t-2 border-blue-50 bg-[#f8fafc] p-2 flex gap-3 items-center">
-                                <div className="flex-[2] flex gap-1">
-                                    <div className="flex-1 relative">
-                                        <input
-                                            type="text"
-                                            readOnly
-                                            value={lookups.expAccounts.find(a => a.code === currentLine.accCode)?.name ? `${currentLine.accCode} - ${lookups.expAccounts.find(a => a.code === currentLine.accCode)?.name}` : ''}
-                                            className="w-full h-9 font-mono border border-gray-300 px-3 text-[12px] font-bold bg-white rounded-[5px] outline-none focus:border-blue-400 shadow-sm transition-all"
-                                        />
+                                    {/* Entry Input Row */}
+                                    <div className="mt-auto border-t-2 border-blue-50 bg-[#f8fafc] p-2 flex gap-3 items-center">
+                                        <div className="flex-[2] flex gap-1">
+                                            <div className="flex-1 relative">
+                                                <input
+                                                    type="text"
+                                                    readOnly
+                                                    value={lookups.expAccounts.find(a => a.code === currentLine.accCode)?.name ? `${currentLine.accCode} - ${lookups.expAccounts.find(a => a.code === currentLine.accCode)?.name}` : ''}
+                                                    className="w-full h-9 font-mono border border-gray-300 px-3 text-[12px] font-bold bg-white rounded-[5px] outline-none focus:border-blue-400 shadow-sm transition-all"
+                                                />
+                                            </div>
+                                            <button onClick={() => setShowExpModal(true)} className="w-10 h-9 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95">
+                                                <Search size={16} />
+                                            </button>
+                                        </div>
+                                        <div className="flex-[1.2] flex gap-1">
+                                            <input
+                                                type="text"
+                                                readOnly
+                                                value={lookups.costCenters.find(c => c.code === currentLine.costCenter)?.name || ''}
+                                                className="flex-1 h-9 font-mono border border-gray-300 px-3 text-[12px] font-bold bg-white rounded-[5px] outline-none focus:border-blue-400 shadow-sm"
+                                            />
+                                            <button onClick={() => { setCcSource('line'); setShowCostCenterModal(true); }} className="w-10 h-9 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95">
+                                                <Search size={16} />
+                                            </button>
+                                        </div>
+                                        <div className="flex-1">
+                                            <input name="amount" value={currentLine.amount} onChange={handleLineChange} onKeyDown={handleAddLine} type="number" className="w-full h-9 font-mono border border-gray-300 px-3 text-[14px] text-right font-black text-blue-700 rounded-[5px] shadow-inner outline-none focus:border-blue-400 bg-white" placeholder="Amount" />
+                                        </div>
+                                        <div className="flex-[2] flex gap-2">
+                                            <input name="memo" value={currentLine.memo} onChange={handleLineChange} onKeyDown={handleAddLine} type="text" className="flex-1 h-9 font-mono border border-gray-300 px-3 text-[12px] font-bold rounded-[5px] shadow-inner outline-none focus:border-blue-400 bg-white" placeholder="Memo" />
+                                            <button onClick={handleAddLine} className="px-6 h-9 bg-[#0078d4] text-white font-black text-[11px] uppercase tracking-widest rounded-sm hover:bg-[#005a9e] whitespace-nowrap transition-all active:scale-95 shadow-md flex items-center gap-2">
+                                                Add Line
+                                            </button>
+                                        </div>
+                                        <div className="w-10" />
                                     </div>
-                                    <button onClick={() => setShowExpModal(true)} className="w-10 h-9 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95">
-                                        <Search size={16} />
-                                    </button>
-                                </div>
-                                <div className="flex-[1.2] flex gap-1">
-                                    <input
-                                        type="text"
-                                        readOnly
-                                        value={lookups.costCenters.find(c => c.code === currentLine.costCenter)?.name || ''}
-                                        className="flex-1 h-9 font-mono border border-gray-300 px-3 text-[12px] font-bold bg-white rounded-[5px] outline-none focus:border-blue-400 shadow-sm"
-                                    />
-                                    <button onClick={() => { setCcSource('line'); setShowCostCenterModal(true); }} className="w-10 h-9 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95">
-                                        <Search size={16} />
-                                    </button>
-                                </div>
-                                <div className="flex-1">
-                                    <input name="amount" value={currentLine.amount} onChange={handleLineChange} onKeyDown={handleAddLine} type="number" className="w-full h-9 font-mono border border-gray-300 px-3 text-[14px] text-right font-black text-blue-700 rounded-[5px] shadow-inner outline-none focus:border-blue-400 bg-white" />
-                                </div>
-                                <div className="flex-[2] flex gap-2">
-                                    <input name="memo" value={currentLine.memo} onChange={handleLineChange} onKeyDown={handleAddLine} type="text" className="flex-1 h-9 font-mono border border-gray-300 px-3 text-[12px] font-bold rounded-[5px] shadow-inner outline-none focus:border-blue-400 bg-white" />
-                                    <button onClick={handleAddLine} className="px-6 h-9 bg-[#0078d4] text-white font-black text-[11px] uppercase tracking-widest rounded-sm hover:bg-[#005a9e] whitespace-nowrap transition-all active:scale-95 shadow-md flex items-center gap-2">
-                                        Add Line
-                                    </button>
-                                </div>
-                                <div className="w-10" />
-                            </div>
+                                </>
+                            ) : (
+                                <>
+                                    <table className="w-full text-sm text-left border-collapse">
+                                        <thead className="bg-[#f8fafc] text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 leading-10">
+                                            <tr>
+                                                <th className="px-4 w-[25%]">Item</th>
+                                                <th className="px-4 w-[25%]">Description</th>
+                                                <th className="px-4 w-[10%] text-center">Qty</th>
+                                                <th className="px-4 w-[15%] text-right">Cost</th>
+                                                <th className="px-4 w-[15%] text-right">Amount</th>
+                                                <th className="px-2 w-[10%] text-center">Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {items.map((item, idx) => (
+                                                <tr key={idx} className="border-b border-gray-50 text-[12px] font-bold text-gray-700 hover:bg-slate-50/50 transition-colors">
+                                                    <td className="py-2.5 px-4 font-mono text-blue-700 uppercase">{lookups.items?.find(i => i.code === item.itemId)?.name || item.itemId}</td>
+                                                    <td className="py-2.5 px-4 font-mono text-gray-600">{item.description || '---'}</td>
+                                                    <td className="py-2.5 px-4 text-center font-mono">{item.qty}</td>
+                                                    <td className="py-2.5 px-4 text-right font-mono">{parseFloat(item.cost).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                                                    <td className="py-2.5 px-4 text-right font-mono font-black text-red-600 bg-red-50/10 tracking-tighter">{(item.qty * item.cost).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                                                    <td className="py-2.5 px-2 text-center">
+                                                        <button onClick={() => handleRemoveItem(idx)} className="text-red-300 hover:text-red-500 bg-red-50 p-1.5 rounded-md transition-all active:scale-95"><Trash2 size={14} /></button>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                            {items.length === 0 && (
+                                                <tr>
+                                                    <td colSpan="6" className="py-12 text-center text-gray-300 font-black italic text-[11px] uppercase tracking-widest">No item purchases added.</td>
+                                                </tr>
+                                            )}
+                                        </tbody>
+                                    </table>
+
+                                    {/* Entry Input Row */}
+                                    <div className="mt-auto border-t-2 border-blue-50 bg-[#f8fafc] p-2 flex gap-3 items-center">
+                                        <div className="flex-[2] flex gap-1">
+                                            <div className="flex-1 relative">
+                                                <input
+                                                    type="text"
+                                                    readOnly
+                                                    value={lookups.items?.find(i => i.code === currentItem.itemId)?.name ? `${currentItem.itemId} - ${lookups.items?.find(i => i.code === currentItem.itemId)?.name}` : ''}
+                                                    className="w-full h-9 font-mono border border-gray-300 px-3 text-[12px] font-bold bg-white rounded-[5px] outline-none focus:border-blue-400 shadow-sm transition-all"
+                                                />
+                                            </div>
+                                            <button onClick={() => setShowItemModal(true)} className="w-10 h-9 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95">
+                                                <Search size={16} />
+                                            </button>
+                                        </div>
+                                        <div className="flex-[1.5]">
+                                            <input name="description" value={currentItem.description} onChange={handleItemChange} onKeyDown={handleAddItem} type="text" className="w-full h-9 font-mono border border-gray-300 px-3 text-[12px] font-bold bg-white rounded-[5px] outline-none focus:border-blue-400 shadow-sm" placeholder="Description" />
+                                        </div>
+                                        <div className="w-20">
+                                            <input name="qty" value={currentItem.qty} onChange={handleItemChange} onKeyDown={handleAddItem} type="number" className="w-full h-9 font-mono border border-gray-300 px-3 text-[14px] text-center font-black text-blue-700 rounded-[5px] shadow-inner outline-none focus:border-blue-400 bg-white" placeholder="Qty" />
+                                        </div>
+                                        <div className="flex-1">
+                                            <input name="cost" value={currentItem.cost} onChange={handleItemChange} onKeyDown={handleAddItem} type="number" className="w-full h-9 font-mono border border-gray-300 px-3 text-[14px] text-right font-black text-blue-700 rounded-[5px] shadow-inner outline-none focus:border-blue-400 bg-white" placeholder="Cost" />
+                                        </div>
+                                        <div className="w-24 flex gap-2 shrink-0">
+                                            <button onClick={handleAddItem} className="w-full h-9 bg-[#0078d4] text-white font-black text-[11px] uppercase tracking-widest rounded-sm hover:bg-[#005a9e] transition-all active:scale-95 shadow-md flex items-center justify-center">
+                                                Add
+                                            </button>
+                                        </div>
+                                        <div className="w-10" />
+                                    </div>
+                                </>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -567,12 +763,99 @@ const EnterBillBoard = ({ isOpen, onClose }) => {
                 </div>
             </SimpleModal>
 
+            {/* Item Search Modal */}
+            <SimpleModal isOpen={showItemModal} onClose={() => setShowItemModal(false)} title={`Items - ${lookups.items?.length || 0} Found`} maxWidth="max-w-xl">
+                 <div className="flex flex-col h-full font-['Tahoma']">
+                    <div className="p-4 bg-slate-50 border-b border-gray-100 flex items-center justify-between mb-2">
+                        <span className="text-[12px] font-bold text-gray-500 uppercase tracking-wider">Search Facility</span>
+                        <input 
+                            type="text" 
+                            className="h-9 border border-gray-300 px-3 text-sm rounded-md w-72 focus:border-[#0285fd] outline-none shadow-sm" 
+                            value={itemSearch} 
+                            onChange={(e) => setItemSearch(e.target.value)} 
+                        />
+                    </div>
+                    <div className="overflow-y-auto max-h-[50vh] custom-scrollbar">
+                        <table className="w-full text-sm text-left">
+                            <thead className="bg-[#f8fafc] sticky top-0 text-gray-600 font-bold uppercase text-[11px] tracking-wider z-10 shadow-sm leading-8">
+                                <tr>
+                                    <th className="px-3 border-b">Code</th>
+                                    <th className="px-3 border-b">Item Name</th>
+                                    <th className="px-3 border-b text-center w-24">Select</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-100">
+                                {(lookups.items || []).filter(i => (i.name || '').toLowerCase().includes(itemSearch.toLowerCase()) || (i.code || '').toLowerCase().includes(itemSearch.toLowerCase())).map((item, idx) => (
+                                    <tr key={idx} className="hover:bg-blue-50/50 transition-colors border-b border-gray-50">
+                                        <td className="p-3 font-bold text-gray-700">{item.code}</td>
+                                        <td className="p-3 font-mono uppercase text-gray-700">{item.name}</td>
+                                        <td className="p-3 text-center">
+                                            <button onClick={() => {
+                                                setCurrentItem(prev => ({ ...prev, itemId: item.code, description: item.name, cost: item.cost }));
+                                                setShowItemModal(false);
+                                            }} className="bg-[#0078d4] text-white text-[10px] px-3 py-1 rounded-sm font-bold hover:bg-[#005a9e] shadow-sm transition-all active:scale-95 uppercase tracking-wider">SELECT</button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </SimpleModal>
+
             <CalendarModal 
                 isOpen={showCalendar} 
                 onClose={() => setShowCalendar(false)} 
                 onDateSelect={handleDateSelect}
                 initialDate={formData[calendarField]}
             />
+
+            {/* Bill Search Modal */}
+            <SimpleModal isOpen={showSearchModal} onClose={() => setShowSearchModal(false)} title={`Existing Bills - ${billSearchResults.length} Found`} maxWidth="max-w-2xl">
+                 <div className="flex flex-col h-full font-['Tahoma']">
+                    <div className="p-4 bg-slate-50 border-b border-gray-100 flex items-center justify-between mb-2">
+                        <span className="text-[12px] font-bold text-gray-500 uppercase tracking-wider">Search Document / Vendor</span>
+                        <input 
+                            type="text" 
+                            className="h-9 border border-gray-300 px-3 text-sm rounded-md w-72 focus:border-[#0285fd] outline-none shadow-sm" 
+                            value={billSearchQuery} 
+                            onChange={(e) => setBillSearchQuery(e.target.value)} 
+                            placeholder="Enter Doc No or Vendor..."
+                        />
+                    </div>
+                    <div className="overflow-y-auto max-h-[50vh] custom-scrollbar">
+                        <table className="w-full text-sm text-left">
+                            <thead className="bg-[#f8fafc] sticky top-0 text-gray-600 font-bold uppercase text-[11px] tracking-wider z-10 shadow-sm leading-8">
+                                <tr>
+                                    <th className="px-3 border-b">Doc No</th>
+                                    <th className="px-3 border-b">Vendor</th>
+                                    <th className="px-3 border-b">Post Date</th>
+                                    <th className="px-3 border-b text-right">Amount</th>
+                                    <th className="px-3 border-b text-center w-24">Select</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-100">
+                                {billSearchResults.map((b, idx) => (
+                                    <tr key={idx} className="hover:bg-blue-50/50 transition-colors border-b border-gray-50">
+                                        <td className="p-3 font-bold text-blue-600">{b.docNo}</td>
+                                        <td className="p-3 font-mono uppercase text-gray-700">{lookups.vendors?.find(v => v.code === b.vendorId)?.name || b.vendorId}</td>
+                                        <td className="p-3 font-mono text-gray-600">{b.date ? b.date.split('T')[0] : ''}</td>
+                                        <td className="p-3 text-right font-bold text-red-600">{b.amount?.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                                        <td className="p-3 text-center">
+                                            <button onClick={() => loadBill(b.docNo)} className="bg-[#0078d4] text-white text-[10px] px-3 py-1 rounded-sm font-bold hover:bg-[#005a9e] shadow-sm transition-all active:scale-95 uppercase tracking-wider">SELECT</button>
+                                        </td>
+                                    </tr>
+                                ))}
+                                {billSearchResults.length === 0 && (
+                                    <tr>
+                                        <td colSpan="5" className="p-6 text-center text-gray-400 font-bold italic">No bills found matching your search.</td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </SimpleModal>
         </>
     );
 };

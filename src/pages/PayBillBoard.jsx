@@ -27,6 +27,7 @@ const PayBillBoard = ({ isOpen, onClose }) => {
     });
 
     const [bills, setBills] = useState([]);
+    const [advanceCredits, setAdvanceCredits] = useState({ count: 0, total: 0 });
     const [loading, setLoading] = useState(false);
 
     // Modal States
@@ -40,6 +41,12 @@ const PayBillBoard = ({ isOpen, onClose }) => {
     const [accSearch, setAccSearch] = useState('');
     const [showCalendar, setShowCalendar] = useState(false);
     const [calendarField, setCalendarField] = useState(null);
+
+    // Search Payment Modal
+    const [showSearchModal, setShowSearchModal] = useState(false);
+    const [paymentSearchQuery, setPaymentSearchQuery] = useState('');
+    const [paymentSearchResults, setPaymentSearchResults] = useState([]);
+    const [searchingPayments, setSearchingPayments] = useState(false);
 
     useEffect(() => {
         if (isOpen) {
@@ -83,6 +90,61 @@ const PayBillBoard = ({ isOpen, onClose }) => {
         }
     };
 
+    useEffect(() => {
+        if (showSearchModal) {
+            handlePaymentSearch();
+        }
+    }, [showSearchModal, paymentSearchQuery]);
+
+    const handlePaymentSearch = async () => {
+        try {
+            setSearchingPayments(true);
+            const results = await payBillService.search(paymentSearchQuery);
+            setPaymentSearchResults(results);
+        } catch (error) {
+            toast.error('Failed to search payments');
+        } finally {
+            setSearchingPayments(false);
+        }
+    };
+
+    const handleSelectPayment = async (payDoc) => {
+        try {
+            setLoading(true);
+            const data = await payBillService.getPayment(payDoc);
+            
+            setFormData(prev => ({
+                ...prev,
+                payDoc: data.payDoc,
+                vendorId: data.vendorId,
+                payType: data.payType || '',
+                payDate: data.payDate || prev.payDate,
+                voucherNo: data.voucherNo || '',
+                memo: data.memo || '',
+                company: data.company || prev.company
+            }));
+            
+            const enhancedBills = data.bills.map(b => ({
+                docNo: b.docNo,
+                discount: b.discount,
+                toPay: b.toPay,
+                setOfUse: b.setOfUse,
+                balance: b.toPay, 
+                amount: b.toPay + b.discount + b.setOfUse,
+                selected: true
+            }));
+            
+            setBills(enhancedBills);
+            setAdvanceCredits({ count: 0, total: 0 }); // reset advance credits
+            setShowSearchModal(false);
+            toast.success(`Payment ${payDoc} loaded.`);
+        } catch (error) {
+            toast.error('Failed to load payment details.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
     // Load available accounts based on Payment Method Dropdown
     const availableAccounts = useMemo(() => {
         switch (formData.payType) {
@@ -108,10 +170,11 @@ const PayBillBoard = ({ isOpen, onClose }) => {
         try {
             setLoading(true);
             const data = await payBillService.getVendorBills(vendorId, formData.company || 'C001');
-            const enhancedData = data.map(b => ({
+            const enhancedData = data.bills.map(b => ({
                 ...b, selected: false, toPay: b.balance, discount: 0, setOfUse: 0
             }));
             setBills(enhancedData);
+            setAdvanceCredits({ count: data.numCredits || 0, total: data.totCredits || 0 });
         } catch (error) {
             toast.error('Failed to load bills.');
         } finally {
@@ -249,8 +312,11 @@ const PayBillBoard = ({ isOpen, onClose }) => {
                     <div className="flex items-center justify-between border-b border-gray-100 pb-3 mb-2">
                         <div className="flex items-center gap-3">
                              <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Doc Number</label>
-                             <div className="flex items-center">
+                             <div className="flex items-center gap-2">
                                 <input type="text" name="payDoc" value={formData.payDoc} readOnly className="w-32 h-8 font-mono border border-gray-300 px-3 text-[12px] font-bold text-blue-600 bg-gray-50 rounded-[5px] outline-none text-center shadow-inner" />
+                                <button onClick={() => setShowSearchModal(true)} className="w-8 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95">
+                                    <Search size={14} />
+                                </button>
                              </div>
                         </div>
 
@@ -263,7 +329,7 @@ const PayBillBoard = ({ isOpen, onClose }) => {
                                     value={formData.payDate} 
                                     className="w-[110px] px-2 text-[12px] border border-gray-300 rounded-[5px] outline-none text-gray-700 font-mono font-bold bg-gray-50 text-center shadow-sm" 
                                 />
-                                <button onClick={() => openCalendar('payDate')} className="w-9 h-8 bg-white border border-gray-300 text-blue-600 flex items-center justify-center hover:bg-blue-50 rounded-[5px] transition-all shadow-sm active:scale-90">
+                                <button onClick={() => openCalendar('payDate')} className="w-9 h-8 bg-[#0285fd] text-white flex items-center justify-center rounded-[5px] transition-all shadow-sm active:scale-90">
                                     <Calendar size={14} />
                                 </button>
                              </div>
@@ -295,7 +361,7 @@ const PayBillBoard = ({ isOpen, onClose }) => {
                                     value={lookups.costCenters.find(c => c.code === formData.costCenter)?.name || ''} 
                                     className="flex-1 h-8 font-mono border border-gray-300 px-3 text-[12px] bg-gray-50 rounded-[5px] font-bold text-gray-600 outline-none truncate shadow-sm" 
                                 />
-                                <button onClick={() => { setCcSource('header'); setShowCCModal(true); }} className="w-10 h-8 bg-white border border-gray-300 text-gray-500 flex items-center justify-center hover:bg-gray-50 rounded-[5px] transition-all shadow-sm active:scale-90">
+                                <button onClick={() => { setCcSource('header'); setShowCCModal(true); }} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center rounded-[5px] transition-all shadow-sm active:scale-90">
                                     <Search size={16} />
                                 </button>
                              </div>
@@ -442,11 +508,31 @@ const PayBillBoard = ({ isOpen, onClose }) => {
                                             value={lookups.costCenters.find(c => c.code === formData.payCostCenter)?.name || ''} 
                                             className="flex-1 h-8 font-mono border border-gray-300 px-3 text-[12px] bg-gray-50 rounded-[5px] font-bold text-gray-600 outline-none truncate shadow-sm" 
                                         />
-                                        <button onClick={() => { setCcSource('payment'); setShowCCModal(true); }} className="w-10 h-8 bg-white border border-gray-300 text-gray-500 flex items-center justify-center hover:bg-gray-50 rounded-[5px] transition-all shadow-sm active:scale-90">
+                                        <button onClick={() => { setCcSource('payment'); setShowCCModal(true); }} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center rounded-[5px] transition-all shadow-sm active:scale-90">
                                             <Search size={16} />
                                         </button>
                                     </div>
                                 </div>
+                                {advanceCredits.count > 0 && (
+                                    <>
+                                        <div className="pt-0.5">
+                                            <div className="flex items-center gap-4 bg-yellow-50/50 p-1.5 rounded-lg border border-yellow-200">
+                                                <label className="text-[12px] font-black text-yellow-800 w-32 shrink-0 uppercase tracking-tighter">No of Credits</label>
+                                                <div className="flex-1 h-8 font-mono bg-white border border-yellow-200 px-3 text-[14px] font-black text-yellow-700 text-right flex items-center justify-end rounded-[5px] shadow-sm">
+                                                    {advanceCredits.count}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="pt-0.5">
+                                            <div className="flex items-center gap-4 bg-green-50/50 p-1.5 rounded-lg border border-green-200">
+                                                <label className="text-[12px] font-black text-green-800 w-32 shrink-0 uppercase tracking-tighter">Available Credit</label>
+                                                <div className="flex-1 h-8 font-mono bg-white border border-green-200 px-3 text-[14px] font-black text-green-700 text-right flex items-center justify-end rounded-[5px] shadow-sm">
+                                                    {advanceCredits.total.toLocaleString(undefined, {minimumFractionDigits: 2})}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </>
+                                )}
                                 <div className="pt-0.5">
                                     <div className="flex items-center gap-4 bg-blue-50/50 p-1.5 rounded-lg border border-blue-100">
                                         <label className="text-[12px] font-black text-blue-800 w-32 shrink-0 uppercase tracking-tighter">Funds Applied</label>
@@ -611,6 +697,52 @@ const PayBillBoard = ({ isOpen, onClose }) => {
                                     </td>
                                 </tr>
                             ))}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </SimpleModal>
+
+        {/* Search Payment Modal */}
+        <SimpleModal isOpen={showSearchModal} onClose={() => setShowSearchModal(false)} title={`Saved Payments - ${paymentSearchResults?.length || 0} Found`} maxWidth="max-w-3xl">
+            <div className="p-4 space-y-4">
+                <div className="flex gap-2">
+                    <input 
+                        type="text" 
+                        placeholder="Search by Document No or Vendor..." 
+                        value={paymentSearchQuery} 
+                        onChange={(e) => setPaymentSearchQuery(e.target.value)} 
+                        className="flex-1 h-10 px-3 border border-gray-300 rounded-[5px] outline-none focus:border-blue-500 font-mono text-sm" 
+                    />
+                </div>
+                <div className="h-[300px] overflow-y-auto border border-gray-200 rounded-[5px]">
+                    <table className="w-full text-sm text-left">
+                        <thead className="text-[11px] text-gray-700 uppercase bg-gray-100 sticky top-0 border-b border-gray-200 shadow-sm z-10">
+                            <tr>
+                                <th className="px-4 py-3 font-black tracking-wider">Pay Doc</th>
+                                <th className="px-4 py-3 font-black tracking-wider">Vendor</th>
+                                <th className="px-4 py-3 font-black tracking-wider">Date</th>
+                                <th className="px-4 py-3 font-black tracking-wider text-right">Amount</th>
+                                <th className="px-4 py-3 font-black tracking-wider text-center">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {searchingPayments ? (
+                                <tr><td colSpan="5" className="text-center py-8 text-gray-500 font-bold"><Loader2 className="w-6 h-6 animate-spin mx-auto mb-2 text-blue-500"/>Searching...</td></tr>
+                            ) : paymentSearchResults?.map((p, i) => (
+                                <tr key={i} className="border-b border-gray-100 hover:bg-blue-50/50 transition-colors">
+                                    <td className="px-4 py-2 font-bold font-mono text-blue-700 text-[13px]">{p.payDoc}</td>
+                                    <td className="px-4 py-2 font-bold text-gray-600 text-[12px]">{p.vendorId}</td>
+                                    <td className="px-4 py-2 font-mono text-[12px]">{p.date}</td>
+                                    <td className="px-4 py-2 text-right font-mono font-bold text-[13px] text-gray-700">{parseFloat(p.amount || 0).toFixed(2)}</td>
+                                    <td className="px-4 py-2 text-center">
+                                        <button onClick={() => handleSelectPayment(p.payDoc)} className="px-4 py-1.5 bg-[#0078d4] text-white rounded-[4px] hover:bg-[#005a9e] text-[11px] font-bold shadow-sm transition-all active:scale-95 uppercase tracking-wider">Select</button>
+                                    </td>
+                                </tr>
+                            ))}
+                            {(!paymentSearchResults || paymentSearchResults.length === 0) && !searchingPayments && (
+                                <tr><td colSpan="5" className="text-center py-8 text-gray-400 font-bold text-sm">No saved payments found.</td></tr>
+                            )}
                         </tbody>
                     </table>
                 </div>

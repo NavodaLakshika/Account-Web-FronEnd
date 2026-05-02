@@ -39,6 +39,12 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
         customers: []
     });
 
+    const safePetty = lookups.pettyAccounts || [];
+    const safeExp = lookups.expenseAccounts || lookups.allAccounts || [];
+    const safeCC = lookups.costCenters || [];
+    const safeSuppliers = lookups.suppliers || [];
+    const safeCustomers = lookups.customers || [];
+
     const [selectedTab, setSelectedTab] = useState('Expenses');
     const [balance, setBalance] = useState(0.00);
     const [rows, setRows] = useState([{ id: Date.now(), accCode: '', costCode: '', amount: 0, memo: '' }]);
@@ -229,7 +235,7 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                                     <input
                                         type="text"
                                         readOnly
-                                        value={formData.account ? `${formData.account} - ${lookups.pettyAccounts.find(a => a.code === formData.account)?.name || ''}` : ''}
+                                        value={formData.account ? `${formData.account} - ${safePetty.find(a => a.code === formData.account)?.name || ''}` : ''}
                                         className="flex-1 h-9 border border-gray-300 px-2 text-[13px] font-mono font-bold bg-gray-50 outline-none rounded-[5px] text-slate-700"
                                     />
                                     <button onClick={() => setShowAccModal(true)} className="w-9 h-9 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-colors shadow-sm">
@@ -283,7 +289,7 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                                         <input
                                             type="text"
                                             readOnly
-                                            value={lookups.costCenters.find(c => c.code === formData.costCenter)?.name || ''}
+                                            value={safeCC.find(c => c.code === formData.costCenter)?.name || ''}
                                             className="flex-1 h-9 border border-gray-300 px-2 text-[13px] font-mono font-bold bg-gray-50 rounded-[5px] text-slate-700"
                                         />
                                         <button onClick={() => { setCcSource('header'); setShowCCModal(true); }} className="w-9 h-9 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] border-none shadow-sm">
@@ -398,7 +404,7 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                                                     <input
                                                         type="text"
                                                         readOnly
-                                                        value={lookups.expenseAccounts.find(e => e.code === row.accCode)?.name || ''}
+                                                        value={safeExp.find(e => e.code === row.accCode)?.name || ''}
                                                         className="flex-1 h-8 px-2 text-[12px] font-mono font-bold outline-none bg-white border border-gray-200 rounded-[5px] text-slate-700 focus:border-blue-400"
                                                     />
                                                     <button onClick={() => { setExpIndex(idx); setShowExpAccModal(true); }} className="w-8 h-8 bg-blue-50/50 backdrop-blur-md border border-blue-200 text-[#0078d4] flex items-center justify-center hover:bg-blue-100/80 rounded-[5px] transition-all shadow-sm active:scale-90">
@@ -411,7 +417,7 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                                                     <input
                                                         type="text"
                                                         readOnly
-                                                        value={lookups.costCenters.find(cc => cc.code === row.costCode)?.name || ''}
+                                                        value={safeCC.find(cc => cc.code === row.costCode)?.name || ''}
                                                         className="flex-1 h-8 border border-gray-200 px-2 text-[12px] font-mono font-bold outline-none bg-white rounded-[5px] text-slate-600"
                                                     />
                                                     <button onClick={() => { setCcSource('line'); setCcIndex(idx); setShowCCModal(true); }} className="w-8 h-8 bg-blue-50/50 backdrop-blur-md border border-blue-200 text-[#0078d4] flex items-center justify-center hover:bg-blue-100/80 rounded-[5px] transition-all shadow-sm active:scale-90">
@@ -518,7 +524,7 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-50">
-                                    {lookups.pettyAccounts.filter(a => a.name?.toLowerCase().includes(accSearch.toLowerCase()) || a.code?.toLowerCase().includes(accSearch.toLowerCase())).map((a, i) => (
+                                    {safePetty.filter(a => a.name?.toLowerCase().includes(accSearch.toLowerCase()) || a.code?.toLowerCase().includes(accSearch.toLowerCase())).map((a, i) => (
                                         <tr key={i} className="group hover:bg-blue-50/50 cursor-pointer transition-colors" onClick={() => { setFormData({ ...formData, account: a.code }); setShowAccModal(false); }}>
                                             <td className="px-5 py-3 font-mono text-[13px] font-bold text-[#0285fd]">{a.code}</td>
                                             <td className="px-5 py-3 text-[13px] font-bold text-gray-600 uppercase italic transition-colors group-hover:text-blue-600">{a.name}</td>
@@ -567,7 +573,7 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-50">
-                                    {lookups.suppliers.filter(v => v.name?.toLowerCase().includes(vendorSearch.toLowerCase()) || v.code?.toLowerCase().includes(vendorSearch.toLowerCase())).map((v, i) => (
+                                    {safeSuppliers.filter(v => v.name?.toLowerCase().includes(vendorSearch.toLowerCase()) || v.code?.toLowerCase().includes(vendorSearch.toLowerCase())).map((v, i) => (
                                         <tr key={i} className="group hover:bg-blue-50/50 cursor-pointer transition-colors" onClick={() => { setFormData({ ...formData, vendorId: v.code, payee: v.name }); setShowVendorModal(false); }}>
                                             <td className="px-5 py-3 font-mono text-[13px] font-bold text-[#0285fd]">{v.code}</td>
                                             <td className="px-5 py-3 text-[13px] font-bold text-gray-600 uppercase italic group-hover:text-blue-600 transition-colors">{v.name}</td>
@@ -616,7 +622,7 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-50">
-                                    {lookups.costCenters.filter(c => c.name?.toLowerCase().includes(ccSearch.toLowerCase()) || c.code?.toLowerCase().includes(ccSearch.toLowerCase())).map((c, i) => (
+                                    {safeCC.filter(c => c.name?.toLowerCase().includes(ccSearch.toLowerCase()) || c.code?.toLowerCase().includes(ccSearch.toLowerCase())).map((c, i) => (
                                         <tr key={i} className="group hover:bg-blue-50/50 cursor-pointer transition-colors" onClick={() => {
                                             if (ccSource === 'header') {
                                                 setFormData({ ...formData, costCenter: c.code });
@@ -674,7 +680,7 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-50">
-                                    {lookups.expenseAccounts.filter(e => e.name?.toLowerCase().includes(expAccSearch.toLowerCase()) || e.code?.toLowerCase().includes(expAccSearch.toLowerCase())).map((e, i) => (
+                                    {safeExp.filter(e => e.name?.toLowerCase().includes(expAccSearch.toLowerCase()) || e.code?.toLowerCase().includes(expAccSearch.toLowerCase())).map((e, i) => (
                                         <tr key={i} className="group hover:bg-blue-50/50 cursor-pointer transition-colors" onClick={() => {
                                             if (expIndex !== null) {
                                                 const newRows = [...rows];

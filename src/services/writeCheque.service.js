@@ -21,7 +21,9 @@ api.interceptors.request.use(
 export const writeChequeService = {
   async getLookups() {
     try {
-      const response = await api.get('/lookups');
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      const userName = user?.emp_Name || user?.empName || 'SYSTEM';
+      const response = await api.get(`/lookups?userName=${encodeURIComponent(userName)}`);
       return response.data;
     } catch (error) {
       throw error.response?.data || 'Failed to fetch lookups';
@@ -30,7 +32,15 @@ export const writeChequeService = {
 
   async generateDocNo() {
     try {
-      const response = await api.get('/generate-doc');
+      const companyData = localStorage.getItem('selectedCompany');
+      let companyCode = 'C001';
+      if (companyData) {
+        try {
+          const parsed = JSON.parse(companyData);
+          companyCode = parsed.company_Code || parsed.companyCode || parsed.CompanyCode || companyData;
+        } catch (e) { companyCode = companyData; }
+      }
+      const response = await api.get(`/generate-doc?company=${encodeURIComponent(companyCode)}`);
       return response.data;
     } catch (error) {
       throw error.response?.data || 'Failed to generate document number';
@@ -39,7 +49,9 @@ export const writeChequeService = {
 
   async save(data) {
     try {
-      const response = await api.post('/save', data);
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      const userName = user?.emp_Name || user?.empName || 'SYSTEM';
+      const response = await api.post(`/save?userName=${encodeURIComponent(userName)}`, data);
       return response.data;
     } catch (error) {
       throw error.response?.data || 'Failed to save cheque portfolio';

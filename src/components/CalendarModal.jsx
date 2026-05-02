@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
 import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, X } from 'lucide-react';
 
-const CalendarModal = ({ isOpen, onClose, onDateSelect, initialDate }) => {
+const CalendarModal = ({ isOpen, onClose, onDateSelect, onDateChange, initialDate, currentDate }) => {
+    const activeCallback = (typeof onDateSelect === 'function' ? onDateSelect : null) || 
+                           (typeof onDateChange === 'function' ? onDateChange : null);
+    const activeDate = initialDate || currentDate;
     const parseDate = (dateStr) => {
         if (!dateStr) return new Date();
         // Handle DD/MM/YYYY format
@@ -18,7 +21,7 @@ const CalendarModal = ({ isOpen, onClose, onDateSelect, initialDate }) => {
         return isNaN(d.getTime()) ? new Date() : d;
     };
 
-    const [viewDate, setViewDate] = useState(parseDate(initialDate));
+    const [viewDate, setViewDate] = useState(parseDate(activeDate));
 
     const daysOfWeek = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
     const months = [
@@ -40,9 +43,9 @@ const CalendarModal = ({ isOpen, onClose, onDateSelect, initialDate }) => {
 
     React.useEffect(() => {
         if (isOpen) {
-            setViewDate(parseDate(initialDate));
+            setViewDate(parseDate(activeDate));
         }
-    }, [isOpen, initialDate]);
+    }, [isOpen, activeDate]);
 
     const handleDateClick = (day, specificDate = null) => {
         const selected = specificDate || new Date(currentYear, currentMonth, day);
@@ -50,7 +53,7 @@ const CalendarModal = ({ isOpen, onClose, onDateSelect, initialDate }) => {
         const mm = String(selected.getMonth() + 1).padStart(2, '0');
         const dd = String(selected.getDate()).padStart(2, '0');
         const formatted = `${dd}/${mm}/${yyyy}`;
-        onDateSelect(formatted);
+        if (activeCallback) activeCallback(formatted);
         onClose();
     };
 

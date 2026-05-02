@@ -44,5 +44,23 @@ export const enterBillService = {
     } catch (error) {
       throw error.response?.data || 'Failed to save bill';
     }
+  },
+
+  async searchBills(query) {
+    try {
+      const response = await api.get('/search', { params: { query } });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || 'Failed to search bills';
+    }
+  },
+
+  async getBill(docNo) {
+    try {
+      const response = await api.get(`/${docNo}`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || 'Failed to load bill';
+    }
   }
 };

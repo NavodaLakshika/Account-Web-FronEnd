@@ -27,6 +27,8 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
     const [showCCModal, setShowCCModal] = useState(false);
     const [showEndorsementModal, setShowEndorsementModal] = useState(false);
     const [showAccModal, setShowAccModal] = useState(false);
+    const [showPayeeModal, setShowPayeeModal] = useState(false);
+    const [showVendorModal, setShowVendorModal] = useState(false);
     const [showCalendar, setShowCalendar] = useState(false);
     const [calendarField, setCalendarField] = useState(null);
     const [ccSource, setCcSource] = useState('header'); // header or line
@@ -60,7 +62,9 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
         banks: [],
         costCenters: [],
         endorsements: ['A/C PAYEE ONLY', 'NOT NEGOTIABLE', 'CASH PAYABLE', 'NONE'],
-        accounts: []
+        accounts: [],
+        payees: [],
+        vendors: []
     });
 
     useEffect(() => {
@@ -111,7 +115,35 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
         
         setLoading(true);
         try {
-             await writeChequeService.save({ ...formData, expenses });
+             const payload = {
+                 DocNo: formData.docId,
+                 Company: formData.company || 'C001',
+                 PayDoc: formData.docId,
+                 PayDate: formData.date,
+                 PayType: formData.isElectronic ? 'Online' : 'Cheque',
+                 BankId: formData.bankAcc,
+                 Bank: lookups.banks.find(b => b.code === formData.bankAcc)?.name || '',
+                 VendorId: formData.payeeId || '',
+                 Payee: formData.payeeName,
+                 Memo: formData.address,
+                 RefNo: formData.chqNo,
+                 ChqNo: formData.chqNo,
+                 OnlinePay: formData.isElectronic,
+                 NetAmount: calculateTotal(),
+                 CostCenterFrom: formData.costCenter,
+                 Expenses: expenses.map(e => ({
+                     AccId: e.accCode,
+                     ExpId: lookups.accounts.find(a => a.code === e.accCode)?.name || '',
+                     Amount: parseFloat(e.amount) || 0,
+                     Memo: e.memo || '',
+                     CustJob: '', // Explicitly send empty string to avoid validation errors
+                     CostCode: e.costCenter,
+                     CostName: lookups.costCenters.find(cc => cc.code === e.costCenter)?.name || ''
+                 })),
+                 Items: [] // Not implemented in UI yet but required by DTO
+             };
+
+             await writeChequeService.save(payload);
              toast.success('Cheque portfolio committed successfully.');
              onClose();
         } catch (error) {
@@ -194,7 +226,7 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
                                             value={formData.date} 
                                             className="flex-1 px-3 text-[12.5px] border border-gray-300 rounded-[5px] outline-none text-slate-700 font-mono font-bold bg-gray-50 text-center shadow-sm" 
                                         />
-                                        <button onClick={() => openCalendar('date')} className="w-9 h-9 bg-white border border-gray-300 text-slate-600 flex items-center justify-center hover:bg-slate-50 rounded-[5px] transition-all shadow-sm active:scale-90">
+                                        <button onClick={() => openCalendar('date')} className="w-9 h-9 bg-[#0285fd] text-white flex items-center justify-center rounded-[5px] transition-all shadow-sm active:scale-90">
                                             <Calendar size={14} />
                                         </button>
                                     </div>
@@ -256,9 +288,12 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
                                 <div className="flex flex-1 gap-2">
                                     <input type="text" className="w-24 h-9 font-mono border border-gray-300 px-3 text-[12.5px] bg-gray-50 text-slate-600 font-bold rounded-[5px]" value={formData.payeeId} readOnly />
                                     <input type="text" className="flex-1 h-9 font-mono border border-slate-200 px-3 text-[12.5px] font-bold text-slate-800 bg-white focus:border-slate-400 outline-none rounded-[5px] shadow-sm" value={formData.payeeName} onChange={(e) => setFormData({...formData, payeeName: e.target.value})} />
-                                    <button className="w-10 h-9 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95">
-                                        <Search size={16} />
-                                    </button>
+                                     <button onClick={() => setShowPayeeModal(true)} title="Search Payees" className="w-10 h-9 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-l-[5px] transition-all shadow-md active:scale-95 border-r border-white/20">
+                                         <Search size={14} />
+                                     </button>
+                                     <button onClick={() => setShowVendorModal(true)} title="Search Vendors" className="w-10 h-9 bg-[#2bb744] text-white flex items-center justify-center hover:bg-[#259b3a] rounded-r-[5px] transition-all shadow-md active:scale-95">
+                                         <Plus size={14} />
+                                     </button>
                                 </div>
                             </FormRow>
                             <FormRow label="Postal Address">
@@ -593,10 +628,87 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
             </div>
         </SimpleModal>
 
+        <SimpleModal
+            isOpen={showPayeeModal}
+            onClose={() => setShowPayeeModal(false)}
+            title="Search Historical Payees"
+            maxWidth="max-w-2xl"
+        >
+            <div className="space-y-4 font-['Tahoma']">
+                <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-lg border border-gray-100 mb-2">
+                    <span className="text-[12px] font-bold text-gray-500 uppercase tracking-widest">Search Facility</span>
+                    <input 
+                        type="text" 
+                        placeholder="Filter payees..." 
+                        className="h-9 border border-gray-300 px-3 text-sm rounded-[5px] w-72 focus:border-[#0285fd] outline-none shadow-sm" 
+                        onChange={(e) => setFormData({...formData, payeeName: e.target.value})} 
+                    />
+                </div>
+                <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm">
+                    <table className="w-full text-left">
+                        <thead className="bg-[#f8fafd] text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">
+                            <tr>
+                                <th className="px-4 py-3">Payee Name</th>
+                                <th className="px-4 py-3 text-right">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-50">
+                            {(lookups.payees || []).filter(p => p.toLowerCase().includes((formData.payeeName || '').toLowerCase())).map((p, idx) => (
+                                <tr key={idx} className="group hover:bg-blue-50/50 cursor-pointer" onClick={() => {
+                                    setFormData({...formData, payeeName: p});
+                                    setShowPayeeModal(false);
+                                }}>
+                                    <td className="px-4 py-3 font-bold text-[13px] text-gray-700 uppercase group-hover:text-blue-600 transition-colors">{p}</td>
+                                    <td className="px-4 py-3 text-right">
+                                        <button className="bg-[#0285fd] text-white text-[10px] px-4 py-1.5 rounded-[5px] font-black hover:bg-[#0073ff] shadow-md transition-all active:scale-95">SELECT</button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </SimpleModal>
+
+        <SimpleModal
+            isOpen={showVendorModal}
+            onClose={() => setShowVendorModal(false)}
+            title="Select Supplier / Vendor"
+            maxWidth="max-w-2xl"
+        >
+            <div className="space-y-4 font-['Tahoma']">
+                <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm">
+                    <table className="w-full text-left">
+                        <thead className="bg-[#f8fafd] text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">
+                            <tr>
+                                <th className="px-4 py-3">Code</th>
+                                <th className="px-4 py-3">Supplier Name</th>
+                                <th className="px-4 py-3 text-right">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-50">
+                            {(lookups.vendors || []).map((v, idx) => (
+                                <tr key={idx} className="group hover:bg-blue-50/50 cursor-pointer" onClick={() => {
+                                    setFormData({...formData, payeeId: v.id, payeeName: v.name, address: v.address});
+                                    setShowVendorModal(false);
+                                }}>
+                                    <td className="px-4 py-3 font-mono text-[12px] text-gray-400">{v.id}</td>
+                                    <td className="px-4 py-3 font-bold text-[13px] text-gray-700 uppercase group-hover:text-blue-600 transition-colors">{v.name}</td>
+                                    <td className="px-4 py-3 text-right">
+                                        <button className="bg-[#2bb744] text-white text-[10px] px-4 py-1.5 rounded-[5px] font-black hover:bg-[#259b3a] shadow-md transition-all active:scale-95">SELECT</button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </SimpleModal>
+
         <CalendarModal 
             isOpen={showCalendar}
             onClose={() => setShowCalendar(false)}
-            onSelect={handleDateSelect}
+            onDateSelect={handleDateSelect}
             initialDate={formData.date}
         />
 

@@ -53,5 +53,23 @@ export const payBillService = {
     } catch (error) {
       throw error.response?.data || 'Failed to process payment';
     }
+  },
+
+  async search(query = '') {
+    try {
+      const response = await api.get('/search', { params: { query } });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || 'Failed to search payments';
+    }
+  },
+
+  async getPayment(payDoc) {
+    try {
+      const response = await api.get(`/${payDoc}`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || 'Failed to load payment details';
+    }
   }
 };

@@ -114,7 +114,7 @@ const BankReconciliationBoard = ({ isOpen, onClose }) => {
                                         value={formData.statementDate}
                                         className="w-[120px] px-2 text-[13px] border border-gray-200 rounded-[5px] outline-none text-slate-700 font-bold bg-white text-center shadow-sm"
                                     />
-                                    <button onClick={() => setShowCalendar(true)} className="w-10 h-10 bg-white border border-gray-300 text-[#0285fd] flex items-center justify-center hover:bg-blue-50 rounded-[5px] transition-all shadow-sm active:scale-90">
+                                    <button onClick={() => setShowCalendar(true)} className="w-10 h-10 bg-[#0285fd] text-white flex items-center justify-center rounded-[5px] transition-all shadow-sm active:scale-90">
                                         <Calendar size={16} />
                                     </button>
                                 </div>

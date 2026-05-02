@@ -29,7 +29,9 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
     const [orders, setOrders] = useState([]); // List of existing POs for picker
     const [showSearchModal, setShowSearchModal] = useState(false);
     const [showConfirmModal, setShowConfirmModal] = useState(false);
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [isApplying, setIsApplying] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
     const [showSupplierSearch, setShowSupplierSearch] = useState(false);
     const [showProductSearch, setShowProductSearch] = useState(false);
     const [showAddProductModal, setShowAddProductModal] = useState(false);
@@ -312,14 +314,20 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
 
     const handleDelete = async () => {
         if (!formData.docNo) return;
-        if (!window.confirm("Are you sure you want to delete this record?")) return;
+        setShowDeleteConfirm(true);
+    };
 
+    const confirmDelete = async () => {
+        setIsDeleting(true);
         try {
             await purchOrderService.delete(formData.docNo, formData.company);
             toast.success('Record deleted successfully.');
             handleClear();
+            setShowDeleteConfirm(false);
         } catch (error) {
             toast.error(error.toString());
+        } finally {
+            setIsDeleting(false);
         }
     };
 
@@ -923,6 +931,17 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
                 message={`Are you sure you want to save and apply this Purchase Order (${formData.docNo})? This action will finalize the transaction.`}
                 loading={isApplying}
                 confirmText="Apply Order"
+            />
+
+            <ConfirmModal 
+                isOpen={showDeleteConfirm}
+                onClose={() => setShowDeleteConfirm(false)}
+                onConfirm={confirmDelete}
+                title="Delete Purchase Order"
+                message={`Are you sure you want to delete this record (${formData.docNo})? This action cannot be undone and will permanently remove the document.`}
+                loading={isDeleting}
+                confirmText="Delete Record"
+                variant="danger"
             />
         </>
     );
