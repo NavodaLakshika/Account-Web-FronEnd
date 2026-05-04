@@ -1,53 +1,56 @@
 import React, { useState } from 'react';
 import SimpleModal from '../components/SimpleModal';
-import { HelpCircle, ChevronDown, PlusCircle , X} from 'lucide-react';
+import AccountBoard from './AccountBoard';
+import MainAccountTypeModal from '../components/MainAccountTypeModal';
+import { HelpCircle, ChevronDown, PlusCircle, X, Search } from 'lucide-react';
 
 const NewAccountBoard = ({ isOpen, onClose }) => {
-    const [selectedType, setSelectedType] = useState('Expence');
+    const [selectedType, setSelectedType] = useState('Expense');
     const [otherAccountType, setOtherAccountType] = useState('');
+    const [showTypeModal, setShowTypeModal] = useState(false);
 
     const accountDetails = {
         Income: {
             title: 'Income Account',
-            description: 'Categorizes money your business earns through sales, services, or other revenue streams.',
-            examples: ['Product sales', 'Service fees', 'Interest income', 'Rental income']
+            description: 'Tracks revenue generated from primary business operations and sales.',
+            tip: 'Record income when earned for accurate profit tracking.',
+            examples: ['Product Sales', 'Service Fees', 'Interest Income']
         },
-        Expence: {
+        Expense: {
             title: 'Expense Account',
-            description: 'Categorizes money spent in the course of normal business operations, such as:',
-            examples: [
-                'Advertising and promotion',
-                'Office supplies',
-                'Insurance',
-                'Legal fees',
-                'Charitable contributions',
-                'Rent'
-            ]
+            description: 'Tracks costs incurred during regular business operation activities.',
+            tip: 'Clearly categorize expenses for better tax reporting.',
+            examples: ['Office Rent', 'Utility Bills', 'Staff Salaries']
         },
         Assets: {
             title: 'Assets Account',
-            description: 'Tracks the value of things your business owns, from cash to physical property.',
-            examples: ['Inventory', 'Equipment', 'Vehicles', 'Real Estate']
+            description: 'Tracks valuable resources owned by the company for future benefit.',
+            tip: 'Regularly audit physical assets for balance sheet accuracy.',
+            examples: ['Inventory', 'Equipment', 'Property Value']
         },
         Bank: {
             title: 'Bank Account',
-            description: 'Tracks money held in financial institutions, including checking and savings accounts.',
-            examples: ['Checking account', 'Savings account', 'Money market account']
+            description: 'Tracks liquid cash balances held within various financial accounts.',
+            tip: 'Perform weekly reconciliations to catch errors early.',
+            examples: ['Checking', 'Savings', 'Petty Cash']
         },
         Loan: {
             title: 'Loan Account',
-            description: 'Tracks money borrowed from lenders and the balance remaining to be paid.',
-            examples: ['Business loans', 'Mortgages', 'Lines of credit']
+            description: 'Tracks borrowed funds from lenders that must be repaid over time.',
+            tip: 'Monitor interest rates to manage debt effectively.',
+            examples: ['Bank Loans', 'Mortgages', 'Credit Lines']
         },
         Equity: {
             title: 'Equity Account',
-            description: 'Tracks the owners\' investment in the business and retained earnings.',
-            examples: ['Owner\'s equity', 'Common stock', 'Retained earnings']
+            description: 'Tracks the net worth of the business belonging to the owners.',
+            tip: 'Equity represents the owners\' stake in the business.',
+            examples: ['Owner Capital', 'Stock Shares', 'Net Earnings']
         },
         'Credit Cards': {
             title: 'Credit Cards Account',
-            description: 'Tracks liabilities incurred through the use of corporate credit cards.',
-            examples: ['Business credit cards', 'Store credit cards']
+            description: 'Tracks revolving debt and liabilities from corporate card usage.',
+            tip: 'Pay off balances monthly to avoid high interest fees.',
+            examples: ['Visa Card', 'Mastercard', 'Amex Business']
         }
     };
 
@@ -57,6 +60,36 @@ const NewAccountBoard = ({ isOpen, onClose }) => {
         examples: []
     };
 
+    const [showAccountBoard, setShowAccountBoard] = useState(false);
+
+    // Reset state when modal is closed
+    React.useEffect(() => {
+        if (!isOpen) {
+            setShowAccountBoard(false);
+            setSelectedType('Expense');
+            setOtherAccountType('');
+        }
+    }, [isOpen]);
+
+    const handleCreateClick = () => {
+        const finalType = selectedType === 'Other' ? otherAccountType : selectedType;
+        if (!finalType) {
+            toast.error('Please select an account type first');
+            return;
+        }
+        setShowAccountBoard(true);
+    };
+
+    if (showAccountBoard) {
+        return (
+            <AccountBoard
+                isOpen={isOpen}
+                onClose={onClose}
+                selectedType={selectedType === 'Other' ? otherAccountType : selectedType}
+            />
+        );
+    }
+
     return (
         <SimpleModal
             isOpen={isOpen}
@@ -64,18 +97,12 @@ const NewAccountBoard = ({ isOpen, onClose }) => {
             title="Create New Account"
             maxWidth="max-w-2xl"
             footer={
-                <div className="bg-slate-50 px-6 py-4 w-full flex justify-end gap-3 border-t border-gray-100 mt-4 rounded-b-xl">
+                <div className="bg-slate-50  w-full flex justify-end gap-3 border-t border-gray-100 mt-4 rounded-b-xl">
                     <button
                         className="px-6 h-10 bg-[#50af60] text-white text-[13px] font-bold rounded-[5px] shadow-md shadow-green-200 hover:bg-[#24db4e] transition-all active:scale-95 flex items-center gap-2"
-                        onClick={() => {
-                            console.log('Creating account:', selectedType === 'Other' ? otherAccountType : selectedType);
-                            onClose();
-                        }}
+                        onClick={handleCreateClick}
                     >
                         <PlusCircle size={14} /> Create Account
-                    </button>
-                    <button onClick={onClose} className="px-6 h-10 bg-[#d13438] text-white text-[13px] font-bold rounded-[5px] shadow-md shadow-red-200 hover:bg-[#a4262c] transition-all active:scale-95 flex items-center justify-center gap-2">
-                        <X size={14} /> Exit
                     </button>
                 </div>
             }
@@ -100,8 +127,8 @@ const NewAccountBoard = ({ isOpen, onClose }) => {
                                     label="Expense"
                                     id="expce"
                                     name="accountType"
-                                    checked={selectedType === 'Expence'}
-                                    onChange={() => setSelectedType('Expence')}
+                                    checked={selectedType === 'Expense'}
+                                    onChange={() => setSelectedType('Expense')}
                                 />
                             </div>
                         </div>
@@ -144,71 +171,80 @@ const NewAccountBoard = ({ isOpen, onClose }) => {
                                     checked={selectedType === 'Credit Cards'}
                                     onChange={() => setSelectedType('Credit Cards')}
                                 />
+                                <div className="pt-2 mt-2 border-t border-gray-200 flex items-center justify-between group">
+                                    <RadioButton
+                                        label={otherAccountType || "Other"}
+                                        id="other"
+                                        name="accountType"
+                                        checked={selectedType === 'Other'}
+                                        onChange={() => {
+                                            setSelectedType('Other');
+                                            setShowTypeModal(true);
+                                        }}
+                                    />
+                                    <button 
+                                        onClick={() => setShowTypeModal(true)}
+                                        className="w-8 h-8 bg-[#0285fd] text-white flex items-center justify-center rounded-[5px] hover:bg-blue-600 transition-all active:scale-95 shrink-0 shadow-sm"
+                                    >
+                                        <Search size={14} />
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    {/* Right Column: Information Pane */}
-                    <div className="flex-1 border border-gray-200 p-6 bg-blue-50/30 rounded-sm">
-                        <div className="text-center mb-6">
-                            <h3 className="text-sm font-bold text-blue-900 uppercase tracking-tight">{currentDetails.title}</h3>
+                    {/* Right Column: Information Pane with Cinematic Page-Turn & Glow */}
+                    <div 
+                        key={selectedType}
+                        className="flex-1 border border-blue-200 p-6 bg-white rounded-sm shadow-[0_0_15px_rgba(30,144,255,0.05)] animate-in slide-in-from-right-4 fade-in duration-500 ease-out"
+                    >
+                        <div className="text-center mb-6 border-b border-blue-50 pb-4">
+                            <h3 className="text-[13px] font-black text-blue-900 uppercase tracking-widest">{currentDetails.title}</h3>
                         </div>
 
-                        <p className="text-xs text-gray-600 leading-relaxed mb-4">
-                            {currentDetails.description}
-                        </p>
-
-                        {currentDetails.examples.length > 0 && (
-                            <div className="space-y-2">
-                                <p className="text-[10px] font-bold text-gray-400 uppercase">Examples:</p>
-                                <ul className="text-xs text-gray-600 space-y-1.5 ml-2">
-                                    {currentDetails.examples.map((ex, i) => (
-                                        <li key={i} className="flex gap-2 items-start">
-                                            <div className="w-1.5 h-1.5 rounded-full bg-blue-400 mt-1.5 shrink-0"></div>
-                                            <span>{ex}</span>
-                                        </li>
-                                    ))}
-                                </ul>
+                        <div className="space-y-6">
+                            <div>
+                                <p className="text-[11px] font-bold text-gray-400 uppercase mb-2 tracking-wider">Description</p>
+                                <p className="text-[11px] text-gray-600 leading-relaxed ">
+                                    "{currentDetails.description}"
+                                </p>
                             </div>
-                        )}
-                    </div>
-                </div>
 
-                {/* Bottom Row: Other Account Type */}
-                <div className="pt-4 border-t border-gray-200">
-                    <div className="flex items-center gap-6">
-                        <div className="flex items-center gap-3 w-[180px] shrink-0">
-                            <input
-                                type="radio"
-                                id="other"
-                                name="accountType"
-                                checked={selectedType === 'Other'}
-                                onChange={() => setSelectedType('Other')}
-                                className="w-4 h-4 cursor-pointer accent-[#0078d4]"
-                            />
-                            <label htmlFor="other" className={`text-sm cursor-pointer ${selectedType === 'Other' ? 'font-bold text-gray-900' : 'text-gray-700 font-medium'}`}>Other Account Type</label>
-                        </div>
-                        <div className="relative flex-1">
-                            <select
-                                disabled={selectedType !== 'Other'}
-                                value={otherAccountType}
-                                onChange={(e) => setOtherAccountType(e.target.value)}
-                                className="w-full h-8 px-2 pr-8 text-sm bg-white border border-gray-300 rounded-sm appearance-none disabled:bg-gray-50 disabled:text-gray-400 focus:outline-none focus:border-blue-500"
-                            >
-                                <option value="" disabled>Select from registry...</option>
-                                <option value="Cost of Goods Sold">Cost of Goods Sold</option>
-                                <option value="Other Income">Other Income</option>
-                                <option value="Other Expense">Other Expense</option>
-                                <option value="Other Current Asset">Other Current Asset</option>
-                                <option value="Fixed Asset">Fixed Asset</option>
-                                <option value="Other Current Liability">Other Current Liability</option>
-                                <option value="Long Term Liability">Long Term Liability</option>
-                            </select>
-                            <ChevronDown size={14} className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+                            <div className="p-3 bg-blue-50/50 rounded-lg border border-blue-100/50">
+                                <p className="text-[10px] font-bold text-blue-400 uppercase mb-1.5 tracking-wider flex items-center gap-1.5">
+                                    <HelpCircle size={10} /> Professional Tip
+                                </p>
+                                <p className="text-[11px] text-blue-800 font-medium">
+                                    {currentDetails.tip}
+                                </p>
+                            </div>
+
+                            {currentDetails.examples.length > 0 && (
+                                <div className="space-y-3">
+                                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Common Examples</p>
+                                    <div className="grid grid-cols-1 gap-2 ml-1">
+                                        {currentDetails.examples.map((ex, i) => (
+                                            <div key={i} className="flex gap-2 items-center group/item">
+                                                <div className="w-1.5 h-1.5 rounded-full bg-blue-500 group-hover/item:scale-125 transition-transform shrink-0"></div>
+                                                <span className="text-[11px] text-gray-600 font-bold group-hover/item:text-blue-600 transition-colors">{ex}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
             </div>
+
+            <MainAccountTypeModal
+                isOpen={showTypeModal}
+                onClose={() => setShowTypeModal(false)}
+                onSelect={(type) => {
+                    setOtherAccountType(type.main_Acc_Name);
+                    setSelectedType('Other');
+                }}
+            />
         </SimpleModal>
     );
 };

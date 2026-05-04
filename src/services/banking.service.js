@@ -215,5 +215,69 @@ export const bankingService = {
         } catch (error) {
             throw error.response?.data?.message || 'Failed to register not presented cheques.';
         }
+    },
+
+    // BANK RECONCILIATION
+    getReconLookups: async (companyCode = 'C001') => {
+        try {
+            const resp = await api.get(`bankreconciliation/lookups?companyCode=${companyCode}`);
+            return resp.data;
+        } catch (error) {
+            return { banks: [] };
+        }
+    },
+
+    generateReconDocNo: async (companyCode = 'C001') => {
+        try {
+            const resp = await api.get(`bankreconciliation/gen-docno?companyCode=${companyCode}`);
+            return resp.data;
+        } catch (error) {
+            return { docNo: 'BRC000000001' };
+        }
+    },
+
+    initializeReconTemp: async (tempDocNo, companyCode = 'C001') => {
+        try {
+            const resp = await api.get(`bankreconciliation/init-temp?tempDocNo=${tempDocNo}&companyCode=${companyCode}`);
+            return resp.data;
+        } catch (error) {
+            return null;
+        }
+    },
+
+    getReconOpeningBalance: async (params) => {
+        try {
+            const resp = await api.get(`bankreconciliation/opening-balance`, { params });
+            return resp.data;
+        } catch (error) {
+            return { openingBalance: 0 };
+        }
+    },
+
+    getReconTransactions: async (params) => {
+        try {
+            const resp = await api.get(`bankreconciliation/transactions`, { params });
+            return resp.data;
+        } catch (error) {
+            return { debits: [], credits: [], totalDebit: 0, totalCredit: 0 };
+        }
+    },
+
+    updateReconCheck: async (data) => {
+        try {
+            const resp = await api.post(`bankreconciliation/update-check`, data);
+            return resp.data;
+        } catch (error) {
+            return null;
+        }
+    },
+
+    applyRecon: async (data) => {
+        try {
+            const resp = await api.post(`bankreconciliation/apply`, data);
+            return resp.data;
+        } catch (error) {
+            throw error.response?.data?.message || 'Failed to apply reconciliation.';
+        }
     }
 };

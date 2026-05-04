@@ -49,6 +49,8 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
     const safeSuppliers = lookups.suppliers || [];
     const safeAccounts = lookups.allAccounts || [];
     const [expenses, setExpenses] = useState([]);
+    const [items, setItems] = useState([]);
+    const [activeTab, setActiveTab] = useState('expenses');
 
     // Header form
     const [form, setForm] = useState({
@@ -60,6 +62,7 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
 
     // Expense line form
     const [line, setLine] = useState({ accCode:'', accName:'', amount:'0.00', memo:'', costCode:'', costName:'', idNo:'0' });
+    const [itemLine, setItemLine] = useState({ itemId:'', itemName:'', qty:1, cost:'0.00', description:'', custJob:'', idNo:'0' });
     const [vouAmount, setVouAmount] = useState(0);
 
     // Modals
@@ -70,6 +73,7 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
     const [showAccModal,      setShowAccModal]      = useState(false);
     const [showCCModal,       setShowCCModal]       = useState(false);
     const [showCCFromModal,   setShowCCFromModal]   = useState(false);
+    const [showItemModal,     setShowItemModal]     = useState(false);
     const [showDocSearch,     setShowDocSearch]     = useState(false);
     const [savedDocs,         setSavedDocs]         = useState([]);
 
@@ -135,6 +139,41 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
         finally { setLoading(false); }
     };
 
+    const handleAddItem = async () => {
+        if (!itemLine.itemId) return toast.error('Select an item.');
+        const cost = parseFloat(itemLine.cost) || 0;
+        if (cost <= 0) return toast.error('Enter a valid cost.');
+        setLoading(true);
+        try {
+            const payload = {
+                DocNo: form.docNo, Company: company, Account: form.pettyAccCode,
+                VendorId: form.vendorId || '.', Payee: form.payee || '.',
+                ItemId: itemLine.itemId, Description: itemLine.description || itemLine.itemName || '.',
+                Qty: itemLine.qty, Cost: cost * itemLine.qty, VouAmount: vouAmount + (cost * itemLine.qty),
+                Memo: '.', CustJob: itemLine.custJob || '', IdNo: itemLine.idNo,
+            };
+            // Note: need pettyCashService.addItem implemented
+            const r = await pettyCashService.addItem(userName, payload);
+            setItems(r.lines || []);
+            setVouAmount(r.totOut || 0);
+            setItemLine({ itemId:'', itemName:'', qty:1, cost:'0.00', description:'', custJob:'', idNo:'0' });
+            if ((r.lines||[]).length === 1 && expenses.length === 0) await saveHeader(r.totOut);
+        } catch(e) { toast.error('Error: ' + e.message); }
+        finally { setLoading(false); }
+    };
+
+    const handleDeleteItem = async (itm) => {
+        setLoading(true);
+        try {
+            const r = await pettyCashService.deleteItem(userName, {
+                DocNo: form.docNo, Company: company, VendorId: form.vendorId||'.', Payee: form.payee||'.', ItemId: itm.itemId, IdNo: itm.idNo,
+            });
+            setItems(r.lines || []);
+            setVouAmount(r.totOut || 0);
+        } catch(e) { toast.error('Error: ' + e.message); }
+        finally { setLoading(false); }
+    };
+
     const saveHeader = async (tot) => {
         try {
             await pettyCashService.apply(userName, {
@@ -150,7 +189,7 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
     const handleApply = async () => {
         if (!form.pettyAccCode) return toast.error('Select a petty cash account.');
         if (!form.costCenterFrom) return toast.error('Select cost center (from).');
-        if (expenses.length === 0) return toast.error('Add at least one expense line.');
+        if (expenses.length === 0 && items.length === 0) return toast.error('Add at least one expense or item line.');
         if (parseFloat(differ()) !== 0) return toast.error(`Bill amount and voucher amount not balanced. Difference: ${differ()}`);
         setLoading(true);
         try {
@@ -170,15 +209,44 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
 
     const handleClear = async () => {
         await pettyCashService.clearDraft(form.docNo, company).catch(()=>{});
-        setExpenses([]); setVouAmount(0);
+        setExpenses([]); setItems([]); setVouAmount(0);
         setLine({ accCode:'', accName:'', amount:'0.00', memo:'', costCode:'', costName:'', idNo:'0' });
+        setItemLine({ itemId:'', itemName:'', qty:1, cost:'0.00', description:'', custJob:'', idNo:'0' });
         setForm(f => ({ ...f, isVendor:false, vendorId:'', vendorName:'', payee:'', location:'', memo:'', vouchNo:'', refNo:'', billAmount:'0.00', pettyAccCode:'', pettyAccName:'', costCenterFrom:'' }));
         generateDoc();
     };
 
     const openDocSearch = async () => {
         const docs = await pettyCashService.searchDocs(company).catch(()=>[]);
-        setSavedDocs(docs); setShowDocSearch(true);
+        const mappedDocs = docs.map(d => ({ ...d, code: d.docNo, name: `${d.payee || 'Unknown'} | Date: ${d.date?.split('T')[0] || ''} | Amt: ${parseFloat(d.amount||0).toFixed(2)}` }));
+        setSavedDocs(mappedDocs); setShowDocSearch(true);
+    };
+
+    const loadDraft = async (d) => {
+        try {
+            const data = await pettyCashService.getDraft(d.docNo, company);
+            const formatDate = (dbDate) => {
+                if (!dbDate) return today();
+                if (dbDate.includes('/')) return dbDate;
+                if (dbDate.includes('-')) {
+                    const parts = dbDate.split('T')[0].split('-');
+                    if (parts.length === 3) {
+                        return `${parts[2]}/${parts[1]}/${parts[0]}`;
+                    }
+                }
+                return today();
+            };
+
+            if (data.header) {
+                setForm(f => ({ ...f, docNo: data.header.doc_No, payee: data.header.payee||'', vendorId: data.header.vendor_Id||'', billAmount: data.header.net_Amount||'0.00', vouchNo: data.header.inv_No||'', date: formatDate(data.header.post_Date), memo: data.header.memo||'', location: data.header.location||'', refNo: data.header.reference||'', dueDate: formatDate(data.header.expected_Date), costCenterFrom: data.header.costCenter||'', pettyAccCode: data.header.account||'', isVendor: !!data.header.vendor_Id }));
+            }
+            setExpenses(data.expenses || []);
+            setItems(data.items || []);
+            // calc vouch amount
+            const expTotal = (data.expenses||[]).reduce((a,b)=>a+parseFloat(b.amount||0), 0);
+            const itemTotal = (data.items||[]).reduce((a,b)=>a+(parseFloat(b.cost||0)), 0);
+            setVouAmount(expTotal + itemTotal);
+        } catch { toast.error('Failed to load draft'); }
     };
 
     const fmtLabel = 'text-[11.5px] font-bold text-gray-600 w-28 shrink-0 font-mono uppercase tracking-wide';
@@ -286,57 +354,120 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                     </div>
                 </div>
 
-                {/* ── Expense Line Entry ── */}
-                <div className="bg-blue-50/40 border border-blue-100 rounded-xl p-3">
-                    <div className="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-2 font-mono">Add Expense Line</div>
-                    <div className="flex flex-wrap gap-2 items-center">
-                        {/* Account */}
-                        <div className="flex items-center gap-1">
-                            <input readOnly value={line.accName||line.accCode} placeholder="Expense account" className={`${fmtInput} w-44 cursor-pointer`} onClick={()=>setShowAccModal(true)}/>
-                            <button onClick={()=>setShowAccModal(true)} className="w-7 h-8 bg-[#0285fd] text-white rounded-md flex items-center justify-center hover:bg-blue-600"><Search size={11}/></button>
-                        </div>
-                        {/* Amount */}
-                        <input type="number" value={line.amount} onChange={e=>setLine(l=>({...l,amount:e.target.value}))} placeholder="Amount" className={`${fmtInput} w-28 text-right`}/>
-                        {/* Cost Center */}
-                        <div className="flex items-center gap-1">
-                            <input readOnly value={line.costName||line.costCode} placeholder="Cost center" className={`${fmtInput} w-36 cursor-pointer`} onClick={()=>setShowCCModal(true)}/>
-                            <button onClick={()=>setShowCCModal(true)} className="w-7 h-8 bg-[#0285fd] text-white rounded-md flex items-center justify-center hover:bg-blue-600"><Search size={11}/></button>
-                        </div>
-                        {/* Memo */}
-                        <input value={line.memo} onChange={e=>setLine(l=>({...l,memo:e.target.value}))} placeholder="Memo" className={`${fmtInput} flex-1 min-w-28`}/>
-                        {/* Add */}
-                        <button onClick={handleAddExpense} disabled={loading} className="h-8 px-4 bg-[#22c55e] hover:bg-green-600 text-white rounded-md text-[11px] font-bold flex items-center gap-1 active:scale-95 disabled:opacity-50">
-                            {loading ? <Loader2 size={11} className="animate-spin"/> : <Plus size={11}/>} Add
-                        </button>
-                    </div>
+                {/* Tabs */}
+                <div className="flex items-center gap-1 border-b border-gray-200 pt-2">
+                    <button onClick={()=>setActiveTab('expenses')} className={`px-4 py-2 text-xs font-bold font-mono tracking-wide rounded-t-lg transition-colors ${activeTab==='expenses'?'bg-[#0285fd] text-white':'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}>Expenses</button>
+                    <button onClick={()=>setActiveTab('items')} className={`px-4 py-2 text-xs font-bold font-mono tracking-wide rounded-t-lg transition-colors ${activeTab==='items'?'bg-[#0285fd] text-white':'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}>Items Purchase</button>
                 </div>
 
-                {/* ── Expense Lines Grid ── */}
-                <div className="border border-gray-200 rounded-xl overflow-hidden">
-                    <div className="grid grid-cols-[2fr_1fr_1.5fr_2fr_auto] bg-[#0285fd] text-white text-[10px] font-black font-mono uppercase tracking-widest">
-                        {['Account','Amount','Cost Center','Memo','Del'].map(h=>(
-                            <div key={h} className="px-3 py-2">{h}</div>
-                        ))}
-                    </div>
-                    <div className="divide-y divide-gray-100 max-h-48 overflow-y-auto">
-                        {expenses.map((exp,i)=>(
-                            <div key={i} className="grid grid-cols-[2fr_1fr_1.5fr_2fr_auto] items-center hover:bg-blue-50/40 transition-colors">
-                                <div className="px-3 py-1.5 text-[11.5px] font-mono text-gray-700">{exp.accName}</div>
-                                <div className="px-3 py-1.5 text-[11.5px] font-mono text-right text-blue-700">{parseFloat(exp.amount||0).toFixed(2)}</div>
-                                <div className="px-3 py-1.5 text-[11px] text-gray-600">{exp.costName||exp.costCode}</div>
-                                <div className="px-3 py-1.5 text-[11px] text-gray-500">{exp.memo}</div>
-                                <div className="px-2">
-                                    <button onClick={()=>handleDeleteExpense(exp)} className="w-6 h-6 flex items-center justify-center text-red-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors">
-                                        <Trash2 size={12}/>
-                                    </button>
+                {activeTab === 'expenses' && (
+                    <>
+                        {/* ── Expense Line Entry ── */}
+                        <div className="bg-blue-50/40 border border-blue-100 rounded-xl p-3">
+                            <div className="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-2 font-mono">Add Expense Line</div>
+                            <div className="flex flex-wrap gap-2 items-center">
+                                {/* Account */}
+                                <div className="flex items-center gap-1">
+                                    <input readOnly value={line.accName||line.accCode} placeholder="Expense account" className={`${fmtInput} w-44 cursor-pointer`} onClick={()=>setShowAccModal(true)}/>
+                                    <button onClick={()=>setShowAccModal(true)} className="w-7 h-8 bg-[#0285fd] text-white rounded-md flex items-center justify-center hover:bg-blue-600"><Search size={11}/></button>
                                 </div>
+                                {/* Amount */}
+                                <input type="number" value={line.amount} onChange={e=>setLine(l=>({...l,amount:e.target.value}))} placeholder="Amount" className={`${fmtInput} w-28 text-right`}/>
+                                {/* Cost Center */}
+                                <div className="flex items-center gap-1">
+                                    <input readOnly value={line.costName||line.costCode} placeholder="Cost center" className={`${fmtInput} w-36 cursor-pointer`} onClick={()=>setShowCCModal(true)}/>
+                                    <button onClick={()=>setShowCCModal(true)} className="w-7 h-8 bg-[#0285fd] text-white rounded-md flex items-center justify-center hover:bg-blue-600"><Search size={11}/></button>
+                                </div>
+                                {/* Memo */}
+                                <input value={line.memo} onChange={e=>setLine(l=>({...l,memo:e.target.value}))} placeholder="Memo" className={`${fmtInput} flex-1 min-w-28`}/>
+                                {/* Add */}
+                                <button onClick={handleAddExpense} disabled={loading} className="h-8 px-4 bg-[#22c55e] hover:bg-green-600 text-white rounded-md text-[11px] font-bold flex items-center gap-1 active:scale-95 disabled:opacity-50">
+                                    {loading ? <Loader2 size={11} className="animate-spin"/> : <Plus size={11}/>} Add
+                                </button>
                             </div>
-                        ))}
-                        {expenses.length===0 && (
-                            <div className="text-center text-gray-400 text-xs py-8 font-mono">No expense lines added</div>
-                        )}
-                    </div>
-                </div>
+                        </div>
+
+                        {/* ── Expense Lines Grid ── */}
+                        <div className="border border-gray-200 rounded-xl overflow-hidden">
+                            <div className="grid grid-cols-[2fr_1fr_1.5fr_2fr_auto] bg-[#0285fd] text-white text-[10px] font-black font-mono uppercase tracking-widest">
+                                {['Account','Amount','Cost Center','Memo','Del'].map(h=>(
+                                    <div key={h} className="px-3 py-2">{h}</div>
+                                ))}
+                            </div>
+                            <div className="divide-y divide-gray-100 max-h-48 overflow-y-auto">
+                                {expenses.map((exp,i)=>(
+                                    <div key={i} className="grid grid-cols-[2fr_1fr_1.5fr_2fr_auto] items-center hover:bg-blue-50/40 transition-colors">
+                                        <div className="px-3 py-1.5 text-[11.5px] font-mono text-gray-700">{exp.accName}</div>
+                                        <div className="px-3 py-1.5 text-[11.5px] font-mono text-right text-blue-700">{parseFloat(exp.amount||0).toFixed(2)}</div>
+                                        <div className="px-3 py-1.5 text-[11px] text-gray-600">{exp.costName||exp.costCode}</div>
+                                        <div className="px-3 py-1.5 text-[11px] text-gray-500">{exp.memo}</div>
+                                        <div className="px-2">
+                                            <button onClick={()=>handleDeleteExpense(exp)} className="w-6 h-6 flex items-center justify-center text-red-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors">
+                                                <Trash2 size={12}/>
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                                {expenses.length===0 && (
+                                    <div className="text-center text-gray-400 text-xs py-8 font-mono">No expense lines added</div>
+                                )}
+                            </div>
+                        </div>
+                    </>
+                )}
+
+                {activeTab === 'items' && (
+                    <>
+                        {/* ── Item Purchase Entry ── */}
+                        <div className="bg-emerald-50/40 border border-emerald-100 rounded-xl p-3">
+                            <div className="text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-2 font-mono">Add Item Purchase</div>
+                            <div className="flex flex-wrap gap-2 items-center">
+                                {/* Item */}
+                                <div className="flex items-center gap-1">
+                                    <input readOnly value={itemLine.itemName||itemLine.itemId} placeholder="Select Item" className={`${fmtInput} w-44 cursor-pointer`} onClick={()=>setShowItemModal(true)}/>
+                                    <button onClick={()=>setShowItemModal(true)} className="w-7 h-8 bg-[#0285fd] text-white rounded-md flex items-center justify-center hover:bg-blue-600"><Search size={11}/></button>
+                                </div>
+                                {/* Qty */}
+                                <input type="number" value={itemLine.qty} onChange={e=>setItemLine(l=>({...l,qty:e.target.value}))} placeholder="Qty" className={`${fmtInput} w-16 text-center`}/>
+                                {/* Cost */}
+                                <input type="number" value={itemLine.cost} onChange={e=>setItemLine(l=>({...l,cost:e.target.value}))} placeholder="Cost" className={`${fmtInput} w-24 text-right`}/>
+                                {/* Description */}
+                                <input value={itemLine.description} onChange={e=>setItemLine(l=>({...l,description:e.target.value}))} placeholder="Description" className={`${fmtInput} flex-1 min-w-28`}/>
+                                {/* Add */}
+                                <button onClick={handleAddItem} disabled={loading} className="h-8 px-4 bg-[#22c55e] hover:bg-green-600 text-white rounded-md text-[11px] font-bold flex items-center gap-1 active:scale-95 disabled:opacity-50">
+                                    {loading ? <Loader2 size={11} className="animate-spin"/> : <Plus size={11}/>} Add
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* ── Items Grid ── */}
+                        <div className="border border-gray-200 rounded-xl overflow-hidden">
+                            <div className="grid grid-cols-[1fr_2fr_1fr_1.5fr_auto] bg-emerald-600 text-white text-[10px] font-black font-mono uppercase tracking-widest">
+                                {['Item Code','Description','Qty','Cost (Total)','Del'].map(h=>(
+                                    <div key={h} className="px-3 py-2">{h}</div>
+                                ))}
+                            </div>
+                            <div className="divide-y divide-gray-100 max-h-48 overflow-y-auto">
+                                {items.map((itm,i)=>(
+                                    <div key={i} className="grid grid-cols-[1fr_2fr_1fr_1.5fr_auto] items-center hover:bg-emerald-50/40 transition-colors">
+                                        <div className="px-3 py-1.5 text-[11.5px] font-mono text-gray-700">{itm.itemId}</div>
+                                        <div className="px-3 py-1.5 text-[11.5px] font-mono text-gray-600">{itm.description}</div>
+                                        <div className="px-3 py-1.5 text-[11px] text-center text-gray-600">{itm.qty}</div>
+                                        <div className="px-3 py-1.5 text-[11.5px] font-mono text-right text-emerald-700">{parseFloat(itm.cost||0).toFixed(2)}</div>
+                                        <div className="px-2">
+                                            <button onClick={()=>handleDeleteItem(itm)} className="w-6 h-6 flex items-center justify-center text-red-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors">
+                                                <Trash2 size={12}/>
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                                {items.length===0 && (
+                                    <div className="text-center text-gray-400 text-xs py-8 font-mono">No item lines added</div>
+                                )}
+                            </div>
+                        </div>
+                    </>
+                )}
 
             </div>
         </SimpleModal>
@@ -364,28 +495,13 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
         <SearchModal isOpen={showCCFromModal} onClose={()=>setShowCCFromModal(false)} title="Select Cost Center (From)"
             items={safeCC} onSelect={c=>setForm(f=>({...f,costCenterFrom:c.code}))}/>
 
+        {/* Item Modal */}
+        <SearchModal isOpen={showItemModal} onClose={()=>setShowItemModal(false)} title="Select Item"
+            items={lookups.products||[]} onSelect={p=>setItemLine(l=>({...l,itemId:p.code,itemName:p.name,cost:p.price,description:p.name}))}/>
+
         {/* Doc Search */}
-        {showDocSearch && (
-            <div className="fixed inset-0 z-[2100] flex items-center justify-center bg-black/40 backdrop-blur-sm" onClick={()=>setShowDocSearch(false)}>
-                <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden" onClick={e=>e.stopPropagation()}>
-                    <div className="bg-[#0285fd] px-5 py-3 flex items-center justify-between">
-                        <span className="text-white font-mono font-bold text-xs tracking-widest uppercase">Saved Drafts</span>
-                        <button onClick={()=>setShowDocSearch(false)} className="text-white hover:bg-white/20 p-1 rounded"><X size={16}/></button>
-                    </div>
-                    <div className="divide-y max-h-72 overflow-y-auto">
-                        {savedDocs.map((d,i)=>(
-                            <div key={i} onClick={async ()=>{ setShowDocSearch(false); }} className="flex items-center gap-4 px-4 py-2.5 hover:bg-blue-50 cursor-pointer">
-                                <span className="font-mono text-xs text-blue-600 w-28">{d.docNo}</span>
-                                <span className="text-xs text-gray-600 flex-1">{d.payee}</span>
-                                <span className="text-xs text-gray-500">{d.date}</span>
-                                <span className="text-xs font-bold text-right text-gray-700">{parseFloat(d.amount||0).toFixed(2)}</span>
-                            </div>
-                        ))}
-                        {savedDocs.length===0 && <div className="text-center text-gray-400 text-sm py-8">No saved drafts</div>}
-                    </div>
-                </div>
-            </div>
-        )}
+        <SearchModal isOpen={showDocSearch} onClose={()=>setShowDocSearch(false)} title="Saved Drafts"
+            items={savedDocs} onSelect={d => loadDraft(d)}/>
         </>
     );
 };

@@ -1,341 +1,414 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import SimpleModal from '../components/SimpleModal';
+import { Search, Calendar, ChevronDown, CheckCircle2, RotateCcw, Landmark, ListChecks, ArrowUpRight, ArrowDownLeft, Info, History, Save, CheckCircle, Loader2 } from 'lucide-react';
 import CalendarModal from '../components/CalendarModal';
-import { Landmark, Search, Calendar, RotateCcw, Save, X, Loader2, ListFilter, CheckCircle2, History, Scale, LandmarkIcon } from 'lucide-react';
+import { bankingService } from '../services/banking.service';
 import { toast } from 'react-hot-toast';
+
+const SearchModal = ({ isOpen, onClose, title, items, onSelect }) => {
+    const [q, setQ] = useState('');
+    if (!isOpen) return null;
+    const filtered = (items || []).filter(i => (i.name || '').toLowerCase().includes(q.toLowerCase()) || (i.code || '').toLowerCase().includes(q.toLowerCase()));
+    
+    return (
+        <SimpleModal isOpen={isOpen} onClose={onClose} title={title} maxWidth="max-w-[500px]">
+            <div className="space-y-4 font-['Tahoma']">
+                <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-lg border border-gray-100">
+                    <span className="text-[11px] font-black text-gray-400 uppercase tracking-widest">Search</span>
+                    <div className="relative flex-1">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={14} />
+                        <input autoFocus value={q} onChange={e => setQ(e.target.value)} placeholder="Search by name or code..." className="w-full h-8 pl-9 pr-4 border border-gray-200 rounded-[5px] outline-none text-[12px] focus:border-blue-500 bg-white" />
+                    </div>
+                </div>
+                <div className="border border-gray-100 rounded-lg overflow-hidden max-h-[350px] overflow-y-auto no-scrollbar">
+                    <table className="w-full text-left text-[12px]">
+                        <thead className="bg-slate-50 sticky top-0 font-bold text-gray-500 border-b border-gray-100">
+                            <tr><th className="px-4 py-2">Code</th><th className="px-4 py-2">Account Name</th></tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-50">
+                            {filtered.map((item, i) => (
+                                <tr key={i} onClick={() => { onSelect(item); onClose(); }} className="hover:bg-blue-50/50 cursor-pointer transition-colors">
+                                    <td className="px-4 py-2.5 font-mono text-blue-600">{item.code}</td>
+                                    <td className="px-4 py-2.5 text-slate-700 font-bold uppercase">{item.name}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </SimpleModal>
+    );
+};
 
 const BankReconciliationBoard = ({ isOpen, onClose }) => {
     const [loading, setLoading] = useState(false);
-    const [formData, setFormData] = useState({
-        bankCode: '',
+    const [isApplying, setIsApplying] = useState(false);
+    const [lookups, setLookups] = useState({ banks: [] });
+    const [companyCode] = useState(localStorage.getItem('company') || 'C001');
+
+    const [currentUser] = useState(() => {
+        const userData = localStorage.getItem('user');
+        if (userData) {
+            try {
+                const parsed = JSON.parse(userData);
+                return parsed.emp_Name || parsed.Emp_Name || parsed.empName || 'SYSTEM';
+            } catch (e) {
+                return 'SYSTEM';
+            }
+        }
+        return 'SYSTEM';
+    });
+
+    const [header, setHeader] = useState({
+        docNo: 'BRC-AUTO',
+        bankId: '',
         bankName: '',
-        statementDate: new Date().toISOString().split('T')[0],
+        dateFrom: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toLocaleDateString('en-GB'),
+        dateTo: new Date().toLocaleDateString('en-GB'),
+        statementDate: new Date().toLocaleDateString('en-GB'),
+        openingBalance: 0,
         endingBalance: 0
     });
 
-    const [clearedBalance, setClearedBalance] = useState(0);
+    const [transactions, setTransactions] = useState({ debits: [], credits: [] });
+    const [activeModal, setActiveModal] = useState(null); // 'bank', 'dateFrom', 'dateTo', 'statementDate'
+    const [searchQ, setSearchQ] = useState('');
 
-    // Modal States
-    const [showBankModal, setShowBankModal] = useState(false);
-    const [bankSearch, setBankSearch] = useState('');
-    const [showCalendar, setShowCalendar] = useState(false);
+    useEffect(() => {
+        if (isOpen) {
+            fetchLookups();
+            generateDocNo();
+        }
+    }, [isOpen]);
 
-    // Dummy Banks
-    const banks = [
-        { code: 'B001', name: 'Commercial Bank - Main' },
-        { code: 'B002', name: 'HNB Business Savings' },
-        { code: 'B003', name: 'Sampath Corporate' }
-    ];
-
-    const delta = Math.abs(parseFloat(formData.endingBalance) - clearedBalance);
-    const isMatched = delta === 0 && formData.bankCode !== '';
-
-    const handleReset = () => {
-        setFormData({
-            bankCode: '',
-            bankName: '',
-            statementDate: new Date().toISOString().split('T')[0],
-            endingBalance: 0
-        });
-        setClearedBalance(0);
-        setBankSearch('');
+    const fetchLookups = async () => {
+        const data = await bankingService.getReconLookups(companyCode);
+        setLookups(data);
     };
 
-    const handleDateSelect = (date) => {
-        setFormData({ ...formData, statementDate: date });
-        setShowCalendar(false);
+    const generateDocNo = async () => {
+        const data = await bankingService.generateReconDocNo(companyCode);
+        setHeader(prev => ({ ...prev, docNo: data.docNo }));
+        await bankingService.initializeReconTemp(data.docNo, companyCode);
     };
 
-    const handleFinish = async () => {
-        if (!formData.bankCode) return toast.error('Please select a bank account to reconcile.');
-        if (!isMatched) return toast.error('Reconciliation delta must be zero to finish.');
-
+    const loadData = async () => {
+        if (!header.bankId) return toast.error('Please select a bank account');
         setLoading(true);
         try {
-            await new Promise(resolve => setTimeout(resolve, 1500));
-            toast.success('Bank Reconciliation Completed!');
-            onClose();
+            // 1. Get Opening Balance
+            const obData = await bankingService.getReconOpeningBalance({
+                accId: header.bankId,
+                companyCode,
+                dateFrom: header.dateFrom,
+                dateTo: header.dateTo
+            });
+
+            // 2. Get Transactions
+            const txData = await bankingService.getReconTransactions({
+                tempDoc: header.docNo,
+                bankId: header.bankId,
+                companyCode,
+                dateFrom: header.dateFrom,
+                dateTo: header.dateTo,
+                openingBalance: obData.openingBalance
+            });
+
+            setHeader(prev => ({ ...prev, openingBalance: obData.openingBalance }));
+            setTransactions(txData);
+            toast.success('Ledger records synchronized');
         } catch (error) {
-            toast.error('Failed to complete reconciliation.');
+            toast.error('Failed to sync bank records');
         } finally {
             setLoading(false);
         }
     };
 
+    const toggleCheck = async (type, index) => {
+        const list = [...transactions[type]];
+        const item = list[index];
+        const newStatus = !item.chk;
+        
+        // Optimistic update
+        list[index].chk = newStatus;
+        setTransactions({ ...transactions, [type]: list });
+
+        // Backend update
+        await bankingService.updateReconCheck({
+            docNo: item.docNo,
+            chqNo: item.chqNo,
+            checked: newStatus,
+            companyCode
+        });
+    };
+
+    const totals = useMemo(() => {
+        const recDebit = transactions.debits.filter(d => d.chk).reduce((sum, d) => sum + d.debit, 0);
+        const recCredit = transactions.credits.filter(c => c.chk).reduce((sum, c) => sum + c.credit, 0);
+        const clearedBalance = header.openingBalance + recDebit - recCredit;
+        const difference = header.endingBalance - clearedBalance;
+        
+        return { recDebit, recCredit, clearedBalance, difference };
+    }, [transactions, header.openingBalance, header.endingBalance]);
+
+    const setDateRange = (type) => {
+        const now = new Date();
+        let from, to;
+        const fmt = (d) => d.toLocaleDateString('en-GB');
+
+        if (type === 'today') {
+            from = to = now;
+        } else if (type === 'yesterday') {
+            from = to = new Date(now.setDate(now.getDate() - 1));
+        } else if (type === 'thisMonth') {
+            from = new Date(now.getFullYear(), now.getMonth(), 1);
+            to = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+        } else if (type === 'lastMonth') {
+            from = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+            to = new Date(now.getFullYear(), now.getMonth(), 0);
+        }
+
+        setHeader(prev => ({ ...prev, dateFrom: fmt(from), dateTo: fmt(to) }));
+    };
+
+    const handleApply = async () => {
+        if (Math.abs(totals.difference) > 0.01) {
+            return toast.error(`Cannot apply reconciliation. Difference must be zero. Current: ${totals.difference.toFixed(2)}`);
+        }
+
+        setIsApplying(true);
+        try {
+            await bankingService.applyRecon({
+                docNo: header.docNo,
+                bankId: header.bankId,
+                companyCode,
+                dateFrom: header.dateFrom,
+                dateTo: header.dateTo,
+                endBalance: header.endingBalance,
+                clearedBalance: totals.clearedBalance,
+                difference: totals.difference
+            });
+            toast.success('Bank Reconciliation Finalized');
+            onClose();
+        } catch (error) {
+            toast.error(error);
+        } finally {
+            setIsApplying(false);
+        }
+    };
+
+    const renderGrid = (title, type, items, icon, color) => (
+        <div className="flex-1 flex flex-col bg-white border border-slate-100 rounded-xl shadow-sm overflow-hidden min-h-[400px]">
+            <div className={`p-3 border-b border-slate-50 flex items-center justify-between bg-slate-50/50`}>
+                <div className="flex items-center gap-2">
+                    <div className={`p-1.5 rounded-lg bg-${color}-50 text-${color}-600`}>{icon}</div>
+                    <span className="text-[11px] font-black text-slate-500 uppercase tracking-widest">{title}</span>
+                </div>
+                <div className="text-[12px] font-black text-slate-700">
+                    {items.filter(i => i.chk).length} / {items.length} Selected
+                </div>
+            </div>
+            <div className="flex-1 overflow-y-auto no-scrollbar">
+                <table className="w-full text-left text-[11px]">
+                    <thead className="bg-white sticky top-0 border-b border-slate-50 text-slate-400 font-black uppercase tracking-tighter">
+                        <tr>
+                            <th className="px-4 py-2 w-10">Recon</th>
+                            <th className="px-4 py-2">Date</th>
+                            <th className="px-4 py-2">Doc/CHQ</th>
+                            <th className="px-4 py-2 text-right">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-50">
+                        {items.map((item, i) => (
+                            <tr key={i} onClick={() => toggleCheck(type, i)} className={`group cursor-pointer transition-colors ${item.chk ? 'bg-emerald-50/30' : 'hover:bg-slate-50'}`}>
+                                <td className="px-4 py-2">
+                                    <div className={`w-4 h-4 rounded border flex items-center justify-center transition-all ${item.chk ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-300 group-hover:border-blue-400'}`}>
+                                        {item.chk && <CheckCircle size={10} />}
+                                    </div>
+                                </td>
+                                <td className="px-4 py-2 font-mono text-slate-500">{item.date}</td>
+                                <td className="px-4 py-2">
+                                    <div className="font-bold text-slate-700">{item.docNo}</div>
+                                    <div className="text-[10px] text-slate-400">{item.chqNo || 'No CHQ'}</div>
+                                </td>
+                                <td className={`px-4 py-2 text-right font-mono font-black ${type === 'credits' ? 'text-rose-600' : 'text-emerald-600'}`}>
+                                    {(type === 'debits' ? item.debit : item.credit).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                </td>
+                            </tr>
+                        ))}
+                        {items.length === 0 && (
+                            <tr><td colSpan={4} className="py-20 text-center text-slate-300 font-bold uppercase italic opacity-50">No {title} Found</td></tr>
+                        )}
+                    </tbody>
+                </table>
+            </div>
+            <div className="p-3 bg-slate-50/80 border-t border-slate-100 flex justify-between items-center font-black">
+                <span className="text-[10px] text-slate-400 uppercase">Subtotal Reconciled</span>
+                <span className={`text-[13px] ${type === 'credits' ? 'text-rose-600' : 'text-emerald-600'}`}>
+                    {(type === 'debits' ? totals.recDebit : totals.recCredit).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                </span>
+            </div>
+        </div>
+    );
+
     return (
         <>
-            <SimpleModal
-                isOpen={isOpen}
-                onClose={onClose}
-                title="Professional Bank Reconciliation"
-                maxWidth="max-w-[1100px]"
+            <SimpleModal isOpen={isOpen} onClose={onClose} title="Bank Reconciliation Board" maxWidth="max-w-[1550px]"
                 footer={
-                    <div className="bg-slate-50 px-6 py-4 w-full flex justify-end gap-3 border-t border-gray-100 rounded-b-xl">
-                        <button onClick={handleReset} className="px-6 h-10 bg-[#00adff] text-white text-sm font-bold rounded-[5px] hover:bg-[#0099e6] transition-all active:scale-95 flex items-center gap-2 border-none">
-                            <RotateCcw size={14} /> RESET PROGRESS
-                        </button>
-                        <button onClick={handleFinish} disabled={loading} className={`px-6 h-10 bg-[#50af60] text-white text-sm font-bold rounded-[5px] shadow-md hover:bg-[#24db4e] transition-all active:scale-95 flex items-center gap-2 ${loading ? 'opacity-50' : ''}`}>
-                            {loading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
-                            FINISH RECONCILIATION
-                        </button>
+                    <div className="bg-white px-8 py-4 w-full flex justify-between items-center border-t border-gray-100 rounded-b-xl shadow-inner">
+                        <div className="flex gap-3">
+                            <button onClick={() => window.location.reload()} className="px-6 h-10 bg-slate-100 text-slate-500 text-[12px] font-black rounded-[5px] hover:bg-slate-200 transition-all flex items-center gap-2 uppercase">
+                                <RotateCcw size={16} /> Reset Form
+                            </button>
+                            <button onClick={loadData} disabled={loading} className="px-6 h-10 bg-white text-blue-600 border-2 border-blue-600 text-[12px] font-black rounded-[5px] hover:bg-blue-50 transition-all flex items-center gap-2 uppercase">
+                                {loading ? <Loader2 size={16} className="animate-spin" /> : <ListChecks size={16} />} Sync Records
+                            </button>
+                        </div>
+                        <div className="flex items-center gap-8 mr-4">
+                            <div className="text-right">
+                                <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Difference</div>
+                                <div className={`text-[18px] font-mono font-black ${Math.abs(totals.difference) < 0.01 ? 'text-emerald-600' : 'text-rose-600'}`}>
+                                    {totals.difference.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                </div>
+                            </div>
+                            <button onClick={handleApply} disabled={isApplying || loading || Math.abs(totals.difference) > 0.01}
+                                className={`px-12 h-10 bg-[#2bb744] text-white text-[12px] font-black rounded-[5px] shadow-md hover:bg-[#259b3a] transition-all flex items-center gap-2 uppercase tracking-widest ${isApplying || loading || Math.abs(totals.difference) > 0.01 ? 'opacity-50 grayscale cursor-not-allowed' : 'active:scale-95'}`}
+                            >
+                                {isApplying ? <Loader2 size={18} className="animate-spin" /> : <CheckCircle2 size={18} />} Finalize Reconciliation
+                            </button>
+                        </div>
                     </div>
                 }
             >
-                <div className="space-y-6 font-['Tahoma'] relative select-none">
-                    {/* Branding Icon */}
-                    <div className="absolute top-0 right-0 p-4 opacity-[0.03] pointer-events-none">
-                        <LandmarkIcon size={160} />
-                    </div>
-
-                    {/* Selection Header */}
-                    <div className="grid grid-cols-12 gap-8 bg-white p-5 border border-gray-200 rounded shadow-sm relative overflow-hidden">
-                        <div className="col-span-12 lg:col-span-4 space-y-4">
-                            <FormRow label="Statement Bank">
-                                <div className="flex-1 flex gap-1 items-center">
-                                    <div className="flex-1 flex flex-col pointer-events-none bg-slate-50 border border-gray-200 px-3 py-1 rounded-[5px]">
-                                        <span className="text-[9px] font-black text-slate-400 leading-none mb-0.5">{formData.bankCode || 'CODE'}</span>
-                                        <input
-                                            type="text"
-                                            readOnly
-                                            value={formData.bankName}
-                                            className="h-5 outline-none bg-transparent font-bold text-slate-700 text-[12px]"
-                                        />
+                <div className="p-1 space-y-4 font-['Tahoma']">
+                    {/* Header Controls */}
+                    <div className="bg-white p-4 border border-slate-100 rounded-xl shadow-sm grid grid-cols-12 gap-6">
+                        <div className="col-span-12 lg:col-span-3">
+                            <label className="text-[11px] font-black text-slate-400 uppercase mb-1.5 block ml-1">Recon Reference</label>
+                            <div className="h-9 px-3 bg-slate-50 border border-slate-200 rounded-[5px] flex items-center justify-between font-mono font-bold text-blue-600">
+                                <span>{header.docNo}</span>
+                                <span className="text-[9px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded uppercase tracking-tighter">{currentUser}</span>
+                            </div>
+                        </div>
+                        
+                        <div className="col-span-12 lg:col-span-4">
+                            <label className="text-[11px] font-black text-slate-400 uppercase mb-1.5 block ml-1">Select Bank Account</label>
+                            <div className="flex gap-2 h-9">
+                                <div onClick={() => setActiveModal('bank')} className="flex-1 px-4 border border-slate-200 rounded-[5px] flex items-center justify-between cursor-pointer hover:border-blue-500 bg-white group transition-all">
+                                    <div className="flex items-center gap-3">
+                                        <Landmark size={15} className="text-slate-300 group-hover:text-blue-500" />
+                                        <span className="text-[12px] font-bold text-slate-700 uppercase truncate">
+                                            {header.bankId ? `${header.bankId} - ${header.bankName}` : 'Select target bank account...'}
+                                        </span>
                                     </div>
-                                    <button onClick={() => setShowBankModal(true)} className="w-10 h-10 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-90">
-                                        <Search size={18} />
-                                    </button>
+                                    <ChevronDown size={14} className="text-slate-300" />
                                 </div>
-                            </FormRow>
-                            <FormRow label="Statement Date">
-                                <div className="flex h-10 gap-1">
-                                    <input
-                                        type="text"
-                                        readOnly
-                                        value={formData.statementDate}
-                                        className="w-[120px] px-2 text-[13px] border border-gray-200 rounded-[5px] outline-none text-slate-700 font-bold bg-white text-center shadow-sm"
-                                    />
-                                    <button onClick={() => setShowCalendar(true)} className="w-10 h-10 bg-[#0285fd] text-white flex items-center justify-center rounded-[5px] transition-all shadow-sm active:scale-90">
-                                        <Calendar size={16} />
-                                    </button>
-                                </div>
-                            </FormRow>
+                                <button onClick={() => setActiveModal('bank')} className="w-10 bg-blue-600 text-white flex items-center justify-center rounded-[5px] hover:bg-blue-700 transition-all shadow-sm">
+                                    <Search size={16} />
+                                </button>
+                            </div>
                         </div>
 
-                        <div className="col-span-12 lg:col-span-8 grid grid-cols-3 gap-4 border-l border-slate-100 pl-8">
-                             <div className="flex flex-col justify-center bg-blue-50/30 p-4 rounded-[5px] border border-blue-100/50">
-                                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-2">Statement Ending Balance</span>
-                                <div className="flex items-baseline gap-1">
-                                    <input
-                                        type="number"
-                                        value={formData.endingBalance}
-                                        onChange={(e) => setFormData({ ...formData, endingBalance: e.target.value })}
-                                        className="w-full text-2xl font-black text-[#0078d4] bg-transparent outline-none tabular-nums"
-                                    />
+                        <div className="col-span-12 lg:col-span-5 grid grid-cols-12 gap-4">
+                            <div className="col-span-6">
+                                <label className="text-[11px] font-black text-slate-400 uppercase mb-1.5 block ml-1">Period From</label>
+                                <div className="flex h-9 gap-1.5">
+                                    <div onClick={() => setActiveModal('dateFrom')} className="flex-1 px-3 border border-slate-200 rounded-[5px] flex items-center justify-center cursor-pointer hover:border-blue-500 bg-white group shadow-sm transition-all">
+                                        <span className="text-[12px] font-bold text-slate-700">{header.dateFrom}</span>
+                                    </div>
+                                    <button onClick={() => setActiveModal('dateFrom')} className="w-9 bg-blue-600 text-white flex items-center justify-center rounded-[5px] hover:bg-blue-700 transition-all shadow-sm active:scale-90 shrink-0">
+                                        <Calendar size={14} />
+                                    </button>
                                 </div>
                             </div>
-                             <div className="flex flex-col justify-center bg-slate-50/50 p-4 rounded-[5px] border border-slate-100">
-                                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-2">Cleared Balance</span>
-                                <div className="text-2xl font-black text-slate-700 tabular-nums flex items-baseline gap-1">
-                                    {clearedBalance.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                                </div>
-                            </div>
-                            <div className="flex flex-col justify-center bg-white p-4 rounded-sm border border-gray-200 shadow-sm relative overflow-hidden group">
-                                <div className={`absolute inset-0 transition-opacity duration-500 ${isMatched ? 'bg-green-600/10 opacity-100' : 'opacity-0'}`} />
-                                <span className={`text-[10px] font-black uppercase tracking-widest leading-none mb-2 relative z-10 ${isMatched ? 'text-green-600' : 'text-slate-400'}`}>
-                                    {isMatched ? 'Perfectly Matched' : 'Reconciliation Delta'}
-                                </span>
-                                 <div className={`text-2xl font-black tabular-nums tracking-tighter relative z-10 flex items-baseline gap-1 ${isMatched ? 'text-green-600' : 'text-[#0078d4]'}`}>
-                                    {delta.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                                    {isMatched && <CheckCircle2 size={24} className="ml-auto text-green-600" />}
+                            <div className="col-span-6">
+                                <label className="text-[11px] font-black text-slate-400 uppercase mb-1.5 block ml-1">Period To</label>
+                                <div className="flex h-9 gap-1.5">
+                                    <div onClick={() => setActiveModal('dateTo')} className="flex-1 px-3 border border-slate-200 rounded-[5px] flex items-center justify-center cursor-pointer hover:border-blue-500 bg-white group shadow-sm transition-all">
+                                        <span className="text-[12px] font-bold text-slate-700">{header.dateTo}</span>
+                                    </div>
+                                    <button onClick={() => setActiveModal('dateTo')} className="w-9 bg-blue-600 text-white flex items-center justify-center rounded-[5px] hover:bg-blue-700 transition-all shadow-sm active:scale-90 shrink-0">
+                                        <Calendar size={14} />
+                                    </button>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    {/* Dual Ledger Portfolios */}
-                    <div className="grid grid-cols-2 gap-8 h-[450px]">
-                        {/* Debit Column */}
-                        <div className="flex flex-col border border-gray-200 bg-white rounded-lg shadow-sm overflow-hidden">
-                            <div className="bg-[#f8fafd] px-5 py-4 border-b border-gray-200 flex justify-between items-center">
-                                <div className="flex items-center gap-2">
-                                    <History size={16} className="text-[#0078d4]" />
-                                    <span className="text-[11px] font-black text-slate-600 uppercase tracking-widest">Debit Instrument Portfolio</span>
-                                </div>
-                                <span className="text-[10px] font-black text-[#0078d4] bg-blue-50 px-3 py-1 rounded-full border border-blue-200/50 tabular-nums">0.00 Total</span>
+                    {/* Dashboard Summary Section */}
+                    <div className="grid grid-cols-12 gap-4">
+                        <div className="col-span-12 lg:col-span-3 flex items-center gap-2">
+                            <button onClick={() => setDateRange('today')} className="h-8 flex-1 bg-white hover:bg-slate-50 text-[10px] font-black uppercase text-slate-500 hover:text-blue-600 rounded-lg border border-slate-200 transition-all shadow-sm">Today</button>
+                            <button onClick={() => setDateRange('yesterday')} className="h-8 flex-1 bg-white hover:bg-slate-50 text-[10px] font-black uppercase text-slate-500 hover:text-blue-600 rounded-lg border border-slate-200 transition-all shadow-sm">Yesterday</button>
+                            <button onClick={() => setDateRange('thisMonth')} className="h-8 flex-1 bg-white hover:bg-slate-50 text-[10px] font-black uppercase text-slate-500 hover:text-blue-600 rounded-lg border border-slate-200 transition-all shadow-sm">Month</button>
+                            <button onClick={() => setDateRange('lastMonth')} className="h-8 flex-1 bg-white hover:bg-slate-50 text-[10px] font-black uppercase text-slate-500 hover:text-blue-600 rounded-lg border border-slate-200 transition-all shadow-sm">Last</button>
+                        </div>
+                        <div className="col-span-12 lg:col-span-6 grid grid-cols-4 gap-3">
+                            <div className="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                                <div className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Opening Balance</div>
+                                <div className="text-[15px] font-mono font-black text-slate-700">{header.openingBalance.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
                             </div>
-                            <div className="flex-1 overflow-y-auto">
-                                <table className="w-full text-[11px] border-collapse">
-                                    <thead className="bg-slate-50 sticky top-0 text-slate-400 font-black uppercase tracking-widest border-b border-gray-100">
-                                        <tr>
-                                            <th className="w-12 py-3 px-4 text-center">√</th>
-                                            <th className="py-3 px-4 text-left">Date</th>
-                                            <th className="py-3 px-4 text-left">Reference</th>
-                                            <th className="w-32 py-3 px-4 text-right">Valuation</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-gray-50">
-                                        <tr className="hover:bg-blue-50/40 cursor-pointer group transition-colors">
-                                            <td className="p-3 text-center">
-                                                <input type="checkbox" className="w-5 h-5 rounded border-gray-300 text-[#0078d4] focus:ring-transparent transition-all" />
-                                            </td>
-                                            <td className="p-3 text-slate-500 font-medium">2026/03/10</td>
-                                            <td className="p-3 font-black text-slate-700 uppercase tracking-tighter">DEP-00412</td>
-                                            <td className="p-3 text-right font-black text-slate-800 tabular-nums text-[13px]">1,250.00</td>
-                                        </tr>
-                                        {[1, 2, 3, 4, 5, 6].map(i => (
-                                            <tr key={i} className="bg-slate-50/10 h-12">
-                                                <td colSpan={4}></td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
+                            <div className="bg-emerald-50/30 p-3 rounded-xl border border-emerald-100">
+                                <div className="text-[9px] font-black text-emerald-600 uppercase tracking-widest mb-1 flex items-center gap-1">
+                                    <ArrowDownLeft size={10} /> Reconciled Deposits
+                                </div>
+                                <div className="text-[15px] font-mono font-black text-emerald-700">{totals.recDebit.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
+                            </div>
+                            <div className="bg-rose-50/30 p-3 rounded-xl border border-rose-100">
+                                <div className="text-[9px] font-black text-rose-600 uppercase tracking-widest mb-1 flex items-center gap-1">
+                                    <ArrowUpRight size={10} /> Reconciled Payments
+                                </div>
+                                <div className="text-[15px] font-mono font-black text-rose-700">{totals.recCredit.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
+                            </div>
+                            <div className="bg-blue-50/30 p-3 rounded-xl border border-blue-100">
+                                <div className="text-[9px] font-black text-blue-600 uppercase tracking-widest mb-1">Cleared Ledger Balance</div>
+                                <div className="text-[15px] font-mono font-black text-blue-700">{totals.clearedBalance.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
                             </div>
                         </div>
 
-                        {/* Credit Column */}
-                        <div className="flex flex-col border border-gray-200 bg-white rounded-lg shadow-sm overflow-hidden">
-                            <div className="bg-[#f8fafd] px-5 py-4 border-b border-gray-200 flex justify-between items-center">
-                                <div className="flex items-center gap-2">
-                                    <ListFilter size={16} className="text-red-500" />
-                                    <span className="text-[11px] font-black text-slate-600 uppercase tracking-widest">Credit Instrument Portfolio</span>
-                                </div>
-                                <span className="text-[10px] font-black text-[#d13438] bg-red-50 px-3 py-1 rounded-full border border-red-200/50 tabular-nums">0.00 Total</span>
+                        <div className="col-span-12 lg:col-span-3 bg-white p-3 rounded-xl shadow-sm flex items-center justify-between gap-4 border border-slate-200">
+                            <div className="flex-1">
+                                <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1 block">Statement Balance</label>
+                                <input 
+                                    type="number" value={header.endingBalance} onChange={e => setHeader({...header, endingBalance: parseFloat(e.target.value) || 0})}
+                                    className="w-full bg-white border border-slate-300 h-9 rounded-[5px] px-3 text-[14px] font-mono font-black text-slate-800 outline-none focus:border-blue-500 transition-all"
+                                />
                             </div>
-                            <div className="flex-1 overflow-y-auto">
-                                <table className="w-full text-[11px] border-collapse">
-                                    <thead className="bg-slate-50 sticky top-0 text-slate-400 font-black uppercase tracking-widest border-b border-gray-100">
-                                        <tr>
-                                            <th className="w-12 py-3 px-4 text-center">√</th>
-                                            <th className="py-3 px-4 text-left">Date</th>
-                                            <th className="py-3 px-4 text-left">Reference</th>
-                                            <th className="w-32 py-3 px-4 text-right">Valuation</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-gray-50">
-                                        <tr className="hover:bg-red-50/40 cursor-pointer group transition-colors">
-                                            <td className="p-3 text-center">
-                                                <input type="checkbox" className="w-5 h-5 rounded border-gray-300 text-red-600 focus:ring-transparent transition-all" />
-                                            </td>
-                                            <td className="p-3 text-slate-500 font-medium">2026/03/08</td>
-                                            <td className="p-3 font-black text-slate-700 uppercase tracking-tighter">ACH-REF-14</td>
-                                            <td className="p-3 text-right font-black text-slate-800 tabular-nums text-[13px]">450.00</td>
-                                        </tr>
-                                        {[1, 2, 3, 4, 5, 6].map(i => (
-                                            <tr key={i} className="bg-slate-50/10 h-12">
-                                                <td colSpan={4}></td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
+                            <div className="w-40">
+                                <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1 block">Statement Date</label>
+                                <div className="flex h-9 gap-1.5">
+                                    <div onClick={() => setActiveModal('statementDate')} className="flex-1 px-3 border border-slate-300 rounded-[5px] flex items-center justify-center cursor-pointer hover:border-blue-500 bg-white group shadow-sm transition-all text-center">
+                                        <span className="text-[12px] font-bold text-slate-700">{header.statementDate}</span>
+                                    </div>
+                                    <button onClick={() => setActiveModal('statementDate')} className="w-9 bg-blue-600 text-white flex items-center justify-center rounded-[5px] hover:bg-blue-700 transition-all shadow-sm active:scale-90 shrink-0">
+                                        <Calendar size={14} />
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    {/* Footer Comparison */}
-                    <div className="bg-slate-50 p-6 border border-gray-200 flex justify-between items-center rounded-lg shadow-inner">
-                        <div className="flex items-center gap-6">
-                            <label className="flex items-center gap-4 cursor-pointer group bg-white px-5 py-3 rounded border border-gray-200 hover:border-[#0078d4] transition-all shadow-sm">
-                                <input type="checkbox" className="w-6 h-6 rounded border-gray-300 text-[#0078d4] transition-all" />
-                                <div className="flex flex-col">
-                                    <span className="text-[11px] font-black text-slate-700 uppercase tracking-tighter">Mass Reconciliation Protocol</span>
-                                    <span className="text-[10px] text-slate-400 font-medium">Automatically reconcile all perfectly matched ledger items</span>
-                                </div>
-                            </label>
-                        </div>
-                        <div className="flex flex-col items-end">
-                            <div className="flex items-center gap-2 mb-1">
-                                <Scale size={16} className="text-[#0078d4]" />
-                                <span className="text-[10px] font-black text-[#0078d4] uppercase tracking-widest leading-none">Status Authentication</span>
-                            </div>
-                            <div className="text-[11px] font-bold italic text-slate-400 bg-white px-4 py-2 rounded-sm border border-slate-100 shadow-sm text-right max-w-sm leading-snug">
-                                "System requires a zero delta synchronization between statement and cleared balances before auditing finalization."
-                            </div>
-                        </div>
+                    {/* Transaction Grids Side-by-Side */}
+                    <div className="flex gap-4 min-h-0 flex-1">
+                        {renderGrid("Deposits & Transfers (Debits)", "debits", transactions.debits, <ArrowDownLeft size={14} />, "emerald")}
+                        {renderGrid("Payments & Withdrawals (Credits)", "credits", transactions.credits, <ArrowUpRight size={14} />, "rose")}
                     </div>
                 </div>
             </SimpleModal>
 
-            {/* Bank Search Modal */}
-            {showBankModal && (
-                <SearchModal
-                    title="Search Statement Bank Accounts"
-                    query={bankSearch}
-                    setQuery={setBankSearch}
-                    onClose={() => setShowBankModal(false)}
-                    data={banks}
-                    columns={[{ label: 'Code', key: 'code' }, { label: 'Bank Institution', key: 'name' }]}
-                    onSelect={(b) => {
-                        setFormData({ ...formData, bankCode: b.code, bankName: b.name });
-                        setShowBankModal(false);
-                    }}
-                />
-            )}
-
+            {/* Lookups */}
+            <SearchModal 
+                isOpen={activeModal === 'bank'} onClose={() => setActiveModal(null)} 
+                title="Select Bank Account" items={lookups.banks}
+                onSelect={item => setHeader({...header, bankId: item.code, bankName: item.name})}
+            />
             <CalendarModal 
-                isOpen={showCalendar} 
-                onClose={() => setShowCalendar(false)} 
-                onDateSelect={handleDateSelect}
-                initialDate={formData.statementDate}
+                isOpen={!!['dateFrom', 'dateTo', 'statementDate'].includes(activeModal)} 
+                onClose={() => setActiveModal(null)}
+                onSelect={date => setHeader({...header, [activeModal]: date})}
             />
         </>
     );
 };
-
-const FormRow = ({ label, children }) => (
-    <div className="flex flex-col gap-1.5">
-        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest leading-none pl-1">{label}</label>
-        {children}
-    </div>
-);
-
-const SearchModal = ({ title, query, setQuery, onClose, data, columns, onSelect }) => (
-    <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4">
-        <div className="absolute inset-0 bg-slate-500/30 backdrop-blur-[2px]" onClick={onClose} />
-        <div className="relative w-full max-w-2xl bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col max-h-[85vh] font-['Tahoma']">
-            <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-slate-50/50">
-                <h3 className="text-base font-black text-slate-800 tracking-tight uppercase tracking-[0.05em]">{title}</h3>
-                <div className="flex gap-4">
-                    <div className="relative">
-                        <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                        <input type="text" placeholder="Search..." className="h-9 border border-gray-200 pl-9 pr-3 text-sm rounded-lg w-64 focus:border-blue-500 outline-none shadow-sm transition-all" value={query} onChange={(e) => setQuery(e.target.value)} autoFocus />
-                    </div>
-                    <button 
-                        onClick={onClose} 
-                        className="w-9 h-8 flex items-center justify-center bg-[#ff3b30] hover:bg-[#e03127] text-white rounded-[8px] shadow-[0_4px_12px_rgba(255,59,48,0.3)] hover:shadow-[0_6px_20px_rgba(255,59,48,0.4)] transition-all active:scale-90 outline-none border-none group"
-                        title="Close"
-                    >
-                        <X size={18} strokeWidth={4} className="group-hover:scale-110 transition-transform" />
-                    </button>
-                </div>
-            </div>
-            <div className="overflow-y-auto p-2">
-                <table className="w-full text-sm text-left">
-                    <thead className="bg-slate-50/50 sticky top-0 text-slate-400 font-black uppercase text-[10px] tracking-widest">
-                        <tr>
-                            {columns.map((col, idx) => <th key={idx} className="p-4 border-b border-slate-100">{col.label}</th>)}
-                            <th className="p-4 border-b border-slate-100 text-center">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {data.filter(item =>
-                            columns.some(col => (item[col.key] || '').toLowerCase().includes(query.toLowerCase()))
-                        ).map((item, idx) => (
-                            <tr key={idx} className="hover:bg-blue-50/50 transition-colors cursor-pointer group" onClick={() => onSelect(item)}>
-                                {columns.map((col, cIdx) => (
-                                    <td key={cIdx} className={`p-4 border-b border-slate-50 text-[13px] ${cIdx === 0 ? 'font-black text-slate-700' : 'font-medium text-slate-600'}`}>
-                                        {item[col.key]}
-                                    </td>
-                                ))}
-                                <td className="p-4 border-b border-slate-50 text-center">
-                                    <button className="bg-blue-50/50 backdrop-blur-md border border-blue-200 text-[#0078d4] text-[10px] uppercase tracking-wider px-3 py-1 rounded-sm font-bold hover:bg-blue-100/80 shadow-sm transition-all active:scale-95">SELECT</button>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-);
 
 export default BankReconciliationBoard;

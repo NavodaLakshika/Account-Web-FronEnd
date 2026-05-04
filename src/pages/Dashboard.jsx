@@ -40,7 +40,7 @@ import MakeDepositBoard from './MakeDepositBoard';
 import JournalEntryBoard from './JournalEntryBoard';
 import BankReconciliationBoard from './BankReconciliationBoard';
 import TrialBalanceBoard from './TrialBalanceBoard';
-import SearchBoard from './SearchBoard';
+import DocumentSearchBoard from './DocumentSearchBoard';
 import PurchaseOrderBoard from '../HomeMaster/PurchaseOrderBoard';
 import GRNBoard from '../HomeMaster/GRNBoard';
 import PettyCashBoard from '../HomeMaster/PettyCashBoard';
@@ -163,6 +163,7 @@ const Dashboard = () => {
     const [isTopBarCollapsed, setIsTopBarCollapsed] = useState(false);
     const [isAIThinking, setIsAIThinking] = useState(false);
     const [isLoaderStopped, setIsLoaderStopped] = useState(false);
+    const [depositData, setDepositData] = useState(null);
 
 
     // Reminder Alarm Logic
@@ -366,6 +367,12 @@ const Dashboard = () => {
 
 
 
+    const handleCollectionComplete = (data) => {
+        setDepositData(data);
+        setShowCollectionToDepositModal(false);
+        setShowMakeDepositModal(true);
+    };
+
     const handleLogout = () => {
         setPendingSnoozeTask(null);
         authService.logout();
@@ -382,7 +389,7 @@ const Dashboard = () => {
         { icon: CreditCard, gif: '/icons/paybill.gif', label: 'Pay Bills', onClick: () => setShowPayBillModal(true), active: showPayBillModal },
         { icon: PenTool, gif: '/icons/cheque.gif', label: 'Cheques', onClick: () => setShowWriteChequeModal(true), active: showWriteChequeModal },
         { icon: Wallet, gif: '/icons/cash.gif', label: 'Cash', onClick: () => setShowPettyCashModal(true), active: showPettyCashModal },
-        { icon: ArrowDownLeft, gif: '/icons/deposit.gif', label: 'Deposit', onClick: () => setShowMakeDepositModal(true), active: showMakeDepositModal },
+        { icon: ArrowDownLeft, gif: '/icons/deposit.gif', label: 'Deposit', onClick: () => setShowCollectionToDepositModal(true), active: showCollectionToDepositModal },
         { icon: BookOpen, gif: '/icons/journal.gif', label: 'Journal', onClick: () => setShowJournalEntryModal(true), active: showJournalEntryModal },
         { icon: RefreshCcw, gif: '/icons/cashflow.gif', label: 'Rec.', onClick: () => setShowBankRecModal(true), active: showBankRecModal },
         { icon: BarChart2, gif: '/icons/report.gif', label: 'Report', onClick: () => setShowTrialBalanceModal(true), active: showTrialBalanceModal },
@@ -425,7 +432,7 @@ const Dashboard = () => {
                     if (label === 'Refunds and Credit') setShowCustomerModal(true);
 
                     // Banking Section
-                    if (label === 'Collection Deposit' || label === 'Make Deposit') setShowMakeDepositModal(true);
+                    if (label === 'Collection Deposit' || label === 'Make Deposit') setShowCollectionToDepositModal(true);
                     if (label === 'Cheque Register' || label === 'Register') setShowChequeRegisterModal(true);
                     if (label === 'Write Cheque') setShowWriteChequeModal(true);
                     if (label === 'Print Cheque') setShowPrintChequeModal(true);
@@ -447,7 +454,7 @@ const Dashboard = () => {
             <EnterBillBoard isOpen={showEnterBillModal} onClose={() => setShowEnterBillModal(false)} />
             <PayBillBoard isOpen={showPayBillModal} onClose={() => setShowPayBillModal(false)} />
             <WriteChequeBoard isOpen={showWriteChequeModal} onClose={() => setShowWriteChequeModal(false)} />
-            <MakeDepositBoard isOpen={showMakeDepositModal} onClose={() => setShowMakeDepositModal(false)} />
+            <MakeDepositBoard isOpen={showMakeDepositModal} onClose={() => { setShowMakeDepositModal(false); setDepositData(null); }} incomingData={depositData} />
             <JournalEntryBoard isOpen={showJournalEntryModal} onClose={() => setShowJournalEntryModal(false)} />
             <BankReconciliationBoard isOpen={showBankRecModal} onClose={() => setShowBankRecModal(false)} />
             <ChequeCancelBoard isOpen={showChequeCancelModal} onClose={() => setShowChequeCancelModal(false)} />
@@ -457,7 +464,7 @@ const Dashboard = () => {
             <ChequeInHandBoard isOpen={showChequeInHandModal} onClose={() => setShowChequeInHandModal(false)} />
             <NotPresentedChequesBoard isOpen={showNotPresentedChequesModal} onClose={() => setShowNotPresentedChequesModal(false)} />
             <TrialBalanceBoard isOpen={showTrialBalanceModal} onClose={() => setShowTrialBalanceModal(false)} />
-            <SearchBoard isOpen={showSearchModal} onClose={() => setShowSearchModal(false)} />
+            <DocumentSearchBoard isOpen={showSearchModal} onClose={() => setShowSearchModal(false)} />
             <MasterFileModal isOpen={showMasterFileModal} onClose={() => setShowMasterFileModal(false)} />
             <ViewUtilityModal
                 isOpen={showViewUtilityModal}
@@ -703,7 +710,7 @@ const Dashboard = () => {
             <JournalEntryBoard isOpen={showJournalEntryModal} onClose={() => setShowJournalEntryModal(false)} />
             <ReversalEntryBoard isOpen={showReversalEntryModal} onClose={() => setShowReversalEntryModal(false)} />
             <PaymentSetoffBoard isOpen={showPaymentSetoffModal} onClose={() => setShowPaymentSetoffModal(false)} />
-            <CollectionToDepositBoard isOpen={showCollectionToDepositModal} onClose={() => setShowCollectionToDepositModal(false)} />
+            <CollectionToDepositBoard isOpen={showCollectionToDepositModal} onClose={() => setShowCollectionToDepositModal(false)} onComplete={handleCollectionComplete} />
             <DirectBankTransactionBoard isOpen={showDirectBankTransactionModal} onClose={() => setShowDirectBankTransactionModal(false)} />
             <FundsTransferBoard isOpen={showFundsTransferModal} onClose={() => setShowFundsTransferModal(false)} />
 

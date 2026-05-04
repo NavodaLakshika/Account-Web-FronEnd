@@ -12,9 +12,10 @@ const CalendarModal = ({ isOpen, onClose, onDateSelect, onDateChange, initialDat
             const [day, month, year] = dateStr.split('/');
             return new Date(year, month - 1, day);
         }
-        // Handle YYYY-MM-DD format
+        // Handle YYYY-MM-DD format (including ISO with time)
         if (typeof dateStr === 'string' && dateStr.includes('-')) {
-            const [year, month, day] = dateStr.split('-');
+            const datePart = dateStr.split('T')[0];
+            const [year, month, day] = datePart.split('-');
             return new Date(year, month - 1, day);
         }
         const d = new Date(dateStr);

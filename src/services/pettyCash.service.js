@@ -40,6 +40,16 @@ export const pettyCashService = {
     return r.data;
   },
 
+  addItem: async (userName, data) => {
+    const r = await api.post('/add-item', data, { params: { userName } });
+    return r.data;
+  },
+
+  deleteItem: async (userName, data) => {
+    const r = await api.post('/delete-item', data, { params: { userName } });
+    return r.data;
+  },
+
   apply: async (userName, data) => {
     const r = await api.post('/apply', data, { params: { userName } });
     return r.data;
