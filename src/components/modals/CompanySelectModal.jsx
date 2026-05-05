@@ -18,6 +18,10 @@ import toast from 'react-hot-toast';
 import { DotLottiePlayer } from '@dotlottie/react-player';
 import ContactSupportModal from './ContactSupportModal';
 
+const SUCCESS_SOUND_URL = '/Music/mrstokes302-success-videogame-sfx-423626.mp3';
+
+
+
 const CompanySelectModal = ({ isOpen, onClose, onSelect, user }) => {
     const [loading, setLoading] = useState(false);
     const [fetching, setFetching] = useState(true);
@@ -71,7 +75,9 @@ const CompanySelectModal = ({ isOpen, onClose, onSelect, user }) => {
     const handleAccessingToast = (message) => {
         toast.custom((t) => (
             <div className={`${t.visible ? 'animate-in slide-in-from-right-20 fade-in duration-700' : 'animate-out slide-out-to-right-20 fade-out duration-500'} 
-                max-w-[320px] w-full bg-white shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] border border-gray-100 rounded-[5px] flex flex-col pointer-events-auto overflow-hidden`}>
+                max-w-[550px] w-fit bg-white shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] border border-gray-100 rounded-[5px] flex flex-col pointer-events-auto overflow-hidden`}>
+
+
                 <div className="px-4 py-2 flex items-center gap-3">
                     <div className="w-12 h-12 shrink-0 bg-blue-50/50 rounded-full flex items-center justify-center">
                         <DotLottiePlayer
@@ -80,9 +86,10 @@ const CompanySelectModal = ({ isOpen, onClose, onSelect, user }) => {
                             loop={false}
                         />
                     </div>
-                    <div className="flex-grow text-left">
-                        <h3 className="text-slate-800 text-[12px] font-bold tracking-tight uppercase font-tahoma truncate">{message}</h3>
+                    <div className="flex-grow text-left py-1">
+                        <h3 className="text-slate-800 text-[12px] font-bold tracking-tight uppercase font-tahoma leading-relaxed">{message}</h3>
                     </div>
+
                     <button onClick={() => toast.dismiss(t.id)} className="text-slate-300 hover:text-slate-500 transition-colors">
                         <X size={14} />
                     </button>
@@ -111,6 +118,12 @@ const CompanySelectModal = ({ isOpen, onClose, onSelect, user }) => {
         try {
             await authService.openCompany(userName, selected.id);
             handleAccessingToast(`Accessing ${selected.name}`);
+            
+            // Play success sound
+            const audio = new Audio(SUCCESS_SOUND_URL);
+            audio.volume = 0.5;
+            audio.play().catch(e => console.error("Audio play failed:", e));
+
             onSelect();
         } catch (err) {
             toast.error(typeof err === 'object' ? (err.message || "Error opening company") : err);

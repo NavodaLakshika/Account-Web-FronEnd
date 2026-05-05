@@ -212,156 +212,257 @@ const SupplierMasterBoard = ({ isOpen, onClose }) => {
     };
 
     const footer = (
-        <div className="bg-slate-50 px-6 py-4 w-full flex justify-end gap-3 border-t border-gray-100 mt-1 rounded-b-xl">
-            <button onClick={handleSave} disabled={loading} className={`px-6 h-10 bg-[#50af60] text-white text-sm font-bold rounded-md shadow-md shadow-blue-200 hover:bg-[#24db4e] transition-all active:scale-95 flex items-center justify-center gap-2 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}>
-                {loading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />} 
+        <div className="bg-white px-6 py-3 w-full flex justify-end gap-3 border-t border-gray-50 mt-1 rounded-b-xl">
+            <button 
+                onClick={handleSave} 
+                disabled={loading} 
+                className={`px-8 h-9 bg-[#5cb85c] text-white text-[13px] font-bold rounded-[4px] shadow-md shadow-green-50 hover:bg-[#4cae4c] transition-all active:scale-95 flex items-center justify-center gap-2 border-none ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+            >
+                {loading ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />} 
                 {isEditMode ? 'Update' : 'Save'}
             </button>
-            <button onClick={handleDelete} disabled={!isEditMode || loading} className={`px-6 h-10 bg-[#d13438] text-white text-sm font-bold rounded-md shadow-md shadow-red-200 hover:bg-[#a4262c] transition-all active:scale-95 flex items-center justify-center gap-2 ${(!isEditMode || loading) ? 'opacity-50 cursor-not-allowed' : ''}`}>
-                <Trash2 size={14} /> Delete
+            <button 
+                onClick={handleDelete} 
+                disabled={!isEditMode || loading} 
+                className={`px-8 h-9 bg-[#d9534f] text-white text-[13px] font-bold rounded-[4px] shadow-md shadow-red-50 hover:bg-[#c9302c] transition-all active:scale-95 flex items-center justify-center gap-2 border-none ${(!isEditMode || loading) ? 'opacity-50 cursor-not-allowed' : ''}`}
+            >
+                <Trash2 size={16} /> Delete
             </button>
-            <button onClick={handleClear} className="px-6 h-10 bg-[#00adff] text-white text-sm font-bold rounded-md hover:bg-[#0099e6] transition-all active:scale-95 flex items-center justify-center gap-2 border-none">
-                <RotateCcw size={14} /> Clear
+            <button 
+                onClick={handleClear} 
+                className="px-8 h-9 bg-[#42a5f5] text-white text-[13px] font-bold rounded-[4px] shadow-md shadow-blue-50 hover:bg-[#2196f3] transition-all active:scale-95 flex items-center justify-center gap-2 border-none"
+            >
+                <RotateCcw size={16} /> Clear
             </button>
         </div>
     );
 
     return (
         <>
-            <SimpleModal isOpen={isOpen} onClose={onClose} title="Supplier Master File" maxWidth="max-w-[780px]" footer={footer} showHeaderClose={true}>
-                <div className="py-2 select-none font-['Tahoma'] space-y-4 text-[12.5px] mt-1 min-h-[500px]">
-                    <div className="border-b border-gray-200 pb-4 flex items-center justify-center gap-3">
-                        <Truck size={20} className="text-[#0078d4]" />
-                        <h2 className="text-[17px] font-bold text-black uppercase tracking-tight">Enter New Supplier Details & Update</h2>
+            <SimpleModal isOpen={isOpen} onClose={onClose} title="Supplier Master Directory" maxWidth="max-w-[720px]" footer={footer} showHeaderClose={true}>
+                <div className="py-2 px-1 select-none font-['Tahoma'] space-y-3 text-[12px] mt-1">
+                    {/* Header Section */}
+                    <div className="border-b border-gray-100 pb-3 flex items-center justify-center">
+                        <h2 className="text-[15px] font-black text-slate-800 uppercase tracking-tight">Enter New Supplier Details & Update</h2>
                     </div>
 
-                    <div className="space-y-4 text-[12.5px]">
-                        {/* ID and Name */}
-                        <div className="flex items-center gap-6">
-                            <label className="w-32 font-bold text-gray-700">Supplier ID / Name</label>
-                            <div className="flex-1 flex gap-3">
-                                <input type="text" name="Code" value={formData.Code} readOnly className="w-32 h-8 border border-gray-300 px-2 bg-white rounded-[5px] outline-none focus:border-blue-400 font-bold text-blue-600 shadow-sm" placeholder="" />
-                                <input type="text" name="Supplier_Name" value={formData.Supplier_Name} onChange={handleInputChange} placeholder="" className="flex-1 h-8 font-mono border border-gray-300 px-3 bg-white rounded-[5px] outline-none focus:border-blue-400 shadow-sm transition-all focus:shadow-md" />
-                                <button onClick={openSearch} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95">
+                    <div className="space-y-2.5">
+                        {/* Supplier ID / Name */}
+                        <div className="flex items-center gap-3">
+                            <label className="w-32 font-bold text-slate-600 shrink-0">Supplier ID / Name</label>
+                            <div className="flex-1 flex gap-2 h-8">
+                                <input 
+                                    type="text" 
+                                    name="Code" 
+                                    value={formData.Code} 
+                                    readOnly 
+                                    className="w-24 border border-gray-300 px-2 bg-white rounded-[3px] outline-none font-bold text-blue-600 shadow-sm text-center" 
+                                />
+                                <input 
+                                    type="text" 
+                                    name="Supplier_Name" 
+                                    value={formData.Supplier_Name} 
+                                    onChange={handleInputChange} 
+                                    className="flex-1 border border-gray-300 px-2 bg-[#eff4ff] rounded-[3px] outline-none focus:border-[#0285fd] shadow-sm transition-all font-medium text-slate-800" 
+                                />
+                                <button onClick={openSearch} className="w-9 h-8 bg-[#4285f4] text-white flex items-center justify-center hover:bg-[#3367d6] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0">
                                     <Search size={18} />
                                 </button>
                             </div>
                         </div>
 
                         {/* Distribution Company */}
-                        <div className="flex items-center gap-6">
-                            <label className="w-32 font-bold text-gray-700">Distrb. Company</label>
-                            <input type="text" name="Destibution_Name" value={formData.Destibution_Name} onChange={handleInputChange} className="flex-1 h-8 font-mono border border-gray-300 px-3 bg-white rounded-[5px] outline-none focus:border-blue-400 shadow-sm" />
+                        <div className="flex items-center gap-3">
+                            <label className="w-32 font-bold text-slate-600 shrink-0">Distrb. Company</label>
+                            <input 
+                                type="text" 
+                                name="Destibution_Name" 
+                                value={formData.Destibution_Name} 
+                                onChange={handleInputChange} 
+                                className="flex-1 h-8 border border-gray-300 px-3 bg-[#eff4ff] rounded-[3px] outline-none focus:border-[#0285fd] shadow-sm font-medium text-slate-800" 
+                            />
                         </div>
 
                         {/* Address Lines */}
-                        <div className="flex items-center gap-6">
-                            <label className="w-32 font-bold text-gray-700">Address 1</label>
-                            <input type="text" name="Address1" value={formData.Address1} onChange={handleInputChange} className="flex-1 h-8 font-mono border border-gray-300 px-3 bg-white rounded-[5px] outline-none focus:border-blue-400 shadow-sm" />
+                        <div className="flex items-center gap-3">
+                            <label className="w-32 font-bold text-slate-600 shrink-0">Address 1</label>
+                            <input 
+                                type="text" 
+                                name="Address1" 
+                                value={formData.Address1} 
+                                onChange={handleInputChange} 
+                                className="flex-1 h-8 border border-gray-300 px-3 bg-[#eff4ff] rounded-[3px] outline-none focus:border-[#0285fd] shadow-sm font-medium text-slate-800" 
+                            />
                         </div>
-                        <div className="flex items-center gap-6">
-                            <label className="w-32 font-bold text-gray-700">Address 2</label>
-                            <input type="text" name="Address2" value={formData.Address2} onChange={handleInputChange} className="flex-1 h-8 font-mono border border-gray-300 px-3 bg-white rounded-[5px] outline-none focus:border-blue-400 shadow-sm" />
+                        <div className="flex items-center gap-3">
+                            <label className="w-32 font-bold text-slate-600 shrink-0">Address 2</label>
+                            <input 
+                                type="text" 
+                                name="Address2" 
+                                value={formData.Address2} 
+                                onChange={handleInputChange} 
+                                className="flex-1 h-8 border border-gray-300 px-3 bg-[#eff4ff] rounded-[3px] outline-none focus:border-[#0285fd] shadow-sm font-medium text-slate-800" 
+                            />
                         </div>
 
                         {/* Phone and Fax */}
-                        <div className="flex items-center gap-6">
-                            <label className="w-32 font-bold text-gray-700">Phone Number</label>
-                            <div className="flex-1 flex items-center gap-10">
-                                <input type="text" name="Phone" value={formData.Phone} onChange={handleInputChange} className="flex-1 h-8 font-mono border border-gray-300 px-3 bg-white rounded-[5px] outline-none focus:border-blue-400 shadow-sm" />
-                                <label className="w-20 font-bold text-gray-700 text-center">Fax</label>
-                                <input type="text" name="Fax" value={formData.Fax} onChange={handleInputChange} className="flex-1 h-8 font-mono border border-gray-300 px-3 bg-white rounded-[5px] outline-none focus:border-blue-400 shadow-sm" />
+                        <div className="flex items-center gap-3">
+                            <label className="w-32 font-bold text-slate-600 shrink-0">Phone Number</label>
+                            <div className="flex-1 flex items-center gap-3 h-8">
+                                <input 
+                                    type="text" 
+                                    name="Phone" 
+                                    value={formData.Phone} 
+                                    onChange={handleInputChange} 
+                                    className="flex-1 h-full border border-gray-300 px-3 bg-[#eff4ff] rounded-[3px] outline-none focus:border-[#0285fd] shadow-sm font-medium text-slate-800" 
+                                />
+                                <label className="w-16 font-bold text-slate-600 text-center">Fax</label>
+                                <input 
+                                    type="text" 
+                                    name="Fax" 
+                                    value={formData.Fax || 'N/A'} 
+                                    onChange={handleInputChange} 
+                                    className="flex-1 h-full border border-gray-300 px-3 bg-[#eff4ff] rounded-[3px] outline-none focus:border-[#0285fd] shadow-sm font-medium text-slate-800" 
+                                />
                             </div>
                         </div>
 
-                        {/* Email */}
-                        <div className="flex items-center gap-6">
-                            <label className="w-32 font-bold text-gray-700">E-Mail Address</label>
-                            <input type="email" name="Email" value={formData.Email} onChange={handleInputChange} className="flex-1 h-8 font-mono border border-gray-300 px-3 bg-white rounded-[5px] outline-none focus:border-blue-400 shadow-sm" />
+                        {/* Email Address */}
+                        <div className="flex items-center gap-3">
+                            <label className="w-32 font-bold text-slate-600 shrink-0">E-Mail Address</label>
+                            <input 
+                                type="email" 
+                                name="Email" 
+                                value={formData.Email} 
+                                onChange={handleInputChange} 
+                                className="flex-1 h-8 border border-gray-300 px-3 bg-[#eff4ff] rounded-[3px] outline-none focus:border-[#0285fd] shadow-sm font-medium text-slate-800" 
+                            />
                         </div>
 
                         {/* Web Site */}
-                        <div className="flex items-center gap-6">
-                            <label className="w-32 font-bold text-gray-700">Web Site</label>
-                            <input type="text" name="Web" value={formData.Web} onChange={handleInputChange} className="flex-1 h-8 font-mono border border-gray-300 px-3 bg-white rounded-[5px] outline-none focus:border-blue-400 shadow-sm" />
+                        <div className="flex items-center gap-3">
+                            <label className="w-32 font-bold text-slate-600 shrink-0">Web Site</label>
+                            <input 
+                                type="text" 
+                                name="Web" 
+                                value={formData.Web} 
+                                onChange={handleInputChange} 
+                                className="flex-1 h-8 border border-gray-300 px-3 bg-[#eff4ff] rounded-[3px] outline-none focus:border-[#0285fd] shadow-sm font-medium text-slate-800" 
+                            />
                         </div>
 
                         {/* Contact Person */}
-                        <div className="flex items-center gap-6">
-                            <label className="w-32 font-bold text-gray-700">Contact Person</label>
-                            <input type="text" name="Contact_Person" value={formData.Contact_Person} onChange={handleInputChange} className="flex-1 h-8 font-mono border border-gray-300 px-3 bg-white rounded-[5px] outline-none focus:border-blue-400 shadow-sm" />
+                        <div className="flex items-center gap-3">
+                            <label className="w-32 font-bold text-slate-600 shrink-0">Contact Person</label>
+                            <input 
+                                type="text" 
+                                name="Contact_Person" 
+                                value={formData.Contact_Person} 
+                                onChange={handleInputChange} 
+                                className="flex-1 h-8 border border-gray-300 px-3 bg-white rounded-[3px] outline-none focus:border-[#0285fd] shadow-sm font-medium text-slate-800" 
+                            />
                         </div>
 
                         {/* Vendor Type and VAT */}
-                        <div className="flex items-center gap-6">
-                            <label className="w-32 font-bold text-gray-700">Vendor Type</label>
-                            <div className="flex-1 flex items-center gap-10">
-                                <div className="flex-1 flex gap-3">
+                        <div className="flex items-center gap-3">
+                            <label className="w-32 font-bold text-slate-600 shrink-0">Vendor Type</label>
+                            <div className="flex-1 flex items-center gap-3 h-8">
+                                <div className="flex-1 flex gap-2 h-full">
                                     <input 
                                         type="text" 
                                         name="Vend_Typ" 
                                         value={formData.Vend_Typ} 
                                         readOnly 
-                                        className="flex-1 h-8 border border-gray-300 px-3 bg-gray-50 rounded-[5px] outline-none shadow-sm cursor-default" 
+                                        className="flex-1 border border-gray-300 px-3 bg-white rounded-[3px] outline-none shadow-sm cursor-default font-medium text-slate-800" 
                                     />
                                     <button 
                                         onClick={() => setShowVTModal(true)} 
-                                        className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95"
+                                        className="w-9 h-8 bg-[#4285f4] text-white flex items-center justify-center hover:bg-[#3367d6] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0"
                                     >
                                         <Search size={18} />
                                     </button>
                                 </div>
-                                <label className="w-24 font-bold text-gray-700 text-center whitespace-nowrap">VAT Reg. No</label>
-                                <input type="text" name="VAT_Number" value={formData.VAT_Number} onChange={handleInputChange} className="flex-1 h-8 font-mono border border-gray-300 px-3 bg-white rounded-[5px] outline-none focus:border-blue-400 shadow-sm transition-all focus:shadow-md" />
+                                <label className="w-24 font-bold text-slate-600 text-center">VAT Reg. No</label>
+                                <input 
+                                    type="text" 
+                                    name="VAT_Number" 
+                                    value={formData.VAT_Number} 
+                                    onChange={handleInputChange} 
+                                    className="flex-1 h-full border border-gray-300 px-3 bg-white rounded-[3px] outline-none focus:border-[#0285fd] shadow-sm font-medium text-slate-800" 
+                                />
                             </div>
                         </div>
 
-                        {/* Credit Limit / Status */}
-                        <div className="flex items-center gap-6">
-                            <label className="w-32 font-bold text-gray-700">Credit Period</label>
-                            <div className="flex-1 flex items-center gap-10 text-left">
-                                <div className="w-56 flex items-center gap-2">
-                                    <input type="text" name="Credit_Period" value={formData.Credit_Period} onChange={handleInputChange} className="flex-1 h-8 font-mono border border-gray-300 px-3 bg-white rounded-[5px] outline-none focus:border-blue-400 text-center shadow-sm" />
-                                </div>
-                                <label className="flex items-center gap-3 cursor-pointer font-bold text-gray-700 ml-40 group">
-                                    <input type="checkbox" name="Locked" checked={formData.Locked} onChange={handleInputChange} className="w-5 h-5 rounded-[5px] border-gray-300 text-[#0078d4] focus:ring-[#0078d4] shadow-sm transition-all" /> 
-                                    <span className={`transition-colors ${formData.Locked ? 'text-red-500' : 'text-gray-600'}`}>Supplier is Inactive</span>
+                        {/* Credit Period and Status */}
+                        <div className="flex items-center gap-3">
+                            <label className="w-32 font-bold text-slate-600 shrink-0">Credit Period</label>
+                            <div className="flex-1 flex items-center justify-between h-8">
+                                <input 
+                                    type="text" 
+                                    name="Credit_Period" 
+                                    value={formData.Credit_Period} 
+                                    onChange={handleInputChange} 
+                                    className="w-48 h-full border border-gray-300 px-3 bg-white rounded-[3px] outline-none focus:border-[#0285fd] text-center shadow-sm font-medium text-slate-800" 
+                                />
+                                <label className="flex items-center gap-2 cursor-pointer font-bold text-slate-600 group">
+                                    <input 
+                                        type="checkbox" 
+                                        name="Locked" 
+                                        checked={formData.Locked} 
+                                        onChange={handleInputChange} 
+                                        className="w-4 h-4 rounded-[2px] border-gray-300 text-[#0285fd] focus:ring-[#0285fd] shadow-sm transition-all" 
+                                    /> 
+                                    <span className={`transition-colors text-[12.5px] ${formData.Locked ? 'text-red-500' : 'text-slate-500'}`}>Supplier is Inactive</span>
                                 </label>
                             </div>
                         </div>
 
-                        {/* Bank Detail */}
-                        <div className="flex items-center gap-6">
-                            <label className="w-32 font-bold text-gray-700">Bank Detail</label>
-                            <div className="flex-1 flex items-center gap-4">
-                                <div className="flex-[2] flex gap-3">
+                        {/* Bank Detail and Branch */}
+                        <div className="flex items-center gap-3">
+                            <label className="w-32 font-bold text-slate-600 shrink-0">Bank Detail</label>
+                            <div className="flex-1 flex items-center gap-3 h-8">
+                                <div className="flex-1 flex gap-2 h-full">
                                     <input 
                                         type="text" 
                                         name="Bank_Name" 
                                         value={formData.Bank_Name} 
                                         readOnly 
-                                        className="flex h-8 border border-gray-300 px-3 bg-gray-50 rounded-[5px] outline-none shadow-sm cursor-default" 
+                                        className="flex-1 border border-gray-300 px-3 bg-white rounded-[3px] outline-none shadow-sm cursor-default font-medium text-slate-800" 
                                     />
                                     <button 
                                         onClick={() => setShowBankModal(true)} 
-                                        className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95"
+                                        className="w-9 h-8 bg-[#4285f4] text-white flex items-center justify-center hover:bg-[#3367d6] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0"
                                     >
                                         <Search size={18} />
                                     </button>
                                 </div>
-                                <label className="w-20 font-bold text-gray-700 text-center">Branch</label>
-                                <input type="text" name="Brunch" value={formData.Brunch} onChange={handleInputChange} placeholder="" className="flex-1 h-8 font-mono border border-gray-300 px-3 bg-white rounded-[5px] outline-none focus:border-blue-400 shadow-sm transition-all focus:shadow-md" />
+                                <label className="w-16 font-bold text-slate-600 text-center">Branch</label>
+                                <input 
+                                    type="text" 
+                                    name="Brunch" 
+                                    value={formData.Brunch} 
+                                    onChange={handleInputChange} 
+                                    className="flex-1 h-full border border-gray-300 px-3 bg-white rounded-[3px] outline-none focus:border-[#0285fd] shadow-sm font-medium text-slate-800" 
+                                />
                             </div>
                         </div>
 
-                        {/* AC Number */}
-                        <div className="flex items-center gap-6">
-                            <label className="w-32 font-bold text-gray-700">A/C Number</label>
-                            <input type="text" name="AC_Number" value={formData.AC_Number} onChange={handleInputChange} className="flex-1 h-8 font-mono border border-gray-300 px-3 bg-white rounded-[5px] outline-none focus:border-blue-400 shadow-sm" />
+                        {/* A/C Number */}
+                        <div className="flex items-center gap-3">
+                            <label className="w-32 font-bold text-slate-600 shrink-0">A/C Number</label>
+                            <input 
+                                type="text" 
+                                name="AC_Number" 
+                                value={formData.AC_Number} 
+                                onChange={handleInputChange} 
+                                className="flex-1 h-8 border border-gray-300 px-3 bg-[#eff4ff] rounded-[3px] outline-none focus:border-[#0285fd] shadow-sm font-medium text-slate-800" 
+                            />
                         </div>
                     </div>
                 </div>
             </SimpleModal>
+
+
 
             {/* Vendor Type Search Modal */}
             {showVTModal && (

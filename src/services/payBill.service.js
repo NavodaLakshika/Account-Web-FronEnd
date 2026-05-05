@@ -28,9 +28,9 @@ export const payBillService = {
     }
   },
 
-  async generateDocNo() {
+  async generateDocNo(company) {
     try {
-      const response = await api.get('/generate-doc');
+      const response = await api.get('/generate-doc', { params: { company } });
       return response.data;
     } catch (error) {
       throw error.response?.data || 'Failed to generate document number';

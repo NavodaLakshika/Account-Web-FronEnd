@@ -16,21 +16,21 @@ const ConfirmModal = ({
     const isDanger = variant === "danger";
 
     return (
-        <div className="fixed inset-0 z-[1200] flex items-center justify-center p-4 font-['Plus_Jakarta_Sans']">
+        <div className="fixed inset-0 z-[1200] flex items-center justify-center p-4 font-['Plus_Jakarta_Sans'] ">
             <div 
                 className="absolute inset-0 bg-slate-900/60 backdrop-blur-md transition-opacity" 
                 onClick={() => !loading && onClose()} 
             />
             
             <div className="relative w-full max-w-md bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden animate-in zoom-in-95 duration-200">
-                <button
+                {/* <button
                     onClick={onClose}
                     disabled={loading}
                     className="absolute top-4 right-4 w-9 h-8 flex items-center justify-center bg-[#ff3b30] hover:bg-[#e03127] text-white rounded-[8px] shadow-[0_4px_12px_rgba(255,59,48,0.3)] hover:shadow-[0_6px_20px_rgba(255,59,48,0.4)] transition-all active:scale-90 outline-none border-none group"
                     title="Close"
                 >
                     <X size={18} strokeWidth={4} className="group-hover:scale-110 transition-transform" />
-                </button>
+                </button> */}
 
                 <div className="p-8 text-center">
                     <div className={`w-20 h-20 ${isDanger ? 'bg-red-50 border-red-100' : 'bg-blue-50 border-white'} rounded-full flex items-center justify-center mx-auto mb-6 border-4 shadow-lg`}>

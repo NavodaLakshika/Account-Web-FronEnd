@@ -6,6 +6,7 @@ import CalendarModal from '../components/CalendarModal';
 import { grnService } from '../services/grn.service';
 import { paymentMethodService } from '../services/paymentMethod.service';
 import { toast } from 'react-hot-toast';
+import { DotLottiePlayer } from '@dotlottie/react-player';
 
 import ItemMasterBoard from './ItemMasterBoard';
 
@@ -63,7 +64,65 @@ const GRNBoard = ({ isOpen, onClose }) => {
         amount: '0.00'
     });
 
+    const [showProductQtyModal, setShowProductQtyModal] = useState(false);
+    const [productMasterData, setProductMasterData] = useState({
+        code: '', name: '', unit: 'Nos', purchasePrice: '', sellingPrice: '', packSize: 1
+    });
+    const [isCreatingProduct, setIsCreatingProduct] = useState(false);
+
     const qtyRef = useRef(null);
+
+    const showSuccessToast = (message) => {
+        toast.custom((t) => (
+            <div className={`${t.visible ? 'animate-in slide-in-from-right-10 fade-in duration-500' : 'animate-out slide-out-to-right-10 fade-out duration-300'} 
+                max-w-[550px] w-fit bg-white/95 backdrop-blur-xl border border-white/20 shadow-2xl rounded-[5px] flex flex-col pointer-events-auto overflow-hidden`}>
+                <div className="px-4 py-2.5 flex items-center gap-3">
+                    <div className="w-12 h-12 shrink-0">
+                        <DotLottiePlayer src="/lottiefile/Successffull.lottie" autoplay loop={false} />
+                    </div>
+                    <div className="flex-grow text-left py-1">
+                        <h3 className="text-slate-800 text-[12px] font-bold tracking-wider uppercase font-tahoma leading-relaxed">{message}</h3>
+                        <div className="flex items-center gap-1.5 mt-0.5">
+                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.3)]" />
+                            <span className="text-emerald-600 text-[8px] font-mono font-bold tracking-widest uppercase">Verified</span>
+                        </div>
+                    </div>
+                    <button onClick={() => toast.dismiss(t.id)} className="text-slate-300 hover:text-slate-500 transition-colors">
+                        <X size={14} />
+                    </button>
+                </div>
+                <div className="h-[2px] w-full bg-emerald-50">
+                    <div className="h-full bg-emerald-500" style={{ animation: 'toastProgress 3s linear forwards' }} />
+                </div>
+            </div>
+        ), { duration: 3000, position: 'top-right' });
+    };
+
+    const showErrorToast = (message) => {
+        toast.custom((t) => (
+            <div className={`${t.visible ? 'animate-in slide-in-from-right-10 fade-in duration-500' : 'animate-out slide-out-to-right-10 fade-out duration-300'} 
+                max-w-[550px] w-fit bg-white/95 backdrop-blur-xl border border-white/20 shadow-2xl rounded-[5px] flex flex-col pointer-events-auto overflow-hidden`}>
+                <div className="px-4 py-2.5 flex items-center gap-3">
+                    <div className="w-12 h-12 shrink-0">
+                        <DotLottiePlayer src="/lottiefile/Error Fail animation.lottie" autoplay loop={false} />
+                    </div>
+                    <div className="flex-grow text-left py-1">
+                        <h3 className="text-slate-800 text-[12px] font-bold tracking-wider uppercase font-tahoma leading-relaxed">{message}</h3>
+                        <div className="flex items-center gap-1.5 mt-0.5">
+                            <div className="w-1.5 h-1.5 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.3)]" />
+                            <span className="text-red-600 text-[8px] font-mono font-bold tracking-widest uppercase">Failed</span>
+                        </div>
+                    </div>
+                    <button onClick={() => toast.dismiss(t.id)} className="text-slate-300 hover:text-slate-500 transition-colors">
+                        <X size={14} />
+                    </button>
+                </div>
+                <div className="h-[2px] w-full bg-red-50">
+                    <div className="h-full bg-red-500" style={{ animation: 'toastProgress 3s linear forwards' }} />
+                </div>
+            </div>
+        ), { duration: 3000, position: 'top-right' });
+    };
 
     useEffect(() => {
         if (isOpen) {
@@ -101,7 +160,7 @@ const GRNBoard = ({ isOpen, onClose }) => {
             const data = await grnService.generateDocNo(company);
             setFormData(prev => ({ ...prev, docNo: data.docNo }));
         } catch (error) {
-            toast.error('Failed to generate document number.');
+            showErrorToast('Failed to generate document number.');
         }
     };
 
@@ -146,11 +205,12 @@ const GRNBoard = ({ isOpen, onClose }) => {
     };
 
     const addProduct = () => {
-        if (!entry.prodCode) return toast.error('Select a Product.');
-        if (!entry.qty || parseFloat(entry.qty) <= 0) return toast.error('Enter valid Quantity.');
+        if (!entry.prodCode) return showErrorToast('Select a Product.');
+        if (!entry.qty || parseFloat(entry.qty) <= 0) return showErrorToast('Enter valid Quantity.');
 
         setProducts([...products, { ...entry }]);
         setEntry({ prodCode: '', prodName: '', unit: '', packSize: 1, qty: '', free: '', cost: '', selling: '', amount: '0.00' });
+        showSuccessToast("Product added to GRN listing.");
     };
 
     const totals = useMemo(() => {
@@ -168,18 +228,18 @@ const GRNBoard = ({ isOpen, onClose }) => {
     }, [products, formData]);
 
     const handleSaveDraft = async () => {
-        if (!formData.suppCode) return toast.error('Select Supplier.');
-        if (products.length === 0) return toast.error('No products entered.');
+        if (!formData.suppCode) return showErrorToast('Select Supplier.');
+        if (products.length === 0) return showErrorToast('No products entered.');
         const payload = preparePayload();
         try {
             await grnService.save(payload);
-            toast.success('Draft saved successfully.');
-        } catch (error) { toast.error(error.toString()); }
+            showSuccessToast('Draft saved successfully.');
+        } catch (error) { showErrorToast(error.toString()); }
     };
 
     const handleApply = async () => {
-        if (!formData.suppCode) return toast.error('Select Supplier.');
-        if (products.length === 0) return toast.error('No products entered.');
+        if (!formData.suppCode) return showErrorToast('Select Supplier.');
+        if (products.length === 0) return showErrorToast('No products entered.');
         setShowConfirmModal(true);
     };
 
@@ -188,10 +248,10 @@ const GRNBoard = ({ isOpen, onClose }) => {
         const payload = preparePayload();
         try {
             await grnService.apply(payload);
-            toast.success('GRN Applied successfully.');
+            showSuccessToast('GRN Applied successfully.');
             handleClear();
             setShowConfirmModal(false);
-        } catch (error) { toast.error(error.toString()); } finally { setIsApplying(false); }
+        } catch (error) { showErrorToast(error.toString()); } finally { setIsApplying(false); }
     };
 
     const handleSelectPO = async (poNo) => {
@@ -222,8 +282,8 @@ const GRNBoard = ({ isOpen, onClose }) => {
             })));
             setShowPOSearch(false);
             setPOSearchQuery('');
-            toast.success(`Purchase Order ${poNo} loaded.`);
-        } catch (error) { toast.error('Failed to fetch PO details.'); }
+            showSuccessToast(`Purchase Order ${poNo} loaded.`);
+        } catch (error) { showErrorToast('Failed to fetch PO details.'); }
     };
 
     const preparePayload = () => ({
@@ -262,7 +322,7 @@ const GRNBoard = ({ isOpen, onClose }) => {
             const data = await grnService.searchDocs(formData.company);
             setOrders(data);
             setShowSearchModal(true);
-        } catch (error) { toast.error('Failed to load saved GRNs.'); }
+        } catch (error) { showErrorToast('Failed to load saved GRNs.'); }
     };
 
     const handleSelectRow = async (docNo) => {
@@ -300,11 +360,35 @@ const GRNBoard = ({ isOpen, onClose }) => {
                 amount: d.amount?.toString() || '0.00'
             })));
             setShowSearchModal(false);
-        } catch (error) { toast.error('Failed to fetch order details.'); }
+            showSuccessToast('Record Loaded Successfully.');
+        } catch (error) { showErrorToast('Failed to fetch order details.'); }
+    };
+
+    const handleCreateProduct = async () => {
+        if (!productMasterData.code || !productMasterData.name) {
+            return showErrorToast('Code and Name are required.');
+        }
+        setIsCreatingProduct(true);
+        try {
+            await grnService.createProduct({
+                ...productMasterData,
+                createUser: formData.createUser
+            });
+            showSuccessToast('Product created successfully.');
+            setShowItemMasterModal(false);
+            setProductMasterData({ code: '', name: '', unit: 'Nos', purchasePrice: '', sellingPrice: '', packSize: 1 });
+            // Refresh products list
+            const results = await grnService.getLookups(formData.company);
+            setLookups(prev => ({ ...prev, products: results.products }));
+        } catch (error) {
+            showErrorToast(error.toString());
+        } finally {
+            setIsCreatingProduct(false);
+        }
     };
 
     const currentSupplierName = useMemo(() => {
-        if (!formData.suppCode) return 'Select Supplier...';
+        if (!formData.suppCode) return '';
         const s = lookups.suppliers.find(x => x.code?.trim().toUpperCase() === formData.suppCode.trim().toUpperCase());
         return s ? s.name : formData.suppCode;
     }, [formData.suppCode, lookups.suppliers]);
@@ -315,9 +399,9 @@ const GRNBoard = ({ isOpen, onClose }) => {
             isOpen={isOpen}
             onClose={onClose}
             title="Good Received Note (GRN)"
-            maxWidth="max-w-[1050px]"
+            maxWidth="max-w-[1200px]"
             footer={
-                <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-gray-100 rounded-b-xl">
+                <div className="bg-slate-50 px-6 py-3 w-full flex justify-between items-center border-t border-gray-100 rounded-b-xl">
                     <div className="flex gap-3">
                         <button
                             onClick={handleClear}
@@ -344,26 +428,26 @@ const GRNBoard = ({ isOpen, onClose }) => {
                 </div>
             }
         >
-            <div className="space-y-4 overflow-y-auto no-scrollbar font-['Tahoma']">
-                <div className="bg-white p-4 border border-gray-100 rounded-lg shadow-sm space-y-4">
-                    <div className="grid grid-cols-12 gap-x-6 gap-y-3.5">
-                        {/* Row 1: Document ID | GRN Date | Expected Date */}
+            <div className="space-y-3 overflow-y-auto no-scrollbar font-['Tahoma']">
+                <div className="bg-white p-3 border border-gray-100 rounded-lg shadow-sm space-y-3">
+                    <div className="grid grid-cols-12 gap-x-4 gap-y-2.5">
+                        {/* Row 1: Document ID | Post Date | Exp. Timeline */}
                         <div className="col-span-4 flex items-center gap-2">
-                            <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Document ID</label>
+                            <label className="text-[12px] font-bold text-gray-700 w-24 shrink-0">Document ID</label>
                             <div className="flex-1 flex gap-1 h-8 min-w-0">
                                 <input type="text" name="docNo" value={formData.docNo} onChange={handleInput} className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-blue-600 bg-gray-50 rounded-[5px] outline-none focus:border-[#0285fd] shadow-sm" />
                                 <button onClick={handleSearchClick} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0"><Search size={16} /></button>
                             </div>
                         </div>
                         <div className="col-span-4 flex items-center gap-2">
-                            <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Post Date</label>
+                            <label className="text-[12px] font-bold text-gray-700 w-24 shrink-0 text-center">Post Date</label>
                             <div className="flex-1 flex gap-1 h-8 min-w-0">
                                 <input type="text" readOnly value={formData.grnDate} onClick={() => { setDatePickerField('grnDate'); setShowDatePicker(true); }} className="flex-1 min-w-0 h-8 border border-gray-300 rounded-[5px] px-3 text-[12px] outline-none bg-white text-gray-700 font-bold cursor-pointer shadow-sm" />
                                 <button onClick={() => { setDatePickerField('grnDate'); setShowDatePicker(true); }} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0"><Calendar size={16} /></button>
                             </div>
                         </div>
                         <div className="col-span-4 flex items-center gap-2">
-                            <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Exp. Timeline</label>
+                            <label className="text-[12px] font-bold text-gray-700 w-24 shrink-0 text-center">Exp. Date</label>
                             <div className="flex-1 flex gap-1 h-8 min-w-0">
                                 <input type="text" readOnly value={formData.expectedDate} onClick={() => { setDatePickerField('expectedDate'); setShowDatePicker(true); }} className="flex-1 min-w-0 h-8 border border-gray-300 rounded-[5px] px-3 text-[12px] outline-none bg-white text-gray-700 font-bold cursor-pointer shadow-sm" />
                                 <button onClick={() => { setDatePickerField('expectedDate'); setShowDatePicker(true); }} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0"><Calendar size={16} /></button>
@@ -372,31 +456,31 @@ const GRNBoard = ({ isOpen, onClose }) => {
 
                         {/* Row 2: Supplier (8) | PO Number (4) */}
                         <div className="col-span-8 flex items-center gap-2">
-                            <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Supplier</label>
+                            <label className="text-[12px] font-bold text-gray-700 w-24 shrink-0">Supplier</label>
                             <div className="flex-1 flex gap-1 h-8 min-w-0">
                                 <input type="text" readOnly value={currentSupplierName} onClick={() => setShowSupplierSearch(true)} className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-red-600 bg-gray-50 rounded-[5px] outline-none shadow-sm cursor-pointer" />
                                 <button onClick={() => setShowSupplierSearch(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0"><Search size={16} /></button>
                             </div>
                         </div>
                         <div className="col-span-4 flex items-center gap-2">
-                            <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">PO Number</label>
+                            <label className="text-[12px] font-bold text-gray-700 w-24 shrink-0 text-center">PO Number</label>
                             <div className="flex-1 flex gap-1 h-8 min-w-0">
-                                <input type="text" readOnly value={formData.poNo || 'Select PO...'} onClick={() => setShowPOSearch(true)} className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-[#0285fd] bg-blue-50/20 rounded-[5px] outline-none cursor-pointer shadow-sm" />
+                                <input type="text" readOnly value={formData.poNo || ''} onClick={() => setShowPOSearch(true)} className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-[#0285fd] bg-blue-50/20 rounded-[5px] outline-none cursor-pointer shadow-sm" />
                                 <button onClick={() => setShowPOSearch(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] shadow-md shrink-0"><ClipboardList size={16} /></button>
                             </div>
                         </div>
 
                         {/* Row 3: Supp. Inv | Amount | Payment */}
                         <div className="col-span-4 flex items-center gap-2">
-                            <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Supp. Inv.</label>
+                            <label className="text-[12px] font-bold text-gray-700 w-24 shrink-0">Supp. Inv.</label>
                             <input type="text" name="suppInv" value={formData.suppInv} onChange={handleInput} className="flex-1 min-w-0 h-8 border border-gray-300 rounded-[5px] px-3 font-mono text-[12px] outline-none bg-white text-gray-700 shadow-sm focus:border-[#0285fd]" />
                         </div>
                         <div className="col-span-4 flex items-center gap-2">
-                            <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Inv. Amount</label>
+                            <label className="text-[12px] font-bold text-gray-700 w-24 shrink-0 text-center">Inv. Amount</label>
                             <input type="text" name="invAmount" value={formData.invAmount} onChange={handleInput} className="flex-1 min-w-0 h-8 border border-gray-300 rounded-[5px] px-3 font-mono text-[12px] font-black text-right outline-none bg-white text-gray-700 shadow-sm focus:border-[#0285fd]" />
                         </div>
                         <div className="col-span-4 flex items-center gap-2">
-                            <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Pay Method</label>
+                            <label className="text-[12px] font-bold text-gray-700 w-24 shrink-0 text-center">Pay Method</label>
                             <div className="flex-1 flex gap-1 h-8 min-w-0">
                                 <input
                                     type="text"
@@ -411,15 +495,19 @@ const GRNBoard = ({ isOpen, onClose }) => {
                             </div>
                         </div>
 
-                        {/* Checkboxes span 8 */}
-                        <div className="col-span-8 flex items-center gap-6 pl-[104px]">
-                            <label className="flex items-center gap-2 cursor-pointer">
-                                <input type="checkbox" name="consignmentBasis" checked={formData.consignmentBasis} onChange={handleInput} className="w-4 h-4 text-[#0285fd] rounded" />
-                                <span className="text-[11px] font-black text-gray-500 uppercase tracking-widest">CONSIGNMENT BASIS</span>
+                        {/* Row 4: Comment (8) | Consignment/Other (4) */}
+                        <div className="col-span-8 flex items-center gap-2">
+                            <label className="text-[12px] font-bold text-gray-700 w-24 shrink-0">Comment</label>
+                            <input type="text" name="comment" value={formData.comment} onChange={handleInput} className="flex-1 min-w-0 h-8 border border-gray-300 rounded-[5px] px-3 text-[12px] outline-none bg-white text-gray-700 shadow-sm focus:border-[#0285fd]" />
+                        </div>
+                        <div className="col-span-4 flex items-center justify-start gap-4 pl-4">
+                            <label className="flex items-center gap-2 cursor-pointer group">
+                                <input type="checkbox" name="consignmentBasis" checked={formData.consignmentBasis} onChange={handleInput} className="w-3.5 h-3.5 text-[#0285fd] border-gray-300 rounded focus:ring-[#0285fd] transition-all" />
+                                <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest group-hover:text-blue-600 transition-colors">Consign.</span>
                             </label>
-                            <label className="flex items-center gap-2 cursor-pointer">
-                                <input type="checkbox" name="acceptOtherSupp" checked={formData.acceptOtherSupp} onChange={handleInput} className="w-4 h-4 text-[#0285fd] rounded" />
-                                <span className="text-[11px] font-black text-gray-500 uppercase tracking-widest">OTHER SUP. PROD</span>
+                            <label className="flex items-center gap-2 cursor-pointer group">
+                                <input type="checkbox" name="acceptOtherSupp" checked={formData.acceptOtherSupp} onChange={handleInput} className="w-3.5 h-3.5 text-[#0285fd] border-gray-300 rounded focus:ring-[#0285fd] transition-all" />
+                                <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest group-hover:text-blue-600 transition-colors">Other Sup.</span>
                             </label>
                         </div>
                     </div>
@@ -502,22 +590,24 @@ const GRNBoard = ({ isOpen, onClose }) => {
                     </div>
                 </div>
 
-                <div className="flex flex-row justify-between items-end gap-x-12">
-                    <div className="flex-1 space-y-2">
-                        <label className="text-[12.5px] font-bold text-gray-700">Internal Remarks & Disclaimers</label>
-                        <textarea name="comment" value={formData.comment} onChange={handleInput} className="w-full h-[70px] border border-gray-300 rounded-lg p-3 text-[12.5px] font-mono outline-none focus:border-[#0285fd] resize-none shadow-sm bg-gray-50/30" placeholder="Add additional comments..."></textarea>
+                <div className="flex flex-row justify-between items-start gap-x-4">
+                    <div className="flex-1 bg-white border border-gray-100 rounded-lg p-3 shadow-sm space-y-3">
                         <div className="grid grid-cols-2 gap-4">
                             <div className="flex items-center gap-3">
-                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Expense Ac.</label>
+                                <label className="text-[12px] font-bold text-gray-700 w-24 shrink-0">Expense Ac.</label>
                                 <div className="flex-1 flex gap-1 h-8 min-w-0">
-                                    <input type="text" readOnly value="Select Account" className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-gray-500 bg-gray-50 rounded-[5px] outline-none shadow-sm cursor-pointer" onClick={() => setShowExpenseSearch(true)} />
+                                    <input type="text" readOnly value="" className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-gray-500 bg-gray-50 rounded-[5px] outline-none shadow-sm cursor-pointer" onClick={() => setShowExpenseSearch(true)} />
                                     <button onClick={() => setShowExpenseSearch(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0"><Search size={16} /></button>
                                 </div>
                             </div>
                             <div className="flex items-center gap-3">
-                                <label className="text-[12.5px] font-bold text-gray-700">Other Charges</label>
+                                <label className="text-[12px] font-bold text-gray-700 w-24 shrink-0 text-right">Other Chg.</label>
                                 <input type="text" defaultValue="0.00" className="flex-1 h-8 border border-gray-300 px-3 rounded-[5px] text-[12px] text-right font-mono font-bold shadow-sm outline-none focus:border-[#0285fd]" />
                             </div>
+                        </div>
+                        <div className="space-y-1">
+                            <label className="text-[12px] font-bold text-gray-700 ml-1">Internal Remarks & Disclaimers</label>
+                            <textarea name="comment" value={formData.comment} onChange={handleInput} className="w-full h-[54px] border border-gray-300 rounded-lg p-3 text-[12px] font-mono outline-none focus:border-[#0285fd] resize-none shadow-sm bg-gray-50/10" placeholder="Type here..."></textarea>
                         </div>
                     </div>
 
@@ -633,7 +723,7 @@ const GRNBoard = ({ isOpen, onClose }) => {
                                             <td className="px-5 py-3 font-mono text-[13px] font-black text-blue-700">{s.code}</td>
                                             <td className="px-5 py-3 text-[13px] font-bold text-gray-700 uppercase group-hover:text-blue-600 transition-colors">{s.name}</td>
                                             <td className="px-5 py-3 text-right">
-                                                <button className="bg-[#0285fd] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#0073ff] shadow-md transition-all active:scale-95">SELECT</button>
+                                                <button className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95">SELECT</button>
                                             </td>
                                         </tr>
                                     ))}
@@ -645,46 +735,46 @@ const GRNBoard = ({ isOpen, onClose }) => {
                 </div>
             </SimpleModal>
 
-            {/* ── Add Product Modal ──────────────────────────────────── */}
-            <SimpleModal isOpen={showAddProductModal} onClose={() => { setShowAddProductModal(false); setProductSearchQuery(''); }} title="Add Product to GRN" maxWidth="max-w-[580px]">
-                <div className="space-y-3 px-1">
-                    {/* Product search */}
-                    <div className="flex gap-2">
-                        <div className="relative flex-1">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
-                            <input
-                                type="text"
-                                placeholder="Search 58,000+ products by code or name..."
-                                className="w-full h-9 pl-9 pr-4 border border-gray-200 rounded-md outline-none text-[12px]"
-                                value={productSearchQuery}
-                                onChange={async (e) => {
-                                    const val = e.target.value; setProductSearchQuery(val);
-                                    if (val.length >= 2) { try { const r = await grnService.searchProducts(val); setLookups(prev => ({ ...prev, products: r })); } catch (_) {} }
-                                    else if (val.length === 0) { const init = await grnService.getLookups(formData.company); setLookups(prev => ({ ...prev, products: init.products })); }
-                                }}
-                                autoFocus
-                            />
+            {/* ── Add Product Modal (Catalog) ──────────────────────────────────── */}
+            <SimpleModal isOpen={showAddProductModal} onClose={() => { setShowAddProductModal(false); setProductSearchQuery(''); }} title="Inventory Acquisition Portal" maxWidth="max-w-[650px]">
+                <div className="space-y-4 px-1 font-['Tahoma']">
+                    <div className="flex items-center justify-between gap-4 bg-slate-50/80 p-3 rounded-xl border border-gray-100 mb-2">
+                        <div className="flex items-center gap-3 flex-1">
+                            <div className="relative flex-1 max-w-[400px]">
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                                <input
+                                    type="text"
+                                    placeholder="Search Inventory"
+                                    className="w-full h-10 pl-10 pr-4 border border-gray-200 rounded-lg outline-none text-sm focus:border-blue-500 focus:ring-4 focus:ring-blue-50 transition-all bg-white shadow-sm font-medium"
+                                    value={productSearchQuery}
+                                    onChange={async (e) => {
+                                        const val = e.target.value; setProductSearchQuery(val);
+                                        if (val.length >= 2) { try { const r = await grnService.searchProducts(val); setLookups(prev => ({ ...prev, products: r })); } catch (_) {} }
+                                        else if (val.length === 0) { const init = await grnService.getLookups(formData.company); setLookups(prev => ({ ...prev, products: init.products })); }
+                                    }}
+                                    autoFocus
+                                />
+                            </div>
                         </div>
                         <button 
                             onClick={() => setShowItemMasterModal(true)}
-                            className="px-3 h-9 bg-green-600 text-white text-[11px] font-bold rounded-md hover:bg-green-700 transition-colors flex items-center gap-1.5 shadow-sm"
+                            className="h-10 px-5 bg-[#2bb744] text-white text-[12px] font-black rounded-lg hover:bg-[#259b3a] transition-all flex items-center gap-2 border-none shadow-md shadow-green-100 active:scale-95 whitespace-nowrap"
                         >
-                            <Plus size={14} /> New
+                            <Plus size={14} /> CREATE NEW ITEM
                         </button>
                     </div>
-                    {/* Product list */}
-                    <div className="border border-gray-100 rounded-md overflow-hidden">
-                        <div className="max-h-[400px] overflow-y-auto no-scrollbar">
-                            <table className="w-full text-[11px]">
-                                <thead className="bg-slate-50 sticky top-0 border-b border-gray-200">
+
+                    <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm bg-white">
+                        <div className="max-h-[420px] overflow-y-auto no-scrollbar">
+                            <table className="w-full text-left border-collapse">
+                                <thead className="bg-[#f8fafd] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 z-10">
                                     <tr>
-                                        <th className="px-3 py-2 text-left font-bold text-gray-500 uppercase">Code</th>
-                                        <th className="px-3 py-2 text-left font-bold text-gray-500 uppercase">Product Name</th>
-                                        <th className="px-3 py-2 text-right font-bold text-gray-500 uppercase">Cost</th>
-                                        <th className="px-3 py-2 text-right font-bold text-gray-500 uppercase">Selling</th>
+                                        <th className="px-6 py-4">Code</th>
+                                        <th className="px-6 py-4">Item Description</th>
+                                        <th className="px-6 py-4 text-right">Base Price</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody className="divide-y divide-gray-50">
                                     {(lookups.products || []).map(p => (
                                         <tr key={p.code}
                                             onClick={() => {
@@ -697,80 +787,121 @@ const GRNBoard = ({ isOpen, onClose }) => {
                                                     qty: prev.qty || '',
                                                     amount: ((parseFloat(prev.qty) || 0) * parseFloat(p.price || 0)).toFixed(2)
                                                 }));
-                                                setProductSearchQuery('');
+                                                setShowProductQtyModal(true);
                                             }}
-                                            className={`border-b border-gray-50 cursor-pointer transition-colors ${
-                                                entry.prodCode === p.code ? 'bg-orange-50 border-l-2 border-l-orange-400' : 'hover:bg-orange-50/50'
+                                            className={`group hover:bg-blue-50/50 cursor-pointer transition-all duration-200 ${
+                                                entry.prodCode === p.code ? 'bg-blue-50/70' : ''
                                             }`}
                                         >
-                                            <td className="px-3 py-1.5 font-bold text-orange-600">{p.code}</td>
-                                            <td className="px-3 py-1.5 text-gray-700 font-medium">{p.name}</td>
-                                            <td className="px-3 py-1.5 text-right font-bold text-gray-600">{parseFloat(p.price || 0).toFixed(2)}</td>
-                                            <td className="px-3 py-1.5 text-right font-bold text-blue-600">{parseFloat(p.sellingPrice || 0).toFixed(2)}</td>
+                                            <td className="px-6 py-4 font-mono text-[13px] font-bold text-blue-600">{p.code}</td>
+                                            <td className="px-6 py-4">
+                                                <div className="text-[13px] font-bold text-gray-700 uppercase group-hover:text-blue-600 transition-colors leading-snug line-clamp-2 max-w-[320px]">
+                                                    {p.name}
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4 text-right font-mono font-black text-gray-500">
+                                                <span className="text-[10px] text-gray-300 mr-1">Rs.</span>
+                                                {parseFloat(p.price || 0).toFixed(2)}
+                                            </td>
                                         </tr>
                                     ))}
                                 </tbody>
                             </table>
                         </div>
                     </div>
-                    {/* SELECTED PRODUCT CAPTURE BANNER */}
-                    {entry.prodCode && (
-                        <div className="bg-slate-50 border border-gray-200 rounded-xl p-4 mt-2 space-y-4 shadow-inner">
-                             <div className="flex justify-between items-start">
-                                <div>
-                                    <div className="text-[14px] font-black text-slate-800 uppercase tracking-tight">
-                                        {entry.prodName}
-                                    </div>
-                                    <div className="text-[11px] font-mono font-black text-blue-500 uppercase tracking-widest mt-0.5">
-                                        Ref: {entry.prodCode}
-                                    </div>
-                                </div>
-                                <div className="text-right">
-                                    <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Active Unit</div>
-                                    <div className="text-[13px] font-bold text-slate-600">{entry.unit || 'PACK'}</div>
-                                </div>
-                             </div>
+                </div>
+            </SimpleModal>
 
-                            <div className="grid grid-cols-4 gap-4">
-                                <div className="space-y-1.5 focus-within:text-blue-600 transition-colors">
-                                    <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest pl-1">Cost Rate</label>
-                                    <input type="text" name="cost" value={entry.cost} onChange={handleEntryInput}
-                                        className="w-full h-9 border border-gray-300 px-3 text-right text-[13px] font-mono font-black rounded-lg outline-none focus:border-[#0285fd] bg-white shadow-sm" />
-                                </div>
-                                <div className="space-y-1.5 focus-within:text-blue-600 transition-colors">
-                                    <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest pl-1">Ex. Selling</label>
-                                    <input type="text" name="selling" value={entry.selling} onChange={handleEntryInput}
-                                        className="w-full h-9 border border-gray-300 px-3 text-right text-[13px] font-mono font-black text-blue-600 rounded-lg outline-none focus:border-[#0285fd] bg-white shadow-sm" />
-                                </div>
-                                <div className="space-y-1.5 focus-within:text-blue-600 transition-colors">
-                                    <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest pl-1">Rec. Qty</label>
-                                    <input type="text" name="qty" value={entry.qty} onChange={handleEntryInput}
-                                        onKeyDown={e => { if (e.key === 'Enter') { addProduct(); setShowAddProductModal(false); setProductSearchQuery(''); } }}
-                                        className="w-full h-9 border border-[#0285fd] px-3 text-center text-[13px] font-mono font-black rounded-lg outline-none bg-blue-50/20 shadow-sm" autoFocus />
-                                </div>
-                                <div className="space-y-1.5 focus-within:text-blue-600 transition-colors">
-                                    <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest pl-1">Free Issue</label>
-                                    <input type="text" name="free" value={entry.free} onChange={handleEntryInput}
-                                        className="w-full h-9 border border-gray-300 px-3 text-center text-[13px] font-mono font-black text-green-600 rounded-lg outline-none focus:border-[#0285fd] bg-white shadow-sm" />
-                                </div>
+            {/* ── Line Item Configuration Modal (Quantity/Cost) ──────────────────────────────────── */}
+            <SimpleModal
+                isOpen={showProductQtyModal}
+                onClose={() => setShowProductQtyModal(false)}
+                title="Line Item Configuration"
+                maxWidth="max-w-[450px]"
+            >
+                <div className="space-y-4 px-1 py-1 font-['Tahoma']">
+                    <div className="bg-slate-50/50 p-4 rounded-xl border border-slate-100 flex flex-col items-center text-center">
+                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1.5">Active Selection</span>
+                        <h3 className="text-[18px] font-black text-slate-700 uppercase leading-[1.2] tracking-tight max-w-[90%] break-words">
+                            {entry.prodName}
+                        </h3>
+                        <div className="flex items-center gap-2 mt-2">
+                            <span className="text-[11px] font-mono font-bold text-blue-500 bg-white px-3 py-0.5 rounded-md shadow-sm border border-slate-100">{entry.prodCode}</span>
+                            <span className="text-[10px] font-black text-slate-300 uppercase">Product Code</span>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-5">
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <label className="text-[11px] font-black text-gray-500 uppercase tracking-widest flex justify-between">
+                                    Unit Price <span className="text-blue-500 font-mono">LKR</span>
+                                </label>
+                                <input 
+                                    type="text" 
+                                    name="cost" 
+                                    value={entry.cost} 
+                                    onChange={handleEntryInput}
+                                    className="w-full h-12 border border-gray-300 px-5 text-right text-[16px] font-mono font-black rounded-xl outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-50 transition-all bg-white" 
+                                />
                             </div>
-
-                            <div className="flex items-center justify-between pt-2">
-                                <div className="flex flex-col">
-                                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Line Item Valuation</span>
-                                    <span className="text-[18px] font-mono font-black text-blue-700 tracking-tighter">
-                                        Rs. {parseFloat(entry.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                                    </span>
-                                </div>
-                                <button
-                                    onClick={() => { addProduct(); setShowAddProductModal(false); setProductSearchQuery(''); }}
-                                    className="px-8 h-10 bg-[#0285fd] text-white text-sm font-black rounded-lg hover:bg-[#0073ff] shadow-lg shadow-blue-100 transition-all active:scale-95 flex items-center gap-2"
-                                >
-                                    <Plus size={16} /> ADD TO LISTING
-                                </button>
+                            <div className="space-y-2">
+                                <label className="text-[11px] font-black text-gray-500 uppercase tracking-widest flex justify-between">
+                                    Selling Price <span className="text-blue-500 font-mono">LKR</span>
+                                </label>
+                                <input 
+                                    type="text" 
+                                    name="selling" 
+                                    value={entry.selling} 
+                                    onChange={handleEntryInput}
+                                    className="w-full h-12 border border-gray-300 px-5 text-right text-[16px] font-mono font-black text-blue-600 rounded-xl outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-50 transition-all bg-white" 
+                                />
                             </div>
                         </div>
-                    )}
+
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <label className="text-[11px] font-black text-gray-500 uppercase tracking-widest">Received Qty</label>
+                                <input 
+                                    type="text" 
+                                    name="qty" 
+                                    value={entry.qty} 
+                                    onChange={handleEntryInput}
+                                    onKeyDown={e => { if (e.key === 'Enter') { addProduct(); setShowProductQtyModal(false); setShowAddProductModal(false); setProductSearchQuery(''); } }}
+                                    className="w-full h-12 border border-blue-500 px-5 text-center text-[18px] font-mono font-black rounded-xl outline-none bg-blue-50/20 focus:ring-4 focus:ring-blue-100 transition-all shadow-inner" 
+                                    autoFocus 
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-[11px] font-black text-gray-500 uppercase tracking-widest">Free Issue</label>
+                                <input 
+                                    type="text" 
+                                    name="free" 
+                                    value={entry.free} 
+                                    onChange={handleEntryInput}
+                                    className="w-full h-12 border border-gray-300 px-5 text-center text-[18px] font-mono font-black text-green-600 rounded-xl outline-none focus:border-blue-500 transition-all bg-white shadow-sm" 
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="pt-4 border-t border-gray-100 flex items-center justify-between">
+                        <div className="flex flex-col">
+                            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Total Valuation</span>
+                            <div className="flex items-baseline gap-1.5 mt-0.5">
+                                <span className="text-[12px] font-bold text-blue-500">LKR</span>
+                                <span className="text-[26px] font-mono font-black text-slate-800 tracking-tight">
+                                    {parseFloat(entry.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                </span>
+                            </div>
+                        </div>
+                        <button
+                            onClick={() => { addProduct(); setShowProductQtyModal(false); setShowAddProductModal(false); setProductSearchQuery(''); }}
+                            className="h-11 px-8 bg-[#0285fd] text-white text-[13px] font-bold rounded-lg hover:bg-[#0073ff] transition-all active:scale-95 flex items-center gap-2 border-none"
+                        >
+                            <Plus size={16} /> ADD TO LIST
+                        </button>
+                    </div>
                 </div>
             </SimpleModal>
 
@@ -958,13 +1089,58 @@ const GRNBoard = ({ isOpen, onClose }) => {
                 </div>
             </SimpleModal>
 
-            {/* Closing the MAIN GRN SimpleModal opened at line 320 */}
             </SimpleModal>
 
-            <ItemMasterBoard 
-                isOpen={showItemMasterModal} 
-                onClose={() => setShowItemMasterModal(false)} 
-            />
+            {/* Product Master Creation Modal (Quick Create) */}
+            <SimpleModal
+                isOpen={showItemMasterModal}
+                onClose={() => setShowItemMasterModal(false)}
+                title="Product Master Creation"
+                maxWidth="max-w-[500px]"
+                footer={
+                    <div className="bg-slate-50 px-6 py-4 w-full flex justify-end gap-3 border-t border-gray-100 rounded-b-xl">
+                        <button onClick={() => setShowItemMasterModal(false)} className="px-6 h-9 bg-white text-gray-500 text-[13px] font-bold rounded-[5px] border border-gray-300 hover:bg-gray-50 transition-all active:scale-95 font-tahoma">CANCEL</button>
+                        <button onClick={handleCreateProduct} disabled={isCreatingProduct} className="px-8 h-9 bg-[#2bb744] text-white text-[13px] font-bold rounded-[5px] shadow-md shadow-green-50 hover:bg-[#259b3a] transition-all active:scale-95 flex items-center gap-2 border-none font-tahoma">
+                            {isCreatingProduct ? 'CREATING...' : 'CREATE PRODUCT'}
+                        </button>
+                    </div>
+                }
+            >
+                <div className="py-2 px-1 font-['Tahoma'] space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-1">
+                            <label className="text-[12px] font-bold text-gray-600 uppercase tracking-widest pl-1">Product Code</label>
+                            <input type="text" value={productMasterData.code} onChange={e => setProductMasterData({...productMasterData, code: e.target.value})} className="w-full h-10 border border-gray-300 rounded-lg px-4 text-[13px] outline-none focus:border-[#0285fd] bg-white font-mono uppercase shadow-sm" placeholder="" />
+                        </div>
+                        <div className="space-y-1">
+                            <label className="text-[12px] font-bold text-gray-600 uppercase tracking-widest pl-1">Unit of Measure</label>
+                            <input type="text" value={productMasterData.unit} onChange={e => setProductMasterData({...productMasterData, unit: e.target.value})} className="w-full h-10 border border-gray-300 rounded-lg px-4 text-[13px] outline-none focus:border-[#0285fd] bg-white shadow-sm" placeholder="Nos" />
+                        </div>
+                    </div>
+                    <div className="space-y-1">
+                        <label className="text-[12px] font-bold text-gray-600 uppercase tracking-widest pl-1">Product Description</label>
+                        <input type="text" value={productMasterData.name} onChange={e => setProductMasterData({...productMasterData, name: e.target.value})} className="w-full h-10 border border-gray-300 rounded-lg px-4 text-[13px] outline-none focus:border-[#0285fd] bg-white uppercase shadow-sm font-bold" placeholder="" />
+                    </div>
+                    <div className="grid grid-cols-3 gap-4">
+                        <div className="space-y-1">
+                            <label className="text-[11px] font-bold text-gray-600 uppercase tracking-widest pl-1">Purchase Price</label>
+                            <input type="text" value={productMasterData.purchasePrice} onChange={e => setProductMasterData({...productMasterData, purchasePrice: e.target.value})} className="w-full h-10 border border-gray-300 rounded-lg px-4 text-right text-[13px] font-mono outline-none focus:border-[#0285fd] bg-white shadow-sm" placeholder="0.00" />
+                        </div>
+                        <div className="space-y-1">
+                            <label className="text-[11px] font-bold text-gray-600 uppercase tracking-widest pl-1">Selling Price</label>
+                            <input type="text" value={productMasterData.sellingPrice} onChange={e => setProductMasterData({...productMasterData, sellingPrice: e.target.value})} className="w-full h-10 border border-gray-300 rounded-lg px-4 text-right text-[13px] font-mono outline-none focus:border-[#0285fd] bg-white shadow-sm" placeholder="0.00" />
+                        </div>
+                        <div className="space-y-1">
+                            <label className="text-[11px] font-bold text-gray-600 uppercase tracking-widest pl-1">Pack Size</label>
+                            <input type="text" value={productMasterData.packSize} onChange={e => setProductMasterData({...productMasterData, packSize: e.target.value})} className="w-full h-10 border border-gray-300 rounded-lg px-4 text-center text-[13px] font-mono outline-none focus:border-[#0285fd] bg-white shadow-sm" placeholder="1" />
+                        </div>
+                    </div>
+                    <div className="bg-blue-50/50 p-3.5 rounded-xl border border-blue-100/50 flex items-start gap-3">
+                        <div className="w-2 h-2 rounded-full bg-blue-400 mt-1.5 shrink-0" />
+                        <p className="text-[10px] text-blue-600 font-bold uppercase tracking-widest leading-relaxed">System Defaults: Category (1) and Department (1) will be automatically assigned to this record.</p>
+                    </div>
+                </div>
+            </SimpleModal>
         </>
     );
 };

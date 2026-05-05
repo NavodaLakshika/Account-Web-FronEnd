@@ -98,5 +98,14 @@ export const grnService = {
     } catch (error) {
       throw error.response?.data || 'Failed to delete GRN';
     }
+  },
+
+  async createProduct(data) {
+    try {
+      const response = await api.post('/create-product', data);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || 'Failed to create product';
+    }
   }
 };

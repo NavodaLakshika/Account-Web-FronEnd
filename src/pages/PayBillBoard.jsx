@@ -4,6 +4,7 @@ import CalendarModal from '../components/CalendarModal';
 import { Search, Calendar, ChevronDown, RefreshCw, X, Save, RotateCcw, Loader2, CreditCard, Trash2 } from 'lucide-react';
 import { payBillService } from '../services/payBill.service';
 import { toast } from 'react-hot-toast';
+import { DotLottiePlayer } from '@dotlottie/react-player';
 
 const PayBillBoard = ({ isOpen, onClose }) => {
     const [lookups, setLookups] = useState({ 
@@ -48,6 +49,58 @@ const PayBillBoard = ({ isOpen, onClose }) => {
     const [paymentSearchResults, setPaymentSearchResults] = useState([]);
     const [searchingPayments, setSearchingPayments] = useState(false);
 
+    const showSuccessToast = (message) => {
+        toast.custom((t) => (
+            <div className={`${t.visible ? 'animate-in slide-in-from-right-10 fade-in duration-500' : 'animate-out slide-out-to-right-10 fade-out duration-300'} 
+                max-w-[550px] w-fit bg-white/95 backdrop-blur-xl border border-white/20 shadow-2xl rounded-[5px] flex flex-col pointer-events-auto overflow-hidden`}>
+                <div className="px-4 py-2.5 flex items-center gap-3">
+                    <div className="w-12 h-12 shrink-0">
+                        <DotLottiePlayer src="/lottiefile/Successffull.lottie" autoplay loop={false} />
+                    </div>
+                    <div className="flex-grow text-left py-1">
+                        <h3 className="text-slate-800 text-[12px] font-bold tracking-wider uppercase font-tahoma leading-relaxed">{message}</h3>
+                        <div className="flex items-center gap-1.5 mt-0.5">
+                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.3)]" />
+                            <span className="text-emerald-600 text-[8px] font-mono font-bold tracking-widest uppercase">Verified</span>
+                        </div>
+                    </div>
+                    <button onClick={() => toast.dismiss(t.id)} className="text-slate-300 hover:text-slate-500 transition-colors">
+                        <X size={14} />
+                    </button>
+                </div>
+                <div className="h-[2px] w-full bg-emerald-50">
+                    <div className="h-full bg-emerald-500" style={{ animation: 'toastProgress 3s linear forwards' }} />
+                </div>
+            </div>
+        ), { duration: 3000, position: 'top-right' });
+    };
+
+    const showErrorToast = (message) => {
+        toast.custom((t) => (
+            <div className={`${t.visible ? 'animate-in slide-in-from-right-10 fade-in duration-500' : 'animate-out slide-out-to-right-10 fade-out duration-300'} 
+                max-w-[550px] w-fit bg-white/95 backdrop-blur-xl border border-white/20 shadow-2xl rounded-[5px] flex flex-col pointer-events-auto overflow-hidden`}>
+                <div className="px-4 py-2.5 flex items-center gap-3">
+                    <div className="w-12 h-12 shrink-0">
+                        <DotLottiePlayer src="/lottiefile/Error Fail animation.lottie" autoplay loop={false} />
+                    </div>
+                    <div className="flex-grow text-left py-1">
+                        <h3 className="text-slate-800 text-[12px] font-bold tracking-wider uppercase font-tahoma leading-relaxed">{message}</h3>
+                        <div className="flex items-center gap-1.5 mt-0.5">
+                            <div className="w-1.5 h-1.5 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.3)]" />
+                            <span className="text-red-600 text-[8px] font-mono font-bold tracking-widest uppercase">Failed</span>
+                        </div>
+                    </div>
+                    <button onClick={() => toast.dismiss(t.id)} className="text-slate-300 hover:text-slate-500 transition-colors">
+                        <X size={14} />
+                    </button>
+                </div>
+                <div className="h-[2px] w-full bg-red-50">
+                    <div className="h-full bg-red-500" style={{ animation: 'toastProgress 3s linear forwards' }} />
+                </div>
+            </div>
+        ), { duration: 3000, position: 'top-right' });
+    };
+
     useEffect(() => {
         if (isOpen) {
             fetchLookups();
@@ -83,10 +136,18 @@ const PayBillBoard = ({ isOpen, onClose }) => {
 
     const generateDocNo = async () => {
         try {
-            const data = await payBillService.generateDocNo();
+            const companyData = localStorage.getItem('selectedCompany');
+            let companyCode = 'C001';
+            if (companyData) {
+                try {
+                    const parsed = JSON.parse(companyData);
+                    companyCode = parsed.company_Code || parsed.companyCode || parsed.CompanyCode || companyData;
+                } catch (e) { companyCode = companyData; }
+            }
+            const data = await payBillService.generateDocNo(companyCode);
             setFormData(prev => ({ ...prev, payDoc: data.docNo }));
         } catch (error) {
-            toast.error('Failed to generate document number.');
+            showErrorToast('Failed to generate document number.');
         }
     };
 
@@ -266,10 +327,20 @@ const PayBillBoard = ({ isOpen, onClose }) => {
 
         try {
             await payBillService.save(payload);
-            toast.success('Payment Applied Successfully.');
-            handleClear();
+            showSuccessToast('Payment Applied Successfully.');
+            setBills([]);
+            setFormData(prev => ({
+                ...prev,
+                vendorId: '',
+                accId: '',
+                memo: '',
+                chqNo: '',
+                voucherNo: '',
+                payAmount: 0
+            }));
+            generateDocNo();
         } catch (error) {
-            toast.error(error.toString());
+            showErrorToast(error.toString());
         } finally {
             setLoading(false);
         }
@@ -293,7 +364,7 @@ const PayBillBoard = ({ isOpen, onClose }) => {
             isOpen={isOpen}
             onClose={onClose}
             title="Pay Supplier Bills"
-            maxWidth="max-w-[950px]"
+            maxWidth="max-w-[1050px]"
             footer={
                 <div className="bg-slate-50 px-6 py-4 w-full flex justify-end gap-3 border-t border-gray-100 rounded-b-xl">
                     <button onClick={handleSave} disabled={loading} className={`px-6 h-10 bg-[#2bb744] text-white text-sm font-black rounded-[5px] shadow-md shadow-green-100 hover:bg-[#259b3a] transition-all active:scale-95 flex items-center justify-center gap-2 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}>
@@ -327,7 +398,7 @@ const PayBillBoard = ({ isOpen, onClose }) => {
                                     type="text" 
                                     readOnly 
                                     value={formData.payDate} 
-                                    className="w-[110px] px-2 text-[12px] border border-gray-300 rounded-[5px] outline-none text-gray-700 font-mono font-bold bg-gray-50 text-center shadow-sm" 
+                                    className="w-[210px] px-2 text-[12px] border border-gray-300 rounded-[5px] outline-none text-gray-700 font-mono font-bold bg-gray-50 text-center shadow-sm" 
                                 />
                                 <button onClick={() => openCalendar('payDate')} className="w-9 h-8 bg-[#0285fd] text-white flex items-center justify-center rounded-[5px] transition-all shadow-sm active:scale-90">
                                     <Calendar size={14} />
@@ -391,7 +462,7 @@ const PayBillBoard = ({ isOpen, onClose }) => {
                     
                     <div className="flex-1 bg-white overflow-y-auto max-h-[250px] custom-scrollbar">
                         {loading && <div className="p-12 text-center text-gray-300 font-black italic text-[11px] uppercase tracking-widest animate-pulse">Fetching Vendor Ledgers...</div>}
-                        {!loading && bills.length === 0 && <div className="p-12 text-center text-gray-300 font-black italic text-[11px] uppercase tracking-widest">No outstanding bills found.</div>}
+                        {!loading && bills.length === 0 && <div className="p-12 text-center text-gray-300 font-black text-[11px] uppercase tracking-widest">No outstanding bills found.</div>}
                         
                         {bills.map((bill, idx) => (
                             <div key={idx} className={`flex border-b border-gray-50 text-[12px] font-bold text-gray-700 transition-colors ${bill.selected ? 'bg-blue-50/30' : 'hover:bg-slate-50/50'}`}>
@@ -432,6 +503,7 @@ const PayBillBoard = ({ isOpen, onClose }) => {
                         </div>
 
                         <div className="flex items-center gap-3 pt-0.5">
+                            <button onClick={() => setBills(bills.map(b => ({ ...b, selected: true })))} className="px-5 h-7 bg-blue-600 text-white text-[10px] font-black uppercase tracking-widest rounded-md hover:bg-blue-700 shadow-sm transition-all active:scale-95 leading-none">Select All Invoices</button>
                             <button onClick={handleClearSelection} className="px-5 h-7 bg-white border border-gray-300 text-gray-500 text-[10px] font-black uppercase tracking-widest rounded-md hover:bg-gray-50 shadow-sm transition-all active:scale-95 leading-none">Reset Selection</button>
                             <div className="h-4 w-[1px] bg-gray-200"></div>
                             <span className="text-[10px] font-bold text-gray-400 flex items-center gap-2"><CreditCard size={11} /> {bills.filter(b => b.selected).length} Active Invoices Selected</span>
@@ -442,8 +514,13 @@ const PayBillBoard = ({ isOpen, onClose }) => {
                         <StatRow label="Gross Amount" value={totals.amountDue.toLocaleString(undefined, {minimumFractionDigits: 2})} />
                         <StatRow label="Trade Discount" value={totals.discount.toLocaleString(undefined, {minimumFractionDigits: 2})} />
                         <StatRow label="Credit Setoffs" value={totals.setOfUse.toLocaleString(undefined, {minimumFractionDigits: 2})} />
-                        <div className="pt-1.5 border-t border-slate-200 mt-1">
-                             <StatRow label="NET TO PAY" value={totals.toPay.toLocaleString(undefined, {minimumFractionDigits: 2})} emphasized />
+                        <div className="pt-2 border-t border-slate-200 mt-2">
+                             <div className="flex items-center justify-between">
+                                <span className="text-[11px] font-black text-blue-600 uppercase tracking-[0.2em]">NET TO PAY</span>
+                                <span className="text-[20px] font-black text-slate-900 tracking-tighter tabular-nums drop-shadow-sm">
+                                    {totals.toPay.toLocaleString(undefined, {minimumFractionDigits: 2})}
+                                </span>
+                             </div>
                         </div>
                     </div>
                 </div>
@@ -461,7 +538,7 @@ const PayBillBoard = ({ isOpen, onClose }) => {
                         <div className="col-span-12 grid grid-cols-12 gap-x-10">
                             <div className="col-span-5 space-y-2">
                                 <div className="flex items-center gap-4">
-                                    <label className="text-[12.5px] font-bold text-gray-700 w-32 shrink-0">Settlement Ledger</label>
+                                    <label className="text-[12.5px] font-bold text-gray-700 w-32 shrink-0">Payment Method</label>
                                     <div className="flex-1 flex gap-2">
                                         <input 
                                             type="text" 
@@ -486,7 +563,7 @@ const PayBillBoard = ({ isOpen, onClose }) => {
 
                             <div className="col-span-7 space-y-2">
                                 <div className="flex items-center gap-4">
-                                    <label className="text-[12.5px] font-bold text-gray-700 w-32 shrink-0">Payment Option</label>
+                                    <label className="text-[12.5px] font-bold text-gray-700 w-32 shrink-0">Payment Account</label>
                                     <div className="flex-1 flex gap-2">
                                         <input 
                                             type="text" 
@@ -500,7 +577,7 @@ const PayBillBoard = ({ isOpen, onClose }) => {
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-4">
-                                    <label className="text-[12.5px] font-bold text-gray-700 w-32 shrink-0">Voucher No</label>
+                                    <label className="text-[12.5px] font-bold text-gray-700 w-32 shrink-0">Allocation CC</label>
                                     <div className="flex-1 flex gap-2">
                                         <input 
                                             type="text" 
@@ -586,7 +663,7 @@ const PayBillBoard = ({ isOpen, onClose }) => {
                                         <button onClick={() => {
                                             handleInput({ target: { name: 'vendorId', value: v.code } });
                                             setShowVendorModal(false);
-                                        }} className="bg-[#0078d4] text-white text-[10px] px-3 py-1 rounded-sm font-bold hover:bg-[#005a9e] shadow-sm transition-all active:scale-95 uppercase tracking-wider">SELECT</button>
+                                        }} className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95">SELECT</button>
                                     </td>
                                 </tr>
                             ))}
@@ -628,7 +705,7 @@ const PayBillBoard = ({ isOpen, onClose }) => {
                                             const field = ccSource === 'header' ? 'costCenter' : 'payCostCenter';
                                             setFormData(prev => ({ ...prev, [field]: c.code }));
                                             setShowCCModal(false);
-                                        }} className="bg-[#0078d4] text-white text-[10px] px-3 py-1 rounded-sm font-bold hover:bg-[#005a9e] shadow-sm transition-all active:scale-95 uppercase tracking-wider">SELECT</button>
+                                        }} className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95">SELECT</button>
                                     </td>
                                 </tr>
                             ))}
@@ -640,24 +717,36 @@ const PayBillBoard = ({ isOpen, onClose }) => {
 
         {/* Payment Method Search Modal */}
         <SimpleModal isOpen={showPayTypeModal} onClose={() => setShowPayTypeModal(false)} title="Select Settlement Mode" maxWidth="max-w-md">
-            <div className="p-4 font-['Tahoma'] space-y-2">
-                <div className="grid grid-cols-1 gap-2">
-                    {['Cash', 'Cheque', 'Online', 'Petty Cash', 'Settlement'].map((type, idx) => (
-                        <button 
-                            key={idx} 
-                            onClick={() => {
-                                setFormData(prev => ({ ...prev, payType: type, accId: '' }));
-                                setShowPayTypeModal(false);
-                            }}
-                            className="w-full h-12 flex items-center justify-between px-6 border border-gray-100 rounded-xl hover:bg-blue-50/50 hover:border-blue-200 transition-all group font-bold text-gray-700"
-                        >
-                            <span className="flex items-center gap-4">
-                                <span className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-[10px] text-gray-400 group-hover:bg-blue-100 group-hover:text-blue-600 transition-colors">{idx + 1}</span>
-                                {type}
-                            </span>
-                            <ChevronDown size={16} className="-rotate-90 text-gray-300 group-hover:text-blue-400 transition-all" />
-                        </button>
-                    ))}
+             <div className="flex flex-col h-full font-['Tahoma']">
+                <div className="overflow-y-auto max-h-[50vh] custom-scrollbar">
+                    <table className="w-full text-sm text-left">
+                        <thead className="bg-[#f8fafc] sticky top-0 text-gray-600 font-bold uppercase text-[11px] tracking-wider z-10 shadow-sm leading-8">
+                            <tr>
+                                <th className="px-6 border-b">ID</th>
+                                <th className="px-6 border-b">Method Descriptor</th>
+                                <th className="px-6 border-b text-center w-24">Select</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-100">
+                            {['Cash', 'Cheque', 'Online', 'Petty Cash', 'Settlement'].map((type, idx) => (
+                                <tr key={idx} className="hover:bg-blue-50/50 transition-colors border-b border-gray-50">
+                                    <td className="px-6 py-3 font-mono font-bold text-gray-400">{idx + 1}</td>
+                                    <td className="px-6 py-3 font-mono font-bold uppercase text-gray-700">{type}</td>
+                                    <td className="px-6 py-3 text-center">
+                                        <button 
+                                            onClick={() => {
+                                                setFormData(prev => ({ ...prev, payType: type, accId: '' }));
+                                                setShowPayTypeModal(false);
+                                            }}
+                                            className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95"
+                                        >
+                                            SELECT
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </SimpleModal>
@@ -693,7 +782,7 @@ const PayBillBoard = ({ isOpen, onClose }) => {
                                         <button onClick={() => {
                                             setFormData(prev => ({ ...prev, accId: a.code }));
                                             setShowAccModal(false);
-                                        }} className="bg-[#0078d4] text-white text-[10px] px-3 py-1 rounded-sm font-bold hover:bg-[#005a9e] shadow-sm transition-all active:scale-95 uppercase tracking-wider">SELECT</button>
+                                        }} className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95">SELECT</button>
                                     </td>
                                 </tr>
                             ))}
@@ -736,7 +825,7 @@ const PayBillBoard = ({ isOpen, onClose }) => {
                                     <td className="px-4 py-2 font-mono text-[12px]">{p.date}</td>
                                     <td className="px-4 py-2 text-right font-mono font-bold text-[13px] text-gray-700">{parseFloat(p.amount || 0).toFixed(2)}</td>
                                     <td className="px-4 py-2 text-center">
-                                        <button onClick={() => handleSelectPayment(p.payDoc)} className="px-4 py-1.5 bg-[#0078d4] text-white rounded-[4px] hover:bg-[#005a9e] text-[11px] font-bold shadow-sm transition-all active:scale-95 uppercase tracking-wider">Select</button>
+                                        <button onClick={() => handleSelectPayment(p.payDoc)} className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95">Select</button>
                                     </td>
                                 </tr>
                             ))}

@@ -18,6 +18,10 @@ import { authService } from '../services/auth.service';
 import AboutUsModal from '../components/modals/AboutUsModal';
 import toast from 'react-hot-toast';
 
+const SUCCESS_SOUND_URL = '/Music/mrstokes302-success-videogame-sfx-423626.mp3';
+
+
+
 const SelectCompanyPage = () => {
     const navigate = useNavigate();
     const videoRef = useRef(null);
@@ -80,12 +84,21 @@ const SelectCompanyPage = () => {
                     border: '1px solid rgba(255, 255, 255, 0.2)',
                     color: '#fff',
                     borderRadius: '24px',
+                    maxWidth: '550px',
                 },
+
+
                 iconTheme: {
                     primary: '#00acee',
                     secondary: '#fff',
                 }
             });
+
+            // Play success sound
+            const audio = new Audio(SUCCESS_SOUND_URL);
+            audio.volume = 0.5;
+            audio.play().catch(e => console.error("Audio play failed:", e));
+
             navigate('/dashboard');
         } catch (err) {
             toast.error(typeof err === 'object' ? (err.message || "Error opening company") : err);

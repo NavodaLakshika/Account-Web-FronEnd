@@ -6,6 +6,7 @@ import CalendarModal from '../components/CalendarModal';
 import { purchOrderService } from '../services/purchOrder.service';
 import { paymentMethodService } from '../services/paymentMethod.service';
 import { toast } from 'react-hot-toast';
+import { DotLottiePlayer } from '@dotlottie/react-player';
 
 const PurchaseOrderBoard = ({ isOpen, onClose }) => {
     const [lookups, setLookups] = useState({ suppliers: [], products: [], paymentMethods: [] });
@@ -41,6 +42,12 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
     const [payMethodSearchQuery, setPayMethodSearchQuery] = useState('');
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [datePickerField, setDatePickerField] = useState('postDate');
+    const [showProductMaster, setShowProductMaster] = useState(false);
+    const [showProductQtyModal, setShowProductQtyModal] = useState(false);
+    const [productMasterData, setProductMasterData] = useState({
+        code: '', name: '', unit: 'Nos', purchasePrice: '', sellingPrice: '', packSize: 1
+    });
+    const [isCreatingProduct, setIsCreatingProduct] = useState(false);
 
     const [entry, setEntry] = useState({
         prodCode: '',
@@ -53,6 +60,58 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
     });
 
     const qtyRef = useRef(null);
+
+    const showSuccessToast = (message) => {
+        toast.custom((t) => (
+            <div className={`${t.visible ? 'animate-in slide-in-from-right-10 fade-in duration-500' : 'animate-out slide-out-to-right-10 fade-out duration-300'} 
+                max-w-[550px] w-fit bg-white/95 backdrop-blur-xl border border-white/20 shadow-2xl rounded-[5px] flex flex-col pointer-events-auto overflow-hidden`}>
+                <div className="px-4 py-2.5 flex items-center gap-3">
+                    <div className="w-12 h-12 shrink-0">
+                        <DotLottiePlayer src="/lottiefile/Successffull.lottie" autoplay loop={false} />
+                    </div>
+                    <div className="flex-grow text-left py-1">
+                        <h3 className="text-slate-800 text-[12px] font-bold tracking-wider uppercase font-tahoma leading-relaxed">{message}</h3>
+                        <div className="flex items-center gap-1.5 mt-0.5">
+                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.3)]" />
+                            <span className="text-emerald-600 text-[8px] font-mono font-bold tracking-widest uppercase">Verified</span>
+                        </div>
+                    </div>
+                    <button onClick={() => toast.dismiss(t.id)} className="text-slate-300 hover:text-slate-500 transition-colors">
+                        <X size={14} />
+                    </button>
+                </div>
+                <div className="h-[2px] w-full bg-emerald-50">
+                    <div className="h-full bg-emerald-500" style={{ animation: 'toastProgress 3s linear forwards' }} />
+                </div>
+            </div>
+        ), { duration: 3000, position: 'top-right' });
+    };
+
+    const showErrorToast = (message) => {
+        toast.custom((t) => (
+            <div className={`${t.visible ? 'animate-in slide-in-from-right-10 fade-in duration-500' : 'animate-out slide-out-to-right-10 fade-out duration-300'} 
+                max-w-[550px] w-fit bg-white/95 backdrop-blur-xl border border-white/20 shadow-2xl rounded-[5px] flex flex-col pointer-events-auto overflow-hidden`}>
+                <div className="px-4 py-2.5 flex items-center gap-3">
+                    <div className="w-12 h-12 shrink-0">
+                        <DotLottiePlayer src="/lottiefile/Error Fail animation.lottie" autoplay loop={false} />
+                    </div>
+                    <div className="flex-grow text-left py-1">
+                        <h3 className="text-slate-800 text-[12px] font-bold tracking-wider uppercase font-tahoma leading-relaxed">{message}</h3>
+                        <div className="flex items-center gap-1.5 mt-0.5">
+                            <div className="w-1.5 h-1.5 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.3)]" />
+                            <span className="text-red-600 text-[8px] font-mono font-bold tracking-widest uppercase">Failed</span>
+                        </div>
+                    </div>
+                    <button onClick={() => toast.dismiss(t.id)} className="text-slate-300 hover:text-slate-500 transition-colors">
+                        <X size={14} />
+                    </button>
+                </div>
+                <div className="h-[2px] w-full bg-red-50">
+                    <div className="h-full bg-red-500" style={{ animation: 'toastProgress 3s linear forwards' }} />
+                </div>
+            </div>
+        ), { duration: 3000, position: 'top-right' });
+    };
 
     useEffect(() => {
         if (isOpen) {
@@ -81,7 +140,7 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
             const methods = await paymentMethodService.getAll(company).catch(() => []);
             setLookups(prev => ({ ...prev, ...data, paymentMethods: methods }));
         } catch (error) {
-            toast.error('Failed to load suppliers/products.');
+            showErrorToast('Failed to load suppliers/products.');
         }
     };
 
@@ -90,7 +149,7 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
             const data = await purchOrderService.generateDocNo(company);
             setFormData(prev => ({ ...prev, docNo: data.docNo }));
         } catch (error) {
-            toast.error('Failed to generate document number.');
+            showErrorToast('Failed to generate document number.');
         }
     };
 
@@ -132,8 +191,8 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
     };
 
     const addProduct = () => {
-        if (!entry.prodCode) return toast.error('Select a Product.');
-        if (!entry.qty || parseFloat(entry.qty) <= 0) return toast.error('Enter valid Quantity.');
+        if (!entry.prodCode) return showErrorToast('Select a Product.');
+        if (!entry.qty || parseFloat(entry.qty) <= 0) return showErrorToast('Enter valid Quantity.');
 
         setProducts([...products, { ...entry }]);
 
@@ -180,7 +239,7 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
             setOrders(data || []);
             setShowSearchModal(true);
         } catch (error) {
-            toast.error('Failed to load purchase orders.');
+            showErrorToast('Failed to load purchase orders.');
         }
     };
 
@@ -212,31 +271,31 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
             }));
             setProducts(detailedProducts);
             setShowSearchModal(false);
-            toast.success("Order Loaded Successfully.");
+            showSuccessToast("Order Loaded Successfully.");
         } catch (error) {
-            toast.error(error.toString());
+            showErrorToast(error.toString());
         }
     };
 
     const handleSave = async () => {
-        if (!formData.vendorId) return toast.error('Select User/Supplier.');
-        if (!formData.payType) return toast.error('Payment type has not been selected.');
-        if (products.length === 0) return toast.error('No products entered.');
+        if (!formData.vendorId) return showErrorToast('Select User/Supplier.');
+        if (!formData.payType) return showErrorToast('Payment type has not been selected.');
+        if (products.length === 0) return showErrorToast('No products entered.');
 
         const payload = preparePayload();
 
         try {
             const resp = await purchOrderService.save(payload);
-            toast.success(`Draft saved successfully (${resp.docNo}).`);
+            showSuccessToast(`Draft saved successfully (${resp.docNo}).`);
         } catch (error) {
-            toast.error(error.toString());
+            showErrorToast(error.toString());
         }
     };
 
     const handleApply = async () => {
-        if (!formData.vendorId) return toast.error('Select User/Supplier.');
-        if (!formData.payType) return toast.error('Payment type has not been selected.');
-        if (products.length === 0) return toast.error('No products entered.');
+        if (!formData.vendorId) return showErrorToast('Select User/Supplier.');
+        if (!formData.payType) return showErrorToast('Payment type has not been selected.');
+        if (products.length === 0) return showErrorToast('No products entered.');
 
         setShowConfirmModal(true);
     };
@@ -247,11 +306,11 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
 
         try {
             const resp = await purchOrderService.apply(payload);
-            toast.success(`Record applied successfully (${resp.docNo}).`);
+            showSuccessToast(`Record applied successfully (${resp.docNo}).`);
             handleClear();
             setShowConfirmModal(false);
         } catch (error) {
-            toast.error(error.toString());
+            showErrorToast(error.toString());
         } finally {
             setIsApplying(false);
         }
@@ -281,6 +340,29 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
     const handleDateSelect = (formattedDate) => {
         setFormData(prev => ({ ...prev, [datePickerField]: formattedDate }));
         setShowDatePicker(false);
+    };
+
+    const handleCreateProduct = async () => {
+        if (!productMasterData.code || !productMasterData.name) {
+            return showErrorToast('Code and Name are required.');
+        }
+        setIsCreatingProduct(true);
+        try {
+            await purchOrderService.createProduct({
+                ...productMasterData,
+                createUser: formData.createUser
+            });
+            showSuccessToast('Product created successfully.');
+            setShowProductMaster(false);
+            setProductMasterData({ code: '', name: '', unit: 'Nos', purchasePrice: '', sellingPrice: '', packSize: 1 });
+            // Refresh products list
+            const results = await purchOrderService.getLookups(formData.company);
+            setLookups(prev => ({ ...prev, products: results.products }));
+        } catch (error) {
+            showErrorToast(error.toString());
+        } finally {
+            setIsCreatingProduct(false);
+        }
     };
 
     const preparePayload = () => {
@@ -321,11 +403,11 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
         setIsDeleting(true);
         try {
             await purchOrderService.delete(formData.docNo, formData.company);
-            toast.success('Record deleted successfully.');
+            showSuccessToast('Record deleted successfully.');
             handleClear();
             setShowDeleteConfirm(false);
         } catch (error) {
-            toast.error(error.toString());
+            showErrorToast(error.toString());
         } finally {
             setIsDeleting(false);
         }
@@ -333,6 +415,14 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
 
     return (
         <>
+            <style>
+                {`
+                    @keyframes toastProgress {
+                        0% { width: 100%; }
+                        100% { width: 0%; }
+                    }
+                `}
+            </style>
             <SimpleModal
                 isOpen={isOpen}
                 onClose={onClose}
@@ -432,7 +522,7 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
                                     <input
                                         type="text"
                                         readOnly
-                                        value={lookups.suppliers.find(s => s.code === formData.vendorId)?.name || 'Select Supplier...'}
+                                        value={lookups.suppliers.find(s => s.code === formData.vendorId)?.name || ''}
                                         className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-red-600 bg-gray-50 rounded-[5px] outline-none shadow-sm cursor-pointer"
                                         onClick={() => setShowSupplierSearch(true)}
                                     />
@@ -449,7 +539,7 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
                                     <input
                                         type="text"
                                         readOnly
-                                        value={lookups.paymentMethods?.find(m => m.code === formData.payType)?.name || formData.payType || 'Select...'}
+                                        value={lookups.paymentMethods?.find(m => m.code === formData.payType)?.name || formData.payType || ''}
                                         className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-gray-700 bg-white rounded-[5px] outline-none shadow-sm cursor-pointer"
                                         onClick={() => setShowPayMethodSearch(true)}
                                     />
@@ -497,7 +587,7 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
 
                         <div className="flex-1 bg-white overflow-y-auto max-h-[220px] divide-y divide-gray-50">
                             {products.length === 0 ? (
-                                <div className="h-24 flex items-center justify-center text-gray-300 text-[11px] font-bold uppercase tracking-widest italic">
+                                <div className="h-24 flex items-center justify-center text-gray-300 text-[10px] font-bold uppercase tracking-widest ">
                                     No items allocated to this document
                                 </div>
                             ) : products.map((p, idx) => (
@@ -553,7 +643,7 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
                     <div className="flex flex-row justify-between items-end gap-x-12">
                         <div className="flex-1 space-y-2">
                             <label className="text-[12.5px] font-bold text-gray-700">Internal Remarks & Comments</label>
-                            <textarea name="comment" value={formData.comment} onChange={handleInput} className="w-full h-[100px] border border-gray-300 rounded-lg p-3 text-[12.5px] font-mono outline-none focus:border-[#0285fd] resize-none shadow-sm bg-gray-50/30" placeholder="Add additional comments..."></textarea>
+                            <textarea name="comment" value={formData.comment} onChange={handleInput} className="w-full h-[100px] border border-gray-300 rounded-lg p-3 text-[12.5px] font-mono outline-none focus:border-[#0285fd] resize-none shadow-sm bg-gray-50/30" placeholder=""></textarea>
                         </div>
 
                         <div className="w-[320px] bg-white border border-gray-100 rounded-lg p-4 space-y-3 shadow-sm">
@@ -742,35 +832,41 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
             {/* ── Add Product Modal ──────────────────────────────────── */}
             <SimpleModal isOpen={showAddProductModal} onClose={() => { setShowAddProductModal(false); setProductSearchQuery(''); }} title="Inventory Acquisition Portal" maxWidth="max-w-[650px]">
                 <div className="space-y-4 px-1 font-['Tahoma']">
-                    {/* Search Facility Header */}
-                    <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-lg border border-gray-100 mb-2">
-                        <span className="text-[12px] font-bold text-gray-500 uppercase tracking-widest">Product Catalog</span>
-                        <div className="relative flex-1">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
-                            <input
-                                type="text"
-                                placeholder="Search inventory by title or SKU..."
-                                className="w-full h-9 pl-10 pr-4 border border-gray-300 rounded-[5px] outline-none text-sm focus:border-[#0285fd] bg-white shadow-sm"
-                                value={productSearchQuery}
-                                onChange={async (e) => {
-                                    const val = e.target.value; setProductSearchQuery(val);
-                                    if (val.length >= 2) { try { const r = await purchOrderService.searchProducts(val); setLookups(prev => ({ ...prev, products: r })); } catch (_) {} }
-                                    else if (val.length === 0) { const init = await purchOrderService.getLookups(formData.company); setLookups(prev => ({ ...prev, products: init.products })); }
-                                }}
-                                autoFocus
-                            />
+                    <div className="flex items-center justify-between gap-4 bg-slate-50/80 p-3 rounded-xl border border-gray-100 mb-2">
+                        <div className="flex items-center gap-3 flex-1">
+                            <div className="relative flex-1 max-w-[400px]">
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                                <input
+                                    type="text"
+                                    placeholder="Search Inventory.."
+                                    className="w-full h-10 pl-10 pr-4 border border-gray-200 rounded-lg outline-none text-sm focus:border-blue-500 focus:ring-4 focus:ring-blue-50 transition-all bg-white shadow-sm font-medium"
+                                    value={productSearchQuery}
+                                    onChange={async (e) => {
+                                        const val = e.target.value; setProductSearchQuery(val);
+                                        if (val.length >= 2) { try { const r = await purchOrderService.searchProducts(val); setLookups(prev => ({ ...prev, products: r })); } catch (_) {} }
+                                        else if (val.length === 0) { const init = await purchOrderService.getLookups(formData.company); setLookups(prev => ({ ...prev, products: init.products })); }
+                                    }}
+                                    autoFocus
+                                />
+                            </div>
                         </div>
+                        <button 
+                            onClick={() => setShowProductMaster(true)}
+                            className="h-10 px-5 bg-[#2bb744] text-white text-[12px] font-black rounded-lg hover:bg-[#259b3a] transition-all flex items-center gap-2 border-none shadow-md shadow-green-100 active:scale-95 whitespace-nowrap"
+                        >
+                            <Plus size={14} /> CREATE NEW ITEM
+                        </button>
                     </div>
 
                     {/* Product Selection List */}
                     <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm">
-                        <div className="max-h-[250px] overflow-y-auto no-scrollbar">
-                            <table className="w-full text-left">
-                                <thead className="bg-[#f8fafd] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">
+                        <div className="max-h-[450px] overflow-y-auto no-scrollbar">
+                            <table className="w-full text-left border-separate border-spacing-0">
+                                <thead className="bg-[#f8fafd] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 z-10">
                                     <tr>
-                                        <th className="px-4 py-3">Code</th>
-                                        <th className="px-4 py-3">Item Description</th>
-                                        <th className="px-4 py-3 text-right">Base Price</th>
+                                        <th className="px-6 py-4">Code</th>
+                                        <th className="px-6 py-4">Item Description</th>
+                                        <th className="px-6 py-4 text-right">Base Price</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-50">
@@ -782,65 +878,98 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
                                                     prodCode: p.code, prodName: p.name, unit: p.unit || '',
                                                     packSize: p.packSize || 1,
                                                     purchasePrice: parseFloat(p.price || 0).toFixed(2),
-                                                    qty: prev.qty || '',
-                                                    amount: ((parseFloat(prev.qty) || 0) * parseFloat(p.price || 0)).toFixed(2)
+                                                    qty: '',
+                                                    amount: '0.00'
                                                 }));
-                                                setProductSearchQuery('');
+                                                setShowProductQtyModal(true);
                                             }}
-                                            className={`group hover:bg-blue-50/50 cursor-pointer transition-colors ${
-                                                entry.prodCode === p.code ? 'bg-blue-50/80 ring-1 ring-inset ring-blue-200' : ''
+                                            className={`group hover:bg-blue-50/50 cursor-pointer transition-all duration-200 ${
+                                                entry.prodCode === p.code ? 'bg-blue-50/80' : ''
                                             }`}
                                         >
-                                            <td className="px-4 py-2 font-mono text-[12px]  text-gray-600">{p.code}</td>
-                                            <td className="px-4 py-2 text-[12px]  text-gray-700 uppercase group-hover:text-blue-600 transition-colors">{p.name}</td>
-                                            <td className="px-4 py-2 text-right font-mono font-black text-slate-600">{parseFloat(p.price || 0).toFixed(2)}</td>
+                                            <td className="px-6 py-4 font-mono text-[13px] font-bold text-blue-600">{p.code}</td>
+                                            <td className="px-6 py-4">
+                                                <div className="text-[13px] font-bold text-gray-700 uppercase group-hover:text-blue-600 transition-colors leading-snug line-clamp-2 max-w-[320px]">
+                                                    {p.name}
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4 text-right font-mono font-black text-gray-500">
+                                                <span className="text-[10px] text-gray-300 mr-1">Rs.</span>
+                                                {parseFloat(p.price || 0).toFixed(2)}
+                                            </td>
                                         </tr>
                                     ))}
                                 </tbody>
                             </table>
                         </div>
                     </div>
+                </div>
+            </SimpleModal>
 
-                    {/* Quantity Entry Section */}
-                    {entry.prodCode && (
-                        <div className="bg-slate-50 border border-gray-100 rounded-xl p-5 space-y-4 shadow-sm animate-in fade-in slide-in-from-bottom-2">
-                             <div className="flex items-center justify-between border-b border-gray-200 pb-2">
-                                <div className="text-[13px] font-black text-slate-800 uppercase tracking-tight">
-                                    {entry.prodName} <span className="text-blue-500 font-mono text-[12px]">[{entry.prodCode}]</span>
-                                </div>
-                                <div className="text-[10px] font-black text-gray-400 uppercase">Input Required</div>
-                             </div>
+            {/* Product Quantity & Price Input Modal */}
+            <SimpleModal
+                isOpen={showProductQtyModal}
+                onClose={() => setShowProductQtyModal(false)}
+                title="Line Item Configuration"
+                maxWidth="max-w-[450px]"
+            >
+                <div className="space-y-6 px-1 py-2 font-['Tahoma']">
+                    <div className="bg-slate-50/50 p-5 rounded-xl border border-slate-100 flex flex-col items-center text-center">
+                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1.5">Active Selection</span>
+                        <h3 className="text-[18px] font-black text-slate-700 uppercase leading-[1.2] tracking-tight max-w-[90%] break-words">
+                            {entry.prodName}
+                        </h3>
+                        <div className="flex items-center gap-2 mt-2">
+                            <span className="text-[11px] font-mono font-bold text-blue-500 bg-white px-3 py-0.5 rounded-md shadow-sm border border-slate-100">{entry.prodCode}</span>
+                            <span className="text-[10px] font-black text-slate-300 uppercase">Product Code</span>
+                        </div>
+                    </div>
 
-                            <div className="grid grid-cols-2 gap-6">
-                                <div className="space-y-1.5 focus-within:text-blue-600 transition-colors">
-                                    <label className="text-[11px] font-black text-gray-500 uppercase tracking-widest pl-1">Adjusted Unit Price</label>
-                                    <input type="text" name="purchasePrice" value={entry.purchasePrice} onChange={handleEntryInput}
-                                        className="w-full h-10 border border-gray-300 px-4 text-right text-[14px] font-mono font-black rounded-lg outline-none focus:border-[#0285fd] bg-white shadow-sm" />
-                                </div>
-                                <div className="space-y-1.5 focus-within:text-blue-600 transition-colors">
-                                    <label className="text-[11px] font-black text-gray-500 uppercase tracking-widest pl-1">Acquisition Qty</label>
-                                    <input type="text" name="qty" value={entry.qty} onChange={handleEntryInput}
-                                        onKeyDown={e => { if (e.key === 'Enter') { addProduct(); setShowAddProductModal(false); setProductSearchQuery(''); } }}
-                                        className="w-full h-10 border border-[#0285fd] px-4 text-center text-[14px] font-mono font-black rounded-lg outline-none bg-blue-50/20 shadow-sm" autoFocus />
-                                </div>
-                            </div>
+                    <div className="grid grid-cols-1 gap-5">
+                        <div className="space-y-2">
+                            <label className="text-[11px] font-black text-gray-500 uppercase tracking-widest flex justify-between">
+                                <span>Adjusted Unit Price</span>
+                                <span className="text-blue-500 font-mono">LKR</span>
+                            </label>
+                            <input 
+                                type="text" 
+                                name="purchasePrice" 
+                                value={entry.purchasePrice} 
+                                onChange={handleEntryInput}
+                                className="w-full h-12 border border-gray-300 px-5 text-right text-[16px] font-mono font-black rounded-xl outline-none focus:border-[#0285fd] focus:ring-4 focus:ring-blue-50 transition-all bg-white" 
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-[11px] font-black text-gray-500 uppercase tracking-widest">Acquisition Quantity</label>
+                            <input 
+                                type="text" 
+                                name="qty" 
+                                value={entry.qty} 
+                                onChange={handleEntryInput}
+                                onKeyDown={e => { if (e.key === 'Enter') { addProduct(); setShowProductQtyModal(false); setShowAddProductModal(false); setProductSearchQuery(''); } }}
+                                className="w-full h-12 border border-[#0285fd] px-5 text-center text-[18px] font-mono font-black rounded-xl outline-none bg-blue-50/20 focus:ring-4 focus:ring-blue-100 transition-all shadow-inner" 
+                                autoFocus 
+                            />
+                        </div>
+                    </div>
 
-                            <div className="flex items-center justify-between pt-2">
-                                <div className="flex flex-col">
-                                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Line Item Extension</span>
-                                    <span className="text-[18px] font-mono font-black text-blue-700 tracking-tighter">
-                                        Rs. {parseFloat(entry.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                                    </span>
-                                </div>
-                                <button
-                                    onClick={() => { addProduct(); setShowAddProductModal(false); setProductSearchQuery(''); }}
-                                    className="px-8 h-10 bg-[#0285fd] text-white text-sm font-black rounded-lg hover:bg-[#0073ff] shadow-lg shadow-blue-100 transition-all active:scale-95 flex items-center gap-2"
-                                >
-                                    <Plus size={16} /> ADD TO LISTING
-                                </button>
+                    <div className="pt-6 border-t border-gray-100 flex items-center justify-between">
+                        <div className="flex flex-col">
+                            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Total Amount</span>
+                            <div className="flex items-baseline gap-1.5 mt-0.5">
+                                <span className="text-[12px] font-bold text-blue-500">LKR</span>
+                                <span className="text-[26px] font-mono font-black text-slate-800 tracking-tight">
+                                    {parseFloat(entry.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                </span>
                             </div>
                         </div>
-                    )}
+                        <button
+                            onClick={() => { addProduct(); setShowProductQtyModal(false); setShowAddProductModal(false); setProductSearchQuery(''); }}
+                            className="h-11 px-8 bg-[#0285fd] text-white text-[13px] font-bold rounded-lg hover:bg-[#0073ff] transition-all active:scale-95 flex items-center gap-2 border-none"
+                        >
+                            <Plus size={16} /> ADD TO LIST
+                        </button>
+                    </div>
                 </div>
             </SimpleModal>
 
@@ -943,6 +1072,56 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
                 confirmText="Delete Record"
                 variant="danger"
             />
+
+            {/* Product Master Creation Modal */}
+            <SimpleModal
+                isOpen={showProductMaster}
+                onClose={() => setShowProductMaster(false)}
+                title="Product Master Creation"
+                maxWidth="max-w-[500px]"
+                footer={
+                    <div className="bg-slate-50 px-6 py-4 w-full flex justify-end gap-3 border-t border-gray-100 rounded-b-xl">
+                        <button onClick={() => setShowProductMaster(false)} className="px-6 h-9 bg-white text-gray-500 text-[13px] font-bold rounded-[5px] border border-gray-300 hover:bg-gray-50 transition-all active:scale-95">CANCEL</button>
+                        <button onClick={handleCreateProduct} disabled={isCreatingProduct} className="px-8 h-9 bg-[#2bb744] text-white text-[13px] font-bold rounded-[5px] shadow-md shadow-green-50 hover:bg-[#259b3a] transition-all active:scale-95 flex items-center gap-2 border-none">
+                            {isCreatingProduct ? 'CREATING...' : 'CREATE PRODUCT'}
+                        </button>
+                    </div>
+                }
+            >
+                <div className="py-2 px-1 font-['Tahoma'] space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-1">
+                            <label className="text-[12px] font-bold text-gray-600">Product Code</label>
+                            <input type="text" value={productMasterData.code} onChange={e => setProductMasterData({...productMasterData, code: e.target.value})} className="w-full h-9 border border-gray-300 rounded-[5px] px-3 text-[13px] outline-none focus:border-[#0285fd] bg-white font-mono uppercase" placeholder="" />
+                        </div>
+                        <div className="space-y-1">
+                            <label className="text-[12px] font-bold text-gray-600">Unit of Measure</label>
+                            <input type="text" value={productMasterData.unit} onChange={e => setProductMasterData({...productMasterData, unit: e.target.value})} className="w-full h-9 border border-gray-300 rounded-[5px] px-3 text-[13px] outline-none focus:border-[#0285fd] bg-white" placeholder="Nos" />
+                        </div>
+                    </div>
+                    <div className="space-y-1">
+                        <label className="text-[12px] font-bold text-gray-600">Product Description</label>
+                        <input type="text" value={productMasterData.name} onChange={e => setProductMasterData({...productMasterData, name: e.target.value})} className="w-full h-9 border border-gray-300 rounded-[5px] px-3 text-[13px] outline-none focus:border-[#0285fd] bg-white uppercase" placeholder="" />
+                    </div>
+                    <div className="grid grid-cols-3 gap-4">
+                        <div className="space-y-1">
+                            <label className="text-[11px] font-bold text-gray-600">Purchase Price</label>
+                            <input type="text" value={productMasterData.purchasePrice} onChange={e => setProductMasterData({...productMasterData, purchasePrice: e.target.value})} className="w-full h-9 border border-gray-300 rounded-[5px] px-3 text-right text-[13px] font-mono outline-none focus:border-[#0285fd] bg-white" placeholder="0.00" />
+                        </div>
+                        <div className="space-y-1">
+                            <label className="text-[11px] font-bold text-gray-600">Selling Price</label>
+                            <input type="text" value={productMasterData.sellingPrice} onChange={e => setProductMasterData({...productMasterData, sellingPrice: e.target.value})} className="w-full h-9 border border-gray-300 rounded-[5px] px-3 text-right text-[13px] font-mono outline-none focus:border-[#0285fd] bg-white" placeholder="0.00" />
+                        </div>
+                        <div className="space-y-1">
+                            <label className="text-[11px] font-bold text-gray-600">Pack Size</label>
+                            <input type="text" value={productMasterData.packSize} onChange={e => setProductMasterData({...productMasterData, packSize: e.target.value})} className="w-full h-9 border border-gray-300 rounded-[5px] px-3 text-center text-[13px] font-mono outline-none focus:border-[#0285fd] bg-white" placeholder="1" />
+                        </div>
+                    </div>
+                    <div className="bg-blue-50/50 p-3 rounded-lg border border-blue-100">
+                        <p className="text-[10px] text-blue-600 font-bold uppercase tracking-tight text-center">Default Category (1) and Department (1) will be assigned.</p>
+                    </div>
+                </div>
+            </SimpleModal>
         </>
     );
 };

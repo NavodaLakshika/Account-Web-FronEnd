@@ -67,6 +67,7 @@ export const purchOrderService = {
   async save(data) {
     try {
       const response = await api.post('/save', data);
+      console.log(response.data)
       return response.data;
     } catch (error) {
       throw error.response?.data || 'Failed to save record';
@@ -88,6 +89,15 @@ export const purchOrderService = {
       return response.data;
     } catch (error) {
       throw error.response?.data || 'Failed to apply record';
+    }
+  },
+
+  async createProduct(productData) {
+    try {
+      const response = await api.post('/create-product', productData);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || 'Failed to create product';
     }
   }
 };

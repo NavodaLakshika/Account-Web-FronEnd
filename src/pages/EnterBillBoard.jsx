@@ -4,6 +4,7 @@ import CalendarModal from '../components/CalendarModal';
 import { Search, Calendar, ChevronDown, Trash2, X, Save, RotateCcw, Loader2 } from 'lucide-react';
 import { enterBillService } from '../services/enterBill.service';
 import { toast } from 'react-hot-toast';
+import { DotLottiePlayer } from '@dotlottie/react-player';
 
 const EnterBillBoard = ({ isOpen, onClose }) => {
     const [selectedTab, setSelectedTab] = useState('Expenses');
@@ -55,19 +56,63 @@ const EnterBillBoard = ({ isOpen, onClose }) => {
         memo: ''
     });
 
-    const [items, setItems] = useState([]);
-    const [currentItem, setCurrentItem] = useState({
-        itemId: '',
-        description: '',
-        qty: '',
-        cost: '',
-        custJob: ''
-    });
+    const showSuccessToast = (message) => {
+        toast.custom((t) => (
+            <div className={`${t.visible ? 'animate-in slide-in-from-right-10 fade-in duration-500' : 'animate-out slide-out-to-right-10 fade-out duration-300'} 
+                max-w-[550px] w-fit bg-white/95 backdrop-blur-xl border border-white/20 shadow-2xl rounded-[5px] flex flex-col pointer-events-auto overflow-hidden`}>
+                <div className="px-4 py-2.5 flex items-center gap-3">
+                    <div className="w-12 h-12 shrink-0">
+                        <DotLottiePlayer src="/lottiefile/Successffull.lottie" autoplay loop={false} />
+                    </div>
+                    <div className="flex-grow text-left py-1">
+                        <h3 className="text-slate-800 text-[12px] font-bold tracking-wider uppercase font-tahoma leading-relaxed">{message}</h3>
+                        <div className="flex items-center gap-1.5 mt-0.5">
+                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.3)]" />
+                            <span className="text-emerald-600 text-[8px] font-mono font-bold tracking-widest uppercase">Verified</span>
+                        </div>
+                    </div>
+                    <button onClick={() => toast.dismiss(t.id)} className="text-slate-300 hover:text-slate-500 transition-colors">
+                        <X size={14} />
+                    </button>
+                </div>
+                <div className="h-[2px] w-full bg-emerald-50">
+                    <div className="h-full bg-emerald-500" style={{ animation: 'toastProgress 3s linear forwards' }} />
+                </div>
+            </div>
+        ), { duration: 3000, position: 'top-right' });
+    };
+
+    const showErrorToast = (message) => {
+        toast.custom((t) => (
+            <div className={`${t.visible ? 'animate-in slide-in-from-right-10 fade-in duration-500' : 'animate-out slide-out-to-right-10 fade-out duration-300'} 
+                max-w-[550px] w-fit bg-white/95 backdrop-blur-xl border border-white/20 shadow-2xl rounded-[5px] flex flex-col pointer-events-auto overflow-hidden`}>
+                <div className="px-4 py-2.5 flex items-center gap-3">
+                    <div className="w-12 h-12 shrink-0">
+                        <DotLottiePlayer src="/lottiefile/Error Fail animation.lottie" autoplay loop={false} />
+                    </div>
+                    <div className="flex-grow text-left py-1">
+                        <h3 className="text-slate-800 text-[12px] font-bold tracking-wider uppercase font-tahoma leading-relaxed">{message}</h3>
+                        <div className="flex items-center gap-1.5 mt-0.5">
+                            <div className="w-1.5 h-1.5 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.3)]" />
+                            <span className="text-red-600 text-[8px] font-mono font-bold tracking-widest uppercase">Failed</span>
+                        </div>
+                    </div>
+                    <button onClick={() => toast.dismiss(t.id)} className="text-slate-300 hover:text-slate-500 transition-colors">
+                        <X size={14} />
+                    </button>
+                </div>
+                <div className="h-[2px] w-full bg-red-50">
+                    <div className="h-full bg-red-500" style={{ animation: 'toastProgress 3s linear forwards' }} />
+                </div>
+            </div>
+        ), { duration: 3000, position: 'top-right' });
+    };
+
+
 
     useEffect(() => {
         if (isOpen) {
             fetchLookups();
-            generateDocNo();
 
             const companyData = localStorage.getItem('selectedCompany');
             const user = JSON.parse(localStorage.getItem('user') || '{}');
@@ -85,6 +130,8 @@ const EnterBillBoard = ({ isOpen, onClose }) => {
                 company: companyCode,
                 createUser: user?.emp_Name || user?.empName || ''
             }));
+            
+            generateDocNo(companyCode);
         }
     }, [isOpen]);
 
@@ -96,7 +143,7 @@ const EnterBillBoard = ({ isOpen, onClose }) => {
 
     const handleSearchBills = async () => {
         try {
-            const results = await enterBillService.searchBills(billSearchQuery);
+            const results = await enterBillService.searchBills(billSearchQuery, formData.company);
             setBillSearchResults(results);
         } catch (error) {
             toast.error('Failed to search bills');
@@ -106,7 +153,7 @@ const EnterBillBoard = ({ isOpen, onClose }) => {
     const loadBill = async (docNo) => {
         setLoading(true);
         try {
-            const data = await enterBillService.getBill(docNo);
+            const data = await enterBillService.getBill(docNo, formData.company);
             setFormData(prev => ({
                 ...prev,
                 docNo: data.header.doc_No || data.header.docNo,
@@ -132,20 +179,10 @@ const EnterBillBoard = ({ isOpen, onClose }) => {
                 })));
             } else { setExpenses([]); }
 
-            if (data.items) {
-                setItems(data.items.map(i => ({
-                    itemId: i.itemId || i.item_Id || '',
-                    description: i.description || i.discription || '',
-                    qty: i.qty || 0,
-                    cost: i.cost || 0,
-                    custJob: i.custJob || i.cust_Job || ''
-                })));
-            } else { setItems([]); }
-
             setShowSearchModal(false);
-            toast.success('Bill loaded successfully');
+            showSuccessToast('Bill loaded successfully');
         } catch (error) {
-            toast.error('Failed to load bill details');
+            showErrorToast('Failed to load bill details');
         } finally {
             setLoading(false);
         }
@@ -156,16 +193,16 @@ const EnterBillBoard = ({ isOpen, onClose }) => {
             const data = await enterBillService.getLookups();
             setLookups(data);
         } catch (error) {
-            toast.error('Failed to load lookups.');
+            showErrorToast('Failed to load lookups.');
         }
     };
 
-    const generateDocNo = async () => {
+    const generateDocNo = async (compCode) => {
         try {
-            const data = await enterBillService.generateDocNo();
+            const data = await enterBillService.generateDocNo(compCode || formData.company);
             setFormData(prev => ({ ...prev, docNo: data.docNo }));
         } catch (error) {
-            toast.error('Failed to generate document number.');
+            showErrorToast('Failed to generate document number.');
         }
     };
 
@@ -182,7 +219,7 @@ const EnterBillBoard = ({ isOpen, onClose }) => {
     const handleAddLine = (e) => {
         if (e.key === 'Enter' || e.type === 'click') {
             if (!currentLine.accCode || !currentLine.amount || parseFloat(currentLine.amount) === 0) {
-                toast.error('Please select an account and enter a valid amount.');
+                showErrorToast('Please select an account and enter a valid amount.');
                 return;
             }
             setExpenses([...expenses, { ...currentLine, amount: parseFloat(currentLine.amount) }]);
@@ -194,41 +231,14 @@ const EnterBillBoard = ({ isOpen, onClose }) => {
         setExpenses(expenses.filter((_, i) => i !== idx));
     };
 
-    const handleItemChange = (e) => {
-        const { name, value } = e.target;
-        setCurrentItem(prev => ({ ...prev, [name]: value }));
-    };
-
-    const handleAddItem = (e) => {
-        if (e.key === 'Enter' || e.type === 'click') {
-            if (!currentItem.itemId || !currentItem.qty || !currentItem.cost) {
-                toast.error('Please select an item and enter valid quantity and cost.');
-                return;
-            }
-            setItems([...items, { 
-                ...currentItem, 
-                qty: parseInt(currentItem.qty), 
-                cost: parseFloat(currentItem.cost) 
-            }]);
-            setCurrentItem({ itemId: '', description: '', qty: '', cost: '', custJob: '' });
-        }
-    };
-
-    const handleRemoveItem = (idx) => {
-        setItems(items.filter((_, i) => i !== idx));
-    };
-
     const calculateTotal = () => {
         const expTotal = expenses.reduce((sum, item) => sum + (parseFloat(item.amount) || 0), 0);
-        const itemTotal = items.reduce((sum, item) => sum + ((parseFloat(item.qty) || 0) * (parseFloat(item.cost) || 0)), 0);
-        return (expTotal + itemTotal).toFixed(2);
+        return expTotal.toFixed(2);
     };
 
     const handleClear = () => {
         setExpenses([]);
-        setItems([]);
         setCurrentLine({ accCode: '', costCenter: '', amount: '', memo: '' });
-        setCurrentItem({ itemId: '', description: '', qty: '', cost: '', custJob: '' });
         setFormData({
             ...formData,
             vendorId: '',
@@ -247,9 +257,9 @@ const EnterBillBoard = ({ isOpen, onClose }) => {
     };
 
     const handleSave = async () => {
-        if (!formData.vendorId) return toast.error('Vendor is required.');
-        if (!formData.accId) return toast.error('A/P Account (Payable) is required.');
-        if (expenses.length === 0 && items.length === 0) return toast.error('At least one expense or item line is required.');
+        if (!formData.vendorId) return showErrorToast('Vendor is required.');
+        if (!formData.accId) return showErrorToast('A/P Account (Payable) is required.');
+        if (expenses.length === 0) return showErrorToast('At least one expense line is required.');
 
         setLoading(true);
         try {
@@ -257,13 +267,12 @@ const EnterBillBoard = ({ isOpen, onClose }) => {
                 ...formData,
                 billType,
                 netAmount: parseFloat(calculateTotal()),
-                expenses: expenses,
-                items: items
+                expenses: expenses
             });
-            toast.success('Bill saved successfully!');
+            showSuccessToast('Bill saved successfully!');
             handleClear();
         } catch (error) {
-            toast.error(error.toString());
+            showErrorToast(error.message || 'Error saving bill');
         } finally {
             setLoading(false);
         }
@@ -283,6 +292,14 @@ const EnterBillBoard = ({ isOpen, onClose }) => {
 
     return (
         <>
+            <style>
+                {`
+                    @keyframes toastProgress {
+                        0% { width: 100%; }
+                        100% { width: 0%; }
+                    }
+                `}
+            </style>
             <SimpleModal
                 isOpen={isOpen}
                 onClose={onClose}
@@ -445,23 +462,14 @@ const EnterBillBoard = ({ isOpen, onClose }) => {
                         <div className="flex items-center gap-3 mb-2 px-2 border-b border-gray-200 pb-2">
                              <div className="flex gap-4">
                                 <button 
-                                    onClick={() => setSelectedTab('Expenses')}
-                                    className={`text-[13px] font-black uppercase tracking-widest pb-1 border-b-2 transition-all ${selectedTab === 'Expenses' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-400 hover:text-gray-600'}`}
+                                    className="text-[13px] font-black uppercase tracking-widest pb-1 border-b-2 transition-all border-blue-600 text-blue-600"
                                 >
                                     Expenses
-                                </button>
-                                <button 
-                                    onClick={() => setSelectedTab('Items')}
-                                    className={`text-[13px] font-black uppercase tracking-widest pb-1 border-b-2 transition-all ${selectedTab === 'Items' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-400 hover:text-gray-600'}`}
-                                >
-                                    Items Purchase
                                 </button>
                              </div>
                         </div>
 
                         <div className="border border-gray-100 rounded-xl bg-white shadow-xl overflow-hidden flex flex-col min-h-[300px]">
-                            {selectedTab === 'Expenses' ? (
-                                <>
                                     <table className="w-full text-sm text-left border-collapse">
                                         <thead className="bg-[#f8fafc] text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 leading-10">
                                             <tr>
@@ -529,74 +537,6 @@ const EnterBillBoard = ({ isOpen, onClose }) => {
                                         </div>
                                         <div className="w-10" />
                                     </div>
-                                </>
-                            ) : (
-                                <>
-                                    <table className="w-full text-sm text-left border-collapse">
-                                        <thead className="bg-[#f8fafc] text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 leading-10">
-                                            <tr>
-                                                <th className="px-4 w-[25%]">Item</th>
-                                                <th className="px-4 w-[25%]">Description</th>
-                                                <th className="px-4 w-[10%] text-center">Qty</th>
-                                                <th className="px-4 w-[15%] text-right">Cost</th>
-                                                <th className="px-4 w-[15%] text-right">Amount</th>
-                                                <th className="px-2 w-[10%] text-center">Action</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {items.map((item, idx) => (
-                                                <tr key={idx} className="border-b border-gray-50 text-[12px] font-bold text-gray-700 hover:bg-slate-50/50 transition-colors">
-                                                    <td className="py-2.5 px-4 font-mono text-blue-700 uppercase">{lookups.items?.find(i => i.code === item.itemId)?.name || item.itemId}</td>
-                                                    <td className="py-2.5 px-4 font-mono text-gray-600">{item.description || '---'}</td>
-                                                    <td className="py-2.5 px-4 text-center font-mono">{item.qty}</td>
-                                                    <td className="py-2.5 px-4 text-right font-mono">{parseFloat(item.cost).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                                                    <td className="py-2.5 px-4 text-right font-mono font-black text-red-600 bg-red-50/10 tracking-tighter">{(item.qty * item.cost).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                                                    <td className="py-2.5 px-2 text-center">
-                                                        <button onClick={() => handleRemoveItem(idx)} className="text-red-300 hover:text-red-500 bg-red-50 p-1.5 rounded-md transition-all active:scale-95"><Trash2 size={14} /></button>
-                                                    </td>
-                                                </tr>
-                                            ))}
-                                            {items.length === 0 && (
-                                                <tr>
-                                                    <td colSpan="6" className="py-12 text-center text-gray-300 font-black italic text-[11px] uppercase tracking-widest">No item purchases added.</td>
-                                                </tr>
-                                            )}
-                                        </tbody>
-                                    </table>
-
-                                    {/* Entry Input Row */}
-                                    <div className="mt-auto border-t-2 border-blue-50 bg-[#f8fafc] p-2 flex gap-3 items-center">
-                                        <div className="flex-[2] flex gap-1">
-                                            <div className="flex-1 relative">
-                                                <input
-                                                    type="text"
-                                                    readOnly
-                                                    value={lookups.items?.find(i => i.code === currentItem.itemId)?.name ? `${currentItem.itemId} - ${lookups.items?.find(i => i.code === currentItem.itemId)?.name}` : ''}
-                                                    className="w-full h-9 font-mono border border-gray-300 px-3 text-[12px] font-bold bg-white rounded-[5px] outline-none focus:border-blue-400 shadow-sm transition-all"
-                                                />
-                                            </div>
-                                            <button onClick={() => setShowItemModal(true)} className="w-10 h-9 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95">
-                                                <Search size={16} />
-                                            </button>
-                                        </div>
-                                        <div className="flex-[1.5]">
-                                            <input name="description" value={currentItem.description} onChange={handleItemChange} onKeyDown={handleAddItem} type="text" className="w-full h-9 font-mono border border-gray-300 px-3 text-[12px] font-bold bg-white rounded-[5px] outline-none focus:border-blue-400 shadow-sm" placeholder="Description" />
-                                        </div>
-                                        <div className="w-20">
-                                            <input name="qty" value={currentItem.qty} onChange={handleItemChange} onKeyDown={handleAddItem} type="number" className="w-full h-9 font-mono border border-gray-300 px-3 text-[14px] text-center font-black text-blue-700 rounded-[5px] shadow-inner outline-none focus:border-blue-400 bg-white" placeholder="Qty" />
-                                        </div>
-                                        <div className="flex-1">
-                                            <input name="cost" value={currentItem.cost} onChange={handleItemChange} onKeyDown={handleAddItem} type="number" className="w-full h-9 font-mono border border-gray-300 px-3 text-[14px] text-right font-black text-blue-700 rounded-[5px] shadow-inner outline-none focus:border-blue-400 bg-white" placeholder="Cost" />
-                                        </div>
-                                        <div className="w-24 flex gap-2 shrink-0">
-                                            <button onClick={handleAddItem} className="w-full h-9 bg-[#0078d4] text-white font-black text-[11px] uppercase tracking-widest rounded-sm hover:bg-[#005a9e] transition-all active:scale-95 shadow-md flex items-center justify-center">
-                                                Add
-                                            </button>
-                                        </div>
-                                        <div className="w-10" />
-                                    </div>
-                                </>
-                            )}
                         </div>
                     </div>
                 </div>
@@ -632,7 +572,7 @@ const EnterBillBoard = ({ isOpen, onClose }) => {
                                             <button onClick={() => {
                                                 setFormData(prev => ({ ...prev, vendorId: v.code }));
                                                 setShowVendorModal(false);
-                                            }} className="bg-[#0078d4] text-white text-[10px] px-3 py-1 rounded-sm font-bold hover:bg-[#005a9e] shadow-sm transition-all active:scale-95 uppercase tracking-wider">SELECT</button>
+                                            }} className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95">SELECT</button>
                                         </td>
                                     </tr>
                                 ))}
@@ -673,7 +613,7 @@ const EnterBillBoard = ({ isOpen, onClose }) => {
                                                 if (ccSource === 'header') setFormData(prev => ({ ...prev, costCenter: c.code }));
                                                 else setCurrentLine(prev => ({ ...prev, costCenter: c.code }));
                                                 setShowCostCenterModal(false);
-                                            }} className="bg-[#0078d4] text-white text-[10px] px-3 py-1 rounded-sm font-bold hover:bg-[#005a9e] shadow-sm transition-all active:scale-95 uppercase tracking-wider">SELECT</button>
+                                            }} className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95">SELECT</button>
                                         </td>
                                     </tr>
                                 ))}
@@ -713,7 +653,7 @@ const EnterBillBoard = ({ isOpen, onClose }) => {
                                             <button onClick={() => {
                                                 setFormData(prev => ({ ...prev, accId: a.code }));
                                                 setShowAPModal(false);
-                                            }} className="bg-[#0078d4] text-white text-[10px] px-3 py-1 rounded-sm font-bold hover:bg-[#005a9e] shadow-sm transition-all active:scale-95 uppercase tracking-wider">SELECT</button>
+                                            }} className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95">SELECT</button>
                                         </td>
                                     </tr>
                                 ))}
@@ -753,7 +693,7 @@ const EnterBillBoard = ({ isOpen, onClose }) => {
                                             <button onClick={() => {
                                                 setCurrentLine(prev => ({ ...prev, accCode: a.code }));
                                                 setShowExpModal(false);
-                                            }} className="bg-[#0078d4] text-white text-[10px] px-3 py-1 rounded-sm font-bold hover:bg-[#005a9e] shadow-sm transition-all active:scale-95 uppercase tracking-wider">SELECT</button>
+                                            }} className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95">SELECT</button>
                                         </td>
                                     </tr>
                                 ))}
@@ -837,12 +777,12 @@ const EnterBillBoard = ({ isOpen, onClose }) => {
                             <tbody className="divide-y divide-gray-100">
                                 {billSearchResults.map((b, idx) => (
                                     <tr key={idx} className="hover:bg-blue-50/50 transition-colors border-b border-gray-50">
-                                        <td className="p-3 font-bold text-blue-600">{b.docNo}</td>
+                                        <td className="p-3 text-[13px] font-bold text-blue-600">{b.docNo}</td>
                                         <td className="p-3 font-mono uppercase text-gray-700">{lookups.vendors?.find(v => v.code === b.vendorId)?.name || b.vendorId}</td>
                                         <td className="p-3 font-mono text-gray-600">{b.date ? b.date.split('T')[0] : ''}</td>
                                         <td className="p-3 text-right font-bold text-red-600">{b.amount?.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
                                         <td className="p-3 text-center">
-                                            <button onClick={() => loadBill(b.docNo)} className="bg-[#0078d4] text-white text-[10px] px-3 py-1 rounded-sm font-bold hover:bg-[#005a9e] shadow-sm transition-all active:scale-95 uppercase tracking-wider">SELECT</button>
+                                            <button onClick={() => loadBill(b.docNo)} className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95">SELECT</button>
                                         </td>
                                     </tr>
                                 ))}

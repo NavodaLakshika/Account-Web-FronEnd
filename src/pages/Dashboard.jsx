@@ -87,6 +87,7 @@ import { reminderService } from '../services/reminder.service';
 import AIChatbotBoard from './AIChatbotBoard';
 import DepartmentBoard from './DepartmentBoard';
 import CalculatorBoard from '../components/modals/ViewAndUtilityModels/CalculatorBoard';
+import EstimateBoard from './EstimateBoard';
 import { Layers } from 'lucide-react';
 
 
@@ -153,6 +154,7 @@ const Dashboard = () => {
     const [showSoftwareAboutModal, setShowSoftwareAboutModal] = useState(false);
     const [editingTask, setEditingTask] = useState(null);
     const [showCategoryModal, setShowCategoryModal] = useState(false);
+    const [showEstimateModal, setShowEstimateModal] = useState(false);
     const [ribbonIcons, setRibbonIcons] = useState(['logout', 'home', 'new_account', 'customer', 'vendor', 'reminder', 'enter_bill', 'pay_bill', 'write_chq', 'petty_cash', 'make_deposit', 'journal_entry', 'bank_rec', 'trial_balance', 'search', 'ai_chat']);
 
     const [showAIChatbotModal, setShowAIChatbotModal] = useState(false);
@@ -427,7 +429,7 @@ const Dashboard = () => {
                     if (label === 'Sales Order') setShowSalesOrderModal(true);
                     if (label === 'Create Sales Receipt') setShowSalesReceiptModal(true);
                     if (label === 'Receive Payment') setShowReceivePaymentModal(true);
-                    if (label === 'Estimate') setShowCustomerModal(true);
+                    if (label === 'Estimate') setShowEstimateModal(true);
                     if (label === 'Create Invoice') setShowCustomerModal(true);
                     if (label === 'Refunds and Credit') setShowCustomerModal(true);
 
@@ -453,6 +455,7 @@ const Dashboard = () => {
             <SupplierMasterBoard isOpen={showVendorModal} onClose={() => setShowVendorModal(false)} />
             <EnterBillBoard isOpen={showEnterBillModal} onClose={() => setShowEnterBillModal(false)} />
             <PayBillBoard isOpen={showPayBillModal} onClose={() => setShowPayBillModal(false)} />
+            <EstimateBoard isOpen={showEstimateModal} onClose={() => setShowEstimateModal(false)} />
             <WriteChequeBoard isOpen={showWriteChequeModal} onClose={() => setShowWriteChequeModal(false)} />
             <MakeDepositBoard isOpen={showMakeDepositModal} onClose={() => { setShowMakeDepositModal(false); setDepositData(null); }} incomingData={depositData} />
             <JournalEntryBoard isOpen={showJournalEntryModal} onClose={() => setShowJournalEntryModal(false)} />

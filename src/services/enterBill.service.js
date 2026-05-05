@@ -28,9 +28,9 @@ export const enterBillService = {
     }
   },
 
-  async generateDocNo() {
+  async generateDocNo(company) {
     try {
-      const response = await api.get('/generate-doc');
+      const response = await api.get('/generate-doc', { params: { company } });
       return response.data;
     } catch (error) {
       throw error.response?.data || 'Failed to generate document number';
@@ -46,18 +46,18 @@ export const enterBillService = {
     }
   },
 
-  async searchBills(query) {
+  async searchBills(query, company) {
     try {
-      const response = await api.get('/search', { params: { query } });
+      const response = await api.get('/search', { params: { query, company } });
       return response.data;
     } catch (error) {
       throw error.response?.data || 'Failed to search bills';
     }
   },
 
-  async getBill(docNo) {
+  async getBill(docNo, company) {
     try {
-      const response = await api.get(`/${docNo}`);
+      const response = await api.get(`/${docNo}`, { params: { company } });
       return response.data;
     } catch (error) {
       throw error.response?.data || 'Failed to load bill';

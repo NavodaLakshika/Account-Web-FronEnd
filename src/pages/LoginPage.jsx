@@ -4,6 +4,10 @@ import { User, Lock, Loader2, Github, Twitter, Facebook, Chrome, AlertCircle } f
 import { authService } from '../services/auth.service';
 import toast from 'react-hot-toast';
 
+const SUCCESS_SOUND_URL = '/Music/mrstokes302-success-videogame-sfx-423626.mp3';
+
+
+
 const LoginPage = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
@@ -29,6 +33,12 @@ const LoginPage = () => {
     try {
       const result = await authService.login(formData.empName, formData.password);
       toast.success(result.message || 'Login Successful!');
+      
+      // Play success sound
+      const audio = new Audio(SUCCESS_SOUND_URL);
+      audio.volume = 0.5;
+      audio.play().catch(e => console.error("Audio play failed:", e));
+
       navigate('/dashboard');
     } catch (err) {
       const msg = typeof err === 'string' ? err : 'Invalid username or password. Please try again.';
