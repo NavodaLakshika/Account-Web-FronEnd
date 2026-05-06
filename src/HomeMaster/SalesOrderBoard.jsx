@@ -1,13 +1,68 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import SimpleModal from '../components/SimpleModal';
-import { Search, Calendar, RefreshCw, Trash2, Plus, X , Save} from 'lucide-react';
+import { Search, Calendar, RefreshCw, Trash2, Plus, X , Save, Check} from 'lucide-react';
 import { salesOrderService } from '../services/salesOrder.service';
+import { productService } from '../services/product.service';
 import { toast } from 'react-hot-toast';
 import CalendarModal from '../components/CalendarModal';
+import { DotLottiePlayer } from '@dotlottie/react-player';
 
 const SalesOrderBoard = ({ isOpen, onClose }) => {
     const company = localStorage.getItem('companyCode') || 'C002';
     
+    // Custom Toast Handlers
+    const showSuccessToast = (message) => {
+        toast.custom((t) => (
+            <div className={`${t.visible ? 'animate-in slide-in-from-right-10 fade-in duration-500' : 'animate-out slide-out-to-right-10 fade-out duration-300'} 
+                max-w-[550px] w-fit bg-white/95 backdrop-blur-xl border border-white/20 shadow-2xl rounded-[5px] flex flex-col pointer-events-auto overflow-hidden`}>
+                <div className="px-4 py-2.5 flex items-center gap-3">
+                    <div className="w-12 h-12 shrink-0">
+                        <DotLottiePlayer src="/lottiefile/Successffull.lottie" autoplay loop={false} />
+                    </div>
+                    <div className="flex-grow text-left py-1">
+                        <h3 className="text-slate-800 text-[12px] font-bold tracking-wider uppercase font-tahoma leading-relaxed">{message}</h3>
+                        <div className="flex items-center gap-1.5 mt-0.5">
+                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.3)]" />
+                            <span className="text-emerald-600 text-[8px] font-mono font-bold tracking-widest uppercase">Verified</span>
+                        </div>
+                    </div>
+                    <button onClick={() => toast.dismiss(t.id)} className="text-slate-300 hover:text-slate-500 transition-colors">
+                        <X size={14} />
+                    </button>
+                </div>
+                <div className="h-[2px] w-full bg-emerald-50">
+                    <div className="h-full bg-emerald-500" style={{ animation: 'toastProgress 3s linear forwards' }} />
+                </div>
+            </div>
+        ), { duration: 3000, position: 'top-right' });
+    };
+
+    const showErrorToast = (message) => {
+        toast.custom((t) => (
+            <div className={`${t.visible ? 'animate-in slide-in-from-right-10 fade-in duration-500' : 'animate-out slide-out-to-right-10 fade-out duration-300'} 
+                max-w-[550px] w-fit bg-white/95 backdrop-blur-xl border border-white/20 shadow-2xl rounded-[5px] flex flex-col pointer-events-auto overflow-hidden`}>
+                <div className="px-4 py-2.5 flex items-center gap-3">
+                    <div className="w-12 h-12 shrink-0">
+                        <DotLottiePlayer src="/lottiefile/Error Fail animation.lottie" autoplay loop={false} />
+                    </div>
+                    <div className="flex-grow text-left py-1">
+                        <h3 className="text-slate-800 text-[12px] font-bold tracking-wider uppercase font-tahoma leading-relaxed">{message}</h3>
+                        <div className="flex items-center gap-1.5 mt-0.5">
+                            <div className="w-1.5 h-1.5 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.3)]" />
+                            <span className="text-red-600 text-[8px] font-mono font-bold tracking-widest uppercase">Failed</span>
+                        </div>
+                    </div>
+                    <button onClick={() => toast.dismiss(t.id)} className="text-slate-300 hover:text-slate-500 transition-colors">
+                        <X size={14} />
+                    </button>
+                </div>
+                <div className="h-[2px] w-full bg-red-50">
+                    <div className="h-full bg-red-500" style={{ animation: 'toastProgress 3s linear forwards' }} />
+                </div>
+            </div>
+        ), { duration: 3000, position: 'top-right' });
+    };
+
     const initialFormState = {
         docNo: '',
         company: company,
@@ -32,7 +87,7 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
 
     const [formData, setFormData] = useState(initialFormState);
     const [rows, setRows] = useState([{ id: Date.now(), prodCode: '', prodName: '', unit: '', cost: 0, selling: 0, qty: 0, discPer: 0, discount: 0, amount: 0 }]);
-    const [lookups, setLookups] = useState({ customers: [], salesAssistants: [], products: [], jobs: [] });
+    const [lookups, setLookups] = useState({ customers: [], salesAssistants: [], products: [], jobs: [], paymentTypes: [] });
     const [showSearchModal, setShowSearchModal] = useState(false);
     const [orders, setOrders] = useState([]);
 
@@ -47,34 +102,63 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
     const [showProdModal, setShowProdModal] = useState(false);
     const [prodSearch, setProdSearch] = useState('');
     const [prodIndex, setProdIndex] = useState(null);
+    const [orderSearch, setOrderSearch] = useState('');
     const [showDateModal, setShowDateModal] = useState(false);
     const [showDueDateModal, setShowDueDateModal] = useState(false);
 
-    // 1. Initial Load & Lookups
+    // 1. Initial Load
     useEffect(() => {
         if (isOpen) {
-            fetchLookups();
-            generateDocNo();
+            initComponent();
         }
     }, [isOpen]);
 
-    const fetchLookups = async () => {
+    const initComponent = async () => {
         try {
-            const data = await salesOrderService.getLookups(company);
-            setLookups(data);
+            const data = await salesOrderService.getInitData(company);
+            setLookups({
+                customers: data.customers || [],
+                salesAssistants: data.salesAssistants || [],
+                products: [], // We will fetch these from ProductController
+                jobs: data.jobs || [],
+                paymentTypes: data.paymentTypes || []
+            });
+            setFormData(prev => ({ ...prev, docNo: data.nextDocNo }));
+
+            // Load initial products using ProductController
+            const productsData = await productService.search(company, '');
+            setLookups(prev => ({ ...prev, products: productsData.map(p => ({
+                code: p.code,
+                name: p.prod_Name,
+                unit: p.unit || '',
+                cost: p.purchase_price || 0,
+                selling: p.selling_Price || 0
+            })) }));
         } catch (error) {
-            toast.error("Failed to load lookup data");
+            toast.error("Failed to initialize Sales Order");
         }
     };
 
-    const generateDocNo = async () => {
-        try {
-            const { docNo } = await salesOrderService.generateDocNo(company);
-            setFormData(prev => ({ ...prev, docNo }));
-        } catch (error) {
-            toast.error("Failed to generate document number");
-        }
-    };
+    // Product search from server
+    useEffect(() => {
+        const fetchProducts = async () => {
+            if (!showProdModal) return;
+            try {
+                const results = await productService.search(company, prodSearch);
+                setLookups(prev => ({ ...prev, products: results.map(p => ({
+                    code: p.code,
+                    name: p.prod_Name,
+                    unit: p.unit || '',
+                    cost: p.purchase_price || 0,
+                    selling: p.selling_Price || 0
+                })) }));
+            } catch (error) {
+                console.error("Search failed", error);
+            }
+        };
+        const timer = setTimeout(fetchProducts, 300);
+        return () => clearTimeout(timer);
+    }, [prodSearch, showProdModal, company]);
 
     // 2. Calculations
     const totals = useMemo(() => {
@@ -149,34 +233,58 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
 
     // 5. Action Handlers
     const handleSave = async (apply = false) => {
-        if (!formData.custCode) return toast.error("Please select a customer");
-        if (rows.some(r => !r.prodCode || r.qty <= 0)) return toast.error("Please fill all item details correctly");
+        if (!formData.custCode) return showErrorToast("Please select a customer");
+        if (rows.some(r => !r.prodCode || r.qty <= 0)) return showErrorToast("Please fill all item details correctly");
 
-        const data = {
-            ...formData,
-            totAmount: totals.sumAmount,
-            totQty: totals.sumQty,
-            totDisc: totals.sumDisc,
-            discValue: totals.headerDiscount,
-            taxValue: totals.taxVal,
-            netAmount: totals.net,
-            createUser: 'Admin', // Static for now 
-            items: rows.map(r => ({ ...r }))
+        const payload = {
+            header: {
+                docNo: formData.docNo,
+                date: formData.date,
+                jobNo: formData.jobNo,
+                custCode: formData.custCode,
+                salesRef: formData.salesRef,
+                payType: formData.payType,
+                dueDate: formData.dueDate,
+                creditPeriod: formData.creditPeriod,
+                company: formData.company,
+                refNo: formData.refNo,
+                comment: formData.comment,
+                totalAmount: totals.sumAmount,
+                discPer: parseFloat(formData.discPer) || 0,
+                discValue: totals.headerDiscount,
+                taxPer: parseFloat(formData.taxPer) || 0,
+                taxValue: totals.taxVal,
+                adjType: formData.adjType,
+                adjValue: parseFloat(formData.adjValue) || 0,
+                netAmount: totals.net
+            },
+            details: rows.map((r, index) => ({
+                prodCode: r.prodCode,
+                prodName: r.prodName,
+                unit: r.unit,
+                cost: parseFloat(r.cost) || 0,
+                selling: parseFloat(r.selling) || 0,
+                qty: parseFloat(r.qty) || 0,
+                disc: parseFloat(r.discPer) || 0,
+                discount: parseFloat(r.discount) || 0,
+                amount: parseFloat(r.amount) || 0,
+                lnNo: index + 1
+            }))
         };
 
         try {
-            const res = apply ? await salesOrderService.applyOrder(data) : await salesOrderService.saveDraft(data);
-            toast.success(res.message);
+            const res = apply ? await salesOrderService.applyOrder(payload) : await salesOrderService.saveDraft(payload);
+            showSuccessToast(res.message);
             if (apply) handleClear();
         } catch (error) {
-            toast.error(error.response?.data || "Operation failed");
+            showErrorToast(error.response?.data || "Operation failed");
         }
     };
 
     const handleClear = () => {
         setFormData(initialFormState);
         setRows([{ id: Date.now(), prodCode: '', prodName: '', unit: '', cost: 0, selling: 0, qty: 0, discPer: 0, discount: 0, amount: 0 }]);
-        generateDocNo();
+        initComponent();
     };
 
     const handleSearchClick = async () => {
@@ -184,7 +292,7 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
             const data = await salesOrderService.searchOrders(company);
             setOrders(data);
             setShowSearchModal(true);
-        } catch (error) { toast.error("Failed to load orders"); }
+        } catch (error) { showErrorToast("Failed to load orders"); }
     };
 
     const loadOrder = async (docNo) => {
@@ -192,57 +300,66 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
             const { header, details } = await salesOrderService.getOrder(docNo, company);
             setFormData({
                 ...formData,
-                docNo: header.doc_No || header.docNo || '',
-                date: (header.post_Date || header.postDate || new Date().toISOString().split('T')[0]).split('T')[0].slice(0, 10),
-                custCode: header.vendor_Id || header.vendorId || '',
-                custName: '',
+                docNo: header.doc_No || '',
+                date: (header.post_Date || new Date().toISOString().split('T')[0]).split('T')[0],
+                custCode: header.vendor_Id || '',
+                custName: lookups.customers.find(c => c.code === header.vendor_Id)?.name || '',
                 jobNo: header.remarks || '-NO-',
                 salesRef: header.salesRef || '',
-                payType: header.pay_Type || header.payType || 'Cash',
-                dueDate: (header.expected_Date || header.expectedDate || new Date().toISOString().split('T')[0]).split('T')[0].slice(0, 10),
+                payType: header.pay_Type || 'Cash',
+                dueDate: (header.expected_Date || new Date().toISOString().split('T')[0]).split('T')[0],
                 creditPeriod: header.crdtPeriod || '0',
-                refNo: header.reffNo || header.reference || '',
+                refNo: header.reference || '',
                 discPer: header.purDiscount || 0,
                 adjType: header.adjType || 'Add',
-                adjValue: header.adjst || 0
+                adjValue: header.adjst || 0,
+                comment: header.comment || ''
             });
             setRows(details.map(d => ({ 
                 id: Math.random(), 
-                prodCode: d.prodCode || '',
-                prodName: d.prodName || '',
+                prodCode: d.prod_Code || '',
+                prodName: d.prod_Name || '',
                 unit: d.unit || '',
-                cost: parseFloat(d.cost) || 0,
-                selling: parseFloat(d.selling) || 0,
+                cost: parseFloat(d.purchase_Price) || 0,
+                selling: parseFloat(d.selling_Price) || 0,
                 qty: parseFloat(d.qty) || 0,
-                discPer: parseFloat(d.discPer) || 0,
+                discPer: parseFloat(d.disc) || 0,
                 discount: parseFloat(d.discount) || 0,
                 amount: parseFloat(d.amount) || 0
             })));
             setShowSearchModal(false);
         } catch (error) { 
             console.error("Load order error:", error);
-            toast.error("Failed to load order"); 
+            showErrorToast("Failed to load order"); 
         }
     };
 
     return (
         <>
+            <style>
+                {`
+                    @keyframes toastProgress {
+                        0% { width: 100%; }
+                        100% { width: 0%; }
+                    }
+                `}
+            </style>
             <SimpleModal
                 isOpen={isOpen}
                 onClose={onClose}
                 title="Sales Order"
                 maxWidth="max-w-[1100px]"
                 footer={
-                    <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-gray-100 rounded-b-xl gap-3">
+                    <div className="bg-slate-50 px-6 py-4 w-full flex  items-center justify-end border-t border-gray-100 rounded-b-xl gap-3">
                         <div className="flex gap-3">
-                            <span className="text-[20px] font-black italic text-[#0285fd]/30 tracking-tighter select-none">onimta IT</span>
-                        </div>
-                        <div className="flex gap-3">
-                            <button onClick={handleClear} className="px-6 h-10 bg-[#00adff] text-white text-sm font-bold rounded-[5px] hover:bg-[#0099e6] transition-all active:scale-95 flex items-center gap-2 border-none">
+                            <button onClick={handleClear} className="px-6 h-10 bg-gray-100 text-gray-600 text-sm font-bold rounded-[5px] hover:bg-gray-200 transition-all active:scale-95 flex items-center gap-2 border-none">
                                 <RefreshCw size={14} /> CLEAR FORM
                             </button>
+                            <button onClick={() => handleSave(false)} className="px-6 h-10 bg-[#00adff] text-white text-sm font-bold rounded-[5px] hover:bg-[#0099e6] transition-all active:scale-95 flex items-center gap-2 border-none">
+                                <Save size={14} /> SAVE DRAFT
+                            </button>
                             <button onClick={() => handleSave(true)} className="px-6 h-10 bg-[#2bb744] text-white text-sm font-bold rounded-[5px] shadow-md shadow-green-100 hover:bg-[#259b3a] transition-all active:scale-95 flex items-center gap-2 border-none">
-                                <Save size={14} /> SAVE ORDER
+                                <Check size={14} /> SAVE ORDER
                             </button>
                         </div>
                     </div>
@@ -251,97 +368,94 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
                 <div className="space-y-4 p-1 font-['Tahoma',_sans-serif] text-slate-700 overflow-y-auto max-h-[80vh] no-scrollbar">
                     {/* 1. Header Information Section */}
                     <div className="bg-white p-4 border border-gray-100 rounded-lg shadow-sm space-y-4">
-                        <div className="grid grid-cols-12 gap-x-6 gap-y-3.5">
+                        <div className="grid grid-cols-12 gap-x-4 gap-y-3.5">
                             
                             {/* Document No */}
-                            <div className="col-span-4 flex items-center gap-2">
-                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Doc No</label>
+                            <div className="col-span-3 flex items-center gap-2">
+                                <label className="text-[12px] font-bold text-gray-700 w-20 shrink-0">Doc No</label>
                                 <div className="flex-1 flex gap-1 h-8 min-w-0">
                                     <input type="text" value={formData.docNo} onChange={handleInputChange} name="docNo" className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-[#0285fd] bg-gray-50 rounded-[5px] outline-none focus:border-[#0285fd] shadow-sm" />
-                                    <button onClick={handleSearchClick} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
-                                        <Search size={16} />
-                                    </button>
-                                    <button onClick={generateDocNo} className="w-10 h-8 bg-gray-100 border border-gray-300 text-gray-600 flex items-center justify-center hover:bg-gray-200 rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
-                                        <RefreshCw size={14} />
+                                    <button onClick={handleSearchClick} className="w-8 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
+                                        <Search size={14} />
                                     </button>
                                 </div>
                             </div>
 
                             {/* Date */}
-                            <div className="col-span-4 flex items-center gap-2">
-                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Date</label>
+                            <div className="col-span-3 flex items-center gap-2">
+                                <label className="text-[12px] font-bold text-gray-700 w-20 shrink-0">Date</label>
                                 <div className="flex-1 flex gap-1 h-8 min-w-0">
                                     <input type="text" readOnly value={formData.date} onClick={() => setShowDateModal(true)} className="flex-1 min-w-0 h-8 border border-gray-300 rounded-[5px] px-3 text-[12px] outline-none bg-white text-gray-700 font-bold cursor-pointer shadow-sm" />
-                                    <button onClick={() => setShowDateModal(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
-                                        <Calendar size={16} />
+                                    <button onClick={() => setShowDateModal(true)} className="w-8 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
+                                        <Calendar size={14} />
                                     </button>
                                 </div>
                             </div>
 
                             {/* Job Number */}
-                            <div className="col-span-4 flex items-center gap-2">
-                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Job Number</label>
+                            <div className="col-span-3 flex items-center gap-2">
+                                <label className="text-[12px] font-bold text-gray-700 w-20 shrink-0 text-nowrap">Job No</label>
                                 <div className="flex-1 flex gap-1 h-8 min-w-0">
                                     <input type="text" readOnly value={formData.jobNo} onClick={() => setShowJobModal(true)} className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-gray-700 bg-white rounded-[5px] outline-none shadow-sm cursor-pointer" />
-                                    <button onClick={() => setShowJobModal(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
-                                        <Search size={16} />
-                                    </button>
-                                </div>
-                            </div>
-
-                            {/* Customer */}
-                            <div className="col-span-8 flex items-center gap-2">
-                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Customer</label>
-                                <div className="flex-1 flex gap-1 h-8 min-w-0">
-                                    <input type="text" readOnly value={formData.custCode} placeholder="ID" className="w-24 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-[#0285fd] bg-gray-50 rounded-[5px] outline-none shadow-sm" />
-                                    <input type="text" readOnly value={formData.custName} onClick={() => setShowCustModal(true)} className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold rounded-[5px] outline-none shadow-sm bg-white text-gray-700 cursor-pointer" placeholder="Select Customer" />
-                                    <button onClick={() => setShowCustModal(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
-                                        <Search size={16} />
+                                    <button onClick={() => setShowJobModal(true)} className="w-8 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
+                                        <Search size={14} />
                                     </button>
                                 </div>
                             </div>
 
                             {/* Sales Assistant */}
-                            <div className="col-span-4 flex items-center gap-2">
-                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Sales Asst</label>
+                            <div className="col-span-3 flex items-center gap-2">
+                                <label className="text-[12px] font-bold text-gray-700 w-20 shrink-0 text-nowrap">Sales Asst</label>
                                 <div className="flex-1 flex gap-1 h-8 min-w-0">
-                                    <input type="text" readOnly value={lookups.salesAssistants.find(s => s.code === formData.salesRef)?.name || formData.salesRef || ''} onClick={() => setShowSalesAsstModal(true)} className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-gray-700 bg-white rounded-[5px] outline-none shadow-sm cursor-pointer" placeholder="Select Asst" />
-                                    <button onClick={() => setShowSalesAsstModal(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
-                                        <Search size={16} />
+                                    <input type="text" readOnly value={lookups.salesAssistants.find(s => s.code === formData.salesRef)?.name || formData.salesRef || ''} onClick={() => setShowSalesAsstModal(true)} className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-gray-700 bg-white rounded-[5px] outline-none shadow-sm cursor-pointer" placeholder="" />
+                                    <button onClick={() => setShowSalesAsstModal(true)} className="w-8 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
+                                        <Search size={14} />
                                     </button>
                                 </div>
                             </div>
 
-                            {/* Payment Type */}
-                            <div className="col-span-4 flex items-center gap-2">
-                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Pay Type</label>
+                            {/* Customer */}
+                            <div className="col-span-6 flex items-center gap-2">
+                                <label className="text-[12px] font-bold text-gray-700 w-20 shrink-0">Customer</label>
                                 <div className="flex-1 flex gap-1 h-8 min-w-0">
-                                    <input type="text" readOnly value={formData.payType} onClick={() => setShowPayTypeModal(true)} className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-gray-700 bg-white rounded-[5px] outline-none shadow-sm cursor-pointer" />
-                                    <button onClick={() => setShowPayTypeModal(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
-                                        <Search size={16} />
+                                    <input type="text" readOnly value={formData.custCode} placeholder="ID" className="w-20 min-w-0 h-8 border border-gray-300 px-2 text-[12px] font-bold text-[#0285fd] bg-gray-50 rounded-[5px] outline-none shadow-sm" />
+                                    <input type="text" readOnly value={formData.custName} onClick={() => setShowCustModal(true)} className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold rounded-[5px] outline-none shadow-sm bg-white text-gray-700 cursor-pointer" placeholder=" " />
+                                    <button onClick={() => setShowCustModal(true)} className="w-8 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
+                                        <Search size={14} />
                                     </button>
                                 </div>
                             </div>
 
                             {/* Ref No */}
-                            <div className="col-span-4 flex items-center gap-2">
-                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Ref. No</label>
+                            <div className="col-span-3 flex items-center gap-2">
+                                <label className="text-[12px] font-bold text-gray-700 w-20 shrink-0">Ref. No</label>
                                 <input type="text" name="refNo" value={formData.refNo} onChange={handleInputChange} className="flex-1 min-w-0 h-8 border border-gray-300 rounded-[5px] px-3 font-mono text-[12px] outline-none bg-white text-gray-700 shadow-sm focus:border-[#0285fd]" />
                             </div>
 
+                            {/* Payment Type */}
+                            <div className="col-span-3 flex items-center gap-2">
+                                <label className="text-[12px] font-bold text-gray-700 w-20 shrink-0">Pay Type</label>
+                                <div className="flex-1 flex gap-1 h-8 min-w-0">
+                                    <input type="text" readOnly value={formData.payType} onClick={() => setShowPayTypeModal(true)} className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-gray-700 bg-white rounded-[5px] outline-none shadow-sm cursor-pointer" />
+                                    <button onClick={() => setShowPayTypeModal(true)} className="w-8 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
+                                        <Search size={14} />
+                                    </button>
+                                </div>
+                            </div>
+
                             {/* Credit Period */}
-                            <div className="col-span-4 flex items-center gap-2">
-                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Credit Period</label>
+                            <div className="col-span-3 flex items-center gap-2">
+                                <label className="text-[12px] font-bold text-gray-700 w-20 shrink-0">Crd. Period</label>
                                 <input type="text" name="creditPeriod" value={formData.creditPeriod} onChange={handleInputChange} className="flex-1 min-w-0 h-8 border border-gray-300 rounded-[5px] px-3 font-mono text-[12px] outline-none bg-white text-gray-700 shadow-sm focus:border-[#0285fd]" />
                             </div>
 
                             {/* Due Date */}
-                            <div className="col-span-4 flex items-center gap-2">
-                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Due Date</label>
+                            <div className="col-span-3 flex items-center gap-2">
+                                <label className="text-[12px] font-bold text-gray-700 w-20 shrink-0">Due Date</label>
                                 <div className="flex-1 flex gap-1 h-8 min-w-0">
                                     <input type="text" readOnly value={formData.dueDate} onClick={() => setShowDueDateModal(true)} className="flex-1 min-w-0 h-8 border border-gray-300 rounded-[5px] px-3 text-[12px] outline-none bg-white text-gray-700 font-bold cursor-pointer shadow-sm" />
-                                    <button onClick={() => setShowDueDateModal(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
-                                        <Calendar size={16} />
+                                    <button onClick={() => setShowDueDateModal(true)} className="w-8 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
+                                        <Calendar size={14} />
                                     </button>
                                 </div>
                             </div>
@@ -433,46 +547,58 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
                             <textarea name="comment" value={formData.comment} onChange={handleInputChange} placeholder="Add comments here..." className="w-full h-[150px] bg-white border border-gray-300 rounded-lg p-3 text-[12.5px] font-mono outline-none focus:border-[#0285fd] shadow-sm resize-none" />
                         </div>
 
-                        <div className="w-[320px] bg-white border border-gray-100 rounded-lg p-4 space-y-3 shadow-sm">
-                            <div className="flex items-center justify-between">
-                                <span className="text-[12.5px] font-bold text-gray-500 uppercase tracking-tight">Total</span>
-                                <div className="flex gap-2 w-48">
-                                    <input type="text" readOnly value={totals.sumQty} className="w-12 h-7 text-center text-[12px] font-mono font-bold border border-gray-200 rounded-[5px] bg-gray-50" title="Total Qty" />
-                                    <input type="text" readOnly value={totals.sumDisc.toFixed(2)} className="w-14 h-7 text-right text-[12px] font-mono font-bold border border-gray-200 rounded-[5px] bg-gray-50 px-2" title="Total Discount" />
-                                    <input type="text" readOnly value={totals.sumAmount.toFixed(2)} className="flex-1 h-7 text-right text-[12px] font-mono font-bold border border-gray-200 rounded-[5px] bg-gray-50 px-2 text-slate-800" title="Total Amount" />
-                                </div>
-                            </div>
-                            <div className="flex items-center justify-between gap-4">
-                                <span className="text-[12.5px] font-bold text-gray-500 uppercase tracking-tight">Over Discount</span>
-                                <div className="flex gap-2 w-48">
-                                    <div className="relative w-12">
-                                        <input type="number" name="discPer" value={formData.discPer} onChange={handleInputChange} className="w-full h-7 text-center text-[12px] font-mono font-bold border border-gray-200 rounded-[5px] outline-none focus:border-[#0285fd]" />
-                                        <span className="absolute right-1 top-1/2 -translate-y-1/2 text-[10px] font-black text-gray-400">%</span>
+                        <div className="w-[360px] bg-white border border-gray-100 rounded-lg p-4 space-y-3 shadow-sm shrink-0">
+                            {/* Total Row */}
+                            <div className="flex items-center gap-3">
+                                <span className="text-[12px] font-bold text-gray-500 uppercase tracking-tight w-24 shrink-0">Total</span>
+                                <div className="flex-1 flex gap-3 items-center justify-end">
+                                    <div className="w-28 h-7 text-center text-[11px] font-mono font-bold border border-gray-200 rounded-[5px] bg-gray-50 flex items-center justify-center shrink-0 text-slate-500">
+                                        Qty: {totals.sumQty}
                                     </div>
-                                    <input type="text" readOnly value={totals.headerDiscount.toFixed(2)} className="flex-1 h-7 text-right text-[12px] font-mono font-bold border border-gray-200 rounded-[5px] bg-gray-50 px-2" />
+                                    <input type="text" readOnly value={totals.sumAmount.toFixed(2)} className="w-[105px] h-7 text-right text-[12px] font-mono font-bold border border-gray-200 rounded-[5px] bg-gray-50 px-2 text-slate-800 outline-none shrink-0" />
                                 </div>
                             </div>
-                            <div className="flex items-center justify-between gap-4">
-                                <span className="text-[12.5px] font-bold text-gray-500 uppercase tracking-tight">Tax Amount</span>
-                                <div className="flex gap-2 w-48">
-                                    <div className="relative w-12">
-                                        <input type="number" name="taxPer" value={formData.taxPer} onChange={handleInputChange} className="w-full h-7 text-center text-[12px] font-mono font-bold border border-gray-200 rounded-[5px] outline-none focus:border-[#0285fd]" />
-                                        <span className="absolute right-1 top-1/2 -translate-y-1/2 text-[10px] font-black text-gray-400">%</span>
+
+                            {/* Over Discount Row */}
+                            <div className="flex items-center gap-3">
+                                <span className="text-[12px] font-bold text-gray-500 uppercase tracking-tight w-24 shrink-0">Over Discount</span>
+                                <div className="flex-1 flex gap-3 items-center justify-end">
+                                    <div className="relative w-28 shrink-0">
+                                        <input type="number" name="discPer" value={formData.discPer} onChange={handleInputChange} className="w-full h-7 text-center text-[11px] font-mono font-bold border border-gray-200 rounded-[5px] outline-none focus:border-[#0285fd] bg-white" />
+                                        <span className="absolute right-1.5 top-1/2 -translate-y-1/2 text-[9px] font-black text-gray-400">%</span>
                                     </div>
-                                    <input type="text" readOnly value={totals.taxVal.toFixed(2)} className="flex-1 h-7 text-right text-[12px] font-mono font-bold border border-gray-200 rounded-[5px] bg-gray-50 px-2" />
+                                    <input type="text" readOnly value={totals.headerDiscount.toFixed(2)} className="w-[105px] h-7 text-right text-[12px] font-mono font-bold border border-gray-200 rounded-[5px] bg-gray-50 px-2 outline-none shrink-0" />
                                 </div>
                             </div>
-                            <div className="flex items-center justify-between gap-4">
-                                <span className="text-[12.5px] font-bold text-gray-500 uppercase tracking-tight">Adjustment</span>
-                                <div className="flex gap-2 w-48">
-                                    <button onClick={() => setFormData({...formData, adjType: formData.adjType === 'Add' ? 'Less' : 'Add'})} className="w-12 h-7 text-[10px] font-bold text-white bg-slate-400 hover:bg-slate-500 rounded-[5px] uppercase shadow-sm transition-colors">{formData.adjType}</button>
-                                    <input type="number" name="adjValue" value={formData.adjValue} onChange={handleInputChange} className="flex-1 h-7 text-right text-[12px] font-mono font-bold border border-gray-200 rounded-[5px] outline-none focus:border-[#0285fd] shadow-sm" />
+
+                            {/* Tax Amount Row */}
+                            <div className="flex items-center gap-3">
+                                <span className="text-[12px] font-bold text-gray-500 uppercase tracking-tight w-24 shrink-0">Tax Amount</span>
+                                <div className="flex-1 flex gap-3 items-center justify-end">
+                                    <div className="relative w-28 shrink-0">
+                                        <input type="number" name="taxPer" value={formData.taxPer} onChange={handleInputChange} className="w-full h-7 text-center text-[11px] font-mono font-bold border border-gray-200 rounded-[5px] outline-none focus:border-[#0285fd] bg-white" />
+                                        <span className="absolute right-1.5 top-1/2 -translate-y-1/2 text-[9px] font-black text-gray-400">%</span>
+                                    </div>
+                                    <input type="text" readOnly value={totals.taxVal.toFixed(2)} className="w-[105px] h-7 text-right text-[12px] font-mono font-bold border border-gray-200 rounded-[5px] bg-gray-50 px-2 outline-none shrink-0" />
                                 </div>
                             </div>
+
+                            {/* Adjustment Row */}
+                            <div className="flex items-center gap-3">
+                                <span className="text-[12px] font-bold text-gray-500 uppercase tracking-tight w-24 shrink-0">Adjustment</span>
+                                <div className="flex-1 flex gap-3 items-center justify-end">
+                                    <button onClick={() => setFormData({...formData, adjType: formData.adjType === 'Add' ? 'Less' : 'Add'})} className="w-28 shrink-0 h-7 text-[10px] font-black text-white bg-[#8c97ab] hover:bg-[#7a869a] rounded-[5px] uppercase shadow-sm transition-all active:scale-95">
+                                        {formData.adjType}
+                                    </button>
+                                    <input type="number" name="adjValue" value={formData.adjValue} onChange={handleInputChange} className="w-[105px] h-7 text-right text-[12px] font-mono font-bold border border-gray-200 rounded-[5px] outline-none focus:border-[#0285fd] shadow-sm bg-white shrink-0" />
+                                </div>
+                            </div>
+
                             <div className="h-[1px] bg-gray-100 my-1" />
-                            <div className="flex items-center justify-between bg-slate-50 p-2 rounded-md">
-                                <span className="text-[13px] font-black text-slate-900 uppercase">Net Amount</span>
-                                <div className="text-[18px] font-mono font-black text-[#0285fd] tracking-tighter">
+
+                            <div className="flex items-center justify-between bg-slate-50/80 p-2.5 rounded-lg border border-gray-50">
+                                <span className="text-[13px] font-black text-slate-900 uppercase tracking-tight">Net Amount</span>
+                                <div className="text-[20px] font-mono font-black text-[#0285fd] tracking-tighter drop-shadow-sm tabular-nums">
                                     {totals.net.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                 </div>
                             </div>
@@ -491,13 +617,20 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
                         <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm max-h-[300px] overflow-y-auto no-scrollbar">
                             <table className="w-full text-left">
                                 <thead className="bg-[#f8fafd] sticky top-0 text-[11px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-100">
-                                    <tr><th className="px-5 py-3">Code</th><th className="px-5 py-3">Name</th></tr>
+                                    <tr>
+                                        <th className="px-5 py-3">Code</th>
+                                        <th className="px-5 py-3">Name</th>
+                                        <th className="px-5 py-3 text-right">Action</th>
+                                    </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-50">
                                     {lookups.customers.filter(c => c.name?.toLowerCase().includes(custSearch.toLowerCase()) || c.code?.toLowerCase().includes(custSearch.toLowerCase())).map((c, i) => (
-                                        <tr key={i} className="group hover:bg-blue-50/50 cursor-pointer" onClick={() => { setFormData({ ...formData, custCode: c.code, custName: c.name }); setShowCustModal(false); }}>
+                                        <tr key={i} className="group hover:bg-blue-50/50 cursor-pointer transition-colors" onClick={() => { setFormData({ ...formData, custCode: c.code, custName: c.name }); setShowCustModal(false); }}>
                                             <td className="px-5 py-3 font-mono text-[13px] font-bold text-[#0285fd]">{c.code}</td>
                                             <td className="px-5 py-3 text-[13px] font-bold text-gray-600 uppercase group-hover:text-blue-600">{c.name}</td>
+                                            <td className="px-5 py-3 text-right">
+                                                <button className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95">SELECT</button>
+                                            </td>
                                         </tr>
                                     ))}
                                 </tbody>
@@ -516,13 +649,20 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
                         <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm max-h-[300px] overflow-y-auto no-scrollbar">
                             <table className="w-full text-left">
                                 <thead className="bg-[#f8fafd] sticky top-0 text-[11px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-100">
-                                    <tr><th className="px-5 py-3">Code</th><th className="px-5 py-3">Name</th></tr>
+                                    <tr>
+                                        <th className="px-5 py-3">Code</th>
+                                        <th className="px-5 py-3">Name</th>
+                                        <th className="px-5 py-3 text-right">Action</th>
+                                    </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-50">
                                     {lookups.salesAssistants.filter(s => s.name?.toLowerCase().includes(salesAsstSearch.toLowerCase()) || s.code?.toLowerCase().includes(salesAsstSearch.toLowerCase())).map((s, i) => (
-                                        <tr key={i} className="group hover:bg-blue-50/50 cursor-pointer" onClick={() => { setFormData({ ...formData, salesRef: s.code }); setShowSalesAsstModal(false); }}>
+                                        <tr key={i} className="group hover:bg-blue-50/50 cursor-pointer transition-colors" onClick={() => { setFormData({ ...formData, salesRef: s.code }); setShowSalesAsstModal(false); }}>
                                             <td className="px-5 py-3 font-mono text-[13px] font-bold text-[#0285fd]">{s.code}</td>
                                             <td className="px-5 py-3 text-[13px] font-bold text-gray-600 uppercase group-hover:text-blue-600">{s.name}</td>
+                                            <td className="px-5 py-3 text-right">
+                                                <button className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95">SELECT</button>
+                                            </td>
                                         </tr>
                                     ))}
                                 </tbody>
@@ -541,15 +681,24 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
                         <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm max-h-[300px] overflow-y-auto no-scrollbar">
                             <table className="w-full text-left">
                                 <thead className="bg-[#f8fafd] sticky top-0 text-[11px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-100">
-                                    <tr><th className="px-5 py-3">Job No</th></tr>
+                                    <tr>
+                                        <th className="px-5 py-3">Job No</th>
+                                        <th className="px-5 py-3 text-right">Action</th>
+                                    </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-50">
-                                    <tr className="group hover:bg-blue-50/50 cursor-pointer" onClick={() => { setFormData({ ...formData, jobNo: '-NO-' }); setShowJobModal(false); }}>
+                                    <tr className="group hover:bg-blue-50/50 cursor-pointer transition-colors" onClick={() => { setFormData({ ...formData, jobNo: '-NO-' }); setShowJobModal(false); }}>
                                         <td className="px-5 py-3 font-mono text-[13px] font-bold text-gray-600">-NO-</td>
+                                        <td className="px-5 py-3 text-right">
+                                            <button className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95">SELECT</button>
+                                        </td>
                                     </tr>
                                     {lookups.jobs.filter(j => j.toLowerCase().includes(jobSearch.toLowerCase())).map((j, i) => (
-                                        <tr key={i} className="group hover:bg-blue-50/50 cursor-pointer" onClick={() => { setFormData({ ...formData, jobNo: j }); setShowJobModal(false); }}>
+                                        <tr key={i} className="group hover:bg-blue-50/50 cursor-pointer transition-colors" onClick={() => { setFormData({ ...formData, jobNo: j }); setShowJobModal(false); }}>
                                             <td className="px-5 py-3 font-mono text-[13px] font-bold text-[#0285fd]">{j}</td>
+                                            <td className="px-5 py-3 text-right">
+                                                <button className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95">SELECT</button>
+                                            </td>
                                         </tr>
                                     ))}
                                 </tbody>
@@ -564,12 +713,20 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
                         <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm max-h-[300px] overflow-y-auto no-scrollbar">
                             <table className="w-full text-left">
                                 <thead className="bg-[#f8fafd] sticky top-0 text-[11px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-100">
-                                    <tr><th className="px-5 py-3">Type</th></tr>
+                                    <tr>
+                                        <th className="px-5 py-3 text-left text-[10px] font-black text-gray-400 uppercase tracking-wider">Code</th>
+                                        <th className="px-5 py-3 text-left text-[10px] font-black text-gray-400 uppercase tracking-wider">Type</th>
+                                        <th className="px-5 py-3 text-right text-[10px] font-black text-gray-400 uppercase tracking-wider">Action</th>
+                                    </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-50">
-                                    {['Cash', 'Credit'].map((t, i) => (
-                                        <tr key={i} className="group hover:bg-blue-50/50 cursor-pointer" onClick={() => { setFormData({ ...formData, payType: t }); setShowPayTypeModal(false); }}>
-                                            <td className="px-5 py-3 font-mono text-[13px] font-bold text-[#0285fd]">{t}</td>
+                                    {lookups.paymentTypes.map((t, i) => (
+                                        <tr key={i} className="group hover:bg-blue-50/50 cursor-pointer transition-colors" onClick={() => { setFormData({ ...formData, payType: t.name }); setShowPayTypeModal(false); }}>
+                                            <td className="px-5 py-3 font-mono text-[12px] text-gray-500">{t.code}</td>
+                                            <td className="px-5 py-3 font-mono text-[13px] font-bold text-[#0285fd]">{t.name}</td>
+                                            <td className="px-5 py-3 text-right">
+                                                <button className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95">SELECT</button>
+                                            </td>
                                         </tr>
                                     ))}
                                 </tbody>
@@ -579,25 +736,48 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
                 </SimpleModal>
 
                 {/* Product Modal */}
-                <SimpleModal isOpen={showProdModal} onClose={() => setShowProdModal(false)} title="Product Directory" maxWidth="max-w-[650px]">
+                <SimpleModal isOpen={showProdModal} onClose={() => setShowProdModal(false)} title="Product Directory" maxWidth="max-w-[900px] min-h-[650px]">
                     <div className="space-y-4 font-['Tahoma']">
                         <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-lg border border-gray-100 mb-2">
-                            <Search className="text-gray-400" size={15} />
-                            <input type="text" className="w-full h-9 border border-gray-300 rounded-[5px] outline-none px-3 text-sm focus:border-[#0285fd]" value={prodSearch} onChange={(e) => setProdSearch(e.target.value)} autoFocus placeholder="Search..." />
+                            <span className="text-[12px] font-bold text-gray-500 uppercase tracking-widest shrink-0">Search Facility</span>
+                            <div className="relative flex-1">
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
+                                <input 
+                                    type="text" 
+                                    className="w-full h-9 pl-10 pr-4 border border-gray-300 rounded-[5px] outline-none text-sm focus:border-[#0285fd] bg-white shadow-sm" 
+                                    value={prodSearch} 
+                                    onChange={(e) => setProdSearch(e.target.value)} 
+                                    autoFocus 
+                                    placeholder="Search by name or code..." 
+                                />
+                            </div>
                         </div>
-                        <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm max-h-[300px] overflow-y-auto no-scrollbar">
+                        <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm max-h-[500px] overflow-y-auto no-scrollbar">
                             <table className="w-full text-left">
-                                <thead className="bg-[#f8fafd] sticky top-0 text-[11px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-100">
-                                    <tr><th className="px-5 py-3">Code</th><th className="px-5 py-3">Name</th></tr>
+                                <thead className="bg-[#f8fafd] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">
+                                    <tr>
+                                        <th className="px-5 py-3">Code</th>
+                                        <th className="px-5 py-3">Name</th>
+                                        <th className="px-5 py-3 text-center">Unit</th>
+                                        <th className="px-5 py-3 text-right">Pur. Price</th>
+                                        <th className="px-5 py-3 text-right">Sell. Price</th>
+                                        <th className="px-5 py-3 text-right">Action</th>
+                                    </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-50">
-                                    {lookups.products.filter(p => p.name?.toLowerCase().includes(prodSearch.toLowerCase()) || p.code?.toLowerCase().includes(prodSearch.toLowerCase())).map((p, i) => (
-                                        <tr key={i} className="group hover:bg-blue-50/50 cursor-pointer" onClick={() => { 
+                                    {lookups.products.map((p, i) => (
+                                        <tr key={i} className="group hover:bg-blue-50/50 cursor-pointer transition-colors" onClick={() => { 
                                             if (prodIndex !== null) handleRowChange(rows[prodIndex].id, 'prodCode', p.code);
                                             setShowProdModal(false); 
                                         }}>
                                             <td className="px-5 py-3 font-mono text-[13px] font-bold text-[#0285fd]">{p.code}</td>
                                             <td className="px-5 py-3 text-[13px] font-bold text-gray-600 uppercase group-hover:text-blue-600">{p.name}</td>
+                                            <td className="px-5 py-3 text-center text-[12px] text-gray-500 font-bold uppercase">{p.unit || 'Nos'}</td>
+                                            <td className="px-5 py-3 text-right font-mono text-[13px] font-bold text-slate-700">{parseFloat(p.cost).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                                            <td className="px-5 py-3 text-right font-mono text-[13px] font-black text-blue-600">{parseFloat(p.selling).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                                            <td className="px-5 py-3 text-right">
+                                                <button className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95">SELECT</button>
+                                            </td>
                                         </tr>
                                     ))}
                                 </tbody>
@@ -607,16 +787,60 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
                 </SimpleModal>
 
                 {/* Search Orders Modal */}
-                <SimpleModal isOpen={showSearchModal} onClose={() => setShowSearchModal(false)} title="Search Sales Orders" maxWidth="max-w-md">
-                    <div className="p-2 space-y-2 font-['Tahoma']">
-                        {orders.length === 0 ? <p className="text-center py-4 text-gray-400">No draft orders found</p> : 
-                            orders.map(o => (
-                                <div key={o.docNo} onClick={() => loadOrder(o.docNo)} className="p-3 border rounded hover:bg-blue-50 cursor-pointer flex justify-between items-center group">
-                                    <span className="font-bold text-[#0285fd]">{o.docNo}</span>
-                                    <span className="text-[11px] text-gray-500 group-hover:text-gray-700">{o.date?.split('T')[0]}</span>
-                                </div>
-                            ))
-                        }
+                <SimpleModal isOpen={showSearchModal} onClose={() => { setShowSearchModal(false); setOrderSearch(''); }} title="Historical Document Directory" maxWidth="max-w-[750px]">
+                    <div className="space-y-4 font-['Tahoma']">
+                        <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-lg border border-gray-100 mb-2">
+                            <span className="text-[12px] font-bold text-gray-500 uppercase tracking-widest">Global Archive Search</span>
+                            <div className="relative flex-1">
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
+                                <input 
+                                    type="text" 
+                                    placeholder="Filter by document id or creation date..." 
+                                    className="w-full h-9 pl-10 pr-4 border border-gray-300 rounded-[5px] outline-none text-sm focus:border-[#0285fd] bg-white shadow-sm" 
+                                    value={orderSearch}
+                                    onChange={(e) => setOrderSearch(e.target.value)}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm">
+                            <div className="max-h-[400px] overflow-y-auto no-scrollbar">
+                                <table className="w-full text-left">
+                                    <thead className="bg-[#f8fafd] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">
+                                        <tr>
+                                            <th className="px-5 py-3">Reference ID</th>
+                                            <th className="px-5 py-3">Ledger Posting Date</th>
+                                            <th className="px-5 py-3 text-center">Status</th>
+                                            <th className="px-5 py-3 text-right">Interaction</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-gray-50">
+                                        {orders
+                                            .filter(o => !orderSearch || o.docNo.toLowerCase().includes(orderSearch.toLowerCase()) || o.date?.includes(orderSearch))
+                                            .length === 0 ? (
+                                            <tr>
+                                                <td colSpan="4" className="text-center py-10 text-gray-300 text-[12px] font-bold uppercase tracking-widest">Archive is currently empty</td>
+                                            </tr>
+                                        ) : orders
+                                            .filter(o => !orderSearch || o.docNo.toLowerCase().includes(orderSearch.toLowerCase()) || o.date?.includes(orderSearch))
+                                            .map((order, i) => (
+                                            <tr key={i} className="group hover:bg-blue-50/50 cursor-pointer transition-colors" onClick={() => loadOrder(order.docNo)}>
+                                                <td className="px-5 py-3 font-mono text-[13px] text-gray-600 ">{order.docNo}</td>
+                                                <td className="px-5 py-3 text-[13px] font-mono text-gray-600 ">{order.date?.split('T')[0]}</td>
+                                                <td className="px-5 py-3 text-center">
+                                                    <span className={`px-2 py-1 rounded-full text-[9px] font-black uppercase ${order.status === 'Applied' ? 'bg-green-100 text-green-600' : 'bg-orange-100 text-orange-600'}`}>
+                                                        {order.status}
+                                                    </span>
+                                                </td>
+                                                <td className="px-5 py-3 text-right">
+                                                    <button className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95">RETRIEVE</button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
                 </SimpleModal>
 

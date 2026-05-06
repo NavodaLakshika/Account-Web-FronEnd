@@ -168,7 +168,8 @@ const EnterBillBoard = ({ isOpen, onClose }) => {
                 costCenter: data.header.costCenter || '',
                 company: data.header.company || ''
             }));
-            setBillType(data.header.bill_Type || data.header.billType || 'Bill');
+            const bType = data.header.bill_Type !== undefined ? data.header.bill_Type : (data.header.billType !== undefined ? data.header.billType : 'Bill');
+            setBillType(bType === true || bType === 'Bill' ? 'Bill' : 'Credit');
             
             if (data.expenses) {
                 setExpenses(data.expenses.map(e => ({
@@ -265,7 +266,7 @@ const EnterBillBoard = ({ isOpen, onClose }) => {
         try {
             await enterBillService.save({
                 ...formData,
-                billType,
+                billType: String(billType || 'Bill'),
                 netAmount: parseFloat(calculateTotal()),
                 expenses: expenses
             });

@@ -1,7 +1,7 @@
 import api from './api';
 
-export const receivePaymentService = {
-  getLookups: async (company, type = 'MM') => {
+export const customerReceiptService = {
+  getInitData: async (company, type = 'MM') => {
     try {
       const response = await api.get('/ReceivePayment/lookups', { params: { company, type } });
       return response.data;
@@ -17,10 +17,10 @@ export const receivePaymentService = {
     } catch (error) { throw error; }
   },
 
-  updateRow: async (item, company, docNo, customerId) => {
+  updateRow: async (item, company, docNo, customerId, accountType = 'MM') => {
     try {
       const response = await api.post('/ReceivePayment/update-row', item, { 
-        params: { company, docNo, customerId } 
+        params: { company, docNo, customerId, accountType } 
       });
       return response.data;
     } catch (error) { throw error; }
@@ -41,4 +41,4 @@ export const receivePaymentService = {
   }
 };
 
-export default receivePaymentService;
+export default customerReceiptService;

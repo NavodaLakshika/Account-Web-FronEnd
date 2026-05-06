@@ -1,54 +1,116 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import SimpleModal from '../components/SimpleModal';
-import { Search, Calendar, ChevronDown, Check, X, Save, RotateCcw, Loader2, FileText, Landmark } from 'lucide-react';
-import receivePaymentService from '../services/receivePayment.service';
+import CalendarModal from '../components/CalendarModal';
+import { Search, Calendar, CheckCircle, Trash2, RotateCcw, Save, X, Plus, Check } from 'lucide-react';
 import { toast } from 'react-hot-toast';
+import { DotLottiePlayer } from '@dotlottie/react-player';
+import { customerReceiptService } from '../services/customerReceipt.service';
+import { salesOrderService } from '../services/salesOrder.service'; // For customer lookup initially
 
 const CustomerReceiptBoard = ({ isOpen, onClose }) => {
-    const [loading, setLoading] = useState(false);
-    const [lookups, setLookups] = useState({ banks: [], costCenters: [], customers: [], subAccounts: [] });
-    
-    // Form States
+    const [lookups, setLookups] = useState({ 
+        customers: [], 
+        paymentMethods: [], 
+        banks: [], 
+        costCenters: [] 
+    });
+
     const [formData, setFormData] = useState({
         docNo: '',
         date: new Date().toISOString().split('T')[0],
         customerId: '',
-        customerName: '',
-        amount: 0,
-        paymentType: 'Cash',
-        bankId: '',
-        bankName: '',
-        branch: '',
+        amount: '0.00',
+        payType: '',
+        bankCode: '',
+        branchCode: '',
         costCenter: '',
         chequeNo: '',
         chequeDate: new Date().toISOString().split('T')[0],
-        reference: '',
         memo: '',
+        reference: '',
         company: 'C001',
         createUser: 'SYSTEM'
     });
 
-    const [rows, setRows] = useState([]);
-    const [totals, setTotals] = useState({
-        outstanding: 0,
-        advance: 0,
-        paid: 0,
-        discount: 0,
-        debit: 0,
-        ending: 0
-    });
+    const [invoices, setInvoices] = useState([]);
+    const [advanceBalance, setAdvanceBalance] = useState(0);
+    const [overPayment, setOverPayment] = useState(0);
+    
+    // Modal States
+    const [showCustomerSearch, setShowCustomerSearch] = useState(false);
+    const [showBankSearch, setShowBankSearch] = useState(false);
+    const [showPayMethodSearch, setShowPayMethodSearch] = useState(false);
+    const [showCostCenterSearch, setShowCostCenterSearch] = useState(false);
+    const [showDatePicker, setShowDatePicker] = useState(false);
+    const [datePickerField, setDatePickerField] = useState('date');
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
-    const [activeModal, setActiveModal] = useState(null); // 'customer', 'bank', 'cc'
-    const [searchTerm, setSearchTerm] = useState('');
+    // Search Queries
+    const [customerSearchQuery, setCustomerSearchQuery] = useState('');
+    const [bankSearchQuery, setBankSearchQuery] = useState('');
+    const [payMethodSearchQuery, setPayMethodSearchQuery] = useState('');
+    const [costCenterSearchQuery, setCostCenterSearchQuery] = useState('');
+
+    const [isSaving, setIsSaving] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
+
+    const showSuccessToast = (message) => {
+        toast.custom((t) => (
+            <div className={`${t.visible ? 'animate-in slide-in-from-right-10 fade-in duration-500' : 'animate-out slide-out-to-right-10 fade-out duration-300'} 
+                max-w-[550px] w-fit bg-white/95 backdrop-blur-xl border border-white/20 shadow-2xl rounded-[5px] flex flex-col pointer-events-auto overflow-hidden`}>
+                <div className="px-4 py-2.5 flex items-center gap-3">
+                    <div className="w-12 h-12 shrink-0">
+                        <DotLottiePlayer src="/lottiefile/Successffull.lottie" autoplay loop={false} />
+                    </div>
+                    <div className="flex-grow text-left py-1">
+                        <h3 className="text-slate-800 text-[12px] font-bold tracking-wider uppercase font-tahoma leading-relaxed">{message}</h3>
+                        <div className="flex items-center gap-1.5 mt-0.5">
+                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.3)]" />
+                            <span className="text-emerald-600 text-[8px] font-mono font-bold tracking-widest uppercase">Verified</span>
+                        </div>
+                    </div>
+                    <button onClick={() => toast.dismiss(t.id)} className="text-slate-300 hover:text-slate-500 transition-colors">
+                        <X size={14} />
+                    </button>
+                </div>
+                <div className="h-[2px] w-full bg-emerald-50">
+                    <div className="h-full bg-emerald-500" style={{ animation: 'toastProgress 3s linear forwards' }} />
+                </div>
+            </div>
+        ), { duration: 3000, position: 'top-right' });
+    };
+
+    const showErrorToast = (message) => {
+        toast.custom((t) => (
+            <div className={`${t.visible ? 'animate-in slide-in-from-right-10 fade-in duration-500' : 'animate-out slide-out-to-right-10 fade-out duration-300'} 
+                max-w-[550px] w-fit bg-white/95 backdrop-blur-xl border border-white/20 shadow-2xl rounded-[5px] flex flex-col pointer-events-auto overflow-hidden`}>
+                <div className="px-4 py-2.5 flex items-center gap-3">
+                    <div className="w-12 h-12 shrink-0">
+                        <DotLottiePlayer src="/lottiefile/Error Fail animation.lottie" autoplay loop={false} />
+                    </div>
+                    <div className="flex-grow text-left py-1">
+                        <h3 className="text-slate-800 text-[12px] font-bold tracking-wider uppercase font-tahoma leading-relaxed">{message}</h3>
+                        <div className="flex items-center gap-1.5 mt-0.5">
+                            <div className="w-1.5 h-1.5 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.3)]" />
+                            <span className="text-red-600 text-[8px] font-mono font-bold tracking-widest uppercase">Failed</span>
+                        </div>
+                    </div>
+                    <button onClick={() => toast.dismiss(t.id)} className="text-slate-300 hover:text-slate-500 transition-colors">
+                        <X size={14} />
+                    </button>
+                </div>
+                <div className="h-[2px] w-full bg-red-50">
+                    <div className="h-full bg-red-500" style={{ animation: 'toastProgress 3s linear forwards' }} />
+                </div>
+            </div>
+        ), { duration: 3000, position: 'top-right' });
+    };
 
     useEffect(() => {
         if (isOpen) {
-            loadInitialData();
-            
             const companyData = localStorage.getItem('selectedCompany');
             const user = JSON.parse(localStorage.getItem('user') || '{}');
             let companyCode = 'C001';
-
             if (companyData) {
                 try {
                     const parsed = JSON.parse(companyData);
@@ -56,429 +118,648 @@ const CustomerReceiptBoard = ({ isOpen, onClose }) => {
                 } catch (e) { companyCode = companyData; }
             }
 
-            setFormData(prev => ({
-                ...prev,
-                company: companyCode,
-                createUser: user?.emp_Name || user?.empName || 'SYSTEM'
-            }));
+            const initCompany = companyCode;
+            const initUser = user?.emp_Name || user?.empName || 'SYSTEM';
+
+            setFormData(prev => ({ ...prev, company: initCompany, createUser: initUser }));
+            fetchLookups(initCompany);
+            generateDocNo(initCompany);
         }
     }, [isOpen]);
 
-    const loadInitialData = async () => {
+    const fetchLookups = async (company) => {
         try {
-            setLoading(true);
-            const companyCode = formData.company || 'C001';
-            const [lookupRes, docRes] = await Promise.all([
-                receivePaymentService.getLookups(companyCode, 'MM'), // Default to Medical Members type mapping if needed
-                receivePaymentService.generateDoc(companyCode)
-            ]);
-            setLookups(lookupRes);
-            setFormData(prev => ({ ...prev, docNo: docRes.docNo.replace('REP', 'CPY') })); // Matching UI Screenshot prefix CPY
-        } catch (error) {
-            toast.error("Failed to load initial data");
-        } finally {
-            setLoading(false);
-        }
-    };
+            let soData = { customers: [], costCenters: [] };
+            let invData = { customers: [], banks: [], costCenters: [] };
 
-    const handleCustomerChange = async (custId) => {
-        const cust = lookups.customers.find(c => c.Code === custId);
-        setFormData(prev => ({ ...prev, customerId: custId, customerName: cust?.Cust_Name || '' }));
-        
-        if (custId) {
             try {
-                setLoading(true);
-                const res = await receivePaymentService.getOutstanding(custId, formData.company, formData.docNo, 'All');
-                setRows(res.outstandingRows || []);
-                setTotals(prev => ({ ...prev, advance: res.advanceBalance || 0 }));
-                calculateTotals(res.outstandingRows || []);
-            } catch (error) {
-                toast.error("Failed to load outstanding invoices");
-            } finally {
-                setLoading(false);
-            }
-        } else {
-            setRows([]);
-            calculateTotals([]);
+                soData = await salesOrderService.getInitData(company);
+            } catch (e) { console.warn("Failed to load sales order fallback data:", e); }
+
+            try {
+                invData = await customerReceiptService.getInitData(company, "MM");
+            } catch (e) { console.warn("Failed to load receipt init data:", e); }
+            
+            // Generate standard payment methods if API doesn't return them directly in lookups
+            const paymentMethods = [
+                { code: 'CASH', name: 'Cash Payment' },
+                { code: 'CHQ', name: 'Cheque Payment' },
+                { code: 'CARD', name: 'Credit Card' },
+                { code: 'BANK', name: 'Bank Transfer' }
+            ];
+
+            setLookups({
+                customers: invData.customers?.length > 0 ? invData.customers : (soData.customers || []),
+                paymentMethods: paymentMethods,
+                banks: invData.banks?.length > 0 ? invData.banks : [],
+                costCenters: invData.costCenters?.length > 0 ? invData.costCenters : (soData.costCenters || [])
+            });
+        } catch (error) {
+            console.error("Lookup Load Error:", error);
         }
     };
 
-    const handleRowChange = (index, field, value) => {
-        const newRows = [...rows];
-        newRows[index][field] = parseFloat(value) || 0;
-        
-        // Auto-check logic? Or just manual. In screenshot it seems manual or based on payment.
-        if (field === 'payment' && newRows[index].payment > 0) {
-            // Keep existing values or auto-allocate
+    const generateDocNo = async (company) => {
+        try {
+            const data = await customerReceiptService.generateDocNo(company);
+            setFormData(prev => ({ ...prev, docNo: data.docNo }));
+        } catch (error) {
+            showErrorToast("Failed to generate Document Number");
         }
-
-        setRows(newRows);
-        calculateTotals(newRows);
     };
 
-    const calculateTotals = (currentRows) => {
-        const paid = currentRows.reduce((sum, r) => sum + (r.payment || 0), 0);
-        const disc = currentRows.reduce((sum, r) => sum + (r.discount || 0), 0);
-        const debit = currentRows.reduce((sum, r) => sum + (r.setOffVal || 0), 0);
-        const out = currentRows.reduce((sum, r) => sum + (r.balance || 0), 0);
-        
-        setTotals(prev => ({
-            ...prev,
-            paid,
-            discount: disc,
-            debit,
-            outstanding: out,
-            ending: out - paid - disc - debit
-        }));
-    };
-
-    const handleInputChange = (e) => {
+    const handleInput = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
-    const handleClear = () => {
-        setFormData({
-            ...formData,
-            customerId: '',
-            customerName: '',
-            amount: 0,
-            paymentType: 'Cash',
-            bankId: '',
-            bankName: '',
-            branch: '',
-            chequeNo: '',
-            memo: '',
-            reference: ''
-        });
-        setRows([]);
-        calculateTotals([]);
-        loadInitialData();
-    };
-
-    const handleSave = async () => {
-        if (!formData.customerId || totals.paid <= 0) {
-            toast.error("Please select a customer and enter payment amounts.");
-            return;
-        }
-
+    const handleCustomerSelect = async (customer) => {
+        setFormData(prev => ({ ...prev, customerId: customer.code || customer.Code }));
+        setShowCustomerSearch(false);
         try {
-            setLoading(true);
-            const res = await receivePaymentService.apply({
-                ...formData,
-                amount: totals.paid
-            });
-            toast.success('Customer Receipt saved successfully!');
-            handleClear();
-            onClose();
+            const data = await customerReceiptService.getOutstanding(customer.code || customer.Code, formData.company, formData.docNo);
+            setAdvanceBalance(data.advanceBalance || 0);
+            setInvoices(data.outstandingRows.map(inv => ({
+                ...inv,
+                selected: inv.payment > 0,
+                doc_No: inv.doc_No,
+                date_Due: inv.date_Due,
+                ref_No: inv.ref_No,
+                inv_Amount: inv.inv_Amount,
+                balance: inv.balance,
+                discount: inv.discount || 0,
+                setOff: inv.setOffVal || 0,
+                payment: inv.payment || 0
+            })));
         } catch (error) {
-            toast.error("Failed to save receipt");
-        } finally {
-            setLoading(false);
+            showErrorToast("Failed to load outstanding invoices");
         }
     };
 
-    const filteredLookup = () => {
-        if (activeModal === 'customer') return lookups.customers.filter(c => (c.Cust_Name || '').toLowerCase().includes(searchTerm.toLowerCase()) || (c.Code || '').toLowerCase().includes(searchTerm.toLowerCase()));
-        if (activeModal === 'bank') return lookups.banks.filter(b => (b.Bank_Name || '').toLowerCase().includes(searchTerm.toLowerCase()) || (b.Bank_Code || '').toLowerCase().includes(searchTerm.toLowerCase()));
-        if (activeModal === 'cc') return lookups.costCenters.filter(c => (c.CostCenterName || '').toLowerCase().includes(searchTerm.toLowerCase()) || (c.CostCenterCode || '').toLowerCase().includes(searchTerm.toLowerCase()));
-        return [];
+    const handleInvoiceCheck = async (idx) => {
+        const newInvoices = [...invoices];
+        newInvoices[idx].selected = !newInvoices[idx].selected;
+        
+        if (newInvoices[idx].selected) {
+            const remainingToPay = parseFloat(formData.amount) - totalAllocated;
+            const canPay = Math.min(newInvoices[idx].balance, Math.max(0, remainingToPay));
+            newInvoices[idx].payment = canPay;
+        } else {
+            newInvoices[idx].payment = 0;
+            newInvoices[idx].discount = 0;
+            newInvoices[idx].setOff = 0;
+        }
+        
+        setInvoices(newInvoices);
+        await updateBackendRow(newInvoices[idx]);
     };
+
+    const handleInvoiceChange = async (idx, field, value) => {
+        const newInvoices = [...invoices];
+        newInvoices[idx][field] = parseFloat(value) || 0;
+        setInvoices(newInvoices);
+        if (newInvoices[idx].selected) {
+            await updateBackendRow(newInvoices[idx]);
+        }
+    };
+
+    const updateBackendRow = async (inv) => {
+        try {
+            await customerReceiptService.updateRow({
+                docNo: inv.doc_No,
+                payment: inv.payment,
+                discount: inv.discount,
+                setOff: inv.setOff
+            }, formData.company, formData.docNo, formData.customerId, formData.accountType);
+        } catch (e) { console.error("Row Update Fail:", e); }
+    };
+
+    const totalAllocated = useMemo(() => invoices.reduce((acc, inv) => acc + (inv.selected ? inv.payment : 0), 0), [invoices]);
+    const totalDiscount = useMemo(() => invoices.reduce((acc, inv) => acc + (inv.selected ? inv.discount : 0), 0), [invoices]);
+    const totalSetOff = useMemo(() => invoices.reduce((acc, inv) => acc + (inv.selected ? inv.setOff : 0), 0), [invoices]);
+
+    const handleClear = () => {
+        setFormData(prev => ({
+            ...prev,
+            customerId: '', amount: '0.00', payType: '', bankCode: '', branchCode: '', costCenter: '',
+            chequeNo: '', memo: '', reference: ''
+        }));
+        setInvoices([]);
+        setAdvanceBalance(0);
+        setOverPayment(0);
+        generateDocNo(formData.company);
+    };
+
+    const handleSelectAll = async () => {
+        let remaining = parseFloat(formData.amount);
+        const newInvoices = [...invoices].map(inv => {
+            let payment = 0;
+            if (remaining > 0) {
+                payment = Math.min(inv.balance, remaining);
+                remaining -= payment;
+            }
+            return { ...inv, selected: payment > 0, payment };
+        });
+        setInvoices(newInvoices);
+        for (const inv of newInvoices) {
+            await updateBackendRow(inv);
+        }
+    };
+
+    const handleClearSelections = async () => {
+        const newInvoices = invoices.map(inv => ({ ...inv, selected: false, payment: 0, discount: 0, setOff: 0 }));
+        setInvoices(newInvoices);
+        for (const inv of newInvoices) {
+            await updateBackendRow(inv);
+        }
+    };
+
+    const handleApply = async () => {
+        if (!formData.customerId) return showErrorToast("Please select a customer");
+        if (parseFloat(formData.amount) <= 0) return showErrorToast("Please enter receipt amount");
+
+        setIsSaving(true);
+        try {
+            const payload = {
+                ...formData,
+                postDate: formData.date,
+                bankName: lookups.banks.find(b => (b.bank_Code || b.Bank_Code) === formData.bankCode)?.bank_Name || lookups.banks.find(b => (b.bank_Code || b.Bank_Code) === formData.bankCode)?.Bank_Name || '',
+                bankId: formData.bankCode,
+                branch: formData.branchCode,
+                accountType: "MM"
+            };
+            await customerReceiptService.apply(payload);
+            showSuccessToast("Payment Applied Successfully");
+            handleClear();
+        } catch (error) {
+            showErrorToast(error.message);
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
+    const handleDelete = async () => {
+        if (!formData.docNo) return;
+        setShowDeleteConfirm(true);
+    };
+
+    if (!isOpen) return null;
 
     return (
         <>
+            <style>
+                {`
+                    @keyframes toastProgress {
+                        0% { width: 100%; }
+                        100% { width: 0%; }
+                    }
+                `}
+            </style>
             <SimpleModal
                 isOpen={isOpen}
                 onClose={onClose}
                 title="Customer Receipt"
-                maxWidth="max-w-5xl"
+                maxWidth="max-w-[1050px]"
                 footer={
-                    <div className="bg-slate-50 px-6 py-3 w-full flex justify-end gap-3 border-t border-gray-100 rounded-b-xl">
-                        <button onClick={handleSave} disabled={loading} className={`px-6 h-9 bg-[#0078d4] text-white text-xs font-bold rounded shadow-sm hover:bg-[#005a9e] transition-all active:scale-95 flex items-center gap-2 ${loading ? 'opacity-50' : ''}`}>
-                            {loading ? <Loader2 size={15} className="animate-spin" /> : <Save size={15} />} Save Receipt
-                        </button>
-                        <button onClick={handleClear} disabled={loading} className="px-6 h-9 bg-white border border-gray-300 text-slate-600 text-xs font-bold rounded hover:bg-slate-50 transition-all flex items-center gap-2">
-                            <RotateCcw size={15} /> Clear
-                        </button>
-                        <button onClick={onClose} className="px-6 h-9 bg-white border border-gray-300 text-slate-600 text-xs font-bold rounded hover:bg-slate-50 transition-all flex items-center gap-2">
-                            <X size={15} /> Exit
-                        </button>
+                    <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-gray-100 rounded-b-xl font-['Tahoma']">
+                        <div className="flex gap-3">
+                            <button
+                                onClick={handleDelete}
+                                className="px-6 h-10 bg-[#ff3b30] text-white text-[12px] font-black rounded-[5px] shadow-md shadow-red-100 hover:bg-[#e03127] transition-all active:scale-95 flex items-center gap-2 border-none"
+                            >
+                                <Trash2 size={14} /> DELETE DOC
+                            </button>
+                             <button
+                                onClick={handleClear}
+                                className="px-6 h-10 bg-[#00adff] text-white text-[12px] font-black rounded-[5px] hover:bg-[#0099e6] transition-all active:scale-95 flex items-center gap-2 border-none"
+                            >
+                                <RotateCcw size={14} /> CLEAR FORM
+                            </button>
+                        </div>
+                        <div className="flex gap-3">
+                            <button
+                                onClick={handleApply}
+                                disabled={isSaving}
+                                className="px-6 h-10 bg-[#2bb744] text-white text-[12px] font-black rounded-[5px] shadow-md shadow-green-100 hover:bg-[#259b3a] transition-all active:scale-95 flex items-center gap-2 border-none disabled:opacity-50"
+                            >
+                                {isSaving ? <RotateCcw size={14} className="animate-spin" /> : <CheckCircle size={14} />} SAVE & APPLY
+                            </button>
+                        </div>
                     </div>
                 }
             >
-                <div className="space-y-3 font-['Plus_Jakarta_Sans']">
-                    {/* Top Section: Form Fields */}
-                    <div className="bg-white p-4 border border-gray-100 rounded shadow-sm space-y-3">
-                        <div className="grid grid-cols-12 gap-x-8 gap-y-3">
-                            {/* Left Side: Core Metadata (Stacked for alignment) */}
-                            <div className="col-span-12 lg:col-span-7 space-y-2.5">
-                                <div className="flex items-center gap-3">
-                                    <label className="text-[11px] font-bold text-slate-400 w-20 shrink-0 uppercase">Doc No</label>
-                                    <input type="text" value={formData.docNo} readOnly className="flex-1 h-8 border border-gray-200 px-3 text-[13px] font-bold text-[#0078d4] bg-white rounded-sm outline-none tracking-widest" />
-                                </div>
-                                
-                                <div className="flex items-center gap-3">
-                                    <label className="text-[11px] font-bold text-slate-400 w-20 shrink-0 uppercase">From</label>
-                                    <div className="flex-1 flex gap-1">
-                                        <input 
-                                            type="text" 
-                                            readOnly 
-                                            value={formData.customerName ? `${formData.customerId} - ${formData.customerName}` : ''} 
-                                            placeholder="Select Customer..." 
-                                            className="flex-1 h-8 border border-gray-200 px-3 text-[13px] font-bold text-[#b91c1c] rounded-sm bg-white outline-none" 
-                                        />
-                                        <button onClick={() => { setActiveModal('customer'); setSearchTerm(''); }} className="w-8 h-8 bg-[#0078d4] text-white flex items-center justify-center hover:bg-[#005a9e] rounded-sm transition-all shadow-sm active:scale-90">
-                                            <Search size={14} />
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <div className="flex items-center gap-3">
-                                    <label className="text-[11px] font-bold text-slate-400 w-20 shrink-0 uppercase">Amount</label>
-                                    <div className="flex-1 flex items-center gap-6">
-                                        <input 
-                                            name="amount" 
-                                            type="number" 
-                                            value={formData.amount} 
-                                            onChange={handleInputChange} 
-                                            className="flex-1 h-8 border-b-2 border-gray-200 px-2 text-[14px] font-black text-right text-gray-800 outline-none focus:border-[#0078d4]" 
-                                        />
-                                        <div className="flex items-center gap-2">
-                                            <label className="text-[10px] font-bold text-slate-400 uppercase">Type</label>
-                                            <select name="paymentType" value={formData.paymentType} onChange={handleInputChange} className="w-28 h-8 border border-gray-200 px-2 text-[11px] outline-none rounded-sm bg-white font-bold">
-                                                <option value="Cash">Cash</option>
-                                                <option value="Cheque">Cheque</option>
-                                                <option value="Direct Deposit">Direct Deposit</option>
-                                                <option value="Credit Card">Credit Card</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="flex items-center gap-3">
-                                    <label className="text-[11px] font-bold text-slate-400 w-20 shrink-0 uppercase">Bank</label>
-                                    <div className="flex-1 flex gap-1">
-                                        <input 
-                                            type="text" 
-                                            readOnly 
-                                            value={lookups.banks.find(b => b.Bank_Code === formData.bankId)?.Bank_Name || ''} 
-                                            placeholder="Select Bank..." 
-                                            className="flex-1 h-8 border border-gray-200 px-3 text-[12px] rounded-sm bg-white outline-none" 
-                                            disabled={formData.paymentType === 'Cash'}
-                                        />
-                                        <button onClick={() => { setActiveModal('bank'); setSearchTerm(''); }} disabled={formData.paymentType === 'Cash'} className="w-8 h-8 bg-[#0078d4] text-white flex items-center justify-center hover:bg-[#005a9e] rounded-sm transition-all shadow-sm active:scale-90 disabled:opacity-50">
-                                            <Search size={14} />
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <div className="flex items-center gap-3">
-                                    <label className="text-[11px] font-bold text-slate-400 w-20 shrink-0 uppercase">Center</label>
-                                    <div className="flex-1 flex gap-1">
-                                        <input 
-                                            type="text" 
-                                            readOnly 
-                                            value={lookups.costCenters.find(c => c.CostCenterCode === formData.costCenter)?.CostCenterName || ''} 
-                                            className="flex-1 h-8 border border-gray-200 px-3 text-[12px] rounded-sm bg-white outline-none" 
-                                        />
-                                        <button onClick={() => { setActiveModal('cc'); setSearchTerm(''); }} className="w-8 h-8 bg-[#0078d4] text-white flex items-center justify-center hover:bg-[#005a9e] rounded-sm transition-all shadow-sm active:scale-90">
-                                            <Search size={14} />
-                                        </button>
-                                    </div>
+                <div className="space-y-4 overflow-y-auto no-scrollbar font-['Tahoma'] p-4 bg-[#f8fafd]">
+                    {/* Top Inputs Section */}
+                    <div className="bg-white p-4 border border-gray-100 rounded-lg shadow-sm space-y-4">
+                        <div className="grid grid-cols-12 gap-x-6 gap-y-3.5">
+                            
+                            {/* Document ID */}
+                            <div className="col-span-4 flex items-center gap-2">
+                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Document ID</label>
+                                <div className="flex-1 flex gap-1 h-8 min-w-0">
+                                    <input type="text" name="docNo" value={formData.docNo} onChange={handleInput} className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-blue-600 bg-gray-50 rounded-[5px] outline-none focus:border-[#0285fd] shadow-sm" />
+                                    <button className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
+                                        <Search size={16} />
+                                    </button>
                                 </div>
                             </div>
 
-                            {/* Right Side: Operational Metadata */}
-                            <div className="col-span-12 lg:col-span-5 space-y-2.5 bg-gray-50/10 p-4 rounded border border-gray-100 shadow-inner">
-                                <div className="flex items-center gap-3">
-                                    <label className="text-[11px] font-bold text-slate-400 w-24 shrink-0 uppercase">Invc. Date</label>
-                                    <input name="date" type="date" value={formData.date} onChange={handleInputChange} className="flex-1 h-8 border border-gray-200 px-3 text-[12px] outline-none rounded-sm font-bold text-[#0078d4] bg-white shadow-sm" />
-                                </div>
-                                <div className="flex items-center gap-3">
-                                    <label className="text-[11px] font-bold text-slate-400 w-24 shrink-0 uppercase">Outstanding</label>
-                                    <div className="flex-1 h-8 flex items-center justify-end px-3 bg-red-50/30 text-[14px] font-black text-[#b91c1c] rounded border border-red-100 tabular-nums shadow-sm">
-                                        {totals.outstanding.toLocaleString()}
-                                    </div>
-                                </div>
-                                <div className="flex items-center gap-3">
-                                    <label className="text-[11px] font-bold text-slate-400 w-24 shrink-0 uppercase">Chq Reference</label>
-                                    <div className="flex-1 flex gap-2">
-                                        <input name="chequeNo" value={formData.chequeNo} onChange={handleInputChange} disabled={formData.paymentType !== 'Cheque'} type="text" placeholder="No..." className="w-24 h-8 border border-gray-200 px-2 text-[12px] outline-none rounded-sm disabled:bg-gray-50 bg-white shadow-sm" />
-                                        <div className="flex flex-1 items-center gap-2">
-                                            <span className="text-[10px] font-bold text-slate-300 uppercase shrink-0">Dt</span>
-                                            <input name="chequeDate" type="date" value={formData.chequeDate} onChange={handleInputChange} disabled={formData.paymentType !== 'Cheque'} className="flex-1 w-7 h-8 border border-gray-200 px-2 text-[12px] outline-none rounded-sm disabled:bg-gray-50 bg-white shadow-sm" />
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="flex flex-col gap-1.5 pt-1">
-                                    <label className="text-[11px] font-bold text-slate-400 uppercase">Memo / Internal Remarks</label>
-                                    <input name="memo" value={formData.memo} onChange={handleInputChange} type="text" placeholder="Enter receipt remarks..." className="w-full h-8 border border-gray-200 px-3 text-[12px] outline-none focus:border-[#0078d4] bg-white rounded-sm shadow-sm" />
+                            {/* Date */}
+                            <div className="col-span-4 flex items-center gap-2">
+                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Date</label>
+                                <div className="flex-1 flex gap-1 h-8 min-w-0">
+                                    <input
+                                        type="text"
+                                        readOnly
+                                        value={formData.date}
+                                        className="flex-1 min-w-0 h-8 border border-gray-300 rounded-[5px] px-3 text-[12px] outline-none bg-white text-gray-700 font-bold cursor-pointer shadow-sm"
+                                        onClick={() => { setDatePickerField('date'); setShowDatePicker(true); }}
+                                    />
+                                    <button
+                                        onClick={() => { setDatePickerField('date'); setShowDatePicker(true); }}
+                                        className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0"
+                                    >
+                                        <Calendar size={16} />
+                                    </button>
                                 </div>
                             </div>
-                        </div>
-                    </div>
 
-                    {/* Middle Section: Invoice Table */}
-                    <div className="bg-white border border-gray-200 rounded shadow-sm overflow-hidden flex flex-col">
-                        <div className="overflow-y-auto max-h-[250px] scrollbar-thin scrollbar-thumb-gray-200">
-                            <table className="w-full text-left border-collapse">
-                                <thead className="bg-gray-50 border-b border-gray-200 sticky top-0 z-10 font-bold text-[10px] text-slate-400 uppercase tracking-widest">
-                                    <tr>
-                                        <th className="px-3 py-2.5 border-r border-gray-100 w-10 text-center text-slate-300">#</th>
-                                        <th className="px-3 py-2.5 border-r border-gray-100 w-28 text-[#0078d4]">Due Date</th>
-                                        <th className="px-3 py-2.5 border-r border-gray-100 w-28 text-slate-600">Doc No</th>
-                                        <th className="px-3 py-2.5 border-r border-gray-100 text-slate-400">Reference</th>
-                                        <th className="px-3 py-2.5 border-r border-gray-100 text-right w-24 text-slate-600">Inv Bal</th>
-                                        <th className="px-3 py-2.5 border-r border-gray-100 text-right w-24 text-slate-600">Disc</th>
-                                        <th className="px-3 py-2.5 border-r border-gray-100 text-right w-24 text-slate-600">SetOff</th>
-                                        <th className="px-3 py-2.5 text-right w-28 bg-gray-50/80 text-[#0078d4]">Payment</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="text-[12px] text-gray-700">
-                                    {rows.map((row, idx) => (
-                                        <tr key={idx} className="border-b border-gray-50 hover:bg-slate-50 transition-colors group">
-                                            <td className="p-1 border-r border-gray-50 text-center">
-                                                <input type="checkbox" checked={row.payment > 0} readOnly className="w-3.5 h-3.5 text-[#0078d4] border-gray-300 rounded focus:ring-0 cursor-default" />
-                                            </td>
-                                            <td className="px-3 py-1 border-r border-gray-50 font-medium text-gray-400 tabular-nums">{row.date_Due?.split('T')[0]}</td>
-                                            <td className="px-3 py-1 border-r border-gray-50 font-bold text-slate-700 tracking-tight underline underline-offset-4 decoration-gray-100">{row.doc_No}</td>
-                                            <td className="px-3 py-1 border-r border-gray-50 text-[11px] text-slate-400">{row.ref_No}</td>
-                                            <td className="px-3 py-1 border-r border-gray-50 text-right font-semibold tabular-nums text-slate-600">{row.balance?.toLocaleString()}</td>
-                                            <td className="p-0 border-r border-gray-50 bg-white">
-                                                <input type="number" value={row.discount} onChange={(e) => handleRowChange(idx, 'discount', e.target.value)} className="w-full h-8 px-2 text-right bg-transparent outline-none focus:bg-slate-50 tabular-nums" />
-                                            </td>
-                                            <td className="p-0 border-r border-gray-50 bg-white">
-                                                <input type="number" value={row.setOffVal} onChange={(e) => handleRowChange(idx, 'setOffVal', e.target.value)} className="w-full h-8 px-2 text-right bg-transparent outline-none focus:bg-slate-50 tabular-nums" />
-                                            </td>
-                                            <td className="p-0 bg-gray-50/20">
-                                                <input type="number" value={row.payment} onChange={(e) => handleRowChange(idx, 'payment', e.target.value)} className="w-full h-8 px-2 text-right font-black text-[#0078d4] outline-none focus:bg-gray-100 tabular-nums" />
-                                            </td>
-                                        </tr>
-                                    ))}
-                                    {rows.length === 0 && !loading && (
-                                        <tr>
-                                            <td colSpan="8" className="px-8 py-16 text-center text-slate-300 font-medium tracking-widest text-[10px] uppercase">No outstanding transactions found.</td>
-                                        </tr>
-                                    )}
-                                </tbody>
-                            </table>
-                        </div>
-                        
-                        {/* Summary Totals Row */}
-                        <div className="bg-gray-50 border-t border-gray-200 p-2 px-4 flex justify-between items-center text-[12px] font-black">
-                            <span className="uppercase tracking-widest text-slate-300 text-[10px]">Batch Totals</span>
-                            <div className="flex gap-10">
-                                <div className="flex items-center gap-2">
-                                    <span className="text-[10px] text-slate-400 uppercase">Disc:</span>
-                                    <span className="text-slate-600 tabular-nums">{totals.discount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                            {/* Received Amount */}
+                            <div className="col-span-4 flex items-center gap-2">
+                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Amount</label>
+                                <input type="text" name="amount" value={formData.amount} onChange={handleInput} className="flex-1 min-w-0 h-8 border border-gray-300 rounded-[5px] px-3 font-black text-[14px] text-[#0285fd] outline-none bg-white shadow-sm focus:border-[#0285fd]" />
+                            </div>
+
+                            {/* Customer */}
+                            <div className="col-span-8 flex items-center gap-2">
+                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Received From</label>
+                                <div className="flex-1 flex gap-1 h-8 min-w-0">
+                                    <input
+                                        type="text"
+                                        readOnly
+                                        value={lookups.customers.find(c => (c.code || c.Code) === formData.customerId)?.name || lookups.customers.find(c => (c.code || c.Code) === formData.customerId)?.Cust_Name || lookups.customers.find(c => (c.code || c.Code) === formData.customerId)?.cust_Name || ''}
+                                        className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-red-600 bg-gray-50 rounded-[5px] outline-none shadow-sm cursor-pointer"
+                                        onClick={() => setShowCustomerSearch(true)}
+                                        placeholder="Select Customer..."
+                                    />
+                                    <button onClick={() => setShowCustomerSearch(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
+                                        <Search size={16} />
+                                    </button>
                                 </div>
-                                <div className="flex items-center gap-2">
-                                    <span className="text-[10px] text-slate-400 uppercase">SetOff:</span>
-                                    <span className="text-slate-600 tabular-nums">{totals.debit.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                            </div>
+
+                            {/* Payment Method */}
+                            <div className="col-span-4 flex items-center gap-2">
+                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Pay Method</label>
+                                <div className="flex-1 flex gap-1 h-8 min-w-0">
+                                    <input
+                                        type="text"
+                                        readOnly
+                                        value={lookups.paymentMethods?.find(m => m.code === formData.payType)?.name || formData.payType || ''}
+                                        className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-gray-700 bg-white rounded-[5px] outline-none shadow-sm cursor-pointer"
+                                        onClick={() => setShowPayMethodSearch(true)}
+                                    />
+                                    <button onClick={() => setShowPayMethodSearch(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
+                                        <Search size={16} />
+                                    </button>
                                 </div>
-                                <div className="flex items-center gap-3 py-1 px-4 bg-white rounded border border-gray-100 shadow-sm">
-                                    <span className="text-[11px] text-[#0078d4] uppercase tracking-tighter">Net Received:</span>
-                                    <span className="text-[16px] text-slate-800 tabular-nums font-black">Rs. {totals.paid.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                            </div>
+
+                            {/* Bank and Branch */}
+                            <div className="col-span-8 flex items-center gap-2">
+                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Bank / Branch</label>
+                                <div className="flex-1 flex gap-1 h-8 min-w-0">
+                                    <input
+                                        type="text"
+                                        readOnly
+                                        value={lookups.banks?.find(b => (b.bank_Code || b.Bank_Code) === formData.bankCode)?.bank_Name || lookups.banks?.find(b => (b.bank_Code || b.Bank_Code) === formData.bankCode)?.Bank_Name || ''}
+                                        className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-gray-700 bg-white rounded-[5px] outline-none shadow-sm cursor-pointer"
+                                        onClick={() => setShowBankSearch(true)}
+                                        placeholder="Select Bank"
+                                    />
+                                    <button onClick={() => setShowBankSearch(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
+                                        <Search size={16} />
+                                    </button>
                                 </div>
+                                <input type="text" name="branchCode" value={formData.branchCode} onChange={handleInput} placeholder="Branch" className="w-32 h-8 border border-gray-300 rounded-[5px] px-3 font-mono text-[12px] outline-none bg-white text-gray-700 shadow-sm focus:border-[#0285fd]" />
+                            </div>
+
+                            {/* Cost Center */}
+                            <div className="col-span-4 flex items-center gap-2">
+                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Cost Center</label>
+                                <div className="flex-1 flex gap-1 h-8 min-w-0">
+                                    <input
+                                        type="text"
+                                        readOnly
+                                        value={lookups.costCenters?.find(c => (c.CostCenterCode || c.costCenterCode) === formData.costCenter)?.CostCenterName || lookups.costCenters?.find(c => (c.CostCenterCode || c.costCenterCode) === formData.costCenter)?.costCenterName || ''}
+                                        className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-gray-700 bg-white rounded-[5px] outline-none shadow-sm cursor-pointer"
+                                        onClick={() => setShowCostCenterSearch(true)}
+                                    />
+                                    <button onClick={() => setShowCostCenterSearch(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
+                                        <Search size={16} />
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Cheque No */}
+                            <div className="col-span-4 flex items-center gap-2">
+                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Cheque No</label>
+                                <input type="text" name="chequeNo" value={formData.chequeNo} onChange={handleInput} className="flex-1 min-w-0 h-8 border border-gray-300 rounded-[5px] px-3 font-mono text-[12px] outline-none bg-white text-gray-700 shadow-sm focus:border-[#0285fd]" />
+                            </div>
+
+                            {/* Cheque Date */}
+                            <div className="col-span-4 flex items-center gap-2">
+                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Cheque Date</label>
+                                <div className="flex-1 flex gap-1 h-8 min-w-0">
+                                    <input
+                                        type="text"
+                                        readOnly
+                                        value={formData.chequeDate}
+                                        className="flex-1 min-w-0 h-8 border border-gray-300 rounded-[5px] px-3 text-[12px] outline-none bg-white text-gray-700 font-bold cursor-pointer shadow-sm"
+                                        onClick={() => { setDatePickerField('chequeDate'); setShowDatePicker(true); }}
+                                    />
+                                    <button
+                                        onClick={() => { setDatePickerField('chequeDate'); setShowDatePicker(true); }}
+                                        className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0"
+                                    >
+                                        <Calendar size={16} />
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Memo */}
+                            <div className="col-span-4 flex items-center gap-2">
+                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Memo / Ref</label>
+                                <input type="text" name="memo" value={formData.memo} onChange={handleInput} className="flex-1 min-w-0 h-8 border border-gray-300 rounded-[5px] px-3 font-mono text-[12px] outline-none bg-white text-gray-700 shadow-sm focus:border-[#0285fd]" />
                             </div>
                         </div>
                     </div>
 
-                    {/* Bottom Section: Summary Grid */}
-                    <div className="grid grid-cols-12 gap-4">
-                        <div className="col-span-12 lg:col-span-6 bg-white p-4 border border-gray-200 rounded shadow-sm flex items-center justify-between">
-                            <div className="space-y-1">
-                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Available Credit</span>
-                                <div className="text-[20px] font-black text-[#4cc3a5] tabular-nums tracking-tighter">Rs. {totals.advance.toLocaleString()}</div>
-                            </div>
-                            <button className="h-9 px-6 bg-gray-50 text-[#0078d4] text-[11px] font-black rounded border border-gray-200 uppercase tracking-widest hover:bg-white hover:border-[#0078d4] transition-all shadow-sm">Apply Advance</button>
+                    {/* Invoice Grid Section */}
+                    <div className="border border-gray-100 rounded-lg bg-white shadow-sm flex flex-col min-h-[250px] overflow-hidden">
+                        <div className="flex bg-slate-50/80 border-b border-gray-100 text-[10px] font-black text-gray-400 uppercase tracking-widest items-center">
+                            <div className="w-12 py-2.5 px-3 border-r border-gray-100 text-center">Chk</div>
+                            <div className="w-24 py-2.5 px-3 border-r border-gray-100">Due Date</div>
+                            <div className="w-32 py-2.5 px-3 border-r border-gray-100">Doc No</div>
+                            <div className="flex-1 py-2.5 px-3 border-r border-gray-100">Ref No</div>
+                            <div className="w-28 py-2.5 px-3 border-r border-gray-100 text-right">Inv Amount</div>
+                            <div className="w-24 py-2.5 px-3 border-r border-gray-100 text-right">Discount</div>
+                            <div className="w-24 py-2.5 px-3 border-r border-gray-100 text-right">SetOff</div>
+                            <div className="w-28 py-2.5 px-3 border-r border-gray-100 text-right">Balance</div>
+                            <div className="w-32 py-2.5 px-4 text-right">Payment</div>
                         </div>
 
-                        <div className="col-span-12 lg:col-span-6 bg-white border border-gray-200 p-4 rounded shadow-sm flex items-center justify-between px-8 relative overflow-hidden">
-                            <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#0078d4]" />
-                            <div className="flex items-center gap-10">
-                                <div className="space-y-1">
-                                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">Pending Balance</span>
-                                    <div className="text-[18px] font-black text-slate-700 tabular-nums leading-none">{totals.outstanding.toLocaleString()}</div>
+                        <div className="flex-1 bg-white overflow-y-auto max-h-[220px] divide-y divide-gray-50">
+                            {invoices.length === 0 ? (
+                                <div className="h-24 flex items-center justify-center text-gray-300 text-[10px] font-bold uppercase tracking-widest ">
+                                    No outstanding invoices for this customer
                                 </div>
-                                <div className="h-10 w-[1px] bg-gray-100" />
-                                <div className="space-y-1">
-                                    <span className="text-[10px] font-bold text-[#0078d4] uppercase tracking-widest leading-none">Ending Balance</span>
-                                    <div className="text-[24px] font-black text-[#0078d4] tabular-nums leading-none tracking-tighter">Rs. {totals.ending.toLocaleString()}</div>
+                            ) : invoices.map((inv, idx) => (
+                                <div key={idx} className={`flex border-b border-gray-100 text-[11px] font-bold text-slate-700 hover:bg-blue-50/30 items-center transition-colors group ${inv.selected ? 'bg-blue-50/10' : ''}`}>
+                                    <div className="w-12 py-2 px-3 border-r border-gray-100 text-center flex items-center justify-center">
+                                        <button onClick={() => handleInvoiceCheck(idx)} className={`w-5 h-5 rounded-[4px] border ${inv.selected ? 'bg-[#0285fd] border-[#0285fd] text-white' : 'bg-white border-gray-300 text-transparent'} flex items-center justify-center transition-all shadow-sm`}>
+                                            <Check size={12} strokeWidth={4} />
+                                        </button>
+                                    </div>
+                                    <div className="w-24 py-2 px-3 border-r border-gray-100 font-mono text-[10px] text-gray-500">{inv.date_Due}</div>
+                                    <div className="w-32 py-2 px-3 border-r border-gray-100 font-mono">{inv.doc_No}</div>
+                                    <div className="flex-1 py-2 px-3 border-r border-gray-100 truncate italic text-gray-400">{inv.ref_No}</div>
+                                    <div className="w-28 py-2 px-3 border-r border-gray-100 text-right font-mono">{inv.inv_Amount.toLocaleString(undefined, {minimumFractionDigits:2})}</div>
+                                    <div className="w-24 py-1.5 px-2 border-r border-gray-100 text-right">
+                                        <input type="text" disabled={!inv.selected} value={inv.discount} onChange={(e) => handleInvoiceChange(idx, 'discount', e.target.value)} className="w-full h-6 border border-gray-200 rounded-[3px] text-right font-mono text-[11px] text-red-500 outline-none focus:border-[#0285fd] disabled:bg-gray-50" />
+                                    </div>
+                                    <div className="w-24 py-1.5 px-2 border-r border-gray-100 text-right">
+                                        <input type="text" disabled={!inv.selected} value={inv.setOff} onChange={(e) => handleInvoiceChange(idx, 'setOff', e.target.value)} className="w-full h-6 border border-gray-200 rounded-[3px] text-right font-mono text-[11px] text-orange-500 outline-none focus:border-[#0285fd] disabled:bg-gray-50" />
+                                    </div>
+                                    <div className="w-28 py-2 px-3 border-r border-gray-100 text-right font-mono text-[#0285fd]">{inv.balance.toLocaleString(undefined, {minimumFractionDigits:2})}</div>
+                                    <div className="w-32 py-1.5 px-2 text-right">
+                                        <input type="text" disabled={!inv.selected} value={inv.payment} onChange={(e) => handleInvoiceChange(idx, 'payment', e.target.value)} className="w-full h-6 border border-gray-200 rounded-[3px] text-right font-mono font-black text-[12px] text-emerald-600 outline-none focus:border-[#0285fd] shadow-inner disabled:bg-gray-50" />
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Actions and Summary Section */}
+                    <div className="grid grid-cols-12 gap-4 mt-2">
+                        {/* Left Side: Buttons & Memo */}
+                        <div className="col-span-4 flex flex-col gap-2">
+                            <div className="flex gap-2">
+                                <div className="flex flex-col gap-2 border border-[#0285fd] p-1.5 rounded-sm relative mt-2">
+                                    <span className="absolute -top-[10px] left-2 bg-[#f8fafd] text-[10px] px-1 font-bold text-[#0285fd]">Bill Reference</span>
+                                    <button onClick={handleSelectAll} className="h-7 px-3 bg-white border border-[#0285fd] hover:bg-blue-50 text-[#0285fd] text-[11px] font-bold shadow-sm active:scale-95 transition-all">Select All Bill</button>
+                                    <button className="h-7 px-3 bg-white border border-[#0285fd] hover:bg-blue-50 text-[#0285fd] text-[11px] font-bold shadow-sm active:scale-95 transition-all">Go To Bill</button>
+                                </div>
+                                <div className="flex flex-col gap-2 pt-2">
+                                    <button onClick={handleClearSelections} className="h-7 px-4 bg-white border border-gray-400 hover:bg-gray-50 text-gray-700 text-[11px] font-bold shadow-sm active:scale-95 transition-all">Clear Selections</button>
+                                    <button className="h-7 px-4 bg-white border border-gray-400 hover:bg-gray-50 text-gray-700 text-[11px] font-bold shadow-sm active:scale-95 transition-all">Set Discount</button>
+                                </div>
+                                <div className="flex flex-col gap-2 pt-2">
+                                    <button className="h-7 px-4 bg-white border border-gray-400 hover:bg-gray-50 text-gray-700 text-[11px] font-bold shadow-sm active:scale-95 transition-all mt-[36px]">Set off Over</button>
                                 </div>
                             </div>
-                            <div className="w-10 h-10 bg-[#4cc3a5]/10 rounded-full flex items-center justify-center border border-[#4cc3a5]/20 shadow-inner">
-                                <Check size={20} className="text-[#4cc3a5]" />
+                            <textarea className="w-full flex-1 border border-gray-300 outline-none p-2 text-[12px] shadow-sm resize-none focus:border-[#0285fd] rounded-sm"></textarea>
+                            <div className="flex items-center gap-2 mt-auto pb-1">
+                                <span className="text-[11px] font-bold text-gray-700">Over Debit Value</span>
+                                <input type="text" className="w-24 h-7 border border-gray-300 outline-none px-2 text-right text-[11px] shadow-inner focus:border-[#0285fd]" />
+                                <label className="flex items-center gap-1 text-[11px] font-bold text-gray-700 ml-2 cursor-pointer">
+                                    <input type="checkbox" className="w-3.5 h-3.5 cursor-pointer accent-[#0285fd]" />
+                                    Print Debit Note
+                                </label>
+                            </div>
+                        </div>
+
+                        {/* Middle Side: Over Payment Display */}
+                        <div className="col-span-4 flex flex-col gap-4 pt-2">
+                            <div className="bg-[#8aff8a] border border-green-500 p-3 flex items-center shadow-sm w-fit ml-4">
+                                <div className="border border-dotted border-gray-800 p-1.5 flex gap-2 items-center bg-white/20">
+                                    <span className="text-[12px] font-bold text-gray-800">Current Over Payment</span>
+                                    <span className="text-[14px] font-black text-red-600">{advanceBalance.toLocaleString(undefined, {minimumFractionDigits:2})}</span>
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-3 ml-4 mt-2">
+                                <span className="text-[11px] font-bold text-gray-700">Over Payment</span>
+                                <input type="text" value={overPayment.toLocaleString(undefined, {minimumFractionDigits:2})} readOnly className="w-24 h-7 border border-gray-300 outline-none px-2 text-right text-[12px] font-bold shadow-inner bg-gray-50" />
+                            </div>
+                        </div>
+
+                        {/* Right Side: Totals */}
+                        <div className="col-span-4 flex flex-col gap-1.5 pt-2 pr-2">
+                            <div className="flex justify-between items-center">
+                                <span className="text-[11px] font-bold text-gray-700">Number Of Debit</span>
+                                <input type="text" readOnly className="w-32 h-7 border border-gray-300 outline-none px-2 text-right text-[12px] font-mono shadow-inner bg-white" />
+                            </div>
+                            <div className="flex justify-between items-center">
+                                <span className="text-[11px] font-bold text-gray-700">Total Debit Available</span>
+                                <input type="text" readOnly className="w-32 h-7 border border-gray-300 outline-none px-2 text-right text-[12px] font-mono shadow-inner bg-white" />
+                            </div>
+                            <div className="flex justify-between items-center mt-2">
+                                <span className="text-[11px] font-bold text-gray-700">Total Amount Due</span>
+                                <input type="text" value={invoices.reduce((a,b) => a + b.balance, 0).toLocaleString(undefined, {minimumFractionDigits:2})} readOnly className="w-32 h-7 border border-gray-300 outline-none px-2 text-right text-[12px] font-bold font-mono shadow-inner bg-white text-gray-800" />
+                            </div>
+                            <div className="flex justify-between items-center">
+                                <span className="text-[11px] font-bold text-gray-700">Payment Received</span>
+                                <input type="text" value={parseFloat(formData.amount).toLocaleString(undefined, {minimumFractionDigits:2})} readOnly className="w-32 h-7 border border-gray-300 outline-none px-2 text-right text-[12px] font-bold font-mono shadow-inner bg-white text-[#0285fd]" />
+                            </div>
+                            <div className="flex justify-between items-center">
+                                <span className="text-[11px] font-bold text-gray-700">Discount Applied</span>
+                                <input type="text" value={totalDiscount.toLocaleString(undefined, {minimumFractionDigits:2})} readOnly className="w-32 h-7 border border-gray-300 outline-none px-2 text-right text-[12px] font-bold font-mono shadow-inner bg-white text-red-500" />
+                            </div>
+                            <div className="flex justify-between items-center">
+                                <span className="text-[11px] font-bold text-gray-700">Debit Applied</span>
+                                <input type="text" value={totalSetOff.toLocaleString(undefined, {minimumFractionDigits:2})} readOnly className="w-32 h-7 border border-gray-300 outline-none px-2 text-right text-[12px] font-bold font-mono shadow-inner bg-white text-emerald-600" />
+                            </div>
+                            <div className="flex justify-between items-center mt-1 pt-1 border-t border-gray-200">
+                                <span className="text-[12px] font-black text-gray-800">Ending Balance Rs.</span>
+                                <input type="text" value={(invoices.reduce((a,b) => a + b.balance, 0) - totalAllocated - totalDiscount - totalSetOff).toLocaleString(undefined, {minimumFractionDigits:2})} readOnly className="w-32 h-8 border-2 border-gray-400 outline-none px-2 text-right text-[14px] font-black font-mono shadow-inner bg-gray-50 text-black" />
                             </div>
                         </div>
                     </div>
                 </div>
             </SimpleModal>
 
-            {/* Selection Modals */}
-            {activeModal && (
-                <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setActiveModal(null)} />
-                    <div className="relative w-full max-w-2xl bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col max-h-[85vh]">
-                        <div className="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-50 font-['Plus_Jakarta_Sans']">
-                            <h3 className="text-lg font-bold text-slate-800 tracking-tight uppercase">
-                                {activeModal === 'customer' ? 'Search Customers' : activeModal === 'bank' ? 'Search Banks' : 'Search Cost Centers'}
-                            </h3>
-                            <div className="flex gap-4">
-                                <input 
-                                    type="text" 
-                                    placeholder="Type to filter..." 
-                                    className="h-9 border border-gray-300 px-3 text-sm rounded-md w-64 focus:border-blue-500 outline-none font-medium" 
-                                    value={searchTerm} 
-                                    onChange={(e) => setSearchTerm(e.target.value)} 
-                                    autoFocus
-                                />
-                                <button 
-                                    onClick={() => setActiveModal(null)} 
-                                    className="w-9 h-8 flex items-center justify-center bg-[#ff3b30] hover:bg-[#e03127] text-white rounded-[8px] shadow-[0_4px_12px_rgba(255,59,48,0.3)] hover:shadow-[0_6px_20px_rgba(255,59,48,0.4)] transition-all active:scale-90 outline-none border-none group"
-                                    title="Close"
-                                >
-                                    <X size={18} strokeWidth={4} className="group-hover:scale-110 transition-transform" />
-                                </button>
-                            </div>
+            {/* Sub Modals */}
+            <CalendarModal isOpen={showDatePicker} onClose={() => setShowDatePicker(false)} onDateSelect={(d) => { setFormData(prev => ({ ...prev, [datePickerField]: d })); setShowDatePicker(false); }} initialDate={formData[datePickerField]} />
+
+            {/* Customer Search Modal */}
+            <SimpleModal isOpen={showCustomerSearch} onClose={() => { setShowCustomerSearch(false); setCustomerSearchQuery(''); }} title="Customer Directory Lookup" maxWidth="max-w-[600px]">
+                <div className="space-y-4 font-['Tahoma']">
+                    <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-lg border border-gray-100 mb-2">
+                        <span className="text-[12px] font-bold text-gray-500 uppercase tracking-widest">Search Facility</span>
+                        <div className="relative flex-1">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
+                            <input type="text" placeholder="Find customer by name or code..." className="w-full h-9 pl-10 pr-4 border border-gray-300 rounded-[5px] outline-none text-sm focus:border-[#0285fd] bg-white shadow-sm" value={customerSearchQuery} onChange={(e) => setCustomerSearchQuery(e.target.value)} autoFocus />
                         </div>
-                        <div className="overflow-y-auto p-2 font-['Plus_Jakarta_Sans']">
-                            <table className="w-full text-sm text-left">
-                                <thead className="bg-gray-100/50 sticky top-0 text-slate-400 font-bold uppercase text-[11px] tracking-wider">
-                                    <tr>
-                                        <th className="p-3 border-b">Code</th>
-                                        <th className="p-3 border-b">Title</th>
-                                        <th className="p-3 border-b text-center">Action</th>
-                                    </tr>
+                    </div>
+                    <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm">
+                        <div className="max-h-[400px] overflow-y-auto no-scrollbar">
+                            <table className="w-full text-left">
+                                <thead className="bg-[#f8fafd] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">
+                                    <tr><th className="px-5 py-3">Code</th><th className="px-5 py-3">Customer Name</th><th className="px-5 py-3 text-right">Action</th></tr>
                                 </thead>
-                                <tbody>
-                                    {filteredLookup().map((item, idx) => (
-                                        <tr key={idx} className="hover:bg-gray-50 transition-colors group cursor-pointer" onClick={() => {
-                                            if (activeModal === 'customer') {
-                                                handleCustomerChange(item.Code);
-                                            } else if (activeModal === 'bank') {
-                                                setFormData(prev => ({ ...prev, bankId: item.Bank_Code, bankName: item.Bank_Name }));
-                                            } else {
-                                                setFormData(prev => ({ ...prev, costCenter: item.CostCenterCode }));
-                                            }
-                                            setActiveModal(null);
-                                        }}>
-                                            <td className="p-3 border-b font-medium text-gray-700">{item.Code || item.Bank_Code || item.CostCenterCode}</td>
-                                            <td className="p-3 border-b font-bold uppercase text-blue-600">{item.Cust_Name || item.Bank_Name || item.CostCenterName}</td>
-                                            <td className="p-3 border-b text-center">
-                                                <button className="bg-[#0078d4] text-white text-[10px] px-3 py-1.5 rounded-sm font-black tracking-widest hover:bg-[#005a9e]">SELECT</button>
-                                            </td>
+                                <tbody className="divide-y divide-gray-50">
+                                    {lookups.customers.filter(c => {
+                                        const q = customerSearchQuery.toLowerCase();
+                                        const code = (c.code || c.Code || '').toString().toLowerCase();
+                                        const name = (c.name || c.Cust_Name || c.cust_Name || '').toString().toLowerCase();
+                                        return code.includes(q) || name.includes(q);
+                                    }).map((c, i) => (
+                                        <tr key={i} className="group hover:bg-blue-50/50 cursor-pointer transition-all" onClick={() => handleCustomerSelect(c)}>
+                                            <td className="px-5 py-3 font-mono text-[12px] font-mono text-gray-700">{c.code || c.Code}</td>
+                                            <td className="px-5 py-3 text-[12px] font-mono text-gray-700 uppercase group-hover:text-blue-600 transition-colors">{c.name || c.Cust_Name || c.cust_Name}</td>
+                                            <td className="px-5 py-3 text-right"><button className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95">SELECT</button></td>
                                         </tr>
                                     ))}
-                                    {filteredLookup().length === 0 && (
-                                        <tr><td colSpan="3" className="p-8 text-center text-gray-400 font-medium italic">No results found for "{searchTerm}"</td></tr>
-                                    )}
                                 </tbody>
                             </table>
                         </div>
                     </div>
                 </div>
-            )}
+            </SimpleModal>
+
+            {/* Payment Method Search Modal */}
+            <SimpleModal isOpen={showPayMethodSearch} onClose={() => { setShowPayMethodSearch(false); setPayMethodSearchQuery(''); }} title="Payment Method Lookup" maxWidth="max-w-[450px]">
+                <div className="space-y-4 font-['Tahoma']">
+                    <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-lg border border-gray-100 mb-2">
+                        <span className="text-[12px] font-bold text-gray-500 uppercase tracking-widest">Search Facility</span>
+                        <div className="relative flex-1">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
+                            <input type="text" placeholder="Filter payment methods..." className="w-full h-9 pl-10 pr-4 border border-gray-300 rounded-[5px] outline-none text-sm focus:border-[#0285fd] bg-white shadow-sm" value={payMethodSearchQuery} onChange={(e) => setPayMethodSearchQuery(e.target.value)} autoFocus />
+                        </div>
+                    </div>
+                    <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm">
+                        <div className="max-h-[300px] overflow-y-auto no-scrollbar">
+                            <table className="w-full text-left">
+                                <thead className="bg-[#f8fafd] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">
+                                    <tr><th className="px-5 py-3">Code</th><th className="px-5 py-3">Method Title</th><th className="px-5 py-3 text-right">Action</th></tr>
+                                </thead>
+                                <tbody className="divide-y divide-gray-50">
+                                    {lookups.paymentMethods.filter(m => !payMethodSearchQuery || m.name.toLowerCase().includes(payMethodSearchQuery.toLowerCase()) || m.code.toLowerCase().includes(payMethodSearchQuery.toLowerCase())).map(m => (
+                                        <tr key={m.code} className="group hover:bg-blue-50/50 cursor-pointer transition-colors" onClick={() => { setFormData(prev => ({ ...prev, payType: m.code })); setShowPayMethodSearch(false); setPayMethodSearchQuery(''); }}>
+                                            <td className="px-5 py-3 font-mono text-[12px] font-mono text-gray-700">{m.code}</td>
+                                            <td className="px-5 py-3 text-[12px] font-mono text-gray-700 uppercase group-hover:text-blue-600">{m.name}</td>
+                                            <td className="px-5 py-3 text-right"><button className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95">SELECT</button></td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </SimpleModal>
+
+            {/* Bank Search Modal */}
+            <SimpleModal isOpen={showBankSearch} onClose={() => { setShowBankSearch(false); setBankSearchQuery(''); }} title="Bank Directory Lookup" maxWidth="max-w-[450px]">
+                <div className="space-y-4 font-['Tahoma']">
+                    <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-lg border border-gray-100 mb-2">
+                        <span className="text-[12px] font-bold text-gray-500 uppercase tracking-widest">Search Facility</span>
+                        <div className="relative flex-1">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
+                            <input type="text" placeholder="Filter banks..." className="w-full h-9 pl-10 pr-4 border border-gray-300 rounded-[5px] outline-none text-sm focus:border-[#0285fd] bg-white shadow-sm" value={bankSearchQuery} onChange={(e) => setBankSearchQuery(e.target.value)} autoFocus />
+                        </div>
+                    </div>
+                    <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm">
+                        <div className="max-h-[300px] overflow-y-auto no-scrollbar">
+                            <table className="w-full text-left">
+                                <thead className="bg-[#f8fafd] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">
+                                    <tr><th className="px-5 py-3">Code</th><th className="px-5 py-3">Bank Name</th><th className="px-5 py-3 text-right">Action</th></tr>
+                                </thead>
+                                <tbody className="divide-y divide-gray-50">
+                                    {lookups.banks.filter(b => {
+                                        const q = bankSearchQuery.toLowerCase();
+                                        const code = (b.bank_Code || b.Bank_Code || '').toLowerCase();
+                                        const name = (b.bank_Name || b.Bank_Name || '').toLowerCase();
+                                        return code.includes(q) || name.includes(q);
+                                    }).map((b, i) => (
+                                        <tr key={i} className="group hover:bg-blue-50/50 cursor-pointer transition-colors" onClick={() => { setFormData(prev => ({ ...prev, bankCode: b.bank_Code || b.Bank_Code })); setShowBankSearch(false); setBankSearchQuery(''); }}>
+                                            <td className="px-5 py-3 font-mono text-[12px] font-mono text-gray-700">{b.bank_Code || b.Bank_Code}</td>
+                                            <td className="px-5 py-3 text-[12px] font-mono text-gray-700 uppercase group-hover:text-blue-600">{b.bank_Name || b.Bank_Name}</td>
+                                            <td className="px-5 py-3 text-right"><button className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95">SELECT</button></td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </SimpleModal>
+
+            {/* Cost Center Search Modal */}
+            <SimpleModal isOpen={showCostCenterSearch} onClose={() => { setShowCostCenterSearch(false); setCostCenterSearchQuery(''); }} title="Cost Center Lookup" maxWidth="max-w-[450px]">
+                <div className="space-y-4 font-['Tahoma']">
+                    <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-lg border border-gray-100 mb-2">
+                        <span className="text-[12px] font-bold text-gray-500 uppercase tracking-widest">Search Facility</span>
+                        <div className="relative flex-1">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
+                            <input type="text" placeholder="Filter cost centers..." className="w-full h-9 pl-10 pr-4 border border-gray-300 rounded-[5px] outline-none text-sm focus:border-[#0285fd] bg-white shadow-sm" value={costCenterSearchQuery} onChange={(e) => setCostCenterSearchQuery(e.target.value)} autoFocus />
+                        </div>
+                    </div>
+                    <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm">
+                        <div className="max-h-[300px] overflow-y-auto no-scrollbar">
+                            <table className="w-full text-left">
+                                <thead className="bg-[#f8fafd] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">
+                                    <tr><th className="px-5 py-3">Code</th><th className="px-5 py-3">Cost Center Name</th><th className="px-5 py-3 text-right">Action</th></tr>
+                                </thead>
+                                <tbody className="divide-y divide-gray-50">
+                                    {lookups.costCenters.filter(c => {
+                                        const q = costCenterSearchQuery.toLowerCase();
+                                        const code = (c.CostCenterCode || c.costCenterCode || c.Code || '').toLowerCase();
+                                        const name = (c.CostCenterName || c.costCenterName || c.Name || '').toLowerCase();
+                                        return code.includes(q) || name.includes(q);
+                                    }).map((c, i) => (
+                                        <tr key={i} className="group hover:bg-blue-50/50 cursor-pointer transition-colors" onClick={() => { setFormData(prev => ({ ...prev, costCenter: c.CostCenterCode || c.costCenterCode || c.Code })); setShowCostCenterSearch(false); setCostCenterSearchQuery(''); }}>
+                                            <td className="px-5 py-3 font-mono text-[12px] font-mono text-gray-700">{c.CostCenterCode || c.costCenterCode || c.Code}</td>
+                                            <td className="px-5 py-3 text-[12px] font-mono text-gray-700 uppercase group-hover:text-blue-600">{c.CostCenterName || c.costCenterName || c.Name}</td>
+                                            <td className="px-5 py-3 text-right"><button className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95">SELECT</button></td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </SimpleModal>
+
         </>
     );
 };

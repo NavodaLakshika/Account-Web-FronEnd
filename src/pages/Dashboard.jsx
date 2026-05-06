@@ -25,7 +25,8 @@ import {
     Menu,
     Bot,
     Calculator,
-    Bell
+    Bell,
+    Receipt
 } from 'lucide-react';
 
 import { authService } from '../services/auth.service';
@@ -53,6 +54,7 @@ import MarketingToolBoard from '../HomeMaster/MarketingToolBoard';
 import AccountBalanceBoard from '../HomeMaster/AccountBalanceBoard';
 import ReminderBoard from '../HomeMaster/ReminderBoard';
 import ReminderListBoard from '../HomeMaster/ReminderListBoard';
+import SalesInvoiceBoard from '../HomeMaster/SalesInvoiceBoard';
 import MasterFileModal from '../components/modals/MasterFileModal';
 import ViewUtilityModal from '../components/modals/ViewUtilityModal';
 import TransactionModal from '../components/modals/TransactionModal';
@@ -138,6 +140,7 @@ const Dashboard = () => {
     const [showChequeBookEntryModal, setShowChequeBookEntryModal] = useState(false);
     const [showChequeInHandModal, setShowChequeInHandModal] = useState(false);
     const [showNotPresentedChequesModal, setShowNotPresentedChequesModal] = useState(false);
+    const [showSalesInvoiceModal, setShowSalesInvoiceModal] = useState(false);
     const [showMasterFileModal, setShowMasterFileModal] = useState(false);
     const [showViewUtilityModal, setShowViewUtilityModal] = useState(false);
     const [showTransactionModal, setShowTransactionModal] = useState(false);
@@ -430,7 +433,7 @@ const Dashboard = () => {
                     if (label === 'Create Sales Receipt') setShowSalesReceiptModal(true);
                     if (label === 'Receive Payment') setShowReceivePaymentModal(true);
                     if (label === 'Estimate') setShowEstimateModal(true);
-                    if (label === 'Create Invoice') setShowCustomerModal(true);
+                    if (label === 'Create Invoice') setShowSalesInvoiceModal(true);
                     if (label === 'Refunds and Credit') setShowCustomerModal(true);
 
                     // Banking Section
@@ -698,8 +701,9 @@ const Dashboard = () => {
             <GRNBoard isOpen={showGRNModal} onClose={() => setShowGRNModal(false)} />
             <PettyCashBoard isOpen={showPettyCashModal} onClose={() => setShowPettyCashModal(false)} />
             <SalesOrderBoard isOpen={showSalesOrderModal} onClose={() => setShowSalesOrderModal(false)} />
+            <SalesInvoiceBoard isOpen={showSalesInvoiceModal} onClose={() => setShowSalesInvoiceModal(false)} />
             <SalesReceiptBoard isOpen={showSalesReceiptModal} onClose={() => setShowSalesReceiptModal(false)} />
-            <ReceivedPaymentBoard isOpen={showReceivePaymentModal} onClose={() => setShowReceivePaymentModal(false)} />
+            <ReceivePaymentBoard isOpen={showReceivePaymentModal} onClose={() => setShowReceivePaymentModal(false)} />
             <ChequeRegisterBoard isOpen={showChequeRegisterModal} onClose={() => setShowChequeRegisterModal(false)} />
             <PrintChequeBoard isOpen={showPrintChequeModal} onClose={() => setShowPrintChequeModal(false)} />
             <MarketingToolBoard isOpen={showMarketingToolModal} onClose={() => setShowMarketingToolModal(false)} />

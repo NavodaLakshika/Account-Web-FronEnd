@@ -203,8 +203,10 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
             // Map backend data to frontend state
             setFormData({
                 ...initialFormState,
-                ...data,
-                items: [] // Items will be handled separately
+                ...data.header,
+                date: toISODate(data.header.date),
+                dueDate: toISODate(data.header.dueDate),
+                items: [] // Items are handled separately below
             });
             
             if (data.items) {
@@ -718,10 +720,10 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                                         <tr key={i} className="group hover:bg-blue-50/50 cursor-pointer transition-colors" onClick={() => handleLoadDoc(d.docNo)}>
                                             <td className="px-5 py-3 font-mono text-[13px] font-black text-[#0285fd]">{d.docNo}</td>
                                             <td className="px-5 py-3 text-[12px] font-bold text-slate-500">{formatDate(d.date)}</td>
-                                            <td className="px-5 py-3 text-[12px] font-bold text-gray-600 uppercase italic transition-colors group-hover:text-blue-600">{d.payee || d.vendorId}</td>
+                                            <td className="px-5 py-3 text-[12px] font-bold text-gray-600 uppercase  transition-colors group-hover:text-blue-600">{d.payee || d.vendorId}</td>
                                             <td className="px-5 py-3 text-right font-mono text-[13px] font-black text-slate-700">{d.billAmount?.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
                                             <td className="px-5 py-3 text-right">
-                                                <button className="bg-blue-200 border border-blue-200 text-white text-[10px] font-black uppercase tracking-widest px-4 py-1.5 rounded-sm hover:bg-[#0285fd] hover:text-white shadow-sm transition-all active:scale-95">RETRIEVE</button>
+                                                <button className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95">RETRIEVE</button>
                                             </td>
                                         </tr>
                                     ))}

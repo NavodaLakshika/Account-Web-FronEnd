@@ -1,16 +1,9 @@
 import api from './api';
 
 export const salesOrderService = {
-  getLookups: async (company) => {
+  getInitData: async (company) => {
     try {
-      const response = await api.get('/SalesOrder/lookups', { params: { company } });
-      return response.data;
-    } catch (error) { throw error; }
-  },
-
-  generateDocNo: async (company) => {
-    try {
-      const response = await api.get('/SalesOrder/generate-doc', { params: { company } });
+      const response = await api.get('/SalesOrder/init-data', { params: { company } });
       return response.data;
     } catch (error) { throw error; }
   },
