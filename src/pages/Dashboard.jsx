@@ -91,6 +91,8 @@ import DepartmentBoard from './DepartmentBoard';
 import CalculatorBoard from '../components/modals/ViewAndUtilityModels/CalculatorBoard';
 import EstimateBoard from './EstimateBoard';
 import { Layers } from 'lucide-react';
+import ReportTemplate from '../components/ReportTemplate';
+import { toast } from 'react-hot-toast';
 
 
 
@@ -161,6 +163,9 @@ const Dashboard = () => {
     const [ribbonIcons, setRibbonIcons] = useState(['logout', 'home', 'new_account', 'customer', 'vendor', 'reminder', 'enter_bill', 'pay_bill', 'write_chq', 'petty_cash', 'make_deposit', 'journal_entry', 'bank_rec', 'trial_balance', 'search', 'ai_chat']);
 
     const [showAIChatbotModal, setShowAIChatbotModal] = useState(false);
+    const [showItemsServicesReport, setShowItemsServicesReport] = useState(false);
+    const [itemsServicesData, setItemsServicesData] = useState([]);
+    const [isReportLoading, setIsReportLoading] = useState(false);
 
 
 
@@ -385,6 +390,13 @@ const Dashboard = () => {
         navigate('/login');
     };
 
+    const handleOpenItemsServicesReport = () => {
+        const companyId = selectedCompany?.Company_Id || selectedCompany?.companyId || 'COM001';
+        const companyName = selectedCompany?.CompanyName || selectedCompany?.companyName || 'ONIMTA IT SOLUTIONS';
+        setShowHomeModal(false);
+        window.open(`/report/items-services?company=${companyId}&name=${encodeURIComponent(companyName)}`, '_blank');
+    };
+
     const navItems = [
         { icon: Home, gif: '/icons/home.gif', label: 'Home', onClick: () => setShowHomeModal(true), active: showHomeModal },
         { icon: UserPlus, gif: '/icons/new account2.gif', label: 'Accounts', onClick: () => setShowNewAccountModal(true), active: showNewAccountModal },
@@ -444,7 +456,7 @@ const Dashboard = () => {
 
                     // Company Section
                     if (label === 'Journal Entry') setShowJournalEntryModal(true);
-                    if (label === 'Items and Servies' || label === 'Items & Services') setShowNewAccountModal(true);
+                    if (label === 'Items and Servies' || label === 'Items & Services') handleOpenItemsServicesReport();
                     if (label === 'Marketing Tool') setShowMarketingToolModal(true);
                     if (label === 'AI Chat') setShowAIChatbotModal(true);
 

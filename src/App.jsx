@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { Toaster } from 'react-hot-toast';
 import AuthPage from './pages/AuthPage';
 import Dashboard from './pages/Dashboard';
+import ItemsServicesReportPage from './pages/ItemsServicesReportPage';
 
 function App() {
   return (
@@ -38,6 +39,7 @@ function App() {
           {/* AuthPage handles login only */}
           <Route path="/login" element={<AuthPage />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/report/items-services" element={<ItemsServicesReportPage />} />
           
           {/* Default Route */}
           <Route path="/" element={<Navigate to="/login" replace />} />

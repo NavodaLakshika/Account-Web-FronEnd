@@ -66,7 +66,6 @@ const MasterSubModal = ({ isOpen, onClose }) => {
         { icon: UserCog, label: 'User Profile Maintenance', shortcut: '', onClick: () => setShowUserProfileBoard(true) },
         { icon: Settings, label: 'Vendor Types', shortcut: '', onClick: () => setShowVendorTypesBoard(true) },
         { icon: Key, label: 'Change Password', shortcut: '', onClick: () => setShowChangePasswordBoard(true) },
-        { type: 'separator' },
         { icon: LogOut, label: 'Log Off', shortcut: '', color: 'text-red-600', onClick: handleLogOff },
     ];
 
@@ -75,74 +74,81 @@ const MasterSubModal = ({ isOpen, onClose }) => {
             <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
                 {/* Backdrop */}
                 <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={onClose} />
-                
-                {/* Modal Container */}
-                <div className="relative w-full max-w-sm bg-white border border-gray-100 rounded-xl shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
+
+                {/* Floating Modal Container - Completely Transparent & Borderless */}
+                <div className="relative w-full max-w-5xl flex flex-col animate-in zoom-in-95 duration-500">
                     
-                    {/* Header */}
-                    <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-100 select-none relative overflow-hidden">
-                        {/* System Color Left Accent */}
-                        <div 
-                            className="absolute left-0 top-0 bottom-0 w-1.5 transition-colors duration-500" 
-                            style={{ backgroundColor: localStorage.getItem('topBarColor') || '#0285fd' }}
-                        />
-                        <div className="flex items-center gap-2">
-                            <Layers size={14} className="text-[#0078d4]" />
-                            <span className="text-[15px] font-[700] text-slate-900 uppercase tracking-[3px] font-mono truncate">Master File Management</span>
-                        </div>
+                    {/* Header - Floating Pill with Gap */}
+                    <div className="relative mb-12">
+                        {/* Independent Close Button - Floating Further Outside */}
                         <button 
                             onClick={onClose} 
-                            className="w-9 h-8 flex items-center justify-center bg-[#ff3b30] hover:bg-[#e03127] text-white rounded-[8px] shadow-[0_4px_12px_rgba(255,59,48,0.3)] hover:shadow-[0_6px_20px_rgba(255,59,48,0.4)] transition-all active:scale-90 outline-none border-none group"
+                            className="absolute -top-20 -right-20 w-10 h-10 flex items-center justify-center bg-[#ff3b30] hover:bg-[#e03127] text-white rounded-[14px] shadow-[0_12px_24px_rgba(255,59,48,0.4)] hover:shadow-[0_16px_32px_rgba(255,59,48,0.5)] transition-all active:scale-90 outline-none border-none group z-[300]"
                             title="Close"
                         >
-                            <X size={18} strokeWidth={4} className="group-hover:scale-110 transition-transform" />
+                            <X size={24} strokeWidth={4} className="group-hover:scale-110 transition-transform" />
                         </button>
+
+                        <div className="bg-white px-8 py-6 flex items-center justify-center rounded-[14px] border-b border-gray-100/10 select-none relative overflow-hidden shadow-xl w-full">
+                            {/* System Color Left Accent */}
+                            <div 
+                                className="absolute left-0 top-0 bottom-0 w-2 transition-colors duration-500" 
+                                style={{ backgroundColor: localStorage.getItem('topBarColor') || '#0285fd' }}
+                            />
+                            
+                            <div className="flex items-center gap-3">
+                                <Layers size={22} className="text-[#0078d4] animate-pulse" />
+                                <span className="text-[19px] font-[900] text-slate-900 uppercase tracking-[8px] font-mono truncate ml-2">Master File Management</span>
+                            </div>
+                        </div>
                     </div>
-                    <div className="p-2 bg-white flex-1 overflow-y-auto max-h-[75vh] no-scrollbar">
-                        {menuItems.map((item, idx) => {
-                            if (item.type === 'separator') {
-                                return <div key={idx} className="my-1.5 h-[1px] bg-gray-200 mx-2" />;
-                            }
-                            const Icon = item.icon;
-                            return (
-                                <button
-                                    key={idx}
-                                    onClick={item.onClick}
-                                    className="w-full flex items-center justify-between px-4 py-3 rounded-xl hover:bg-slate-50 group transition-all relative overflow-hidden"
-                                >
-                                    {/* Hover Indicator Bar */}
-                                    <div 
-                                        className="absolute left-0 top-0 bottom-0 w-1 opacity-0 group-hover:opacity-100 transition-all duration-300"
-                                        style={{ backgroundColor: localStorage.getItem('topBarColor') || '#0078d4' }}
-                                    />
-                                    
-                                    <div className="flex items-center gap-3 relative z-10">
-                                        <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center group-hover:bg-white transition-colors shadow-sm group-hover:shadow-md">
-                                            <Icon size={16} className={`text-slate-500 transition-colors ${item.color || 'group-hover:text-[#0078d4]'}`} style={{ color: !item.color ? undefined : undefined }} />
-                                        </div>
-                                        <span className={`text-[13px] font-bold ${item.color || 'text-slate-700'} group-hover:text-slate-900 transition-colors`}>
-                                            {item.label}
-                                        </span>
-                                    </div>
-                                    
-                                    <div className="flex items-center gap-3 relative z-10">
-                                        {item.shortcut && (
-                                            <span className="text-[10px] font-bold text-slate-300 group-hover:text-slate-400 bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100">
-                                                {item.shortcut}
-                                            </span>
+
+                    {/* Floating Menu Grid - No backgrounds or borders */}
+                    <div className="p-12 flex-1 overflow-y-auto max-h-[80vh] no-scrollbar">
+                        <div className="grid grid-cols-6 gap-x-8 gap-y-10">
+                            {menuItems.map((item, idx) => {
+                                const Icon = item.icon;
+                                return (
+                                    <React.Fragment key={idx}>
+                                        {/* Row Separator after 6 items */}
+                                        {idx === 6 && (
+                                            <div className="col-span-6 my-1 h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent w-full" />
                                         )}
-                                    </div>
-                                </button>
-                            );
-                        })}
+                                        
+                                        <div className="flex flex-col items-center group">
+                                            <button
+                                                onClick={item.onClick}
+                                                className="w-24 h-24 bg-white rounded-[14px] shadow-lg hover:shadow-2xl hover:-translate-y-3 active:scale-90 transition-all duration-500 flex items-center justify-center relative overflow-hidden"
+                                            >
+                                                {/* Subtle Gradient Backdrop */}
+                                                <div className="absolute inset-0 bg-gradient-to-br from-transparent to-slate-50/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                                                
+                                                <Icon 
+                                                    size={32} 
+                                                    strokeWidth={1.5}
+                                                    className={`transition-all duration-500 group-hover:scale-110 ${item.color || 'text-slate-500 group-hover:text-[#0078d4]'}`} 
+                                                />
+
+                                                {/* Decorative Corner Glow */}
+                                                <div className="absolute -right-6 -top-6 w-12 h-12 bg-[#0078d4]/10 rounded-full blur-xl group-hover:scale-150 transition-transform duration-700" />
+                                            </button>
+                                            
+                                            <span className={`mt-5 text-[11px] font-[700] uppercase tracking-[0.25em] text-center leading-tight transition-all duration-300 font-['Inter',sans-serif] ${item.color || 'text-white group-hover:text-white/80'}`}>
+                                                {item.label}
+                                            </span>
+                                        </div>
+                                    </React.Fragment>
+                                );
+                            })}
+                        </div>
                     </div>
                 </div>
             </div>
 
             {showChartOfAccountantModal && (
-                <ChartOfAccountantModal 
-                    isOpen={showChartOfAccountantModal} 
-                    onClose={() => setShowChartOfAccountantModal(false)} 
+                <ChartOfAccountantModal
+                    isOpen={showChartOfAccountantModal}
+                    onClose={() => setShowChartOfAccountantModal(false)}
                     onCreateNewAccount={() => {
                         setShowChartOfAccountantModal(false);
                         setShowNewAccountBoard(true);
@@ -171,132 +177,132 @@ const MasterSubModal = ({ isOpen, onClose }) => {
             )}
 
             {showNewAccountBoard && (
-                <NewAccountBoard 
-                    isOpen={showNewAccountBoard} 
-                    onClose={() => setShowNewAccountBoard(false)} 
+                <NewAccountBoard
+                    isOpen={showNewAccountBoard}
+                    onClose={() => setShowNewAccountBoard(false)}
                 />
             )}
 
             {showFixedAssetsBoard && (
-                <FixedAssetsBoard 
-                    isOpen={showFixedAssetsBoard} 
-                    onClose={() => setShowFixedAssetsBoard(false)} 
+                <FixedAssetsBoard
+                    isOpen={showFixedAssetsBoard}
+                    onClose={() => setShowFixedAssetsBoard(false)}
                 />
             )}
 
             {showLiabilityBoard && (
-                <LongTermLiabilityBoard 
-                    isOpen={showLiabilityBoard} 
-                    onClose={() => setShowLiabilityBoard(false)} 
+                <LongTermLiabilityBoard
+                    isOpen={showLiabilityBoard}
+                    onClose={() => setShowLiabilityBoard(false)}
                 />
             )}
 
             {showDepreciationBoard && (
-                <DepreciationBoard 
-                    isOpen={showDepreciationBoard} 
-                    onClose={() => setShowDepreciationBoard(false)} 
+                <DepreciationBoard
+                    isOpen={showDepreciationBoard}
+                    onClose={() => setShowDepreciationBoard(false)}
                 />
             )}
 
             {showFixedIncomeBoard && (
-                <FixedIncomeBoard 
-                    isOpen={showFixedIncomeBoard} 
-                    onClose={() => setShowFixedIncomeBoard(false)} 
+                <FixedIncomeBoard
+                    isOpen={showFixedIncomeBoard}
+                    onClose={() => setShowFixedIncomeBoard(false)}
                 />
             )}
 
             {showFixedExpensesBoard && (
-                <FixedExpensesBoard 
-                    isOpen={showFixedExpensesBoard} 
-                    onClose={() => setShowFixedExpensesBoard(false)} 
+                <FixedExpensesBoard
+                    isOpen={showFixedExpensesBoard}
+                    onClose={() => setShowFixedExpensesBoard(false)}
                 />
             )}
 
             {showCompanyBoard && (
-                <CompanyBoard 
-                    isOpen={showCompanyBoard} 
-                    onClose={() => setShowCompanyBoard(false)} 
+                <CompanyBoard
+                    isOpen={showCompanyBoard}
+                    onClose={() => setShowCompanyBoard(false)}
                 />
             )}
 
             {showCostCenterBoard && (
-                <CostCenterBoard 
-                    isOpen={showCostCenterBoard} 
-                    onClose={() => setShowCostCenterBoard(false)} 
+                <CostCenterBoard
+                    isOpen={showCostCenterBoard}
+                    onClose={() => setShowCostCenterBoard(false)}
                 />
             )}
 
             {showDepartmentBoard && (
-                <DepartmentBoard 
-                    isOpen={showDepartmentBoard} 
-                    onClose={() => setShowDepartmentBoard(false)} 
+                <DepartmentBoard
+                    isOpen={showDepartmentBoard}
+                    onClose={() => setShowDepartmentBoard(false)}
                 />
             )}
 
             {showCategoryBoard && (
-                <CategoryBoard 
-                    isOpen={showCategoryBoard} 
-                    onClose={() => setShowCategoryBoard(false)} 
+                <CategoryBoard
+                    isOpen={showCategoryBoard}
+                    onClose={() => setShowCategoryBoard(false)}
                 />
             )}
 
             {showSupplierMasterBoard && (
-                <SupplierMasterBoard 
-                    isOpen={showSupplierMasterBoard} 
-                    onClose={() => setShowSupplierMasterBoard(false)} 
+                <SupplierMasterBoard
+                    isOpen={showSupplierMasterBoard}
+                    onClose={() => setShowSupplierMasterBoard(false)}
                 />
             )}
 
             {showCustomerMasterBoard && (
-                <CustomerMasterBoard 
-                    isOpen={showCustomerMasterBoard} 
-                    onClose={() => setShowCustomerMasterBoard(false)} 
+                <CustomerMasterBoard
+                    isOpen={showCustomerMasterBoard}
+                    onClose={() => setShowCustomerMasterBoard(false)}
                 />
             )}
 
             {showCardCommissionBoard && (
-                <CardCommissionBoard 
-                    isOpen={showCardCommissionBoard} 
-                    onClose={() => setShowCardCommissionBoard(false)} 
+                <CardCommissionBoard
+                    isOpen={showCardCommissionBoard}
+                    onClose={() => setShowCardCommissionBoard(false)}
                 />
             )}
 
             {showUserProfileBoard && (
-                <UserProfileBoard 
-                    isOpen={showUserProfileBoard} 
-                    onClose={() => setShowUserProfileBoard(false)} 
+                <UserProfileBoard
+                    isOpen={showUserProfileBoard}
+                    onClose={() => setShowUserProfileBoard(false)}
                 />
             )}
 
             {showVendorTypesBoard && (
-                <VendorTypesBoard 
-                    isOpen={showVendorTypesBoard} 
-                    onClose={() => setShowVendorTypesBoard(false)} 
+                <VendorTypesBoard
+                    isOpen={showVendorTypesBoard}
+                    onClose={() => setShowVendorTypesBoard(false)}
                 />
             )}
 
             {showChangePasswordBoard && (
-                <ChangePasswordBoard 
-                    isOpen={showChangePasswordBoard} 
-                    onClose={() => setShowChangePasswordBoard(false)} 
+                <ChangePasswordBoard
+                    isOpen={showChangePasswordBoard}
+                    onClose={() => setShowChangePasswordBoard(false)}
                 />
             )}
 
-            <ThankYouModal 
-                isOpen={showThankYouModal} 
+            <ThankYouModal
+                isOpen={showThankYouModal}
                 onClose={() => {
                     setShowThankYouModal(false);
                     onClose();
-                }} 
+                }}
             />
 
-            <LogoutConfirmModal 
-                isOpen={showLogoutConfirmModal} 
-                onClose={() => setShowLogoutConfirmModal(false)} 
+            <LogoutConfirmModal
+                isOpen={showLogoutConfirmModal}
+                onClose={() => setShowLogoutConfirmModal(false)}
                 onConfirm={() => {
                     setShowLogoutConfirmModal(false);
                     setShowThankYouModal(true);
-                }} 
+                }}
             />
         </>
     );

@@ -12,7 +12,13 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
         customers: [], 
         paymentMethods: [], 
         banks: [], 
-        costCenters: [] 
+        costCenters: [],
+        accountTypes: [
+            { code: 'All', name: 'All Customers' },
+            { code: 'Medical Members', name: 'Medical Members' },
+            { code: 'Staff Credit', name: 'Staff Credit' },
+            { code: 'Other', name: 'Other Accounts' }
+        ]
     });
 
     const [formData, setFormData] = useState({
@@ -30,7 +36,7 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
         reference: '',
         company: 'C001',
         createUser: 'SYSTEM',
-        accountType: 'MM'
+        accountType: 'Medical Members'
     });
 
     const [invoices, setInvoices] = useState([]);
@@ -42,6 +48,7 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
     const [showBankSearch, setShowBankSearch] = useState(false);
     const [showPayMethodSearch, setShowPayMethodSearch] = useState(false);
     const [showCostCenterSearch, setShowCostCenterSearch] = useState(false);
+    const [showAccountTypeSearch, setShowAccountTypeSearch] = useState(false);
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [datePickerField, setDatePickerField] = useState('date');
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -53,6 +60,7 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
     const [bankSearchQuery, setBankSearchQuery] = useState('');
     const [payMethodSearchQuery, setPayMethodSearchQuery] = useState('');
     const [costCenterSearchQuery, setCostCenterSearchQuery] = useState('');
+    const [accountTypeSearchQuery, setAccountTypeSearchQuery] = useState('');
 
     const [isSaving, setIsSaving] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
@@ -130,23 +138,20 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
         }
     }, [isOpen]);
 
-    const fetchLookups = async (company) => {
+    const fetchLookups = async (company, typeOverride) => {
         try {
-            const data = await receivePaymentService.getLookups(company, formData.accountType);
+            const currentType = typeOverride || formData.accountType || 'Medical Members';
+            const data = await receivePaymentService.getLookups(company, currentType);
             
-            const paymentMethods = data.paymentMethods?.length > 0 ? data.paymentMethods : [
-                { code: 'CASH', name: 'Cash Payment' },
-                { code: 'CHQ', name: 'Cheque Payment' },
-                { code: 'CARD', name: 'Credit Card' },
-                { code: 'BANK', name: 'Bank Transfer' }
-            ];
 
-            setLookups({
+
+            setLookups(prev => ({
+                ...prev,
                 customers: data.customers || [],
-                paymentMethods: paymentMethods,
+                paymentMethods: data.paymentMethods || [],
                 banks: data.banks || [],
                 costCenters: data.costCenters || []
-            });
+            }));
         } catch (error) {
             console.error("Lookup Load Error:", error);
         }
@@ -167,13 +172,13 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
     };
 
     const handleCustomerSelect = async (customer) => {
-        const custId = customer.code || customer.Code || customer.id || customer.Id;
+        const custId = customer.code || customer.Code || customer.id;
         setFormData(prev => ({ ...prev, customerId: custId }));
         setShowCustomerSearch(false);
         setCustomerSearchQuery('');
         
         try {
-            const data = await receivePaymentService.getOutstanding(custId, formData.company, formData.docNo, formData.accountType);
+            const data = await receivePaymentService.getOutstanding(custId, formData.company, formData.docNo, formData.accountType, formData.createUser);
             setAdvanceBalance(data.advanceBalance || 0);
             setInvoices(data.outstandingRows.map(inv => ({
                 ...inv,
@@ -273,6 +278,9 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
     const handleApply = async () => {
         if (!formData.customerId) return showErrorToast("Please select a customer");
         if (parseFloat(formData.amount) <= 0) return showErrorToast("Please enter receipt amount");
+        if (formData.accountType !== "Other" && parseFloat(formData.amount) < totalAllocated) {
+            return showErrorToast("Paid amount less than payble amount do not match.");
+        }
 
         setShowConfirmModal(true);
     };
@@ -287,7 +295,9 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
                 branch: formData.branchCode,
                 totalAllocated: totalAllocated,
                 totalDiscount: totalDiscount,
-                totalSetOff: totalSetOff
+                totalSetOff: totalSetOff,
+                overPayment: Math.max(0, parseFloat(formData.amount) - totalAllocated),
+                customerName: lookups.customers.find(c => (c.code || c.Code || c.id || c.Id || c.customerCode || c.customer_Code) === formData.customerId)?.name || lookups.customers.find(c => (c.code || c.Code || c.id || c.Id || c.customerCode || c.customer_Code) === formData.customerId)?.Cust_Name || lookups.customers.find(c => (c.code || c.Code || c.id || c.Id || c.customerCode || c.customer_Code) === formData.customerId)?.cust_Name || ''
             };
             await receivePaymentService.apply(payload);
             showSuccessToast("Payment Applied Successfully");
@@ -321,8 +331,67 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
     };
 
     const handleSearch = async () => {
-        // Mocking search for now as service might need an endpoint for it
-        setShowSearchModal(true);
+        try {
+            const data = await receivePaymentService.getHistory(formData.company);
+            setOrders(data);
+            setShowSearchModal(true);
+        } catch (error) {
+            showErrorToast("Failed to load historical documents");
+        }
+    };
+
+    const [archiveSearchQuery, setArchiveSearchQuery] = useState('');
+
+    const filteredOrders = useMemo(() => {
+        if (!archiveSearchQuery) return orders;
+        const q = archiveSearchQuery.toLowerCase();
+        return orders.filter(o => 
+            (o.docNo || '').toLowerCase().includes(q) || 
+            (o.reference || '').toLowerCase().includes(q)
+        );
+    }, [orders, archiveSearchQuery]);
+
+    const handleRetrieve = async (docNo) => {
+        try {
+            const data = await receivePaymentService.getPayment(docNo, formData.company);
+            const header = data.header;
+            const details = data.details;
+
+            setFormData(prev => ({
+                ...prev,
+                docNo: header.doc_No,
+                date: header.post_Date?.split('T')[0],
+                customerId: header.vendor_Id,
+                amount: header.amount?.toString() || '0.00',
+                payType: header.pay_Type,
+                bankCode: header.bank,
+                branchCode: header.remarks, // Mapped to Remarks in SP
+                costCenter: header.costCenter,
+                chequeNo: header.reduceRemarks, // Mapped to ReduceRemarks in SP
+                chequeDate: header.expected_Date?.split('T')[0],
+                remarks: header.memo,
+                reference: header.reference,
+                comment: header.comment,
+                accountType: header.acc_Type === 'Other' ? 'Other' : 'Medical Members' // Simplification
+            }));
+
+            setInvoices(details.map(d => ({
+                doc_No: d.docNo,
+                payment: d.amount,
+                selected: true,
+                inv_Amount: d.amount,
+                balance: 0,
+                discount: 0,
+                setOff: 0,
+                ref_No: d.accountCode,
+                date_Due: header.post_Date
+            })));
+
+            setShowSearchModal(false);
+            showSuccessToast("Document retrieved successfully");
+        } catch (error) {
+            showErrorToast("Failed to retrieve document");
+        }
     };
 
     const handleDateSelect = (formattedDate) => {
@@ -346,7 +415,7 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
                 isOpen={isOpen}
                 onClose={onClose}
                 title="Receive Payment"
-                maxWidth="max-w-[1050px]"
+                maxWidth="max-w-[1350px]"
                 footer={
                     <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-gray-100 rounded-b-xl font-['Tahoma']">
                         <div className="flex gap-3">
@@ -380,6 +449,8 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
                     <div className="bg-white p-4 border border-gray-100 rounded-lg shadow-sm space-y-4">
                         <div className="grid grid-cols-12 gap-x-6 gap-y-3.5">
                             
+
+
                             {/* Document ID */}
                             <div className="col-span-4 flex items-center gap-2">
                                 <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Document ID</label>
@@ -424,7 +495,7 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
                                     <input
                                         type="text"
                                         readOnly
-                                        value={lookups.customers.find(c => (c.code || c.Code || c.id || c.Id) === formData.customerId)?.name || lookups.customers.find(c => (c.code || c.Code || c.id || c.Id) === formData.customerId)?.Cust_Name || ''}
+                                        value={lookups.customers.find(c => (c.code || c.Code) === formData.customerId)?.name || lookups.customers.find(c => (c.code || c.Code) === formData.customerId)?.Name || lookups.customers.find(c => (c.code || c.Code) === formData.customerId)?.Cust_Name || ''}
                                         className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-red-600 bg-gray-50 rounded-[5px] outline-none shadow-sm cursor-pointer"
                                         onClick={() => setShowCustomerSearch(true)}
                                         placeholder="Click to select customer..."
@@ -478,7 +549,7 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
                                     <input
                                         type="text"
                                         readOnly
-                                        value={lookups.costCenters?.find(c => (c.CostCenterCode || c.costCenterCode || c.Code) === formData.costCenter)?.CostCenterName || ''}
+                                        value={lookups.costCenters?.find(c => (c.CostCenterCode || c.costCenterCode || c.Code || c.code || c.costCenterCode) === formData.costCenter)?.CostCenterName || lookups.costCenters?.find(c => (c.CostCenterCode || c.costCenterCode || c.Code || c.code || c.costCenterCode) === formData.costCenter)?.name || ''}
                                         className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-gray-700 bg-white rounded-[5px] outline-none shadow-sm cursor-pointer"
                                         onClick={() => setShowCostCenterSearch(true)}
                                     />
@@ -598,7 +669,15 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
                             </div>
                             <div className="flex justify-between items-center text-blue-600 font-bold text-[11px] uppercase tracking-tight">
                                 <span>Payment Received</span>
-                                <span className="font-mono text-[14px] font-black">{totalAllocated.toLocaleString(undefined, {minimumFractionDigits:2})}</span>
+                                <span className="font-mono text-[14px] font-black">{parseFloat(formData.amount).toLocaleString(undefined, {minimumFractionDigits:2})}</span>
+                            </div>
+                            <div className="flex justify-between items-center text-purple-600 font-bold text-[11px] uppercase tracking-tight">
+                                <span>Total Allocated</span>
+                                <span className="font-mono text-[13px]">{totalAllocated.toLocaleString(undefined, {minimumFractionDigits:2})}</span>
+                            </div>
+                            <div className="flex justify-between items-center text-orange-500 font-bold text-[11px] uppercase tracking-tight">
+                                <span>Over Payment</span>
+                                <span className="font-mono text-[13px]">{Math.max(0, parseFloat(formData.amount) - totalAllocated).toLocaleString(undefined, {minimumFractionDigits:2})}</span>
                             </div>
                             <div className="flex justify-between items-center text-red-500 font-bold text-[11px] uppercase tracking-tight">
                                 <span>Discount Applied</span>
@@ -649,7 +728,13 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
                         <span className="text-[12px] font-bold text-gray-500 uppercase tracking-widest">Global Archive Search</span>
                         <div className="relative flex-1">
                              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
-                             <input type="text" placeholder="Filter by document id..." className="w-full h-9 pl-10 pr-4 border border-gray-300 rounded-[5px] outline-none text-sm focus:border-[#0285fd] bg-white shadow-sm" />
+                             <input 
+                                type="text" 
+                                placeholder="Filter by document id..." 
+                                className="w-full h-9 pl-10 pr-4 border border-gray-300 rounded-[5px] outline-none text-sm focus:border-[#0285fd] bg-white shadow-sm" 
+                                value={archiveSearchQuery}
+                                onChange={(e) => setArchiveSearchQuery(e.target.value)}
+                             />
                         </div>
                     </div>
                     <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm">
@@ -658,13 +743,13 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
                                 <tr><th className="px-5 py-3">Reference ID</th><th className="px-5 py-3">Posting Date</th><th className="px-5 py-3 text-right">Action</th></tr>
                             </thead>
                             <tbody className="divide-y divide-gray-50">
-                                {orders.length === 0 ? (
+                                {filteredOrders.length === 0 ? (
                                     <tr><td colSpan="3" className="text-center py-10 text-gray-300 text-[12px] font-bold uppercase tracking-widest">Archive is empty</td></tr>
-                                ) : orders.map((order, i) => (
+                                ) : filteredOrders.map((order, i) => (
                                     <tr key={i} className="group hover:bg-blue-50/50 cursor-pointer transition-colors">
                                         <td className="px-5 py-3 font-mono text-[13px] text-gray-600 ">{order.docNo}</td>
                                         <td className="px-5 py-3 text-[13px] font-mono text-gray-600 ">{order.date?.split('T')[0]}</td>
-                                        <td className="px-5 py-3 text-right"><button className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95">RETRIEVE</button></td>
+                                        <td className="px-5 py-3 text-right"><button onClick={() => handleRetrieve(order.docNo)} className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95">RETRIEVE</button></td>
                                     </tr>
                                 ))}
                             </tbody>
@@ -692,13 +777,11 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
                                 <tbody className="divide-y divide-gray-50">
                                     {lookups.customers.filter(c => {
                                         const q = customerSearchQuery.toLowerCase();
-                                        const code = (c.code || c.Code || '').toString().toLowerCase();
-                                        const name = (c.name || c.Cust_Name || c.cust_Name || '').toString().toLowerCase();
-                                        return code.includes(q) || name.includes(q);
+                                        return (c.name || c.Name || '').toLowerCase().includes(q) || (c.code || c.Code || '').toLowerCase().includes(q);
                                     }).map((c, i) => (
                                         <tr key={i} className="group hover:bg-blue-50/50 cursor-pointer transition-all" onClick={() => handleCustomerSelect(c)}>
                                             <td className="px-5 py-3 font-mono text-[12px] text-gray-700">{c.code || c.Code}</td>
-                                            <td className="px-5 py-3 text-[12px] font-bold text-gray-700 uppercase group-hover:text-blue-600 transition-colors">{c.name || c.Cust_Name || c.cust_Name}</td>
+                                            <td className="px-5 py-3 text-[12px] font-bold text-gray-700 uppercase group-hover:text-blue-600 transition-colors">{c.name || c.Name}</td>
                                             <td className="px-5 py-3 text-right"><button className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95">SELECT</button></td>
                                         </tr>
                                     ))}
@@ -795,13 +878,13 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
                                 <tbody className="divide-y divide-gray-50">
                                     {lookups.costCenters.filter(c => {
                                         const q = costCenterSearchQuery.toLowerCase();
-                                        const code = (c.CostCenterCode || c.costCenterCode || c.Code || '').toLowerCase();
-                                        const name = (c.CostCenterName || c.costCenterName || c.Name || '').toLowerCase();
+                                        const code = (c.CostCenterCode || c.costCenterCode || c.Code || c.code || '').toLowerCase();
+                                        const name = (c.CostCenterName || c.costCenterName || c.Name || c.name || '').toLowerCase();
                                         return code.includes(q) || name.includes(q);
                                     }).map((c, i) => (
-                                        <tr key={i} className="group hover:bg-blue-50/50 cursor-pointer transition-colors" onClick={() => { setFormData(prev => ({ ...prev, costCenter: c.CostCenterCode || c.costCenterCode || c.Code })); setShowCostCenterSearch(false); }}>
-                                            <td className="px-5 py-3 font-mono text-[12px] text-gray-700">{c.CostCenterCode || c.costCenterCode || c.Code}</td>
-                                            <td className="px-5 py-3 text-[12px] font-bold text-gray-700 uppercase group-hover:text-blue-600">{c.CostCenterName || c.costCenterName || c.Name}</td>
+                                        <tr key={i} className="group hover:bg-blue-50/50 cursor-pointer transition-colors" onClick={() => { setFormData(prev => ({ ...prev, costCenter: c.CostCenterCode || c.costCenterCode || c.Code || c.code })); setShowCostCenterSearch(false); }}>
+                                            <td className="px-5 py-3 font-mono text-[12px] text-gray-700">{c.CostCenterCode || c.costCenterCode || c.Code || c.code}</td>
+                                            <td className="px-5 py-3 text-[12px] font-bold text-gray-700 uppercase group-hover:text-blue-600">{c.CostCenterName || c.costCenterName || c.Name || c.name}</td>
                                             <td className="px-5 py-3 text-right"><button className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95">SELECT</button></td>
                                         </tr>
                                     ))}
@@ -811,6 +894,44 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
                     </div>
                 </div>
             </SimpleModal>
+            {/* Account Type Search */}
+            <SimpleModal isOpen={showAccountTypeSearch} onClose={() => setShowAccountTypeSearch(false)} title="Account Type Lookup" maxWidth="max-w-[450px]">
+                <div className="space-y-4 font-['Tahoma']">
+                    <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-lg border border-gray-100 mb-2">
+                        <span className="text-[12px] font-bold text-gray-500 uppercase tracking-widest">Search Facility</span>
+                        <div className="relative flex-1">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
+                            <input type="text" placeholder="Filter account types..." className="w-full h-9 pl-10 pr-4 border border-gray-300 rounded-[5px] outline-none text-sm focus:border-[#0285fd] bg-white shadow-sm" value={accountTypeSearchQuery} onChange={(e) => setAccountTypeSearchQuery(e.target.value)} autoFocus />
+                        </div>
+                    </div>
+                    <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm">
+                        <div className="max-h-[300px] overflow-y-auto no-scrollbar">
+                            <table className="w-full text-left">
+                                <thead className="bg-[#f8fafd] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">
+                                    <tr><th className="px-5 py-3">Code</th><th className="px-5 py-3">Account Type</th><th className="px-5 py-3 text-right">Action</th></tr>
+                                </thead>
+                                <tbody className="divide-y divide-gray-50">
+                                    {lookups.accountTypes?.filter(a => {
+                                        const q = accountTypeSearchQuery.toLowerCase();
+                                        return a.code.toLowerCase().includes(q) || a.name.toLowerCase().includes(q);
+                                    }).map((a, i) => (
+                                        <tr key={i} className="group hover:bg-blue-50/50 cursor-pointer transition-colors" onClick={() => {
+                                            setFormData(prev => ({ ...prev, accountType: a.code, customerId: '' }));
+                                            fetchLookups(formData.company, a.code);
+                                            setShowAccountTypeSearch(false);
+                                        }}>
+                                            <td className="px-5 py-3 font-mono text-[12px] text-gray-700">{a.code}</td>
+                                            <td className="px-5 py-3 text-[12px] font-bold text-gray-700 uppercase group-hover:text-blue-600">{a.name}</td>
+                                            <td className="px-5 py-3 text-right"><button className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95">SELECT</button></td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </SimpleModal>
+
         </>
     );
 };

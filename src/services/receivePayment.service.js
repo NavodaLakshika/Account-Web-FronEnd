@@ -8,10 +8,10 @@ export const receivePaymentService = {
     } catch (error) { throw error; }
   },
 
-  getOutstanding: async (customerId, company, docNo, accountType = 'MM') => {
+  getOutstanding: async (customerId, company, docNo, accountType = 'MM', userName = 'Admin') => {
     try {
       const response = await api.get('/ReceivePayment/outstanding', { 
-        params: { customerId, company, docNo, accountType } 
+        params: { customerId, company, docNo, accountType, userName } 
       });
       return response.data;
     } catch (error) { throw error; }
@@ -36,6 +36,20 @@ export const receivePaymentService = {
   generateDocNo: async (company) => {
     try {
       const response = await api.get('/ReceivePayment/generate-doc', { params: { company } });
+      return response.data;
+    } catch (error) { throw error; }
+  },
+  
+  getHistory: async (company) => {
+    try {
+      const response = await api.get('/ReceivePayment/history', { params: { company } });
+      return response.data;
+    } catch (error) { throw error; }
+  },
+
+  getPayment: async (docNo, company) => {
+    try {
+      const response = await api.get(`/ReceivePayment/${docNo}`, { params: { company } });
       return response.data;
     } catch (error) { throw error; }
   }
