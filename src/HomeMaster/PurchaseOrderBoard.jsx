@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import SimpleModal from '../components/SimpleModal';
 import ConfirmModal from '../components/modals/ConfirmModal';
-import { Search, Calendar, ChevronDown, CheckCircle, Trash2, Printer, X, Save, RotateCcw, ChevronLeft, ChevronRight, Plus } from 'lucide-react';
+import { Search, Calendar, ChevronDown, CheckCircle, Trash2, Printer, X, Save, RotateCcw, ChevronLeft, ChevronRight, Plus, Lock, Unlock } from 'lucide-react';
 import CalendarModal from '../components/CalendarModal';
 import { purchOrderService } from '../services/purchOrder.service';
 import { paymentMethodService } from '../services/paymentMethod.service';
@@ -48,6 +48,14 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
         code: '', name: '', unit: 'Nos', purchasePrice: '', sellingPrice: '', packSize: 1
     });
     const [isCreatingProduct, setIsCreatingProduct] = useState(false);
+    const [isAddProductLocked, setIsAddProductLocked] = useState(false);
+    const [showLockModal, setShowLockModal] = useState(false);
+
+    useEffect(() => {
+        if (isOpen) {
+            setIsAddProductLocked(localStorage.getItem('isAddProductLocked_PO') === 'true');
+        }
+    }, [isOpen]);
 
     const [entry, setEntry] = useState({
         prodCode: '',
@@ -399,6 +407,16 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
         setShowDeleteConfirm(true);
     };
 
+    const handleOpenAddProduct = () => {
+        if (isAddProductLocked) {
+            setShowLockModal(true);
+            return;
+        }
+        setEntry({ prodCode: '', prodName: '', unit: '', packSize: 1, qty: '', purchasePrice: '', amount: '0.00' });
+        purchOrderService.getLookups(formData.company).then(data => setLookups(prev => ({ ...prev, products: data.products })));
+        setShowAddProductModal(true);
+    };
+
     const confirmDelete = async () => {
         setIsDeleting(true);
         try {
@@ -569,11 +587,7 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
                             <div className="flex-[2.5] py-2.5 px-4 border-r border-gray-100 truncate flex items-center justify-between">
                                 <span>Item Selection Portfolio</span>
                                 <button
-                                    onClick={() => {
-                                        setEntry({ prodCode: '', prodName: '', unit: '', packSize: 1, qty: '', purchasePrice: '', amount: '0.00' });
-                                        purchOrderService.getLookups(formData.company).then(data => setLookups(prev => ({ ...prev, products: data.products })));
-                                        setShowAddProductModal(true);
-                                    }}
+                                    onClick={handleOpenAddProduct}
                                     className="w-8 h-7 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0"
                                     title="Add Product"
                                 ><Plus size={14} /></button>
@@ -1120,6 +1134,32 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
                     <div className="bg-blue-50/50 p-3 rounded-lg border border-blue-100">
                         <p className="text-[10px] text-blue-600 font-bold uppercase tracking-tight text-center">Default Category (1) and Department (1) will be assigned.</p>
                     </div>
+                </div>
+            </SimpleModal>
+            
+            <SimpleModal
+                isOpen={showLockModal}
+                onClose={() => setShowLockModal(false)}
+                title="LOCK STATUS"
+                maxWidth="max-w-[360px]"
+                showHeaderClose={false}
+            >
+                <div className="flex flex-col items-center text-center space-y-6 font-['Plus_Jakarta_Sans'] py-2">
+                    <div className="w-28 h-28 shrink-0">
+                        <DotLottiePlayer src="/lottiefile/Forgot Password1.lottie" autoplay loop />
+                    </div>
+                    <div className="space-y-1">
+                        <h3 className="text-[18px] font-bold text-slate-800 uppercase tracking-tight">Access Locked</h3>
+                        <p className="text-[12px] text-slate-500 font-medium">
+                            Please contact supporters to unlock this feature.
+                        </p>
+                    </div>
+                    <button
+                        onClick={() => setShowLockModal(false)}
+                        className="w-full h-10 bg-[#0285fd] text-white text-[12px] font-black rounded-[5px] hover:bg-[#0073ff] transition-all active:scale-95 uppercase tracking-widest"
+                    >
+                        CLOSE
+                    </button>
                 </div>
             </SimpleModal>
         </>

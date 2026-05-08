@@ -3,6 +3,7 @@ import SimpleModal from '../components/SimpleModal';
 import { Save, RotateCcw, X, ChevronDown, List, AlertCircle, Info, Search } from 'lucide-react';
 import { accountService } from '../services/account.service';
 import { toast } from 'react-hot-toast';
+import { DotLottiePlayer } from '@dotlottie/react-player';
 
 const AccountBoard = ({ isOpen, onClose, selectedType, initialData }) => {
     const [loading, setLoading] = useState(false);
@@ -12,6 +13,7 @@ const AccountBoard = ({ isOpen, onClose, selectedType, initialData }) => {
         subAccountOfName: '',
         accountId: '',
         accountName: '',
+        shortId: '',
         isSubAccount: false,
         description: '',
         note: '',
@@ -27,6 +29,58 @@ const AccountBoard = ({ isOpen, onClose, selectedType, initialData }) => {
     const [typeSearchQuery, setTypeSearchQuery] = useState('');
     const [parentSearchQuery, setParentSearchQuery] = useState('');
     const companyCode = localStorage.getItem('company') || 'C001';
+
+    const showSuccessToast = (message) => {
+        toast.custom((t) => (
+            <div className={`${t.visible ? 'animate-in slide-in-from-right-10 fade-in duration-500' : 'animate-out slide-out-to-right-10 fade-out duration-300'} 
+                max-w-[550px] w-fit bg-white/95 backdrop-blur-xl border border-white/20 shadow-2xl rounded-[5px] flex flex-col pointer-events-auto overflow-hidden`}>
+                <div className="px-4 py-2.5 flex items-center gap-3">
+                    <div className="w-12 h-12 shrink-0">
+                        <DotLottiePlayer src="/lottiefile/Successffull.lottie" autoplay loop={false} />
+                    </div>
+                    <div className="flex-grow text-left py-1">
+                        <h3 className="text-slate-800 text-[12px] font-bold tracking-wider uppercase font-tahoma leading-relaxed">{message}</h3>
+                        <div className="flex items-center gap-1.5 mt-0.5">
+                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.3)]" />
+                            <span className="text-emerald-600 text-[8px] font-mono font-bold tracking-widest uppercase">Verified</span>
+                        </div>
+                    </div>
+                    <button onClick={() => toast.dismiss(t.id)} className="text-slate-300 hover:text-slate-500 transition-colors">
+                        <X size={14} />
+                    </button>
+                </div>
+                <div className="h-[2px] w-full bg-emerald-50">
+                    <div className="h-full bg-emerald-500" style={{ animation: 'toastProgress 3s linear forwards' }} />
+                </div>
+            </div>
+        ), { duration: 3000, position: 'top-right' });
+    };
+
+    const showErrorToast = (message) => {
+        toast.custom((t) => (
+            <div className={`${t.visible ? 'animate-in slide-in-from-right-10 fade-in duration-500' : 'animate-out slide-out-to-right-10 fade-out duration-300'} 
+                max-w-[550px] w-fit bg-white/95 backdrop-blur-xl border border-white/20 shadow-2xl rounded-[5px] flex flex-col pointer-events-auto overflow-hidden`}>
+                <div className="px-4 py-2.5 flex items-center gap-3">
+                    <div className="w-12 h-12 shrink-0">
+                        <DotLottiePlayer src="/lottiefile/Error Fail animation.lottie" autoplay loop={false} />
+                    </div>
+                    <div className="flex-grow text-left py-1">
+                        <h3 className="text-slate-800 text-[12px] font-bold tracking-wider uppercase font-tahoma leading-relaxed">{message}</h3>
+                        <div className="flex items-center gap-1.5 mt-0.5">
+                            <div className="w-1.5 h-1.5 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.3)]" />
+                            <span className="text-red-600 text-[8px] font-mono font-bold tracking-widest uppercase">Failed</span>
+                        </div>
+                    </div>
+                    <button onClick={() => toast.dismiss(t.id)} className="text-slate-300 hover:text-slate-500 transition-colors">
+                        <X size={14} />
+                    </button>
+                </div>
+                <div className="h-[2px] w-full bg-red-50">
+                    <div className="h-full bg-red-500" style={{ animation: 'toastProgress 3s linear forwards' }} />
+                </div>
+            </div>
+        ), { duration: 3000, position: 'top-right' });
+    };
 
     useEffect(() => {
         if (isOpen) {
@@ -95,24 +149,40 @@ const AccountBoard = ({ isOpen, onClose, selectedType, initialData }) => {
 
     const handleSave = async () => {
         if (!formData.accountId || !formData.accountName) {
-            toast.error('Please enter Account ID and Name');
+            showErrorToast('Please enter Account ID and Name');
             return;
         }
 
         setLoading(true);
         try {
             await accountService.createAccount({ ...formData, companyCode });
-            toast.success('Account Saved Successfully');
+            showSuccessToast('Account Saved Successfully');
             onClose();
         } catch (error) {
-            toast.error('Failed to save account');
+            showErrorToast('Failed to save account');
         } finally {
             setLoading(false);
         }
     };
 
+    const getReportType = (code) => {
+        if (!code) return '';
+        const firstDigit = code.toString()[0];
+        if (['1', '2', '3'].includes(firstDigit)) return 'Balance Sheet';
+        if (['4', '5', '6', '7', '8'].includes(firstDigit)) return 'Profit & Loss';
+        return '';
+    };
+
     return (
         <>
+            <style>
+                {`
+                    @keyframes toastProgress {
+                        0% { width: 100%; }
+                        100% { width: 0%; }
+                    }
+                `}
+            </style>
             <SimpleModal
                 isOpen={isOpen}
                 onClose={onClose}
@@ -154,6 +224,17 @@ const AccountBoard = ({ isOpen, onClose, selectedType, initialData }) => {
                                 >
                                     <Search size={14} />
                                 </button>
+                            </div>
+                            <div className="col-span-5 flex justify-end">
+                                <div className={`inline-flex items-center px-3 h-8 rounded-[5px] text-[10px] font-black uppercase tracking-widest ${
+                                    getReportType(formData.accountId) === 'Balance Sheet' 
+                                    ? 'bg-blue-50 text-blue-600 border border-blue-100' 
+                                    : getReportType(formData.accountId) === 'Profit & Loss'
+                                    ? 'bg-green-50 text-green-600 border border-green-100'
+                                    : 'bg-gray-50 text-gray-400 border border-gray-100'
+                                }`}>
+                                    {getReportType(formData.accountId) || 'Report Type'}
+                                </div>
                             </div>
                         </div>
 
@@ -199,16 +280,41 @@ const AccountBoard = ({ isOpen, onClose, selectedType, initialData }) => {
                         </div>
 
                         <div className="grid grid-cols-12 gap-2 items-center">
-                            <div className="col-span-3"></div>
-                            <div className="col-span-9 flex items-center gap-2">
+                            {/* <label className="col-span-3 text-[12.5px] font-bold text-gray-700">Short ID / Alias</label>
+                            <div className="col-span-4">
                                 <input
-                                    type="checkbox"
-                                    id="editSub"
-                                    checked={formData.editSubAccount}
-                                    onChange={(e) => setFormData({ ...formData, editSubAccount: e.target.checked })}
-                                    className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                    type="text"
+                                    placeholder="e.g. MK"
+                                    className="w-full h-8 px-3 border border-gray-300 rounded-[5px] text-[12px] font-bold text-gray-700 shadow-sm focus:border-[#0285fd] outline-none"
+                                    value={formData.shortId}
+                                    onChange={(e) => setFormData({ ...formData, shortId: e.target.value })}
                                 />
-                                <label htmlFor="editSub" className="text-[12.5px] font-bold text-gray-600">Edit Sub Account</label>
+                            </div> */}
+                        </div>
+
+                        <div className="grid grid-cols-12 gap-2 items-center">
+                            <div className="col-span-3"></div>
+                            <div className="col-span-9 flex items-center gap-6">
+                                <div className="flex items-center gap-2">
+                                    <input
+                                        type="checkbox"
+                                        id="activeStatus"
+                                        checked={!formData.inactiveAcc}
+                                        onChange={(e) => setFormData({ ...formData, inactiveAcc: !e.target.checked })}
+                                        className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                    />
+                                    <label htmlFor="activeStatus" className="text-[12.5px] font-bold text-gray-600">Active Account</label>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <input
+                                        type="checkbox"
+                                        id="editSub"
+                                        checked={formData.editSubAccount}
+                                        onChange={(e) => setFormData({ ...formData, editSubAccount: e.target.checked })}
+                                        className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                    />
+                                    <label htmlFor="editSub" className="text-[12.5px] font-bold text-gray-600">Edit Sub Account</label>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -245,25 +351,25 @@ const AccountBoard = ({ isOpen, onClose, selectedType, initialData }) => {
                         </div>
                     </div>
 
-                    {/* Customer Account Table */}
+                    {/* Sub-Accounts Registry Table */}
                     <div className="border border-gray-100 rounded-lg overflow-hidden shadow-sm bg-white">
                         <div className="bg-slate-50/80 px-4 py-2.5 border-b border-gray-100 flex items-center gap-2">
                             <List size={14} className="text-gray-400" />
-                            <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Current Customer Account</span>
+                            <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Child / Sub-Accounts Registry</span>
                         </div>
                         <div className="h-[150px] overflow-y-auto no-scrollbar">
                             <table className="w-full text-left border-collapse">
                                 <thead className="sticky top-0 bg-slate-50 border-b border-gray-100 z-10">
                                     <tr>
-                                        <th className="px-4 py-2.5 text-[10px] font-black text-gray-400 uppercase tracking-widest border-r border-gray-100 w-[120px]">Acc. Code</th>
-                                        <th className="px-4 py-2.5 text-[10px] font-black text-gray-400 uppercase tracking-widest">Account Name</th>
+                                        <th className="px-4 py-2.5 text-[10px] font-black text-gray-400 uppercase tracking-widest border-r border-gray-100 w-[120px]">Sub Code</th>
+                                        <th className="px-4 py-2.5 text-[10px] font-black text-gray-400 uppercase tracking-widest">Account Title</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-50">
                                     {customerAccounts.length > 0 ? (
                                         customerAccounts.map((cust, i) => (
                                             <tr key={i} className="hover:bg-blue-50/30 transition-colors group">
-                                                <td className="px-4 py-1.5 text-[11px] font-bold text-gray-600 border-r border-gray-100">{cust.sub_Cust_Acc_Code}</td>
+                                                <td className="px-4 py-1.5 text-[11px] font-bold text-blue-600 border-r border-gray-100">{cust.sub_Cust_Acc_Code}</td>
                                                 <td className="px-4 py-1.5 text-[11px] font-bold text-gray-700">{cust.sub_Cust_Acc_Name}</td>
                                             </tr>
                                         ))

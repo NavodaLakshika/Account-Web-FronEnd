@@ -30,7 +30,7 @@ const SimpleModal = ({ isOpen, onClose, title, children, footer, maxWidth = "max
                     </div>
 
                     <div className="flex items-center gap-2 ml-auto shrink-0">
-                        {showHeaderClose ? (
+                        {showHeaderClose && (
                             <button
                                 onClick={onClose}
                                 className="w-9 h-8 flex items-center justify-center bg-[#ff3b30] hover:bg-[#e03127] text-white rounded-[8px] shadow-[0_4px_12px_rgba(255,59,48,0.3)] hover:shadow-[0_6px_20px_rgba(255,59,48,0.4)] transition-all active:scale-90 outline-none border-none group"
@@ -38,18 +38,6 @@ const SimpleModal = ({ isOpen, onClose, title, children, footer, maxWidth = "max
                             >
                                 <X size={18} strokeWidth={4} className="group-hover:scale-110 transition-transform" />
                             </button>
-                        ) : (
-                            <>
-                                <button className="w-8 h-8 flex items-center justify-center hover:bg-slate-100 text-slate-400 rounded-full transition-colors group outline-none">
-                                    <HelpCircle size={18} className="group-hover:text-slate-600" />
-                                </button>
-                                <button
-                                    onClick={onClose}
-                                    className="w-8 h-8 flex items-center justify-center hover:bg-red-50 text-slate-400 hover:text-red-500 transition-colors rounded-full group outline-none"
-                                >
-                                    <X size={18} />
-                                </button>
-                            </>
                         )}
                     </div>
                 </div>

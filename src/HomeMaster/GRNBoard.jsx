@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import SimpleModal from '../components/SimpleModal';
 import ConfirmModal from '../components/modals/ConfirmModal';
-import { Search, Calendar, ChevronDown, CheckCircle, Trash2, XCircle, Save, X, RotateCcw, ChevronLeft, ChevronRight, ClipboardList, Plus } from 'lucide-react';
+import { Search, Calendar, ChevronDown, CheckCircle, Trash2, XCircle, Save, X, RotateCcw, ChevronLeft, ChevronRight, ClipboardList, Plus, FileUp, FileDown, Lock } from 'lucide-react';
+import * as XLSX from 'xlsx';
 import CalendarModal from '../components/CalendarModal';
 import { grnService } from '../services/grn.service';
 import { paymentMethodService } from '../services/paymentMethod.service';
@@ -18,6 +19,17 @@ const GRNBoard = ({ isOpen, onClose }) => {
     const [showSupplierSearch, setShowSupplierSearch] = useState(false);
     const [showProductSearch, setShowProductSearch] = useState(false);
     const [showAddProductModal, setShowAddProductModal] = useState(false);
+    const [showLockModal, setShowLockModal] = useState(false);
+    const [isAddProductLocked, setIsAddProductLocked] = useState(false);
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    const [productToDelete, setProductToDelete] = useState(null);
+    const [isDeleting, setIsDeleting] = useState(false);
+
+    useEffect(() => {
+        if (isOpen) {
+            setIsAddProductLocked(localStorage.getItem('isAddProductLocked') === 'true');
+        }
+    }, [isOpen]);
     const [showItemMasterModal, setShowItemMasterModal] = useState(false);
     const [showPOSearch, setShowPOSearch] = useState(false);
     const [showDatePicker, setShowDatePicker] = useState(false);
@@ -29,6 +41,7 @@ const GRNBoard = ({ isOpen, onClose }) => {
     const [showPayMethodSearch, setShowPayMethodSearch] = useState(false);
     const [payMethodSearchQuery, setPayMethodSearchQuery] = useState('');
     const [orders, setOrders] = useState([]);
+    const excelInputRef = useRef(null);
 
     const [formData, setFormData] = useState({
         docNo: '',
@@ -286,6 +299,105 @@ const GRNBoard = ({ isOpen, onClose }) => {
         } catch (error) { showErrorToast('Failed to fetch PO details.'); }
     };
 
+    const downloadExcelTemplate = () => {
+        const template = [
+            { 
+                'Supplier Code': '', 
+                'Supplier Invoice': '',
+                'PO Number' :'',
+                'Payment Method': '',
+                'Comment': '',
+                'Product Code': '', 
+                'Qty': '', 
+                'Free Qty': '', 
+                'Purchase Price': '', 
+                'Selling Price': '' 
+            },
+        ];
+        const ws = XLSX.utils.json_to_sheet(template);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "GRN_Template");
+        XLSX.writeFile(wb, "GRN_Full_Template.xlsx");
+        showSuccessToast("Premium template downloaded. You can now import header data too!");
+    };
+
+    const handleExcelUpload = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (evt) => {
+            try {
+                const bstr = evt.target.result;
+                const wb = XLSX.read(bstr, { type: 'binary' });
+                const wsname = wb.SheetNames[0];
+                const ws = wb.Sheets[wsname];
+                const data = XLSX.utils.sheet_to_json(ws);
+
+                if (data.length === 0) return showErrorToast("Excel file is empty.");
+
+                // 1. Handle Header Data (from first row)
+                const firstRow = data[0];
+                const suppCode = firstRow['Supplier Code'] || firstRow['Supplier'];
+                const invNo = firstRow['Supplier Invoice'] || firstRow['Inv No'];
+                const payType = firstRow['Payment Method'] || firstRow['Pay Type'];
+                const comment = firstRow['Comment'] || firstRow['Remarks'];
+                const poNo = firstRow['PO Number'] || firstRow['PO No'];
+
+                if (suppCode || invNo || payType || comment || poNo) {
+                    setFormData(prev => ({
+                        ...prev,
+                        suppCode: (suppCode || prev.suppCode).toString().trim(),
+                        suppInv: (invNo || prev.suppInv).toString().trim(),
+                        payType: (payType || prev.payType).toString().trim(),
+                        comment: (comment || prev.comment).toString().trim(),
+                        poNo: (poNo || prev.poNo).toString().trim()
+                    }));
+                }
+
+                // 2. Handle Product Data
+                const importedProducts = [];
+                let skipCount = 0;
+
+                data.forEach((row, index) => {
+                    const pCode = row['Product Code'] || row['prodCode'] || row['Item Code'];
+                    if (!pCode) { skipCount++; return; }
+
+                    const prod = lookups.products.find(p => p.code?.trim().toUpperCase() === pCode.toString().trim().toUpperCase());
+                    
+                    const qty = parseFloat(row['Qty'] || row['Quantity'] || 0);
+                    const free = parseFloat(row['Free Qty'] || row['Free'] || 0);
+                    const cost = parseFloat(row['Purchase Price'] || row['Cost Price'] || row['Cost'] || (prod ? prod.price : 0));
+                    const selling = parseFloat(row['Selling Price'] || row['Selling'] || (prod ? prod.sellingPrice : 0));
+
+                    importedProducts.push({
+                        prodCode: pCode.toString().trim(),
+                        prodName: prod ? prod.name : 'Unknown Product',
+                        unit: prod ? prod.unit : 'Nos',
+                        packSize: prod ? prod.packSize : 1,
+                        qty: qty.toString(),
+                        free: free.toString(),
+                        cost: cost.toFixed(2),
+                        selling: selling.toFixed(2),
+                        amount: (qty * cost).toFixed(2)
+                    });
+                });
+
+                if (importedProducts.length > 0) {
+                    setProducts(importedProducts); // Replace instead of append for "Full Import"
+                    showSuccessToast(`Successfully loaded ${importedProducts.length} items and header data.`);
+                }
+                if (skipCount > 0) toast.error(`Skipped ${skipCount} rows due to missing Product Code.`);
+                
+            } catch (err) {
+                showErrorToast("Failed to parse Excel file.");
+                console.error(err);
+            }
+        };
+        reader.readAsBinaryString(file);
+        e.target.value = null; // Reset input
+    };
+
     const preparePayload = () => ({
         ...formData,
         total: totals.sumTotal,
@@ -405,9 +517,9 @@ const GRNBoard = ({ isOpen, onClose }) => {
                     <div className="flex gap-3">
                         <button
                             onClick={handleClear}
-                            className="px-6 h-10 bg-[#00adff] text-white text-sm font-black rounded-[5px] hover:bg-[#0099e6] transition-all active:scale-95 flex items-center gap-2 border-none"
+                            className="px-6 h-10 bg-[#00adff] text-white text-sm font-black rounded-[5px] hover:bg-[#0099e6] transition-all active:scale-95 flex  items-center gap-2 border-none"
                         >
-                            <RotateCcw size={14} /> CLEAR FORM
+                            <RotateCcw size={14} /> CLEAR
                         </button>
                     </div>
                     <div className="flex gap-3">
@@ -415,20 +527,65 @@ const GRNBoard = ({ isOpen, onClose }) => {
                             onClick={handleSaveDraft}
                             className="px-6 h-10 bg-white text-[#0285fd] text-sm font-black rounded-[5px] border-2 border-[#0285fd] hover:bg-blue-50 transition-all active:scale-95 flex items-center gap-2"
                         >
-                            <Save size={14} /> SAVE DRAFT
+                            <Save size={14} /> SAVE
                         </button>
                         <button
                             onClick={handleApply}
                             disabled={isApplying}
                             className="px-6 h-10 bg-[#2bb744] text-white text-sm font-black rounded-[5px] shadow-md shadow-green-100 hover:bg-[#259b3a] transition-all active:scale-95 flex items-center gap-2 border-none disabled:opacity-50"
                         >
-                            {isApplying ? <Search className="animate-spin" size={14} /> : <CheckCircle size={14} />} SAVE & APPLY
+                            {isApplying ? <Search className="animate-spin" size={14} /> : <CheckCircle size={14} />} APPLY
                         </button>
                     </div>
                 </div>
             }
         >
+            <input 
+                type="file" 
+                ref={excelInputRef} 
+                onChange={handleExcelUpload} 
+                accept=".xlsx, .xls, .csv" 
+                className="hidden" 
+            />
             <div className="space-y-3 overflow-y-auto no-scrollbar font-['Tahoma']">
+                <div className="flex items-center justify-between mb-1 px-1">
+                    <div className="flex items-center gap-4">
+                        <label className="flex items-center gap-2 cursor-pointer group">
+                            <input
+                                type="checkbox"
+                                name="consignmentBasis"
+                                checked={formData.consignmentBasis}
+                                onChange={handleInput}
+                                className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500 border-gray-300 transition-all cursor-pointer"
+                            />
+                            <span className="text-[11px] font-black uppercase tracking-widest text-gray-500 group-hover:text-blue-600 transition-colors">Consignment Basis</span>
+                        </label>
+                        <label className="flex items-center gap-2 cursor-pointer group">
+                            <input
+                                type="checkbox"
+                                name="acceptOtherSupp"
+                                checked={formData.acceptOtherSupp}
+                                onChange={handleInput}
+                                className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500 border-gray-300 transition-all cursor-pointer"
+                            />
+                            <span className="text-[11px] font-black uppercase tracking-widest text-gray-500 group-hover:text-blue-600 transition-colors">Accept Other Supp.</span>
+                        </label>
+                    </div>
+                    <div className="flex gap-2">
+                        <button
+                            onClick={downloadExcelTemplate}
+                            className="h-8 px-4 bg-white text-emerald-600 border-2 border-emerald-500 text-[10px] font-black rounded-[5px] hover:bg-emerald-50 transition-all flex items-center gap-2 uppercase active:scale-95 shadow-sm"
+                        >
+                            <FileDown size={14} /> TEMPLATE
+                        </button>
+                        <button
+                            onClick={() => excelInputRef.current?.click()}
+                            className="h-8 px-4 bg-white text-blue-600 border-2 border-blue-500 text-[10px] font-black rounded-[5px] hover:bg-blue-50 transition-all flex items-center gap-2 uppercase active:scale-95 shadow-sm"
+                        >
+                            <FileUp size={14} /> LOAD EXCEL
+                        </button>
+                    </div>
+                </div>
                 <div className="bg-white p-3 border border-gray-100 rounded-lg shadow-sm space-y-3">
                     <div className="grid grid-cols-12 gap-x-4 gap-y-2.5">
                         {/* Row 1: Document ID | Post Date | Exp. Timeline */}
@@ -500,16 +657,6 @@ const GRNBoard = ({ isOpen, onClose }) => {
                             <label className="text-[12px] font-bold text-gray-700 w-24 shrink-0">Comment</label>
                             <input type="text" name="comment" value={formData.comment} onChange={handleInput} className="flex-1 min-w-0 h-8 border border-gray-300 rounded-[5px] px-3 text-[12px] outline-none bg-white text-gray-700 shadow-sm focus:border-[#0285fd]" />
                         </div>
-                        <div className="col-span-4 flex items-center justify-start gap-4 pl-4">
-                            <label className="flex items-center gap-2 cursor-pointer group">
-                                <input type="checkbox" name="consignmentBasis" checked={formData.consignmentBasis} onChange={handleInput} className="w-3.5 h-3.5 text-[#0285fd] border-gray-300 rounded focus:ring-[#0285fd] transition-all" />
-                                <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest group-hover:text-blue-600 transition-colors">Consign.</span>
-                            </label>
-                            <label className="flex items-center gap-2 cursor-pointer group">
-                                <input type="checkbox" name="acceptOtherSupp" checked={formData.acceptOtherSupp} onChange={handleInput} className="w-3.5 h-3.5 text-[#0285fd] border-gray-300 rounded focus:ring-[#0285fd] transition-all" />
-                                <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest group-hover:text-blue-600 transition-colors">Other Sup.</span>
-                            </label>
-                        </div>
                     </div>
                 </div>
 
@@ -520,6 +667,10 @@ const GRNBoard = ({ isOpen, onClose }) => {
                             <span>Inventory Allocation</span>
                             <button
                                 onClick={() => {
+                                    if (isAddProductLocked) {
+                                        setShowLockModal(true);
+                                        return;
+                                    }
                                     setEntry({ prodCode: '', prodName: '', unit: '', packSize: 1, qty: '', free: '', cost: '', selling: '', amount: '0.00' });
                                     grnService.getLookups(formData.company).then(data => setLookups(prev => ({ ...prev, products: data.products })));
                                     setShowAddProductModal(true);
@@ -528,12 +679,12 @@ const GRNBoard = ({ isOpen, onClose }) => {
                                 title="Add Product"
                             ><Plus size={14} /></button>
                         </div>
-                        <div className="w-16 py-2.5 px-3 border-r border-gray-100 text-center">UM</div>
-                        <div className="w-24 py-2.5 px-3 border-r border-gray-100 text-right">Cost Rate</div>
-                        <div className="w-24 py-2.5 px-3 border-r border-gray-100 text-right">M.R.P</div>
+                        <div className="w-16 py-2.5 px-3 border-r border-gray-100 text-center">Unit</div>
+                        <div className="w-24 py-2.5 px-3 border-r border-gray-100 text-right">Cost</div>
+                        <div className="w-24 py-2.5 px-3 border-r border-gray-100 text-right">Selling</div>
                         <div className="w-16 py-2.5 px-3 border-r border-gray-100 text-center">Qty</div>
                         <div className="w-16 py-2.5 px-3 border-r border-gray-100 text-center">Free</div>
-                        <div className="w-32 py-2.5 px-4 text-right">Extended Net</div>
+                        <div className="w-32 py-2.5 px-4 text-right">Amount</div>
                         <div className="w-10"></div>
                     </div>
                     <div className="flex-1 bg-white overflow-y-auto max-h-[170px] divide-y divide-gray-50">
@@ -581,7 +732,13 @@ const GRNBoard = ({ isOpen, onClose }) => {
                                     {parseFloat(p.amount).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                 </div>
                                 <div className="w-10 flex justify-center py-1">
-                                    <button onClick={() => setProducts(products.filter((_, i) => i !== idx))} className="text-red-300 hover:text-red-500 transition-all p-1.5 hover:bg-red-50 rounded-[5px]">
+                                    <button 
+                                        onClick={() => {
+                                            setProductToDelete(p);
+                                            setShowDeleteConfirm(true);
+                                        }} 
+                                        className="text-red-300 hover:text-red-500 transition-all p-1.5 hover:bg-red-50 rounded-[5px]"
+                                    >
                                         <Trash2 size={13} />
                                     </button>
                                 </div>
@@ -607,7 +764,7 @@ const GRNBoard = ({ isOpen, onClose }) => {
                         </div>
                         <div className="space-y-1">
                             <label className="text-[12px] font-bold text-gray-700 ml-1">Internal Remarks & Disclaimers</label>
-                            <textarea name="comment" value={formData.comment} onChange={handleInput} className="w-full h-[54px] border border-gray-300 rounded-lg p-3 text-[12px] font-mono outline-none focus:border-[#0285fd] resize-none shadow-sm bg-gray-50/10" placeholder="Type here..."></textarea>
+                            <textarea name="comment" value={formData.comment} onChange={handleInput} className="w-full h-[128px] border border-gray-300 rounded-lg p-3 text-[12px] font-mono outline-none focus:border-[#0285fd] resize-none shadow-sm bg-gray-50/10" placeholder=""></textarea>
                         </div>
                     </div>
 
@@ -1141,6 +1298,49 @@ const GRNBoard = ({ isOpen, onClose }) => {
                     </div>
                 </div>
             </SimpleModal>
+
+            {/* ── Feature Locked Modal ──────────────────────────────────── */}
+            <SimpleModal
+                isOpen={showLockModal}
+                onClose={() => setShowLockModal(false)}
+                title="LOCK STATUS"
+                maxWidth="max-w-[360px]"
+                showHeaderClose={false}
+            >
+                <div className="flex flex-col items-center text-center space-y-6 font-['Plus_Jakarta_Sans'] py-2">
+                    <div className="w-28 h-28 shrink-0">
+                        <DotLottiePlayer src="/lottiefile/Forgot Password1.lottie" autoplay loop />
+                    </div>
+                    <div className="space-y-1">
+                        <h3 className="text-[18px] font-bold text-slate-800 uppercase tracking-tight">Access Locked</h3>
+                        <p className="text-[12px] text-slate-500 font-medium">
+                            Please contact supporters to unlock this feature.
+                        </p>
+                    </div>
+                    <button
+                        onClick={() => setShowLockModal(false)}
+                        className="w-full h-10 bg-[#0285fd] text-white text-[12px] font-black rounded-[5px] hover:bg-[#0073ff] transition-all active:scale-95 uppercase tracking-widest"
+                    >
+                        CLOSE
+                    </button>
+                </div>
+            </SimpleModal>
+
+            <ConfirmModal
+                isOpen={showDeleteConfirm}
+                onClose={() => setShowDeleteConfirm(false)}
+                onConfirm={() => {
+                    if (productToDelete) {
+                        setProducts(products.filter(p => p.prodCode !== productToDelete.prodCode));
+                        setShowDeleteConfirm(false);
+                        setProductToDelete(null);
+                        toast.success("Item removed from allocation");
+                    }
+                }}
+                title="Confirm Item Removal"
+                message={`Are you sure you want to remove "${productToDelete?.prodName}" from this GRN allocation?`}
+                loading={isDeleting}
+            />
         </>
     );
 };

@@ -10,7 +10,7 @@ import SystemUpdateModal from './SystemUpdateModal';
 import ClearTempDataModal from './ClearTempDataModal';
 import PeriodLockModal from './PeriodLockModal';
 
-const SystemAdminModal = ({ isOpen, onClose, onOpenChangePassword }) => {
+const SystemAdminModal = ({ isOpen, onClose, onOpenChangePassword, onOpenSystemSettings }) => {
     const [showBackupModal, setShowBackupModal] = React.useState(false);
     const [showStockUpdateModal, setShowStockUpdateModal] = React.useState(false);
     const [showDownloadModal, setShowDownloadModal] = React.useState(false);
@@ -33,6 +33,7 @@ const SystemAdminModal = ({ isOpen, onClose, onOpenChangePassword }) => {
         { icon: CloudLightning, label: 'System Update', shortcut: '', action: 'update' },
         { icon: Eraser, label: 'Clear Temporary Data', shortcut: '', action: 'clear' },
         { icon: Lock, label: 'Period Lock Facility', shortcut: '', action: 'lock' },
+        { icon: Settings, label: 'System Configuration', action: 'systemSettings' },
         { icon: FileText, label: 'Change Password', shortcut: '', action: 'changePassword' },
     ];
 
@@ -82,6 +83,7 @@ const SystemAdminModal = ({ isOpen, onClose, onOpenChangePassword }) => {
                                     if (item.action === 'update') setShowUpdateModal(true);
                                     if (item.action === 'clear') setShowClearModal(true);
                                     if (item.action === 'lock') setShowLockModal(true);
+                                    if (item.action === 'systemSettings') onOpenSystemSettings();
                                 }}
                                 className="w-full flex items-center justify-between px-4 py-3 rounded-xl hover:bg-slate-50 group transition-all relative overflow-hidden text-left"
                             >

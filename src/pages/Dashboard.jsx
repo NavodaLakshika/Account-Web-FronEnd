@@ -55,6 +55,7 @@ import AccountBalanceBoard from '../HomeMaster/AccountBalanceBoard';
 import ReminderBoard from '../HomeMaster/ReminderBoard';
 import ReminderListBoard from '../HomeMaster/ReminderListBoard';
 import SalesInvoiceBoard from '../HomeMaster/SalesInvoiceBoard';
+import SystemSettingsBoard from '../HomeMaster/SystemSettingsBoard';
 import MasterFileModal from '../components/modals/MasterFileModal';
 import ViewUtilityModal from '../components/modals/ViewUtilityModal';
 import TransactionModal from '../components/modals/TransactionModal';
@@ -149,6 +150,7 @@ const Dashboard = () => {
     const [showReportsModal, setShowReportsModal] = useState(false);
     const [showSystemAdminModal, setShowSystemAdminModal] = useState(false);
     const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
+    const [showSystemSettingsModal, setShowSystemSettingsModal] = useState(false);
     const [showSideBar, setShowSideBar] = useState(false);
     const [showThankYouModal, setShowThankYouModal] = useState(false);
     const [showLogoutConfirmModal, setShowLogoutConfirmModal] = useState(false);
@@ -610,8 +612,13 @@ const Dashboard = () => {
                     setShowSystemAdminModal(false);
                     setShowChangePasswordModal(true);
                 }}
+                onOpenSystemSettings={() => {
+                    setShowSystemAdminModal(false);
+                    setShowSystemSettingsModal(true);
+                }}
             />
             <ChangePasswordBoard isOpen={showChangePasswordModal} onClose={() => setShowChangePasswordModal(false)} />
+            <SystemSettingsBoard isOpen={showSystemSettingsModal} onClose={() => setShowSystemSettingsModal(false)} />
             <AIChatbotBoard isOpen={showAIChatbotModal} onClose={() => setShowAIChatbotModal(false)} />
             <DepartmentBoard isOpen={showDepartmentModal} onClose={() => setShowDepartmentModal(false)} />
             <CalculatorBoard isOpen={showCalculatorModal} onClose={() => setShowCalculatorModal(false)} />

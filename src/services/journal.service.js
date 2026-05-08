@@ -1,16 +1,16 @@
 import api from './api';
 
 export const journalService = {
-    getLookups: async (companyCode = 'C001') => {
+    getLookups: async (companyCode, userName = 'SYSTEM') => {
         try {
-            const resp = await api.get(`journal/lookups?companyCode=${companyCode}`);
+            const resp = await api.get(`journal/lookups?companyCode=${companyCode}&userName=${userName}`);
             return resp.data;
         } catch (error) {
             throw error.response?.data?.message || 'Failed to fetch journal lookups.';
         }
     },
 
-    generateDocNo: async (companyCode = 'C001') => {
+    generateDocNo: async (companyCode) => {
         try {
             const resp = await api.get(`journal/gen-docno?companyCode=${companyCode}`);
             return resp.data;

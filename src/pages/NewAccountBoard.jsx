@@ -10,47 +10,53 @@ const NewAccountBoard = ({ isOpen, onClose }) => {
     const [showTypeModal, setShowTypeModal] = useState(false);
 
     const accountDetails = {
-        Income: {
-            title: 'Income Account',
-            description: 'Tracks revenue generated from primary business operations and sales.',
-            tip: 'Record income when earned for accurate profit tracking.',
-            examples: ['Product Sales', 'Service Fees', 'Interest Income']
-        },
-        Expense: {
-            title: 'Expense Account',
-            description: 'Tracks costs incurred during regular business operation activities.',
-            tip: 'Clearly categorize expenses for better tax reporting.',
-            examples: ['Office Rent', 'Utility Bills', 'Staff Salaries']
-        },
         Assets: {
-            title: 'Assets Account',
-            description: 'Tracks valuable resources owned by the company for future benefit.',
+            title: 'Assets (1xxxx)',
+            description: 'Tracks valuable resources owned by the company for future benefit, including cash, inventory, and fixed assets.',
             tip: 'Regularly audit physical assets for balance sheet accuracy.',
-            examples: ['Inventory', 'Equipment', 'Property Value']
+            examples: ['Cash in Hand', 'Bank Accounts', 'Inventory', 'Fixed Assets']
         },
-        Bank: {
-            title: 'Bank Account',
-            description: 'Tracks liquid cash balances held within various financial accounts.',
-            tip: 'Perform weekly reconciliations to catch errors early.',
-            examples: ['Checking', 'Savings', 'Petty Cash']
-        },
-        Loan: {
-            title: 'Loan Account',
-            description: 'Tracks borrowed funds from lenders that must be repaid over time.',
-            tip: 'Monitor interest rates to manage debt effectively.',
-            examples: ['Bank Loans', 'Mortgages', 'Credit Lines']
+        Liabilities: {
+            title: 'Liabilities (2xxxx)',
+            description: 'Tracks money the company owes to external parties, including loans, creditors, and payables.',
+            tip: 'Monitor debt levels to maintain a healthy debt-to-equity ratio.',
+            examples: ['Bank Loans', 'Trade Creditors', 'VAT Payable', 'Accrued Expenses']
         },
         Equity: {
-            title: 'Equity Account',
-            description: 'Tracks the net worth of the business belonging to the owners.',
-            tip: 'Equity represents the owners\' stake in the business.',
-            examples: ['Owner Capital', 'Stock Shares', 'Net Earnings']
+            title: 'Equity (3xxxx)',
+            description: 'Tracks the net worth of the business belonging to the owners/shareholders.',
+            tip: 'Equity represents the residual interest in the assets after deducting liabilities.',
+            examples: ['Owner Capital', 'Retained Earnings', 'Share Capital', 'Drawings']
         },
-        'Credit Cards': {
-            title: 'Credit Cards Account',
-            description: 'Tracks revolving debt and liabilities from corporate card usage.',
-            tip: 'Pay off balances monthly to avoid high interest fees.',
-            examples: ['Visa Card', 'Mastercard', 'Amex Business']
+        Income: {
+            title: 'Income (4xxxx)',
+            description: 'Tracks revenue generated from primary business operations and sales.',
+            tip: 'Record income when earned for accurate profit tracking.',
+            examples: ['Local Sales', 'Export Sales', 'Service Income', 'Commission']
+        },
+        'Cost of Sales': {
+            title: 'Cost of Sales (5xxxx)',
+            description: 'Tracks direct costs incurred to produce or purchase the goods sold by the company.',
+            tip: 'Accurate COS tracking is vital for calculating Gross Profit.',
+            examples: ['Material Cost', 'Direct Labor', 'Production Overhead', 'Freight In']
+        },
+        Expenses: {
+            title: 'Operating Expenses (6xxxx)',
+            description: 'Tracks day-to-day operational costs not directly tied to production.',
+            tip: 'Clearly categorize expenses for better budget management and tax reporting.',
+            examples: ['Office Rent', 'Electricity', 'Staff Salaries', 'Telephone & Internet']
+        },
+        'Other Income': {
+            title: 'Other Income (7xxxx)',
+            description: 'Tracks revenue from non-operating activities like interest or asset disposal gains.',
+            tip: 'Separate other income to understand the core performance of the business.',
+            examples: ['Interest Income', 'Gain on Disposal', 'Rent Income']
+        },
+        'Other Expenses': {
+            title: 'Other Expenses (8xxxx)',
+            description: 'Tracks non-operating costs such as bank charges and interest expenses.',
+            tip: 'Monitor these costs to identify potential savings in financial transactions.',
+            examples: ['Bank Charges', 'Interest Expense', 'Exchange Loss']
         }
     };
 
@@ -66,7 +72,7 @@ const NewAccountBoard = ({ isOpen, onClose }) => {
     React.useEffect(() => {
         if (!isOpen) {
             setShowAccountBoard(false);
-            setSelectedType('Expense');
+            setSelectedType('Assets');
             setOtherAccountType('');
         }
     }, [isOpen]);
@@ -124,11 +130,32 @@ const NewAccountBoard = ({ isOpen, onClose }) => {
                                     onChange={() => setSelectedType('Income')}
                                 />
                                 <RadioButton
-                                    label="Expense"
+                                    label="Cost of Sales"
+                                    id="cos"
+                                    name="accountType"
+                                    checked={selectedType === 'Cost of Sales'}
+                                    onChange={() => setSelectedType('Cost of Sales')}
+                                />
+                                <RadioButton
+                                    label="Expenses"
                                     id="expce"
                                     name="accountType"
-                                    checked={selectedType === 'Expense'}
-                                    onChange={() => setSelectedType('Expense')}
+                                    checked={selectedType === 'Expenses'}
+                                    onChange={() => setSelectedType('Expenses')}
+                                />
+                                <RadioButton
+                                    label="Other Income"
+                                    id="otherIncome"
+                                    name="accountType"
+                                    checked={selectedType === 'Other Income'}
+                                    onChange={() => setSelectedType('Other Income')}
+                                />
+                                <RadioButton
+                                    label="Other Expenses"
+                                    id="otherExpenses"
+                                    name="accountType"
+                                    checked={selectedType === 'Other Expenses'}
+                                    onChange={() => setSelectedType('Other Expenses')}
                                 />
                             </div>
                         </div>
@@ -144,18 +171,11 @@ const NewAccountBoard = ({ isOpen, onClose }) => {
                                     onChange={() => setSelectedType('Assets')}
                                 />
                                 <RadioButton
-                                    label="Bank"
-                                    id="bank"
+                                    label="Liabilities"
+                                    id="liabilities"
                                     name="accountType"
-                                    checked={selectedType === 'Bank'}
-                                    onChange={() => setSelectedType('Bank')}
-                                />
-                                <RadioButton
-                                    label="Loan"
-                                    id="loan"
-                                    name="accountType"
-                                    checked={selectedType === 'Loan'}
-                                    onChange={() => setSelectedType('Loan')}
+                                    checked={selectedType === 'Liabilities'}
+                                    onChange={() => setSelectedType('Liabilities')}
                                 />
                                 <RadioButton
                                     label="Equity"
@@ -164,36 +184,11 @@ const NewAccountBoard = ({ isOpen, onClose }) => {
                                     checked={selectedType === 'Equity'}
                                     onChange={() => setSelectedType('Equity')}
                                 />
-                                <RadioButton
-                                    label="Credit Cards"
-                                    id="credit"
-                                    name="accountType"
-                                    checked={selectedType === 'Credit Cards'}
-                                    onChange={() => setSelectedType('Credit Cards')}
-                                />
-                                <div className="pt-2 mt-2 border-t border-gray-200 flex items-center justify-between group">
-                                    <RadioButton
-                                        label={otherAccountType || "Other"}
-                                        id="other"
-                                        name="accountType"
-                                        checked={selectedType === 'Other'}
-                                        onChange={() => {
-                                            setSelectedType('Other');
-                                            setShowTypeModal(true);
-                                        }}
-                                    />
-                                    <button 
-                                        onClick={() => setShowTypeModal(true)}
-                                        className="w-8 h-8 bg-[#0285fd] text-white flex items-center justify-center rounded-[5px] hover:bg-blue-600 transition-all active:scale-95 shrink-0 shadow-sm"
-                                    >
-                                        <Search size={14} />
-                                    </button>
-                                </div>
                             </div>
                         </div>
                     </div>
 
-                    {/* Right Column: Information Pane with Cinematic Page-Turn & Glow */}
+                    {/* Right Column: Information Pane with original style */}
                     <div 
                         key={selectedType}
                         className="flex-1 border border-blue-200 p-6 bg-white rounded-sm shadow-[0_0_15px_rgba(30,144,255,0.05)] animate-in slide-in-from-right-4 fade-in duration-500 ease-out"
