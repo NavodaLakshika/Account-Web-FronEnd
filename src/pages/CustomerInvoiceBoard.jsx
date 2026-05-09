@@ -3,6 +3,7 @@ import SimpleModal from '../components/SimpleModal';
 import { Search, Calendar, ChevronDown, Check, X, Save, RotateCcw, Loader2 } from 'lucide-react';
 import { customerInvoiceService } from '../services/customerInvoice.service';
 import { toast } from 'react-hot-toast';
+import { getSessionData } from '../utils/session';
 
 const CustomerInvoiceBoard = ({ isOpen, onClose }) => {
     const [lookups, setLookups] = useState({ customers: [], accounts: [] });
@@ -17,8 +18,8 @@ const CustomerInvoiceBoard = ({ isOpen, onClose }) => {
         discount: '0.00',
         netAmount: '0.00',
         accountId: '',
-        company: 'C001',
-        createUser: 'SYSTEM'
+        company: '',
+        createUser: ''
     });
 
     const [activeModal, setActiveModal] = useState(null);
@@ -26,25 +27,16 @@ const CustomerInvoiceBoard = ({ isOpen, onClose }) => {
 
     useEffect(() => {
         if (isOpen) {
-            fetchLookups();
-            generateDocNo();
-
-            const companyData = localStorage.getItem('selectedCompany');
-            const user = JSON.parse(localStorage.getItem('user') || '{}');
-            let companyCode = 'C001';
-
-            if (companyData) {
-                try {
-                    const parsed = JSON.parse(companyData);
-                    companyCode = parsed.company_Code || parsed.companyCode || parsed.CompanyCode || companyData;
-                } catch (e) { companyCode = companyData; }
-            }
-
+            const { companyCode, userName } = getSessionData();
+            
             setFormData(prev => ({
                 ...prev,
                 company: companyCode,
-                createUser: user?.emp_Name || user?.empName || 'SYSTEM'
+                createUser: userName
             }));
+
+            fetchLookups();
+            generateDocNo(companyCode);
         }
     }, [isOpen]);
 
@@ -60,9 +52,9 @@ const CustomerInvoiceBoard = ({ isOpen, onClose }) => {
         }
     };
 
-    const generateDocNo = async () => {
+    const generateDocNo = async (companyCode) => {
         try {
-            const data = await customerInvoiceService.generateDocNo(formData.company);
+            const data = await customerInvoiceService.generateDocNo(companyCode);
             setFormData(prev => ({ ...prev, docNo: data.docNo }));
         } catch (error) {
             console.error('Failed to gen doc no');

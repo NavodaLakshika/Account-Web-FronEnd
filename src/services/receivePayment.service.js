@@ -1,4 +1,5 @@
 import api from './api';
+import { getUserName } from '../utils/session';
 
 export const receivePaymentService = {
   getLookups: async (company, type = 'MM') => {
@@ -8,7 +9,7 @@ export const receivePaymentService = {
     } catch (error) { throw error; }
   },
 
-  getOutstanding: async (customerId, company, docNo, accountType = 'MM', userName = 'Admin') => {
+  getOutstanding: async (customerId, company, docNo, accountType = 'MM', userName = getUserName()) => {
     try {
       const response = await api.get('/ReceivePayment/outstanding', { 
         params: { customerId, company, docNo, accountType, userName } 

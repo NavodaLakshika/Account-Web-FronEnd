@@ -1,7 +1,8 @@
 import api from './api';
+import { getCompanyCode } from '../utils/session';
 
 export const bankingService = {
-    getCollectionLookups: async (companyCode = 'C001') => {
+    getCollectionLookups: async (companyCode = getCompanyCode()) => {
         try {
             const resp = await api.get(`banking/collection-lookups?companyCode=${companyCode}`);
             return resp.data;
@@ -28,7 +29,7 @@ export const bankingService = {
         }
     },
 
-    generateDocNo: async (prefix = 'MDP', companyCode = 'C001') => {
+    generateDocNo: async (prefix = 'MDP', companyCode = getCompanyCode()) => {
         try {
             const resp = await api.get(`banking/gen-docno?prefix=${prefix}&companyCode=${companyCode}`);
             return resp.data;
@@ -37,7 +38,7 @@ export const bankingService = {
         }
     },
 
-    getDirectTransactionLookups: async (companyCode = 'C001') => {
+    getDirectTransactionLookups: async (companyCode = getCompanyCode()) => {
         try {
             const resp = await api.get(`banking/direct-lookups?companyCode=${companyCode}`);
             return resp.data;
@@ -55,7 +56,7 @@ export const bankingService = {
         }
     },
 
-    getTransferLookups: async (companyCode = 'C001') => {
+    getTransferLookups: async (companyCode = getCompanyCode()) => {
         try {
             const resp = await api.get(`banking/transfer-lookups?companyCode=${companyCode}`);
             return resp.data;
@@ -64,7 +65,7 @@ export const bankingService = {
         }
     },
 
-    getAccountBalance: async (accountCode, companyCode = 'C001') => {
+    getAccountBalance: async (accountCode, companyCode = getCompanyCode()) => {
         try {
             const resp = await api.get(`banking/account-balance?code=${accountCode}&companyCode=${companyCode}`);
             return resp.data;
@@ -82,7 +83,7 @@ export const bankingService = {
         }
     },
 
-    getCancelLookups: async (companyCode = 'C001') => {
+    getCancelLookups: async (companyCode = getCompanyCode()) => {
         try {
             const resp = await api.get(`banking/cancel-lookups?companyCode=${companyCode}`);
             return resp.data;
@@ -109,7 +110,7 @@ export const bankingService = {
         }
     },
 
-    getCustomerChequeLookups: async (companyCode = 'C001') => {
+    getCustomerChequeLookups: async (companyCode = getCompanyCode()) => {
         try {
             const resp = await api.get(`banking/customer-cheque-lookups?companyCode=${companyCode}`);
             return resp.data;
@@ -136,7 +137,7 @@ export const bankingService = {
         }
     },
 
-    getChequeFormatLookups: async (companyCode = 'C001') => {
+    getChequeFormatLookups: async (companyCode = getCompanyCode()) => {
         try {
             const resp = await api.get(`banking/cheque-formats?companyCode=${companyCode}`);
             return resp.data;
@@ -163,25 +164,34 @@ export const bankingService = {
         }
     },
 
-    getChequeBookLookups: async (companyCode = 'C001') => {
+    getChequeBookLookups: async (companyCode = getCompanyCode(), accCode = '') => {
         try {
-            const resp = await api.get(`banking/cheque-book-lookups?companyCode=${companyCode}`);
+            const resp = await api.get(`banking/cheque-book/lookups?companyCode=${companyCode}&accCode=${accCode}`);
             return resp.data;
         } catch (error) {
-            return { accounts: [] };
+            return { accounts: [], nextBookNo: 1 };
+        }
+    },
+
+    getChequeBookList: async (companyCode = getCompanyCode(), accCode = '') => {
+        try {
+            const resp = await api.get(`banking/cheque-book/list?companyCode=${companyCode}&accCode=${accCode}`);
+            return resp.data;
+        } catch (error) {
+            return [];
         }
     },
 
     saveChequeBook: async (data) => {
         try {
-            const resp = await api.post(`banking/cheque-book`, data);
+            const resp = await api.post(`banking/cheque-book/save`, data);
             return resp.data;
         } catch (error) {
             throw error.response?.data?.message || 'Failed to register cheque book.';
         }
     },
 
-    getChequeInHandLookups: async (companyCode = 'C001') => {
+    getChequeInHandLookups: async (companyCode = getCompanyCode()) => {
         try {
             const resp = await api.get(`banking/cheque-in-hand-lookups?companyCode=${companyCode}`);
             return resp.data;
@@ -199,7 +209,7 @@ export const bankingService = {
         }
     },
 
-    getNotPresentedLookups: async (companyCode = 'C001') => {
+    getNotPresentedLookups: async (companyCode = getCompanyCode()) => {
         try {
             const resp = await api.get(`banking/not-presented-lookups?companyCode=${companyCode}`);
             return resp.data;
@@ -218,7 +228,7 @@ export const bankingService = {
     },
 
     // BANK RECONCILIATION
-    getReconLookups: async (companyCode = 'C001') => {
+    getReconLookups: async (companyCode = getCompanyCode()) => {
         try {
             const resp = await api.get(`bankreconciliation/lookups?companyCode=${companyCode}`);
             return resp.data;
@@ -227,7 +237,7 @@ export const bankingService = {
         }
     },
 
-    generateReconDocNo: async (companyCode = 'C001') => {
+    generateReconDocNo: async (companyCode = getCompanyCode()) => {
         try {
             const resp = await api.get(`bankreconciliation/gen-docno?companyCode=${companyCode}`);
             return resp.data;
@@ -236,7 +246,7 @@ export const bankingService = {
         }
     },
 
-    initializeReconTemp: async (tempDocNo, companyCode = 'C001') => {
+    initializeReconTemp: async (tempDocNo, companyCode = getCompanyCode()) => {
         try {
             const resp = await api.get(`bankreconciliation/init-temp?tempDocNo=${tempDocNo}&companyCode=${companyCode}`);
             return resp.data;

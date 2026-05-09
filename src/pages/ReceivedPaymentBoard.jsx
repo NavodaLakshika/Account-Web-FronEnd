@@ -4,6 +4,7 @@ import { Search, Calendar, RefreshCw, X, Save, RotateCcw, Loader2 } from 'lucide
 import receivePaymentService from '../services/receivePayment.service';
 import { toast } from 'react-hot-toast';
 import CalendarModal from '../components/CalendarModal';
+import { getSessionData } from '../utils/session';
 
 const ReceivedPaymentBoard = ({ isOpen, onClose }) => {
     const [lookups, setLookups] = useState({ banks: [], accounts: [] });
@@ -22,8 +23,8 @@ const ReceivedPaymentBoard = ({ isOpen, onClose }) => {
         debitAccount: '',
         creditAccount: '',
         memo: '',
-        company: 'C001',
-        createUser: 'SYSTEM'
+        company: '',
+        createUser: ''
     });
 
     const [activeModal, setActiveModal] = useState(null); // 'bank', 'debit', 'credit', 'payType'
@@ -33,31 +34,22 @@ const ReceivedPaymentBoard = ({ isOpen, onClose }) => {
 
     useEffect(() => {
         if (isOpen) {
-            fetchLookups();
-            generateReceiptNo();
-
-            const companyData = localStorage.getItem('selectedCompany');
-            const user = JSON.parse(localStorage.getItem('user') || '{}');
-            let companyCode = 'C001';
-
-            if (companyData) {
-                try {
-                    const parsed = JSON.parse(companyData);
-                    companyCode = parsed.company_Code || parsed.companyCode || parsed.CompanyCode || companyData;
-                } catch (e) { companyCode = companyData; }
-            }
-
+            const { companyCode, userName } = getSessionData();
+            
             setFormData(prev => ({
                 ...prev,
                 company: companyCode,
-                createUser: user?.emp_Name || user?.empName || 'SYSTEM'
+                createUser: userName
             }));
+
+            fetchLookups(companyCode);
+            generateReceiptNo(companyCode);
         }
     }, [isOpen]);
 
-    const fetchLookups = async () => {
+    const fetchLookups = async (companyCode) => {
         try {
-            const data = await receivePaymentService.getLookups(formData.company, 'MM');
+            const data = await receivePaymentService.getLookups(companyCode, 'MM');
             setLookups({
                 banks: data.banks || [],
                 accounts: data.subAccounts || []
@@ -67,9 +59,9 @@ const ReceivedPaymentBoard = ({ isOpen, onClose }) => {
         }
     };
 
-    const generateReceiptNo = async () => {
+    const generateReceiptNo = async (companyCode) => {
         try {
-            const data = await receivePaymentService.generateDoc(formData.company);
+            const data = await receivePaymentService.generateDoc(companyCode);
             setFormData(prev => ({ ...prev, receiptNo: data.docNo }));
         } catch (error) {
             console.error('Failed to gen receipt no');

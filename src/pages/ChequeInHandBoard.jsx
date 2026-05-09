@@ -3,6 +3,7 @@ import SimpleModal from '../components/SimpleModal';
 import { Search, X, RotateCcw, Loader2, Landmark, Calendar, FileText, CheckCircle2, Plus, Trash2, Wallet, HandCoins, ShieldCheck } from 'lucide-react';
 import { bankingService } from '../services/banking.service';
 import { toast } from 'react-hot-toast';
+import { getSessionData } from '../utils/session';
 
 const ChequeInHandBoard = ({ isOpen, onClose }) => {
     const [loading, setLoading] = useState(false);
@@ -13,8 +14,8 @@ const ChequeInHandBoard = ({ isOpen, onClose }) => {
         bankCode: '',
         bankName: '',
         docNo: '',
-        company: 'C001',
-        createUser: 'SYSTEM'
+        company: '',
+        createUser: ''
     });
 
     // Line Entry States
@@ -33,34 +34,25 @@ const ChequeInHandBoard = ({ isOpen, onClose }) => {
 
     useEffect(() => {
         if (isOpen) {
-            loadInitialData();
-            
-            const companyData = localStorage.getItem('selectedCompany');
-            const user = JSON.parse(localStorage.getItem('user') || '{}');
-            let companyCode = 'C001';
-
-            if (companyData) {
-                try {
-                    const parsed = JSON.parse(companyData);
-                    companyCode = parsed.company_Code || parsed.companyCode || parsed.CompanyCode || companyData;
-                } catch (e) { companyCode = companyData; }
-            }
+            const { companyCode, userName } = getSessionData();
 
             setHeader(prev => ({
                 ...prev,
                 company: companyCode,
-                createUser: user?.emp_Name || user?.empName || 'SYSTEM'
+                createUser: userName
             }));
+            
+            loadInitialData(companyCode);
         }
     }, [isOpen]);
 
-    const loadInitialData = async () => {
+    const loadInitialData = async (compCode) => {
         try {
             setLoading(true);
-            const companyCode = header.company || 'C001';
+            const activeComp = compCode || header.company;
             const [lookupRes, docRes] = await Promise.all([
-                bankingService.getChequeInHandLookups(companyCode),
-                bankingService.generateDocNo('CIH', companyCode)
+                bankingService.getChequeInHandLookups(activeComp),
+                bankingService.generateDocNo('CIH', activeComp)
             ]);
             setLookups(lookupRes);
             setHeader(prev => ({ ...prev, docNo: docRes.docNo }));

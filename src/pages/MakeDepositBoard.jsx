@@ -4,13 +4,13 @@ import CalendarModal from '../components/CalendarModal';
 import { Landmark, Search, RotateCcw, Save, Calendar, Plus, X, Loader2, Wallet, Banknote, ListFilter, Users, ChevronRight, CheckCircle2, Filter } from 'lucide-react';
 import { bankingService } from '../services/banking.service';
 import { toast } from 'react-hot-toast';
+import { getSessionData } from '../utils/session';
 
 const MakeDepositBoard = ({ isOpen, onClose, incomingData }) => {
     const [loading, setLoading] = useState(false);
     const [lookups, setLookups] = useState({ banks: [], accounts: [], costCenters: [] });
     
-    const userName = localStorage.getItem('userName') || 'SYSTEM';
-    const companyCode = localStorage.getItem('company') || 'C001';
+    const { companyCode, userName } = getSessionData();
 
     const [formData, setFormData] = useState({
         depositTo: '',
@@ -33,7 +33,8 @@ const MakeDepositBoard = ({ isOpen, onClose, incomingData }) => {
 
     useEffect(() => {
         if (isOpen) {
-            loadInitialData();
+            const { companyCode: comp } = getSessionData();
+            loadInitialData(comp);
             if (incomingData && incomingData.items) {
                 const mapped = incomingData.items.map(item => ({
                     id: Math.random(),
@@ -53,9 +54,10 @@ const MakeDepositBoard = ({ isOpen, onClose, incomingData }) => {
         }
     }, [isOpen, incomingData]);
 
-    const loadInitialData = async () => {
+    const loadInitialData = async (comp) => {
         try {
-            const data = await bankingService.getDirectTransactionLookups(companyCode);
+            const activeComp = comp || companyCode;
+            const data = await bankingService.getDirectTransactionLookups(activeComp);
             setLookups(data);
         } catch (error) {
             toast.error("Failed to load lookups");

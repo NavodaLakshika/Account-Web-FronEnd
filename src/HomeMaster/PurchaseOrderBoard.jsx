@@ -7,14 +7,15 @@ import { purchOrderService } from '../services/purchOrder.service';
 import { paymentMethodService } from '../services/paymentMethod.service';
 import { toast } from 'react-hot-toast';
 import { DotLottiePlayer } from '@dotlottie/react-player';
+import { getSessionData } from '../utils/session';
 
 const PurchaseOrderBoard = ({ isOpen, onClose }) => {
     const [lookups, setLookups] = useState({ suppliers: [], products: [], paymentMethods: [] });
 
     const [formData, setFormData] = useState({
         docNo: '',
-        company: 'C001',
-        createUser: 'SYSTEM',
+        company: '',
+        createUser: '',
         postDate: new Date().toISOString().split('T')[0],
         expectedDate: new Date().toISOString().split('T')[0],
         vendorId: '',
@@ -123,18 +124,7 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
 
     useEffect(() => {
         if (isOpen) {
-            const companyData = localStorage.getItem('selectedCompany');
-            const user = JSON.parse(localStorage.getItem('user') || '{}');
-            let companyCode = 'C001';
-            if (companyData) {
-                try {
-                    const parsed = JSON.parse(companyData);
-                    companyCode = parsed.company_Code || parsed.companyCode || parsed.CompanyCode || companyData;
-                } catch (e) { companyCode = companyData; }
-            }
-
-            const initCompany = companyCode;
-            const initUser = user?.emp_Name || user?.empName || 'SYSTEM';
+            const { companyCode: initCompany, userName: initUser } = getSessionData();
 
             setFormData(prev => ({ ...prev, company: initCompany, createUser: initUser }));
             fetchLookups(initCompany);

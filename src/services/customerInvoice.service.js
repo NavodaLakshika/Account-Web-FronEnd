@@ -1,4 +1,5 @@
 import api from './api';
+import { getCompanyCode } from '../utils/session';
 
 export const customerInvoiceService = {
     getLookups: async () => {
@@ -10,7 +11,7 @@ export const customerInvoiceService = {
         }
     },
 
-    generateDocNo: async (companyCode = 'C001') => {
+    generateDocNo: async (companyCode = getCompanyCode()) => {
         try {
             const resp = await api.get(`salesorder/gen-docno?companyCode=${companyCode}`);
             const doc = resp.data.docNo || 'CIV001000001';

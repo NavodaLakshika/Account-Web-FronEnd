@@ -4,13 +4,14 @@ import { Search, Calendar, RefreshCw, X, Save, RotateCcw, Loader2, Landmark, Wal
 import { pettyCashService } from '../services/pettyCash.service';
 import { toast } from 'react-hot-toast';
 import { DotLottiePlayer } from '@dotlottie/react-player';
+import { getSessionData } from '../utils/session';
 import CalendarModal from '../components/CalendarModal';
 import CustomerMasterBoard from '../components/modals/MasterSubModal/CustomerMasterBoard';
 import NewAccountBoard from '../pages/NewAccountBoard';
 
 const PettyCashBoard = ({ isOpen, onClose }) => {
-    const company = localStorage.getItem('companyCode') || 'C002';
     const [loading, setLoading] = useState(false);
+    const [company, setCompany] = useState('');
 
     const initialFormState = {
         docNo: '',
@@ -168,18 +169,18 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
         fetchBalance();
     }, [fetchBalance]);
 
-    const fetchLookups = useCallback(async () => {
+    const fetchLookups = useCallback(async (comp) => {
         try {
-            const data = await pettyCashService.getLookups(company);
+            const data = await pettyCashService.getLookups(comp || company);
             setLookups(data);
         } catch (error) {
             showErrorToast('Failed to load lookup data');
         }
     }, [company]);
 
-    const handleGenerateDoc = async () => {
+    const handleGenerateDoc = async (comp) => {
         try {
-            const { docNo } = await pettyCashService.generateDocNo(company);
+            const { docNo } = await pettyCashService.generateDocNo(comp || company);
             setFormData(prev => ({ ...prev, docNo }));
         } catch (error) {
             showErrorToast('Failed to generate document number');
@@ -236,12 +237,16 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
 
     useEffect(() => {
         if (isOpen) {
-            fetchLookups();
-            handleGenerateDoc();
+            const { companyCode } = getSessionData();
+            setCompany(companyCode);
+            setFormData(prev => ({ ...prev, company: companyCode }));
+            
+            fetchLookups(companyCode);
+            handleGenerateDoc(companyCode);
             setExpenseRows([{ id: Date.now(), accCode: '', costCode: '', amount: 0, memo: '' }]);
             setItemRows([{ id: Date.now(), prodCode: '', qty: 1, cost: 0, memo: '' }]);
         }
-    }, [isOpen, fetchLookups]);
+    }, [isOpen]);
 
     const handleExpenseRowUpdate = (id, field, value) => {
         setExpenseRows(prev => prev.map(row => row.id === id ? { ...row, [field]: value } : row));

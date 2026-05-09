@@ -3,6 +3,7 @@ import SimpleModal from '../components/SimpleModal';
 import { Search, X, RotateCcw, Loader2, ArrowRightLeft, Landmark, Calendar, FileText, CheckCircle2, Wallet, ArrowRightCircle } from 'lucide-react';
 import { bankingService } from '../services/banking.service';
 import { toast } from 'react-hot-toast';
+import { getSessionData } from '../utils/session';
 
 const FundsTransferBoard = ({ isOpen, onClose }) => {
     const [loading, setLoading] = useState(false);
@@ -25,8 +26,8 @@ const FundsTransferBoard = ({ isOpen, onClose }) => {
         amount: 0,
         reffNo: '',
         memo: '',
-        company: 'C001',
-        createUser: 'SYSTEM'
+        company: '',
+        createUser: ''
     });
 
     const [activeModal, setActiveModal] = useState(null); // 'fromAcc', 'toAcc', 'fromCC', 'toCC'
@@ -34,34 +35,25 @@ const FundsTransferBoard = ({ isOpen, onClose }) => {
 
     useEffect(() => {
         if (isOpen) {
-            loadInitialData();
-            
-            const companyData = localStorage.getItem('selectedCompany');
-            const user = JSON.parse(localStorage.getItem('user') || '{}');
-            let companyCode = 'C001';
-
-            if (companyData) {
-                try {
-                    const parsed = JSON.parse(companyData);
-                    companyCode = parsed.company_Code || parsed.companyCode || parsed.CompanyCode || companyData;
-                } catch (e) { companyCode = companyData; }
-            }
+            const { companyCode, userName } = getSessionData();
 
             setFormData(prev => ({
                 ...prev,
                 company: companyCode,
-                createUser: user?.emp_Name || user?.empName || 'SYSTEM'
+                createUser: userName
             }));
+            
+            loadInitialData(companyCode);
         }
     }, [isOpen]);
 
-    const loadInitialData = async () => {
+    const loadInitialData = async (compCode) => {
         try {
             setLoading(true);
-            const companyCode = formData.company || 'C001';
+            const activeComp = compCode || formData.company;
             const [lookupRes, docRes] = await Promise.all([
-                bankingService.getTransferLookups(companyCode),
-                bankingService.generateDocNo('FNT', companyCode)
+                bankingService.getTransferLookups(activeComp),
+                bankingService.generateDocNo('FNT', activeComp)
             ]);
             setLookups(lookupRes);
             setFormData(prev => ({ ...prev, docNo: docRes.docNo }));

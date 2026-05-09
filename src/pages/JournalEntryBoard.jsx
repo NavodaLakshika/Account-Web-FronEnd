@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { journalService } from '../services/journal.service';
 import { toast } from 'react-hot-toast';
+import { getSessionData } from '../utils/session';
 import { DotLottiePlayer } from '@dotlottie/react-player';
 import * as XLSX from 'xlsx';
 
@@ -92,32 +93,8 @@ const JournalEntryBoard = ({ isOpen, onClose, onComplete }) => {
     const [tempEntries, setTempEntries] = useState([]);
     const [history, setHistory] = useState([]);
     const [accBalance, setAccBalance] = useState(0);
-    const [companyCode] = useState(() => {
-        const savedCompany = localStorage.getItem('selectedCompany');
-        if (savedCompany) {
-            try {
-                const parsed = JSON.parse(savedCompany);
-                return parsed.companyCode || parsed.CompanyCode || parsed.Company_Id || parsed.companyId || null;
-            } catch (e) {
-                console.error("Error parsing selectedCompany:", e);
-                return null;
-            }
-        }
-        return null;
-    });
-
-    const [currentUser] = useState(() => {
-        const userData = localStorage.getItem('user');
-        if (userData) {
-            try {
-                const parsed = JSON.parse(userData);
-                return parsed.emp_Name || parsed.Emp_Name || parsed.empName || parsed.EmpName || 'SYSTEM';
-            } catch (e) {
-                return 'SYSTEM';
-            }
-        }
-        return 'SYSTEM';
-    });
+    const [companyCode, setCompanyCode] = useState(null);
+    const [currentUser, setCurrentUser] = useState('');
 
     const [header, setHeader] = useState({
         docNo: 'JNL-AUTO',
@@ -206,18 +183,21 @@ const JournalEntryBoard = ({ isOpen, onClose, onComplete }) => {
 
     useEffect(() => {
         if (isOpen) {
-            loadInitialData();
+            const { companyCode: sessCompany, userName: sessUser } = getSessionData();
+            setCompanyCode(sessCompany);
+            setCurrentUser(sessUser);
+            loadInitialData(sessCompany, sessUser);
         }
     }, [isOpen]);
 
-    const loadInitialData = async () => {
-        if (!companyCode) {
+    const loadInitialData = async (compCode, user) => {
+        if (!compCode) {
             showErrorToast("Company session not found. Please select a company from the dashboard.");
             return;
         }
         try {
             setLoading(true);
-            const lks = await journalService.getLookups(companyCode, currentUser);
+            const lks = await journalService.getLookups(compCode, user);
             setLookups({
                 costCenters: lks.costCenters || [],
                 accounts: lks.accounts || [],
@@ -226,7 +206,7 @@ const JournalEntryBoard = ({ isOpen, onClose, onComplete }) => {
                 dateRanges: lks.dateRanges || []
             });
 
-            const docs = await journalService.generateDocNo(companyCode);
+            const docs = await journalService.generateDocNo(compCode);
             console.log("Journal Docs Response:", docs);
 
             if (!docs.docNo) {
@@ -254,11 +234,11 @@ const JournalEntryBoard = ({ isOpen, onClose, onComplete }) => {
         } finally {
             setLoading(false);
         }
-        loadHistory();
+        loadHistory(compCode);
     };
 
-    const loadHistory = async () => {
-        const hist = await journalService.getHistory(companyCode, selectedDateRange.code);
+    const loadHistory = async (compCode) => {
+        const hist = await journalService.getHistory(compCode, selectedDateRange.code);
         setHistory(hist);
     };
 

@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { getUserName } from '../utils/session';
 
 const api = axios.create({
   baseURL: '/api/PettyCash',
@@ -56,8 +57,7 @@ export const pettyCashService = {
   },
 
   applyPettyCash: async (data) => {
-    // For HomeMaster compatibility, pass empty username or get from localStorage
-    const userName = localStorage.getItem('userName') || 'SYSTEM';
+    const userName = getUserName();
     const r = await api.post('/apply', data, { params: { userName } });
     return r.data;
   },

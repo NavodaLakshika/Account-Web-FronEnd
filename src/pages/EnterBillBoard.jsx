@@ -5,6 +5,7 @@ import { Search, Calendar, ChevronDown, Trash2, X, Save, RotateCcw, Loader2 } fr
 import { enterBillService } from '../services/enterBill.service';
 import { toast } from 'react-hot-toast';
 import { DotLottiePlayer } from '@dotlottie/react-player';
+import { getSessionData } from '../utils/session';
 
 const EnterBillBoard = ({ isOpen, onClose }) => {
     const [selectedTab, setSelectedTab] = useState('Expenses');
@@ -43,7 +44,7 @@ const EnterBillBoard = ({ isOpen, onClose }) => {
         billDueDate: new Date().toISOString().split('T')[0],
         costCenter: '',
         company: '',
-        createUser: 'SYSTEM'
+        createUser: ''
     });
 
     const [expenses, setExpenses] = useState([]);
@@ -114,21 +115,12 @@ const EnterBillBoard = ({ isOpen, onClose }) => {
         if (isOpen) {
             fetchLookups();
 
-            const companyData = localStorage.getItem('selectedCompany');
-            const user = JSON.parse(localStorage.getItem('user') || '{}');
-            let companyCode = '';
-
-            if (companyData) {
-                try {
-                    const parsed = JSON.parse(companyData);
-                    companyCode = parsed.company_Code || parsed.companyCode || parsed.CompanyCode || companyData;
-                } catch (e) { companyCode = companyData; }
-            }
+            const { companyCode, userName } = getSessionData();
 
             setFormData(prev => ({
                 ...prev,
                 company: companyCode,
-                createUser: user?.emp_Name || user?.empName || ''
+                createUser: userName
             }));
             
             generateDocNo(companyCode);

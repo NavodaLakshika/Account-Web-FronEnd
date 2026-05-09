@@ -3,6 +3,7 @@ import SimpleModal from '../components/SimpleModal';
 import { Search, Calendar, ChevronDown, Check, X, Save, RotateCcw, Loader2 } from 'lucide-react';
 import { advancePayService } from '../services/advancePay.service';
 import { toast } from 'react-hot-toast';
+import { getSessionData } from '../utils/session';
 
 const AdvancePayBoard = ({ isOpen, onClose }) => {
     const [lookups, setLookups] = useState({ vendors: [], payAccounts: [], costCenters: [] });
@@ -24,8 +25,8 @@ const AdvancePayBoard = ({ isOpen, onClose }) => {
         isCheque: false,
         chequeNo: '',
         chequeDate: new Date().toISOString().split('T')[0],
-        company: 'C001',
-        createUser: 'SYSTEM'
+        company: '',
+        createUser: ''
     });
 
     // Search Modal States
@@ -34,25 +35,16 @@ const AdvancePayBoard = ({ isOpen, onClose }) => {
 
     useEffect(() => {
         if (isOpen) {
-            fetchLookups();
-            generateDocNo();
-
-            const companyData = localStorage.getItem('selectedCompany');
-            const user = JSON.parse(localStorage.getItem('user') || '{}');
-            let companyCode = 'C001';
-
-            if (companyData) {
-                try {
-                    const parsed = JSON.parse(companyData);
-                    companyCode = parsed.company_Code || parsed.companyCode || parsed.CompanyCode || companyData;
-                } catch (e) { companyCode = companyData; }
-            }
+            const { companyCode, userName } = getSessionData();
 
             setFormData(prev => ({
                 ...prev,
                 company: companyCode,
-                createUser: user?.emp_Name || user?.empName || 'SYSTEM'
+                createUser: userName
             }));
+            
+            fetchLookups();
+            generateDocNo(companyCode);
         }
     }, [isOpen]);
 
@@ -70,9 +62,9 @@ const AdvancePayBoard = ({ isOpen, onClose }) => {
         }
     };
 
-    const generateDocNo = async () => {
+    const generateDocNo = async (compCode) => {
         try {
-            const data = await advancePayService.generateDocNo(formData.company);
+            const data = await advancePayService.generateDocNo(compCode || formData.company);
             setFormData(prev => ({ ...prev, docNo: data.docNo }));
         } catch (error) {
             console.error('Failed to generate doc number.');

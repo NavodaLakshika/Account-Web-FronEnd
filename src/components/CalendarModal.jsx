@@ -12,11 +12,22 @@ const CalendarModal = ({ isOpen, onClose, onDateSelect, onDateChange, initialDat
             const [day, month, year] = dateStr.split('/');
             return new Date(year, month - 1, day);
         }
-        // Handle YYYY-MM-DD format (including ISO with time)
+        // Handle hyphenated formats (YYYY-MM-DD or DD-MM-YYYY)
         if (typeof dateStr === 'string' && dateStr.includes('-')) {
-            const datePart = dateStr.split('T')[0];
-            const [year, month, day] = datePart.split('-');
-            return new Date(year, month - 1, day);
+            const parts = dateStr.split('T')[0].split('-');
+            if (parts.length === 3) {
+                const p0 = parseInt(parts[0]);
+                const p1 = parseInt(parts[1]);
+                const p2 = parseInt(parts[2]);
+                
+                if (parts[2].length === 4) {
+                    // Confirmed DD-MM-YYYY (e.g. 10-05-2026)
+                    return new Date(p2, p1 - 1, p0);
+                } else if (parts[0].length === 4) {
+                    // Confirmed YYYY-MM-DD (e.g. 2026-05-10)
+                    return new Date(p0, p1 - 1, p2);
+                }
+            }
         }
         const d = new Date(dateStr);
         return isNaN(d.getTime()) ? new Date() : d;

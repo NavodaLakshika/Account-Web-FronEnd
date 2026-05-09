@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { X, Send, Bot, User, Trash2, Plus, ChevronLeft, ChevronRight, Paperclip, File, Image as ImageIcon, Mic, Maximize2, Minimize2 } from 'lucide-react';
 import { DotLottiePlayer } from '@dotlottie/react-player';
+import { getUserName } from '../utils/session';
 
 // ─── DrawBorderBox ────────────────────────────────────────────────────────────
 // SVG stroke-dashoffset animation that perfectly traces the rounded-rect border.
@@ -221,7 +222,7 @@ const AIChatbotBoard = ({ isOpen, onClose }) => {
                                     if (hour < 12) return "Good Morning";
                                     if (hour < 17) return "Good Afternoon";
                                     return "Good Evening";
-                                })()}, {localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')).empName.split(' ')[0] : 'Navoda'}
+                                })()}, {getUserName().split(' ')[0]}
                             </h3>
                         </div>
 

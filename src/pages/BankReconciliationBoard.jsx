@@ -4,6 +4,7 @@ import { Search, Calendar, ChevronDown, CheckCircle2, RotateCcw, Landmark, ListC
 import CalendarModal from '../components/CalendarModal';
 import { bankingService } from '../services/banking.service';
 import { toast } from 'react-hot-toast';
+import { getSessionData } from '../utils/session';
 
 const SearchModal = ({ isOpen, onClose, title, items, onSelect }) => {
     const [q, setQ] = useState('');
@@ -44,20 +45,8 @@ const BankReconciliationBoard = ({ isOpen, onClose }) => {
     const [loading, setLoading] = useState(false);
     const [isApplying, setIsApplying] = useState(false);
     const [lookups, setLookups] = useState({ banks: [] });
-    const [companyCode] = useState(localStorage.getItem('company') || 'C001');
-
-    const [currentUser] = useState(() => {
-        const userData = localStorage.getItem('user');
-        if (userData) {
-            try {
-                const parsed = JSON.parse(userData);
-                return parsed.emp_Name || parsed.Emp_Name || parsed.empName || 'SYSTEM';
-            } catch (e) {
-                return 'SYSTEM';
-            }
-        }
-        return 'SYSTEM';
-    });
+    const [companyCode, setCompanyCode] = useState('');
+    const [currentUser, setCurrentUser] = useState('');
 
     const [header, setHeader] = useState({
         docNo: 'BRC-AUTO',
@@ -76,20 +65,24 @@ const BankReconciliationBoard = ({ isOpen, onClose }) => {
 
     useEffect(() => {
         if (isOpen) {
-            fetchLookups();
-            generateDocNo();
+            const { companyCode: comp, userName } = getSessionData();
+            setCompanyCode(comp);
+            setCurrentUser(userName);
+            fetchLookups(comp);
+            generateDocNo(comp);
         }
     }, [isOpen]);
 
-    const fetchLookups = async () => {
-        const data = await bankingService.getReconLookups(companyCode);
+    const fetchLookups = async (comp) => {
+        const data = await bankingService.getReconLookups(comp || companyCode);
         setLookups(data);
     };
 
-    const generateDocNo = async () => {
-        const data = await bankingService.generateReconDocNo(companyCode);
+    const generateDocNo = async (comp) => {
+        const activeComp = comp || companyCode;
+        const data = await bankingService.generateReconDocNo(activeComp);
         setHeader(prev => ({ ...prev, docNo: data.docNo }));
-        await bankingService.initializeReconTemp(data.docNo, companyCode);
+        await bankingService.initializeReconTemp(data.docNo, activeComp);
     };
 
     const loadData = async () => {

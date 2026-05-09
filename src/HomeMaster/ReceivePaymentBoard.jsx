@@ -6,6 +6,7 @@ import { Search, Calendar, CheckCircle, Trash2, RotateCcw, Save, X, Plus, Check 
 import { toast } from 'react-hot-toast';
 import { DotLottiePlayer } from '@dotlottie/react-player';
 import { receivePaymentService } from '../services/receivePayment.service';
+import { getSessionData } from '../utils/session';
 
 const ReceivePaymentBoard = ({ isOpen, onClose }) => {
     const [lookups, setLookups] = useState({ 
@@ -34,8 +35,8 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
         chequeDate: new Date().toISOString().split('T')[0],
         remarks: '',
         reference: '',
-        company: 'C001',
-        createUser: 'SYSTEM',
+        company: '',
+        createUser: '',
         accountType: 'Medical Members'
     });
 
@@ -119,18 +120,7 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
 
     useEffect(() => {
         if (isOpen) {
-            const companyData = localStorage.getItem('selectedCompany');
-            const user = JSON.parse(localStorage.getItem('user') || '{}');
-            let companyCode = 'C001';
-            if (companyData) {
-                try {
-                    const parsed = JSON.parse(companyData);
-                    companyCode = parsed.company_Code || parsed.companyCode || parsed.CompanyCode || companyData;
-                } catch (e) { companyCode = companyData; }
-            }
-
-            const initCompany = companyCode;
-            const initUser = user?.emp_Name || user?.empName || 'SYSTEM';
+            const { companyCode: initCompany, userName: initUser } = getSessionData();
 
             setFormData(prev => ({ ...prev, company: initCompany, createUser: initUser }));
             fetchLookups(initCompany);

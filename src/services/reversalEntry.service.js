@@ -1,7 +1,8 @@
 import api from './api';
+import { getCompanyCode } from '../utils/session';
 
 export const reversalEntryService = {
-    getLookups: async (companyCode = 'C001') => {
+    getLookups: async (companyCode = getCompanyCode()) => {
         try {
             const resp = await api.get(`reversal/lookups?companyCode=${companyCode}`);
             return resp.data;

@@ -3,6 +3,7 @@ import SimpleModal from '../components/SimpleModal';
 import { Search, RotateCcw, Save, Trash2, Loader2, X } from 'lucide-react';
 import { customerService } from '../services/customer.service';
 import { toast } from 'react-hot-toast';
+import { getSessionData } from '../utils/session';
 
 const CustomerBoard = ({ isOpen, onClose }) => {
     const initialState = {
@@ -26,7 +27,7 @@ const CustomerBoard = ({ isOpen, onClose }) => {
         Area_Code: '',
         Route_Code: '',
         Locked: false,
-        CurrentUser: 'SYSTEM'
+        CurrentUser: ''
     };
 
     const [formData, setFormData] = useState(initialState);
@@ -43,10 +44,8 @@ const CustomerBoard = ({ isOpen, onClose }) => {
     useEffect(() => {
         if (isOpen) {
             fetchLookups();
-            const user = JSON.parse(localStorage.getItem('user'));
-            if (user) {
-                setFormData(prev => ({ ...prev, CurrentUser: user.emp_Name || 'SYSTEM' }));
-            }
+            const { userName } = getSessionData();
+            setFormData(prev => ({ ...prev, CurrentUser: userName }));
         }
     }, [isOpen]);
 

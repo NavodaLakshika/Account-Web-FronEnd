@@ -3,6 +3,7 @@ import SimpleModal from '../components/SimpleModal';
 import { Search, Plus, Save, RotateCcw, X, Trash2, Calendar, CheckCircle, Image as ImageIcon, Camera } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { productService } from '../services/product.service';
+import { getSessionData } from '../utils/session';
 
 const ItemMasterBoard = ({ isOpen, onClose }) => {
     const [lookups, setLookups] = useState({ 
@@ -42,9 +43,9 @@ const ItemMasterBoard = ({ isOpen, onClose }) => {
         underCostAllow: false,
         isInactive: false,
         availableStock: 0,
-        createUser: 'SYSTEM',
+        createUser: '',
         createDate: new Date().toISOString().split('T')[0],
-        modifiedUser: 'SYSTEM',
+        modifiedUser: '',
         modifiedDate: new Date().toISOString().split('T')[0],
         lastPurchQty: 0,
         discount: 0,
@@ -55,17 +56,8 @@ const ItemMasterBoard = ({ isOpen, onClose }) => {
 
     useEffect(() => {
         if (isOpen) {
-            const companyData = localStorage.getItem('selectedCompany');
-            const user = JSON.parse(localStorage.getItem('user') || '{}');
-            let companyCode = 'C001';
-            if (companyData) {
-                try {
-                    const parsed = JSON.parse(companyData);
-                    companyCode = parsed.company_Code || parsed.companyCode || parsed.CompanyCode || companyData;
-                } catch (e) { companyCode = companyData; }
-            }
+            const { companyCode, userName: initUser } = getSessionData();
 
-            const initUser = user?.emp_Name || user?.empName || 'SYSTEM';
             setFormData(prev => ({ ...prev, companyCode, createUser: initUser, modifiedUser: initUser }));
             fetchLookups(companyCode);
         }

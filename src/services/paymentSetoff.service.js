@@ -1,7 +1,8 @@
 import api from './api';
+import { getCompanyCode } from '../utils/session';
 
 export const paymentSetoffService = {
-    getLookups: async (companyCode = 'C001') => {
+    getLookups: async (companyCode = getCompanyCode()) => {
         try {
             const resp = await api.get(`paymentsetoff/lookups?companyCode=${companyCode}`);
             return resp.data;
@@ -10,7 +11,7 @@ export const paymentSetoffService = {
         }
     },
 
-    getPendingPayments: async (supplierCode, companyCode = 'C001') => {
+    getPendingPayments: async (supplierCode, companyCode = getCompanyCode()) => {
         try {
             const resp = await api.get(`paymentsetoff/pending?supplierCode=${supplierCode}&companyCode=${companyCode}`);
             return resp.data;
@@ -19,7 +20,7 @@ export const paymentSetoffService = {
         }
     },
 
-    getReturns: async (supplierCode, companyCode = 'C001') => {
+    getReturns: async (supplierCode, companyCode = getCompanyCode()) => {
         try {
             const resp = await api.get(`paymentsetoff/returns?supplierCode=${supplierCode}&companyCode=${companyCode}`);
             return resp.data;
@@ -28,7 +29,7 @@ export const paymentSetoffService = {
         }
     },
 
-    generateDocNo: async (companyCode = 'C001') => {
+    generateDocNo: async (companyCode = getCompanyCode()) => {
         try {
             const resp = await api.get(`paymentsetoff/gen-docno?companyCode=${companyCode}`);
             return resp.data;

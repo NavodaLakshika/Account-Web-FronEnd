@@ -8,6 +8,7 @@ import { grnService } from '../services/grn.service';
 import { paymentMethodService } from '../services/paymentMethod.service';
 import { toast } from 'react-hot-toast';
 import { DotLottiePlayer } from '@dotlottie/react-player';
+import { getSessionData } from '../utils/session';
 
 import ItemMasterBoard from './ItemMasterBoard';
 
@@ -55,8 +56,8 @@ const GRNBoard = ({ isOpen, onClose }) => {
         consignmentBasis: false,
         acceptOtherSupp: false,
         comment: '',
-        company: 'C001',
-        createUser: 'SYSTEM',
+        company: '',
+        createUser: '',
         taxPer: '0',
         nbtPer: '0',
         discPer: '0',
@@ -139,18 +140,7 @@ const GRNBoard = ({ isOpen, onClose }) => {
 
     useEffect(() => {
         if (isOpen) {
-            const companyData = localStorage.getItem('selectedCompany');
-            const user = JSON.parse(localStorage.getItem('user') || '{}');
-            let companyCode = 'C001';
-            if (companyData) {
-                try {
-                    const parsed = JSON.parse(companyData);
-                    companyCode = parsed.company_Code || parsed.companyCode || parsed.CompanyCode || companyData;
-                } catch (e) { companyCode = companyData; }
-            }
-
-            const initCompany = companyCode;
-            const initUser = user?.emp_Name || user?.empName || 'SYSTEM';
+            const { companyCode: initCompany, userName: initUser } = getSessionData();
 
             setFormData(prev => ({ ...prev, company: initCompany, createUser: initUser }));
             fetchLookups(initCompany);

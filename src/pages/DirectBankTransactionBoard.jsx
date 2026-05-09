@@ -3,6 +3,7 @@ import SimpleModal from '../components/SimpleModal';
 import { Search, X, RotateCcw, Loader2, Landmark, Calendar, Banknote, ShieldCheck, Wallet, ArrowUpRight, ArrowDownLeft, FileText, CheckCircle2 } from 'lucide-react';
 import { bankingService } from '../services/banking.service';
 import { toast } from 'react-hot-toast';
+import { getSessionData } from '../utils/session';
 
 const DirectBankTransactionBoard = ({ isOpen, onClose }) => {
     const [loading, setLoading] = useState(false);
@@ -22,8 +23,8 @@ const DirectBankTransactionBoard = ({ isOpen, onClose }) => {
         costCenterName: '',
         memo: '',
         amount: 0,
-        company: 'C001',
-        createUser: 'SYSTEM'
+        company: '',
+        createUser: ''
     });
 
     const [activeModal, setActiveModal] = useState(null); // 'bank', 'ap', 'costCenter'
@@ -31,34 +32,25 @@ const DirectBankTransactionBoard = ({ isOpen, onClose }) => {
 
     useEffect(() => {
         if (isOpen) {
-            loadInitialData();
-            
-            const companyData = localStorage.getItem('selectedCompany');
-            const user = JSON.parse(localStorage.getItem('user') || '{}');
-            let companyCode = 'C001';
-
-            if (companyData) {
-                try {
-                    const parsed = JSON.parse(companyData);
-                    companyCode = parsed.company_Code || parsed.companyCode || parsed.CompanyCode || companyData;
-                } catch (e) { companyCode = companyData; }
-            }
+            const { companyCode, userName } = getSessionData();
 
             setFormData(prev => ({
                 ...prev,
                 company: companyCode,
-                createUser: user?.emp_Name || user?.empName || 'SYSTEM'
+                createUser: userName
             }));
+            
+            loadInitialData(companyCode);
         }
     }, [isOpen]);
 
-    const loadInitialData = async () => {
+    const loadInitialData = async (compCode) => {
         try {
             setLoading(true);
-            const companyCode = formData.company || 'C001';
+            const activeComp = compCode || formData.company;
             const [lookupRes, docRes] = await Promise.all([
-                bankingService.getDirectTransactionLookups(companyCode),
-                bankingService.generateDocNo('BDT', companyCode)
+                bankingService.getDirectTransactionLookups(activeComp),
+                bankingService.generateDocNo('BDT', activeComp)
             ]);
             setLookups(lookupRes);
             setFormData(prev => ({ ...prev, docNo: docRes.docNo }));

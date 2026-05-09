@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import SimpleModal from '../components/SimpleModal';
 import CalendarModal from '../components/CalendarModal';
-import { Search, X, RotateCcw, Loader2, Landmark, Calendar, CheckSquare, Square, Filter, Banknote, ListChecks, CheckCircle2, ChevronRight, CornerDownRight } from 'lucide-react';
+import { Search, X, RotateCcw, Loader2, Landmark, Calendar, CheckSquare, Square, Filter, Banknote, ListChecks, CheckCircle2, ChevronRight, CornerDownRight, CheckCircle } from 'lucide-react';
 import { bankingService } from '../services/banking.service';
 import { toast } from 'react-hot-toast';
+import { DotLottiePlayer } from '@dotlottie/react-player';
+import { getSessionData } from '../utils/session';
 
 const SearchModal = ({ isOpen, onClose, title, items, onSelect }) => {
     const [q, setQ] = useState('');
@@ -27,8 +29,8 @@ const SearchModal = ({ isOpen, onClose, title, items, onSelect }) => {
                             autoFocus 
                             value={q} 
                             onChange={e => setQ(e.target.value)} 
-                            placeholder="Find record by name or code..." 
-                            className="w-full h-9 pl-10 pr-4 border border-gray-300 rounded-[5px] outline-none text-sm focus:border-[#0285fd] bg-white shadow-sm"
+                            placeholder="" 
+                            className="w-full h-9 pl-10 pr-4 border border-gray-300 rounded-[5px] outline-none text-sm focus:border-[#0285fd] bg-white shadow-sm font-bold"
                         />
                     </div>
                 </div>
@@ -47,8 +49,8 @@ const SearchModal = ({ isOpen, onClose, title, items, onSelect }) => {
                             <tbody className="divide-y divide-gray-50">
                                 {filtered.map((item, i) => (
                                     <tr key={i} onClick={() => { onSelect(item); onClose(); }} className="group hover:bg-blue-50/50 cursor-pointer transition-colors">
-                                        <td className="px-5 py-3 font-mono text-[12px] font-mono text-blue-600">{item.code || 'N/A'}</td>
-                                        <td className="px-5 py-3 text-[12px] font-mono text-gray-700 uppercase group-hover:text-blue-600 transition-colors">{item.name}</td>
+                                        <td className="px-5 py-3 font-mono text-[12px] font-mono text-blue-600 font-bold">{item.code || 'N/A'}</td>
+                                        <td className="px-5 py-3 text-[12px] font-mono text-gray-700 uppercase group-hover:text-blue-600 transition-colors font-bold">{item.name}</td>
                                         <td className="px-5 py-3 text-right">
                                             <button className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95">SELECT</button>
                                         </td>
@@ -77,14 +79,13 @@ const CollectionToDepositBoard = ({ isOpen, onClose, onComplete }) => {
     const [loading, setLoading] = useState(false);
     const [lookups, setLookups] = useState({ costCenters: [], paymentModes: [], customers: [], departments: [] });
 
-    const userName = localStorage.getItem('userName') || 'SYSTEM';
-    const companyCode = localStorage.getItem('company') || 'C001';
+    const { companyCode, userName } = getSessionData();
 
     const [formData, setFormData] = useState({
         docNo: '',
         costCenter: '',
         costCenterName: '',
-        dateFrom: new Date().toLocaleDateString('en-GB'), // Initial in DD/MM/YYYY
+        dateFrom: new Date().toLocaleDateString('en-GB'), 
         dateTo: new Date().toLocaleDateString('en-GB'),
         paymentMode: '',
         customerReceipt: false,
@@ -102,41 +103,101 @@ const CollectionToDepositBoard = ({ isOpen, onClose, onComplete }) => {
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [datePickerField, setDatePickerField] = useState('dateFrom');
 
+    const showSuccessToast = (message) => {
+        toast.custom((t) => (
+            <div className={`${t.visible ? 'animate-in slide-in-from-right-10 fade-in duration-500' : 'animate-out slide-out-to-right-10 fade-out duration-300'} 
+                max-w-[550px] w-fit bg-white/95 backdrop-blur-xl border border-white/20 shadow-2xl rounded-[5px] flex flex-col pointer-events-auto overflow-hidden`}>
+                <div className="px-4 py-2.5 flex items-center gap-3">
+                    <div className="w-12 h-12 shrink-0">
+                        <DotLottiePlayer src="/lottiefile/Successffull.lottie" autoplay loop={false} />
+                    </div>
+                    <div className="flex-grow text-left py-1">
+                        <h3 className="text-slate-800 text-[12px] font-bold tracking-wider uppercase font-tahoma leading-relaxed">{message}</h3>
+                        <div className="flex items-center gap-1.5 mt-0.5">
+                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.3)]" />
+                            <span className="text-emerald-600 text-[8px] font-mono font-bold tracking-widest uppercase">Verified</span>
+                        </div>
+                    </div>
+                    <button onClick={() => toast.dismiss(t.id)} className="text-slate-300 hover:text-slate-500 transition-colors">
+                        <X size={14} />
+                    </button>
+                </div>
+                <div className="h-[2px] w-full bg-emerald-50">
+                    <div className="h-full bg-emerald-500" style={{ animation: 'toastProgress 3s linear forwards' }} />
+                </div>
+            </div>
+        ), { duration: 3000, position: 'top-right' });
+    };
+
+    const showErrorToast = (message) => {
+        toast.custom((t) => (
+            <div className={`${t.visible ? 'animate-in slide-in-from-right-10 fade-in duration-500' : 'animate-out slide-out-to-right-10 fade-out duration-300'} 
+                max-w-[550px] w-fit bg-white/95 backdrop-blur-xl border border-white/20 shadow-2xl rounded-[5px] flex flex-col pointer-events-auto overflow-hidden`}>
+                <div className="px-4 py-2.5 flex items-center gap-3">
+                    <div className="w-12 h-12 shrink-0">
+                        <DotLottiePlayer src="/lottiefile/Error Fail animation.lottie" autoplay loop={false} />
+                    </div>
+                    <div className="flex-grow text-left py-1">
+                        <h3 className="text-slate-800 text-[12px] font-bold tracking-wider uppercase font-tahoma leading-relaxed">{message}</h3>
+                        <div className="flex items-center gap-1.5 mt-0.5">
+                            <div className="w-1.5 h-1.5 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.3)]" />
+                            <span className="text-red-600 text-[8px] font-mono font-bold tracking-widest uppercase">Failed</span>
+                        </div>
+                    </div>
+                    <button onClick={() => toast.dismiss(t.id)} className="text-slate-300 hover:text-slate-500 transition-colors">
+                        <X size={14} />
+                    </button>
+                </div>
+                <div className="h-[2px] w-full bg-red-50">
+                    <div className="h-full bg-red-500" style={{ animation: 'toastProgress 3s linear forwards' }} />
+                </div>
+            </div>
+        ), { duration: 3000, position: 'top-right' });
+    };
+
     useEffect(() => {
         if (isOpen) {
-            loadInitialData();
+            const { companyCode: comp, userName: user } = getSessionData();
+            setFormData(prev => ({
+                ...prev,
+                company: comp,
+                createUser: user
+            }));
+            loadInitialData(comp);
         }
     }, [isOpen]);
 
-    const loadInitialData = async () => {
+    const loadInitialData = async (comp) => {
         try {
             setLoading(true);
-            const lookupRes = await bankingService.getCollectionLookups(companyCode);
+            const activeComp = comp || companyCode;
+            const lookupRes = await bankingService.getCollectionLookups(activeComp);
             setLookups(lookupRes);
-            generateDocNo();
+            generateDocNo(activeComp);
         } catch (error) {
-            toast.error("Failed to load initial data");
+            showErrorToast("Failed to load initial data");
         } finally {
             setLoading(false);
         }
     };
 
-    const generateDocNo = async () => {
+    const generateDocNo = async (comp) => {
         try {
-            const docRes = await bankingService.generateDocNo('MDP', companyCode);
+            const activeComp = comp || companyCode;
+            const docRes = await bankingService.generateDocNo('MDPO', activeComp);
             setFormData(prev => ({ ...prev, docNo: docRes.docNo }));
         } catch (e) {}
     };
 
     const handleFetchCollections = async () => {
-        if (!formData.docNo) return toast.error("Document Number is required.");
+        if (!formData.docNo) return showErrorToast("Document Number is required.");
         try {
             setLoading(true);
             const data = await bankingService.getCollections({ ...formData, company: companyCode });
             setCollections(data);
             setSelectedIds([]);
         } catch (error) {
-            toast.error("Failed to fetch collections records");
+            showErrorToast("Failed to fetch collections records");
         } finally {
             setLoading(false);
         }
@@ -156,16 +217,16 @@ const CollectionToDepositBoard = ({ isOpen, onClose, onComplete }) => {
         .reduce((sum, c) => sum + (c.balance || 0), 0);
 
     const handleSave = async () => {
-        if (selectedIds.length === 0) return toast.error("Please select at least one record to deposit.");
+        if (selectedIds.length === 0) return showErrorToast("Please select at least one record to deposit.");
         try {
             setLoading(true);
             const selectedItems = collections.filter(c => selectedIds.includes(c.documentNo));
             const result = await bankingService.saveDeposit({ ...formData, items: selectedItems });
-            toast.success('Funds successfully moved to deposit state!');
+            showSuccessToast('Funds successfully moved to deposit state!');
             if (onComplete) onComplete({ items: result.items, totalBalance: result.totalBalance, sourceDocNo: formData.docNo });
             onClose();
         } catch (error) {
-            toast.error(error.toString());
+            showErrorToast(error.toString());
         } finally {
             setLoading(false);
         }
@@ -191,6 +252,14 @@ const CollectionToDepositBoard = ({ isOpen, onClose, onComplete }) => {
 
     return (
         <>
+            <style>
+                {`
+                    @keyframes toastProgress {
+                        0% { width: 100%; }
+                        100% { width: 0%; }
+                    }
+                `}
+            </style>
             <SimpleModal
                 isOpen={isOpen}
                 onClose={onClose}
@@ -200,17 +269,17 @@ const CollectionToDepositBoard = ({ isOpen, onClose, onComplete }) => {
                     <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-gray-100 rounded-b-xl">
                         <button 
                             onClick={handleClear} 
-                            className="px-6 h-10 bg-[#00adff] text-white text-sm font-black rounded-[5px] hover:bg-[#0099e6] transition-all flex items-center gap-2 border-none active:scale-95"
+                            className="px-6 h-10 bg-[#00adff] text-white text-sm font-black rounded-[5px] hover:bg-[#0099e6] transition-all flex items-center gap-2 border-none active:scale-95 shadow-md"
                         >
-                            <RotateCcw size={14} /> CLEAR REGISTRY
+                            <RotateCcw size={14} /> CLEAR 
                         </button>
                         <div className="flex gap-4">
                             <button 
                                 onClick={handleSave} 
                                 disabled={loading || selectedIds.length === 0} 
-                                className={`px-8 h-10 bg-[#2bb744] text-white text-sm font-black rounded-[5px] shadow-md shadow-green-100 hover:bg-[#259b3a] transition-all flex items-center gap-2 active:scale-95 ${loading || selectedIds.length === 0 ? 'opacity-50 grayscale cursor-not-allowed' : ''}`}
+                                className={`px-8 h-10 bg-[#2bb744] text-white text-sm font-black rounded-[5px] shadow-md shadow-green-100 hover:bg-[#259b3a] transition-all flex items-center gap-2 active:scale-95 border-none ${loading || selectedIds.length === 0 ? 'opacity-50 grayscale cursor-not-allowed' : ''}`}
                             >
-                                {loading ? <Loader2 size={14} className="animate-spin" /> : <CheckCircle2 size={14} />} CONFIRM SELECTION
+                                {loading ? <Loader2 size={14} className="animate-spin" /> : <CheckCircle size={14} />} CONFIRM 
                             </button>
                         </div>
                     </div>
@@ -225,13 +294,13 @@ const CollectionToDepositBoard = ({ isOpen, onClose, onComplete }) => {
                             {/* Column 1 */}
                             <div className="col-span-12 lg:col-span-4 flex items-center gap-2">
                                 <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Document ID</label>
-                                <div className="flex-1 h-8 bg-gray-50 border border-gray-300 rounded-[5px] px-3 flex items-center">
-                                    <span className="text-[12px] font-bold text-blue-600">{formData.docNo}</span>
+                                <div className="flex-1 h-8 bg-white border border-gray-300 rounded-[5px] px-3 flex items-center shadow-sm">
+                                    <span className="text-[12px] font-bold text-blue-600 font-mono uppercase">{formData.docNo}</span>
                                 </div>
                             </div>
 
                             <div className="col-span-12 lg:col-span-4 flex items-center gap-2">
-                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0 text-center lg:text-right px-2">Date From</label>
+                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Date From</label>
                                 <div className="flex-1 flex gap-1 h-8 min-w-0">
                                     <input 
                                         type="text" 
@@ -247,7 +316,7 @@ const CollectionToDepositBoard = ({ isOpen, onClose, onComplete }) => {
                             </div>
 
                             <div className="col-span-12 lg:col-span-4 flex items-center gap-2">
-                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0 text-center lg:text-right px-2">Date To</label>
+                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Date To</label>
                                 <div className="flex-1 flex gap-1 h-8 min-w-0">
                                     <input 
                                         type="text" 
@@ -269,7 +338,7 @@ const CollectionToDepositBoard = ({ isOpen, onClose, onComplete }) => {
                                     <input 
                                         type="text" 
                                         readOnly 
-                                        value={formData.costCenterName || 'Global Portfolio Selection'} 
+                                        value={formData.costCenterName || ''} 
                                         onClick={() => setActiveModal('costCenter')} 
                                         className="flex-1 h-8 border border-gray-300 rounded-[5px] px-3 text-[12px] font-bold text-gray-700 outline-none focus:border-[#0285fd] bg-white cursor-pointer shadow-sm" 
                                     />
@@ -280,12 +349,12 @@ const CollectionToDepositBoard = ({ isOpen, onClose, onComplete }) => {
                             </div>
 
                             <div className="col-span-12 lg:col-span-4 flex items-center gap-2">
-                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0 text-center lg:text-right px-2">Pay Type</label>
+                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Pay Type</label>
                                 <div className="flex-1 flex gap-1 h-8 min-w-0">
                                     <input 
                                         type="text" 
                                         readOnly 
-                                        value={formData.paymentMode || 'Consolidated Modes'} 
+                                        value={formData.paymentMode || ''} 
                                         onClick={() => setActiveModal('paymentMode')} 
                                         className="flex-1 h-8 border border-gray-300 rounded-[5px] px-3 text-[12px] font-bold text-gray-700 outline-none focus:border-[#0285fd] bg-white cursor-pointer shadow-sm" 
                                     />
@@ -296,23 +365,23 @@ const CollectionToDepositBoard = ({ isOpen, onClose, onComplete }) => {
                             </div>
 
                             {/* Row 3 */}
-                            <div className="col-span-12 lg:col-span-7 flex items-center gap-2">
+                            <div className="col-span-12 lg:col-span-8 flex items-center gap-2">
                                 <div className="w-24 shrink-0 flex items-center gap-2">
-                                    <input type="checkbox" checked={formData.customerReceipt} onChange={e => setFormData({...formData, customerReceipt: e.target.checked})} className="w-4 h-4 rounded border-gray-300 cursor-pointer" />
-                                    <label className="text-[12.5px] font-bold text-gray-700 cursor-pointer">Customer</label>
+                                    <input type="checkbox" id="chkCustomer" checked={formData.customerReceipt} onChange={e => setFormData({...formData, customerReceipt: e.target.checked})} className="w-4 h-4 rounded border-gray-300 cursor-pointer" />
+                                    <label htmlFor="chkCustomer" className="text-[12.5px] font-bold text-gray-700 cursor-pointer">Customer</label>
                                 </div>
                                 <div className={`flex-1 flex gap-1 h-8 min-w-0 ${!formData.customerReceipt ? 'opacity-30 grayscale pointer-events-none' : ''}`}>
-                                    <input type="text" readOnly value={formData.customerName || 'Filter by client registry...'} onClick={() => setActiveModal('customer')} className="flex-1 h-8 border border-gray-300 rounded-[5px] px-3 text-[12px] font-bold text-gray-700 outline-none focus:border-[#0285fd] bg-white cursor-pointer shadow-sm" />
-                                    <button onClick={() => setActiveModal('customer')} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center rounded-[5px] shadow-md hover:bg-blue-600 transition-all active:scale-95 shrink-0">
+                                    <input type="text" readOnly value={formData.customerName || ''} onClick={() => setActiveModal('customer')} className="flex-1 h-8 border border-gray-300 rounded-[5px] px-3 text-[12px] font-bold text-gray-700 outline-none focus:border-[#0285fd] bg-white cursor-pointer shadow-sm" />
+                                    <button onClick={() => setActiveModal('customer')} className="w-10 h-8 bg-gray-200 text-gray-400 flex items-center justify-center rounded-[5px] shadow-sm shrink-0">
                                         <Search size={16} />
                                     </button>
                                 </div>
                             </div>
 
-                            <div className="col-span-12 lg:col-span-5 flex items-center gap-2">
-                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0 text-center lg:text-right px-2">Dept Unit</label>
+                            <div className="col-span-12 lg:col-span-4 flex items-center gap-2">
+                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Dept Unit</label>
                                 <div className="flex-1 flex gap-1 h-8 min-w-0">
-                                    <input type="text" readOnly value={formData.departmentName || 'All Functional Departments'} onClick={() => setActiveModal('dept')} className="flex-1 h-8 border border-gray-300 rounded-[5px] px-3 text-[12px] font-bold text-gray-700 outline-none focus:border-[#0285fd] bg-white cursor-pointer shadow-sm" />
+                                    <input type="text" readOnly value={formData.departmentName || ''} onClick={() => setActiveModal('dept')} className="flex-1 h-8 border border-gray-300 rounded-[5px] px-3 text-[12px] font-bold text-gray-700 outline-none focus:border-[#0285fd] bg-white cursor-pointer shadow-sm" />
                                     <button onClick={() => setActiveModal('dept')} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center rounded-[5px] shadow-md hover:bg-blue-600 transition-all active:scale-95 shrink-0">
                                         <Search size={16} />
                                     </button>
@@ -324,21 +393,23 @@ const CollectionToDepositBoard = ({ isOpen, onClose, onComplete }) => {
                                 <div className="flex items-center gap-4">
                                     <div 
                                         onClick={toggleSelectAll}
-                                        className="flex items-center gap-2 bg-blue-50/50 px-3 py-1.5 rounded-[5px] border border-blue-100 cursor-pointer hover:bg-blue-100 transition-all"
+                                        className="flex items-center gap-2 bg-white px-4 py-1.5 rounded-[5px] border-2 border-blue-100 cursor-pointer hover:bg-blue-50 transition-all shadow-sm group"
                                     >
-                                        <input type="checkbox" checked={collections.length > 0 && selectedIds.length === collections.length} readOnly className="w-4 h-4 rounded border-gray-300 cursor-pointer" />
-                                        <span className="text-[11px] font-black text-blue-700 uppercase tracking-widest">Select All Records</span>
+                                        <div className={`w-4 h-4 rounded border-2 flex items-center justify-center transition-all ${collections.length > 0 && selectedIds.length === collections.length ? 'bg-[#0285fd] border-[#0285fd]' : 'border-gray-300'}`}>
+                                            {(collections.length > 0 && selectedIds.length === collections.length) && <CheckSquare size={12} className="text-white" />}
+                                        </div>
+                                        <span className="text-[11px] font-black text-blue-700 uppercase tracking-widest">Select All</span>
                                     </div>
-                                    <div className="text-[11px] font-bold text-slate-400 italic">
+                                    <div className="text-[11px] font-bold text-slate-400 ">
                                         * Use filters above to narrow down the collection queue
                                     </div>
                                 </div>
                                 <button 
                                     onClick={handleFetchCollections} 
                                     disabled={loading} 
-                                    className="h-8 px-6 bg-[#0285fd] text-white text-[11px] font-black uppercase tracking-widest rounded-[5px] shadow-md hover:bg-blue-600 transition-all flex items-center gap-2 active:scale-95"
+                                    className="h-9 px-8 bg-[#0285fd] text-white text-[11px] font-black uppercase tracking-widest rounded-[5px] shadow-lg shadow-blue-100 hover:bg-blue-600 transition-all flex items-center gap-2 active:scale-95 border-none"
                                 >
-                                    {loading ? <Loader2 size={14} className="animate-spin" /> : <Filter size={14} />} Load Records Grid
+                                    {loading ? <Loader2 size={14} className="animate-spin" /> : <Filter size={14} />} Load Records
                                 </button>
                             </div>
                         </div>
@@ -359,7 +430,7 @@ const CollectionToDepositBoard = ({ isOpen, onClose, onComplete }) => {
                             {collections.length === 0 ? (
                                 <div className="h-64 flex flex-col items-center justify-center text-gray-300 gap-4">
                                     <Landmark size={48} className="opacity-20" />
-                                    <div className="text-[11px] font-bold uppercase tracking-widest italic">Pending collection queue is empty</div>
+                                    <div className="text-[11px] font-bold uppercase tracking-widest">Pending collection queue is empty</div>
                                 </div>
                             ) : collections.map((c) => (
                                 <div 
@@ -369,19 +440,19 @@ const CollectionToDepositBoard = ({ isOpen, onClose, onComplete }) => {
                                 >
                                     <div className="w-14 py-2 px-3 border-r border-gray-100 flex items-center justify-center">
                                         <div className={`w-4 h-4 rounded flex items-center justify-center border-2 transition-all ${selectedIds.includes(c.documentNo) ? 'bg-[#2bb744] border-[#2bb744] text-white' : 'border-gray-200 bg-white'}`}>
-                                            {selectedIds.includes(c.documentNo) && <CheckCircle2 size={10} strokeWidth={4} />}
+                                            {selectedIds.includes(c.documentNo) && <CheckCircle size={10} strokeWidth={4} />}
                                         </div>
                                     </div>
-                                    <div className="flex-1 py-2 px-4 border-r border-gray-100 text-blue-600 font-mono flex items-center gap-2">
+                                    <div className="flex-1 py-2 px-4 border-r border-gray-100 text-blue-600 font-mono flex items-center gap-2 font-bold">
                                         <CornerDownRight size={12} className="text-gray-300" />
                                         {c.documentNo}
                                     </div>
-                                    <div className="w-32 py-2 px-4 border-r border-gray-100 text-center text-slate-500 font-mono">{c.date}</div>
+                                    <div className="w-32 py-2 px-4 border-r border-gray-100 text-center text-slate-500 font-mono font-bold">{c.date}</div>
                                     <div className="w-24 py-2 px-4 border-r border-gray-100 text-center flex justify-center">
                                         <span className="px-1.5 py-0.5 rounded-[3px] bg-gray-100 text-gray-500 text-[9px] font-black uppercase tracking-widest">{c.type}</span>
                                     </div>
-                                    <div className="flex-1 py-2 px-4 border-r border-gray-100 truncate italic text-slate-500 group-hover:text-slate-800 transition-colors">{c.name || 'INTERNAL RECONCILIATION'}</div>
-                                    <div className="w-36 py-2 px-4 border-r border-gray-100 text-right text-gray-400 font-mono">{c.amount?.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
+                                    <div className="flex-1 py-2 px-4 border-r border-gray-100 truncate italic text-slate-500 group-hover:text-slate-800 transition-colors font-bold">{c.name || 'INTERNAL RECONCILIATION'}</div>
+                                    <div className="w-36 py-2 px-4 border-r border-gray-100 text-right text-gray-400 font-mono font-bold">{c.amount?.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
                                     <div className="w-36 py-2 px-4 text-right font-black text-slate-900 group-hover:text-blue-700 transition-colors font-mono">{c.balance?.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
                                 </div>
                             ))}

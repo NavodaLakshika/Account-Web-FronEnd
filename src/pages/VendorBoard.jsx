@@ -3,6 +3,7 @@ import SimpleModal from '../components/SimpleModal';
 import { Search, RotateCcw, Save, Trash2, Loader2, X } from 'lucide-react';
 import { supplierService } from '../services/supplier.service';
 import { toast } from 'react-hot-toast';
+import { getSessionData } from '../utils/session';
 
 const VendorBoard = ({ isOpen, onClose }) => {
     const initialState = {
@@ -25,7 +26,7 @@ const VendorBoard = ({ isOpen, onClose }) => {
         Vend_Typ: '',
         Locked: false,
         Company: '',
-        CurrentUser: 'SYSTEM'
+        CurrentUser: ''
     };
 
     const [formData, setFormData] = useState(initialState);
@@ -40,15 +41,12 @@ const VendorBoard = ({ isOpen, onClose }) => {
     useEffect(() => {
         if (isOpen) {
             fetchLookups();
-            const user = JSON.parse(localStorage.getItem('user'));
-            const company = JSON.parse(localStorage.getItem('selectedCompany'));
-            if (user) {
-                setFormData(prev => ({ 
-                    ...prev, 
-                    CurrentUser: user.emp_Name || 'SYSTEM',
-                    Company: company?.company_Code || ''
-                }));
-            }
+            const { companyCode, userName } = getSessionData();
+            setFormData(prev => ({ 
+                ...prev, 
+                CurrentUser: userName,
+                Company: companyCode
+            }));
         }
     }, [isOpen]);
 

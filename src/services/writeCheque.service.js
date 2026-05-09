@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { getCompanyCode } from '../utils/session';
 
 const api = axios.create({
   baseURL: '/api/WriteCheque',
@@ -19,42 +20,57 @@ api.interceptors.request.use(
 );
 
 export const writeChequeService = {
-  async getLookups() {
+  async getInitData(company = getCompanyCode()) {
     try {
-      const user = JSON.parse(localStorage.getItem('user') || '{}');
-      const userName = user?.emp_Name || user?.empName || 'SYSTEM';
-      const response = await api.get(`/lookups?userName=${encodeURIComponent(userName)}`);
+      const response = await api.get(`/init-data?company=${encodeURIComponent(company)}`);
       return response.data;
     } catch (error) {
-      throw error.response?.data || 'Failed to fetch lookups';
+      throw error.response?.data || 'Failed to initialize data';
     }
   },
 
-  async generateDocNo() {
+  async getBankBalance(bankCode, company = getCompanyCode()) {
     try {
-      const companyData = localStorage.getItem('selectedCompany');
-      let companyCode = 'C001';
-      if (companyData) {
-        try {
-          const parsed = JSON.parse(companyData);
-          companyCode = parsed.company_Code || parsed.companyCode || parsed.CompanyCode || companyData;
-        } catch (e) { companyCode = companyData; }
-      }
-      const response = await api.get(`/generate-doc?company=${encodeURIComponent(companyCode)}`);
+      const response = await api.get(`/bank-balance?bankCode=${encodeURIComponent(bankCode)}&company=${encodeURIComponent(company)}`);
       return response.data;
     } catch (error) {
-      throw error.response?.data || 'Failed to generate document number';
+      throw error.response?.data || 'Failed to fetch bank balance';
     }
   },
 
-  async save(data) {
+  async tempSaveExpense(data) {
     try {
-      const user = JSON.parse(localStorage.getItem('user') || '{}');
-      const userName = user?.emp_Name || user?.empName || 'SYSTEM';
-      const response = await api.post(`/save?userName=${encodeURIComponent(userName)}`, data);
+      const response = await api.post('/temp-save-expense', data);
       return response.data;
     } catch (error) {
-      throw error.response?.data || 'Failed to save cheque portfolio';
+      throw error.response?.data || 'Failed to save expense line';
+    }
+  },
+
+  async tempSaveItem(data) {
+    try {
+      const response = await api.post('/temp-save-item', data);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || 'Failed to save item line';
+    }
+  },
+
+  async saveHeader(data) {
+    try {
+      const response = await api.post('/save-header', data);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || 'Failed to save header';
+    }
+  },
+
+  async apply(data) {
+    try {
+      const response = await api.post('/apply', data);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || 'Failed to apply transaction';
     }
   }
 };

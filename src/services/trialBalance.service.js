@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { getCompanyCode } from '../utils/session';
 
 const API_URL = '/api';
 
@@ -15,7 +16,7 @@ export const trialBalanceService = {
             params: {
                 dateFrom: params.dateFrom,
                 dateTo: params.dateTo,
-                companyCode: params.companyCode || 'C001',
+                companyCode: params.companyCode || getCompanyCode(),
                 costCenter: params.costCenter || 'all',
                 isYearEnd: params.isYearEnd || false,
                 hideZeroBalances: params.hideZeroBalances !== undefined ? params.hideZeroBalances : true

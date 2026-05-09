@@ -4,6 +4,7 @@ import SimpleModal from '../components/SimpleModal';
 import CalendarModal from '../components/CalendarModal';
 import { pettyCashService } from '../services/pettyCash.service';
 import { toast } from 'react-hot-toast';
+import { getSessionData } from '../utils/session';
 
 const today = () => {
     const d = new Date();
@@ -39,8 +40,7 @@ const SearchModal = ({ isOpen, onClose, title, items, onSelect, searchKey = 'nam
 };
 
 const PettyCashBoard = ({ isOpen, onClose }) => {
-    const userName = localStorage.getItem('userName') || 'SYSTEM';
-    const company  = localStorage.getItem('company')  || 'COM001';
+    const { companyCode: company, userName } = getSessionData();
 
     const [loading, setLoading]   = useState(false);
     const [lookups, setLookups]   = useState({ pettyAccounts:[], allAccounts:[], products:[], suppliers:[], costCenters:[], customers:[] });
@@ -78,17 +78,21 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
     const [savedDocs,         setSavedDocs]         = useState([]);
 
     useEffect(() => {
-        if (isOpen) { loadLookups(); generateDoc(); }
+        if (isOpen) { 
+            const { companyCode } = getSessionData();
+            loadLookups(companyCode); 
+            generateDoc(companyCode); 
+        }
     }, [isOpen]);
 
-    const loadLookups = async () => {
-        try { setLookups(await pettyCashService.getLookups(company)); }
+    const loadLookups = async (companyCode) => {
+        try { setLookups(await pettyCashService.getLookups(companyCode)); }
         catch { toast.error('Failed to load lookup data.'); }
     };
 
-    const generateDoc = async () => {
+    const generateDoc = async (companyCode) => {
         try {
-            const r = await pettyCashService.generateDocNo(company);
+            const r = await pettyCashService.generateDocNo(companyCode);
             setForm(f => ({ ...f, docNo: r.docNo }));
         } catch { toast.error('Failed to generate document number.'); }
     };

@@ -1,9 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import SimpleModal from '../components/SimpleModal';
 import CalendarModal from '../components/CalendarModal';
-import { BarChart3, Search, Calendar, RotateCcw, Printer, Download, X, Loader2, ListFilter, FileText, PieChart, TrendingUp, ChevronRight, Play } from 'lucide-react';
 import { trialBalanceService } from '../services/trialBalance.service';
 import { toast } from 'react-hot-toast';
+import { 
+    Printer, 
+    Calendar, 
+    ChevronRight, 
+    Loader2, 
+    Search 
+} from 'lucide-react';
+import { getCompanyCode } from '../utils/session';
 
 const TrialBalanceBoard = ({ isOpen, onClose }) => {
     const [loading, setLoading] = useState(false);
@@ -26,8 +33,6 @@ const TrialBalanceBoard = ({ isOpen, onClose }) => {
     const [showCalendarTo, setShowCalendarTo] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
 
-    const companyCode = localStorage.getItem('company') || 'C001';
-
     useEffect(() => {
         if (isOpen) {
             loadLookups();
@@ -36,7 +41,7 @@ const TrialBalanceBoard = ({ isOpen, onClose }) => {
 
     const loadLookups = async () => {
         try {
-            const data = await trialBalanceService.getLookups(companyCode);
+            const data = await trialBalanceService.getLookups(getCompanyCode());
             setLookups(data);
         } catch (e) {
             console.error('Lookup load failed', e);
@@ -52,7 +57,7 @@ const TrialBalanceBoard = ({ isOpen, onClose }) => {
         try {
             const data = await trialBalanceService.generate({
                 ...formData,
-                companyCode,
+                companyCode: getCompanyCode(),
                 costCenter: formData.costCenterCode,
                 hideZeroBalances: hideZero && !formData.allAccounts
             });

@@ -6,9 +6,10 @@ import { productService } from '../services/product.service';
 import { toast } from 'react-hot-toast';
 import CalendarModal from '../components/CalendarModal';
 import { DotLottiePlayer } from '@dotlottie/react-player';
+import { getSessionData } from '../utils/session';
 
 const SalesOrderBoard = ({ isOpen, onClose }) => {
-    const company = localStorage.getItem('companyCode') || 'C002';
+    const [company, setCompany] = useState('');
     
     // Custom Toast Handlers
     const showSuccessToast = (message) => {
@@ -109,13 +110,17 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
     // 1. Initial Load
     useEffect(() => {
         if (isOpen) {
-            initComponent();
+            const { companyCode } = getSessionData();
+            setCompany(companyCode);
+            setFormData(prev => ({ ...prev, company: companyCode }));
+            initComponent(companyCode);
         }
     }, [isOpen]);
 
-    const initComponent = async () => {
+    const initComponent = async (comp) => {
+        const activeCompany = comp || company;
         try {
-            const data = await salesOrderService.getInitData(company);
+            const data = await salesOrderService.getInitData(activeCompany);
             setLookups({
                 customers: data.customers || [],
                 salesAssistants: data.salesAssistants || [],

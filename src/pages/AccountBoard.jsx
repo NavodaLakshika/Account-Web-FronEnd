@@ -4,6 +4,7 @@ import { Save, RotateCcw, X, ChevronDown, List, AlertCircle, Info, Search } from
 import { accountService } from '../services/account.service';
 import { toast } from 'react-hot-toast';
 import { DotLottiePlayer } from '@dotlottie/react-player';
+import { getSessionData } from '../utils/session';
 
 const AccountBoard = ({ isOpen, onClose, selectedType, initialData }) => {
     const [loading, setLoading] = useState(false);
@@ -18,8 +19,10 @@ const AccountBoard = ({ isOpen, onClose, selectedType, initialData }) => {
         description: '',
         note: '',
         editSubAccount: false,
-        user: localStorage.getItem('userName') || 'System'
+        user: '',
+        editSubAccount: false
     });
+    const [companyCode, setCompanyCode] = useState('');
 
     const [parentAccounts, setParentAccounts] = useState([]);
     const [mainAccountTypes, setMainAccountTypes] = useState([]);
@@ -28,7 +31,6 @@ const AccountBoard = ({ isOpen, onClose, selectedType, initialData }) => {
     const [showParentModal, setShowParentModal] = useState(false);
     const [typeSearchQuery, setTypeSearchQuery] = useState('');
     const [parentSearchQuery, setParentSearchQuery] = useState('');
-    const companyCode = localStorage.getItem('company') || 'C001';
 
     const showSuccessToast = (message) => {
         toast.custom((t) => (
@@ -84,13 +86,16 @@ const AccountBoard = ({ isOpen, onClose, selectedType, initialData }) => {
 
     useEffect(() => {
         if (isOpen) {
-            loadMainAccountTypes();
+            const { companyCode: comp, userName: user } = getSessionData();
+            setCompanyCode(comp);
+            setFormData(prev => ({ ...prev, user }));
+            loadMainAccountTypes(comp);
         }
     }, [isOpen]);
 
-    const loadMainAccountTypes = async () => {
+    const loadMainAccountTypes = async (comp) => {
         try {
-            const data = await accountService.getMainTypes(companyCode);
+            const data = await accountService.getMainTypes(comp || companyCode);
             setMainAccountTypes(data);
         } catch (error) {
             console.error('Failed to load main types', error);
@@ -99,15 +104,16 @@ const AccountBoard = ({ isOpen, onClose, selectedType, initialData }) => {
 
     useEffect(() => {
         if (isOpen) {
+            const { companyCode: comp } = getSessionData();
             setFormData(prev => ({ ...prev, accountType: selectedType }));
-            loadParentAccounts(selectedType);
+            loadParentAccounts(selectedType, comp);
         }
     }, [isOpen, selectedType]);
 
-    const loadParentAccounts = async (type) => {
+    const loadParentAccounts = async (type, comp) => {
         setLoading(true);
         try {
-            const data = await accountService.getParentAccounts(type, companyCode);
+            const data = await accountService.getParentAccounts(type, comp || companyCode);
             setParentAccounts(data);
         } catch (error) {
             console.error('Failed to load parent accounts', error);

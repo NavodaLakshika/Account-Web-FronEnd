@@ -3,6 +3,7 @@ import SimpleModal from '../components/SimpleModal';
 import { Search, X, RotateCcw, Loader2, Ban, Landmark, Calendar, FileText, CheckCircle2, ShieldAlert, AlertTriangle, ArrowRightLeft } from 'lucide-react';
 import { bankingService } from '../services/banking.service';
 import { toast } from 'react-hot-toast';
+import { getSessionData } from '../utils/session';
 
 const ChequeCancelBoard = ({ isOpen, onClose }) => {
     const [loading, setLoading] = useState(false);
@@ -24,8 +25,8 @@ const ChequeCancelBoard = ({ isOpen, onClose }) => {
         cancelDate: new Date().toISOString().split('T')[0],
         reason: '',
         memo: '',
-        company: 'C001',
-        createUser: 'SYSTEM'
+        company: '',
+        createUser: ''
     });
 
     const [activeModal, setActiveModal] = useState(null); // 'account', 'docType'
@@ -33,31 +34,22 @@ const ChequeCancelBoard = ({ isOpen, onClose }) => {
 
     useEffect(() => {
         if (isOpen) {
-            loadInitialData();
-            
-            const companyData = localStorage.getItem('selectedCompany');
-            const user = JSON.parse(localStorage.getItem('user') || '{}');
-            let companyCode = 'C001';
-
-            if (companyData) {
-                try {
-                    const parsed = JSON.parse(companyData);
-                    companyCode = parsed.company_Code || parsed.companyCode || parsed.CompanyCode || companyData;
-                } catch (e) { companyCode = companyData; }
-            }
+            const { companyCode, userName } = getSessionData();
 
             setFormData(prev => ({
                 ...prev,
                 company: companyCode,
-                createUser: user?.emp_Name || user?.empName || 'SYSTEM'
+                createUser: userName
             }));
+            
+            loadInitialData(companyCode);
         }
     }, [isOpen]);
 
-    const loadInitialData = async () => {
+    const loadInitialData = async (compCode) => {
         try {
             setLoading(true);
-            const res = await bankingService.getCancelLookups(formData.company);
+            const res = await bankingService.getCancelLookups(compCode || formData.company);
             setLookups(res);
         } catch (error) {
             toast.error("Failed to load search parameters");
