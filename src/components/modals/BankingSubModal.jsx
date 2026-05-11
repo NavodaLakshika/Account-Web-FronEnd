@@ -11,7 +11,7 @@ const BankingSubModal = ({ isOpen, onClose, onOpenCollectionDeposit, onOpenDirec
         { icon: RefreshCw, label: 'Reconcile', action: onOpenBankReconciliation },
         { icon: Ban, label: 'Cheque Cancel', action: onOpenChequeCancel },
         { icon: Reply, label: 'Customer Cheque Return', action: onOpenCustomerChequeReturn },
-        { icon: Printer, label: 'Cheque Printing', action: onOpenChequePrint },
+
         { icon: Hash, label: 'Enter Cheque Book Number', action: onOpenChequeBookEntry },
         { icon: PenTool, label: 'Cheque Writing', action: onOpenWriteCheque },
         { type: 'separator' },

@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import SimpleModal from '../components/SimpleModal';
-import { Search, Calendar, ChevronDown, CheckCircle2, RotateCcw, Landmark, ListChecks, ArrowUpRight, ArrowDownLeft, Info, History, Save, CheckCircle, Loader2 } from 'lucide-react';
+import { Search, Calendar, ChevronDown, CheckCircle2, RotateCcw, Landmark, ListChecks, ArrowUpRight, ArrowDownLeft, Info, History, Save, CheckCircle, Loader2, X } from 'lucide-react';
 import CalendarModal from '../components/CalendarModal';
 import { bankingService } from '../services/banking.service';
 import { toast } from 'react-hot-toast';
 import { getSessionData } from '../utils/session';
+import { DotLottiePlayer } from '@dotlottie/react-player';
 
 const SearchModal = ({ isOpen, onClose, title, items, onSelect }) => {
     const [q, setQ] = useState('');
@@ -61,7 +62,58 @@ const BankReconciliationBoard = ({ isOpen, onClose }) => {
 
     const [transactions, setTransactions] = useState({ debits: [], credits: [] });
     const [activeModal, setActiveModal] = useState(null); // 'bank', 'dateFrom', 'dateTo', 'statementDate'
-    const [searchQ, setSearchQ] = useState('');
+
+    const showSuccessToast = (message) => {
+        toast.custom((t) => (
+            <div className={`${t.visible ? 'animate-in slide-in-from-right-10 fade-in duration-500' : 'animate-out slide-out-to-right-10 fade-out duration-300'} 
+                max-w-[550px] w-fit bg-white/95 backdrop-blur-xl border border-white/20 shadow-2xl rounded-[5px] flex flex-col pointer-events-auto overflow-hidden font-tahoma`}>
+                <div className="px-4 py-2.5 flex items-center gap-3">
+                    <div className="w-12 h-12 shrink-0">
+                        <DotLottiePlayer src="/lottiefile/Successffull.lottie" autoplay loop={false} />
+                    </div>
+                    <div className="flex-grow text-left py-1">
+                        <h3 className="text-slate-800 text-[12px] font-bold tracking-wider uppercase leading-relaxed">{message}</h3>
+                        <div className="flex items-center gap-1.5 mt-0.5">
+                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.3)]" />
+                            <span className="text-emerald-600 text-[8px] font-mono font-bold tracking-widest uppercase">Verified</span>
+                        </div>
+                    </div>
+                    <button onClick={() => toast.dismiss(t.id)} className="text-slate-300 hover:text-slate-500 transition-colors">
+                        <X size={14} />
+                    </button>
+                </div>
+                <div className="h-[2px] w-full bg-emerald-50">
+                    <div className="h-full bg-emerald-500" style={{ animation: 'toastProgress 3s linear forwards' }} />
+                </div>
+            </div>
+        ), { duration: 3000, position: 'top-right' });
+    };
+
+    const showErrorToast = (message) => {
+        toast.custom((t) => (
+            <div className={`${t.visible ? 'animate-in slide-in-from-right-10 fade-in duration-500' : 'animate-out slide-out-to-right-10 fade-out duration-300'} 
+                max-w-[550px] w-fit bg-white/95 backdrop-blur-xl border border-white/20 shadow-2xl rounded-[5px] flex flex-col pointer-events-auto overflow-hidden font-tahoma`}>
+                <div className="px-4 py-2.5 flex items-center gap-3">
+                    <div className="w-12 h-12 shrink-0">
+                        <DotLottiePlayer src="/lottiefile/Error Fail animation.lottie" autoplay loop={false} />
+                    </div>
+                    <div className="flex-grow text-left py-1">
+                        <h3 className="text-slate-800 text-[12px] font-bold tracking-wider uppercase leading-relaxed">{message}</h3>
+                        <div className="flex items-center gap-1.5 mt-0.5">
+                            <div className="w-1.5 h-1.5 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.3)]" />
+                            <span className="text-red-600 text-[8px] font-mono font-bold tracking-widest uppercase">Failed</span>
+                        </div>
+                    </div>
+                    <button onClick={() => toast.dismiss(t.id)} className="text-slate-300 hover:text-slate-500 transition-colors">
+                        <X size={14} />
+                    </button>
+                </div>
+                <div className="h-[2px] w-full bg-red-50">
+                    <div className="h-full bg-red-500" style={{ animation: 'toastProgress 3s linear forwards' }} />
+                </div>
+            </div>
+        ), { duration: 3000, position: 'top-right' });
+    };
 
     useEffect(() => {
         if (isOpen) {
@@ -86,7 +138,7 @@ const BankReconciliationBoard = ({ isOpen, onClose }) => {
     };
 
     const loadData = async () => {
-        if (!header.bankId) return toast.error('Please select a bank account');
+        if (!header.bankId) return showErrorToast('Please select a bank account');
         setLoading(true);
         try {
             // 1. Get Opening Balance
@@ -109,9 +161,9 @@ const BankReconciliationBoard = ({ isOpen, onClose }) => {
 
             setHeader(prev => ({ ...prev, openingBalance: obData.openingBalance }));
             setTransactions(txData);
-            toast.success('Ledger records synchronized');
+            showSuccessToast('Ledger records synchronized');
         } catch (error) {
-            toast.error('Failed to sync bank records');
+            showErrorToast('Failed to sync bank records');
         } finally {
             setLoading(false);
         }
@@ -152,7 +204,7 @@ const BankReconciliationBoard = ({ isOpen, onClose }) => {
         if (type === 'today') {
             from = to = now;
         } else if (type === 'yesterday') {
-            from = to = new Date(now.setDate(now.getDate() - 1));
+            from = to = new Date(new Date().setDate(now.getDate() - 1));
         } else if (type === 'thisMonth') {
             from = new Date(now.getFullYear(), now.getMonth(), 1);
             to = new Date(now.getFullYear(), now.getMonth() + 1, 0);
@@ -166,7 +218,7 @@ const BankReconciliationBoard = ({ isOpen, onClose }) => {
 
     const handleApply = async () => {
         if (Math.abs(totals.difference) > 0.01) {
-            return toast.error(`Cannot apply reconciliation. Difference must be zero. Current: ${totals.difference.toFixed(2)}`);
+            return showErrorToast(`Cannot apply reconciliation. Difference must be zero. Current: ${totals.difference.toFixed(2)}`);
         }
 
         setIsApplying(true);
@@ -181,17 +233,17 @@ const BankReconciliationBoard = ({ isOpen, onClose }) => {
                 clearedBalance: totals.clearedBalance,
                 difference: totals.difference
             });
-            toast.success('Bank Reconciliation Finalized');
+            showSuccessToast('Bank Reconciliation Finalized');
             onClose();
         } catch (error) {
-            toast.error(error);
+            showErrorToast(error.toString());
         } finally {
             setIsApplying(false);
         }
     };
 
     const renderGrid = (title, type, items, icon, color) => (
-        <div className="flex-1 flex flex-col bg-white border border-slate-100 rounded-xl shadow-sm overflow-hidden min-h-[400px]">
+        <div className="flex-1 flex flex-col bg-white border border-slate-100 rounded-xl shadow-sm overflow-hidden min-h-[450px]">
             <div className={`p-3 border-b border-slate-50 flex items-center justify-between bg-slate-50/50`}>
                 <div className="flex items-center gap-2">
                     <div className={`p-1.5 rounded-lg bg-${color}-50 text-${color}-600`}>{icon}</div>
@@ -203,7 +255,7 @@ const BankReconciliationBoard = ({ isOpen, onClose }) => {
             </div>
             <div className="flex-1 overflow-y-auto no-scrollbar">
                 <table className="w-full text-left text-[11px]">
-                    <thead className="bg-white sticky top-0 border-b border-slate-50 text-slate-400 font-black uppercase tracking-tighter">
+                    <thead className="bg-white sticky top-0 border-b border-slate-50 text-slate-400 font-black uppercase tracking-tighter z-10">
                         <tr>
                             <th className="px-4 py-2 w-10">Recon</th>
                             <th className="px-4 py-2">Date</th>
@@ -221,7 +273,7 @@ const BankReconciliationBoard = ({ isOpen, onClose }) => {
                                 </td>
                                 <td className="px-4 py-2 font-mono text-slate-500">{item.date}</td>
                                 <td className="px-4 py-2">
-                                    <div className="font-bold text-slate-700">{item.docNo}</div>
+                                    <div className="font-bold text-slate-700 truncate max-w-[150px]">{item.docNo}</div>
                                     <div className="text-[10px] text-slate-400">{item.chqNo || 'No CHQ'}</div>
                                 </td>
                                 <td className={`px-4 py-2 text-right font-mono font-black ${type === 'credits' ? 'text-rose-600' : 'text-emerald-600'}`}>
@@ -230,7 +282,7 @@ const BankReconciliationBoard = ({ isOpen, onClose }) => {
                             </tr>
                         ))}
                         {items.length === 0 && (
-                            <tr><td colSpan={4} className="py-20 text-center text-slate-300 font-bold uppercase italic opacity-50">No {title} Found</td></tr>
+                            <tr><td colSpan={4} className="py-20 text-center text-slate-300 font-bold uppercase  opacity-50">No {title} Found</td></tr>
                         )}
                     </tbody>
                 </table>
@@ -246,11 +298,19 @@ const BankReconciliationBoard = ({ isOpen, onClose }) => {
 
     return (
         <>
-            <SimpleModal isOpen={isOpen} onClose={onClose} title="Bank Reconciliation Board" maxWidth="max-w-[1550px]"
+            <style>
+                {`
+                    @keyframes toastProgress {
+                        0% { width: 100%; }
+                        100% { width: 0%; }
+                    }
+                `}
+            </style>
+            <SimpleModal isOpen={isOpen} onClose={onClose} title="Bank Reconciliation Board" maxWidth="max-w-[1600px]"
                 footer={
-                    <div className="bg-white px-8 py-4 w-full flex justify-between items-center border-t border-gray-100 rounded-b-xl shadow-inner">
+                    <div className="bg-slate-50 px-8 py-4 w-full flex justify-between items-center border-t border-gray-100 rounded-b-xl shadow-inner">
                         <div className="flex gap-3">
-                            <button onClick={() => window.location.reload()} className="px-6 h-10 bg-slate-100 text-slate-500 text-[12px] font-black rounded-[5px] hover:bg-slate-200 transition-all flex items-center gap-2 uppercase">
+                            <button onClick={() => window.location.reload()} className="px-6 h-10 bg-white text-slate-500 text-[12px] font-black rounded-[5px] border border-slate-200 hover:bg-slate-50 transition-all flex items-center gap-2 uppercase">
                                 <RotateCcw size={16} /> Reset Form
                             </button>
                             <button onClick={loadData} disabled={loading} className="px-6 h-10 bg-white text-blue-600 border-2 border-blue-600 text-[12px] font-black rounded-[5px] hover:bg-blue-50 transition-all flex items-center gap-2 uppercase">
@@ -260,7 +320,7 @@ const BankReconciliationBoard = ({ isOpen, onClose }) => {
                         <div className="flex items-center gap-8 mr-4">
                             <div className="text-right">
                                 <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Difference</div>
-                                <div className={`text-[18px] font-mono font-black ${Math.abs(totals.difference) < 0.01 ? 'text-emerald-600' : 'text-rose-600'}`}>
+                                <div className={`text-[20px] font-mono font-black ${Math.abs(totals.difference) < 0.01 ? 'text-emerald-600' : 'text-rose-600'}`}>
                                     {totals.difference.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                 </div>
                             </div>
@@ -273,9 +333,9 @@ const BankReconciliationBoard = ({ isOpen, onClose }) => {
                     </div>
                 }
             >
-                <div className="p-1 space-y-4 font-['Tahoma']">
+                <div className="p-1 space-y-4 font-['Tahoma'] overflow-y-auto max-h-[calc(100vh-200px)] no-scrollbar">
                     {/* Header Controls */}
-                    <div className="bg-white p-4 border border-slate-100 rounded-xl shadow-sm grid grid-cols-12 gap-6">
+                    <div className="bg-white p-5 border border-slate-100 rounded-xl shadow-sm grid grid-cols-12 gap-6">
                         <div className="col-span-12 lg:col-span-3">
                             <label className="text-[11px] font-black text-slate-400 uppercase mb-1.5 block ml-1">Recon Reference</label>
                             <div className="h-9 px-3 bg-slate-50 border border-slate-200 rounded-[5px] flex items-center justify-between font-mono font-bold text-blue-600">
@@ -330,47 +390,50 @@ const BankReconciliationBoard = ({ isOpen, onClose }) => {
 
                     {/* Dashboard Summary Section */}
                     <div className="grid grid-cols-12 gap-4">
-                        <div className="col-span-12 lg:col-span-3 flex items-center gap-2">
-                            <button onClick={() => setDateRange('today')} className="h-8 flex-1 bg-white hover:bg-slate-50 text-[10px] font-black uppercase text-slate-500 hover:text-blue-600 rounded-lg border border-slate-200 transition-all shadow-sm">Today</button>
-                            <button onClick={() => setDateRange('yesterday')} className="h-8 flex-1 bg-white hover:bg-slate-50 text-[10px] font-black uppercase text-slate-500 hover:text-blue-600 rounded-lg border border-slate-200 transition-all shadow-sm">Yesterday</button>
-                            <button onClick={() => setDateRange('thisMonth')} className="h-8 flex-1 bg-white hover:bg-slate-50 text-[10px] font-black uppercase text-slate-500 hover:text-blue-600 rounded-lg border border-slate-200 transition-all shadow-sm">Month</button>
-                            <button onClick={() => setDateRange('lastMonth')} className="h-8 flex-1 bg-white hover:bg-slate-50 text-[10px] font-black uppercase text-slate-500 hover:text-blue-600 rounded-lg border border-slate-200 transition-all shadow-sm">Last</button>
+                        <div className="col-span-12 lg:col-span-3 flex flex-col gap-2">
+                            <label className="text-[11px] font-black text-slate-400 uppercase mb-1.5 block ml-1">Quick Ranges</label>
+                            <div className="grid grid-cols-2 gap-2">
+                                <button onClick={() => setDateRange('today')} className="h-8 bg-white hover:bg-slate-50 text-[10px] font-black uppercase text-slate-500 hover:text-blue-600 rounded-lg border border-slate-200 transition-all shadow-sm">Today</button>
+                                <button onClick={() => setDateRange('yesterday')} className="h-8 bg-white hover:bg-slate-50 text-[10px] font-black uppercase text-slate-500 hover:text-blue-600 rounded-lg border border-slate-200 transition-all shadow-sm">Yesterday</button>
+                                <button onClick={() => setDateRange('thisMonth')} className="h-8 bg-white hover:bg-slate-50 text-[10px] font-black uppercase text-slate-500 hover:text-blue-600 rounded-lg border border-slate-200 transition-all shadow-sm">This Month</button>
+                                <button onClick={() => setDateRange('lastMonth')} className="h-8 bg-white hover:bg-slate-50 text-[10px] font-black uppercase text-slate-500 hover:text-blue-600 rounded-lg border border-slate-200 transition-all shadow-sm">Last Month</button>
+                            </div>
                         </div>
                         <div className="col-span-12 lg:col-span-6 grid grid-cols-4 gap-3">
-                            <div className="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                            <div className="bg-slate-50 p-3 rounded-xl border border-slate-100 flex flex-col justify-center">
                                 <div className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Opening Balance</div>
-                                <div className="text-[15px] font-mono font-black text-slate-700">{header.openingBalance.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
+                                <div className="text-[16px] font-mono font-black text-slate-700">{header.openingBalance.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
                             </div>
-                            <div className="bg-emerald-50/30 p-3 rounded-xl border border-emerald-100">
+                            <div className="bg-emerald-50/30 p-3 rounded-xl border border-emerald-100 flex flex-col justify-center">
                                 <div className="text-[9px] font-black text-emerald-600 uppercase tracking-widest mb-1 flex items-center gap-1">
                                     <ArrowDownLeft size={10} /> Reconciled Deposits
                                 </div>
-                                <div className="text-[15px] font-mono font-black text-emerald-700">{totals.recDebit.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
+                                <div className="text-[16px] font-mono font-black text-emerald-700">{totals.recDebit.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
                             </div>
-                            <div className="bg-rose-50/30 p-3 rounded-xl border border-rose-100">
+                            <div className="bg-rose-50/30 p-3 rounded-xl border border-rose-100 flex flex-col justify-center">
                                 <div className="text-[9px] font-black text-rose-600 uppercase tracking-widest mb-1 flex items-center gap-1">
                                     <ArrowUpRight size={10} /> Reconciled Payments
                                 </div>
-                                <div className="text-[15px] font-mono font-black text-rose-700">{totals.recCredit.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
+                                <div className="text-[16px] font-mono font-black text-rose-700">{totals.recCredit.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
                             </div>
-                            <div className="bg-blue-50/30 p-3 rounded-xl border border-blue-100">
+                            <div className="bg-blue-50/30 p-3 rounded-xl border border-blue-100 flex flex-col justify-center">
                                 <div className="text-[9px] font-black text-blue-600 uppercase tracking-widest mb-1">Cleared Ledger Balance</div>
-                                <div className="text-[15px] font-mono font-black text-blue-700">{totals.clearedBalance.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
+                                <div className="text-[16px] font-mono font-black text-blue-700">{totals.clearedBalance.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
                             </div>
                         </div>
 
-                        <div className="col-span-12 lg:col-span-3 bg-white p-3 rounded-xl shadow-sm flex items-center justify-between gap-4 border border-slate-200">
+                        <div className="col-span-12 lg:col-span-3 bg-white p-4 rounded-xl shadow-sm flex flex-col gap-3 border border-slate-100">
                             <div className="flex-1">
-                                <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1 block">Statement Balance</label>
+                                <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1 block">Statement Ending Balance</label>
                                 <input 
                                     type="number" value={header.endingBalance} onChange={e => setHeader({...header, endingBalance: parseFloat(e.target.value) || 0})}
-                                    className="w-full bg-white border border-slate-300 h-9 rounded-[5px] px-3 text-[14px] font-mono font-black text-slate-800 outline-none focus:border-blue-500 transition-all"
+                                    className="w-full bg-slate-50 border border-slate-200 h-9 rounded-[5px] px-3 text-[16px] font-mono font-black text-slate-800 outline-none focus:border-blue-500 transition-all text-right"
                                 />
                             </div>
-                            <div className="w-40">
+                            <div className="flex-1">
                                 <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1 block">Statement Date</label>
                                 <div className="flex h-9 gap-1.5">
-                                    <div onClick={() => setActiveModal('statementDate')} className="flex-1 px-3 border border-slate-300 rounded-[5px] flex items-center justify-center cursor-pointer hover:border-blue-500 bg-white group shadow-sm transition-all text-center">
+                                    <div onClick={() => setActiveModal('statementDate')} className="flex-1 px-3 border border-slate-200 rounded-[5px] flex items-center justify-center cursor-pointer hover:border-blue-500 bg-white group shadow-sm transition-all text-center">
                                         <span className="text-[12px] font-bold text-slate-700">{header.statementDate}</span>
                                     </div>
                                     <button onClick={() => setActiveModal('statementDate')} className="w-9 bg-blue-600 text-white flex items-center justify-center rounded-[5px] hover:bg-blue-700 transition-all shadow-sm active:scale-90 shrink-0">
@@ -382,7 +445,7 @@ const BankReconciliationBoard = ({ isOpen, onClose }) => {
                     </div>
 
                     {/* Transaction Grids Side-by-Side */}
-                    <div className="flex gap-4 min-h-0 flex-1">
+                    <div className="flex gap-6 min-h-0 flex-1">
                         {renderGrid("Deposits & Transfers (Debits)", "debits", transactions.debits, <ArrowDownLeft size={14} />, "emerald")}
                         {renderGrid("Payments & Withdrawals (Credits)", "credits", transactions.credits, <ArrowUpRight size={14} />, "rose")}
                     </div>

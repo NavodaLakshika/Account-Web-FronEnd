@@ -10,6 +10,13 @@ export const accountService = {
         return response.data;
     },
 
+    getOtherTypes: async (companyCode) => {
+        const response = await axios.get(`${API_URL}/Account/other-types`, {
+            params: { companyCode }
+        });
+        return response.data;
+    },
+
     getParentAccounts: async (type, companyCode) => {
         const response = await axios.get(`${API_URL}/Account/parents`, {
             params: { type, companyCode }

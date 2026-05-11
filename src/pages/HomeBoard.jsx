@@ -47,7 +47,7 @@ const HomeBoard = ({ isOpen, onClose, onOpenModal }) => {
             title="SELECT ITEM TO QUICK VIEW"
             maxWidth="max-w-[1240px]"
         >
-            <div className="flex bg-[#fcfdfe] h-[780px] font-['Plus_Jakarta_Sans'] overflow-hidden shadow-[0_25px_50px_-12px_rgba(0,0,0,0.1)] relative select-none rounded-[32px] m-1 border border-gray-100">
+            <div className="flex bg-[#fcfdfe] h-[75vh] max-h-[780px] min-h-[500px] font-['Plus_Jakarta_Sans'] overflow-hidden shadow-[0_25px_50px_-12px_rgba(0,0,0,0.1)] relative select-none rounded-[32px] m-1 border border-gray-100">
 
                 {/* 1. Vertical Sidebar - System Blue (#0078d4) with Curve */}
                 <div className="w-[200px] bg-[#0078d4] flex flex-col items-center justify-center relative overflow-hidden shrink-0 z-20">
@@ -68,7 +68,7 @@ const HomeBoard = ({ isOpen, onClose, onOpenModal }) => {
                 </div>
 
                 {/* 2. Main Area with 4 Quadrants */}
-                <div className="flex-1 relative p-16">
+                <div className="flex-1 relative p-16 overflow-y-auto no-scrollbar">
                     {/* Centered Cross-hair divider lines (Thin System Blue) */}
                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                         <div className="w-[85%] h-[1px] bg-[#0078d4]/10 absolute" />
@@ -138,7 +138,7 @@ const HomeBoard = ({ isOpen, onClose, onOpenModal }) => {
                                 <CategoryItem icon={ArrowDownLeft} label="Collection Deposit" onClick={() => onOpenModal('Make Deposit')} />
                                 <CategoryItem icon={ClipboardList} label="Cheque Register" onClick={() => onOpenModal('Register')} />
                                 <CategoryItem icon={PenTool} label="Write Cheque" onClick={() => onOpenModal('Write Cheque')} />
-                                <CategoryItem icon={RefreshCcw} label="Print Cheque" onClick={() => onOpenModal('Print Cheque')} />
+
                             </div>
                         </div>
                     </div>

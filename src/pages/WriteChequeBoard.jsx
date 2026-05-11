@@ -767,7 +767,7 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
                                     <td className="px-4 py-3 font-mono text-[12px] text-gray-400">{c.costCenterCode}</td>
                                     <td className="px-4 py-3 font-bold text-[13px] text-gray-700 uppercase group-hover:text-blue-600 transition-colors">{c.costCenterName}</td>
                                     <td className="px-4 py-3 text-right">
-                                        <button className="bg-[#0285fd] text-white text-[10px] px-4 py-1.5 rounded-[5px] font-black shadow-md border-none">SELECT</button>
+                                        <button className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95">SELECT</button>
                                     </td>
                                 </tr>
                             ))}

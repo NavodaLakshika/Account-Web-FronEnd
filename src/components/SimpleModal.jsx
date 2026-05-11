@@ -24,7 +24,7 @@ const SimpleModal = ({ isOpen, onClose, title, children, footer, maxWidth = "max
                     />
                     
                     <div className="flex-1 flex items-center">
-                        <span className="text-[15px] font-[700] text-slate-900 uppercase tracking-[3px] font-mono truncate">
+                        <span className="text-[15px] font-[650] text-slate-900 uppercase tracking-[2px] font-sans truncate">
                             {title}
                         </span>
                     </div>

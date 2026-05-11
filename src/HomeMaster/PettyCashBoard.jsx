@@ -625,7 +625,7 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                                             <td className="px-5 py-3 font-mono text-[11px] font-bold text-[#0285fd]">{a.code}</td>
                                             <td className="px-5 py-3 text-[11px] font-bold text-gray-600 uppercase  transition-colors group-hover:text-blue-600">{a.name}</td>
                                             <td className="px-5 py-3 text-right">
-                                                <button className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95">SELECT ACCOUNT</button>
+                                                <button className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95">SELECT </button>
                                             </td>
                                         </tr>
                                     ))}
@@ -898,7 +898,7 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                                             <td className="px-5 py-3 font-mono text-[13px] font-bold text-[#0285fd]">{e.code}</td>
                                             <td className="px-5 py-3 text-[12px] font-bold text-gray-700 uppercase  group-hover:text-blue-600 transition-colors">{e.name}</td>
                                             <td className="px-5 py-3 text-right">
-                                                <button className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95">SELECT ACCOUNT</button>
+                                                <button className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95">SELECT </button>
                                             </td>
                                         </tr>
                                     ))}

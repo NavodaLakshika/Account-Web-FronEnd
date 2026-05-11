@@ -49,7 +49,7 @@ import SalesOrderBoard from '../HomeMaster/SalesOrderBoard';
 import SalesReceiptBoard from '../HomeMaster/SalesReceiptBoard';
 import ReceivePaymentBoard from '../HomeMaster/ReceivePaymentBoard';
 import ChequeRegisterBoard from '../HomeMaster/ChequeRegisterBoard';
-import PrintChequeBoard from '../HomeMaster/PrintChequeBoard';
+
 import MarketingToolBoard from '../HomeMaster/MarketingToolBoard';
 import AccountBalanceBoard from '../HomeMaster/AccountBalanceBoard';
 import ReminderBoard from '../HomeMaster/ReminderBoard';
@@ -79,7 +79,7 @@ import DirectBankTransactionBoard from './DirectBankTransactionBoard';
 import FundsTransferBoard from './FundsTransferBoard';
 import ChequeCancelBoard from './ChequeCancelBoard';
 import CustomerChequeReturnBoard from './CustomerChequeReturnBoard';
-import ChequePrintingBoard from './ChequePrintingBoard';
+
 import ChequeBookEntryBoard from './ChequeBookEntryBoard';
 import ChequeInHandBoard from './ChequeInHandBoard';
 import NotPresentedChequesBoard from './NotPresentedChequesBoard';
@@ -122,7 +122,7 @@ const Dashboard = () => {
     const [showSalesReceiptModal, setShowSalesReceiptModal] = useState(false);
     const [showReceivePaymentModal, setShowReceivePaymentModal] = useState(false);
     const [showChequeRegisterModal, setShowChequeRegisterModal] = useState(false);
-    const [showPrintChequeModal, setShowPrintChequeModal] = useState(false);
+
     const [topBarColor, setTopBarColor] = useState(localStorage.getItem('topBarColor') || '#0078d4');
     const [showAccountBalanceModal, setShowAccountBalanceModal] = useState(false);
     const [showAdvancePayModal, setShowAdvancePayModal] = useState(false);
@@ -139,7 +139,7 @@ const Dashboard = () => {
     const [showFundsTransferModal, setShowFundsTransferModal] = useState(false);
     const [showChequeCancelModal, setShowChequeCancelModal] = useState(false);
     const [showCustomerChequeReturnModal, setShowCustomerChequeReturnModal] = useState(false);
-    const [showChequePrintModal, setShowChequePrintModal] = useState(false);
+
     const [showChequeBookEntryModal, setShowChequeBookEntryModal] = useState(false);
     const [showChequeInHandModal, setShowChequeInHandModal] = useState(false);
     const [showNotPresentedChequesModal, setShowNotPresentedChequesModal] = useState(false);
@@ -454,7 +454,7 @@ const Dashboard = () => {
                     if (label === 'Collection Deposit' || label === 'Make Deposit') setShowCollectionToDepositModal(true);
                     if (label === 'Cheque Register' || label === 'Register') setShowChequeRegisterModal(true);
                     if (label === 'Write Cheque') setShowWriteChequeModal(true);
-                    if (label === 'Print Cheque') setShowPrintChequeModal(true);
+
 
                     // Company Section
                     if (label === 'Journal Entry') setShowJournalEntryModal(true);
@@ -479,7 +479,7 @@ const Dashboard = () => {
             <BankReconciliationBoard isOpen={showBankRecModal} onClose={() => setShowBankRecModal(false)} />
             <ChequeCancelBoard isOpen={showChequeCancelModal} onClose={() => setShowChequeCancelModal(false)} />
             <CustomerChequeReturnBoard isOpen={showCustomerChequeReturnModal} onClose={() => setShowCustomerChequeReturnModal(false)} />
-            <ChequePrintingBoard isOpen={showChequePrintModal} onClose={() => setShowChequePrintModal(false)} />
+
             <ChequeBookEntryBoard isOpen={showChequeBookEntryModal} onClose={() => setShowChequeBookEntryModal(false)} />
             <ChequeInHandBoard isOpen={showChequeInHandModal} onClose={() => setShowChequeInHandModal(false)} />
             <NotPresentedChequesBoard isOpen={showNotPresentedChequesModal} onClose={() => setShowNotPresentedChequesModal(false)} />
@@ -583,10 +583,7 @@ const Dashboard = () => {
                     setShowCustomerChequeReturnModal(true);
                     setShowTransactionModal(false);
                 }}
-                onOpenChequePrint={() => {
-                    setShowChequePrintModal(true);
-                    setShowTransactionModal(false);
-                }}
+
                 onOpenChequeBookEntry={() => {
                     setShowChequeBookEntryModal(true);
                     setShowTransactionModal(false);
@@ -724,7 +721,7 @@ const Dashboard = () => {
             <SalesReceiptBoard isOpen={showSalesReceiptModal} onClose={() => setShowSalesReceiptModal(false)} />
             <ReceivePaymentBoard isOpen={showReceivePaymentModal} onClose={() => setShowReceivePaymentModal(false)} />
             <ChequeRegisterBoard isOpen={showChequeRegisterModal} onClose={() => setShowChequeRegisterModal(false)} />
-            <PrintChequeBoard isOpen={showPrintChequeModal} onClose={() => setShowPrintChequeModal(false)} />
+
             <MarketingToolBoard isOpen={showMarketingToolModal} onClose={() => setShowMarketingToolModal(false)} />
             <AccountBalanceBoard isOpen={showAccountBalanceModal} onClose={() => setShowAccountBalanceModal(false)} />
             <AdvancePayBoard isOpen={showAdvancePayModal} onClose={() => setShowAdvancePayModal(false)} />

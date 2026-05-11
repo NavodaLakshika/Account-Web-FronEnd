@@ -1,339 +1,339 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import SimpleModal from '../components/SimpleModal';
 import CalendarModal from '../components/CalendarModal';
-import { Search, Calendar, RotateCcw, Printer, Download, X, Loader2, ListFilter, FileText, ChevronRight, Play, User, Users, Filter, Hash, CreditCard, Banknote } from 'lucide-react';
+import { Search, Calendar, RotateCcw, Printer, X, Loader2, ChevronRight, Play, User, Users, Filter, Hash, CreditCard, Banknote, DollarSign, List, MapPin } from 'lucide-react';
 import { documentSearchService } from '../services/documentSearch.service';
+import { DotLottiePlayer } from '@dotlottie/react-player';
 import { toast } from 'react-hot-toast';
 
 const DocumentSearchBoard = ({ isOpen, onClose }) => {
     const [loading, setLoading] = useState(false);
     const [lookups, setLookups] = useState({ transTypes: [], payees: [], costCenters: [], customers: [], suppliers: [] });
-    const [searchResults, setSearchResults] = useState([]);
-    
+    const [results, setResults] = useState([]);
     const [formData, setFormData] = useState({
-        transType: 'SAL',
-        vendorType: 'customer',
-        vendorId: '',
-        vendorName: 'ALL CONTEXTS',
-        docNo: '',
-        chequeNo: '',
-        amount: '',
-        costCenter: '',
-        dateFrom: new Date().toISOString().split('T')[0],
-        dateTo: new Date().toISOString().split('T')[0],
-        useDate: false,
-        payee: ''
+        transType: '', transLabel: 'ALL TYPES',
+        vendorType: 'customer', vendorId: '', vendorName: 'ALL ENTITIES',
+        docNo: '', chequeNo: '', amount: '', costCenter: '', costCenterName: 'ALL CENTERS', payee: 'ALL PAYEES',
+        dateFrom: new Date().toLocaleDateString('en-GB').split('/').reverse().join('-'),
+        dateTo: new Date().toLocaleDateString('en-GB').split('/').reverse().join('-'),
+        useDate: false
     });
 
     // Modal States
     const [showVendorModal, setShowVendorModal] = useState(false);
+    const [showTransTypeModal, setShowTransTypeModal] = useState(false);
+    const [showCostCenterModal, setShowCostCenterModal] = useState(false);
+    const [showPayeeModal, setShowPayeeModal] = useState(false);
+
+    // Search States for Modals
     const [vendorSearch, setVendorSearch] = useState('');
-    const [showCalendarFrom, setShowCalendarFrom] = useState(false);
-    const [showCalendarTo, setShowCalendarTo] = useState(false);
+    const [transTypeSearch, setTransTypeSearch] = useState('');
+    const [costCenterSearch, setCostCenterSearch] = useState('');
+    const [payeeSearch, setPayeeSearch] = useState('');
 
-    const companyCode = localStorage.getItem('company') || 'C001';
+    const [showCalFrom, setShowCalFrom] = useState(false);
+    const [showCalTo, setShowCalTo] = useState(false);
+    const companyCode = localStorage.getItem('company') || '';
 
-    useEffect(() => {
-        if (isOpen) {
-            loadLookups();
-        }
-    }, [isOpen]);
+    const showSuccessToast = (msg) => toast.custom((t) => (
+        <div className={`${t.visible ? 'animate-in slide-in-from-right-10 fade-in duration-500' : 'animate-out slide-out-to-right-10 fade-out duration-300'} 
+            max-w-[550px] w-fit bg-white/95 backdrop-blur-xl border border-white/20 shadow-2xl rounded-[5px] flex flex-col pointer-events-auto overflow-hidden`}>
+            <div className="px-4 py-2.5 flex items-center gap-3">
+                <div className="w-12 h-12 shrink-0">
+                    <DotLottiePlayer src="/lottiefile/Successffull.lottie" autoplay loop={false} />
+                </div>
+                <div className="flex-grow text-left py-1">
+                    <h3 className="text-slate-800 text-[12px] font-bold tracking-wider uppercase font-tahoma leading-relaxed">{msg}</h3>
+                    <div className="flex items-center gap-1.5 mt-0.5">
+                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.3)]" />
+                        <span className="text-emerald-600 text-[8px] font-mono font-bold tracking-widest uppercase">Verified</span>
+                    </div>
+                </div>
+                <button onClick={() => toast.dismiss(t.id)} className="text-slate-300 hover:text-slate-500 transition-colors">
+                    <X size={14} />
+                </button>
+            </div>
+            <div className="h-[2px] w-full bg-emerald-50">
+                <div className="h-full bg-emerald-500" style={{ animation: 'toastProgress 3s linear forwards' }} />
+            </div>
+        </div>
+    ), { duration: 3000, position: 'top-right' });
+
+    const showErrorToast = (msg) => toast.custom((t) => (
+        <div className={`${t.visible ? 'animate-in slide-in-from-right-10 fade-in duration-500' : 'animate-out slide-out-to-right-10 fade-out duration-300'} 
+            max-w-[550px] w-fit bg-white/95 backdrop-blur-xl border border-white/20 shadow-2xl rounded-[5px] flex flex-col pointer-events-auto overflow-hidden`}>
+            <div className="px-4 py-2.5 flex items-center gap-3">
+                <div className="w-12 h-12 shrink-0">
+                    <DotLottiePlayer src="/lottiefile/Error Fail animation.lottie" autoplay loop={false} />
+                </div>
+                <div className="flex-grow text-left py-1">
+                    <h3 className="text-slate-800 text-[12px] font-bold tracking-wider uppercase font-tahoma leading-relaxed">{msg}</h3>
+                    <div className="flex items-center gap-1.5 mt-0.5">
+                        <div className="w-1.5 h-1.5 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.3)]" />
+                        <span className="text-red-600 text-[8px] font-mono font-bold tracking-widest uppercase">Failed</span>
+                    </div>
+                </div>
+                <button onClick={() => toast.dismiss(t.id)} className="text-slate-300 hover:text-slate-500 transition-colors">
+                    <X size={14} />
+                </button>
+            </div>
+            <div className="h-[2px] w-full bg-red-50">
+                <div className="h-full bg-red-500" style={{ animation: 'toastProgress 3s linear forwards' }} />
+            </div>
+        </div>
+    ), { duration: 4000, position: 'top-right' });
+
+    useEffect(() => { if (isOpen) loadLookups(); }, [isOpen]);
 
     const loadLookups = async () => {
         try {
             const data = await documentSearchService.getLookups(companyCode);
             setLookups(data);
-            if (data.transTypes?.length > 0) {
-                setFormData(prev => ({ ...prev, transType: data.transTypes[0].iid }));
+            if (data.transTypes?.length > 0 && !formData.transType) {
+                setFormData(prev => ({ 
+                    ...prev, 
+                    transType: data.transTypes[0].iid, 
+                    transLabel: data.transTypes[0].tr_Type 
+                }));
             }
-        } catch (e) {
-            toast.error('Failed to load search parameters');
-        }
+        } catch { showErrorToast('Failed to load lookups'); }
     };
 
-    const runSearch = async () => {
+    const runSearch = useCallback(async (fd = formData) => {
+        if (!fd.transType) return;
         setLoading(true);
         try {
-            const data = await documentSearchService.search({
-                ...formData,
-                companyCode
-            });
-            setSearchResults(data);
-            toast.success(`Retrieved ${data.length} Matching Documents`);
-        } catch (error) {
-            toast.error('Search operation failed');
-        } finally {
-            setLoading(false);
+            const data = await documentSearchService.search({ ...fd, companyCode });
+            setResults(data);
+            if (data.length > 0) showSuccessToast(`${data.length} Document(s) Retrieved`);
+            else showSuccessToast(`No documents found`);
+        } catch (e) {
+            showErrorToast(e?.response?.data || 'Search failed');
+        } finally { setLoading(false); }
+    }, [formData, companyCode]);
+
+    const set = (key, val) => {
+        const next = { ...formData, [key]: val };
+        setFormData(next);
+        if (['docNo', 'chequeNo', 'amount', 'vendorId', 'transType', 'costCenter', 'payee'].includes(key)) {
+            clearTimeout(window._dsTimer);
+            window._dsTimer = setTimeout(() => runSearch(next), 400);
         }
     };
 
     const handleReset = () => {
-        setFormData({
-            ...formData,
-            vendorId: '',
-            vendorName: 'ALL CONTEXTS',
-            docNo: '',
-            chequeNo: '',
-            amount: '',
-            costCenter: '',
-            useDate: false,
-            payee: ''
-        });
-        setSearchResults([]);
+        const fd = { 
+            ...formData, 
+            vendorId: '', vendorName: 'ALL ENTITIES', 
+            docNo: '', chequeNo: '', amount: '', 
+            costCenter: '', costCenterName: 'ALL CENTERS',
+            payee: 'ALL PAYEES', useDate: false 
+        };
+        setFormData(fd);
+        setResults([]);
     };
 
+    const vendors = formData.vendorType === 'customer' ? (lookups.customers || []) : (lookups.suppliers || []);
+    const transTypes = lookups.transTypes || [];
+    const costCenters = lookups.costCenters || [];
+    const payees = lookups.payees || [];
+
+    // --- PURCHASE ORDER STYLE CONSTANTS ---
+    const labelStyle = "text-[12.5px] font-bold text-gray-700 w-24 shrink-0";
+    const inputStyle = "flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-gray-700 bg-white rounded-[5px] outline-none shadow-sm focus:border-[#0285fd]";
+    const pickerStyle = "flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-blue-600 bg-gray-50 rounded-[5px] outline-none shadow-sm cursor-pointer flex items-center justify-between overflow-hidden";
+    const iconBtnStyle = "w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0";
+
     const footer = (
-        <div className="bg-slate-50 px-6 py-4 w-full flex justify-end gap-3 border-t border-gray-100 mt-2 rounded-b-xl">
-            <div className="flex-1 flex items-center gap-2 opacity-30 select-none">
-                <span className="text-[20px] font-black text-[#0078d4] tracking-tighter">onimta IT</span>
+        <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-gray-100 rounded-b-xl">
+            <div className="flex gap-3">
+                <button 
+                    onClick={handleReset}
+                    className="px-6 h-10 bg-[#00adff] text-white text-sm font-black rounded-[5px] hover:bg-[#0099e6] transition-all active:scale-95 flex items-center gap-2 border-none uppercase"
+                >
+                    <RotateCcw size={14} /> CLEAR
+                </button>
+                <button className="px-6 h-10 bg-white text-[#0285fd] text-sm font-black rounded-[5px] border-2 border-[#0285fd] hover:bg-blue-50 transition-all active:scale-95 flex items-center gap-2 uppercase">
+                    <Printer size={14} /> PRINT 
+                </button>
             </div>
-            <button className="px-6 h-9 bg-[#0285fd] text-white text-[12px] font-black rounded-[3px] shadow-sm hover:bg-[#0073ff] transition-all active:scale-95 flex items-center gap-2 uppercase tracking-widest">
-                <Printer size={15} /> PRINT LIST
-            </button>
-            <button onClick={onClose} className="px-6 h-9 bg-slate-400 text-white text-[12px] font-black rounded-[3px] shadow-sm hover:bg-slate-500 transition-all active:scale-95 flex items-center gap-2 uppercase tracking-widest">
-                <X size={15} /> CLOSE ARCHIVE
-            </button>
+            <div className="flex gap-3">
+                <button 
+                    onClick={() => runSearch()}
+                    disabled={loading}
+                    className="px-8 h-10 bg-[#2bb744] text-white text-sm font-black rounded-[5px] shadow-md shadow-green-100 hover:bg-[#259b3a] transition-all active:scale-95 flex items-center gap-2 border-none uppercase disabled:opacity-50"
+                >
+                    {loading ? <Loader2 size={16} className="animate-spin" /> : <Play size={16} fill="currentColor" />}
+                    EXECUTE SEARCH
+                </button>
+            </div>
         </div>
     );
 
-    const vendors = formData.vendorType === 'customer' ? lookups.customers : lookups.suppliers;
-
     return (
         <>
-            <SimpleModal
-                isOpen={isOpen}
-                onClose={onClose}
-                title="Historical Transaction Archive: Advanced Document Discovery"
-                maxWidth="max-w-[1550px]"
-                footer={footer}
-            >
-                <div className="space-y-4 pt-1 font-['Tahoma',_sans-serif]">
-                    {/* Advanced Filter Matrix */}
-                    <div className="bg-white/50 backdrop-blur-sm p-5 border border-gray-200 rounded-[8px] shadow-sm space-y-5">
-                        <div className="grid grid-cols-12 gap-5 items-end">
-                            {/* Primary Category */}
-                            <div className="col-span-2 space-y-1.5">
-                                <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest pl-1 flex items-center gap-2">
-                                    <Filter size={12} className="text-[#0285fd]" /> Transaction Type
-                                </label>
-                                <select 
-                                    value={formData.transType}
-                                    onChange={(e) => setFormData({ ...formData, transType: e.target.value })}
-                                    className="w-full h-9 px-3 text-[12.5px] border border-gray-300 bg-white rounded-[3px] outline-none text-slate-800 font-bold focus:border-[#0285fd] transition-all"
-                                >
-                                    {lookups.transTypes.map(t => (
-                                        <option key={t.iid} value={t.iid}>{t.tr_Type}</option>
-                                    ))}
-                                </select>
+            <style>
+                {`
+                    @keyframes toastProgress {
+                        0% { width: 100%; }
+                        100% { width: 0%; }
+                    }
+                `}
+            </style>
+            <SimpleModal isOpen={isOpen} onClose={onClose} title="Advanced Document Discovery — Transaction Archive" maxWidth="max-w-[1550px]" footer={footer}>
+                <div className="space-y-4 pt-2 font-['Tahoma'] overflow-y-auto no-scrollbar">
+                    
+                    {/* ── FILTER PANEL (PO STYLE) ── */}
+                    <div className="bg-white p-5 border border-gray-100 rounded-lg shadow-sm space-y-4">
+                        <div className="grid grid-cols-12 gap-x-6 gap-y-3.5">
+                            
+                            {/* Trans Type - Col 1 */}
+                            <div className="col-span-4 flex items-center gap-2">
+                                <label className={labelStyle}>Category</label>
+                                <div className="flex-1 flex gap-1 h-8 min-w-0">
+                                    <div onClick={() => setShowTransTypeModal(true)} className={pickerStyle}>
+                                        <span className="truncate">{formData.transLabel}</span>
+                                    </div>
+                                    <button onClick={() => setShowTransTypeModal(true)} className={iconBtnStyle}><List size={16} /></button>
+                                </div>
                             </div>
 
-                            {/* Vendor Context */}
-                            <div className="col-span-3 space-y-1.5">
-                                <div className="flex items-center justify-between pl-1">
-                                    <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                                        {formData.vendorType === 'customer' ? <Users size={12} className="text-[#0285fd]" /> : <User size={12} className="text-[#e49e1b]" />}
-                                        Context Entity
+                            {/* Vendor Context (Customer/Supplier radios + Picker) - Col 2 & 3 */}
+                            <div className="col-span-8 flex items-center gap-4">
+                                <label className={labelStyle}>Entity Context</label>
+                                <div className="flex items-center gap-3 h-8 shrink-0 bg-slate-50 px-3 rounded-[5px] border border-gray-200">
+                                    <label className="flex items-center gap-1.5 cursor-pointer">
+                                        <input type="radio" name="vt" checked={formData.vendorType === 'customer'} onChange={() => setFormData(p => ({ ...p, vendorType: 'customer', vendorId: '', vendorName: 'ALL CUSTOMERS' }))} className="w-3.5 h-3.5 accent-[#0285fd]" />
+                                        <span className="text-[11px] font-bold text-slate-500 flex items-center gap-1 uppercase">Customer</span>
                                     </label>
-                                    <div className="flex gap-4">
-                                        <label className="flex items-center gap-1.5 cursor-pointer group">
-                                            <input type="radio" name="vType" checked={formData.vendorType === 'customer'} onChange={() => setFormData({...formData, vendorType: 'customer', vendorId: '', vendorName: 'ALL CUSTOMERS'})} className="w-3 h-3 accent-[#0285fd]" />
-                                            <span className="text-[10px] font-black text-slate-500 uppercase group-hover:text-[#0285fd]">Customer</span>
-                                        </label>
-                                        <label className="flex items-center gap-1.5 cursor-pointer group">
-                                            <input type="radio" name="vType" checked={formData.vendorType === 'supplier'} onChange={() => setFormData({...formData, vendorType: 'supplier', vendorId: '', vendorName: 'ALL SUPPLIERS'})} className="w-3 h-3 accent-[#e49e1b]" />
-                                            <span className="text-[10px] font-black text-slate-500 uppercase group-hover:text-[#e49e1b]">Supplier</span>
-                                        </label>
-                                    </div>
+                                    <label className="flex items-center gap-1.5 cursor-pointer">
+                                        <input type="radio" name="vt" checked={formData.vendorType === 'supplier'} onChange={() => setFormData(p => ({ ...p, vendorType: 'supplier', vendorId: '', vendorName: 'ALL SUPPLIERS' }))} className="w-3.5 h-3.5 accent-[#e49e1b]" />
+                                        <span className="text-[11px] font-bold text-slate-500 flex items-center gap-1 uppercase">Supplier</span>
+                                    </label>
                                 </div>
-                                <div className="flex h-9 gap-1.5">
-                                    <div className="flex-1 h-9 border border-gray-300 bg-white rounded-[3px] px-3 flex items-center justify-between group cursor-pointer hover:border-[#0285fd] transition-all shadow-sm" onClick={() => setShowVendorModal(true)}>
-                                        <div className="flex items-center gap-2 overflow-hidden">
-                                            {formData.vendorId && <span className="text-[10px] font-black text-[#0285fd] shrink-0">{formData.vendorId}</span>}
-                                            <span className="text-[12.5px] font-bold text-slate-700 truncate">{formData.vendorName}</span>
-                                        </div>
-                                        <ChevronRight size={14} className="text-gray-300 group-hover:text-[#0285fd] transition-colors shrink-0" />
+                                <div className="flex-1 flex gap-1 h-8 min-w-0">
+                                    <div onClick={() => setShowVendorModal(true)} className={pickerStyle}>
+                                        <span className="truncate text-red-600">{formData.vendorName}</span>
                                     </div>
-                                    <button onClick={() => setShowVendorModal(true)} className="w-10 h-9 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0">
-                                        <Search size={16} />
-                                    </button>
+                                    <button onClick={() => setShowVendorModal(true)} className={iconBtnStyle}><Search size={16} /></button>
                                 </div>
                             </div>
 
-                            {/* Document Meta */}
-                            <div className="col-span-2 space-y-1.5">
-                                <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest pl-1 flex items-center gap-2">
-                                    <Hash size={12} className="text-[#0285fd]" /> Document No
-                                </label>
-                                <input 
-                                    type="text" 
-                                    value={formData.docNo}
-                                    onChange={(e) => setFormData({ ...formData, docNo: e.target.value })}
-                                    placeholder="Prefix or ID..."
-                                    className="w-full h-9 px-3 text-[12.5px] border border-gray-300 bg-white rounded-[3px] outline-none text-slate-800 font-mono font-bold focus:border-[#0285fd] transition-all shadow-sm"
-                                />
+                            {/* Document ID - Col 1 */}
+                            <div className="col-span-4 flex items-center gap-2">
+                                <label className={labelStyle}>Document ID</label>
+                                <input value={formData.docNo} onChange={e => set('docNo', e.target.value)} placeholder=" " className={inputStyle} />
                             </div>
 
-                            <div className="col-span-2 space-y-1.5">
-                                <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest pl-1 flex items-center gap-2">
-                                    <CreditCard size={12} className="text-[#0285fd]" /> Cheque No
-                                </label>
-                                <input 
-                                    type="text" 
-                                    value={formData.chequeNo}
-                                    onChange={(e) => setFormData({ ...formData, chequeNo: e.target.value })}
-                                    placeholder="Serial Search..."
-                                    className="w-full h-9 px-3 text-[12.5px] border border-gray-300 bg-white rounded-[3px] outline-none text-slate-800 font-mono font-bold focus:border-[#0285fd] transition-all shadow-sm"
-                                />
+                            {/* Cheque Number - Col 2 */}
+                            <div className="col-span-4 flex items-center gap-2">
+                                <label className={labelStyle}>Cheque No</label>
+                                <input value={formData.chequeNo} onChange={e => set('chequeNo', e.target.value)} placeholder="" className={inputStyle} />
                             </div>
 
-                            <div className="col-span-1 space-y-1.5">
-                                <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest pl-1 flex items-center gap-2">
-                                    <Banknote size={12} className="text-[#0285fd]" /> Amount
-                                </label>
-                                <input 
-                                    type="number" 
-                                    value={formData.amount}
-                                    onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-                                    placeholder="Exact..."
-                                    className="w-full h-9 px-3 text-[12.5px] border border-gray-300 bg-white rounded-[3px] outline-none text-slate-800 font-bold focus:border-[#0285fd] transition-all shadow-sm"
-                                />
+                            {/* Exact Amount - Col 3 */}
+                            <div className="col-span-4 flex items-center gap-2">
+                                <label className={labelStyle}>Exact Amount</label>
+                                <input type="number" value={formData.amount} onChange={e => set('amount', e.target.value)} placeholder="0.00" className={inputStyle} />
                             </div>
 
-                            <div className="col-span-2 space-y-1.5">
-                                <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest pl-1">Cost Center</label>
-                                <select 
-                                    value={formData.costCenter}
-                                    onChange={(e) => setFormData({ ...formData, costCenter: e.target.value })}
-                                    className="w-full h-9 px-3 text-[12.5px] border border-gray-300 bg-white rounded-[3px] outline-none text-slate-800 font-bold focus:border-[#0285fd] transition-all"
-                                >
-                                    <option value="">ALL COST CENTERS</option>
-                                    {lookups.costCenters.map(cc => (
-                                        <option key={cc.code} value={cc.code}>{cc.name}</option>
-                                    ))}
-                                </select>
-                            </div>
-                        </div>
-
-                        <div className="grid grid-cols-12 gap-5 items-end pt-1">
-                            {/* Date Matrix */}
-                            <div className="col-span-5 flex items-end gap-3 bg-slate-50/50 p-3 rounded-lg border border-slate-100">
-                                <div className="flex flex-col gap-2 shrink-0 pr-3 border-r border-slate-200">
-                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Temporal Filter</label>
-                                    <div className="flex items-center gap-2 bg-white px-2 py-1 rounded border border-gray-200 shadow-sm cursor-pointer" onClick={() => setFormData({...formData, useDate: !formData.useDate})}>
-                                        <input type="checkbox" checked={formData.useDate} readOnly className="w-3.5 h-3.5 accent-[#0285fd] cursor-pointer" />
-                                        <span className="text-[10px] font-black text-slate-600 uppercase">Enable Period</span>
+                            {/* Cost Center - Col 1 */}
+                            <div className="col-span-4 flex items-center gap-2">
+                                <label className={labelStyle}>Cost Center</label>
+                                <div className="flex-1 flex gap-1 h-8 min-w-0">
+                                    <div onClick={() => setShowCostCenterModal(true)} className={pickerStyle}>
+                                        <span className="truncate">{formData.costCenterName}</span>
                                     </div>
+                                    <button onClick={() => setShowCostCenterModal(true)} className={iconBtnStyle}><MapPin size={16} /></button>
                                 </div>
-                                
-                                <div className={`flex-1 space-y-1.5 transition-opacity ${!formData.useDate ? 'opacity-30 pointer-events-none' : ''}`}>
-                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">From</label>
-                                    <div className="flex h-9 gap-1">
-                                        <input readOnly value={formData.dateFrom} className="flex-1 px-3 text-[12px] border border-gray-300 bg-white rounded-[3px] outline-none text-slate-800 font-mono font-bold shadow-sm" />
-                                        <button onClick={() => setShowCalendarFrom(true)} className="w-9 h-9 bg-[#0285fd] text-white flex items-center justify-center rounded-[3px] transition-all shadow-sm active:scale-90"><Calendar size={14} /></button>
-                                    </div>
-                                </div>
+                            </div>
 
-                                <div className={`flex-1 space-y-1.5 transition-opacity ${!formData.useDate ? 'opacity-30 pointer-events-none' : ''}`}>
-                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">To</label>
-                                    <div className="flex h-9 gap-1">
-                                        <input readOnly value={formData.dateTo} className="flex-1 px-3 text-[12px] border border-gray-300 bg-white rounded-[3px] outline-none text-slate-800 font-mono font-bold shadow-sm" />
-                                        <button onClick={() => setShowCalendarTo(true)} className="w-9 h-9 bg-[#0285fd] text-white flex items-center justify-center rounded-[3px] transition-all shadow-sm active:scale-90"><Calendar size={14} /></button>
+                            {/* Date Filter Matrix - Col 2 & 3 */}
+                            <div className="col-span-8 flex items-center gap-4">
+                                <div className="flex items-center gap-2 cursor-pointer shrink-0 bg-slate-50 px-3 h-8 rounded-[5px] border border-gray-200" onClick={() => set('useDate', !formData.useDate)}>
+                                    <input type="checkbox" checked={formData.useDate} readOnly className="w-4 h-4 accent-[#0285fd]" />
+                                    <span className="text-[11px] font-bold text-gray-600 uppercase">Period Search</span>
+                                </div>
+                                <div className={`flex-1 flex items-center gap-2 transition-opacity ${!formData.useDate ? 'opacity-30 pointer-events-none' : ''}`}>
+                                    <label className="text-[12px] font-bold text-gray-500">From</label>
+                                    <div className="flex-1 flex gap-1 h-8 min-w-0">
+                                        <input readOnly value={formData.dateFrom} className={inputStyle} />
+                                        <button onClick={() => setShowCalFrom(true)} className={iconBtnStyle}><Calendar size={16} /></button>
+                                    </div>
+                                    <label className="text-[12px] font-bold text-gray-500">To</label>
+                                    <div className="flex-1 flex gap-1 h-8 min-w-0">
+                                        <input readOnly value={formData.dateTo} className={inputStyle} />
+                                        <button onClick={() => setShowCalTo(true)} className={iconBtnStyle}><Calendar size={16} /></button>
                                     </div>
                                 </div>
                             </div>
 
-                            {/* Payee Context (Specific to PTC) */}
-                            <div className="col-span-3 space-y-1.5">
-                                <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest pl-1 flex items-center gap-2">
-                                    <User size={12} className="text-[#0285fd]" /> Payee Filter
-                                </label>
-                                <select 
-                                    value={formData.payee}
-                                    onChange={(e) => setFormData({ ...formData, payee: e.target.value })}
-                                    className="w-full h-9 px-3 text-[12.5px] border border-gray-300 bg-white rounded-[3px] outline-none text-slate-800 font-bold focus:border-[#0285fd] transition-all"
-                                >
-                                    <option value="">ALL PAYEES</option>
-                                    {lookups.payees.map(p => (
-                                        <option key={p} value={p}>{p}</option>
-                                    ))}
-                                </select>
-                            </div>
-
-                            {/* Actions */}
-                            <div className="col-span-4 flex gap-3 h-9">
-                                <button onClick={handleReset} className="flex-1 h-9 bg-slate-100 text-slate-500 text-[11px] font-black uppercase tracking-widest rounded-[3px] hover:bg-slate-200 transition-all active:scale-95 flex items-center justify-center gap-2">
-                                    <RotateCcw size={15} /> RESET
-                                </button>
-                                <button onClick={runSearch} disabled={loading} className={`flex-[2] h-9 bg-[#2bb744] text-white text-[11px] font-black uppercase tracking-widest rounded-[3px] hover:bg-[#259b3a] shadow-md shadow-green-100 transition-all active:scale-95 flex items-center justify-center gap-2 ${loading ? 'opacity-50' : ''}`}>
-                                    {loading ? <Loader2 size={15} className="animate-spin" /> : <Play size={15} fill="currentColor" />}
-                                    EXECUTE SEARCH
-                                </button>
+                            {/* Payee Discovery - Col 1 & 2 */}
+                            <div className="col-span-8 flex items-center gap-2">
+                                <label className={labelStyle}>Payee Entity</label>
+                                <div className="flex-1 flex gap-1 h-8 min-w-0">
+                                    <div onClick={() => setShowPayeeModal(true)} className={pickerStyle}>
+                                        <span className="truncate">{formData.payee}</span>
+                                    </div>
+                                    <button onClick={() => setShowPayeeModal(true)} className={iconBtnStyle}><User size={16} /></button>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    {/* Result Matrix */}
-                    <div className="space-y-2">
-                        <div className="flex items-center justify-between px-2">
+                    {/* ── RESULTS GRID ── */}
+                    <div className="space-y-1.5">
+                        <div className="flex items-center justify-between px-1">
                             <div className="flex items-center gap-2">
-                                <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
-                                <span className="text-[12px] font-black text-slate-500 uppercase tracking-widest opacity-80">Discovery Results Stream</span>
+                                <span className="text-[11px] font-black text-slate-400 uppercase tracking-widest">Discovery Results Stream</span>
                             </div>
-                            <span className="text-[11px] font-black text-slate-400 uppercase tracking-widest">{searchResults.length} Records Found</span>
+                            <div className="flex items-center gap-4">
+                                {results.length > 0 && (
+                                    <div className="bg-[#f0f7ff] px-3 py-0.5 rounded-full border border-blue-100 flex items-center gap-2">
+                                        <span className="text-[10px] font-black text-blue-400 uppercase">Valuation:</span>
+                                        <span className="text-[12px] font-mono font-black text-[#0285fd]">
+                                            LKR {results.reduce((s, r) => s + (r.amount || 0), 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                        </span>
+                                    </div>
+                                )}
+                                <span className="text-[11px] font-black text-slate-400 uppercase tracking-widest">{results.length} Records Matched</span>
+                            </div>
                         </div>
 
-                        <div className="border border-gray-200 rounded-[5px] shadow-sm bg-white overflow-hidden">
-                            <div className="max-h-[450px] overflow-y-auto no-scrollbar">
+                        <div className="border border-gray-100 rounded-lg bg-white shadow-sm overflow-hidden flex flex-col">
+                            <div className="max-h-[440px] overflow-y-auto no-scrollbar">
                                 <table className="w-full text-left border-collapse">
-                                    <thead className="bg-[#f8fafd] border-b border-gray-200 text-slate-500 font-black uppercase text-[10.5px] tracking-widest z-10 sticky top-0">
+                                    <thead className="bg-slate-50/80 border-b border-gray-100 text-[10.5px] font-black text-gray-400 uppercase tracking-widest sticky top-0 z-10 backdrop-blur-sm">
                                         <tr>
-                                            <th className="px-5 py-3 border-r border-gray-100 w-28">Date</th>
-                                            <th className="px-5 py-3 border-r border-gray-100 w-40">Document ID</th>
-                                            <th className="px-5 py-3 border-r border-gray-100 min-w-[200px]">Context Entity</th>
-                                            <th className="px-5 py-3 border-r border-gray-100 w-44">Reference/Inv No</th>
-                                            <th className="px-5 py-3 border-r border-gray-100 w-44">Account Stratum</th>
-                                            <th className="px-5 py-3 border-r border-gray-100 w-32">Cheque No</th>
-                                            <th className="px-5 py-3 border-r border-gray-100 w-28">Chq Date</th>
-                                            <th className="px-5 py-3 border-r border-gray-100 min-w-[150px]">Memo</th>
-                                            <th className="px-5 py-3 w-36 text-right">Amount (LKR)</th>
+                                            <th className="px-4 py-3 border-r border-gray-100 w-24">Date</th>
+                                            <th className="px-4 py-3 border-r border-gray-100 w-36">Document ID</th>
+                                            <th className="px-4 py-3 border-r border-gray-100 min-w-[200px]">Entity Context</th>
+                                            <th className="px-4 py-3 border-r border-gray-100 w-40">Ref / Inv No</th>
+                                            <th className="px-4 py-3 border-r border-gray-100 w-44">Accounting</th>
+                                            <th className="px-4 py-3 border-r border-gray-100 w-28">Cheque</th>
+                                            <th className="px-4 py-3 border-r border-gray-100 w-24">Chq Date</th>
+                                            <th className="px-4 py-3 border-r border-gray-100 min-w-[150px]">Memo</th>
+                                            <th className="px-4 py-3 text-right w-36">Net Amount</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-gray-50">
-                                        {searchResults.map((row, idx) => (
-                                            <tr key={idx} className="hover:bg-blue-50/50 transition-colors group cursor-default">
-                                                <td className="px-5 py-2.5 border-r border-gray-50">
-                                                    <span className="text-[12px] font-mono font-bold text-slate-500">{row.date}</span>
-                                                </td>
-                                                <td className="px-5 py-2.5 border-r border-gray-50">
-                                                    <span className="text-[12.5px] font-black text-[#0285fd] font-mono">{row.docNo}</span>
-                                                </td>
-                                                <td className="px-5 py-2.5 border-r border-gray-50">
-                                                    <span className="text-[12.5px] font-bold text-slate-700 uppercase">{row.name}</span>
-                                                </td>
-                                                <td className="px-5 py-2.5 border-r border-gray-50">
-                                                    <span className="text-[12px] font-bold text-slate-500">{row.invNo}</span>
-                                                </td>
-                                                <td className="px-5 py-2.5 border-r border-gray-50">
-                                                    <span className="text-[12px] font-bold text-slate-600">{row.accName}</span>
-                                                </td>
-                                                <td className="px-5 py-2.5 border-r border-gray-50">
-                                                    <span className="text-[12px] font-mono font-bold text-slate-700">{row.chqNo}</span>
-                                                </td>
-                                                <td className="px-5 py-2.5 border-r border-gray-50">
-                                                    <span className="text-[11px] font-bold text-slate-400">{row.chqDate}</span>
-                                                </td>
-                                                <td className="px-5 py-2.5 border-r border-gray-50">
-                                                    <span className="text-[12px] text-slate-500 italic truncate max-w-[200px] block">{row.memo}</span>
-                                                </td>
-                                                <td className="px-5 py-2.5 text-right font-mono font-black text-[13.5px] text-slate-800 tabular-nums">
-                                                    {row.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                        {results.map((row, idx) => (
+                                            <tr key={idx} className="hover:bg-blue-50/40 transition-colors group cursor-default">
+                                                <td className="px-4 py-2.5 border-r border-gray-50 text-[11.5px] font-mono font-bold text-slate-500">{row.date}</td>
+                                                <td className="px-4 py-2.5 border-r border-gray-50 text-[12px] font-black text-[#0285fd] font-mono uppercase">{row.docNo}</td>
+                                                <td className="px-4 py-2.5 border-r border-gray-50 text-[12px] font-bold text-slate-700 uppercase">{row.name}</td>
+                                                <td className="px-4 py-2.5 border-r border-gray-50 text-[11.5px] font-bold text-slate-500">{row.invNo}</td>
+                                                <td className="px-4 py-2.5 border-r border-gray-50 text-[11.5px] font-bold text-slate-600">{row.accName}</td>
+                                                <td className="px-4 py-2.5 border-r border-gray-50 text-[11.5px] font-mono font-bold text-slate-600">{row.chqNo}</td>
+                                                <td className="px-4 py-2.5 border-r border-gray-50 text-[11px] text-slate-400">{row.chqDate}</td>
+                                                <td className="px-4 py-2.5 border-r border-gray-50 text-[11.5px] text-slate-500 italic truncate max-w-[150px]">{row.memo}</td>
+                                                <td className="px-4 py-2.5 text-right font-mono font-black text-[12.5px] text-slate-800 tabular-nums">
+                                                    {(row.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                                 </td>
                                             </tr>
                                         ))}
-                                        {Array.from({ length: Math.max(0, 10 - searchResults.length) }).map((_, i) => (
-                                            <tr key={`filler-${i}`} className="h-10">
-                                                <td colSpan={9}></td>
-                                            </tr>
+                                        {Array.from({ length: Math.max(0, 12 - results.length) }).map((_, i) => (
+                                            <tr key={`filler-${i}`} className="h-10"><td colSpan={9}></td></tr>
                                         ))}
                                     </tbody>
                                 </table>
@@ -343,85 +343,185 @@ const DocumentSearchBoard = ({ isOpen, onClose }) => {
                 </div>
             </SimpleModal>
 
-            {/* Entity Search Modal */}
+            {/* ── MODALS (PURCHASE ORDER STYLE) ── */}
+            
+            {/* Vendor Discovery Modal */}
             {showVendorModal && (
-                <SimpleModal 
-                    isOpen={showVendorModal} 
-                    onClose={() => setShowVendorModal(false)} 
-                    title={`${formData.vendorType === 'customer' ? 'Customer' : 'Supplier'} Discovery Portal - ${vendors.length} Matched`} 
-                    maxWidth="max-w-3xl"
-                >
-                    <div className="flex flex-col h-full font-['Tahoma']">
-                        <div className="p-4 bg-slate-50 border-b border-gray-100 flex items-center justify-between mb-2">
-                            <div className="flex items-center gap-2">
-                                <Search size={16} className="text-gray-400" />
-                                <span className="text-[12px] font-bold text-gray-500 uppercase tracking-widest">Context Search</span>
+                <SimpleModal isOpen={showVendorModal} onClose={() => setShowVendorModal(false)}
+                    title={`${formData.vendorType === 'customer' ? 'Customer' : 'Supplier'} Directory Lookup`}
+                    maxWidth="max-w-[600px]">
+                    <div className="space-y-4 font-['Tahoma']">
+                        <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-lg border border-gray-100 mb-2">
+                            <span className="text-[12px] font-bold text-gray-500 uppercase tracking-widest whitespace-nowrap">Search Facility</span>
+                            <div className="relative flex-1">
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
+                                <input
+                                    type="text"
+                                    placeholder=""
+                                    className="w-full h-9 pl-10 pr-4 border border-gray-300 rounded-[5px] outline-none text-sm focus:border-[#0285fd] bg-white shadow-sm font-bold"
+                                    value={vendorSearch}
+                                    onChange={(e) => setVendorSearch(e.target.value)}
+                                    autoFocus
+                                />
                             </div>
-                            <input 
-                                type="text" 
-                                placeholder="Filter by ID or Nomenclature..." 
-                                className="h-10 border border-gray-300 px-4 text-sm rounded-md w-96 focus:border-[#0285fd] outline-none shadow-sm transition-all" 
-                                value={vendorSearch} 
-                                onChange={(e) => setVendorSearch(e.target.value)} 
-                                autoFocus
-                            />
                         </div>
-                        <div className="overflow-y-auto max-h-[60vh] custom-scrollbar">
-                            <table className="w-full text-sm text-left">
-                                <thead className="bg-[#f8fafc] sticky top-0 text-gray-600 font-bold uppercase text-[11px] tracking-wider z-10 shadow-sm leading-8">
-                                    <tr>
-                                        <th className="px-6 border-b text-center">Identity</th>
-                                        <th className="px-6 border-b">Nomenclature</th>
-                                        <th className="px-6 border-b text-center">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-gray-100">
-                                    <tr onClick={() => { setFormData({ ...formData, vendorId: '', vendorName: 'ALL CONTEXTS' }); setShowVendorModal(false); }} className="bg-blue-50/30 hover:bg-blue-100/50 transition-colors cursor-pointer font-black italic">
-                                        <td className="p-3 text-center text-blue-600">ALL</td>
-                                        <td className="p-3 text-blue-600 uppercase">Universal Context Search</td>
-                                        <td className="p-3 text-center">
-                                            <button className="bg-blue-600 text-white text-[10px] px-5 py-1.5 rounded-md font-bold hover:bg-blue-700 shadow-sm transition-all active:scale-95 uppercase">SELECT</button>
-                                        </td>
-                                    </tr>
-                                    {vendors.filter(v => 
-                                        v.name.toLowerCase().includes(vendorSearch.toLowerCase()) || 
-                                        v.code.toLowerCase().includes(vendorSearch.toLowerCase())
-                                    ).map(v => (
-                                        <tr key={v.code} className="hover:bg-blue-50/50 transition-colors border-b border-gray-50">
-                                            <td className="p-3 text-center font-mono font-bold text-gray-700">{v.code}</td>
-                                            <td className="p-3 font-medium font-mono uppercase text-gray-700">{v.name}</td>
-                                            <td className="p-3 text-center">
-                                                <button 
-                                                    onClick={() => {
-                                                        setFormData({ ...formData, vendorId: v.code, vendorName: v.name });
-                                                        setShowVendorModal(false);
-                                                    }} 
-                                                    className="bg-[#e49e1b] text-white text-[10px] px-5 py-1.5 rounded-md font-bold hover:bg-[#cb9b34] shadow-sm transition-all active:scale-95 uppercase"
-                                                >
-                                                    SELECT
-                                                </button>
-                                            </td>
+                        <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm">
+                            <div className="max-h-[400px] overflow-y-auto no-scrollbar">
+                                <table className="w-full text-left">
+                                    <thead className="bg-[#f8fafd] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 z-10">
+                                        <tr>
+                                            <th className="px-5 py-3">Identity</th>
+                                            <th className="px-5 py-3">Credential / Nomenclature</th>
+                                            <th className="px-5 py-3 text-right">Action</th>
                                         </tr>
-                                    ))}
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody className="divide-y divide-gray-50">
+                                        {vendors.filter(v => (v.name || '').toLowerCase().includes(vendorSearch.toLowerCase()) || (v.code || '').toLowerCase().includes(vendorSearch.toLowerCase()))
+                                            .map(v => (
+                                                <tr key={v.code} className="group hover:bg-blue-50/50 cursor-pointer transition-all" onClick={() => { set('vendorId', v.code); set('vendorName', v.name); setShowVendorModal(false); }}>
+                                                    <td className="px-5 py-3 font-mono text-[12.5px] font-bold text-gray-600">{v.code}</td>
+                                                    <td className="px-5 py-3 text-[12.5px] font-bold text-gray-700 uppercase group-hover:text-blue-600 transition-colors">{v.name}</td>
+                                                    <td className="px-5 py-3 text-right">
+                                                        <button className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95 uppercase">Select</button>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </SimpleModal>
             )}
 
-            <CalendarModal 
-                isOpen={showCalendarFrom} 
-                onClose={() => setShowCalendarFrom(false)} 
-                onDateSelect={(date) => setFormData({ ...formData, dateFrom: date })}
-                initialDate={formData.dateFrom}
-            />
-            <CalendarModal 
-                isOpen={showCalendarTo} 
-                onClose={() => setShowCalendarTo(false)} 
-                onDateSelect={(date) => setFormData({ ...formData, dateTo: date })}
-                initialDate={formData.dateTo}
-            />
+            {/* Trans Type Modal */}
+            {showTransTypeModal && (
+                <SimpleModal isOpen={showTransTypeModal} onClose={() => setShowTransTypeModal(false)} title="Transaction Category Search" maxWidth="max-w-[500px]">
+                    <div className="space-y-4 font-['Tahoma']">
+                        <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-lg border border-gray-100 mb-2">
+                            <span className="text-[12px] font-bold text-gray-500 uppercase tracking-widest whitespace-nowrap">Search Facility</span>
+                            <div className="relative flex-1">
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
+                                <input
+                                    type="text"
+                                    placeholder=""
+                                    className="w-full h-9 pl-10 pr-4 border border-gray-300 rounded-[5px] outline-none text-sm focus:border-[#0285fd] bg-white shadow-sm font-bold"
+                                    value={transTypeSearch}
+                                    onChange={(e) => setTransTypeSearch(e.target.value)}
+                                    autoFocus
+                                />
+                            </div>
+                        </div>
+                        <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm">
+                            <div className="max-h-[300px] overflow-y-auto no-scrollbar">
+                                <table className="w-full text-left">
+                                    <thead className="bg-[#f8fafd] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 z-10">
+                                        <tr>
+                                            <th className="px-5 py-3">Code</th>
+                                            <th className="px-5 py-3">Type Nomenclature</th>
+                                            <th className="px-5 py-3 text-right">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-gray-50">
+                                        {transTypes.filter(t => (t.tr_Type || '').toLowerCase().includes(transTypeSearch.toLowerCase()) || (t.iid || '').toLowerCase().includes(transTypeSearch.toLowerCase()))
+                                            .map(t => (
+                                                <tr key={t.iid} className="group hover:bg-blue-50/50 cursor-pointer transition-colors" onClick={() => { set('transType', t.iid); set('transLabel', t.tr_Type); setShowTransTypeModal(false); }}>
+                                                    <td className="px-5 py-3 font-mono text-[12px] font-bold text-slate-500">{t.iid}</td>
+                                                    <td className="px-5 py-3 text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600">{t.tr_Type}</td>
+                                                    <td className="px-5 py-3 text-right">
+                                                        <button className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95 uppercase">Select</button>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </SimpleModal>
+            )}
+
+            {/* Cost Center Modal */}
+            {showCostCenterModal && (
+                <SimpleModal isOpen={showCostCenterModal} onClose={() => setShowCostCenterModal(false)} title="Cost Center Discovery Lookup" maxWidth="max-w-[500px]">
+                    <div className="space-y-4 font-['Tahoma']">
+                        <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-lg border border-gray-100 mb-2">
+                            <span className="text-[12px] font-bold text-gray-500 uppercase tracking-widest whitespace-nowrap">Search Facility</span>
+                            <div className="relative flex-1">
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
+                                <input
+                                    type="text"
+                                    placeholder=""
+                                    className="w-full h-9 pl-10 pr-4 border border-gray-300 rounded-[5px] outline-none text-sm focus:border-[#0285fd] bg-white shadow-sm font-bold"
+                                    value={costCenterSearch}
+                                    onChange={(e) => setCostCenterSearch(e.target.value)}
+                                    autoFocus
+                                />
+                            </div>
+                        </div>
+                        <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm">
+                            <div className="max-h-[350px] overflow-y-auto no-scrollbar">
+                                <table className="w-full text-left">
+                                    <tbody className="divide-y divide-gray-50">
+                                        {costCenters.filter(cc => (cc.name || '').toLowerCase().includes(costCenterSearch.toLowerCase()) || (cc.code || '').toLowerCase().includes(costCenterSearch.toLowerCase()))
+                                            .map(cc => (
+                                                <tr key={cc.code} className="group hover:bg-blue-50/50 cursor-pointer transition-colors" onClick={() => { set('costCenter', cc.code); set('costCenterName', cc.name); setShowCostCenterModal(false); }}>
+                                                    <td className="px-5 py-3 font-mono text-[12px] font-bold text-slate-500">{cc.code}</td>
+                                                    <td className="px-5 py-3 text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600">{cc.name}</td>
+                                                    <td className="px-5 py-3 text-right">
+                                                        <button className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95 uppercase">Select</button>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </SimpleModal>
+            )}
+
+            {/* Payee Modal */}
+            {showPayeeModal && (
+                <SimpleModal isOpen={showPayeeModal} onClose={() => setShowPayeeModal(false)} title="Payee Entity Discovery" maxWidth="max-w-[450px]">
+                    <div className="space-y-4 font-['Tahoma']">
+                        <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-lg border border-gray-100 mb-2">
+                            <span className="text-[12px] font-bold text-gray-500 uppercase tracking-widest whitespace-nowrap">Search Facility</span>
+                            <div className="relative flex-1">
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
+                                <input
+                                    type="text"
+                                    placeholder=""
+                                    className="w-full h-9 pl-10 pr-4 border border-gray-300 rounded-[5px] outline-none text-sm focus:border-[#0285fd] bg-white shadow-sm font-bold"
+                                    value={payeeSearch}
+                                    onChange={(e) => setPayeeSearch(e.target.value)}
+                                    autoFocus
+                                />
+                            </div>
+                        </div>
+                        <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm">
+                            <div className="max-h-[300px] overflow-y-auto no-scrollbar">
+                                <table className="w-full text-left">
+                                    <tbody className="divide-y divide-gray-50">
+                                        {payees.filter(p => (p || '').toLowerCase().includes(payeeSearch.toLowerCase()))
+                                            .map((p, i) => (
+                                                <tr key={i} className="group hover:bg-blue-50/50 cursor-pointer transition-colors" onClick={() => { set('payee', p); setShowPayeeModal(false); }}>
+                                                    <td className="px-5 py-3 text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600">{p}</td>
+                                                    <td className="px-5 py-3 text-right">
+                                                        <button className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95 uppercase">Select</button>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </SimpleModal>
+            )}
+
+            <CalendarModal isOpen={showCalFrom} onClose={() => setShowCalFrom(false)} onDateSelect={d => { set('dateFrom', d); setShowCalFrom(false); }} initialDate={formData.dateFrom} />
+            <CalendarModal isOpen={showCalTo} onClose={() => setShowCalTo(false)} onDateSelect={d => { set('dateTo', d); setShowCalTo(false); }} initialDate={formData.dateTo} />
         </>
     );
 };
