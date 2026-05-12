@@ -1,11 +1,65 @@
 import React, { useState, useEffect } from 'react';
 import SimpleModal from '../../SimpleModal';
+import { toast } from 'react-hot-toast';
+import { DotLottiePlayer } from '@dotlottie/react-player';
 import { Search, RotateCcw, Save, Trash2, Loader2, X, Truck, Briefcase } from 'lucide-react';
 import { supplierService } from '../../../services/supplier.service';
 import ConfirmModal from '../../modals/ConfirmModal';
-import { toast } from 'react-hot-toast';
 
 const SupplierMasterBoard = ({ isOpen, onClose }) => {
+    // Custom Toast Handlers
+    const showSuccessToast = (message) => {
+        toast.custom((t) => (
+            <div className={`${t.visible ? 'animate-in slide-in-from-right-10 fade-in duration-500' : 'animate-out slide-out-to-right-10 fade-out duration-300'} 
+                max-w-[550px] w-fit bg-white/95 backdrop-blur-xl border border-white/20 shadow-2xl rounded-[5px] flex flex-col pointer-events-auto overflow-hidden`}>
+                <div className="px-4 py-2.5 flex items-center gap-3">
+                    <div className="w-12 h-12 shrink-0">
+                        <DotLottiePlayer src="/lottiefile/Successffull.lottie" autoplay loop={false} />
+                    </div>
+                    <div className="flex-grow text-left py-1">
+                        <h3 className="text-slate-800 text-[12px] font-bold tracking-wider uppercase font-['Tahoma'] leading-relaxed">{message}</h3>
+                        <div className="flex items-center gap-1.5 mt-0.5">
+                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.3)]" />
+                            <span className="text-emerald-600 text-[8px] font-mono font-bold tracking-widest uppercase">Verified</span>
+                        </div>
+                    </div>
+                    <button onClick={() => toast.dismiss(t.id)} className="text-slate-300 hover:text-slate-500 transition-colors">
+                        <X size={14} />
+                    </button>
+                </div>
+                <div className="h-[2px] w-full bg-emerald-50">
+                    <div className="h-full bg-emerald-500" style={{ animation: 'toastProgress 3s linear forwards' }} />
+                </div>
+            </div>
+        ), { duration: 3000, position: 'top-right' });
+    };
+
+    const showErrorToast = (message) => {
+        toast.custom((t) => (
+            <div className={`${t.visible ? 'animate-in slide-in-from-right-10 fade-in duration-500' : 'animate-out slide-out-to-right-10 fade-out duration-300'} 
+                max-w-[550px] w-fit bg-white/95 backdrop-blur-xl border border-white/20 shadow-2xl rounded-[5px] flex flex-col pointer-events-auto overflow-hidden`}>
+                <div className="px-4 py-2.5 flex items-center gap-3">
+                    <div className="w-12 h-12 shrink-0">
+                        <DotLottiePlayer src="/lottiefile/Error Fail animation.lottie" autoplay loop={false} />
+                    </div>
+                    <div className="flex-grow text-left py-1">
+                        <h3 className="text-slate-800 text-[12px] font-bold tracking-wider uppercase font-['Tahoma'] leading-relaxed">{message}</h3>
+                        <div className="flex items-center gap-1.5 mt-0.5">
+                            <div className="w-1.5 h-1.5 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.3)]" />
+                            <span className="text-red-600 text-[8px] font-mono font-bold tracking-widest uppercase">Failed</span>
+                        </div>
+                    </div>
+                    <button onClick={() => toast.dismiss(t.id)} className="text-slate-300 hover:text-slate-500 transition-colors">
+                        <X size={14} />
+                    </button>
+                </div>
+                <div className="h-[2px] w-full bg-red-50">
+                    <div className="h-full bg-red-500" style={{ animation: 'toastProgress 3s linear forwards' }} />
+                </div>
+            </div>
+        ), { duration: 3000, position: 'top-right' });
+    };
+
     const initialState = {
         Code: '',
         Supplier_Name: '',
@@ -111,11 +165,11 @@ const SupplierMasterBoard = ({ isOpen, onClose }) => {
 
     const handleSave = async () => {
         if (!formData.Supplier_Name) {
-            toast.error('Supplier Name is required');
+            showErrorToast('Supplier Name is required');
             return;
         }
         if (!formData.Vend_Typ) {
-            toast.error('Vendor Type is required');
+            showErrorToast('Vendor Type is required');
             return;
         }
 
@@ -129,15 +183,15 @@ const SupplierMasterBoard = ({ isOpen, onClose }) => {
 
             if (isEditMode) {
                 await supplierService.update(formData.Code, payload);
-                toast.success('Supplier updated successfully');
+                showSuccessToast('Supplier updated successfully');
             } else {
                 const response = await supplierService.create(payload);
                 setFormData(prev => ({ ...prev, Code: response.code }));
-                toast.success(`Supplier created: ${response.code}`);
+                showSuccessToast(`Supplier created: ${response.code}`);
                 setIsEditMode(true);
             }
         } catch (error) {
-            toast.error(typeof error === 'string' ? error : (error.message || 'Operation failed'));
+            showErrorToast(typeof error === 'string' ? error : (error.message || 'Operation failed'));
         } finally {
             setLoading(false);
         }
@@ -152,11 +206,11 @@ const SupplierMasterBoard = ({ isOpen, onClose }) => {
         setLoading(true);
         try {
             await supplierService.delete(formData.Code);
-            toast.success('Supplier deleted');
+            showSuccessToast('Supplier deleted successfully');
             handleClear();
             setShowConfirmModal(false);
         } catch (error) {
-            toast.error(error);
+            showErrorToast(error.toString());
         } finally {
             setLoading(false);
         }
@@ -169,7 +223,7 @@ const SupplierMasterBoard = ({ isOpen, onClose }) => {
             setSuppliersList(data);
             setShowSearchModal(true);
         } catch (err) {
-            toast.error('Failed to load suppliers');
+            showErrorToast('Failed to load suppliers');
         } finally {
             setLoading(false);
         }
@@ -203,9 +257,9 @@ const SupplierMasterBoard = ({ isOpen, onClose }) => {
             });
             setIsEditMode(true);
             setShowSearchModal(false);
-            toast.success('Supplier loaded');
+            showSuccessToast('Supplier loaded successfully');
         } catch (error) {
-            toast.error(error);
+            showErrorToast(error.toString());
         } finally {
             setLoading(false);
         }
@@ -239,6 +293,14 @@ const SupplierMasterBoard = ({ isOpen, onClose }) => {
 
     return (
         <>
+            <style>
+                {`
+                    @keyframes toastProgress {
+                        0% { width: 100%; }
+                        100% { width: 0%; }
+                    }
+                `}
+            </style>
             <SimpleModal isOpen={isOpen} onClose={onClose} title="Supplier Master Directory" maxWidth="max-w-[720px]" footer={footer} showHeaderClose={true}>
                 <div className="py-2 px-1 select-none font-['Tahoma'] space-y-3 text-[12px] mt-1">
                     {/* Header Section */}

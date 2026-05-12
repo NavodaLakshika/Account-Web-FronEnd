@@ -253,11 +253,6 @@ const VendorTypesBoard = ({ isOpen, onClose }) => {
                             </div>
                         </div>
 
-                        {/* Footer */}
-                        <div className="bg-gray-50 px-4 py-2 border-t border-gray-200 flex justify-between items-center text-[10px] text-gray-400">
-                            <span>{vendors.length} Result(s)</span>
-                            <span className="italic font-bold text-[#0078d4]">ACCOUNT CLOUD INFRASTRUCTURE</span>
-                        </div>
                     </div>
                 </div>
             )}
@@ -325,12 +320,6 @@ const VendorTypesBoard = ({ isOpen, onClose }) => {
                                     <div className="p-8 text-center text-gray-400 italic text-sm">No accounts found.</div>
                                 )}
                             </div>
-                        </div>
-
-                        {/* Footer */}
-                        <div className="bg-gray-50 px-4 py-2 border-t border-gray-200 flex justify-between items-center text-[10px] text-gray-400">
-                            <span>{accounts.length} Result(s)</span>
-                            <span className="italic font-bold text-[#0078d4]">ACCOUNT CLOUD INFRASTRUCTURE</span>
                         </div>
                     </div>
                 </div>

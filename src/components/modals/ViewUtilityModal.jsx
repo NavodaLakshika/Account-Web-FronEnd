@@ -4,17 +4,14 @@ import LetterEnvelopesModal from './LetterEnvelopesModal';
 import OfficeDocumentModal from './OfficeDocumentModal';
 import ToDoListBoard from './ViewAndUtilityModels/ToDoListBoard';
 import SendFileBoard from './ViewAndUtilityModels/SendFileBoard';
-import FindBoard from './ViewAndUtilityModels/FindBoard';
-import CalculatorBoard from './ViewAndUtilityModels/CalculatorBoard';
-import ChangeBackgroundBoard from './ViewAndUtilityModels/ChangeBackgroundBoard';
-import CustomizeIconBarBoard from './ViewAndUtilityModels/CustomizeIconBarBoard';
+import DocumentSearchModal from './ViewAndUtilityModels/DocumentSearchModal';
 
 const ViewUtilityModal = ({ isOpen, onClose, onToggleSideBar, onOpenReminder, onOpenCalculator, onOpenNotepad, onOpenPrinter, currentTopBarColor, onColorSelect }) => {
     const [showLetterEnvelopesModal, setShowLetterEnvelopesModal] = useState(false);
     const [showOfficeDocumentModal, setShowOfficeDocumentModal] = useState(false);
     const [showToDoListBoard, setShowToDoListBoard] = useState(false);
     const [showSendFileBoard, setShowSendFileBoard] = useState(false);
-    const [showFindBoard, setShowFindBoard] = useState(false);
+    const [showDocumentSearchModal, setShowDocumentSearchModal] = useState(false);
     const [showCalculatorBoard, setShowCalculatorBoard] = useState(false);
     const [showCustomizeIconBarBoard, setShowCustomizeIconBarBoard] = useState(false);
     const [showChangeBackgroundBoard, setShowChangeBackgroundBoard] = useState(false);
@@ -29,8 +26,8 @@ const ViewUtilityModal = ({ isOpen, onClose, onToggleSideBar, onOpenReminder, on
         } },
         { icon: Send, label: 'Send File', shortcut: '', onClick: () => setShowSendFileBoard(true) },
         { icon: Mail, label: 'Use E-Mail', shortcut: '' },
-        { icon: Search, label: 'Find', shortcut: '', onClick: () => setShowFindBoard(true) },
-        { icon: Search, label: 'Search', shortcut: '', onClick: () => setShowFindBoard(true) },
+        { icon: Search, label: 'Find', shortcut: '', onClick: () => setShowDocumentSearchModal(true) },
+        { icon: Search, label: 'Search', shortcut: '', onClick: () => setShowDocumentSearchModal(true) },
         { icon: Calculator, label: 'Use Calculator', shortcut: '', onClick: () => {
              onOpenCalculator();
              onClose();
@@ -144,10 +141,10 @@ const ViewUtilityModal = ({ isOpen, onClose, onToggleSideBar, onOpenReminder, on
                 />
             )}
 
-            {showFindBoard && (
-                <FindBoard 
-                    isOpen={showFindBoard} 
-                    onClose={() => setShowFindBoard(false)} 
+            {showDocumentSearchModal && (
+                <DocumentSearchModal 
+                    isOpen={showDocumentSearchModal} 
+                    onClose={() => setShowDocumentSearchModal(false)} 
                 />
             )}
             {showCustomizeIconBarBoard && (

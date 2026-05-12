@@ -4,6 +4,7 @@ import SimpleModal from '../components/SimpleModal';
 import CalendarModal from '../components/CalendarModal';
 import { pettyCashService } from '../services/pettyCash.service';
 import { toast } from 'react-hot-toast';
+import { DotLottiePlayer } from '@dotlottie/react-player';
 import { getSessionData } from '../utils/session';
 
 const today = () => {
@@ -77,6 +78,58 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
     const [showDocSearch,     setShowDocSearch]     = useState(false);
     const [savedDocs,         setSavedDocs]         = useState([]);
 
+    const showSuccessToast = (message) => {
+        toast.custom((t) => (
+            <div className={`${t.visible ? 'animate-in slide-in-from-right-10 fade-in duration-500' : 'animate-out slide-out-to-right-10 fade-out duration-300'} 
+                max-w-[550px] w-fit bg-white/95 backdrop-blur-xl border border-white/20 shadow-2xl rounded-[5px] flex flex-col pointer-events-auto overflow-hidden`}>
+                <div className="px-4 py-2.5 flex items-center gap-3">
+                    <div className="w-12 h-12 shrink-0">
+                        <DotLottiePlayer src="/lottiefile/Successffull.lottie" autoplay loop={false} />
+                    </div>
+                    <div className="flex-grow text-left py-1 font-['Tahoma']">
+                        <h3 className="text-slate-800 text-[12px] font-bold tracking-wider uppercase leading-relaxed">{message}</h3>
+                        <div className="flex items-center gap-1.5 mt-0.5">
+                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.3)]" />
+                            <span className="text-emerald-600 text-[8px] font-mono font-bold tracking-widest uppercase">Verified</span>
+                        </div>
+                    </div>
+                    <button onClick={() => toast.dismiss(t.id)} className="text-slate-300 hover:text-slate-500 transition-colors">
+                        <X size={14} />
+                    </button>
+                </div>
+                <div className="h-[2px] w-full bg-emerald-50">
+                    <div className="h-full bg-emerald-500" style={{ animation: 'toastProgress 3s linear forwards' }} />
+                </div>
+            </div>
+        ), { duration: 3000, position: 'top-right' });
+    };
+
+    const showErrorToast = (message) => {
+        toast.custom((t) => (
+            <div className={`${t.visible ? 'animate-in slide-in-from-right-10 fade-in duration-500' : 'animate-out slide-out-to-right-10 fade-out duration-300'} 
+                max-w-[550px] w-fit bg-white/95 backdrop-blur-xl border border-white/20 shadow-2xl rounded-[5px] flex flex-col pointer-events-auto overflow-hidden`}>
+                <div className="px-4 py-2.5 flex items-center gap-3">
+                    <div className="w-12 h-12 shrink-0">
+                        <DotLottiePlayer src="/lottiefile/Error Fail animation.lottie" autoplay loop={false} />
+                    </div>
+                    <div className="flex-grow text-left py-1 font-['Tahoma']">
+                        <h3 className="text-slate-800 text-[12px] font-bold tracking-wider uppercase leading-relaxed">{message}</h3>
+                        <div className="flex items-center gap-1.5 mt-0.5">
+                            <div className="w-1.5 h-1.5 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.3)]" />
+                            <span className="text-red-600 text-[8px] font-mono font-bold tracking-widest uppercase">Failed</span>
+                        </div>
+                    </div>
+                    <button onClick={() => toast.dismiss(t.id)} className="text-slate-300 hover:text-slate-500 transition-colors">
+                        <X size={14} />
+                    </button>
+                </div>
+                <div className="h-[2px] w-full bg-red-50">
+                    <div className="h-full bg-red-500" style={{ animation: 'toastProgress 3s linear forwards' }} />
+                </div>
+            </div>
+        ), { duration: 3000, position: 'top-right' });
+    };
+
     useEffect(() => {
         if (isOpen) { 
             const { companyCode } = getSessionData();
@@ -87,14 +140,14 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
 
     const loadLookups = async (companyCode) => {
         try { setLookups(await pettyCashService.getLookups(companyCode)); }
-        catch { toast.error('Failed to load lookup data.'); }
+        catch { showErrorToast('Failed to load lookup data.'); }
     };
 
     const generateDoc = async (companyCode) => {
         try {
             const r = await pettyCashService.generateDocNo(companyCode);
             setForm(f => ({ ...f, docNo: r.docNo }));
-        } catch { toast.error('Failed to generate document number.'); }
+        } catch { showErrorToast('Failed to generate document number.'); }
     };
 
     const openCal = (field) => { setCalField(field); setShowCal(true); };
@@ -106,10 +159,10 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
     };
 
     const handleAddExpense = async () => {
-        if (!line.accCode) return toast.error('Select an expense account.');
-        if (!line.costCode) return toast.error('Select a cost center.');
+        if (!line.accCode) return showErrorToast('Select an expense account.');
+        if (!line.costCode) return showErrorToast('Select a cost center.');
         const amt = parseFloat(line.amount) || 0;
-        if (amt <= 0) return toast.error('Enter a valid amount.');
+        if (amt <= 0) return showErrorToast('Enter a valid amount.');
         setLoading(true);
         try {
             const payload = {
@@ -126,7 +179,7 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
             setLine({ accCode:'', accName:'', amount:'0.00', memo:'', costCode:'', costName:'', idNo:'0' });
             // Save header if first line
             if ((r.lines||[]).length === 1) await saveHeader(r.totOut);
-        } catch(e) { toast.error('Error: ' + e.message); }
+        } catch(e) { showErrorToast('Error: ' + e.message); }
         finally { setLoading(false); }
     };
 
@@ -139,14 +192,14 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
             });
             setExpenses(r.lines || []);
             setVouAmount(r.totOut || 0);
-        } catch(e) { toast.error('Error: ' + e.message); }
+        } catch(e) { showErrorToast('Error: ' + e.message); }
         finally { setLoading(false); }
     };
 
     const handleAddItem = async () => {
-        if (!itemLine.itemId) return toast.error('Select an item.');
+        if (!itemLine.itemId) return showErrorToast('Select an item.');
         const cost = parseFloat(itemLine.cost) || 0;
-        if (cost <= 0) return toast.error('Enter a valid cost.');
+        if (cost <= 0) return showErrorToast('Enter a valid cost.');
         setLoading(true);
         try {
             const payload = {
@@ -162,7 +215,7 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
             setVouAmount(r.totOut || 0);
             setItemLine({ itemId:'', itemName:'', qty:1, cost:'0.00', description:'', custJob:'', idNo:'0' });
             if ((r.lines||[]).length === 1 && expenses.length === 0) await saveHeader(r.totOut);
-        } catch(e) { toast.error('Error: ' + e.message); }
+        } catch(e) { showErrorToast('Error: ' + e.message); }
         finally { setLoading(false); }
     };
 
@@ -174,7 +227,7 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
             });
             setItems(r.lines || []);
             setVouAmount(r.totOut || 0);
-        } catch(e) { toast.error('Error: ' + e.message); }
+        } catch(e) { showErrorToast('Error: ' + e.message); }
         finally { setLoading(false); }
     };
 
@@ -191,10 +244,10 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
     };
 
     const handleApply = async () => {
-        if (!form.pettyAccCode) return toast.error('Select a petty cash account.');
-        if (!form.costCenterFrom) return toast.error('Select cost center (from).');
-        if (expenses.length === 0 && items.length === 0) return toast.error('Add at least one expense or item line.');
-        if (parseFloat(differ()) !== 0) return toast.error(`Bill amount and voucher amount not balanced. Difference: ${differ()}`);
+        if (!form.pettyAccCode) return showErrorToast('Select a petty cash account.');
+        if (!form.costCenterFrom) return showErrorToast('Select cost center (from).');
+        if (expenses.length === 0 && items.length === 0) return showErrorToast('Add at least one expense or item line.');
+        if (parseFloat(differ()) !== 0) return showErrorToast(`Bill amount and voucher amount not balanced. Difference: ${differ()}`);
         setLoading(true);
         try {
             const r = await pettyCashService.apply(userName, {
@@ -205,9 +258,9 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                 DueDate: form.dueDate, RefNo: form.refNo||'.', BillAmount: parseFloat(form.billAmount)||0,
                 CostCenterFrom: form.costCenterFrom,
             });
-            toast.success(`${r.orgDocNo} – Saved successfully!`);
+            showSuccessToast(`${r.orgDocNo} – Saved successfully!`);
             handleClear();
-        } catch(e) { toast.error('Save failed: ' + (e.response?.data || e.message)); }
+        } catch(e) { showErrorToast('Save failed: ' + (e.response?.data || e.message)); }
         finally { setLoading(false); }
     };
 
@@ -250,7 +303,7 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
             const expTotal = (data.expenses||[]).reduce((a,b)=>a+parseFloat(b.amount||0), 0);
             const itemTotal = (data.items||[]).reduce((a,b)=>a+(parseFloat(b.cost||0)), 0);
             setVouAmount(expTotal + itemTotal);
-        } catch { toast.error('Failed to load draft'); }
+        } catch { showErrorToast('Failed to load draft'); }
     };
 
     const fmtLabel = 'text-[11.5px] font-bold text-gray-600 w-28 shrink-0 font-mono uppercase tracking-wide';
@@ -258,7 +311,15 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
 
     return (
         <>
-        <SimpleModal isOpen={isOpen} onClose={onClose} title="Petty Cash" maxWidth="max-w-[1050px]"
+            <style>
+                {`
+                    @keyframes toastProgress {
+                        0% { width: 100%; }
+                        100% { width: 0%; }
+                    }
+                `}
+            </style>
+            <SimpleModal isOpen={isOpen} onClose={onClose} title="Petty Cash" maxWidth="max-w-[1050px]"
             footer={
                 <div className="flex gap-2 w-full justify-end">
                     <button onClick={handleApply} disabled={loading} className="px-5 h-9 bg-[#22c55e] hover:bg-[#16a34a] text-white text-xs font-bold rounded-lg flex items-center gap-2 transition-all active:scale-95 shadow-md disabled:opacity-50">

@@ -258,12 +258,6 @@ const ChangePasswordBoard = ({ isOpen, onClose }) => {
                                 )}
                             </div>
                         </div>
-
-                        {/* Footer */}
-                        <div className="bg-gray-50 px-4 py-2 border-t border-gray-200 flex justify-between items-center text-[10px] text-gray-400">
-                            <span>{filteredUsers.length} Result(s)</span>
-                            <span className="italic font-bold text-[#0078d4]">ACCOUNT CLOUD INFRASTRUCTURE</span>
-                        </div>
                     </div>
                 </div>
             )}

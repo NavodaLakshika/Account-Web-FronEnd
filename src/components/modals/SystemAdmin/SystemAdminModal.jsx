@@ -3,33 +3,37 @@ import { X, ShieldCheck, Database, RefreshCw, Download, Trash2, Search, FileEdit
 
 import DatabaseBackupModal from './DatabaseBackupModal';
 import StockBalanceUpdateModal from './StockBalanceUpdateModal';
-import DownloadDataModal from './DownloadDataModal';
+import InventoryDownloadModal from './InventoryDownloadModal';
 import DeleteAccountModal from './DeleteAccountModal';
 import TransactionSearchModal from './TransactionSearchModal';
 import SystemUpdateModal from './SystemUpdateModal';
 import ClearTempDataModal from './ClearTempDataModal';
 import PeriodLockModal from './PeriodLockModal';
+import JournalEntryEditorModal from './JournalEntryEditorModal';
+import TransactionEditorModal from './TransactionEditorModal';
 
 const SystemAdminModal = ({ isOpen, onClose, onOpenChangePassword, onOpenSystemSettings }) => {
     const [showBackupModal, setShowBackupModal] = React.useState(false);
     const [showStockUpdateModal, setShowStockUpdateModal] = React.useState(false);
-    const [showDownloadModal, setShowDownloadModal] = React.useState(false);
+    const [showInventoryDownloadModal, setShowInventoryDownloadModal] = React.useState(false);
     const [showDeleteAccountModal, setShowDeleteAccountModal] = React.useState(false);
     const [showSearchModal, setShowSearchModal] = React.useState(false);
     const [showUpdateModal, setShowUpdateModal] = React.useState(false);
     const [showClearModal, setShowClearModal] = React.useState(false);
     const [showLockModal, setShowLockModal] = React.useState(false);
+    const [showJournalEditorModal, setShowJournalEditorModal] = React.useState(false);
+    const [showTransactionEditorModal, setShowTransactionEditorModal] = React.useState(false);
 
     if (!isOpen) return null;
 
     const menuItems = [
         { icon: Database, label: 'Create a Data Backup', shortcut: '', action: 'backup' },
         { icon: RefreshCw, label: 'Stock Balance Update', shortcut: '', action: 'stockUpdate' },
-        { icon: Download, label: 'Download Data', shortcut: '', action: 'download' },
+        { icon: Download, label: 'Inventory Data Download', shortcut: '', action: 'inventoryDownload' },
         { icon: Trash2, label: 'Delete Account', color: 'text-red-600', action: 'deleteAccount' },
         { icon: Search, label: 'Transaction Search', shortcut: '', action: 'search' },
-        { icon: FileEdit, label: 'Document Editor', shortcut: '' },
-        { icon: Settings, label: 'Transaction Editor', shortcut: '' },
+        { icon: FileEdit, label: 'Document Editor', shortcut: '', action: 'journalEditor' },
+        { icon: Settings, label: 'Transaction Editor', shortcut: '', action: 'transactionEditor' },
         { icon: CloudLightning, label: 'System Update', shortcut: '', action: 'update' },
         { icon: Eraser, label: 'Clear Temporary Data', shortcut: '', action: 'clear' },
         { icon: Lock, label: 'Period Lock Facility', shortcut: '', action: 'lock' },
@@ -54,7 +58,6 @@ const SystemAdminModal = ({ isOpen, onClose, onOpenChangePassword, onOpenSystemS
                         style={{ backgroundColor: localStorage.getItem('topBarColor') || '#0078d4' }}
                     />
                     <div className="flex items-center gap-2">
-                        <ShieldCheck size={14} className="text-[#0078d4]" />
                         <span className="text-lg font-bold text-slate-800 tracking-tight">System Administration</span>
                     </div>
                     <button 
@@ -77,12 +80,14 @@ const SystemAdminModal = ({ isOpen, onClose, onOpenChangePassword, onOpenSystemS
                                     if (item.action === 'changePassword') onOpenChangePassword();
                                     if (item.action === 'backup') setShowBackupModal(true);
                                     if (item.action === 'stockUpdate') setShowStockUpdateModal(true);
-                                    if (item.action === 'download') setShowDownloadModal(true);
+                                    if (item.action === 'inventoryDownload') setShowInventoryDownloadModal(true);
                                     if (item.action === 'deleteAccount') setShowDeleteAccountModal(true);
                                     if (item.action === 'search') setShowSearchModal(true);
                                     if (item.action === 'update') setShowUpdateModal(true);
                                     if (item.action === 'clear') setShowClearModal(true);
                                     if (item.action === 'lock') setShowLockModal(true);
+                                    if (item.action === 'journalEditor') setShowJournalEditorModal(true);
+                                    if (item.action === 'transactionEditor') setShowTransactionEditorModal(true);
                                     if (item.action === 'systemSettings') onOpenSystemSettings();
                                 }}
                                 className="w-full flex items-center justify-between px-4 py-3 rounded-xl hover:bg-slate-50 group transition-all relative overflow-hidden text-left"
@@ -101,8 +106,7 @@ const SystemAdminModal = ({ isOpen, onClose, onOpenChangePassword, onOpenSystemS
                                         {item.label}
                                     </span>
                                 </div>
-                                <ChevronRight size={14} className="text-slate-300 group-hover:text-slate-500 group-hover:translate-x-0.5 transition-all relative z-10" />
-                            </button>
+                                </button>
                         );
                     })}
                 </div>
@@ -118,9 +122,9 @@ const SystemAdminModal = ({ isOpen, onClose, onOpenChangePassword, onOpenSystemS
                 onClose={() => setShowStockUpdateModal(false)} 
             />
 
-            <DownloadDataModal 
-                isOpen={showDownloadModal} 
-                onClose={() => setShowDownloadModal(false)} 
+            <InventoryDownloadModal 
+                isOpen={showInventoryDownloadModal} 
+                onClose={() => setShowInventoryDownloadModal(false)} 
             />
 
             <DeleteAccountModal 
@@ -146,6 +150,16 @@ const SystemAdminModal = ({ isOpen, onClose, onOpenChangePassword, onOpenSystemS
             <PeriodLockModal 
                 isOpen={showLockModal} 
                 onClose={() => setShowLockModal(false)} 
+            />
+
+            <JournalEntryEditorModal
+                isOpen={showJournalEditorModal}
+                onClose={() => setShowJournalEditorModal(false)}
+            />
+
+            <TransactionEditorModal
+                isOpen={showTransactionEditorModal}
+                onClose={() => setShowTransactionEditorModal(false)}
             />
         </div>
     );

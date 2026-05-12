@@ -64,7 +64,7 @@ const CalendarModal = ({ isOpen, onClose, onDateSelect, onDateChange, initialDat
         const yyyy = selected.getFullYear();
         const mm = String(selected.getMonth() + 1).padStart(2, '0');
         const dd = String(selected.getDate()).padStart(2, '0');
-        const formatted = `${dd}/${mm}/${yyyy}`;
+        const formatted = `${yyyy}-${mm}-${dd}`;
         if (activeCallback) activeCallback(formatted);
         onClose();
     };
