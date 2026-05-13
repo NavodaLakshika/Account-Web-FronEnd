@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import SimpleModal from '../SimpleModal';
 import { Search, Save, RotateCcw, X, Loader2, Lock, User, Key, Eye, EyeOff, CheckCircle2 } from 'lucide-react';
 import { userProfileService } from '../../services/userProfile.service';
+import { showSuccessToast, showErrorToast } from '../../utils/toastUtils';
 import { toast } from 'react-hot-toast';
 
 const ChangePasswordBoard = ({ isOpen, onClose }) => {
@@ -42,21 +43,25 @@ const ChangePasswordBoard = ({ isOpen, onClose }) => {
                 LastModUser: user?.emp_Name || user?.empName || 'SYSTEM'
             }));
             
-            if (companyCode) {
-                fetchUsers(companyCode);
-            } else {
-                console.warn('No company code found for user fetch');
-            }
+            fetchUsers(companyCode);
         }
     }, [isOpen]);
 
 
     const fetchUsers = async (companyCode) => {
+        setLoading(true);
         try {
+            console.log('Fetching users for company:', companyCode);
             const data = await userProfileService.searchUsers(companyCode);
             setUsers(data);
+            if (data.length === 0 && companyCode) {
+                toast.error(`No users found for company: ${companyCode}`);
+            }
         } catch (error) {
             console.error('Fetch users error:', error);
+            showErrorToast('Error loading employees: ' + (error.message || error));
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -70,10 +75,10 @@ const ChangePasswordBoard = ({ isOpen, onClose }) => {
     };
 
     const handleSave = () => {
-        if (!formData.EmpCode) return toast.error('Please select a user');
-        if (!formData.CurrentPassword) return toast.error('Current password is required');
-        if (!formData.NewPassword) return toast.error('New password is required');
-        if (formData.NewPassword !== formData.ConfirmPassword) return toast.error('Passwords do not match');
+        if (!formData.EmpCode) return showErrorToast('Please select a user');
+        if (!formData.CurrentPassword) return showErrorToast('Current password is required');
+        if (!formData.NewPassword) return showErrorToast('New password is required');
+        if (formData.NewPassword !== formData.ConfirmPassword) return showErrorToast('Passwords do not match');
         
         setShowSaveConfirm(true);
     };
@@ -83,10 +88,10 @@ const ChangePasswordBoard = ({ isOpen, onClose }) => {
         setLoading(true);
         try {
             const response = await userProfileService.changePassword(formData);
-            toast.success(response.message);
+            showSuccessToast(response.message);
             handleClear();
         } catch (error) {
-            toast.error(typeof error === 'string' ? error : (error.message || 'Operation failed'));
+            showErrorToast(typeof error === 'string' ? error : (error.message || 'Operation failed'));
         } finally {
             setLoading(false);
         }
@@ -98,6 +103,14 @@ const ChangePasswordBoard = ({ isOpen, onClose }) => {
 
     return (
         <>
+            <style>
+                {`
+                    @keyframes toastProgress {
+                        0% { width: 100%; }
+                        100% { width: 0%; }
+                    }
+                `}
+            </style>
             <SimpleModal
                 isOpen={isOpen}
                 onClose={onClose}
@@ -202,36 +215,97 @@ const ChangePasswordBoard = ({ isOpen, onClose }) => {
             </SimpleModal>
 
             {/* User Selection Modal */}
-            {showUserModal && (
-                <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4 font-['Plus_Jakarta_Sans']">
-                    <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setShowUserModal(false)} />
-                    <div className="relative w-full max-w-sm bg-white shadow-2xl rounded-2xl border border-gray-100 overflow-hidden flex flex-col max-h-[70vh] animate-in slide-in-from-bottom-4 duration-300">
-                        <div className="p-4 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
-                            <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest">Select System Employee</h3>
-                            <button onClick={() => setShowUserModal(false)} className="text-slate-400 hover:text-red-500 transition-colors"><X size={20} /></button>
+            <SimpleModal
+                isOpen={showUserModal}
+                onClose={() => setShowUserModal(false)}
+                title="Select System Employee"
+                maxWidth="max-w-[700px]"
+            >
+                <div className="space-y-4 font-['Tahoma']">
+                    {/* Search Section matching PurchaseOrderBoard style */}
+                    <div className="flex items-center gap-4 bg-slate-50/80 p-3 rounded-lg border border-gray-100 mb-2">
+                        <span className="text-[11px] font-bold text-gray-500 uppercase tracking-widest whitespace-nowrap">Global Archive Search</span>
+                        <div className="relative flex-1">
+                            <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                            <input 
+                                type="text" 
+                                placeholder="Filter by name or employee code..." 
+                                className="w-full h-9 pl-10 pr-4 border border-gray-300 rounded-[5px] outline-none text-sm focus:border-[#0285fd] bg-white shadow-sm transition-all"
+                                value={userSearchQuery} 
+                                onChange={(e) => setUserSearchQuery(e.target.value)} 
+                                autoFocus
+                            />
                         </div>
-                        <div className="p-3 bg-white border-b border-gray-50">
-                            <div className="relative">
-                                <Search size={14} className="absolute left-3 top-2.5 text-gray-400" />
-                                <input type="text" placeholder="Quick search users..." className="w-full h-9 pl-9 pr-3 border border-gray-200 rounded-lg text-xs outline-none focus:border-blue-400" value={userSearchQuery} onChange={(e) => setUserSearchQuery(e.target.value)} />
-                            </div>
-                        </div>
-                        <div className="overflow-y-auto no-scrollbar">
-                            {users.filter(u => u.emp_Name.toLowerCase().includes(userSearchQuery.toLowerCase())).map((u, i) => (
-                                <button key={i} onClick={() => handleUserSelect(u)} className="w-full p-4 flex items-center gap-4 hover:bg-blue-50 border-b border-gray-50 transition-all text-left group">
-                                    <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-[10px] font-bold text-slate-500 group-hover:bg-blue-600 group-hover:text-white">
-                                        {u.emp_Name.charAt(0)}
-                                    </div>
-                                    <div>
-                                        <div className="text-sm font-bold text-slate-800 uppercase leading-none mb-1">{u.emp_Name}</div>
-                                        <div className="text-[10px] font-bold text-blue-500/70 tracking-tighter">{u.emp_Code}</div>
-                                    </div>
-                                </button>
-                            ))}
+                        <button 
+                            onClick={() => {
+                                const companyData = localStorage.getItem('selectedCompany');
+                                let companyCode = '';
+                                if (companyData) {
+                                    try {
+                                        const parsed = JSON.parse(companyData);
+                                        companyCode = parsed.companyCode || parsed.CompanyCode || parsed.company_Code || '';
+                                    } catch (e) { companyCode = companyData; }
+                                }
+                                fetchUsers(companyCode);
+                            }}
+                            className="p-2 text-[#0285fd] hover:bg-blue-50 rounded-md transition-colors"
+                            title="Reload Data"
+                        >
+                            <RotateCcw size={16} />
+                        </button>
+                    </div>
+
+                    {/* Table matching PurchaseOrderBoard style */}
+                    <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm bg-white">
+                        <table className="w-full text-left">
+                            <thead className="bg-[#f8fafd] text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 sticky top-0 z-10">
+                                <tr>
+                                    <th className="px-5 py-3 w-32">Reference ID</th>
+                                    <th className="px-5 py-3">Full Name / Description</th>
+                                    <th className="px-5 py-3 text-right">SELECT</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-50">
+                                {users.filter(u => u?.emp_Name?.toLowerCase().includes(userSearchQuery.toLowerCase()) || u?.emp_Code?.toLowerCase().includes(userSearchQuery.toLowerCase())).length === 0 ? (
+                                    <tr>
+                                        <td colSpan="3" className="text-center py-20 text-gray-300 text-[12px] font-bold uppercase tracking-widest">
+                                            {loading ? "Establishing database connection..." : "No matching employees found"}
+                                        </td>
+                                    </tr>
+                                ) : (
+                                    users.filter(u => u?.emp_Name?.toLowerCase().includes(userSearchQuery.toLowerCase()) || u?.emp_Code?.toLowerCase().includes(userSearchQuery.toLowerCase())).map((u, i) => (
+                                        <tr key={i} className="group hover:bg-blue-50/50 cursor-pointer transition-colors" onClick={() => handleUserSelect(u)}>
+                                            <td className="px-5 py-3 font-mono text-[13px] font-bold text-gray-600 border-r border-gray-50/50">
+                                                {u.emp_Code}
+                                            </td>
+                                            <td className="px-5 py-3 text-[13px] font-bold text-gray-600 uppercase group-hover:text-[#0285fd]">
+                                                {u.emp_Name}
+                                            </td>
+                                            <td className="px-5 py-3 text-right">
+                                                <button 
+                                                    onClick={(e) => { e.stopPropagation(); handleUserSelect(u); }}
+                                                    className="bg-[#e49e1b] hover:bg-[#cb9b34] text-white text-[10px] px-5 py-2 rounded-[5px] font-black shadow-md transition-all active:scale-95 uppercase tracking-wider"
+                                                >
+                                                    SELECT
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {/* Status Bar */}
+                    <div className="flex items-center justify-between opacity-50 px-2 mt-2">
+                        <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest italic">Total Records: {users.length}</span>
+                        <div className="flex items-center gap-1.5">
+                            <div className={`w-1.5 h-1.5 rounded-full ${users.length > 0 ? 'bg-emerald-500' : 'bg-red-400'}`} />
+                            <span className="text-[9px] font-black text-slate-400 uppercase tracking-tight">Onimta User Registry v1.0</span>
                         </div>
                     </div>
                 </div>
-            )}
+            </SimpleModal>
 
             {/* Save Confirmation */}
             {showSaveConfirm && (

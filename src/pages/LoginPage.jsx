@@ -41,7 +41,7 @@ const LoginPage = () => {
 
       navigate('/dashboard');
     } catch (err) {
-      const msg = typeof err === 'string' ? err : 'Invalid username or password. Please try again.';
+      const msg = typeof err === 'string' ? err : (err.message || 'Invalid username or password. Please try again.');
       setErrorMsg(msg);
     } finally {
       setLoading(false);

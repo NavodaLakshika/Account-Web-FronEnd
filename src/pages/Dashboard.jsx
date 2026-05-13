@@ -30,6 +30,7 @@ import {
 } from 'lucide-react';
 
 import { authService } from '../services/auth.service';
+import { systemLocksService } from '../services/systemLocks.service';
 import HomeBoard from './HomeBoard';
 import NewAccountBoard from './NewAccountBoard';
 import CustomerMasterBoard from '../components/modals/MasterSubModal/CustomerMasterBoard';
@@ -192,6 +193,19 @@ const Dashboard = () => {
     }, []);
 
     useEffect(() => {
+        // Sync system locks from backend on dashboard mount
+        const syncLocks = async () => {
+            try {
+                const locks = await systemLocksService.getAllLocks();
+                Object.entries(locks).forEach(([moduleId, isLocked]) => {
+                    localStorage.setItem(moduleId, isLocked ? 'true' : 'false');
+                });
+            } catch (err) {
+                console.error("Failed to sync system locks from server", err);
+            }
+        };
+        syncLocks();
+
         const currentUser = authService.getCurrentUser();
         const company = localStorage.getItem('selectedCompany');
         const savedIcons = localStorage.getItem('ribbon_icons');

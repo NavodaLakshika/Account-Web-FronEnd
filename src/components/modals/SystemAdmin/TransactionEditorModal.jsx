@@ -7,6 +7,7 @@ import { transactionEditorService } from '../../../services/transactionEditor.se
 import { getSessionData } from '../../../utils/session';
 import { toast } from 'react-hot-toast';
 import { DotLottiePlayer } from '@dotlottie/react-player';
+import { showSuccessToast, showErrorToast } from '../../../utils/toastUtils';
 
 const TransactionEditorModal = ({ isOpen, onClose }) => {
     const [loading, setLoading] = useState(false);
@@ -52,33 +53,11 @@ const TransactionEditorModal = ({ isOpen, onClose }) => {
         }
     };
 
-    const showSuccessToast = (message) => {
-        toast.custom((t) => (
-            <div className={`${t.visible ? 'animate-in slide-in-from-right-10 fade-in duration-500' : 'animate-out slide-out-to-right-10 fade-out duration-300'} 
-                max-w-[550px] w-fit bg-white/95 backdrop-blur-xl border border-white/20 shadow-2xl rounded-[5px] flex flex-col pointer-events-auto overflow-hidden`}>
-                <div className="px-4 py-2.5 flex items-center gap-3">
-                    <div className="w-12 h-12 shrink-0">
-                        <DotLottiePlayer src="/lottiefile/Successffull.lottie" autoplay loop={false} />
-                    </div>
-                    <div className="flex-grow text-left py-1">
-                        <h3 className="text-slate-800 text-[12px] font-bold tracking-wider uppercase font-['Tahoma'] leading-relaxed">{message}</h3>
-                        <div className="flex items-center gap-1.5 mt-0.5">
-                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.3)]" />
-                            <span className="text-emerald-600 text-[8px] font-mono font-bold tracking-widest uppercase">Success</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        ), { position: 'top-right' });
-    };
-
-    const showErrorToast = (message) => {
-        toast.error(message);
-    };
+    // Removed old toast methods as they are now handled by shared utils
 
     const handleLoad = async () => {
         if (!docNo || !transType) {
-            toast.error('Please enter Document No and Transaction Type');
+            showErrorToast('Please enter Document No and Transaction Type');
             return;
         }
 
@@ -103,10 +82,10 @@ const TransactionEditorModal = ({ isOpen, onClose }) => {
                     amount: d.amount,
                     memo: d.memo
                 })));
-                toast.success('Transaction loaded successfully');
+                showSuccessToast('Transaction loaded successfully');
             }
         } catch (error) {
-            toast.error('Error loading transaction');
+            showErrorToast('Error loading transaction');
         } finally {
             setLoading(false);
         }
@@ -114,7 +93,7 @@ const TransactionEditorModal = ({ isOpen, onClose }) => {
 
     const handleAddRow = async () => {
         if (!currentRow.expAcc || !currentRow.amount) {
-            toast.error('Please select an account and enter amount');
+            showErrorToast('Please select an account and enter amount');
             return;
         }
 
@@ -142,9 +121,9 @@ const TransactionEditorModal = ({ isOpen, onClose }) => {
             })));
 
             setCurrentRow({ id: null, expAcc: '', costCenter: '', amount: '', memo: '' });
-            toast.success('Row updated');
+            showSuccessToast('Row updated successfully');
         } catch (error) {
-            toast.error('Error saving row');
+            showErrorToast('Error saving row');
         } finally {
             setLoading(false);
         }
@@ -171,10 +150,10 @@ const TransactionEditorModal = ({ isOpen, onClose }) => {
                 company: sessionData?.companyCode,
                 user: sessionData?.empCode
             });
-            toast.success('Transaction committed successfully');
+            showSuccessToast('Transaction committed successfully');
             handleClear();
         } catch (error) {
-            toast.error('Error committing transaction');
+            showErrorToast('Error committing transaction');
         } finally {
             setLoading(false);
         }

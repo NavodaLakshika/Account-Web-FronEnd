@@ -11,7 +11,7 @@ api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
     if (token) {
-      config.headers.Authorization = `Bearer \${token}`;
+      config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
@@ -21,21 +21,21 @@ api.interceptors.request.use(
 export const userProfileService = {
   async searchUsers(companyCode, query = '') {
     try {
-      const response = await api.get('/searchUsers', { 
+      const response = await api.get('searchUsers', { 
         params: { companyCode, query } 
       });
       return response.data;
     } catch (error) {
-      throw error.response?.data || 'Failed to search users';
+      throw error.response?.data || error.message || 'Failed to search users';
     }
   },
 
   async changePassword(requestData) {
     try {
-      const response = await api.post('/changePassword', requestData);
+      const response = await api.post('changePassword', requestData);
       return response.data;
     } catch (error) {
-      throw error.response?.data || 'Failed to change password';
+      throw error.response?.data || error.message || 'Failed to change password';
     }
   }
 };

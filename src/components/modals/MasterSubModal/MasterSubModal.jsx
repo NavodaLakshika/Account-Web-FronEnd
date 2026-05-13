@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, ChevronRight, Building2, Target, Users, UserSquare, CreditCard, PieChart, UserCog, Settings, Key, LogOut, Layers, Briefcase } from 'lucide-react';
+import { X, ChevronRight, Building2, Target, Users, UserSquare, CreditCard, PieChart, UserCog, Settings, Key, LogOut, Layers, Briefcase, Lock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { authService } from '../../../services/auth.service';
 
@@ -23,10 +23,20 @@ import ChangePasswordBoard from './ChangePasswordBoard';
 import ThankYouModal from '../ThankYouModal';
 import LogoutConfirmModal from '../LogoutConfirmModal';
 
+import { showErrorToast } from '../../../utils/toastUtils';
+
+import FeatureLockedModal from '../FeatureLockedModal';
+
 const MasterSubModal = ({ isOpen, onClose }) => {
     const navigate = useNavigate();
 
+    const [showLockModal, setShowLockModal] = useState(false);
+
     const handleLogOff = () => {
+        if (localStorage.getItem('isLocked_master_logoff') === 'true') {
+            setShowLockModal(true);
+            return;
+        }
         setShowLogoutConfirmModal(true);
     };
 
@@ -55,18 +65,18 @@ const MasterSubModal = ({ isOpen, onClose }) => {
     if (!isOpen) return null;
 
     const menuItems = [
-        { icon: Building2, label: 'Open Company', shortcut: '', onClick: () => setShowCompanyBoard(true) },
-        { icon: Target, label: 'Cost Center Master', shortcut: '', onClick: () => setShowCostCenterBoard(true) },
-        { icon: Briefcase, label: 'Create Department', shortcut: '', onClick: () => setShowDepartmentBoard(true) },
-        { icon: Layers, label: 'Create Category', shortcut: '', onClick: () => setShowCategoryBoard(true) },
-        { icon: UserSquare, label: 'Supplier Master', shortcut: '', onClick: () => setShowSupplierMasterBoard(true) },
-        { icon: Users, label: 'Customer Master', shortcut: '', onClick: () => setShowCustomerMasterBoard(true) },
-        { icon: CreditCard, label: 'Card Sale Commission', shortcut: '', onClick: () => setShowCardCommissionBoard(true) },
-        { icon: PieChart, label: 'Chart of Accountant', hasSubmenu: true, onClick: () => setShowChartOfAccountantModal(true) },
-        { icon: UserCog, label: 'User Profile Maintenance', shortcut: '', onClick: () => setShowUserProfileBoard(true) },
-        { icon: Settings, label: 'Vendor Types', shortcut: '', onClick: () => setShowVendorTypesBoard(true) },
-        { icon: Key, label: 'Change Password', shortcut: '', onClick: () => setShowChangePasswordBoard(true) },
-        { icon: LogOut, label: 'Log Off', shortcut: '', color: 'text-red-600', onClick: handleLogOff },
+        { icon: Building2, label: 'Open Company', id: 'master_company', onClick: () => setShowCompanyBoard(true) },
+        { icon: Target, label: 'Cost Center Master', id: 'master_costCenter', onClick: () => setShowCostCenterBoard(true) },
+        { icon: Briefcase, label: 'Create Department', id: 'master_department', onClick: () => setShowDepartmentBoard(true) },
+        { icon: Layers, label: 'Create Category', id: 'master_category', onClick: () => setShowCategoryBoard(true) },
+        { icon: UserSquare, label: 'Supplier Master', id: 'master_supplier', onClick: () => setShowSupplierMasterBoard(true) },
+        { icon: Users, label: 'Customer Master', id: 'master_customer', onClick: () => setShowCustomerMasterBoard(true) },
+        { icon: CreditCard, label: 'Card Sale Commission', id: 'master_cardSale', onClick: () => setShowCardCommissionBoard(true) },
+        { icon: PieChart, label: 'Chart of Accountant', id: 'master_chartOfAccount', hasSubmenu: true, onClick: () => setShowChartOfAccountantModal(true) },
+        { icon: UserCog, label: 'User Profile Maintenance', id: 'master_userProfile', onClick: () => setShowUserProfileBoard(true) },
+        { icon: Settings, label: 'Vendor Types', id: 'master_vendorTypes', onClick: () => setShowVendorTypesBoard(true) },
+        { icon: Key, label: 'Change Password', id: 'master_changePassword', onClick: () => setShowChangePasswordBoard(true) },
+        { icon: LogOut, label: 'Log Off', id: 'master_logoff', color: 'text-red-600', onClick: handleLogOff },
     ];
 
     return (
@@ -83,7 +93,7 @@ const MasterSubModal = ({ isOpen, onClose }) => {
                         {/* Independent Close Button - Floating Further Outside */}
                         <button 
                             onClick={onClose} 
-                            className="absolute -top-20 -right-20 w-10 h-10 flex items-center justify-center bg-[#ff3b30] hover:bg-[#e03127] text-white rounded-[14px] shadow-[0_12px_24px_rgba(255,59,48,0.4)] hover:shadow-[0_16px_32px_rgba(255,59,48,0.5)] transition-all active:scale-90 outline-none border-none group z-[300]"
+                            className="absolute -top-12 -right-12 w-10 h-10 flex items-center justify-center bg-[#ff3b30] hover:bg-[#e03127] text-white rounded-[14px] shadow-[0_12px_24px_rgba(255,59,48,0.4)] hover:shadow-[0_16px_32px_rgba(255,59,48,0.5)] transition-all active:scale-90 outline-none border-none group z-[300]"
                             title="Close"
                         >
                             <X size={24} strokeWidth={4} className="group-hover:scale-110 transition-transform" />
@@ -108,6 +118,8 @@ const MasterSubModal = ({ isOpen, onClose }) => {
                         <div className="grid grid-cols-6 gap-x-8 gap-y-10">
                             {menuItems.map((item, idx) => {
                                 const Icon = item.icon;
+                                const isLocked = localStorage.getItem(`isLocked_${item.id}`) === 'true';
+
                                 return (
                                     <React.Fragment key={idx}>
                                         {/* Row Separator after 6 items */}
@@ -115,10 +127,17 @@ const MasterSubModal = ({ isOpen, onClose }) => {
                                             <div className="col-span-6 my-1 h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent w-full" />
                                         )}
                                         
-                                        <div className="flex flex-col items-center group">
+                                        <div className="flex flex-col items-center group relative">
+
                                             <button
-                                                onClick={item.onClick}
-                                                className="w-24 h-24 bg-white rounded-[14px] shadow-lg hover:shadow-2xl hover:-translate-y-3 active:scale-90 transition-all duration-500 flex items-center justify-center relative overflow-hidden"
+                                                onClick={() => {
+                                                    if (isLocked) {
+                                                        setShowLockModal(true);
+                                                        return;
+                                                    }
+                                                    item.onClick();
+                                                }}
+                                                className={`w-24 h-24 bg-white rounded-[14px] shadow-lg hover:shadow-2xl hover:-translate-y-3 active:scale-90 transition-all duration-500 flex items-center justify-center relative overflow-hidden ${isLocked ? 'opacity-75 grayscale-[0.5]' : ''}`}
                                             >
                                                 {/* Subtle Gradient Backdrop */}
                                                 <div className="absolute inset-0 bg-gradient-to-br from-transparent to-slate-50/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
@@ -126,16 +145,26 @@ const MasterSubModal = ({ isOpen, onClose }) => {
                                                 <Icon 
                                                     size={32} 
                                                     strokeWidth={1.5}
-                                                    className={`transition-all duration-500 group-hover:scale-110 ${item.color || 'text-slate-500 group-hover:text-[#0078d4]'}`} 
+                                                    className={`transition-all duration-500 group-hover:scale-110 ${item.color || (isLocked ? 'text-slate-400' : 'text-slate-500 group-hover:text-[#0078d4]')}`} 
                                                 />
 
                                                 {/* Decorative Corner Glow */}
-                                                <div className="absolute -right-6 -top-6 w-12 h-12 bg-[#0078d4]/10 rounded-full blur-xl group-hover:scale-150 transition-transform duration-700" />
+                                                {!isLocked && (
+                                                    <div className="absolute -right-6 -top-6 w-12 h-12 bg-[#0078d4]/10 rounded-full blur-xl group-hover:scale-150 transition-transform duration-700" />
+                                                )}
                                             </button>
                                             
-                                            <span className={`mt-5 text-[11px] font-[700] uppercase tracking-[0.25em] text-center leading-tight transition-all duration-300 font-['Inter',sans-serif] ${item.color || 'text-white group-hover:text-white/80'}`}>
+                                            <span className={`mt-5 text-[11px] font-[700] uppercase tracking-[0.25em] text-center leading-tight transition-all duration-300 font-['Inter',sans-serif] ${item.color || 'text-white group-hover:text-white/80'} ${isLocked ? 'opacity-60' : ''}`}>
                                                 {item.label}
                                             </span>
+                                            
+                                            {/* Minimalist Professional Secured Label */}
+                                            {isLocked && (
+                                                <div className="mt-2.5 flex items-center gap-1.5 px-2.5 py-0.5 bg-red-500/10 border border-red-500/20 rounded-full backdrop-blur-md shadow-sm">
+                                                    <Lock size={9} strokeWidth={3} className="text-red-400" />
+                                                    <span className="text-[8.5px] font-bold uppercase tracking-[0.2em] text-red-400">Secured</span>
+                                                </div>
+                                            )}
                                         </div>
                                     </React.Fragment>
                                 );
@@ -144,6 +173,11 @@ const MasterSubModal = ({ isOpen, onClose }) => {
                     </div>
                 </div>
             </div>
+
+            <FeatureLockedModal
+                isOpen={showLockModal}
+                onClose={() => setShowLockModal(false)}
+            />
 
             {showChartOfAccountantModal && (
                 <ChartOfAccountantModal

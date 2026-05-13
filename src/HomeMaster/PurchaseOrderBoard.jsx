@@ -7,6 +7,7 @@ import { purchOrderService } from '../services/purchOrder.service';
 import { paymentMethodService } from '../services/paymentMethod.service';
 import { toast } from 'react-hot-toast';
 import { DotLottiePlayer } from '@dotlottie/react-player';
+import FeatureLockedModal from '../components/modals/FeatureLockedModal';
 import { getSessionData } from '../utils/session';
 
 const PurchaseOrderBoard = ({ isOpen, onClose }) => {
@@ -1127,31 +1128,10 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
                 </div>
             </SimpleModal>
             
-            <SimpleModal
+            <FeatureLockedModal
                 isOpen={showLockModal}
                 onClose={() => setShowLockModal(false)}
-                title="LOCK STATUS"
-                maxWidth="max-w-[360px]"
-                showHeaderClose={false}
-            >
-                <div className="flex flex-col items-center text-center space-y-6 font-['Plus_Jakarta_Sans'] py-2">
-                    <div className="w-28 h-28 shrink-0">
-                        <DotLottiePlayer src="/lottiefile/Forgot Password1.lottie" autoplay loop />
-                    </div>
-                    <div className="space-y-1">
-                        <h3 className="text-[18px] font-bold text-slate-800 uppercase tracking-tight">Access Locked</h3>
-                        <p className="text-[12px] text-slate-500 font-medium">
-                            Please contact supporters to unlock this feature.
-                        </p>
-                    </div>
-                    <button
-                        onClick={() => setShowLockModal(false)}
-                        className="w-full h-10 bg-[#0285fd] text-white text-[12px] font-black rounded-[5px] hover:bg-[#0073ff] transition-all active:scale-95 uppercase tracking-widest"
-                    >
-                        CLOSE
-                    </button>
-                </div>
-            </SimpleModal>
+            />
         </>
     );
 };
