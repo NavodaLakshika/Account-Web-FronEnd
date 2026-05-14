@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: '/api/LongTermLiab',
+  baseURL: '/api/FixedIncome',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -18,16 +18,7 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-export const longTermLiabService = {
-  async generateDocNo(company) {
-    try {
-      const response = await api.get('/generate-doc', { params: { company } });
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || 'Failed to generate document number';
-    }
-  },
-
+export const fixedIncomeService = {
   async getLookups() {
     try {
       const response = await api.get('/lookups');
@@ -37,21 +28,12 @@ export const longTermLiabService = {
     }
   },
 
-  async getByCode(code, company) {
+  async getList(company) {
     try {
-      const response = await api.get(`/${code}`, { params: { company } });
+      const response = await api.get('/list', { params: { company } });
       return response.data;
     } catch (error) {
-      throw error.response?.data || 'Failed to fetch liability details';
-    }
-  },
-
-  async search(company, query = '') {
-    try {
-      const response = await api.get('/search', { params: { company, query } });
-      return response.data;
-    } catch (error) {
-      throw error.response?.data || 'Search failed';
+      throw error.response?.data || 'Failed to fetch income list';
     }
   },
 

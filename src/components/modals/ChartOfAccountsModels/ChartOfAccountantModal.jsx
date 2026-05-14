@@ -4,6 +4,8 @@ import { X, PieChart, Plus, List, Landmark, RefreshCcw, TrendingUp, TrendingDown
 const ChartOfAccountantModal = ({ isOpen, onClose, onCreateNewAccount, onOpenFixedAssets, onOpenLiability, onOpenDepreciation, onOpenFixedIncome, onOpenFixedExpenses }) => {
     if (!isOpen) return null;
 
+    const currentTopBarColor = localStorage.getItem('topBarColor') || '#0285fd';
+
     const menuItems = [
         { icon: Plus, label: 'Create New Account', onClick: onCreateNewAccount },
         { icon: List, label: 'Fixed Assets Item List', onClick: onOpenFixedAssets },
@@ -16,70 +18,75 @@ const ChartOfAccountantModal = ({ isOpen, onClose, onCreateNewAccount, onOpenFix
 
     return (
         <>
+            {/* Modal Container Logic */}
             <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
                 {/* Backdrop */}
                 <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={onClose} />
                 
-                {/* Floating Modal Container - Completely Transparent & Borderless */}
-                <div className="relative w-full max-w-5xl flex flex-col animate-in zoom-in-95 duration-500">
+                {/* Modal Container */}
+                <div className="relative w-full max-w-sm bg-white border border-gray-100 rounded-xl shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
                     
-                    {/* Header - Floating Pill with Gap */}
-                    <div className="relative mb-12">
-                        {/* Independent Close Button - Floating Further Outside */}
+                    {/* Header */}
+                    <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-100 select-none relative overflow-hidden">
+                        {/* System Color Left Accent */}
+                        <div 
+                            className="absolute left-0 top-0 bottom-0 w-1.5 transition-colors duration-500" 
+                            style={{ backgroundColor: currentTopBarColor }}
+                        />
+                        
+                        <div className="flex items-center gap-2">
+                            <PieChart size={14} className="text-[#0078d4]" />
+                            <span className="text-[15px] font-[700] text-slate-900 uppercase tracking-[3px] font-mono truncate">Chart of Accounts</span>
+                        </div>
                         <button 
                             onClick={onClose} 
-                            className="absolute -top-20 -right-20 w-10 h-10 flex items-center justify-center bg-[#ff3b30] hover:bg-[#e03127] text-white rounded-[14px] shadow-[0_12px_24px_rgba(255,59,48,0.4)] hover:shadow-[0_16px_32px_rgba(255,59,48,0.5)] transition-all active:scale-90 outline-none border-none group z-[300]"
+                            className="w-9 h-8 flex items-center justify-center bg-[#ff3b30] hover:bg-[#e03127] text-white rounded-[8px] shadow-[0_4px_12px_rgba(255,59,48,0.3)] hover:shadow-[0_6px_20px_rgba(255,59,48,0.4)] transition-all active:scale-90 outline-none border-none group"
                             title="Close"
                         >
-                            <X size={24} strokeWidth={4} className="group-hover:scale-110 transition-transform" />
+                            <X size={18} strokeWidth={4} className="group-hover:scale-110 transition-transform" />
                         </button>
-
-                        <div className="bg-white px-8 py-6 flex items-center justify-center rounded-[14px] border-b border-gray-100/10 select-none relative overflow-hidden shadow-xl w-full">
-                            {/* System Color Left Accent */}
-                            <div 
-                                className="absolute left-0 top-0 bottom-0 w-2 transition-colors duration-500" 
-                                style={{ backgroundColor: localStorage.getItem('topBarColor') || '#0285fd' }}
-                            />
-                            
-                            <div className="flex items-center gap-3">
-                                <PieChart size={22} className="text-[#0078d4] animate-pulse" />
-                                <span className="text-[19px] font-[900] text-slate-900 uppercase tracking-[8px] font-mono truncate ml-2">Chart of Accounts</span>
-                            </div>
-                        </div>
                     </div>
 
-                    {/* Floating Menu Grid - All in one line */}
-                    <div className="p-12 flex-1 overflow-y-auto max-h-[80vh] no-scrollbar">
-                        <div className="flex flex-wrap justify-center gap-x-8 gap-y-10">
-                            {menuItems.map((item, idx) => {
-                                const Icon = item.icon;
-                                return (
-                                    <div key={idx} className="flex flex-col items-center group">
-                                        <button
-                                            onClick={item.onClick}
-                                            className="w-24 h-24 bg-white rounded-[14px] shadow-lg hover:shadow-2xl hover:-translate-y-3 active:scale-90 transition-all duration-500 flex items-center justify-center relative overflow-hidden"
-                                        >
-                                            {/* Subtle Gradient Backdrop */}
-                                            <div className="absolute inset-0 bg-gradient-to-br from-transparent to-slate-50/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                                            
-                                            <Icon 
-                                                size={32} 
-                                                strokeWidth={1.5}
-                                                className="text-slate-500 group-hover:text-[#0078d4] transition-all duration-500 group-hover:scale-110" 
-                                            />
+                    {/* Menu Content */}
+                    <div className="p-2 bg-white flex-1 overflow-y-auto max-h-[75vh] no-scrollbar">
+                    {menuItems.map((item, idx) => {
+                        if (item.type === 'separator') {
+                            return <div key={idx} className="my-1.5 h-[1px] bg-gray-200 mx-2" />;
+                        }
 
-                                            {/* Decorative Corner Glow */}
-                                            <div className="absolute -right-6 -top-6 w-12 h-12 bg-[#0078d4]/10 rounded-full blur-xl group-hover:scale-150 transition-transform duration-700" />
-                                        </button>
-                                        
-                                        <span className="mt-5 text-[11px] font-[700] uppercase tracking-[0.25em] text-white group-hover:text-white/80 text-center leading-tight transition-all duration-300 font-['Inter',sans-serif]">
-                                            {item.label}
-                                        </span>
+                        const Icon = item.icon;
+                        return (
+                            <button
+                                key={idx}
+                                onClick={item.onClick}
+                                className="w-full flex items-center justify-between px-4 py-3 rounded-xl hover:bg-slate-50 group transition-all relative overflow-hidden text-left"
+                            >
+                                {/* Hover Indicator Bar */}
+                                <div 
+                                    className="absolute left-0 top-0 bottom-0 w-1 opacity-0 group-hover:opacity-100 transition-all duration-300"
+                                    style={{ backgroundColor: currentTopBarColor || '#0078d4' }}
+                                />
+
+                                <div className="flex items-center gap-3 relative z-10">
+                                    <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center group-hover:bg-white transition-colors shadow-sm group-hover:shadow-md">
+                                        <Icon size={16} className="text-slate-500 group-hover:text-[#0078d4] transition-colors" />
                                     </div>
-                                );
-                            })}
-                        </div>
-                    </div>
+                                    <span className="text-[14px] font-bold text-slate-700 group-hover:text-slate-900 transition-colors">
+                                        {item.label}
+                                    </span>
+                                </div>
+                                
+                                <div className="flex items-center gap-3 relative z-10">
+                                    {item.shortcut && (
+                                        <span className="text-[10px] font-bold text-slate-300 group-hover:text-slate-400 bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100">
+                                            {item.shortcut}
+                                        </span>
+                                    )}
+                                </div>
+                            </button>
+                        );
+                    })}
+                    </div>              
                 </div>
             </div>
         </>

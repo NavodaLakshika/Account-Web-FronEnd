@@ -169,8 +169,7 @@ const SystemSettingsBoard = ({ isOpen, onClose }) => {
         const chunks = chunkArray(items, 8);
         return (
             <div className="space-y-4">
-                <div className="flex items-center gap-3 px-5 py-3 bg-slate-50/80 rounded-full border border-slate-100 shadow-sm sticky top-0 z-10 mx-2">
-                    <IconComponent size={18} className="text-[#0285fd]" />
+                <div className="flex items-center gap-3 px-5 py-3 bg-slate-50/80 rounded-[10px] border border-slate-100 shadow-sm sticky top-0 z-10 mx-2">
                     <h4 className="text-[12px] font-[900] text-slate-700 uppercase tracking-[0.25em]">{title}</h4>
                 </div>
                 <div className="flex flex-col gap-4 px-2">
@@ -203,7 +202,7 @@ const SystemSettingsBoard = ({ isOpen, onClose }) => {
             maxWidth="max-w-[1250px]"
             showHeaderClose={true}
         >
-            <div className="font-['Tahoma'] flex flex-col max-h-[85vh]">
+            <div className="font-['mono'] flex flex-col max-h-[85vh]">
                 
                 <div className="overflow-y-auto no-scrollbar pr-2 flex-grow space-y-10 pb-6">
                     

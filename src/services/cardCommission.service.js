@@ -28,12 +28,12 @@ export const cardCommissionService = {
     }
   },
 
-  async getRate(bankAccCode, cardID) {
+  async getRate(bankCode, cardId) {
     try {
-      const response = await api.get('/rate', { params: { bankAccCode, cardID } });
-      return response.data.rate;
+      const response = await api.get('/rate', { params: { bankCode, cardId } });
+      return response.data;
     } catch (error) {
-      throw error.response?.data || 0;
+      throw error.response?.data || 'Failed to fetch rate';
     }
   },
 
@@ -42,7 +42,7 @@ export const cardCommissionService = {
       const response = await api.post('/save', data);
       return response.data;
     } catch (error) {
-      throw error.response?.data || 'Failed to save commission rate';
+      throw error.response?.data || 'Failed to save record';
     }
   }
 };

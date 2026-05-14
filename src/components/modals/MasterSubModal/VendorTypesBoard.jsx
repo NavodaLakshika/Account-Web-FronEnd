@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import SimpleModal from '../../SimpleModal';
-import { Search, Save, RotateCcw, X, Loader2, CheckCircle2 } from 'lucide-react';
+import ConfirmModal from '../ConfirmModal';
+import { Search, Save, RotateCcw, X, Loader2, CheckCircle2, Layout } from 'lucide-react';
 import { vendorTypeService } from '../../../services/vendorType.service';
 import { toast } from 'react-hot-toast';
 
@@ -193,162 +194,145 @@ const VendorTypesBoard = ({ isOpen, onClose }) => {
             </SimpleModal>
 
             {/* Vendor List Modal */}
-            {showVendorModal && (
-                <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4 font-['Tahoma']">
-                    <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setShowVendorModal(false)} />
-                    <div className="relative w-full max-w-lg bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
-                        {/* Header */}
-                        <div className="bg-[#0078d4] px-4 py-2 flex items-center justify-between text-white">
-                            <div className="flex items-center gap-2">
-                                <Search size={16} />
-                                <span className="text-sm font-bold uppercase tracking-tight">Vendor Type Lookup</span>
-                            </div>
-                            <button
-                                onClick={() => setShowVendorModal(false)}
-                                className="w-9 h-8 flex items-center justify-center bg-[#ff3b30] hover:bg-[#e03127] text-white rounded-[8px] shadow-[0_4px_12px_rgba(255,59,48,0.3)] hover:shadow-[0_6px_20px_rgba(255,59,48,0.4)] transition-all active:scale-90 outline-none border-none group"
-                                title="Close"
-                            >
-                                <X size={18} strokeWidth={4} className="group-hover:scale-110 transition-transform" />
-                            </button>
+            <SimpleModal
+                isOpen={showVendorModal}
+                onClose={() => setShowVendorModal(false)}
+                title="Vendor Type Lookup"
+                maxWidth="max-w-lg"
+            >
+                <div className="space-y-4 font-['Tahoma']">
+                    {/* Search Input Area */}
+                    <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-lg border border-gray-100 mb-2">
+                        <div className="flex items-center gap-2">
+                            <Search size={14} className="text-gray-400" />
+                            <span className="text-[10px] font-[900] text-gray-500 uppercase tracking-[0.2em] text-center">Search Facility</span>
                         </div>
-
-                        {/* Search Input Area */}
-                        <div className="p-3 bg-slate-50 border-b border-gray-100 flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                                <Search size={14} className="text-gray-400" />
-                                <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest text-center">Search Facility</span>
-                            </div>
+                        <div className="relative flex-1">
                             <input 
                                 type="text" 
                                 placeholder="Find by Vendor Type..." 
-                                className="h-9 border border-gray-300 px-3 text-xs rounded-md w-72 focus:border-[#0285fd] outline-none shadow-sm transition-all" 
+                                className="w-full h-9 border border-gray-300 px-3 text-xs rounded-md focus:border-[#0285fd] outline-none shadow-sm transition-all bg-white" 
                                 value={vendorSearchQuery} 
                                 onChange={(e) => setVendorSearchQuery(e.target.value)} 
+                                autoFocus
                             />
                         </div>
+                    </div>
 
-                        {/* Results List */}
-                        <div className="p-2">
-                            <div className="bg-gray-100 px-3 py-1.5 flex text-[10px] font-bold text-gray-600 border-b border-gray-200 uppercase tracking-wider">
-                                <span className="flex-1 px-3">Vendor Type</span>
-                            </div>
-                            <div className="max-h-[400px] overflow-y-auto custom-scrollbar">
-                                {vendors.filter(v => v.vendorTypes.toLowerCase().includes(vendorSearchQuery.toLowerCase())).map((v, i) => (
+                    {/* Results List */}
+                    <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm bg-white">
+                        <div className="bg-[#f8fafd] px-4 py-2.5 flex text-[10px] font-[900] text-gray-400 border-b border-gray-100 uppercase tracking-[0.15em]">
+                            <span className="flex-1 px-3">Identity Title / Portfolio</span>
+                        </div>
+                        <div className="max-h-[350px] overflow-y-auto no-scrollbar">
+                            {vendors.filter(v => v.vendorTypes.toLowerCase().includes(vendorSearchQuery.toLowerCase())).length === 0 ? (
+                                <div className="p-12 text-center">
+                                    <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-3">
+                                        <Search size={24} className="text-slate-300" />
+                                    </div>
+                                    <p className="text-slate-400 text-[11px] font-bold uppercase tracking-widest">No matching records found</p>
+                                </div>
+                            ) : (
+                                vendors.filter(v => v.vendorTypes.toLowerCase().includes(vendorSearchQuery.toLowerCase())).map((v, i) => (
                                     <button 
                                         key={i} 
                                         onClick={() => handleVendorSelect(v)}
-                                        className="w-full flex items-center justify-between px-3 py-2 text-xs border-b border-gray-100 hover:bg-blue-50 transition-all text-left group"
+                                        className="w-full flex items-center justify-between px-4 py-3 text-xs border-b border-gray-50 hover:bg-blue-50/50 transition-all text-left group"
                                     >
                                         <div className="flex items-center gap-2 flex-1">
-                                            <span className="flex-1 px-3 font-mono font-medium text-gray-700 uppercase">
+                                            <span className="flex-1 px-3 font-bold text-slate-700 uppercase tracking-tight group-hover:text-blue-600 transition-colors">
                                                 {v.vendorTypes}
                                             </span>
                                         </div>
-                                        <div className="bg-[#e49e1b] text-white text-[10px] px-5 py-1.5 rounded-md font-bold hover:bg-[#cb9b34] shadow-sm transition-all active:scale-95 uppercase">Select</div>
+                                        <div className="bg-[#e49e1b] text-white text-[10px] px-6 py-1.5 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95 uppercase tracking-wider">Select</div>
                                     </button>
-                                ))}
-                                {vendors.length === 0 && (
-                                    <div className="p-8 text-center text-gray-400 italic text-sm">No vendor types found.</div>
-                                )}
-                            </div>
+                                ))
+                            )}
                         </div>
-
                     </div>
                 </div>
-            )}
+            </SimpleModal>
 
             {/* Account List Modal */}
-            {showAccModal && (
-                <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4 font-['Tahoma']">
-                    <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setShowAccModal(false)} />
-                    <div className="relative w-full max-w-xl bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
-                        {/* Header */}
-                        <div className="bg-[#0078d4] px-4 py-2 flex items-center justify-between text-white">
-                            <div className="flex items-center gap-2">
-                                <Search size={16} />
-                                <span className="text-sm font-bold uppercase tracking-tight">Chart of Accounts Lookup</span>
-                            </div>
-                            <button
-                                onClick={() => setShowAccModal(false)}
-                                className="w-9 h-8 flex items-center justify-center bg-[#ff3b30] hover:bg-[#e03127] text-white rounded-[8px] shadow-[0_4px_12px_rgba(255,59,48,0.3)] hover:shadow-[0_6px_20px_rgba(255,59,48,0.4)] transition-all active:scale-90 outline-none border-none group"
-                                title="Close"
-                            >
-                                <X size={18} strokeWidth={4} className="group-hover:scale-110 transition-transform" />
-                            </button>
+            <SimpleModal
+                isOpen={showAccModal}
+                onClose={() => setShowAccModal(false)}
+                title="Chart of Accounts Lookup"
+                maxWidth="max-w-xl"
+            >
+                <div className="space-y-4 font-['Tahoma']">
+                    {/* Search Input Area */}
+                    <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-lg border border-gray-100 mb-2">
+                        <div className="flex items-center gap-2">
+                            <Search size={14} className="text-gray-400" />
+                            <span className="text-[10px] font-[900] text-gray-500 uppercase tracking-[0.2em] text-center">Search Facility</span>
                         </div>
-
-                        {/* Search Input Area */}
-                        <div className="p-3 bg-slate-50 border-b border-gray-100 flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                                <Search size={14} className="text-gray-400" />
-                                <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest text-center">Search Facility</span>
-                            </div>
+                        <div className="relative flex-1">
                             <input 
                                 type="text" 
                                 placeholder="Search by name or code..." 
-                                className="h-9 border border-gray-300 px-3 text-xs rounded-md w-72 focus:border-[#0285fd] outline-none shadow-sm transition-all" 
+                                className="w-full h-9 border border-gray-300 px-3 text-xs rounded-md focus:border-[#0285fd] outline-none shadow-sm transition-all bg-white" 
                                 value={accSearchQuery} 
                                 onChange={(e) => setAccSearchQuery(e.target.value)} 
+                                autoFocus
                             />
                         </div>
+                    </div>
 
-                        {/* Results List */}
-                        <div className="p-2">
-                            <div className="bg-gray-100 px-3 py-1.5 flex text-[10px] font-bold text-gray-600 border-b border-gray-200 uppercase tracking-wider">
-                                <span className="w-32 text-center">Code</span>
-                                <span className="flex-1 px-3">Account Name</span>
-                            </div>
-                            <div className="max-h-[400px] overflow-y-auto custom-scrollbar">
-                                {accounts.filter(a => a.sub_Acc_Name.toLowerCase().includes(accSearchQuery.toLowerCase()) || a.sub_Code.includes(accSearchQuery)).map((a, i) => (
+                    {/* Results List */}
+                    <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm bg-white">
+                        <div className="bg-[#f8fafd] px-4 py-2.5 flex text-[10px] font-[900] text-gray-400 border-b border-gray-100 uppercase tracking-[0.15em]">
+                            <span className="w-32 text-center">Reference ID</span>
+                            <span className="flex-1 px-3">Identity Title / Description</span>
+                        </div>
+                        <div className="max-h-[350px] overflow-y-auto no-scrollbar">
+                            {accounts.filter(a => a.sub_Acc_Name.toLowerCase().includes(accSearchQuery.toLowerCase()) || a.sub_Code.includes(accSearchQuery)).length === 0 ? (
+                                <div className="p-12 text-center">
+                                    <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-3">
+                                        <Search size={24} className="text-slate-300" />
+                                    </div>
+                                    <p className="text-slate-400 text-[11px] font-bold uppercase tracking-widest">No matching records found</p>
+                                </div>
+                            ) : (
+                                accounts.filter(a => a.sub_Acc_Name.toLowerCase().includes(accSearchQuery.toLowerCase()) || a.sub_Code.includes(accSearchQuery)).map((a, i) => (
                                     <button 
                                         key={i} 
                                         onClick={() => handleAccSelect(a)}
-                                        className="w-full flex items-center justify-between px-3 py-2 text-xs border-b border-gray-100 hover:bg-blue-50 transition-all text-left group"
+                                        className="w-full flex items-center justify-between px-4 py-3 text-xs border-b border-gray-50 hover:bg-blue-50/50 transition-all text-left group"
                                     >
                                         <div className="flex items-center gap-2 flex-1">
-                                            <span className="w-32 text-center font-mono text-[11px] font-bold text-[#0078d4]">
+                                            <span className="w-32 text-center font-mono text-[12px] font-bold text-[#0078d4]">
                                                 {a.sub_Code}
                                             </span>
-                                            <span className="flex-1 px-3 font-mono font-medium text-gray-700 uppercase">
+                                            <span className="flex-1 px-3 font-bold text-slate-700 uppercase tracking-tight group-hover:text-blue-600 transition-colors">
                                                 {a.sub_Acc_Name}
                                             </span>
                                         </div>
-                                        <div className="bg-[#e49e1b] text-white text-[10px] px-5 py-1.5 rounded-md font-bold hover:bg-[#cb9b34] shadow-sm transition-all active:scale-95 uppercase">Select</div>
+                                        <div className="bg-[#e49e1b] text-white text-[10px] px-6 py-1.5 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95 uppercase tracking-wider">Select</div>
                                     </button>
-                                ))}
-                                {accounts.length === 0 && (
-                                    <div className="p-8 text-center text-gray-400 italic text-sm">No accounts found.</div>
-                                )}
-                            </div>
+                                ))
+                            )}
                         </div>
                     </div>
                 </div>
-            )}
+            </SimpleModal>
 
             {/* Save Confirmation Modal */}
-            {showSaveConfirm && (
-                <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4 font-['Plus_Jakarta_Sans']">
-                    <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setShowSaveConfirm(false)} />
-                    <div className="relative w-full max-w-md bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden animate-in zoom-in-95 duration-200">
-                        <div className="p-8 text-center">
-                            <div className="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-6 border-4 border-white shadow-lg">
-                                <CheckCircle2 size={40} className="text-[#0078d4]" />
-                            </div>
-                            <h3 className="text-xl font-black text-slate-800 mb-2">Confirm Save</h3>
-                            <p className="text-slate-500 text-sm leading-relaxed mb-8">
-                                Are you sure you want to save <span className="font-bold text-[#0078d4] uppercase">"{formData.VendorType}"</span>?
-                                <br />This will link it to account <span className="font-black text-slate-800">{formData.PaybleAccCode}</span>.
-                            </p>
-                            <div className="flex gap-3">
-                                <button onClick={() => setShowSaveConfirm(false)} className="flex-1 h-12 bg-slate-100 text-slate-600 font-bold rounded-xl hover:bg-slate-200 transition-all active:scale-95">Cancel</button>
-                                <button onClick={confirmSave} className="flex-1 h-12 bg-[#0078d4] text-white font-bold rounded-xl hover:bg-[#005a9e] shadow-lg shadow-blue-200 transition-all active:scale-95 flex items-center justify-center gap-2">
-                                    Continue Save
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
+            <ConfirmModal
+                isOpen={showSaveConfirm}
+                onClose={() => setShowSaveConfirm(false)}
+                onConfirm={confirmSave}
+                title="Confirm Save"
+                message={
+                    <>
+                        Are you sure you want to save <span className="font-bold text-[#0078d4] uppercase">"{formData.VendorType}"</span>?
+                        <br />This will link it to account <span className="font-black text-slate-800">{formData.PaybleAccCode}</span>.
+                    </>
+                }
+                loading={loading}
+                confirmText="Continue Save"
+                cancelText="Cancel"
+            />
         </>
     );
 };

@@ -3,7 +3,7 @@ import SimpleModal from '../../SimpleModal';
 import CalendarModal from '../../CalendarModal';
 import { Search, RotateCcw, Save, Calendar, Loader2, X, PlusCircle } from 'lucide-react';
 import { longTermLiabService } from '../../../services/longTermLiab.service';
-import { toast } from 'react-hot-toast';
+import { showSuccessToast, showErrorToast } from '../../../utils/toastUtils';
 
 const LongTermLiabilityBoard = ({ isOpen, onClose }) => {
     const initialState = {
@@ -25,7 +25,7 @@ const LongTermLiabilityBoard = ({ isOpen, onClose }) => {
     };
 
     const [formData, setFormData] = useState(initialState);
-    const [lookups, setLookups] = useState({ accounts: [], lenders: [] });
+    const [lookups, setLookups] = useState({ accounts: [], lenders: [], payTypes: [] });
     const [loading, setLoading] = useState(false);
     const [isEditMode, setIsEditMode] = useState(false);
     const [showSearchModal, setShowSearchModal] = useState(false);
@@ -37,7 +37,7 @@ const LongTermLiabilityBoard = ({ isOpen, onClose }) => {
     const [lenderSearchQuery, setLenderSearchQuery] = useState('');
     const [showOrgDateModal, setShowOrgDateModal] = useState(false);
     const [showPayTypeSearch, setShowPayTypeSearch] = useState(false);
-    const payTypes = ['Fixed', 'Variable', 'Balloon'];
+    // const payTypes = ['Fixed', 'Variable', 'Balloon']; // Removed hardcode
 
     useEffect(() => {
         if (isOpen) {
@@ -59,8 +59,23 @@ const LongTermLiabilityBoard = ({ isOpen, onClose }) => {
             }));
 
             fetchLookups();
+            if (!isEditMode) {
+                fetchNextDocNo(companyCode);
+            }
         }
     }, [isOpen]);
+
+    const fetchNextDocNo = async (companyCode) => {
+        try {
+            const result = await longTermLiabService.generateDocNo(companyCode || formData.Company);
+            if (result && result.docNo) {
+                setFormData(prev => ({ ...prev, LiabCode: result.docNo }));
+            }
+        } catch (error) {
+            console.error('Failed to fetch next doc no:', error);
+            showErrorToast('Failed to auto-generate Liability Number. Please enter it manually or check connection.');
+        }
+    };
 
     const fetchLookups = async () => {
         try {
@@ -83,15 +98,16 @@ const LongTermLiabilityBoard = ({ isOpen, onClose }) => {
             CreateUser: formData.CreateUser
         });
         setIsEditMode(false);
+        fetchNextDocNo(formData.Company);
     };
 
-    const handleAccountSelect = (code, name) => {
-        setFormData(prev => ({ ...prev, LiabAccCode: code }));
+    const handleAccountSelect = (item) => {
+        setFormData(prev => ({ ...prev, LiabAccCode: item.code }));
         setShowAccountSearch(false);
     };
 
-    const handleLenderSelect = (code, name) => {
-        setFormData(prev => ({ ...prev, LenderCode: code }));
+    const handleLenderSelect = (item) => {
+        setFormData(prev => ({ ...prev, LenderCode: item.code }));
         setShowLenderSearch(false);
     };
 
@@ -100,21 +116,25 @@ const LongTermLiabilityBoard = ({ isOpen, onClose }) => {
     };
 
     const handlePayTypeSelect = (type) => {
-        setFormData(prev => ({ ...prev, PayType: type }));
+        setFormData(prev => ({ ...prev, PayType: typeof type === 'object' ? (type.name || type.Name) : type }));
         setShowPayTypeSearch(false);
     };
 
     const handleSave = async () => {
-        if (!formData.LiabCode || !formData.LiabName) {
-            toast.error('Liability number and name are required.');
+        if (!formData.LiabCode) {
+            showErrorToast('Liability Number is required.');
+            return;
+        }
+        if (!formData.LiabName) {
+            showErrorToast('Liability Name is required.');
             return;
         }
         if (!formData.LiabAccCode) {
-            toast.error('Account is not selected.');
+            showErrorToast('Account is not selected.');
             return;
         }
         if (!formData.LenderCode) {
-            toast.error('Vendor is not selected.');
+            showErrorToast('Vendor is not selected.');
             return;
         }
 
@@ -128,10 +148,10 @@ const LongTermLiabilityBoard = ({ isOpen, onClose }) => {
                 NoOfInstallment: parseInt(formData.NoOfInstallment),
                 MonthlyIns: parseFloat(formData.MonthlyIns)
             });
-            toast.success('Record saved successfully.');
+            showSuccessToast('Record saved successfully.');
             handleClear();
         } catch (error) {
-            toast.error(error);
+            showErrorToast(error.message || error.toString() || 'Failed to save record.');
         } finally {
             setLoading(false);
         }
@@ -144,7 +164,7 @@ const LongTermLiabilityBoard = ({ isOpen, onClose }) => {
             setSearchList(data);
             setShowSearchModal(true);
         } catch (err) {
-            toast.error('Failed to load liabilities list');
+            showErrorToast('Failed to load liabilities list.');
         } finally {
             setLoading(false);
         }
@@ -174,7 +194,7 @@ const LongTermLiabilityBoard = ({ isOpen, onClose }) => {
             setIsEditMode(true);
             setShowSearchModal(false);
         } catch (error) {
-            toast.error('Failed to load liability details');
+            showErrorToast('Failed to load liability details.');
         } finally {
             setLoading(false);
         }
@@ -247,7 +267,10 @@ const LongTermLiabilityBoard = ({ isOpen, onClose }) => {
                             <div className="flex-1 flex gap-2">
                                 <input 
                                     type="text" 
-                                    value={lookups.accounts.find(a => a.sub_Code === formData.LiabAccCode)?.sub_Acc_Name?.trim() || formData.LiabAccCode} 
+                                    value={(() => {
+                                        const acc = lookups.accounts.find(a => (a.code || a.Code) === formData.LiabAccCode);
+                                        return acc ? (acc.name || acc.Name || '').trim() : formData.LiabAccCode;
+                                    })()} 
                                     readOnly 
                                     className="min-w-0 flex-1 h-8 border border-gray-300 px-3 text-[12.5px] bg-gray-50 rounded-[5px] outline-none font-bold text-blue-600 shadow-sm cursor-default" 
                                 />
@@ -265,7 +288,10 @@ const LongTermLiabilityBoard = ({ isOpen, onClose }) => {
                             <div className="flex-1 flex gap-2">
                                 <input 
                                     type="text" 
-                                    value={lookups.lenders.find(l => l.code === formData.LenderCode)?.supplier_Name?.trim() || formData.LenderCode} 
+                                    value={(() => {
+                                        const lender = lookups.lenders.find(l => (l.code || l.Code) === formData.LenderCode);
+                                        return lender ? (lender.name || lender.Name || lender.supplier_Name || '').trim() : formData.LenderCode;
+                                    })()} 
                                     readOnly 
                                     className="min-w-0 flex-1 h-8 border border-gray-300 px-3 text-[12.5px] bg-gray-50 rounded-[5px] outline-none font-bold text-blue-600 shadow-sm cursor-default" 
                                 />
@@ -467,11 +493,14 @@ const LongTermLiabilityBoard = ({ isOpen, onClose }) => {
                                 <span className="flex-1 px-3">Account Description</span>
                             </div>
                             <div className="max-h-[400px] overflow-y-auto custom-scrollbar">
-                                {lookups.accounts.filter(a => (a.sub_Acc_Name || '').toLowerCase().includes(accSearchQuery.toLowerCase()) || (a.sub_Code || '').toLowerCase().includes(accSearchQuery.toLowerCase())).map((acc, idx) => (
-                                    <button key={idx} onClick={() => handleAccountSelect(acc.sub_Code, acc.sub_Acc_Name)} className="w-full flex items-center justify-between px-3 py-2 text-xs border-b border-gray-100 hover:bg-blue-50 transition-all text-left group">
+                                {lookups.accounts.filter(a => 
+                                    ((a.name || a.Name || '').toLowerCase().includes(accSearchQuery.toLowerCase())) || 
+                                    ((a.code || a.Code || '').toLowerCase().includes(accSearchQuery.toLowerCase()))
+                                ).map((acc, idx) => (
+                                    <button key={idx} onClick={() => handleAccountSelect(acc)} className="w-full flex items-center justify-between px-3 py-2 text-xs border-b border-gray-100 hover:bg-blue-50 transition-all text-left group">
                                         <div className="flex items-center gap-2 flex-1">
-                                            <span className="w-32 text-center font-mono text-[11px] font-bold text-[#0078d4]">{acc.sub_Code}</span>
-                                            <span className="flex-1 px-3 font-mono font-medium text-gray-700 uppercase">{acc.sub_Acc_Name}</span>
+                                            <span className="w-32 text-center font-mono text-[11px] font-bold text-[#0078d4]">{acc.code || acc.Code}</span>
+                                            <span className="flex-1 px-3 font-mono font-medium text-gray-700 uppercase">{acc.name || acc.Name}</span>
                                         </div>
                                         <div className="bg-[#e49e1b] text-white text-[10px] px-5 py-1.5 rounded-md font-bold uppercase">Select</div>
                                     </button>
@@ -509,11 +538,14 @@ const LongTermLiabilityBoard = ({ isOpen, onClose }) => {
                                 <span className="flex-1 px-3">Institution Name</span>
                             </div>
                             <div className="max-h-[400px] overflow-y-auto custom-scrollbar">
-                                {lookups.lenders.filter(l => (l.supplier_Name || '').toLowerCase().includes(lenderSearchQuery.toLowerCase()) || (l.code || '').toLowerCase().includes(lenderSearchQuery.toLowerCase())).map((lender, idx) => (
-                                    <button key={idx} onClick={() => handleLenderSelect(lender.code, lender.supplier_Name)} className="w-full flex items-center justify-between px-3 py-2 text-xs border-b border-gray-100 hover:bg-blue-50 transition-all text-left group">
+                                {lookups.lenders.filter(l => 
+                                    ((l.name || l.Name || '').toLowerCase().includes(lenderSearchQuery.toLowerCase())) || 
+                                    ((l.code || l.Code || '').toLowerCase().includes(lenderSearchQuery.toLowerCase()))
+                                ).map((lender, idx) => (
+                                    <button key={idx} onClick={() => handleLenderSelect(lender)} className="w-full flex items-center justify-between px-3 py-2 text-xs border-b border-gray-100 hover:bg-blue-50 transition-all text-left group">
                                         <div className="flex items-center gap-2 flex-1">
-                                            <span className="w-32 text-center font-mono text-[11px] font-bold text-[#0078d4]">{lender.code}</span>
-                                            <span className="flex-1 px-3 font-mono font-medium text-gray-700 uppercase">{lender.supplier_Name}</span>
+                                            <span className="w-32 text-center font-mono text-[11px] font-bold text-[#0078d4]">{lender.code || lender.Code}</span>
+                                            <span className="flex-1 px-3 font-mono font-medium text-gray-700 uppercase">{lender.name || lender.Name}</span>
                                         </div>
                                         <div className="bg-[#e49e1b] text-white text-[10px] px-5 py-1.5 rounded-md font-bold uppercase">Select</div>
                                     </button>
@@ -546,13 +578,13 @@ const LongTermLiabilityBoard = ({ isOpen, onClose }) => {
                             <button onClick={() => setShowPayTypeSearch(false)} className="w-9 h-8 flex items-center justify-center bg-[#ff3b30] hover:bg-[#e03127] text-white rounded-[8px] shadow-sm active:scale-90"><X size={18} strokeWidth={4} /></button>
                         </div>
                         <div className="p-4 space-y-2">
-                            {payTypes.map((type, idx) => (
+                            {(lookups.payTypes || []).map((type, idx) => (
                                 <button 
                                     key={idx} 
                                     onClick={() => handlePayTypeSelect(type)}
                                     className="w-full px-4 py-3 text-sm font-bold text-gray-700 hover:bg-blue-50 border border-gray-100 rounded-lg transition-all text-left flex justify-between items-center group"
                                 >
-                                    <span className="uppercase tracking-wider">{type}</span>
+                                    <span className="uppercase tracking-wider">{type.name || type.Name}</span>
                                     <PlusCircle size={16} className="text-gray-300 group-hover:text-[#0078d4] transition-colors" />
                                 </button>
                             ))}
