@@ -7,6 +7,7 @@ import AboutUsModal from '../components/modals/AboutUsModal';
 import ContactModal from '../components/modals/ContactModal';
 import HelpModal from '../components/modals/HelpModal';
 import WelcomeModal from '../components/modals/WelcomeModal';
+import { showSuccessToast, showErrorToast, showInfoToast } from '../utils/toastUtils';
 import toast from 'react-hot-toast';
 
 import { DotLottiePlayer } from '@dotlottie/react-player';
@@ -21,7 +22,10 @@ const AuthPage = () => {
     const [showSelection, setShowSelection] = useState(false);
     const [currentUser, setCurrentUser] = useState(null);
     const [showForgot, setShowForgot] = useState(false);
+    const [recoveryStep, setRecoveryStep] = useState(1); // 1: Request, 2: Reset
     const [forgotEmail, setForgotEmail] = useState('');
+    const [resetToken, setResetToken] = useState('');
+    const [newPassword, setNewPassword] = useState('');
     const [showSocialLinks, setShowSocialLinks] = useState(false);
     const [showAboutUs, setShowAboutUs] = useState(false);
     const [showContact, setShowContact] = useState(false);
@@ -75,85 +79,6 @@ const AuthPage = () => {
 
     const handleLoginChange = (e) => setLoginData({ ...loginData, [e.target.name]: e.target.value });
 
-    const handleLoginSuccessToast = (message) => {
-        toast.custom((t) => (
-            <div className={`${t.visible ? 'animate-in slide-in-from-right-10 fade-in duration-500' : 'animate-out slide-out-to-right-10 fade-out duration-300'} 
-                max-w-[550px] w-fit bg-white/90 backdrop-blur-3xl border border-white/20 shadow-2xl rounded-[5px] flex flex-col pointer-events-auto overflow-hidden`}>
-
-
-                <div className="px-4 py-2 flex items-center gap-3">
-                    <div className="w-12 h-12 shrink-0">
-                        <DotLottiePlayer
-                            src="/lottiefile/Successffull.lottie"
-                            autoplay
-                            loop={false}
-                        />
-                    </div>
-                    <div className="flex-grow text-left py-1">
-                        <h3 className="text-slate-800 text-[12px] font-bold tracking-wider uppercase font-tahoma leading-relaxed">{message}</h3>
-
-                        <div className="flex items-center gap-1.5 mt-0.5">
-                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.3)]" />
-                            <span className="text-emerald-600 text-[8px] font-mono font-bold tracking-widest uppercase">Verified</span>
-                        </div>
-                    </div>
-                    <button onClick={() => toast.dismiss(t.id)} className="text-slate-300 hover:text-slate-500 transition-colors">
-                        <X size={14} />
-                    </button>
-                </div>
-                {/* Progress Bar Timer */}
-                <div className="h-[2px] w-full bg-emerald-50">
-                    <div 
-                        className="h-full bg-emerald-500"
-                        style={{ animation: 'toastProgress 3s linear forwards' }}
-                    />
-                </div>
-            </div>
-        ), {
-            duration: 3000,
-            position: 'top-right'
-        });
-    };
-
-    const handleLoginErrorToast = (message) => {
-        toast.custom((t) => (
-            <div className={`${t.visible ? 'animate-in slide-in-from-right-10 fade-in duration-500' : 'animate-out slide-out-to-right-10 fade-out duration-300'} 
-                max-w-[550px] w-fit bg-white/90 backdrop-blur-3xl border border-white/20 shadow-2xl rounded-[5px] flex flex-col pointer-events-auto overflow-hidden`}>
-
-
-                <div className="px-4 py-2 flex items-center gap-3">
-                    <div className="w-12 h-12 shrink-0">
-                        <DotLottiePlayer
-                            src="/lottiefile/Error Fail animation.lottie"
-                            autoplay
-                            loop={false}
-                        />
-                    </div>
-                    <div className="flex-grow text-left py-1">
-                        <h3 className="text-slate-800 text-[12px] font-bold tracking-wider uppercase font-tahoma leading-relaxed">{message}</h3>
-
-                        <div className="flex items-center gap-1.5 mt-0.5">
-                            <div className="w-1.5 h-1.5 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.3)]" />
-                            <span className="text-red-600 text-[8px] font-mono font-bold tracking-widest uppercase">Access Denied</span>
-                        </div>
-                    </div>
-                    <button onClick={() => toast.dismiss(t.id)} className="text-slate-300 hover:text-slate-500 transition-colors">
-                        <X size={14} />
-                    </button>
-                </div>
-                {/* Progress Bar Timer */}
-                <div className="h-[2px] w-full bg-red-50">
-                    <div 
-                        className="h-full bg-red-500"
-                        style={{ animation: 'toastProgress 3s linear forwards' }}
-                    />
-                </div>
-            </div>
-        ), {
-            duration: 3000,
-            position: 'top-right'
-        });
-    };
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -163,7 +88,7 @@ const AuthPage = () => {
             const user = authService.getCurrentUser();
             setCurrentUser(user);
             
-            handleLoginSuccessToast(result.message || 'Verification Successful');
+            showSuccessToast(result.message || 'Verification Successful');
             
             // Show the welcome modal after toast animation starts
             setTimeout(() => {
@@ -171,7 +96,44 @@ const AuthPage = () => {
             }, 1000);
         } catch (err) {
             const errorMessage = typeof err === 'object' ? (err.message || err.Message || 'Invalid credentials') : err;
-            handleLoginErrorToast(errorMessage);
+            showErrorToast(errorMessage);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleForgotPassword = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        try {
+            const result = await authService.forgotPassword(forgotEmail);
+            showSuccessToast(result.message || 'Recovery instruction sent');
+            
+            // Second alert for the 24 hour wait as requested
+            setTimeout(() => {
+                showInfoToast('Waiting for 24 hours recovery and reset your password', 'Protocol Init');
+            }, 1500);
+
+            setRecoveryStep(2); // Move to reset step
+        } catch (err) {
+            showErrorToast(typeof err === 'object' ? (err.message || 'Request failed') : err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleResetPassword = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        try {
+            const result = await authService.resetPassword(resetToken, newPassword);
+            showSuccessToast(result.message || 'Password reset successful');
+            setShowForgot(false);
+            setRecoveryStep(1);
+            setResetToken('');
+            setNewPassword('');
+        } catch (err) {
+            showErrorToast(typeof err === 'object' ? (err.message || 'Reset failed') : err);
         } finally {
             setLoading(false);
         }
@@ -300,46 +262,74 @@ const AuthPage = () => {
                         </>
                     ) : (
                         <div className="animate-in fade-in slide-in-from-right-4 duration-500">
-                            <h2 className="text-white text-3xl font-tahoma font-bold mb-4 uppercase tracking-tight">Account Recovery</h2>
+                            <h2 className="text-white text-3xl font-tahoma font-bold mb-4 uppercase tracking-tight">
+                                {recoveryStep === 1 ? 'Account Recovery' : 'Reset Password'}
+                            </h2>
                             <p className="text-white/60 font-mono text-sm mb-8 leading-relaxed">
-                                Enter your <span className="text-[#00acee] font-bold">Username or Corporate Email</span> and we will send you a recovery protocol.
+                                {recoveryStep === 1 
+                                    ? <>Enter your <span className="text-[#00acee] font-bold">Username or Corporate Email</span> and we will send you a recovery protocol.</>
+                                    : <>Enter the <span className="text-[#00acee] font-bold">Recovery Token</span> sent to you and your <span className="text-[#00acee] font-bold">New Password</span>.</>
+                                }
                             </p>
                             
                             <form 
-                                onSubmit={(e) => {
-                                    e.preventDefault();
-                                    setLoading(true);
-                                    setTimeout(() => {
-                                        toast.success('Recovery instruction sent to registered email');
-                                        setLoading(false);
-                                        setShowForgot(false);
-                                    }, 1500);
-                                }} 
+                                onSubmit={recoveryStep === 1 ? handleForgotPassword : handleResetPassword} 
                                 className="space-y-6"
                             >
-                                <div className="space-y-1">
-                                    <input 
-                                        type="text" 
-                                        value={forgotEmail} 
-                                        onChange={(e) => setForgotEmail(e.target.value)} 
-                                        placeholder="Username / Email" 
-                                        className="w-full px-4 py-3 bg-white font-mono text-slate-800 placeholder-slate-400 font-bold outline-none focus:ring-4 focus:ring-[#00acee]/30 transition-all" 
-                                        required 
-                                    />
-                                </div>
+                                {recoveryStep === 1 ? (
+                                    <div className="space-y-1">
+                                        <input 
+                                            type="text" 
+                                            value={forgotEmail} 
+                                            onChange={(e) => setForgotEmail(e.target.value)} 
+                                            placeholder="Username / Email" 
+                                            className="w-full px-4 py-3 bg-white font-mono text-slate-800 placeholder-slate-400 font-bold outline-none focus:ring-4 focus:ring-[#00acee]/30 transition-all" 
+                                            required 
+                                        />
+                                    </div>
+                                ) : (
+                                    <>
+                                        <div className="space-y-1">
+                                            <input 
+                                                type="text" 
+                                                value={resetToken} 
+                                                onChange={(e) => setResetToken(e.target.value)} 
+                                                placeholder="Recovery Token" 
+                                                className="w-full px-4 py-3 bg-white font-mono text-slate-800 placeholder-slate-400 font-bold outline-none focus:ring-4 focus:ring-[#00acee]/30 transition-all" 
+                                                required 
+                                            />
+                                        </div>
+                                        <div className="space-y-1">
+                                            <input 
+                                                type="password" 
+                                                value={newPassword} 
+                                                onChange={(e) => setNewPassword(e.target.value)} 
+                                                placeholder="New Password" 
+                                                className="w-full px-4 py-3 bg-white font-mono text-slate-800 placeholder-slate-400 font-bold outline-none focus:ring-4 focus:ring-[#00acee]/30 transition-all" 
+                                                required 
+                                            />
+                                        </div>
+                                    </>
+                                )}
                                 <div className="space-y-4">
                                     <button 
                                         disabled={loading} 
                                         className="w-full py-4 bg-[#00acee] hover:bg-[#0092cc] text-white font-mono font-bold tracking-[0.2em] transition-all active:scale-[0.98] disabled:opacity-70 uppercase"
                                     >
-                                        {loading ? <Loader2 className="animate-spin mx-auto" /> : 'Request Reset'}
+                                        {loading ? <Loader2 className="animate-spin mx-auto" /> : (recoveryStep === 1 ? 'Request Reset' : 'Update Password')}
                                     </button>
                                     <button 
                                         type="button"
-                                        onClick={() => setShowForgot(false)}
+                                        onClick={() => {
+                                            if (recoveryStep === 2) {
+                                                setRecoveryStep(1);
+                                            } else {
+                                                setShowForgot(false);
+                                            }
+                                        }}
                                         className="w-full py-2 text-white/40 font-mono text-xs hover:text-white transition-all uppercase tracking-widest font-bold"
                                     >
-                                        Back to Sign In
+                                        {recoveryStep === 1 ? 'Back to Sign In' : 'Back to Request'}
                                     </button>
                                 </div>
                             </form>

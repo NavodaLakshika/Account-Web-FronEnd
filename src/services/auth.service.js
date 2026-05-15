@@ -64,6 +64,33 @@ export const authService = {
     }
   },
 
+  // FORGOT PASSWORD
+  async forgotPassword(usernameOrEmail) {
+    try {
+      const response = await api.post('/Auth/forgot-password', {
+        UsernameOrEmail: usernameOrEmail
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Forgot Password Error:', error);
+      throw error.response?.data || 'Failed to process request.';
+    }
+  },
+
+  // RESET PASSWORD
+  async resetPassword(token, newPassword) {
+    try {
+      const response = await api.post('/Auth/reset-password', {
+        Token: token,
+        NewPassword: newPassword
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Reset Password Error:', error);
+      throw error.response?.data || 'Failed to reset password.';
+    }
+  },
+
   // LOGOUT
   logout() {
     localStorage.removeItem('user');
