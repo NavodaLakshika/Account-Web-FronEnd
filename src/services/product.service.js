@@ -6,6 +6,8 @@ export const productService = {
         return response.data;
     },
     search: async (company, query = '') => {
+        // Don't fire if company is not yet loaded from session
+        if (!company) return [];
         const response = await api.get(`/Product/search?company=${company}&query=${encodeURIComponent(query)}`);
         return response.data;
     },

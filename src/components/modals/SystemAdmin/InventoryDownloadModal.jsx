@@ -46,7 +46,7 @@ const LookupSearchModal = ({ isOpen, onClose, onSelect, title, data, searchPlace
         >
             <div className="p-2 space-y-6 font-['Tahoma']">
                 {/* Global Search Container */}
-                <div className="bg-slate-50/80 p-5 rounded-xl border border-gray-100 flex items-center gap-6 shadow-sm">
+                <div className="bg-slate-50/80 p-5 rounded-[5px] border border-gray-100 flex items-center gap-6 shadow-sm">
                     <label className="text-[11px] font-black text-slate-500 uppercase tracking-[0.15em] shrink-0">{searchTitle || 'Global Search'}</label>
                     <div className="relative flex-1">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
@@ -62,7 +62,7 @@ const LookupSearchModal = ({ isOpen, onClose, onSelect, title, data, searchPlace
                 </div>
 
                 {/* Data Table */}
-                <div className="border border-gray-100 rounded-2xl overflow-hidden shadow-lg bg-white">
+                <div className="border border-gray-100 rounded-[5px] overflow-hidden shadow-lg bg-white">
                     <div className="bg-slate-50/80 px-6 py-2.5 flex items-center gap-4 border-b border-gray-100">
                         <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest w-40">{idLabel}</span>
                         <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex-1">{nameLabel}</span>
@@ -76,34 +76,30 @@ const LookupSearchModal = ({ isOpen, onClose, onSelect, title, data, searchPlace
                                     key={item.code}
                                     className="w-full flex items-center gap-4 px-6 py-4 hover:bg-slate-50 transition-all border-b border-gray-50 last:border-0 group"
                                 >
-                                    <span className="text-[13px] font-mono font-bold text-slate-500 w-40">{item.code}</span>
-                                    <span className="text-[13px] font-bold text-slate-700 flex-1 uppercase truncate">{item.name}</span>
+                                    <span className="text-[11px] font-mono font-bold text-slate-500 w-40">{item.code}</span>
+                                    <span className="text-[11px] font-bold text-slate-700 flex-1 uppercase truncate">{item.name}</span>
                                     <div className="w-32 flex justify-center shrink-0">
                                         <button
                                             onClick={() => {
                                                 onSelect(item);
                                                 onClose();
                                             }}
-                                            className="px-5 h-8 bg-[#0285fd] text-white text-[10px] font-black rounded-[5px] flex items-center gap-2 shadow-sm hover:bg-[#0073ff] transition-all active:scale-95 uppercase tracking-widest"
+                                            className="px-4 h-7 bg-[#e49e1b] text-white text-[9px] font-black rounded-[5px] flex items-center gap-2 shadow-sm hover:bg-[#cb9b34] transition-all active:scale-95 uppercase tracking-widest"
                                         >
-                                            <CheckCircle size={12} /> SELECT
+                                         SELECT
                                         </button>
                                     </div>
                                 </div>
                             ))
                         ) : (
-                            <div className="py-24 flex flex-col items-center justify-center text-slate-400 opacity-40 italic">
-                                <Filter size={48} className="mb-3" />
-                                <span className="text-[14px] font-black uppercase tracking-[0.3em] text-center">No Data Found</span>
+                            <div className="py-24 flex flex-col items-center justify-center text-slate-400 opacity-40 ">
+                                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-center">No Data Found</span>
                             </div>
                         )}
                     </div>
                 </div>
 
-                <div className="flex items-center justify-between px-2 text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em] italic">
-                    <span>Total Records: {data.length}</span>
-                    <span className="flex items-center gap-2"><ShieldCheck size={14} className="text-emerald-500"/> Secure Data Stream Active</span>
-                </div>
+               
             </div>
         </SimpleModal>
     );
@@ -384,7 +380,6 @@ const InventoryDownloadModal = ({ isOpen, onClose }) => {
                             <div className="col-span-8 flex items-center gap-2">
                                 <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Sub Branch</label>
                                 <div className="flex-1 h-8 border border-gray-300 rounded-[5px] bg-slate-50 flex items-center px-3 cursor-not-allowed">
-                                    <span className="text-[11px] font-bold text-slate-400 uppercase ">Primary sync source active</span>
                                 </div>
                             </div>
                         </div>
@@ -426,7 +421,7 @@ const InventoryDownloadModal = ({ isOpen, onClose }) => {
                                 id="selectAll"
                                 checked={selectAll}
                                 onChange={(e) => setSelectAll(e.target.checked)}
-                                className="w-4 h-4 rounded border-gray-300 text-[#0285fd] focus:ring-[#0285fd] transition-all cursor-pointer" 
+                                className="w-4 h-4 rounded-[5px] border-gray-300 text-[#0285fd] focus:ring-[#0285fd] transition-all cursor-pointer" 
                             />
                             <label htmlFor="selectAll" className="text-[12px] font-bold text-slate-600 uppercase cursor-pointer select-none">Global Selection Toggle</label>
                         </div>
@@ -483,21 +478,6 @@ const InventoryDownloadModal = ({ isOpen, onClose }) => {
                             </div>
                         </div>
                     </div>
-
-                    {/* Status Utility Bar */}
-                    <div className="flex items-center justify-between px-2 pt-2 text-[11px] font-bold text-slate-400 border-t border-gray-100 select-none">
-                        <div className="flex items-center gap-6">
-                            <span className="uppercase tracking-widest">System Load: <span className="text-[#0285fd]">STABLE</span></span>
-                            <div className="flex items-center gap-2">
-                                <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
-                                <span className="uppercase tracking-tighter">Live Connection Verified</span>
-                            </div>
-                        </div>
-                        <div className="flex items-center gap-4 italic opacity-50">
-                            <span>SESSION ID: {getSessionData().userName?.toUpperCase()}</span>
-                            <span>VERSION 2.0.4</span>
-                        </div>
-                    </div>
                 </div>
             </SimpleModal>
 
@@ -519,7 +499,7 @@ const InventoryDownloadModal = ({ isOpen, onClose }) => {
                 onSelect={setSelectedLocation}
                 title="Location Lookup"
                 data={locations}
-                searchPlaceholder="Filter by location name or id..."
+                searchPlaceholder="Filter by location name..."
                 idLabel="REFERENCE ID"
                 nameLabel="Location Name"
                 searchTitle="Global Location Search"
@@ -531,7 +511,7 @@ const InventoryDownloadModal = ({ isOpen, onClose }) => {
                 onSelect={setSelectedCostCenter}
                 title="Cost Center Lookup"
                 data={costCenters}
-                searchPlaceholder="Filter by cost center name or id..."
+                searchPlaceholder="Filter by cost center name..."
                 idLabel="REFERENCE ID"
                 nameLabel="Cost Center Description"
                 searchTitle="Global Cost Center Search"

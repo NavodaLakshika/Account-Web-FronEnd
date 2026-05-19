@@ -461,7 +461,7 @@ const AccountBoard = ({ isOpen, onClose, selectedType, initialData }) => {
                                     ))}
                                     {parentAccounts.length === 0 && (
                                         <tr>
-                                            <td colSpan="3" className="text-center py-20 text-slate-300 text-[12px] font-black uppercase tracking-[0.3em] italic">No branches detected for this class</td>
+                                            <td colSpan="3" className="text-center py-20 text-slate-300 text-[10px] font-black uppercase tracking-[0.3em] ">No branches detected for this class</td>
                                         </tr>
                                     )}
                                 </tbody>

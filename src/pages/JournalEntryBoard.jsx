@@ -256,30 +256,41 @@ const JournalEntryBoard = ({ isOpen, onClose, onComplete }) => {
 
     const handleAddLine = async () => {
         if (!currentLine.accId || (!currentLine.debit && !currentLine.credit)) {
-            toast.error("Please select an account and enter an amount");
+            showErrorToast("Please select an account and enter an amount");
             return;
         }
 
         const data = {
-            doc_No: header.docNo,
-            acc_Id: currentLine.accId,
-            acc_Name: currentLine.accName,
-            memo: currentLine.memo,
+            accId: currentLine.accId,
+            accName: currentLine.accName,
+            costCenter: currentLine.costCenter || '',
+            costCenterName: currentLine.costCenterName || '',
             debit: parseFloat(currentLine.debit || 0),
             credit: parseFloat(currentLine.credit || 0),
-            costCenter: currentLine.costCenter || '',
+            memo: currentLine.memo || '',
             vendId: currentLine.vendId || '',
             vendName: currentLine.vendName || '',
-            companyCode: companyCode
+            docNo: header.docNo,
+            entryNo: header.entryNo,
+            date: header.date,
+            company: companyCode,
+            createUser: currentUser,
+            type: '',
+            drNote: header.debitNote,
+            idNo: 0,
+            reconcileDate: '',
+            reconcileDocNo: '',
+            tempIdNo: 0,
+            balance: 0
         };
 
         try {
-            await journalService.saveTempLine(data);
-            fetchTempEntries();
+            const res = await journalService.addTempEntry(data);
+            setTempEntries(res);
             resetLine();
-            toast.success("Line added successfully");
+            showSuccessToast("Line added successfully");
         } catch (error) {
-            toast.error("Failed to add line");
+            showErrorToast("Failed to add line");
         }
     };
 
@@ -294,9 +305,9 @@ const JournalEntryBoard = ({ isOpen, onClose, onComplete }) => {
         try {
             await journalService.deleteTempLine(lineToDelete.id_No, companyCode);
             setTempEntries(prev => prev.filter(e => e.id_No !== lineToDelete.id_No));
-            toast.success("Line removed");
+            showSuccessToast("Line removed");
         } catch (error) {
-            toast.error("Failed to delete line");
+            showErrorToast("Failed to delete line");
         } finally {
             setIsDeleting(false);
             setShowDeleteConfirm(false);

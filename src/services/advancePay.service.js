@@ -1,9 +1,9 @@
 import api from './api';
 
 export const advancePayService = {
-    getLookups: async () => {
+    getLookups: async (companyCode = 'C001', userName = '') => {
         try {
-            const resp = await api.get('paybill/lookups'); 
+            const resp = await api.get(`advancepay/lookups?companyCode=${companyCode}&userName=${userName}`); 
             return resp.data;
         } catch (error) {
             throw error;
@@ -12,18 +12,25 @@ export const advancePayService = {
 
     generateDocNo: async (companyCode = 'C001') => {
         try {
-            const resp = await api.get(`paybill/gen-docno?companyCode=${companyCode}`);
-            // Let's assume the doc prefix should be ADP
-            const doc = resp.data.docNo || 'ADP001000001';
-            return { docNo: doc.startsWith('P') ? doc.replace('P', 'ADP') : doc };
+            const resp = await api.get(`advancepay/gen-docno?companyCode=${companyCode}`);
+            return resp.data; // returns { docNo: "..." }
         } catch (error) {
-            return { docNo: 'ADP001000001' };
+            throw error;
+        }
+    },
+
+    validateCheque: async (accCode, chkNo, companyCode = 'C001') => {
+        try {
+            const resp = await api.get(`advancepay/cheque-validate?accCode=${accCode}&chkNo=${chkNo}&companyCode=${companyCode}`);
+            return resp.data; // returns { isValid: true/false, message: "..." }
+        } catch (error) {
+            throw error;
         }
     },
 
     save: async (data) => {
         try {
-            const resp = await api.post('paybill/save-advance', data);
+            const resp = await api.post('advancepay/save', data);
             return resp.data;
         } catch (error) {
             throw error.response?.data?.message || 'Failed to save advance payment.';

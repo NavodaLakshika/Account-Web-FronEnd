@@ -1,35 +1,214 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import SimpleModal from '../components/SimpleModal';
+import CalendarModal from '../components/CalendarModal';
 import { Search, Calendar, ChevronDown, Check, X, Save, RotateCcw, Loader2 } from 'lucide-react';
 import { customerAdvanceService } from '../services/customerAdvance.service';
 import { toast } from 'react-hot-toast';
 import { getSessionData } from '../utils/session';
+import { DotLottiePlayer } from '@dotlottie/react-player';
+
+const formatDateToDMY = (dateStr) => {
+    if (!dateStr) return '';
+    const parts = dateStr.split('-');
+    if (parts.length === 3) {
+        return `${parts[2]}/${parts[1]}/${parts[0]}`;
+    }
+    return dateStr;
+};
+
+// Custom Search Modal matching AdvancePayBoard
+const SearchModal = ({ isOpen, onClose, title, items, onSelect, searchPlaceholder = "Search by code or name..." }) => {
+    const [query, setQuery] = useState('');
+    const filtered = (items || []).filter(item => 
+        (item.name || '').toLowerCase().includes(query.toLowerCase()) || 
+        (item.code || '').toLowerCase().includes(query.toLowerCase())
+    );
+
+    if (!isOpen) return null;
+
+    return (
+        <SimpleModal isOpen={isOpen} onClose={onClose} title={title} maxWidth="max-w-[600px]">
+            <div className="space-y-4 font-['Tahoma']">
+                <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-lg border border-gray-100 mb-2">
+                    <span className="text-[12px] font-bold text-gray-500 uppercase tracking-widest shrink-0">Search Facility</span>
+                    <div className="relative flex-1">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
+                        <input
+                            type="text"
+                            placeholder={searchPlaceholder}
+                            className="w-full h-9 pl-10 pr-4 border border-gray-300 rounded-[5px] outline-none text-sm focus:border-[#0285fd] bg-white shadow-sm font-sans"
+                            value={query}
+                            onChange={(e) => setQuery(e.target.value)}
+                            autoFocus
+                        />
+                    </div>
+                </div>
+
+                <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm">
+                    <div className="max-h-[400px] overflow-y-auto no-scrollbar">
+                        <table className="w-full text-left">
+                            <thead className="bg-[#f8fafd] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">
+                                <tr>
+                                    <th className="px-5 py-3 w-32">Identifier</th>
+                                    <th className="px-5 py-3">Credential / Name</th>
+                                    <th className="px-5 py-3 text-right">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-50">
+                                {filtered.length === 0 ? (
+                                    <tr>
+                                        <td colSpan="3" className="py-20 text-center text-gray-300 font-bold uppercase tracking-widest text-[10px]">
+                                            No matching records discovered
+                                        </td>
+                                    </tr>
+                                ) : filtered.map((item, idx) => (
+                                    <tr 
+                                        key={idx} 
+                                        className="group hover:bg-blue-50/50 cursor-pointer transition-all" 
+                                        onClick={() => { onSelect(item); onClose(); }}
+                                    >
+                                        <td className="px-5 py-3 font-mono text-[12px] text-gray-700">{item.code}</td>
+                                        <td className="px-5 py-3 text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors">
+                                            {item.name}
+                                        </td>
+                                        <td className="px-5 py-3 text-right">
+                                            <button className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95 border-none uppercase">
+                                                SELECT
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </SimpleModal>
+    );
+};
 
 const CustomerAdvanceBoard = ({ isOpen, onClose }) => {
-    const [lookups, setLookups] = useState({ banks: [], accounts: [] });
+    const [lookups, setLookups] = useState({ customers: [], drAccounts: [], banks: [] });
     const [loading, setLoading] = useState(false);
 
+    // Form States
     const [formData, setFormData] = useState({
         receiptNo: '',
-        receiptDate: new Date().toISOString().split('T')[0],
-        payType: 'Cash',
+        postDate: new Date().toISOString().split('T')[0],
+        payType: 'CASH', // Default PayType matching legacy C# code
         chequeNo: '',
         chequeDate: new Date().toISOString().split('T')[0],
-        bankId: '',
-        bankName: '',
+        bank: '',
         branch: '',
         amount: '0.00',
-        debitAccount: '810-101', // Example from screenshot
-        debitAccountName: 'Undepodited Funds',
-        creditAccount: '',
-        creditAccountName: '',
+        debitAccCode: '810-101',
+        debitAccName: 'Cash In Hand',
+        creditAccCode: '',
+        creditAccName: '',
         memo: '',
         company: '',
         createUser: ''
     });
 
-    const [activeModal, setActiveModal] = useState(null); // 'bank', 'debit', 'credit'
-    const [searchTerm, setSearchTerm] = useState('');
+    // Custom Search Modal States
+    const [activeModal, setActiveModal] = useState(null); // 'customer', 'debitAcc', 'bank', 'payType'
+    const [showDatePicker, setShowDatePicker] = useState(false);
+    const [showChqDatePicker, setShowChqDatePicker] = useState(false);
+
+    // Keyboard Focus References
+    const inputRefs = {
+        postDate: useRef(null),
+        creditAccCode: useRef(null),
+        debitAccCode: useRef(null),
+        payType: useRef(null),
+        chequeNo: useRef(null),
+        chequeDate: useRef(null),
+        bank: useRef(null),
+        branch: useRef(null),
+        amount: useRef(null),
+        memo: useRef(null),
+        saveBtn: useRef(null)
+    };
+
+    // Keyboard Focus Order Transitions
+    const handleKeyDown = (e, currentField) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            
+            if (currentField === 'creditAccCode') {
+                inputRefs.debitAccCode.current?.focus();
+            } else if (currentField === 'debitAccCode') {
+                inputRefs.payType.current?.focus();
+            } else if (currentField === 'payType') {
+                setActiveModal('payType');
+            } else if (currentField === 'chequeNo') {
+                setShowChqDatePicker(true);
+            } else if (currentField === 'chequeDate') {
+                inputRefs.bank.current?.focus();
+            } else if (currentField === 'bank') {
+                inputRefs.branch.current?.focus();
+            } else if (currentField === 'branch') {
+                inputRefs.amount.current?.focus();
+            } else if (currentField === 'amount') {
+                inputRefs.memo.current?.focus();
+            } else if (currentField === 'memo') {
+                handleSave();
+            }
+        }
+    };
+
+    // Toast Custom Layouts
+    const showSuccessToast = (message) => {
+        toast.custom((t) => (
+            <div className={`${t.visible ? 'animate-in slide-in-from-right-10 fade-in duration-500' : 'animate-out slide-out-to-right-10 fade-out duration-300'} 
+                max-w-[550px] w-fit bg-white/95 backdrop-blur-xl border border-white/20 shadow-2xl rounded-[5px] flex flex-col pointer-events-auto overflow-hidden`}>
+                <div className="px-4 py-2.5 flex items-center gap-3 font-['Tahoma']">
+                    <div className="w-12 h-12 shrink-0">
+                        <DotLottiePlayer src="/lottiefile/Successffull.lottie" autoplay loop={false} />
+                    </div>
+                    <div className="flex-grow text-left py-1">
+                        <h3 className="text-slate-800 text-[12px] font-bold tracking-wider uppercase leading-relaxed">{message}</h3>
+                        <div className="flex items-center gap-1.5 mt-0.5">
+                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.3)]" />
+                            <span className="text-emerald-600 text-[8px] font-mono font-bold tracking-widest uppercase font-sans">Verified</span>
+                        </div>
+                    </div>
+                    <button onClick={() => toast.dismiss(t.id)} className="text-slate-300 hover:text-slate-500 transition-colors">
+                        <X size={14} />
+                    </button>
+                </div>
+                <div className="h-[2px] w-full bg-emerald-50">
+                    <div className="h-full bg-emerald-500" style={{ animation: 'toastProgress 3s linear forwards' }} />
+                </div>
+            </div>
+        ), { duration: 3000, position: 'top-right' });
+    };
+
+    const showErrorToast = (message) => {
+        toast.custom((t) => (
+            <div className={`${t.visible ? 'animate-in slide-in-from-right-10 fade-in duration-500' : 'animate-out slide-out-to-right-10 fade-out duration-300'} 
+                max-w-[550px] w-fit bg-white/95 backdrop-blur-xl border border-white/20 shadow-2xl rounded-[5px] flex flex-col pointer-events-auto overflow-hidden`}>
+                <div className="px-4 py-2.5 flex items-center gap-3 font-['Tahoma']">
+                    <div className="w-12 h-12 shrink-0">
+                        <DotLottiePlayer src="/lottiefile/Error Fail animation.lottie" autoplay loop={false} />
+                    </div>
+                    <div className="flex-grow text-left py-1">
+                        <h3 className="text-slate-800 text-[12px] font-bold tracking-wider uppercase leading-relaxed">{message}</h3>
+                        <div className="flex items-center gap-1.5 mt-0.5">
+                            <div className="w-1.5 h-1.5 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.3)]" />
+                            <span className="text-red-600 text-[8px] font-mono font-bold tracking-widest uppercase font-sans">Failed</span>
+                        </div>
+                    </div>
+                    <button onClick={() => toast.dismiss(t.id)} className="text-slate-300 hover:text-slate-500 transition-colors">
+                        <X size={14} />
+                    </button>
+                </div>
+                <div className="h-[2px] w-full bg-red-50">
+                    <div className="h-full bg-red-500" style={{ animation: 'toastProgress 3s linear forwards' }} />
+                </div>
+            </div>
+        ), { duration: 3000, position: 'top-right' });
+    };
 
     useEffect(() => {
         if (isOpen) {
@@ -41,20 +220,27 @@ const CustomerAdvanceBoard = ({ isOpen, onClose }) => {
                 createUser: userName
             }));
             
-            fetchLookups();
+            fetchLookups(companyCode);
             generateDocNo(companyCode);
         }
     }, [isOpen]);
 
-    const fetchLookups = async () => {
+    const fetchLookups = async (companyCode) => {
         try {
-            const data = await customerAdvanceService.getLookups();
+            const data = await customerAdvanceService.getLookups(companyCode);
             setLookups({
-                banks: data.banks || [],
-                accounts: data.settlementAccounts || data.incomeAccounts || []
+                customers: data.customers || [],
+                drAccounts: data.drAccounts || [],
+                banks: (data.banks || []).map(b => ({ code: b, name: b }))
             });
+
+            // Set default debit account name if found in list
+            const defaultDr = (data.drAccounts || []).find(a => a.code === '810-101');
+            if (defaultDr) {
+                setFormData(prev => ({ ...prev, debitAccName: defaultDr.name }));
+            }
         } catch (error) {
-            toast.error('Failed to load lookups.');
+            showErrorToast('Failed to load transaction lookups.');
         }
     };
 
@@ -63,7 +249,7 @@ const CustomerAdvanceBoard = ({ isOpen, onClose }) => {
             const data = await customerAdvanceService.generateDocNo(compCode || formData.company);
             setFormData(prev => ({ ...prev, receiptNo: data.docNo }));
         } catch (error) {
-            console.error('Failed to generate doc no');
+            console.error('Failed to generate doc number.');
         }
     };
 
@@ -72,269 +258,406 @@ const CustomerAdvanceBoard = ({ isOpen, onClose }) => {
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
+    const handlePayTypeChange = (type) => {
+        setFormData(prev => ({
+            ...prev,
+            payType: type,
+            chequeNo: type === 'CHEQUE' ? prev.chequeNo : '',
+            chequeDate: type === 'CHEQUE' ? prev.chequeDate : prev.postDate,
+            bank: type === 'CHEQUE' ? prev.bank : '',
+            branch: type === 'CHEQUE' ? prev.branch : ''
+        }));
+    };
+
     const handleClear = () => {
-        setFormData({
-            ...formData,
-            payType: 'Cash',
+        setFormData(prev => ({
+            ...prev,
+            payType: 'CASH',
             chequeNo: '',
             chequeDate: new Date().toISOString().split('T')[0],
-            bankId: '',
-            bankName: '',
+            bank: '',
             branch: '',
             amount: '0.00',
-            debitAccount: '810-101',
-            debitAccountName: 'Undepodited Funds',
-            creditAccount: '',
-            creditAccountName: '',
+            debitAccCode: '810-101',
+            debitAccName: 'Cash In Hand',
+            creditAccCode: '',
+            creditAccName: '',
             memo: ''
-        });
-        setSearchTerm('');
+        }));
         generateDocNo();
     };
 
     const handleSave = async () => {
-        if (!formData.debitAccount || !formData.creditAccount) return toast.error('Debit and Credit accounts are required.');
-        if (parseFloat(formData.amount) <= 0) return toast.error('Valid Amount is required.');
+        if (!formData.creditAccCode) return showErrorToast('Please select a customer (credit account).');
+        if (!formData.debitAccCode) return showErrorToast('Please select a debit account.');
+        if (!formData.amount || parseFloat(formData.amount) <= 0) return showErrorToast('Valid Payment Amount is required.');
+        if (formData.payType === 'CHEQUE') {
+            if (!formData.chequeNo) return showErrorToast('Cheque Number is required.');
+        }
 
         setLoading(true);
+        const payload = {
+            ...formData,
+            amount: parseFloat(formData.amount) || 0
+        };
+
         try {
-            await customerAdvanceService.save(formData);
-            toast.success('Customer Advance received successfully!');
+            const resp = await customerAdvanceService.save(payload);
+            showSuccessToast(resp.message || `Customer Advance received successfully! Doc ID: ${resp.docNo}`);
             handleClear();
             onClose();
         } catch (error) {
-            toast.error(error.toString());
+            showErrorToast(error.toString());
         } finally {
             setLoading(false);
         }
     };
 
-    const filteredData = () => {
-        if (activeModal === 'bank') return lookups.banks.filter(b => (b.name || '').toLowerCase().includes(searchTerm.toLowerCase()) || (b.code || '').toLowerCase().includes(searchTerm.toLowerCase()));
-        if (activeModal === 'debit' || activeModal === 'credit') return lookups.accounts.filter(a => (a.name || '').toLowerCase().includes(searchTerm.toLowerCase()) || (a.code || '').toLowerCase().includes(searchTerm.toLowerCase()));
-        return [];
+    // Modal Selection Handlers
+    const handleSelectCustomer = (item) => {
+        setFormData(prev => ({ 
+            ...prev, 
+            creditAccCode: item.code, 
+            creditAccName: item.name 
+        }));
+    };
+
+    const handleSelectDebitAccount = (item) => {
+        setFormData(prev => ({ 
+            ...prev, 
+            debitAccCode: item.code, 
+            debitAccName: item.name 
+        }));
+    };
+
+    const handleSelectBank = (item) => {
+        setFormData(prev => ({ 
+            ...prev, 
+            bank: item.name 
+        }));
     };
 
     return (
         <>
+            <style>
+                {`
+                    @keyframes toastProgress {
+                        0% { width: 100%; }
+                        100% { width: 0%; }
+                    }
+                `}
+            </style>
             <SimpleModal
                 isOpen={isOpen}
                 onClose={onClose}
-                title="Customer Advance Receive"
-                maxWidth="max-w-[750px]"
+                title="Customer Advance Receipt"
+                maxWidth="max-w-[900px]"
                 footer={
-                    <div className="bg-slate-50 px-5 py-3.5 w-full flex justify-end gap-3 border-t border-gray-100 rounded-b-xl">
-                        <button onClick={handleSave} disabled={loading} className={`px-6 h-8 bg-[#0078d4] text-white text-[12px] font-bold rounded-sm shadow-sm hover:bg-[#005a9e] transition-all active:scale-95 flex items-center justify-center gap-2 ${loading ? 'opacity-50' : ''}`}>
-                            {loading ? <Loader2 size={13} className="animate-spin" /> : <Save size={13} />} Save
-                        </button>
-                        <button onClick={handleClear} disabled={loading} className="px-6 h-8 bg-white border border-gray-300 text-slate-600 text-[12px] font-bold rounded-sm hover:bg-slate-50 transition-all flex items-center justify-center gap-2">
-                             <RotateCcw size={13} /> Clear
-                        </button>
-                        <button onClick={onClose} className="px-6 h-8 bg-white border border-gray-300 text-slate-600 text-[12px] font-bold rounded-sm hover:bg-slate-50 transition-all flex items-center justify-center gap-2">
-                             <X size={13} /> Exit
-                        </button>
+                    <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-gray-100 rounded-b-xl">
+                        <div>
+                            <button 
+                                onClick={handleClear} 
+                                disabled={loading} 
+                                className="px-6 h-10 bg-[#00adff] text-white text-sm font-black rounded-[5px] hover:bg-[#0099e6] transition-all active:scale-95 flex items-center justify-center gap-2 border-none font-['Tahoma']"
+                            >
+                                <RotateCcw size={14} /> Clear Form
+                            </button>
+                        </div>
+                        <div className="flex gap-3">
+                            <button 
+                                onClick={handleSave} 
+                                disabled={loading} 
+                                className={`px-6 h-10 bg-[#2bb744] text-white text-sm font-black rounded-[5px] shadow-md shadow-green-100 hover:bg-[#259b3a] transition-all active:scale-95 flex items-center justify-center gap-2 border-none font-['Tahoma'] ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            >
+                                {loading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />} 
+                                Save & Apply
+                            </button>                    
+                        </div>
                     </div>
                 }
             >
-                <div className="space-y-4 font-['Plus_Jakarta_Sans']">
-                    <div className="bg-white p-5 border border-gray-100 rounded shadow-sm">
-                        <div className="grid grid-cols-12 gap-x-8 gap-y-3.5">
+                <div className="space-y-4 font-['Tahoma']">
+                    {/* Main Entry Panel */}
+                    <div className="bg-white p-5 border border-gray-100 rounded-lg shadow-sm space-y-4">
+                        <div className="grid grid-cols-12 gap-x-6 gap-y-3.5">
                             
-                            {/* Left Column - Core Fields */}
-                            <div className="col-span-12 lg:col-span-7 space-y-3">
-                                <div className="flex items-center gap-3">
-                                    <label className="text-[10px] font-bold text-slate-400 w-20 shrink-0 uppercase tracking-wider">Receipt No</label>
-                                    <input type="text" value={formData.receiptNo} readOnly className="flex-1 h-8 border border-gray-200 px-3 text-[12px] font-bold text-[#0078d4] bg-white rounded-sm outline-none tracking-widest shadow-sm" />
-                                </div>
+                            {/* Receipt No / Doc ID */}
+                            <div className="col-span-6 flex items-center gap-2">
+                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Doc ID</label>
+                                <input 
+                                    type="text" 
+                                    value={formData.receiptNo} 
+                                    readOnly 
+                                    className="flex-1 h-8 border border-gray-300 px-3 text-[12px] font-bold text-slate-700 bg-white rounded-[5px] outline-none shadow-sm focus:border-[#0285fd]" 
+                                />
+                            </div>
 
-                                <div className="flex items-center gap-3">
-                                    <label className="text-[10px] font-bold text-slate-400 w-20 shrink-0 uppercase tracking-wider">Pay Type</label>
-                                    <select name="payType" value={formData.payType} onChange={handleInputChange} className="flex-1 h-8 border border-gray-200 px-2 text-[11px] outline-none rounded-sm bg-white font-bold shadow-sm">
-                                        <option value="Cash">Cash</option>
-                                        <option value="Cheque">Cheque</option>
-                                        <option value="Direct Deposit">Direct Deposit</option>
-                                        <option value="Credit Card">Credit Card</option>
-                                    </select>
-                                </div>
-
-                                <div className="flex items-center gap-3">
-                                    <label className="text-[10px] font-bold text-slate-400 w-20 shrink-0 uppercase tracking-wider">Cheque No</label>
-                                    <input name="chequeNo" value={formData.chequeNo} onChange={handleInputChange} disabled={formData.payType !== 'Cheque'} type="text" placeholder="No..." className="flex-1 h-8 border border-gray-200 px-3 text-[11px] outline-none rounded-sm disabled:bg-gray-50 bg-white shadow-sm" />
-                                </div>
-
-                                <div className="flex items-center gap-3">
-                                    <label className="text-[10px] font-bold text-slate-400 w-20 shrink-0 uppercase tracking-wider">Bank</label>
-                                    <div className="flex-1 flex gap-1">
-                                        <input 
-                                            type="text" 
-                                            readOnly 
-                                            value={formData.bankName} 
-                                            placeholder="Select Bank..." 
-                                            className="flex-1 h-8 border border-gray-200 px-2 text-[11px] rounded-sm bg-white outline-none shadow-sm" 
-                                            disabled={formData.payType === 'Cash'}
-                                        />
-                                        <button onClick={() => { setActiveModal('bank'); setSearchTerm(''); }} disabled={formData.payType === 'Cash'} className="w-8 h-8 bg-[#0078d4] text-white flex items-center justify-center hover:bg-[#005a9e] rounded-sm transition-all shadow-sm active:scale-90 disabled:opacity-50">
-                                            <Search size={13} />
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <div className="flex items-center gap-3">
-                                    <label className="text-[10px] font-bold text-slate-400 w-20 shrink-0 uppercase tracking-wider">Amount</label>
+                            {/* Post Date */}
+                            <div className="col-span-6 flex items-center gap-2">
+                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0 text-right pr-2">Rec. Date</label>
+                                <div className="flex-1 flex gap-1 h-8 min-w-0">
                                     <input 
-                                        name="amount" 
-                                        value={formData.amount} 
-                                        onChange={handleInputChange} 
-                                        type="number" 
-                                        step="0.01" 
-                                        className="w-40 h-8 border-b-2 border-slate-200 px-2 text-[16px] text-right font-black text-[#b91c1c] outline-none focus:border-[#0078d4] bg-transparent tabular-nums" 
-                                        placeholder="0.00" 
+                                        type="text" 
+                                        readOnly 
+                                        value={formData.postDate ? formatDateToDMY(formData.postDate) : ''} 
+                                        className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-slate-700 bg-white rounded-[5px] outline-none shadow-sm cursor-pointer"
+                                        onClick={() => setShowDatePicker(true)}
                                     />
-                                </div>
-
-                                <div className="pt-3 space-y-3 border-t border-gray-50">
-                                    <div className="flex items-center gap-3">
-                                        <label className="text-[10px] font-bold text-slate-400 w-20 shrink-0 uppercase tracking-wider">Debit</label>
-                                        <div className="flex-1 flex gap-1">
-                                            <input 
-                                                type="text" 
-                                                readOnly 
-                                                value={formData.debitAccountName ? `${formData.debitAccount} - ${formData.debitAccountName}` : ''} 
-                                                placeholder="Select Debit Account..." 
-                                                className="flex-1 h-8 border border-gray-200 px-3 text-[12px] font-bold text-slate-700 rounded-sm bg-white outline-none shadow-sm" 
-                                            />
-                                            <button onClick={() => { setActiveModal('debit'); setSearchTerm(''); }} className="w-9 h-8 bg-[#0078d4] text-white flex items-center justify-center hover:bg-[#005a9e] rounded-sm transition-all shadow-sm active:scale-90">
-                                                <Search size={14} />
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    <div className="flex items-center gap-3">
-                                        <label className="text-[10px] font-bold text-slate-400 w-20 shrink-0 uppercase tracking-wider">Credit</label>
-                                        <div className="flex-1 flex gap-1">
-                                            <input 
-                                                type="text" 
-                                                readOnly 
-                                                value={formData.creditAccountName ? `${formData.creditAccount} - ${formData.creditAccountName}` : ''} 
-                                                placeholder="Select Credit Account..." 
-                                                className="flex-1 h-8 border border-gray-200 px-3 text-[12px] font-bold text-slate-700 rounded-sm bg-white outline-none shadow-sm" 
-                                            />
-                                            <button onClick={() => { setActiveModal('credit'); setSearchTerm(''); }} className="w-9 h-8 bg-[#0078d4] text-white flex items-center justify-center hover:bg-[#005a9e] rounded-sm transition-all shadow-sm active:scale-90">
-                                                <Search size={14} />
-                                            </button>
-                                        </div>
-                                    </div>
+                                    <button 
+                                        type="button"
+                                        onClick={() => setShowDatePicker(true)} 
+                                        className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0 border-none"
+                                    >
+                                        <Calendar size={16} />
+                                    </button>
                                 </div>
                             </div>
 
-                            {/* Right Column - Secondary Metadata */}
-                            <div className="col-span-12 lg:col-span-5 space-y-3 bg-gray-50/20 p-4 border border-gray-100 rounded-sm">
-                                <div className="flex items-center gap-3">
-                                    <label className="text-[10px] font-bold text-slate-400 w-20 shrink-0 uppercase tracking-wider">Rec. Date</label>
-                                    <input name="receiptDate" type="date" value={formData.receiptDate} onChange={handleInputChange} className="flex-1 h-8 border border-gray-200 px-2 text-[11px] font-bold text-[#0078d4] outline-none rounded-sm bg-white shadow-sm" />
+                            {/* Credit Account / Customer Selection */}
+                            <div className="col-span-12 flex items-center gap-2">
+                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Customer *</label>
+                                <div className="flex-1 flex gap-1 h-8 min-w-0">
+                                    <input 
+                                        type="text" 
+                                        ref={inputRefs.creditAccCode}
+                                        readOnly 
+                                        value={formData.creditAccCode ? `${formData.creditAccCode} - ${formData.creditAccName}` : ''} 
+                                        className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-red-600 bg-white rounded-[5px] outline-none shadow-sm cursor-pointer"
+                                        onClick={() => setActiveModal('customer')}
+                                        onKeyDown={(e) => handleKeyDown(e, 'creditAccCode')}
+                                    />
+                                    <button 
+                                        onClick={() => setActiveModal('customer')} 
+                                        className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0 border-none"
+                                    >
+                                        <Search size={16} />
+                                    </button>
                                 </div>
-                                <div className="flex items-center gap-3">
-                                    <label className="text-[10px] font-bold text-slate-400 w-20 shrink-0 uppercase tracking-wider">Chq. Date</label>
-                                    <input name="chequeDate" type="date" value={formData.chequeDate} onChange={handleInputChange} disabled={formData.payType !== 'Cheque'} className="flex-1 h-8 border border-gray-200 px-2 text-[11px] font-bold text-gray-600 outline-none rounded-sm disabled:bg-gray-100 bg-white shadow-sm" />
-                                </div>
-                                <div className="flex items-center gap-3">
-                                    <label className="text-[10px] font-bold text-slate-400 w-20 shrink-0 uppercase tracking-wider">Branch</label>
-                                    <input name="branch" value={formData.branch} onChange={handleInputChange} placeholder="Name..." disabled={formData.payType === 'Cash'} type="text" className="flex-1 w-7 h-8 border border-gray-200 px-2 text-[11px] outline-none rounded-sm disabled:bg-gray-100 bg-white shadow-sm" />
-                                </div>
+                            </div>
 
-                                <div className="pt-4">
-                                    <div className="p-3 bg-white border border-gray-100 rounded-sm shadow-sm space-y-1 text-right">
-                                        <div className="text-[9px] font-bold text-slate-300 uppercase tracking-widest leading-none">TOTAL ADVANCE</div>
-                                        <div className="text-[20px] font-black text-[#0078d4] tabular-nums leading-none">
-                                            {parseFloat(formData.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                                        </div>
-                                    </div>
+                            {/* Debit Account Selection */}
+                            <div className="col-span-12 flex items-center gap-2">
+                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Debit Acc *</label>
+                                <div className="flex-1 flex gap-1 h-8 min-w-0">
+                                    <input 
+                                        type="text" 
+                                        ref={inputRefs.debitAccCode}
+                                        readOnly 
+                                        value={formData.debitAccCode ? `${formData.debitAccCode} - ${formData.debitAccName}` : ''} 
+                                        className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-slate-700 bg-white rounded-[5px] outline-none shadow-sm cursor-pointer"
+                                        onClick={() => setActiveModal('debitAcc')}
+                                        onKeyDown={(e) => handleKeyDown(e, 'debitAccCode')}
+                                    />
+                                    <button 
+                                        onClick={() => setActiveModal('debitAcc')} 
+                                        className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0 border-none"
+                                    >
+                                        <Search size={16} />
+                                    </button>
                                 </div>
+                            </div>
+
+                            {/* Pay Type Selection */}
+                            <div className="col-span-4 flex items-center gap-2">
+                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Pay Type</label>
+                                <div className="flex-1 flex gap-1 h-8 min-w-0">
+                                    <input 
+                                        type="text" 
+                                        ref={inputRefs.payType}
+                                        readOnly 
+                                        value={formData.payType} 
+                                        className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-slate-700 bg-white rounded-[5px] outline-none shadow-sm cursor-pointer"
+                                        onClick={() => setActiveModal('payType')}
+                                        onKeyDown={(e) => handleKeyDown(e, 'payType')}
+                                    />
+                                    <button 
+                                        onClick={() => setActiveModal('payType')} 
+                                        className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0 border-none"
+                                    >
+                                        <Search size={16} />
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Cheque Details (Only if PayType === 'CHEQUE') */}
+                            <div className="col-span-4 flex items-center gap-2">
+                                <label className="text-[12.5px] font-bold text-gray-700 w-20 shrink-0 text-right pr-2">Chq No</label>
+                                <input 
+                                    type="text" 
+                                    ref={inputRefs.chequeNo}
+                                    name="chequeNo" 
+                                    value={formData.chequeNo} 
+                                    onChange={handleInputChange} 
+                                    disabled={formData.payType !== 'CHEQUE'}
+                                    onKeyDown={(e) => handleKeyDown(e, 'chequeNo')}
+                                    className="flex-1 h-8 border border-gray-300 px-3 text-[12px] rounded-[5px] outline-none bg-white shadow-sm focus:border-[#0285fd] disabled:bg-gray-100 disabled:text-gray-400" 
+                                />
+                            </div>
+
+                            <div className="col-span-4 flex items-center gap-2">
+                                <label className="text-[12.5px] font-bold text-gray-700 w-20 shrink-0 text-right pr-2">Chq Date</label>
+                                <div className="flex-1 flex gap-1 h-8 min-w-0">
+                                    <input 
+                                        type="text" 
+                                        readOnly 
+                                        value={formData.chequeDate ? formatDateToDMY(formData.chequeDate) : ''} 
+                                        disabled={formData.payType !== 'CHEQUE'}
+                                        className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-slate-700 bg-white rounded-[5px] outline-none shadow-sm cursor-pointer disabled:bg-gray-100 disabled:text-gray-400"
+                                        onClick={() => formData.payType === 'CHEQUE' && setShowChqDatePicker(true)}
+                                    />
+                                    <button 
+                                        type="button"
+                                        disabled={formData.payType !== 'CHEQUE'}
+                                        onClick={() => setShowChqDatePicker(true)} 
+                                        className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0 border-none disabled:opacity-50"
+                                    >
+                                        <Calendar size={16} />
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Bank Selection (Cheque only) */}
+                            <div className="col-span-6 flex items-center gap-2">
+                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Bank</label>
+                                <div className="flex-1 flex gap-1 h-8 min-w-0">
+                                    <input 
+                                        type="text" 
+                                        ref={inputRefs.bank}
+                                        readOnly 
+                                        value={formData.bank || ''} 
+                                        disabled={formData.payType !== 'CHEQUE'}
+                                        className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-slate-700 bg-white rounded-[5px] outline-none shadow-sm cursor-pointer disabled:bg-gray-100 disabled:text-gray-400"
+                                        onClick={() => formData.payType === 'CHEQUE' && setActiveModal('bank')}
+                                        onKeyDown={(e) => handleKeyDown(e, 'bank')}
+                                    />
+                                    <button 
+                                        disabled={formData.payType !== 'CHEQUE'}
+                                        onClick={() => setActiveModal('bank')} 
+                                        className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0 border-none disabled:opacity-50"
+                                    >
+                                        <Search size={16} />
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Branch (Cheque only) */}
+                            <div className="col-span-6 flex items-center gap-2">
+                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0 text-right pr-2">Branch</label>
+                                <input 
+                                    type="text" 
+                                    ref={inputRefs.branch}
+                                    name="branch" 
+                                    value={formData.branch} 
+                                    onChange={handleInputChange} 
+                                    disabled={formData.payType !== 'CHEQUE'}
+                                    onKeyDown={(e) => handleKeyDown(e, 'branch')}
+                                    className="flex-1 h-8 border border-gray-300 px-3 text-[12px] rounded-[5px] outline-none bg-white shadow-sm focus:border-[#0285fd] disabled:bg-gray-100 disabled:text-gray-400" 
+                                />
+                            </div>
+
+                            {/* Amount */}
+                            <div className="col-span-12 flex items-center gap-2">
+                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Amount *</label>
+                                <input 
+                                    type="number" 
+                                    ref={inputRefs.amount}
+                                    name="amount" 
+                                    step="0.01"
+                                    value={formData.amount} 
+                                    onChange={handleInputChange} 
+                                    onKeyDown={(e) => handleKeyDown(e, 'amount')}
+                                    className="w-48 h-8 border border-gray-300 px-3 text-[14px] text-right font-black text-red-600 bg-white rounded-[5px] outline-none shadow-sm focus:border-[#0285fd]" 
+                                />
                             </div>
 
                             {/* Memo */}
-                            <div className="col-span-12">
-                                <div className="flex flex-col gap-1.5 pt-2">
-                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider pl-1 font-['Plus_Jakarta_Sans']">Memo / Remarks</label>
-                                    <input 
-                                        name="memo" 
-                                        value={formData.memo} 
-                                        onChange={handleInputChange} 
-                                        type="text" 
-                                        className="w-full h-9 border border-gray-200 px-3 text-[12px] focus:border-[#0078d4] outline-none transition-all shadow-sm rounded-sm placeholder:text-gray-300" 
-                                        placeholder="Internal remarks for advance receipt..." 
-                                    />
-                                </div>
+                            <div className="col-span-12 flex items-start gap-2 pt-2">
+                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0 pt-1.5">Remarks / Memo</label>
+                                <input 
+                                    type="text" 
+                                    ref={inputRefs.memo}
+                                    name="memo" 
+                                    value={formData.memo} 
+                                    onChange={handleInputChange} 
+                                    onKeyDown={(e) => handleKeyDown(e, 'memo')}
+                                    className="flex-1 h-9 border border-gray-300 px-3 text-[12px] rounded-[5px] outline-none bg-white shadow-sm focus:border-[#0285fd]" 
+                                />
                             </div>
+
                         </div>
                     </div>
                 </div>
             </SimpleModal>
 
-            {/* Selection Modal Wrapper */}
-            {activeModal && (
-                <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setActiveModal(null)} />
-                    <div className="relative w-full max-w-2xl bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col max-h-[85vh]">
-                        <div className="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-50 font-['Plus_Jakarta_Sans']">
-                            <h3 className="text-lg font-bold text-slate-800 tracking-tight">
-                                {activeModal === 'bank' ? 'Search Banks' : 'Search Accounts'}
-                            </h3>
-                            <div className="flex gap-4">
-                                <input 
-                                    type="text" 
-                                    placeholder="Search by code or name..." 
-                                    className="h-9 border border-gray-300 px-3 text-sm rounded-md w-64 focus:border-blue-500 outline-none" 
-                                    value={searchTerm} 
-                                    onChange={(e) => setSearchTerm(e.target.value)} 
-                                    autoFocus
-                                />
-                                <button 
-                                    onClick={() => setActiveModal(null)} 
-                                    className="w-9 h-8 flex items-center justify-center bg-[#ff3b30] hover:bg-[#e03127] text-white rounded-[8px] shadow-[0_4px_12px_rgba(255,59,48,0.3)] hover:shadow-[0_6px_20px_rgba(255,59,48,0.4)] transition-all active:scale-90 outline-none border-none group"
-                                    title="Close"
-                                >
-                                    <X size={18} strokeWidth={4} className="group-hover:scale-110 transition-transform" />
-                                </button>
-                            </div>
-                        </div>
-                        <div className="overflow-y-auto p-2 font-['Plus_Jakarta_Sans']">
-                            <table className="w-full text-sm text-left">
-                                <thead className="bg-slate-50 sticky top-0 text-gray-600 font-bold uppercase text-[11px] tracking-wider">
-                                    <tr>
-                                        <th className="p-3 border-b">Code</th>
-                                        <th className="p-3 border-b">Name</th>
-                                        <th className="p-3 border-b text-center">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {filteredData().map((item, idx) => (
-                                        <tr key={idx} className="hover:bg-blue-50 transition-colors group cursor-pointer" onClick={() => {
-                                            if (activeModal === 'bank') {
-                                                setFormData(prev => ({ ...prev, bankId: item.code || item.Bank_Code, bankName: item.name || item.Bank_Name }));
-                                            } else if (activeModal === 'debit') {
-                                                setFormData(prev => ({ ...prev, debitAccount: item.code || item.Account_Code, debitAccountName: item.name || item.Account_Name }));
-                                            } else {
-                                                setFormData(prev => ({ ...prev, creditAccount: item.code || item.Account_Code, creditAccountName: item.name || item.Account_Name }));
-                                            }
-                                            setActiveModal(null);
-                                        }}>
-                                            <td className="p-3 border-b font-medium text-gray-700">{item.code || item.Bank_Code || item.Account_Code}</td>
-                                            <td className="p-3 border-b font-medium uppercase text-blue-600">{item.name || item.Bank_Name || item.Account_Name}</td>
-                                            <td className="p-3 border-b text-center">
-                                                <button className="bg-[#0078d4] text-white text-[10px] px-3 py-1.5 rounded-sm font-bold hover:bg-[#005a9e]">SELECT</button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                    {filteredData().length === 0 && (
-                                        <tr><td colSpan="3" className="p-8 text-center text-gray-400 font-medium italic">No results found for "{searchTerm}"</td></tr>
-                                    )}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            )}
+            {/* Selection Lookups */}
+            <SearchModal 
+                isOpen={activeModal === 'customer'} 
+                onClose={() => setActiveModal(null)} 
+                title="Select Customer (Credit Account)" 
+                items={lookups.customers} 
+                onSelect={handleSelectCustomer} 
+            />
+
+            <SearchModal 
+                isOpen={activeModal === 'debitAcc'} 
+                onClose={() => setActiveModal(null)} 
+                title="Select Debit Account" 
+                items={lookups.drAccounts} 
+                onSelect={handleSelectDebitAccount} 
+            />
+
+            <SearchModal 
+                isOpen={activeModal === 'bank'} 
+                onClose={() => setActiveModal(null)} 
+                title="Select Bank" 
+                items={lookups.banks} 
+                onSelect={handleSelectBank} 
+            />
+
+            <SearchModal 
+                isOpen={activeModal === 'payType'} 
+                onClose={() => setActiveModal(null)} 
+                title="Select Pay Type" 
+                items={[
+                    { code: 'CASH', name: 'CASH' },
+                    { code: 'CHEQUE', name: 'CHEQUE' }
+                ]} 
+                onSelect={(item) => {
+                    handlePayTypeChange(item.code);
+                    setTimeout(() => {
+                        if (item.code === 'CHEQUE') {
+                            inputRefs.chequeNo.current?.focus();
+                        } else {
+                            inputRefs.amount.current?.focus();
+                        }
+                    }, 100);
+                }} 
+            />
+
+            {/* Date Pickers */}
+            <CalendarModal 
+                isOpen={showDatePicker} 
+                onClose={() => setShowDatePicker(false)} 
+                onSelectDate={(date) => {
+                    setFormData(prev => ({ ...prev, postDate: date }));
+                    setShowDatePicker(false);
+                }} 
+                currentDate={formData.postDate} 
+            />
+
+            <CalendarModal 
+                isOpen={showChqDatePicker} 
+                onClose={() => setShowChqDatePicker(false)} 
+                onSelectDate={(date) => {
+                    setFormData(prev => ({ ...prev, chequeDate: date }));
+                    setShowChqDatePicker(false);
+                    // Focus on next element bank after selecting cheque date
+                    setTimeout(() => {
+                        inputRefs.bank.current?.focus();
+                    }, 100);
+                }} 
+                currentDate={formData.chequeDate} 
+            />
         </>
     );
 };
