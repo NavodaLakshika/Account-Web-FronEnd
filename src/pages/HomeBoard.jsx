@@ -22,7 +22,9 @@ import {
     Home,
     MousePointer2,
     LayoutDashboard,
-    Lock
+    Lock,
+    PieChart,
+    TrendingUp
 } from 'lucide-react';
 
 import FeatureLockedModal from '../components/modals/FeatureLockedModal';
@@ -50,7 +52,7 @@ const CategoryItem = ({ icon: Icon, label, onClick, colorClass = "bg-[#4cc3a5]",
     </div>
 );
 
-const HomeBoard = ({ isOpen, onClose, onOpenModal }) => {
+const HomeBoard = ({ isOpen, onClose, onOpenModal, onOpenDashboard }) => {
     const [showLockModal, setShowLockModal] = useState(false);
 
     const handleItemClick = (label, isLocked) => {

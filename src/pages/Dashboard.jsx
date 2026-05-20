@@ -26,7 +26,9 @@ import {
     Bot,
     Calculator,
     Bell,
-    Receipt
+    Receipt,
+    PieChart,
+    LayoutGrid
 } from 'lucide-react';
 
 import { authService } from '../services/auth.service';
@@ -89,6 +91,9 @@ import AlarmAlertModal from '../components/modals/AlarmAlertModal';
 import { reminderService } from '../services/reminder.service';
 
 import AIChatbotBoard from './AIChatbotBoard';
+import GetThingsDoneBoard from './GetThingsDoneBoard';
+import ExpensesDashboardBoard from './ExpensesDashboardBoard';
+import QuickLaunchGridModal from '../components/modals/QuickLaunchGridModal';
 import DepartmentBoard from './DepartmentBoard';
 import CalculatorBoard from '../components/modals/ViewAndUtilityModels/CalculatorBoard';
 import EstimateBoard from './EstimateBoard';
@@ -115,6 +120,7 @@ const Dashboard = () => {
     const [showBankRecModal, setShowBankRecModal] = useState(false);
     const [showTrialBalanceModal, setShowTrialBalanceModal] = useState(false);
     const [showSearchModal, setShowSearchModal] = useState(false);
+    const [showExpensesDashboardModal, setShowExpensesDashboardModal] = useState(false);
     const [showMarketingToolModal, setShowMarketingToolModal] = useState(false);
     const [showPurchaseOrderModal, setShowPurchaseOrderModal] = useState(false);
     const [showGRNModal, setShowGRNModal] = useState(false);
@@ -163,7 +169,8 @@ const Dashboard = () => {
     const [editingTask, setEditingTask] = useState(null);
     const [showCategoryModal, setShowCategoryModal] = useState(false);
     const [showEstimateModal, setShowEstimateModal] = useState(false);
-    const [ribbonIcons, setRibbonIcons] = useState(['logout', 'home', 'new_account', 'customer', 'vendor', 'reminder', 'enter_bill', 'pay_bill', 'write_chq', 'petty_cash', 'make_deposit', 'journal_entry', 'bank_rec', 'trial_balance', 'search', 'ai_chat']);
+    const [showBIDashboard, setShowBIDashboard] = useState(false);
+    const [showQuickLaunchModal, setShowQuickLaunchModal] = useState(false);
 
     const [showAIChatbotModal, setShowAIChatbotModal] = useState(false);
     const [showItemsServicesReport, setShowItemsServicesReport] = useState(false);
@@ -178,6 +185,33 @@ const Dashboard = () => {
     const [isLoaderStopped, setIsLoaderStopped] = useState(false);
     const [depositData, setDepositData] = useState(null);
 
+    const [ribbonIcons, setRibbonIcons] = useState(() => {
+        const defaultIcons = [
+            'home', 'new_account', 'customer', 'vendor', 'enter_bill',
+            'pay_bill', 'write_chq', 'petty_cash', 'make_deposit',
+            'journal_entry', 'bank_rec', 'trial_balance', 'search',
+            'ai_chat', 'dashboard', 'department', 'calculator', 'help', 'category',
+            'reminder', 'logout'
+        ];
+        try {
+            const saved = localStorage.getItem('ribbon_icons');
+            if (saved) {
+                let parsed = JSON.parse(saved);
+                // Always ensure 'dashboard' is present after 'ai_chat'
+                if (!parsed.includes('dashboard')) {
+                    const aiIdx = parsed.indexOf('ai_chat');
+                    if (aiIdx !== -1) {
+                        parsed.splice(aiIdx + 1, 0, 'dashboard');
+                    } else {
+                        parsed.push('dashboard');
+                    }
+                    localStorage.setItem('ribbon_icons', JSON.stringify(parsed));
+                }
+                return parsed;
+            }
+        } catch { /* ignore */ }
+        return defaultIcons;
+    });
 
     // Reminder Alarm Logic
     const [activeAlarmTask, setActiveAlarmTask] = useState(null);
@@ -215,7 +249,11 @@ const Dashboard = () => {
         } else {
             setUser(currentUser);
             setSelectedCompany(company ? JSON.parse(company) : null);
-            if (savedIcons) setRibbonIcons(JSON.parse(savedIcons));
+            if (savedIcons) {
+                let parsed = JSON.parse(savedIcons);
+                localStorage.setItem('ribbon_icons', JSON.stringify(parsed));
+                setRibbonIcons(parsed);
+            }
         }
     }, [navigate]);
 
@@ -293,6 +331,23 @@ const Dashboard = () => {
 
         setActiveAlarmTask(null);
     };
+
+    // Listen to messages from other tabs (like SpendOverviewPage)
+    useEffect(() => {
+        const handleMessage = (event) => {
+            if (event.data && event.data.type === 'LAUNCH_MODAL') {
+                const modal = event.data.modal;
+                if (modal === 'showEnterBillModal') setShowEnterBillModal(true);
+                if (modal === 'showPayBillModal') setShowPayBillModal(true);
+                if (modal === 'showWriteChequeModal') setShowWriteChequeModal(true);
+                if (modal === 'showPettyCashModal') setShowPettyCashModal(true);
+                if (modal === 'showJournalEntryModal') setShowJournalEntryModal(true);
+                if (modal === 'showMakeDepositModal') setShowMakeDepositModal(true);
+            }
+        };
+        window.addEventListener('message', handleMessage);
+        return () => window.removeEventListener('message', handleMessage);
+    }, []);
 
     // Check Reminders
     useEffect(() => {
@@ -413,6 +468,7 @@ const Dashboard = () => {
         window.open(`/report/items-services?company=${companyId}&name=${encodeURIComponent(companyName)}`, '_blank');
     };
 
+
     const navItems = [
         { icon: Home, gif: '/icons/home.gif', label: 'Home', onClick: () => setShowHomeModal(true), active: showHomeModal },
         { icon: UserPlus, gif: '/icons/new account2.gif', label: 'Accounts', onClick: () => setShowNewAccountModal(true), active: showNewAccountModal },
@@ -442,6 +498,7 @@ const Dashboard = () => {
             <HomeBoard
                 isOpen={showHomeModal}
                 onClose={() => setShowHomeModal(false)}
+                onOpenDashboard={() => { setShowHomeModal(false); setShowBIDashboard(true); }}
                 onOpenModal={(label) => {
                     // Item Mapping from Legend/Original Home Page
                     if (label === 'Home') setShowHomeModal(true);
@@ -485,6 +542,14 @@ const Dashboard = () => {
             <CustomerMasterBoard isOpen={showCustomerModal} onClose={() => setShowCustomerModal(false)} />
             <SupplierMasterBoard isOpen={showVendorModal} onClose={() => setShowVendorModal(false)} />
             <EnterBillBoard isOpen={showEnterBillModal} onClose={() => setShowEnterBillModal(false)} />
+            <ExpensesDashboardBoard
+                isOpen={showExpensesDashboardModal}
+                onClose={() => setShowExpensesDashboardModal(false)}
+                onEnterBill={() => { setShowExpensesDashboardModal(false); setShowEnterBillModal(true); }}
+                onPayBill={() => { setShowExpensesDashboardModal(false); setShowPayBillModal(true); }}
+                onWriteCheque={() => { setShowExpensesDashboardModal(false); setShowWriteChequeModal(true); }}
+                onPettyCash={() => { setShowExpensesDashboardModal(false); setShowPettyCashModal(true); }}
+            />
             <PayBillBoard isOpen={showPayBillModal} onClose={() => setShowPayBillModal(false)} />
             <EstimateBoard isOpen={showEstimateModal} onClose={() => setShowEstimateModal(false)} />
             <WriteChequeBoard isOpen={showWriteChequeModal} onClose={() => setShowWriteChequeModal(false)} />
@@ -865,6 +930,7 @@ const Dashboard = () => {
                             bank_rec: { icon: RefreshCcw, label: 'Bank Rec', onClick: () => setShowBankRecModal(true), active: showBankRecModal },
                             trial_balance: { icon: BarChart2, label: 'Trial Balance', onClick: () => setShowTrialBalanceModal(true), active: showTrialBalanceModal },
                             search: { icon: Search, label: 'Search', onClick: () => setShowSearchModal(true), active: showSearchModal },
+                            dashboard: { icon: PieChart, label: 'Dashboard', onClick: () => setShowBIDashboard(true), active: showBIDashboard, isHighlighted: true },
                             ai_chat: { icon: Bot, label: 'AI Chat', onClick: handleAIClick, active: showAIChatbotModal },
                             department: { icon: Building2, label: 'Dept.', onClick: () => setShowDepartmentModal(true), active: showDepartmentModal },
                             calculator: { icon: Calculator, label: 'Calculator', onClick: () => window.open('ms-calculator:'), active: showCalculatorModal },
@@ -874,6 +940,47 @@ const Dashboard = () => {
                         }[iconId];
 
                         if (!iconData) return null;
+
+                        // Custom animated Dashboard button
+                        if (iconId === 'dashboard') {
+                            return (
+                                <button
+                                    key="dashboard"
+                                    onClick={() => setShowBIDashboard(true)}
+                                    className="relative flex flex-col items-center justify-center min-w-[75px] h-[75px] m-0.5 rounded-xl cursor-pointer border-0 outline-none group transition-all duration-200"
+                                    style={{
+                                        background: showBIDashboard ? 'rgba(255,255,255,0.20)' : 'transparent',
+                                    }}
+                                    onMouseEnter={e => {
+                                        if (!showBIDashboard) e.currentTarget.style.background = 'rgba(255,255,255,0.12)';
+                                    }}
+                                    onMouseLeave={e => {
+                                        if (!showBIDashboard) e.currentTarget.style.background = 'transparent';
+                                    }}
+                                >
+                                    <PieChart
+                                        size={26}
+                                        strokeWidth={1.8}
+                                        className="text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.2)] group-hover:scale-110 transition-transform duration-300"
+                                        style={{
+                                            transform: showBIDashboard ? 'translateY(-1px) scale(1.08)' : undefined,
+                                        }}
+                                    />
+                                    <span className="text-[11px] font-bold mt-2 tracking-wide leading-none text-center text-white opacity-90 group-hover:opacity-100 px-1">
+                                        Dashboard
+                                    </span>
+
+                                    {/* Active underline — same as RibbonButton */}
+                                    {showBIDashboard && (
+                                        <div className="absolute bottom-1 left-1/2 -translate-x-1/2 w-8 h-1 bg-white rounded-full shadow-[0_0_10px_rgba(255,255,255,0.8)]" />
+                                    )}
+
+                                    {/* Hover glow overlay — same as RibbonButton */}
+                                    <div className="absolute inset-0 bg-white/0 group-hover:bg-white/5 rounded-xl transition-colors duration-300" />
+                                </button>
+                            );
+                        }
+
                         return (
                             <RibbonButton
                                 key={iconId}
@@ -883,13 +990,22 @@ const Dashboard = () => {
                                 active={iconData.active}
                                 hasBadge={iconData.hasBadge}
                                 iconColor={iconData.iconColor}
-                            />
-                        );
+                                isHighlighted={iconData.isHighlighted}
+                            />);
                     })}
 
 
 
-                    <div className="ml-auto pr-4 flex items-center">
+                    <div className="ml-auto pr-4 flex items-center gap-1">
+                        {/* <button
+                            type="button"
+                            title="Quick launch menu"
+                            onClick={() => setShowQuickLaunchModal(true)}
+                            className="flex flex-col items-center justify-center min-w-[52px] h-[52px] rounded-xl text-white/90 hover:bg-white/15 hover:text-white transition-all border border-transparent hover:border-white/20"
+                        >
+                            <LayoutGrid size={22} strokeWidth={1.8} />
+                            <span className="text-[8px] font-bold uppercase tracking-wide mt-0.5 opacity-80">Menu</span>
+                        </button> */}
                         <ChevronRight
                             size={16}
                             className="text-white/50 cursor-pointer hover:text-white transition-all transform -rotate-90"
@@ -1140,7 +1256,14 @@ const Dashboard = () => {
                     100% { transform: translateX(-50%); }
                 }
 
-
+                @keyframes ribbonGlow {
+                    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.5); border-color: rgba(16, 185, 129, 0.4); }
+                    70% { transform: scale(1.04); box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); border-color: rgba(16, 185, 129, 0.8); }
+                    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); border-color: rgba(16, 185, 129, 0.4); }
+                }
+                .animate-ribbon-glow {
+                    animation: ribbonGlow 2.5s infinite ease-in-out;
+                }
 
                 @keyframes cardLoading {
                     0% { width: 0%; opacity: 1; }
@@ -1154,10 +1277,69 @@ const Dashboard = () => {
                 .no-scrollbar::-webkit-scrollbar { display: none; }
                 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
                 * { font-family: 'Plus Jakarta Sans', sans-serif; }
+
+                @keyframes dashAurora {
+                    0%   { background-position: 0% 50%; opacity: 0.3; }
+                    50%  { background-position: 100% 50%; opacity: 0.6; }
+                    100% { background-position: 0% 50%; opacity: 0.3; }
+                }
             `}</style>
             <SoftwareAboutModal
                 isOpen={showSoftwareAboutModal}
                 onClose={() => setShowSoftwareAboutModal(false)}
+            />
+
+            <QuickLaunchGridModal
+                isOpen={showQuickLaunchModal}
+                onClose={() => setShowQuickLaunchModal(false)}
+                items={navItems}
+                onSearch={() => setShowSearchModal(true)}
+                onAIClick={handleAIClick}
+            />
+
+            <GetThingsDoneBoard
+                isOpen={showBIDashboard}
+                onClose={() => setShowBIDashboard(false)}
+                user={user}
+                selectedCompany={selectedCompany}
+                onAction={(actionId) => {
+                    setShowBIDashboard(false);
+                    const actions = {
+                        home: () => setShowHomeModal(true),
+                        header_search: () => setShowSearchModal(true),
+                        header_tasks: () => setShowReminderListModal(true),
+                        header_apps: () => setShowQuickLaunchModal(true),
+                        header_notifications: () => setShowReminderModal(true),
+                        header_settings: () => setShowSystemSettingsModal(true),
+                        header_help: () => setShowViewUtilityModal(true),
+                        header_profile: () => setShowChangePasswordModal(true),
+                        header_ai: () => setShowAIChatbotModal(true),
+                        enter_bill: () => setShowEnterBillModal(true),
+                        pay_bill: () => setShowPayBillModal(true),
+                        record_expense: () => setShowPettyCashModal(true),
+                        make_deposit: () => setShowMakeDepositModal(true),
+                        write_cheque: () => setShowWriteChequeModal(true),
+                        expenses_detail: () => setShowExpensesDashboardModal(true),
+                        journal: () => setShowJournalEntryModal(true),
+                        trial_balance: () => setShowTrialBalanceModal(true),
+                        bank_rec: () => setShowBankRecModal(true),
+                        opening_balance: () => setShowOpeningBalanceModal(true),
+                        invoice: () => setShowSalesInvoiceModal(true),
+                        sales_receipt: () => setShowSalesReceiptModal(true),
+                        receive_payment: () => setShowReceivePaymentModal(true),
+                        sales_order: () => setShowSalesOrderModal(true),
+                        customer: () => setShowCustomerModal(true),
+                        customer_advance: () => setShowCustomerAdvanceModal(true),
+                        customer_receipt: () => setShowCustomerReceiptModal(true),
+                        department: () => setShowDepartmentModal(true),
+                        estimate: () => setShowEstimateModal(true),
+                        purchase_order: () => setShowPurchaseOrderModal(true),
+                        grn: () => setShowGRNModal(true),
+                        items: () => handleOpenItemsServicesReport(),
+                        reports: () => setShowReportsModal(true),
+                    };
+                    actions[actionId]?.();
+                }}
             />
         </div>
     );
@@ -1199,6 +1381,7 @@ const RibbonButton = ({ icon: Icon, label, onClick, active, hasBadge, isHighligh
             ${active
                 ? 'bg-white/20 text-white shadow-[0_4px_12px_rgba(0,0,0,0.1)] backdrop-blur-sm'
                 : 'text-white/80 hover:bg-white/10 hover:text-white hover:shadow-lg'}
+            ${isHighlighted ? 'bg-gradient-to-br from-emerald-500/20 via-green-600/30 to-emerald-500/10 text-white border border-emerald-400/40 shadow-[0_0_15px_rgba(16,185,129,0.3)] animate-ribbon-glow' : ''}
         `}
     >
         <div className="relative z-10">

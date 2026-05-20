@@ -5,6 +5,8 @@ import OfficeDocumentModal from './OfficeDocumentModal';
 import ToDoListBoard from './ViewAndUtilityModels/ToDoListBoard';
 import SendFileBoard from './ViewAndUtilityModels/SendFileBoard';
 import DocumentSearchModal from './ViewAndUtilityModels/DocumentSearchModal';
+import CustomizeIconBarBoard from './ViewAndUtilityModels/CustomizeIconBarBoard';
+import ChangeBackgroundBoard from './ViewAndUtilityModels/ChangeBackgroundBoard';
 
 const ViewUtilityModal = ({ isOpen, onClose, onToggleSideBar, onOpenReminder, onOpenCalculator, onOpenNotepad, onOpenPrinter, currentTopBarColor, onColorSelect }) => {
     const [showLetterEnvelopesModal, setShowLetterEnvelopesModal] = useState(false);

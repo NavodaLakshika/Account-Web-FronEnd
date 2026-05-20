@@ -40,7 +40,6 @@ function App() {
           <Route path="/login" element={<AuthPage />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/report/items-services" element={<ItemsServicesReportPage />} />
-          
           {/* Default Route */}
           <Route path="/" element={<Navigate to="/login" replace />} />
           
