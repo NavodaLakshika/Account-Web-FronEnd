@@ -7,12 +7,24 @@ const api = axios.create({
   },
 });
 
-// Request interceptor: Attach Token
+// Request interceptor: Attach Token and Company Code
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
+    }
+    
+    const companyStr = localStorage.getItem('selectedCompany');
+    if (companyStr) {
+      try {
+        const companyObj = JSON.parse(companyStr);
+        if (companyObj && companyObj.companyCode) {
+          config.headers['x-company-code'] = companyObj.companyCode;
+        }
+      } catch (e) {
+        console.error('Error parsing selectedCompany', e);
+      }
     }
     return config;
   },

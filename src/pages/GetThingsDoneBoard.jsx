@@ -514,16 +514,16 @@ const AddWidgetsPanel = ({ isOpen, onClose, initialSelected, onSave }) => {
 const EditWrapper = ({ children, isEditing, grabbers = [], className = '', onRemove }) => {
   if (!isEditing) return <div className={className}>{children}</div>;
   return (
-    <div className={`group relative rounded-lg ring-[1.5px] ring-[#0078d4] z-10 transition-all ${className} hover:ring-2 hover:shadow-lg`}>
-      {grabbers.includes('left') && <div className="absolute left-[-5px] top-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-[#0078d4] z-20 cursor-move" title="Change place" />}
-      {grabbers.includes('right') && <div className="absolute right-[-5px] top-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-[#0078d4] z-20 cursor-move" title="Change place" />}
-      {grabbers.includes('top') && <div className="absolute top-[-5px] left-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-[#0078d4] z-20 cursor-move" title="Change place" />}
-      {grabbers.includes('bottom') && <div className="absolute bottom-[-5px] left-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-[#0078d4] z-20 cursor-move" title="Change place" />}
+    <div className={`group relative rounded-2xl ring-[1.5px] ring-blue-500 z-10 transition-all ${className} hover:ring-2 hover:shadow-xl`}>
+      {grabbers.includes('left') && <div className="absolute left-[-5px] top-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-blue-500 z-20 cursor-move" title="Change place" />}
+      {grabbers.includes('right') && <div className="absolute right-[-5px] top-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-blue-500 z-20 cursor-move" title="Change place" />}
+      {grabbers.includes('top') && <div className="absolute top-[-5px] left-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-blue-500 z-20 cursor-move" title="Change place" />}
+      {grabbers.includes('bottom') && <div className="absolute bottom-[-5px] left-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-blue-500 z-20 cursor-move" title="Change place" />}
       
       {onRemove && (
         <button 
           onClick={onRemove}
-          className="absolute -top-3 -right-3 w-6 h-6 bg-white border border-[#d4d7dc] rounded-full flex items-center justify-center text-[#ff3b30] shadow-md hover:bg-[#ff3b30] hover:text-white hover:border-[#ff3b30] transition-colors z-30 opacity-0 group-hover:opacity-100"
+          className="absolute -top-3 -right-3 w-6 h-6 bg-white border border-slate-200 rounded-full flex items-center justify-center text-rose-500 shadow-md hover:bg-rose-550 hover:text-white hover:border-rose-550 transition-colors z-30 opacity-0 group-hover:opacity-100"
           title="Delete widget"
         >
           <X size={14} strokeWidth={2.5} />
@@ -541,7 +541,7 @@ const EditWrapper = ({ children, isEditing, grabbers = [], className = '', onRem
         </div>
       )}
 
-      <div className="opacity-40 pointer-events-none select-none transition-opacity h-full">
+      <div className="opacity-45 pointer-events-none select-none transition-opacity h-full">
         {children}
       </div>
     </div>
@@ -550,32 +550,32 @@ const EditWrapper = ({ children, isEditing, grabbers = [], className = '', onRem
 
 /** QBO-style widget: white card + optional full-width footer button */
 const WidgetShell = ({ title, subtitle, children, footerButtonLabel, onFooterButton, onHide }) => (
-  <div className="group relative bg-white border border-[#d4d7dc] rounded-lg shadow-[0_1px_3px_rgba(0,0,0,0.06)] flex flex-col min-h-[240px] h-full">
-    <div className="p-4 sm:p-5 flex-1 flex flex-col min-h-0 relative">
+  <div className="group relative bg-white border border-slate-200/60 rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.02),0_1px_3px_rgba(0,0,0,0.01)] flex flex-col min-h-[200px] h-full hover:shadow-[0_12px_24px_-8px_rgba(0,0,0,0.06)] hover:border-slate-350/80 transition-all duration-300 ease-out">
+    <div className="p-4 sm:p-4.5 flex-1 flex flex-col min-h-0 relative">
       <div className="flex justify-between items-start gap-2 mb-1">
-        <span className="text-[11px] font-bold uppercase tracking-wider text-[#393a3d]">
+        <span className="text-[9.5px] font-extrabold uppercase tracking-widest text-slate-400">
           {title}
         </span>
         {onHide ? (
           <button 
             onClick={onHide} 
-            className="text-[12px] font-bold text-[#0078d4] opacity-0 group-hover:opacity-100 transition-opacity absolute right-4 sm:right-5 top-4 sm:top-5 bg-white z-10 hover:text-[#005a9e]"
+            className="text-[11.5px] font-bold text-blue-600 opacity-0 group-hover:opacity-100 transition-opacity absolute right-4 sm:right-5 top-4 sm:top-5 bg-white z-10 hover:text-blue-800"
           >
             Hide
           </button>
         ) : (
-          <ChevronDown size={14} className="text-[#8d9096] shrink-0 mt-0.5" />
+          <ChevronDown size={13} className="text-slate-400 shrink-0 mt-0.5" />
         )}
       </div>
-      <p className="text-[14px] sm:text-[15px] font-bold text-[#393a3d] leading-snug">{subtitle}</p>
-      <div className="flex-1 min-h-0 mt-3 overflow-hidden">{children}</div>
+      {subtitle && <p className="text-[13.5px] font-extrabold text-slate-800 leading-snug tracking-tight">{subtitle}</p>}
+      <div className="flex-1 min-h-0 mt-1.5 overflow-hidden">{children}</div>
     </div>
     {footerButtonLabel && (
       <div className="px-3 pb-3 pt-0 shrink-0">
         <button
           type="button"
           onClick={onFooterButton}
-          className="w-full h-9 rounded-md border border-[#d4d7dc] bg-white text-[12px] font-bold text-[#393a3d] hover:bg-[#f4f5f8] transition-colors"
+          className="w-full h-8 rounded-xl border border-slate-100 bg-slate-50/50 text-[11px] font-bold text-slate-650 hover:bg-slate-100 hover:text-slate-805 hover:border-slate-200 transition-all"
         >
           {footerButtonLabel}
         </button>
@@ -590,7 +590,7 @@ const HeaderIconBtn = ({ children, label, onClick }) => (
     title={label}
     aria-label={label}
     onClick={onClick}
-    className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-lg text-[#393a3d] hover:bg-black/[0.06] active:bg-black/[0.08] transition-colors shrink-0"
+    className="w-9 h-9 flex items-center justify-center rounded-xl text-slate-500 hover:text-slate-800 hover:bg-slate-100/80 active:scale-95 transition-all shrink-0"
   >
     {children}
   </button>
@@ -789,12 +789,9 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction }
   const topActions = activeTab === 'accounting' ? favActions.map(id => ALL_ACTIONS_MAP[id]).filter(Boolean) : (TAB_EXTRA_ACTIONS[activeTab] || []);
 
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-2 sm:p-4 font-['Plus_Jakarta_Sans'] text-[#393a3d]">
-      <div className="absolute inset-0 bg-[#393a3d]/45 backdrop-blur-[2px]" />
-
-      <div className="relative w-full max-w-[min(2100px,calc(100vw-1rem))] max-h-[min(100dvh,calc(100dvh-1.5rem))] min-h-0 bg-[#f4f5f8] rounded-[5px] shadow-2xl border border-[#d4d7dc] flex flex-col overflow-hidden">
-        {/* QBO-style top header */}
-        <header className="shrink-0 bg-[#f4f5f8] border-b border-[#d4d7dc] px-3 sm:px-4 lg:px-6 py-2.5">
+    <div className="fixed inset-0 z-[9999] flex flex-col font-['Plus_Jakarta_Sans'] text-slate-700 bg-[#f8fafc] overflow-hidden animate-in fade-in duration-300">
+      {/* QBO-style top header */}
+        <header className="shrink-0 bg-white/95 border-b border-slate-200/60 px-4 sm:px-5 lg:px-7 py-3">
           <div className="flex items-center gap-2 lg:gap-4 min-h-[44px]">
             {/* Left: brand + company */}
             <div className="flex items-center gap-2 sm:gap-3 min-w-0 shrink-0 max-w-[40%] sm:max-w-none">
@@ -808,16 +805,16 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction }
                 }}
               />
                 <div className="leading-[1.05] hidden sm:block">
-                  <div className="text-[9px] font-bold text-[#393a3d] tracking-[0.12em] uppercase">
+                  <div className="text-[9px] font-bold text-slate-800 tracking-[0.12em] uppercase">
                     ONIMTA
                   </div>
-                  <div className="text-[11px] font-bold text-[#393a3d] tracking-tight">Accounts</div>
+                  <div className="text-[11px] font-extrabold text-slate-950 tracking-tight">Accounts</div>
                 </div>
               </div>
-              <div className="h-6 w-px bg-[#babec5] shrink-0 hidden sm:block" aria-hidden />
+              <div className="h-6 w-px bg-slate-200 shrink-0 hidden sm:block" aria-hidden />
             
               <span
-                className="text-[11px] sm:text-[13px] font-bold text-[#393a3d] uppercase tracking-wide truncate min-w-0"
+                className="text-[11.5px] sm:text-[13px] font-extrabold text-slate-800 uppercase tracking-wider truncate min-w-0"
                 title={companyName}
               >
                 {companyNameUpper}
@@ -829,10 +826,11 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction }
               <button
                 type="button"
                 onClick={() => runAction('header_search')}
-                className="w-full max-w-lg lg:max-w-2xl xl:max-w-3xl flex items-center gap-2.5 h-9 sm:h-10 pl-3 sm:pl-4 pr-3 rounded-full bg-white border border-[#d4d7dc] shadow-[0_1px_2px_rgba(0,0,0,0.04)] hover:border-[#8d9096] text-left transition-colors"
+                className="w-full max-w-[620px] flex items-center gap-2.5 h-9 px-4 rounded-full bg-slate-100/60 border border-slate-200/50 hover:bg-slate-100 hover:border-slate-300 text-left transition-all duration-200 focus:outline-none"
               >
-                <Search size={17} className="text-[#6b6c72] shrink-0" strokeWidth={2} />
-                <span className="text-[12px] sm:text-[13px] text-[#8d9096] truncate">
+                <Search size={15} className="text-slate-500 shrink-0" strokeWidth={2.5} />
+                <span className="text-[12.5px] text-slate-400 truncate">
+                  Search transactions, settings, and help...
                 </span>
               </button>
             </div>
@@ -840,35 +838,35 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction }
             {/* Right: utilities + close */}
             <div className="flex items-center gap-0.5 sm:gap-1 shrink-0">
               <HeaderIconBtn label="Tasks" onClick={() => runAction('header_tasks')}>
-                <ClipboardList size={19} strokeWidth={1.9} className="text-[#393a3d]" />
+                <ClipboardList size={18} strokeWidth={2} className="text-slate-650" />
               </HeaderIconBtn>
               <HeaderIconBtn label="Quick menu" onClick={() => runAction('header_apps')}>
-                <LayoutGrid size={19} strokeWidth={1.9} className="text-[#393a3d]" />
+                <LayoutGrid size={18} strokeWidth={2} className="text-slate-650" />
               </HeaderIconBtn>
               <HeaderIconBtn label="Notifications" onClick={() => runAction('header_notifications')}>
-                <Bell size={19} strokeWidth={1.9} className="text-[#393a3d]" />
+                <Bell size={18} strokeWidth={2} className="text-slate-650" />
               </HeaderIconBtn>
               <HeaderIconBtn label="Settings" onClick={() => runAction('header_settings')}>
-                <Settings size={19} strokeWidth={1.9} className="text-[#393a3d]" />
+                <Settings size={18} strokeWidth={2} className="text-slate-650" />
               </HeaderIconBtn>
               <HeaderIconBtn label="Help" onClick={() => runAction('header_help')}>
-                <HelpCircle size={19} strokeWidth={1.9} className="text-[#393a3d]" />
+                <HelpCircle size={18} strokeWidth={2} className="text-slate-650" />
               </HeaderIconBtn>
               <HeaderIconBtn label="Your profile" onClick={() => runAction('header_profile')}>
-                <span className="w-8 h-8 rounded-full bg-[#0078d4] text-white text-[13px] font-bold flex items-center justify-center">
+                <span className="w-7 h-7 rounded-full bg-gradient-to-tr from-blue-600 to-sky-500 text-white text-[12px] font-bold flex items-center justify-center shadow-sm ring-2 ring-blue-100">
                   {userInitial}
                 </span>
               </HeaderIconBtn>
               <HeaderIconBtn label="Assistant" onClick={() => runAction('header_ai')}>
-                <Sparkles size={19} strokeWidth={1.9} className="text-[#0078d4]" />
+                <Sparkles size={18} strokeWidth={2} className="text-blue-600" />
               </HeaderIconBtn>
               <button
                 type="button"
                 onClick={onClose}
-                className="ml-0.5 w-8 h-8 sm:w-8 sm:h-8 flex items-center justify-center bg-[#ff3b30] hover:bg-[#e03127] text-white rounded-lg shadow-md transition-all active:scale-95 border-none shrink-0"
+                className="ml-2 w-9 h-9 flex items-center justify-center bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-xl transition-all active:scale-95 border-none shrink-0"
                 title="Close"
               >
-                <X size={18} strokeWidth={3} />
+                <X size={16} strokeWidth={2.5} />
               </button>
             </div>
           </div>
@@ -876,13 +874,13 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction }
 
         {/* Body (no duplicate slim chrome) */}
         <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden">
-          <div className="w-full max-w-[min(2050px,100%)] mx-auto px-3 sm:px-6 lg:px-10 pb-8">
+          <div className="w-full max-w-[min(2050px,100%)] mx-auto px-2.5 sm:px-5 lg:px-7 pb-4">
             {/* Greeting + utilities */}
-            <div className="relative pt-5 sm:pt-8 pb-4">
-              <div className="absolute right-0 top-5 sm:top-8 flex items-center gap-3 sm:gap-4 text-[12px] sm:text-[13px] font-bold text-[#393a3d]">
+            <div className="relative pt-3 sm:pt-4.5 pb-2.5">
+              <div className="absolute right-0 top-3 sm:top-4.5 flex items-center gap-3 sm:gap-4 text-[12px] sm:text-[13px] font-bold text-slate-605">
                 {isCustomising ? (
                   <>
-                    <button className="text-[#0078d4] hover:underline transition-colors hidden sm:block">
+                    <button className="text-blue-650 hover:underline transition-colors hidden sm:block">
                       Learn how to customise your layout
                     </button>
                     <button 
@@ -902,27 +900,27 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction }
                   <>
                     <button
                       type="button"
-                      className="flex items-center gap-1.5 hover:text-[#0078d4] transition-colors"
+                      className="flex items-center gap-1.5 hover:text-blue-600 transition-colors"
                       onClick={() => setVideoOpen('get_started')}
                     >
-                      <PlayCircle size={15} className="text-[#6b6c72]" />
+                      <PlayCircle size={15} className="text-slate-400" />
                       <span className="hidden sm:inline">Video tutorials</span>
                     </button>
                     <button
                       type="button"
-                      className="flex items-center gap-1.5 hover:text-[#0078d4] transition-colors"
+                      className="flex items-center gap-1.5 hover:text-blue-600 transition-colors"
                       onClick={() => setIsCustomising(true)}
                     >
-                      <SlidersHorizontal size={15} className="text-[#6b6c72]" />
+                      <SlidersHorizontal size={15} className="text-slate-400" />
                       <span className="hidden sm:inline">Customise</span>
                     </button>
                     <div className="relative group flex items-center">
                       <button 
                         type="button" 
                         onClick={() => setIsPrivacyMode(!isPrivacyMode)}
-                        className={`flex items-center gap-1.5 transition-colors ${isPrivacyMode ? 'text-[#393a3d]' : 'hover:text-[#0078d4]'}`}
+                        className={`flex items-center gap-1.5 transition-colors ${isPrivacyMode ? 'text-slate-800' : 'hover:text-blue-600'}`}
                       >
-                        {isPrivacyMode ? <EyeOff size={15} className="text-[#6b6c72]" /> : <Eye size={15} className="text-[#6b6c72]" />}
+                        {isPrivacyMode ? <EyeOff size={15} className="text-slate-400" /> : <Eye size={15} className="text-slate-400" />}
                         <span className="hidden sm:inline">Privacy</span>
                       </button>
                       
@@ -938,18 +936,18 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction }
                   </>
                 )}
               </div>
-              <h1 className="text-center text-[28px] sm:text-[34px] lg:text-[38px] font-light text-[#393a3d] tracking-tight px-8 sm:px-0">
-                {greeting},{' '}
-                <span className="font-bold">{userName}!</span>
+              <h1 className="text-center text-[22px] sm:text-[26px] lg:text-[30px] font-extralight text-slate-800 tracking-tight px-8 sm:px-0">
+                {greeting}, <span className="font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-slate-900 via-slate-850 to-slate-900">{userName}!</span>
               </h1>
+              <p className="text-center text-slate-500 text-[12px] mt-0.5 font-medium">Here's what's happening with your business today.</p>
             </div>
 
             {/* Dark category pills + scroll */}
-            <EditWrapper isEditing={isCustomising} className="mb-5 py-2 px-1">
+            <EditWrapper isEditing={isCustomising} className="mb-3.5 py-1 px-1">
               <div className="flex items-center justify-center gap-1 sm:gap-2 w-full">
                 <div
                   ref={tabScrollRef}
-                  className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1 max-w-full min-w-0"
+                  className="flex items-center gap-2.5 overflow-x-auto no-scrollbar py-1 max-w-full min-w-0"
                 >
                   {TABS.map((tab) => {
                     const isActive = activeTab === tab.id;
@@ -959,19 +957,22 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction }
                         key={tab.id}
                         type="button"
                         onClick={() => setActiveTab(tab.id)}
-                        className={`shrink-0 flex items-center gap-2 pl-1 pr-3 sm:pr-4 h-9 sm:h-10 rounded-[20px] text-left transition-all border ${
+                        className={`shrink-0 flex items-center gap-3 pl-1.5 pr-5 h-11 rounded-full text-left transition-all border duration-200 ${
                           isActive
-                            ? 'bg-[#eceef1] border-[#d4d7dc] shadow-sm'
-                            : 'bg-white border-[#d4d7dc] hover:bg-[#f4f5f8]'
+                            ? 'bg-slate-900 border-slate-900 text-white shadow-md shadow-slate-900/10'
+                            : 'bg-white border-slate-200/80 hover:border-slate-350 hover:bg-slate-50 text-slate-700'
                         }`}
                       >
                         <span
-                          className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 bg-[#0e1826]"
-                          style={{ color: tab.iconBg }}
+                          className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-colors"
+                          style={{
+                            backgroundColor: isActive ? 'rgba(255,255,255,0.15)' : `${tab.iconBg}18`,
+                            color: isActive ? '#ffffff' : tab.iconBg,
+                          }}
                         >
-                          <Icon size={14} strokeWidth={2.5} />
+                          <Icon size={15} strokeWidth={2.5} />
                         </span>
-                        <span className={`text-[11px] sm:text-[12px] font-semibold whitespace-nowrap pr-1 ${isActive ? 'text-[#111827]' : 'text-[#393a3d]'}`}>
+                        <span className={`text-[13.5px] font-semibold whitespace-nowrap ${isActive ? 'text-white' : 'text-slate-700'}`}>
                           {tab.label}
                         </span>
                       </button>
@@ -983,16 +984,16 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction }
 
             {/* Create actions */}
             {selectedWidgets.create_actions && (
-              <EditWrapper isEditing={isCustomising} className="mb-5 py-2 px-1">
-                <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center justify-center gap-2 sm:gap-2">
-                  <span className="text-[13px] font-bold text-[#393a3d] sm:mr-2 shrink-0">Create actions</span>
+              <EditWrapper isEditing={isCustomising} className="mb-4 py-2 px-1">
+                <div className="flex flex-col items-center justify-center gap-3 bg-slate-50 border border-slate-200/50 p-4 rounded-2xl max-w-4xl mx-auto shadow-sm">
+                  <span className="text-[11px] font-bold text-slate-500 uppercase tracking-widest text-center">Create Actions</span>
                   <div className="flex flex-wrap items-center justify-center gap-2">
                     {DISPLAY_CREATE_ACTIONS.map((a) => (
                       <button
                         key={a.id}
                         type="button"
                         onClick={() => runAction(a.id)}
-                        className="px-3 sm:px-3.5 h-8 rounded-full text-[12px] sm:text-[13px] font-semibold text-[#393a3d] bg-white border border-[#d4d7dc] hover:border-[#8d9096] hover:shadow-sm transition-all whitespace-nowrap"
+                        className="px-4 py-1 h-9 rounded-full text-[13px] font-semibold text-slate-700 bg-white border border-slate-200/80 hover:border-slate-450 hover:text-slate-950 hover:shadow-[0_2px_8px_rgba(0,0,0,0.04)] active:scale-97 transition-all whitespace-nowrap"
                       >
                         {a.label}
                       </button>
@@ -1002,7 +1003,7 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction }
                         key={a.id}
                         type="button"
                         onClick={() => runAction(a.id)}
-                        className="px-3 sm:px-3.5 h-8 rounded-full text-[12px] sm:text-[13px] font-semibold text-[#393a3d] bg-white border border-[#d4d7dc] hover:border-[#8d9096] hover:shadow-sm transition-all whitespace-nowrap"
+                        className="px-4 py-1 h-9 rounded-full text-[13px] font-semibold text-slate-700 bg-white border border-slate-200/80 hover:border-slate-450 hover:text-slate-950 hover:shadow-[0_2px_8px_rgba(0,0,0,0.04)] active:scale-97 transition-all whitespace-nowrap"
                       >
                         {a.label}
                       </button>
@@ -1011,7 +1012,7 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction }
                       <button
                         type="button"
                         onClick={() => setIsShowAllActionsOpen(true)}
-                        className="text-[13px] font-bold text-[#0078d4] hover:underline ml-1"
+                        className="text-[13px] font-bold text-blue-650 hover:text-blue-800 transition-colors ml-2 mr-3"
                       >
                         Show all
                       </button>
@@ -1021,8 +1022,8 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction }
               </EditWrapper>
             )}
 
-            <div className="border-b border-[#d4d7dc] pb-2 mb-4">
-              <h2 className="text-[11px] font-bold uppercase tracking-widest text-[#6b6c72]">
+            <div className="border-b border-slate-200 pb-1.5 mb-3 flex items-center justify-between">
+              <h2 className="text-[11px] font-extrabold uppercase tracking-widest text-slate-400">
                 Business at a glance
               </h2>
             </div>
@@ -1082,27 +1083,31 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction }
                     onFooterButton={bringInTransactions}
                     onHide={() => setWidgetToHide('profit_and_loss')}
                   >
-                  <div className="flex flex-col justify-center h-full gap-5 py-2 mt-2">
+                  <div className="flex flex-col justify-center h-full gap-4.5 py-1 mt-1">
                     {[
-                      { label: 'Income', val: totalIncome, color: '#2ca01c' },
-                      { label: 'Expenses', val: totalSpend, color: '#27a8b0' },
+                      { label: 'Income', val: totalIncome, gradient: 'from-green-500 to-emerald-600' },
+                      { label: 'Expenses', val: totalSpend, gradient: 'from-sky-500 to-cyan-550' },
                     ].map((bar, idx) => {
                       const max = Math.max(totalIncome, totalSpend, 1);
                       const hasData = bar.val > 0;
                       const wPct = hasData ? Math.max(10, Math.round((bar.val / max) * 100)) : 0;
                       return (
-                        <div key={idx} className="flex flex-col gap-0.5">
-                          <div className="text-[14px] font-bold text-[#393a3d]">LRs{formatShortK(bar.val)}</div>
-                          <div className="flex items-center gap-2">
-                            <div className="text-[12px] text-[#6b6c72] w-[60px] shrink-0">{bar.label}</div>
-                            {hasData ? (
-                              <div 
-                                className="h-5 transition-all duration-700 rounded-sm"
-                                style={{ width: `${wPct}%`, backgroundColor: bar.color }}
-                              />
-                            ) : (
-                              <div className="h-5 w-[6px] bg-[#d4d7dc] rounded-sm" />
-                            )}
+                        <div key={idx} className="flex flex-col gap-1">
+                          <div className="text-[15px] font-extrabold text-slate-800">
+                            {formatLkr(bar.val).replace('LKR', 'LKR ')}
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <div className="text-[12px] font-semibold text-slate-500 w-[60px] shrink-0">{bar.label}</div>
+                            <div className="flex-1 bg-slate-100 h-3 rounded-full overflow-hidden">
+                              {hasData ? (
+                                <div 
+                                  className={`h-full transition-all duration-1000 ease-out rounded-full bg-gradient-to-r ${bar.gradient}`}
+                                  style={{ width: `${wPct}%` }}
+                                />
+                              ) : (
+                                <div className="h-full w-2 bg-slate-200 rounded-full" />
+                              )}
+                            </div>
                           </div>
                         </div>
                       );
@@ -1168,7 +1173,7 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction }
                         >
                           <div className="absolute inset-[18px] rounded-full bg-white" />
                         </div>
-                        <div className="flex-1 space-y-2 w-full max-w-[160px] text-[12px]">
+                        <div className="flex-1 space-y-2.5 w-full max-w-[160px] text-[12px]">
                           {categories.slice(0, 5).map((cat, i) => {
                             const name = cat.categoryName || cat.CategoryName || cat.name || cat.Name || '';
                             return (
@@ -1179,7 +1184,7 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction }
                                     backgroundColor: ['#3478c1', '#39a29e', '#68358e', '#b4190c', '#e86016'][i % 5],
                                   }}
                                 />
-                                <span className="truncate flex-1 text-[#393a3d] text-[12px]">
+                                <span className="truncate flex-1 text-slate-650 font-bold text-[12px]">
                                   {name || 'Category name'}
                                 </span>
                               </div>
@@ -1264,26 +1269,26 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction }
                     onFooterButton={() => runAction('bank_rec')}
                     onHide={() => setWidgetToHide('bank_accounts')}
                   >
-                  <div className="space-y-2.5">
+                  <div className="space-y-3">
                     {PLACEHOLDER_BANKS.map((b, i) => (
                       <div
                         key={i}
-                        className="flex items-center justify-between gap-2 border-b border-[#eceef1] pb-2 last:border-0"
+                        className="flex items-center justify-between gap-3 border-b border-slate-100 pb-3 last:border-0 last:pb-0"
                       >
-                        <div className="flex items-center gap-2 min-w-0">
-                          <div className="w-8 h-8 rounded-md bg-[#eceef1] flex items-center justify-center shrink-0">
-                            <Landmark size={16} className="text-[#6b6c72]" />
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className="w-9 h-9 rounded-xl bg-slate-50 border border-slate-150 flex items-center justify-center shrink-0">
+                            <Landmark size={15} className="text-slate-500" />
                           </div>
                           <div className="min-w-0">
-                            <p className="text-[11px] text-[#393a3d] truncate">{b.name}</p>
+                            <p className="text-[12px] font-bold text-slate-700 truncate">{b.name}</p>
                           </div>
                         </div>
                         <button
                           type="button"
-                          className="w-6 h-6 flex items-center justify-center text-[#0078d4] shrink-0"
+                          className="w-7 h-7 rounded-lg hover:bg-blue-50 text-blue-655 flex items-center justify-center shrink-0 transition-colors"
                           aria-label="Add"
                         >
-                          <Plus size={18} strokeWidth={2.5} />
+                          <Plus size={16} strokeWidth={2.5} />
                         </button>
                       </div>
                     ))}
@@ -1339,17 +1344,17 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction }
       {/* Bars */}
       <div className="absolute top-0 bottom-[22px] left-0 right-0 flex justify-between px-1">
         {monthlyData.map((d) => (
-          <div key={d.m} className="flex gap-[1px] items-end flex-1 justify-center relative group cursor-pointer hover:bg-black/5 rounded-t-sm transition-colors" title={`${d.m}: LRs${formatShortK(monthlyExpenses[MONTHS.indexOf(d.m)])}`}>
-            <div className={`w-[14px] rounded-t-sm transition-all ${d.hasData ? 'bg-[#8cc63f]' : 'bg-[#d4d7dc]'}`} style={{ height: `${d.h1}%` }} />
-            <div className={`w-[14px] rounded-t-sm transition-all ${d.hasData ? 'bg-[#3bd1d3]' : 'bg-[#e5e7eb]'}`} style={{ height: `${d.h2}%` }} />
+          <div key={d.m} className="flex gap-[2px] items-end flex-1 justify-center relative group cursor-pointer hover:bg-slate-100 rounded-t-lg transition-all duration-200" title={`${d.m}: LKR ${formatShortK(monthlyExpenses[MONTHS.indexOf(d.m)])}`}>
+            <div className={`w-[11px] rounded-full transition-all duration-500 ${d.hasData ? 'bg-gradient-to-t from-emerald-600 to-green-450' : 'bg-slate-200'}`} style={{ height: `${d.h1}%` }} />
+            <div className={`w-[11px] rounded-full transition-all duration-500 ${d.hasData ? 'bg-gradient-to-t from-blue-655 to-cyan-455' : 'bg-slate-300'}`} style={{ height: `${d.h2}%` }} />
           </div>
         ))}
       </div>
       
       {/* Months */}
-      <div className="absolute bottom-0 left-0 right-0 flex justify-between px-1 border-t border-[#eceef1] pt-1.5">
+      <div className="absolute bottom-0 left-0 right-0 flex justify-between px-1 border-t border-slate-200/80 pt-2">
         {['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'].map((m) => (
-          <div key={m} className="flex-1 text-center text-[10px] text-[#393a3d]">
+          <div key={m} className="flex-1 text-center text-[10px] font-bold text-slate-500">
             {m}
           </div>
         ))}
@@ -1461,34 +1466,34 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction }
         title="Invoices"
         onHide={() => setWidgetToHide('invoices')}
       >
-        <div className="flex flex-col gap-4 py-2 mt-2">
+        <div className="flex flex-col gap-8 py-2 mt-4">
           <div>
-            <div className="flex justify-between text-[11px] font-bold text-[#393a3d] mb-1">
-              <span>LRs0 Unpaid <span className="font-normal text-[#6b6c72] ml-1">Last 365 days</span></span>
+            <div className="flex justify-between text-[11.5px] font-bold text-slate-500 mb-1">
+              <span>UNPAID <span className="font-normal text-slate-400 ml-1">Last 365 days</span></span>
             </div>
-            <div className="flex gap-1 h-[20px] mt-7">
-              <div className="w-1/2 bg-[#e33e07] rounded-l-sm relative">
-                <span className="absolute -top-6 left-0 text-[14px] font-bold text-[#393a3d]">LRs0</span>
-                <span className="absolute top-6 left-0 text-[11px] text-[#6b6c72]">Overdue</span>
+            <div className="flex gap-1 h-[14px] mt-8">
+              <div className="w-1/2 bg-gradient-to-r from-red-500 to-rose-500 rounded-l-full relative">
+                <span className="absolute bottom-full left-0 mb-1 text-[13.5px] font-extrabold text-slate-800">LKR 0.00</span>
+                <span className="absolute top-full left-0 mt-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Overdue</span>
               </div>
-              <div className="w-1/2 bg-[#d4d7dc] rounded-r-sm relative">
-                <span className="absolute -top-6 right-0 text-[14px] font-bold text-[#393a3d]">LRs0</span>
-                <span className="absolute top-6 right-0 text-[11px] text-[#6b6c72]">Not due yet</span>
+              <div className="w-1/2 bg-slate-200 rounded-r-full relative">
+                <span className="absolute bottom-full right-0 mb-1 text-[13.5px] font-extrabold text-slate-800">LKR 0.00</span>
+                <span className="absolute top-full right-0 mt-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider text-right whitespace-nowrap">Not due yet</span>
               </div>
             </div>
           </div>
-          <div className="mt-8">
-            <div className="flex justify-between text-[11px] font-bold text-[#393a3d] mb-1">
-              <span>LRs0 Paid <span className="font-normal text-[#6b6c72] ml-1">Last 30 days</span></span>
+          <div className="mt-6">
+            <div className="flex justify-between text-[11.5px] font-bold text-slate-500 mb-1">
+              <span>PAID <span className="font-normal text-slate-400 ml-1">Last 30 days</span></span>
             </div>
-            <div className="flex gap-1 h-[20px] mt-7">
-              <div className="w-1/2 bg-[#2ca01c] rounded-l-sm opacity-80 relative">
-                <span className="absolute -top-6 left-0 text-[14px] font-bold text-[#393a3d]">LRs0</span>
-                <span className="absolute top-6 left-0 text-[11px] text-[#6b6c72]">Not deposited</span>
+            <div className="flex gap-1 h-[14px] mt-8">
+              <div className="w-1/2 bg-gradient-to-r from-green-500 to-emerald-500 rounded-l-full relative">
+                <span className="absolute bottom-full left-0 mb-1 text-[13.5px] font-extrabold text-slate-800">LKR 0.00</span>
+                <span className="absolute top-full left-0 mt-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Not deposited</span>
               </div>
-              <div className="w-1/2 bg-[#2ca01c] rounded-r-sm relative">
-                <span className="absolute -top-6 right-0 text-[14px] font-bold text-[#393a3d]">LRs0</span>
-                <span className="absolute top-6 right-0 text-[11px] text-[#6b6c72]">Deposited</span>
+              <div className="w-1/2 bg-emerald-500 rounded-r-full relative">
+                <span className="absolute bottom-full right-0 mb-1 text-[13.5px] font-extrabold text-slate-800">LKR 0.00</span>
+                <span className="absolute top-full right-0 mt-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider text-right whitespace-nowrap">Deposited</span>
               </div>
             </div>
           </div>
@@ -1505,25 +1510,25 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction }
       onRemove={() => setSelectedWidgets(prev => ({...prev, customers_funnel: false}))}
     >
       <WidgetShell title="Customers Funnel">
-        <div className="absolute top-4 right-4 text-[11px] text-[#6b6c72]">As of today</div>
-        <div className="flex items-center justify-between gap-1 overflow-x-auto py-2 h-full mt-4 pb-4">
+        <div className="absolute top-5 right-5 text-[11px] font-semibold text-slate-400">As of today</div>
+        <div className="flex items-center justify-between gap-1 overflow-x-auto py-2 h-full mt-4 pb-4 no-scrollbar">
           {[
-            { label: 'Open opportunities', val: '0', color: '#6ee7b7' },
-            { label: 'Open estimates', val: '0', color: '#34d399' },
-            { label: 'Open contracts', val: '0', color: '#10b981' },
-            { label: 'In progress projects', val: '0', color: '#059669' },
-            { label: 'Unpaid invoices', val: '0', color: '#047857' },
-            { label: 'Reviews', val: '0', color: '#064e3b' },
+            { label: 'Open opportunities', val: '0', color: '#34d399' },
+            { label: 'Open estimates', val: '0', color: '#10b981' },
+            { label: 'Open contracts', val: '0', color: '#059669' },
+            { label: 'In progress projects', val: '0', color: '#047857' },
+            { label: 'Unpaid invoices', val: '0', color: '#064e3b' },
+            { label: 'Reviews', val: '0', color: '#022c22' },
           ].map((f, i, arr) => (
             <React.Fragment key={i}>
-              <div className="border border-[#d4d7dc] rounded-md flex flex-col min-w-[110px] flex-1 shrink-0 h-[100px] overflow-hidden relative shadow-sm">
-                <div className="h-2 w-full shrink-0" style={{ backgroundColor: f.color }} />
-                <div className="p-3 flex-1 flex flex-col justify-between">
-                  <span className="text-[12px] text-[#393a3d] leading-tight">{f.label}</span>
-                  <span className="text-[20px] font-bold text-[#393a3d]">{f.val}</span>
+              <div className="border border-slate-100 rounded-2xl flex flex-col min-w-[115px] flex-1 shrink-0 h-[105px] overflow-hidden bg-slate-50/40 hover:bg-white hover:border-slate-200 hover:shadow-md transition-all duration-305 relative shadow-[0_1px_3px_rgba(0,0,0,0.01)]">
+                <div className="h-1.5 w-full shrink-0" style={{ backgroundColor: f.color }} />
+                <div className="p-4 flex-1 flex flex-col justify-between">
+                  <span className="text-[12px] font-bold text-slate-500 leading-tight">{f.label}</span>
+                  <span className="text-[22px] font-extrabold text-slate-800">{f.val}</span>
                 </div>
               </div>
-              {i < arr.length - 1 && <ChevronRight size={14} className="text-[#8d9096] shrink-0" />}
+              {i < arr.length - 1 && <ChevronRight size={14} className="text-slate-400 shrink-0" />}
             </React.Fragment>
           ))}
         </div>
@@ -1734,30 +1739,30 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction }
       onRemove={() => setSelectedWidgets(prev => ({...prev, video_tutorials: false}))}
     >
       <WidgetShell title="Video tutorials" subtitle="Watch and learn how to use your dashboard">
-        <div className="grid grid-cols-2 gap-4 mt-4 h-full pb-4">
-          <div className="flex flex-col gap-2">
+        <div className="grid grid-cols-2 gap-5 mt-4 h-full pb-4">
+          <div className="flex flex-col gap-2.5">
             <div 
-              className="relative w-full rounded-lg overflow-hidden bg-[#e0e3e8] aspect-video group cursor-pointer flex items-center justify-center border border-[#eceef1] shadow-sm hover:shadow-md transition-shadow"
+              className="relative w-full rounded-2xl overflow-hidden bg-slate-100 aspect-video group cursor-pointer flex items-center justify-center border border-slate-150 shadow-sm hover:shadow-lg transition-all duration-300"
               onClick={() => setVideoOpen('get_started')}
             >
-              <img src="https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=400&q=80" alt="Thumbnail 1" className="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
-              <div className="w-10 h-10 rounded-full bg-white/90 shadow-lg flex items-center justify-center z-10 text-[#2ca01c] group-hover:scale-110 transition-transform">
+              <img src="https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=400&q=80" alt="Thumbnail 1" className="absolute inset-0 w-full h-full object-cover opacity-75 group-hover:opacity-95 group-hover:scale-103 transition-all duration-350" />
+              <div className="w-11 h-11 rounded-full bg-white shadow-xl flex items-center justify-center z-10 text-emerald-600 group-hover:scale-110 transition-transform duration-200">
                 <Play size={18} fill="currentColor" className="ml-0.5" />
               </div>
             </div>
-            <div className="text-[12px] font-bold text-[#393a3d] leading-snug">Getting started with ONIMTA Accounts</div>
+            <div className="text-[12.5px] font-bold text-slate-700 leading-snug tracking-tight px-1">Getting started with ONIMTA Accounts</div>
           </div>
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2.5">
             <div 
-              className="relative w-full rounded-lg overflow-hidden bg-[#e0e3e8] aspect-video group cursor-pointer flex items-center justify-center border border-[#eceef1] shadow-sm hover:shadow-md transition-shadow"
+              className="relative w-full rounded-2xl overflow-hidden bg-slate-100 aspect-video group cursor-pointer flex items-center justify-center border border-slate-150 shadow-sm hover:shadow-lg transition-all duration-300"
               onClick={() => setVideoOpen('track_expenses')}
             >
-              <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&q=80" alt="Thumbnail 2" className="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
-              <div className="w-10 h-10 rounded-full bg-white/90 shadow-lg flex items-center justify-center z-10 text-[#2ca01c] group-hover:scale-110 transition-transform">
+              <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&q=80" alt="Thumbnail 2" className="absolute inset-0 w-full h-full object-cover opacity-75 group-hover:opacity-95 group-hover:scale-103 transition-all duration-350" />
+              <div className="w-11 h-11 rounded-full bg-white shadow-xl flex items-center justify-center z-10 text-emerald-600 group-hover:scale-110 transition-transform duration-200">
                 <Play size={18} fill="currentColor" className="ml-0.5" />
               </div>
             </div>
-            <div className="text-[12px] font-bold text-[#393a3d] leading-snug">How to track your expenses efficiently</div>
+            <div className="text-[12.5px] font-bold text-slate-700 leading-snug tracking-tight px-1">How to track your expenses efficiently</div>
           </div>
         </div>
       </WidgetShell>
@@ -1768,7 +1773,6 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction }
             )}
           </div>
         </div>
-      </div>
       <AddWidgetsPanel 
         isOpen={isAddWidgetsOpen} 
         onClose={() => setIsAddWidgetsOpen(false)} 

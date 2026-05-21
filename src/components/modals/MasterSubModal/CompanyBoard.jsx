@@ -3,7 +3,7 @@ import SimpleModal from '../../SimpleModal';
 import { Search, RotateCcw, Plus, Edit, Trash2, X, Building2, Loader2, AlertTriangle, Globe, Briefcase, Calendar } from 'lucide-react';
 import CalendarModal from '../../CalendarModal';
 import { authService } from '../../../services/auth.service';
-import toast from 'react-hot-toast';
+import { showSuccessToast, showErrorToast } from '../../../utils/toastUtils';
 
 const CompanyBoard = ({ isOpen, onClose }) => {
     const user = authService.getCurrentUser();
@@ -126,7 +126,7 @@ const CompanyBoard = ({ isOpen, onClose }) => {
             setLookupResults(normalizedData);
         } catch (error) {
             console.error('Error fetching companies:', error);
-            toast.error('Failed to load companies for search.');
+            showErrorToast('Failed to load companies for search.');
         } finally {
             setSearching(false);
         }
@@ -140,7 +140,7 @@ const CompanyBoard = ({ isOpen, onClose }) => {
             setCountryResults(data);
         } catch (error) {
             console.error('Error fetching countries:', error);
-            toast.error('Failed to load countries.');
+            showErrorToast('Failed to load countries.');
         } finally {
             setSearchingCountry(false);
         }
@@ -154,7 +154,7 @@ const CompanyBoard = ({ isOpen, onClose }) => {
             setIndustryResults(data);
         } catch (error) {
             console.error('Error fetching industries:', error);
-            toast.error('Failed to load industries.');
+            showErrorToast('Failed to load industries.');
         } finally {
             setSearchingIndustry(false);
         }
@@ -184,10 +184,10 @@ const CompanyBoard = ({ isOpen, onClose }) => {
                 User_Name: user?.empName || user?.EmpName || user?.username || 'Admin'
             });
             setShowLookup(false);
-            toast.success('Company loaded successfully!');
+            showSuccessToast('Company loaded successfully!');
         } catch (error) {
             console.error('Error loading company details:', error);
-            toast.error('Failed to load company details.');
+            showErrorToast('Failed to load company details.');
         } finally {
             setLoading(false);
         }
@@ -214,7 +214,7 @@ const CompanyBoard = ({ isOpen, onClose }) => {
 
     const handleAddNew = async () => {
         if (!formData.Comp_Name) {
-            toast.error('Company Name is required.');
+            showErrorToast('Company Name is required.');
             return;
         }
 
@@ -222,11 +222,11 @@ const CompanyBoard = ({ isOpen, onClose }) => {
 
         try {
             await authService.createCompany(formData);
-            toast.success('Company created successfully!');
+            showSuccessToast('Company created successfully!');
             handleClear(); // Reset after successful creation
         } catch (error) {
             console.error('Error creating company:', error);
-            toast.error(typeof error === 'string' ? error : error.message || 'Failed to create company.');
+            showErrorToast(typeof error === 'string' ? error : error.message || 'Failed to create company.');
         } finally {
             setLoading(false);
         }
@@ -239,10 +239,10 @@ const CompanyBoard = ({ isOpen, onClose }) => {
 
         try {
             await authService.editCompany(formData);
-            toast.success('Company updated successfully!');
+            showSuccessToast('Company updated successfully!');
         } catch (error) {
             console.error('Error editing company:', error);
-            toast.error(typeof error === 'string' ? error : error.message || 'Failed to update company.');
+            showErrorToast(typeof error === 'string' ? error : error.message || 'Failed to update company.');
         } finally {
             setLoading(false);
         }
@@ -257,12 +257,12 @@ const CompanyBoard = ({ isOpen, onClose }) => {
         setLoading(true);
         try {
             await authService.deleteCompany(formData.Code);
-            toast.success('Company deleted successfully!');
+            showSuccessToast('Company deleted successfully!');
             handleClear(); // Reset form after deletion
             setShowDeleteConfirm(false);
         } catch (error) {
             console.error('Error deleting company:', error);
-            toast.error(typeof error === 'string' ? error : error.message || 'Failed to delete company.');
+            showErrorToast(typeof error === 'string' ? error : error.message || 'Failed to delete company.');
         } finally {
             setLoading(false);
         }
@@ -534,7 +534,7 @@ const CompanyBoard = ({ isOpen, onClose }) => {
                             </div>
                             <button
                                 onClick={() => setShowLookup(false)}
-                                className="w-9 h-8 flex items-center justify-center bg-[#ff3b30] hover:bg-[#e03127] text-white rounded-[8px] shadow-[0_4px_12px_rgba(255,59,48,0.3)] hover:shadow-[0_6px_20px_rgba(255,59,48,0.4)] transition-all active:scale-90 outline-none border-none group"
+                                className="w-9 h-8 flex items-center justify-center bg-red-50 hover:bg-red-100 text-red-600 rounded-[8px] transition-all active:scale-90 outline-none border-none group"
                                 title="Close"
                             >
                                 <X size={18} strokeWidth={4} className="group-hover:scale-110 transition-transform" />
@@ -640,7 +640,7 @@ const CompanyBoard = ({ isOpen, onClose }) => {
                             </div>
                             <button
                                 onClick={() => setShowCountryLookup(false)}
-                                className="w-9 h-8 flex items-center justify-center bg-[#ff3b30] hover:bg-[#e03127] text-white rounded-[8px] shadow-[0_4px_12px_rgba(255,59,48,0.3)] hover:shadow-[0_6px_20px_rgba(255,59,48,0.4)] transition-all active:scale-90 outline-none border-none group"
+                                className="w-9 h-8 flex items-center justify-center bg-red-50 hover:bg-red-100 text-red-600 rounded-[8px] transition-all active:scale-90 outline-none border-none group"
                                 title="Close"
                             >
                                 <X size={18} strokeWidth={4} className="group-hover:scale-110 transition-transform" />
@@ -706,7 +706,7 @@ const CompanyBoard = ({ isOpen, onClose }) => {
                             </div>
                             <button
                                 onClick={() => setShowIndustryLookup(false)}
-                                className="w-9 h-8 flex items-center justify-center bg-[#ff3b30] hover:bg-[#e03127] text-white rounded-[8px] shadow-[0_4px_12px_rgba(255,59,48,0.3)] hover:shadow-[0_6px_20px_rgba(255,59,48,0.4)] transition-all active:scale-90 outline-none border-none group"
+                                className="w-9 h-8 flex items-center justify-center bg-red-50 hover:bg-red-100 text-red-600 rounded-[8px] transition-all active:scale-90 outline-none border-none group"
                                 title="Close"
                             >
                                 <X size={18} strokeWidth={4} className="group-hover:scale-110 transition-transform" />
@@ -772,7 +772,7 @@ const CompanyBoard = ({ isOpen, onClose }) => {
                             </div>
                             <button
                                 onClick={() => setShowOrgLookup(false)}
-                                className="w-9 h-8 flex items-center justify-center bg-[#ff3b30] hover:bg-[#e03127] text-white rounded-[8px] shadow-[0_4px_12px_rgba(255,59,48,0.3)] hover:shadow-[0_6px_20px_rgba(255,59,48,0.4)] transition-all active:scale-90 outline-none border-none group"
+                                className="w-9 h-8 flex items-center justify-center bg-red-50 hover:bg-red-100 text-red-600 rounded-[8px] transition-all active:scale-90 outline-none border-none group"
                                 title="Close"
                             >
                                 <X size={18} strokeWidth={4} className="group-hover:scale-110 transition-transform" />

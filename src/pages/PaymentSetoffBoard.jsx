@@ -424,7 +424,7 @@ const PaymentSetoffBoard = ({ isOpen, onClose }) => {
                             <h3 className="text-lg font-bold text-slate-800 tracking-tight uppercase">Search Suppliers</h3>
                             <button 
                                 onClick={() => setActiveSupplierModal(false)} 
-                                className="w-10 h-10 flex items-center justify-center bg-[#ff3b30] hover:bg-[#e03127] text-white rounded-[8px] shadow-[0_4px_12px_rgba(255,59,48,0.3)] hover:shadow-[0_6px_20px_rgba(255,59,48,0.4)] transition-all active:scale-90 outline-none border-none group"
+                                className="w-10 h-10 flex items-center justify-center bg-red-50 hover:bg-red-100 text-red-600 rounded-[8px] transition-all active:scale-90 outline-none border-none group"
                                 title="Close"
                             >
                                 <X size={20} strokeWidth={4} className="group-hover:scale-110 transition-transform" />

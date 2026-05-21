@@ -2,8 +2,10 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import AuthPage from './pages/AuthPage';
+import RegisterPage from './pages/RegisterPage';
 import Dashboard from './pages/Dashboard';
 import ItemsServicesReportPage from './pages/ItemsServicesReportPage';
+import SuperAdminDashboard from './pages/SuperAdminDashboard';
 
 function App() {
   return (
@@ -38,7 +40,10 @@ function App() {
         <Routes>
           {/* AuthPage handles login only */}
           <Route path="/login" element={<AuthPage />} />
+          <Route path="/register" element={<RegisterPage />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/super-admin" element={<SuperAdminDashboard />} />
+
           <Route path="/report/items-services" element={<ItemsServicesReportPage />} />
           {/* Default Route */}
           <Route path="/" element={<Navigate to="/login" replace />} />

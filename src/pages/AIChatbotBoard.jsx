@@ -202,7 +202,7 @@ const AIChatbotBoard = ({ isOpen, onClose }) => {
                         >
                             {chatSize === 'wide' ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
                         </button>
-                        <button onClick={onClose} className="w-9 h-8 flex items-center justify-center bg-[#ff3b30] hover:bg-[#e03127] text-white rounded-[8px] shadow-lg transition-all active:scale-90 border-none group">
+                        <button onClick={onClose} className="w-9 h-8 flex items-center justify-center bg-red-50 hover:bg-red-100 text-red-600 rounded-[8px] transition-all active:scale-90 border-none group">
                             <X size={18} strokeWidth={4} />
                         </button>
                     </div>

@@ -15,8 +15,10 @@ import {
 } from 'lucide-react';
 import { authService } from '../../services/auth.service';
 import toast from 'react-hot-toast';
+import { showErrorToast, showSuccessToast } from '../../utils/toastUtils';
 import { DotLottiePlayer } from '@dotlottie/react-player';
 import ContactSupportModal from './ContactSupportModal';
+import CreateCompanyModal from './CreateCompanyModal';
 
 const SUCCESS_SOUND_URL = '/Music/mrstokes302-success-videogame-sfx-423626.mp3';
 
@@ -66,7 +68,10 @@ const CompanySelectModal = ({ isOpen, onClose, onSelect, user }) => {
             }
         } catch (err) {
             console.error("Error fetching companies:", err);
-            toast.error("Failed to load companies");
+            // Ignore the expected 404 error when user has no companies yet
+            if (err?.message !== "No companies assigned to this employee." && err?.message !== "Employee not found.") {
+                showErrorToast("Failed to load companies");
+            }
         } finally {
             setFetching(false);
         }
@@ -111,7 +116,7 @@ const CompanySelectModal = ({ isOpen, onClose, onSelect, user }) => {
     const handleOpen = async () => {
         const selected = companies.find(c => c.id === selectedCompanyId);
         if (!selected) {
-            toast.error('Please select a company first');
+            showErrorToast('Please select a company first');
             return;
         }
         setLoading(true);
@@ -126,7 +131,7 @@ const CompanySelectModal = ({ isOpen, onClose, onSelect, user }) => {
 
             onSelect();
         } catch (err) {
-            toast.error(typeof err === 'object' ? (err.message || "Error opening company") : err);
+            showErrorToast(typeof err === 'object' ? (err.message || "Error opening company") : err);
         } finally {
             setLoading(false);
         }
@@ -135,6 +140,7 @@ const CompanySelectModal = ({ isOpen, onClose, onSelect, user }) => {
 
     const [showSupport, setShowSupport] = useState(false);
     const [isFlipped, setIsFlipped] = useState(false);
+    const [showCreateCompany, setShowCreateCompany] = useState(false);
 
     if (!isOpen) return null;
 
@@ -160,7 +166,14 @@ const CompanySelectModal = ({ isOpen, onClose, onSelect, user }) => {
                                 <p className="text-[10px] text-gray-400 uppercase tracking-widest font-bold font-mono">Identifying Entities...</p>
                             </div>
                         ) : companies.length === 0 ? (
-                            <div className="py-16 text-center text-gray-400 uppercase text-sm font-bold opacity-50">No Data Available</div>
+                            <div className="py-10 flex flex-col items-center gap-4 text-center">
+                                <Building2 size={36} className="text-gray-200" strokeWidth={1} />
+                                <p className="text-gray-400 text-xs font-mono uppercase tracking-widest">No companies assigned</p>
+                                <button onClick={() => setShowCreateCompany(true)}
+                                    className="mt-2 px-6 py-3 bg-[#00D1FF] hover:bg-[#00acee] text-white font-mono font-bold text-xs uppercase tracking-widest rounded-[5px] transition-all active:scale-[0.98]">
+                                    + Create New Company
+                                </button>
+                            </div>
                         ) : (
                             companies.map((company) => {
                                 const isSelected = selectedCompanyId === company.id;
@@ -210,18 +223,33 @@ const CompanySelectModal = ({ isOpen, onClose, onSelect, user }) => {
                     </button>
                 </div>
 
-                {/* Subtle Footer Prompt */}
-                <button 
-                    onClick={() => setShowSupport(true)}
-                    className="mt-8 text-white/40 hover:text-white/80 transition-all font-bold text-[10px] uppercase tracking-[0.3em] flex items-center gap-2"
-                >
-                    <span className="text-[#00D1FF] underline decoration-2 underline-offset-4">Contact Support</span>
-                </button>
+                {/* Bottom actions */}
+                <div className="flex flex-col items-center gap-3 mt-6">
+                    <button onClick={() => setShowCreateCompany(true)}
+                        className="text-[#00D1FF]/70 hover:text-[#00D1FF] font-mono font-bold text-[10px] uppercase tracking-widest transition-all">
+                        + Create New Company
+                    </button>
+                    <button 
+                        onClick={() => setShowSupport(true)}
+                        className="text-white/30 hover:text-white/80 transition-all font-bold text-[10px] uppercase tracking-[0.3em] flex items-center gap-2"
+                    >
+                        <span className="text-[#00D1FF] underline decoration-2 underline-offset-4">Contact Support</span>
+                    </button>
+                </div>
             </div>
 
             <ContactSupportModal 
                 isOpen={showSupport} 
                 onClose={() => setShowSupport(false)} 
+            />
+            <CreateCompanyModal
+                isOpen={showCreateCompany}
+                onClose={() => setShowCreateCompany(false)}
+                user={user}
+                onCreated={() => {
+                    setShowCreateCompany(false);
+                    fetchUserCompanies();
+                }}
             />
         </div>
     );

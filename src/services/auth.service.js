@@ -64,6 +64,54 @@ export const authService = {
     }
   },
 
+  // SEND OTP FOR REGISTRATION
+  async sendOtpForRegistration(phoneNumber) {
+    try {
+      const response = await api.post('/Auth/send-otp', { PhoneNumber: phoneNumber });
+      return response.data;
+    } catch (error) {
+      console.error('Send OTP Error:', error);
+      throw error.response?.data || 'Failed to send OTP. Please try again.';
+    }
+  },
+
+  // VERIFY OTP FOR REGISTRATION
+  async verifyOtpForRegistration(phoneNumber, otpCode) {
+    try {
+      const response = await api.post('/Auth/verify-otp', { PhoneNumber: phoneNumber, OtpCode: otpCode });
+      return response.data;
+    } catch (error) {
+      console.error('Verify OTP Error:', error);
+      throw error.response?.data || 'Invalid OTP. Please try again.';
+    }
+  },
+
+  // SEND OTP VIA AIRTEL SMS GATEWAY (frontend direct call via Vite proxy)
+  async sendSmsOtp(phoneNumber) {
+    // Generate a secure 6-digit OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+    // Normalize phone: remove spaces, dashes, leading +94 or 0, keep digits only
+    let dst = phoneNumber.replace(/[\s\-\(\)]/g, '');
+    if (dst.startsWith('+')) dst = dst.slice(1); // remove leading +
+    // Sri Lanka: if starts with 94, keep; if starts with 0, replace with 94
+    if (dst.startsWith('0')) dst = '94' + dst.slice(1);
+
+    const message = encodeURIComponent(`Your ONIMTA verification code is: ${otp}. Valid for 5 minutes. Do not share this code.`);
+    const url = `/sms/send_sms.php?username=onimta&password=gUY2eBbvpr&src=ONIMTA&dst=${dst}&msg=${message}&dr=1`;
+
+    try {
+      const res = await fetch(url);
+      const text = await res.text();
+      console.log('SMS Gateway response:', text);
+      // Most SMS gateways return a success code/message; we trust the send succeeded
+      return otp; // Return the OTP so caller can verify locally
+    } catch (error) {
+      console.error('SMS Gateway Error:', error);
+      throw 'Failed to send OTP. Please check your phone number and try again.';
+    }
+  },
+
   // FORGOT PASSWORD
   async forgotPassword(usernameOrEmail) {
     try {

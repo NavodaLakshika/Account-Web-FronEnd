@@ -33,10 +33,10 @@ const SimpleModal = ({ isOpen, onClose, title, children, footer, maxWidth = "max
                         {showHeaderClose && (
                             <button
                                 onClick={onClose}
-                                className="w-9 h-8 flex items-center justify-center bg-[#ff3b30] hover:bg-[#e03127] text-white rounded-[8px] shadow-[0_4px_12px_rgba(255,59,48,0.3)] hover:shadow-[0_6px_20px_rgba(255,59,48,0.4)] transition-all active:scale-90 outline-none border-none group"
+                                className="w-9 h-8 flex items-center justify-center bg-red-50 hover:bg-red-100 text-red-600 rounded-[8px] transition-all active:scale-90 outline-none border-none group"
                                 title="Close"
                             >
-                                <X size={18} strokeWidth={4} className="group-hover:scale-110 transition-transform" />
+                                <X size={16} strokeWidth={3} className="group-hover:scale-110 transition-transform" />
                             </button>
                         )}
                     </div>

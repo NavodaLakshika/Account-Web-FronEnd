@@ -36,7 +36,7 @@ const AuthPage = () => {
     const translations = {
         EN: {
             systemTitle: 'Financial System',
-            username: 'Username / Email',
+            username: 'Username ',
             password: 'Password',
             remember: 'Remember Password',
             forgot: 'Forgot Password?',
@@ -257,7 +257,20 @@ const AuthPage = () => {
                                     >
                                         {t.forgot}
                                     </button>
+                                    <div className="flex items-center gap-3">
+                                        <div className="flex-1 h-[1px] bg-white/10" />
+                                        <span className="text-white/20 font-mono text-[10px] uppercase tracking-widest">or</span>
+                                        <div className="flex-1 h-[1px] bg-white/10" />
+                                    </div>
+                                    <button
+                                        type="button"
+                                        onClick={() => navigate('/register')}
+                                        className="w-full py-3 border border-white/20 hover:border-[#00acee]/60 text-white/50 hover:text-white font-mono font-bold tracking-[0.2em] transition-all uppercase text-sm"
+                                    >
+                                        CREATE ACCOUNT
+                                    </button>
                                 </div>
+
                             </form>
                         </>
                     ) : (
@@ -436,7 +449,11 @@ const AuthPage = () => {
                 user={currentUser}
                 onComplete={() => {
                     setShowWelcome(false);
-                    setShowSelection(true);
+                    if (currentUser && (currentUser.userRoleId === "99" || currentUser.UserRoleId === "99")) {
+                        navigate('/super-admin');
+                    } else {
+                        setShowSelection(true);
+                    }
                 }}
             />
 

@@ -514,7 +514,7 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
                             </div>
                             <button
                                 onClick={() => setShowSearchModal(false)}
-                                className="w-9 h-8 flex items-center justify-center bg-[#ff3b30] hover:bg-[#e03127] text-white rounded-[8px] shadow-[0_4px_12px_rgba(255,59,48,0.3)] hover:shadow-[0_6px_20px_rgba(255,59,48,0.4)] transition-all active:scale-90 outline-none border-none group"
+                                className="w-9 h-8 flex items-center justify-center bg-red-50 hover:bg-red-100 text-red-600 rounded-[8px] transition-all active:scale-90 outline-none border-none group"
                                 title="Close"
                             >
                                 <X size={18} strokeWidth={4} className="group-hover:scale-110 transition-transform" />
@@ -596,7 +596,7 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
                             </div>
                             <button
                                 onClick={() => setShowAreaSearch(false)}
-                                className="w-9 h-8 flex items-center justify-center bg-[#ff3b30] hover:bg-[#e03127] text-white rounded-[8px] shadow-[0_4px_12px_rgba(255,59,48,0.3)] hover:shadow-[0_6px_20px_rgba(255,59,48,0.4)] transition-all active:scale-90 outline-none border-none group"
+                                className="w-9 h-8 flex items-center justify-center bg-red-50 hover:bg-red-100 text-red-600 rounded-[8px] transition-all active:scale-90 outline-none border-none group"
                                 title="Close"
                             >
                                 <X size={18} strokeWidth={4} className="group-hover:scale-110 transition-transform" />
@@ -671,7 +671,7 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
                             </div>
                             <button
                                 onClick={() => setShowRouteSearch(false)}
-                                className="w-9 h-8 flex items-center justify-center bg-[#ff3b30] hover:bg-[#e03127] text-white rounded-[8px] shadow-[0_4px_12px_rgba(255,59,48,0.3)] hover:shadow-[0_6px_20px_rgba(255,59,48,0.4)] transition-all active:scale-90 outline-none border-none group"
+                                className="w-9 h-8 flex items-center justify-center bg-red-50 hover:bg-red-100 text-red-600 rounded-[8px] transition-all active:scale-90 outline-none border-none group"
                                 title="Close"
                             >
                                 <X size={18} strokeWidth={4} className="group-hover:scale-110 transition-transform" />
@@ -746,7 +746,7 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
                             </div>
                             <button
                                 onClick={() => setShowBankSearch(false)}
-                                className="w-9 h-8 flex items-center justify-center bg-[#ff3b30] hover:bg-[#e03127] text-white rounded-[8px] shadow-[0_4px_12px_rgba(255,59,48,0.3)] hover:shadow-[0_6px_20px_rgba(255,59,48,0.4)] transition-all active:scale-90 outline-none border-none group"
+                                className="w-9 h-8 flex items-center justify-center bg-red-50 hover:bg-red-100 text-red-600 rounded-[8px] transition-all active:scale-90 outline-none border-none group"
                                 title="Close"
                             >
                                 <X size={18} strokeWidth={4} className="group-hover:scale-110 transition-transform" />
@@ -821,7 +821,7 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
                             </div>
                             <button
                                 onClick={() => setShowTypeSearch(false)}
-                                className="w-9 h-8 flex items-center justify-center bg-[#ff3b30] hover:bg-[#e03127] text-white rounded-[8px] shadow-[0_4px_12px_rgba(255,59,48,0.3)] hover:shadow-[0_6px_20px_rgba(255,59,48,0.4)] transition-all active:scale-90 outline-none border-none group"
+                                className="w-9 h-8 flex items-center justify-center bg-red-50 hover:bg-red-100 text-red-600 rounded-[8px] transition-all active:scale-90 outline-none border-none group"
                                 title="Close"
                             >
                                 <X size={18} strokeWidth={4} className="group-hover:scale-110 transition-transform" />

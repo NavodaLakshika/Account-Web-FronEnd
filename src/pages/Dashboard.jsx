@@ -187,11 +187,10 @@ const Dashboard = () => {
 
     const [ribbonIcons, setRibbonIcons] = useState(() => {
         const defaultIcons = [
-            'home', 'new_account', 'customer', 'vendor', 'enter_bill',
+            'logout' ,'home', 'new_account', 'customer', 'vendor', 'enter_bill',
             'pay_bill', 'write_chq', 'petty_cash', 'make_deposit',
             'journal_entry', 'bank_rec', 'trial_balance', 'search',
-            'ai_chat', 'dashboard', 'department', 'calculator', 'help', 'category',
-            'reminder', 'logout'
+            'ai_chat', 'dashboard'
         ];
         try {
             const saved = localStorage.getItem('ribbon_icons');

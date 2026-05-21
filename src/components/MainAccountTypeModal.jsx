@@ -7,7 +7,17 @@ const MainAccountTypeModal = ({ isOpen, onClose, onSelect }) => {
     const [types, setTypes] = useState([]);
     const [loading, setLoading] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
-    const companyCode = localStorage.getItem('company') || 'C001';
+    let parsedCompany = '';
+    const selectedCompanyStr = localStorage.getItem('selectedCompany');
+    if (selectedCompanyStr) {
+        try {
+            const companyObj = JSON.parse(selectedCompanyStr);
+            parsedCompany = companyObj?.companyCode || companyObj?.CompanyCode || '';
+        } catch (e) {
+            console.error('Error parsing company', e);
+        }
+    }
+    const companyCode = parsedCompany || localStorage.getItem('company') || 'C001';
 
     useEffect(() => {
         if (isOpen) {

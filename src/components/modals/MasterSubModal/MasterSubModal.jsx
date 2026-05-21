@@ -93,7 +93,7 @@ const MasterSubModal = ({ isOpen, onClose }) => {
                         {/* Independent Close Button - Floating Further Outside */}
                         <button 
                             onClick={onClose} 
-                            className="absolute -top-12 -right-12 w-10 h-10 flex items-center justify-center bg-[#ff3b30] hover:bg-[#e03127] text-white rounded-[14px] shadow-[0_12px_24px_rgba(255,59,48,0.4)] hover:shadow-[0_16px_32px_rgba(255,59,48,0.5)] transition-all active:scale-90 outline-none border-none group z-[300]"
+                            className="absolute -top-12 -right-12 w-10 h-10 flex items-center justify-center bg-red-50 hover:bg-red-100 text-red-600 rounded-[14px] transition-all active:scale-90 outline-none border-none group z-[300]"
                             title="Close"
                         >
                             <X size={24} strokeWidth={4} className="group-hover:scale-110 transition-transform" />

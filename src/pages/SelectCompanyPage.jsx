@@ -11,12 +11,12 @@ import {
     Linkedin,
     Globe,
     CheckCircle2,
-    Settings,
-    X
+    Settings
 } from 'lucide-react';
 import { authService } from '../services/auth.service';
 import AboutUsModal from '../components/modals/AboutUsModal';
-import toast from 'react-hot-toast';
+import CreateCompanyModal from '../components/modals/CreateCompanyModal';
+import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
 
 const SUCCESS_SOUND_URL = '/Music/mrstokes302-success-videogame-sfx-423626.mp3';
 
@@ -32,7 +32,13 @@ const SelectCompanyPage = () => {
     const [currentPage, setCurrentPage] = useState(0);
     const [showSocialLinks, setShowSocialLinks] = useState(false);
     const [showAboutUs, setShowAboutUs] = useState(false);
+    const [showCreateCompanyModal, setShowCreateCompanyModal] = useState(false);
     const itemsPerPage = 3; // Vertical list fits better in the right panel
+
+    const handleCompanyCreated = async () => {
+        setShowCreateCompanyModal(false);
+        await fetchUserCompanies();
+    };
 
     const user = authService.getCurrentUser();
     const userName = user ? (user.EmpName || user.empName || user.Emp_Name || 'User') : 'Guest';
@@ -62,7 +68,10 @@ const SelectCompanyPage = () => {
             }
         } catch (err) {
             console.error("Error fetching companies:", err);
-            toast.error("Failed to load companies");
+            // Ignore the expected 404 error when user has no companies yet
+            if (err?.message !== "No companies assigned to this employee." && err?.message !== "Employee not found.") {
+                showErrorToast("Failed to load companies");
+            }
         } finally {
             setFetching(false);
         }
@@ -71,28 +80,13 @@ const SelectCompanyPage = () => {
     const handleOpen = async () => {
         const selected = companies.find(c => c.id === selectedCompanyId);
         if (!selected) {
-            toast.error('Please select a company first');
+            showErrorToast('Please select a company first');
             return;
         }
         setLoading(true);
         try {
             await authService.openCompany(userName, selected.id);
-            toast.success(`Accessing ${selected.name}...`, {
-                style: {
-                    background: 'rgba(255, 255, 255, 0.1)',
-                    backdropFilter: 'blur(12px)',
-                    border: '1px solid rgba(255, 255, 255, 0.2)',
-                    color: '#fff',
-                    borderRadius: '24px',
-                    maxWidth: '550px',
-                },
-
-
-                iconTheme: {
-                    primary: '#00acee',
-                    secondary: '#fff',
-                }
-            });
+            showSuccessToast(`Accessing ${selected.name}...`);
 
             // Play success sound
             const audio = new Audio(SUCCESS_SOUND_URL);
@@ -101,7 +95,7 @@ const SelectCompanyPage = () => {
 
             navigate('/dashboard');
         } catch (err) {
-            toast.error(typeof err === 'object' ? (err.message || "Error opening company") : err);
+            showErrorToast(typeof err === 'object' ? (err.message || "Error opening company") : err);
         } finally {
             setLoading(false);
         }
@@ -175,7 +169,15 @@ const SelectCompanyPage = () => {
 
                 {/* Right Form Panel (Company Selection Interface) */}
                 <div className="flex-1 max-w-md w-full py-12 flex flex-col">
-                    <h2 className="text-white text-3xl font-bold mb-8 font-tahoma">Select Entity</h2>
+                    <div className="flex items-center justify-between mb-8">
+                        <h2 className="text-white text-3xl font-bold font-tahoma">Select Entity</h2>
+                        <button 
+                            onClick={() => setShowCreateCompanyModal(true)}
+                            className="px-4 py-2 border border-[#00acee] hover:bg-[#00acee] text-[#00acee] hover:text-white transition-all text-[11px] font-mono font-bold tracking-wider uppercase rounded"
+                        >
+                            + New Company
+                        </button>
+                    </div>
                     
                     <div className="space-y-3 flex-grow min-h-[300px]">
                         {fetching ? (
@@ -186,7 +188,13 @@ const SelectCompanyPage = () => {
                         ) : companies.length === 0 ? (
                             <div className="h-full flex flex-col items-center justify-center gap-4 text-white/10 py-20">
                                 <Building2 size={40} strokeWidth={1} />
-                                <p className="text-[10px] font-mono tracking-[0.4em] uppercase">No active entities</p>
+                                <p className="text-[10px] font-mono tracking-[0.4em] uppercase mb-2">No active entities</p>
+                                <button 
+                                    onClick={() => setShowCreateCompanyModal(true)}
+                                    className="px-6 py-2.5 bg-[#00acee] hover:bg-[#0092cc] text-white font-mono text-[11px] font-bold tracking-widest uppercase transition-all active:scale-95 rounded shadow-lg shadow-cyan-500/20"
+                                >
+                                    Create Company
+                                </button>
                             </div>
                         ) : (
                             currentCompanies.map((company) => {
@@ -336,6 +344,14 @@ const SelectCompanyPage = () => {
             <AboutUsModal 
                 isOpen={showAboutUs} 
                 onClose={() => setShowAboutUs(false)} 
+            />
+
+            {/* Create Company Modal */}
+            <CreateCompanyModal
+                isOpen={showCreateCompanyModal}
+                onClose={() => setShowCreateCompanyModal(false)}
+                onCreated={handleCompanyCreated}
+                user={user}
             />
         </div>
     );

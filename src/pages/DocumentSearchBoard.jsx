@@ -33,7 +33,17 @@ const DocumentSearchBoard = ({ isOpen, onClose }) => {
 
     const [showCalFrom, setShowCalFrom] = useState(false);
     const [showCalTo, setShowCalTo] = useState(false);
-    const companyCode = localStorage.getItem('company') || '';
+    let parsedCompany = '';
+    const selectedCompanyStr = localStorage.getItem('selectedCompany');
+    if (selectedCompanyStr) {
+        try {
+            const companyObj = JSON.parse(selectedCompanyStr);
+            parsedCompany = companyObj?.companyCode || companyObj?.CompanyCode || '';
+        } catch (e) {
+            console.error('Error parsing company', e);
+        }
+    }
+    const companyCode = parsedCompany || localStorage.getItem('company') || '';
 
     const showSuccessToast = (msg) => toast.custom((t) => (
         <div className={`${t.visible ? 'animate-in slide-in-from-right-10 fade-in duration-500' : 'animate-out slide-out-to-right-10 fade-out duration-300'} 

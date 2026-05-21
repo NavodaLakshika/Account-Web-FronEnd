@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, ShieldCheck, Database, RefreshCw, Download, Trash2, Search, FileEdit, Settings, CloudLightning, Eraser, Lock, FileText, Key, Layout } from 'lucide-react';
+import { X, ShieldCheck, Database, RefreshCw, Download, Trash2, Search, FileEdit, Settings, CloudLightning, Eraser, Lock, FileText, Key, Layout, Users } from 'lucide-react';
 import SimpleModal from '../../SimpleModal';
 import DatabaseBackupModal from './DatabaseBackupModal';
 import StockBalanceUpdateModal from './StockBalanceUpdateModal';
@@ -14,6 +14,7 @@ import TransactionEditorModal from './TransactionEditorModal';
 import SystemSettingsBoard from '../../../HomeMaster/SystemSettingsBoard';
 import ChangePasswordBoard from '../MasterSubModal/ChangePasswordBoard';
 import PeriodLockModal from './PeriodLockModal';
+import CompanyUsersModal from './CompanyUsersModal';
 
 const SystemAdminModal = ({ isOpen, onClose }) => {
     const [showBackupModal, setShowBackupModal] = useState(false);
@@ -28,6 +29,7 @@ const SystemAdminModal = ({ isOpen, onClose }) => {
     const [showTransactionEditorModal, setShowTransactionEditorModal] = useState(false);
     const [showSystemSettings, setShowSystemSettings] = useState(false);
     const [showChangePassword, setShowChangePassword] = useState(false);
+    const [showUsersModal, setShowUsersModal] = useState(false);
     const [showFeatureLockedModal, setShowFeatureLockedModal] = useState(false);
 
     if (!isOpen) return null;
@@ -46,6 +48,7 @@ const SystemAdminModal = ({ isOpen, onClose }) => {
             case 'lock': setShowPeriodLockModal(true); break;
             case 'systemSettings': setShowSystemSettings(true); break;
             case 'changePassword': setShowChangePassword(true); break;
+            case 'users': setShowUsersModal(true); break;
         }
     };
 
@@ -60,6 +63,7 @@ const SystemAdminModal = ({ isOpen, onClose }) => {
         { icon: CloudLightning, label: 'System Update', action: 'update' },
         { icon: Eraser, label: 'Clear Temp Data', action: 'clear' },
         { icon: Lock, label: 'Period Lock Facility', action: 'lock' },
+        { icon: Users, label: 'User & Role Management', action: 'users' },
         { icon: Key, label: 'Change Password', action: 'changePassword' },
         { icon: Settings, label: 'Admin Configuration', action: 'systemSettings' }
     ];
@@ -92,7 +96,7 @@ const SystemAdminModal = ({ isOpen, onClose }) => {
                         </div>
                         <button 
                             onClick={onClose} 
-                            className="w-9 h-8 flex items-center justify-center bg-[#ff3b30] hover:bg-[#e03127] text-white rounded-[8px] shadow-[0_4px_12px_rgba(255,59,48,0.3)] hover:shadow-[0_6px_20px_rgba(255,59,48,0.4)] transition-all active:scale-90 outline-none border-none group"
+                            className="w-9 h-8 flex items-center justify-center bg-red-50 hover:bg-red-100 text-red-600 rounded-[8px] transition-all active:scale-90 outline-none border-none group"
                             title="Close"
                         >
                             <X size={18} strokeWidth={4} className="group-hover:scale-110 transition-transform" />
@@ -103,7 +107,7 @@ const SystemAdminModal = ({ isOpen, onClose }) => {
                     <div className="p-2 bg-white flex-1 overflow-y-auto max-h-[75vh] no-scrollbar">
                         {menuItems.map((item, idx) => {
                             const Icon = item.icon;
-                            const isLocked = item.action !== 'systemSettings' && localStorage.getItem(`isLocked_${item.action}`) === 'true';
+                            const isLocked = item.action !== 'systemSettings' && item.action !== 'users' && localStorage.getItem(`isLocked_${item.action}`) === 'true';
 
                             return (
                                 <React.Fragment key={idx}>
@@ -166,6 +170,7 @@ const SystemAdminModal = ({ isOpen, onClose }) => {
             <TransactionEditorModal isOpen={showTransactionEditorModal} onClose={() => setShowTransactionEditorModal(false)} />
             <SystemSettingsBoard isOpen={showSystemSettings} onClose={() => setShowSystemSettings(false)} />
             <ChangePasswordBoard isOpen={showChangePassword} onClose={() => setShowChangePassword(false)} />
+            <CompanyUsersModal isOpen={showUsersModal} onClose={() => setShowUsersModal(false)} />
         </>
     );
 };

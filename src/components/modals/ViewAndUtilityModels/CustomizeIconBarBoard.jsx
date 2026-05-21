@@ -4,7 +4,7 @@ import {
     X, ChevronRight, ChevronLeft, Save, RotateCcw,
     LogOut, Home, UserPlus, Users, Truck, FileText,
     CreditCard, PenTool, Wallet, ArrowDownLeft, BookOpen,
-    RefreshCcw, BarChart2, Search, Bot, Building2, Calculator, HelpCircle, Layers
+    RefreshCcw, BarChart2, Search, Bot, Building2, Calculator, HelpCircle, Layers, PieChart, Bell
 } from 'lucide-react';
 
 const ALL_POSSIBLE_ICONS = [
@@ -23,10 +23,12 @@ const ALL_POSSIBLE_ICONS = [
     { id: 'trial_balance', label: 'Trial Balance', icon: BarChart2 },
     { id: 'search', label: 'Search', icon: Search },
     { id: 'ai_chat', label: 'AI Chat', icon: Bot, color: 'text-blue-500' },
+    { id: 'dashboard', label: 'Dashboard', icon: PieChart },
     { id: 'department', label: 'Department', icon: Building2 },
     { id: 'calculator', label: 'Calculator', icon: Calculator },
     { id: 'help', label: 'Help', icon: HelpCircle },
     { id: 'category', label: 'Category', icon: Layers },
+    { id: 'reminder', label: 'Reminder', icon: Bell, color: 'text-yellow-400' },
 ];
 
 const CustomizeIconBarBoard = ({ isOpen, onClose, onSave }) => {
@@ -35,7 +37,7 @@ const CustomizeIconBarBoard = ({ isOpen, onClose, onSave }) => {
     const [selectedAvailable, setSelectedAvailable] = useState(null);
     const [selectedCurrent, setSelectedCurrent] = useState(null);
 
-    const defaultIds = ['logout', 'home', 'new_account', 'customer', 'vendor', 'enter_bill', 'pay_bill', 'write_chq', 'petty_cash', 'make_deposit', 'journal_entry', 'bank_rec', 'trial_balance', 'search', 'ai_chat'];
+    const defaultIds = ['home', 'new_account', 'customer', 'vendor', 'enter_bill', 'pay_bill', 'write_chq', 'petty_cash', 'make_deposit', 'journal_entry', 'bank_rec', 'trial_balance', 'search', 'ai_chat', 'dashboard', 'logout'];
 
     useEffect(() => {
         if (isOpen) {
