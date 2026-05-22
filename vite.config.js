@@ -13,6 +13,11 @@ export default defineConfig(({ mode }) => {
           changeOrigin: true,
           secure: false,
         },
+        '/swagger': {
+          target: env.VITE_API_URL || 'http://localhost:5046',
+          changeOrigin: true,
+          secure: false,
+        },
         '/sms': {
           target: 'http://sms.airtel.lk:5000',
           changeOrigin: true,

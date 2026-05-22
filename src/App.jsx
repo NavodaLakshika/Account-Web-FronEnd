@@ -7,6 +7,8 @@ import Dashboard from './pages/Dashboard';
 import ItemsServicesReportPage from './pages/ItemsServicesReportPage';
 import SuperAdminDashboard from './pages/SuperAdminDashboard';
 
+import SystemAnalyticsReportPage from './pages/SystemAnalyticsReportPage';
+
 function App() {
   return (
     <Router>
@@ -45,6 +47,7 @@ function App() {
           <Route path="/super-admin" element={<SuperAdminDashboard />} />
 
           <Route path="/report/items-services" element={<ItemsServicesReportPage />} />
+          <Route path="/report/system-analytics" element={<SystemAnalyticsReportPage />} />
           {/* Default Route */}
           <Route path="/" element={<Navigate to="/login" replace />} />
           

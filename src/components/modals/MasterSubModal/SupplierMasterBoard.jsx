@@ -301,7 +301,7 @@ const SupplierMasterBoard = ({ isOpen, onClose }) => {
                     }
                 `}
             </style>
-            <SimpleModal isOpen={isOpen} onClose={onClose} title="Supplier Master Directory" maxWidth="max-w-[720px]" footer={footer} showHeaderClose={true}>
+            <SimpleModal isOpen={isOpen} onClose={onClose} title="Supplier Master Directory" maxWidth="max-w-[820px]" footer={footer} showHeaderClose={true}>
                 <div className="py-2 px-1 select-none font-['Tahoma'] space-y-3 text-[12px] mt-1">
                     {/* Header Section */}
                     <div className="border-b border-gray-100 pb-3 flex items-center justify-center">

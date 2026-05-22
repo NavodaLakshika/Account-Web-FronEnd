@@ -336,7 +336,7 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
                     }
                 `}
             </style>
-            <SimpleModal isOpen={isOpen} onClose={onClose} title="Customer Master File" maxWidth="max-w-[850px]" footer={footer}>
+            <SimpleModal isOpen={isOpen} onClose={onClose} title="Customer Master File" maxWidth="max-w-[950px]" footer={footer}>
                 <div className="py-2 select-none font-['Tahoma']">
                     <div className="border-b border-gray-200 pb-4 flex items-center justify-center">
                         <h2 className="text-[17px] font-bold text-black uppercase tracking-tight">Enter New Customer Details & Update</h2>

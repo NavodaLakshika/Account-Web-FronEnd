@@ -1,7 +1,21 @@
 import React, { useState } from 'react';
-import { X, ChevronRight, Building2, Target, Users, UserSquare, CreditCard, PieChart, UserCog, Settings, Key, LogOut, Layers, Briefcase, Lock } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import { authService } from '../../../services/auth.service';
+import {
+    X,
+    ChevronRight,
+    Building2,
+    Target,
+    Users,
+    UserSquare,
+    CreditCard,
+    PieChart,
+    UserCog,
+    Settings,
+    Key,
+    LogOut,
+    Layers,
+    Briefcase,
+    Lock
+} from 'lucide-react';
 
 import ChartOfAccountantModal from '../ChartOfAccountsModels/ChartOfAccountantModal';
 import FixedAssetsBoard from '../ChartOfAccountsModels/FixedAssetsBoard';
@@ -10,6 +24,7 @@ import DepreciationBoard from '../ChartOfAccountsModels/DepreciationBoard';
 import FixedIncomeBoard from '../ChartOfAccountsModels/FixedIncomeBoard';
 import FixedExpensesBoard from '../ChartOfAccountsModels/FixedExpensesBoard';
 import NewAccountBoard from '../../../pages/NewAccountBoard';
+
 import CompanyBoard from './CompanyBoard';
 import CostCenterBoard from './CostCenterBoard';
 import DepartmentBoard from './DepartmentBoard';
@@ -20,26 +35,14 @@ import CardCommissionBoard from './CardCommissionBoard';
 import UserProfileBoard from './UserProfileBoard';
 import VendorTypesBoard from './VendorTypesBoard';
 import ChangePasswordBoard from './ChangePasswordBoard';
+
 import ThankYouModal from '../ThankYouModal';
 import LogoutConfirmModal from '../LogoutConfirmModal';
-
-import { showErrorToast } from '../../../utils/toastUtils';
-
 import FeatureLockedModal from '../FeatureLockedModal';
 
 const MasterSubModal = ({ isOpen, onClose }) => {
-    const navigate = useNavigate();
 
     const [showLockModal, setShowLockModal] = useState(false);
-
-    const handleLogOff = () => {
-        if (localStorage.getItem('isLocked_master_logoff') === 'true') {
-            setShowLockModal(true);
-            return;
-        }
-        setShowLogoutConfirmModal(true);
-    };
-
 
     const [showChartOfAccountantModal, setShowChartOfAccountantModal] = useState(false);
     const [showCompanyBoard, setShowCompanyBoard] = useState(false);
@@ -61,8 +64,16 @@ const MasterSubModal = ({ isOpen, onClose }) => {
     const [showThankYouModal, setShowThankYouModal] = useState(false);
     const [showLogoutConfirmModal, setShowLogoutConfirmModal] = useState(false);
 
-
     if (!isOpen) return null;
+
+    const handleLogOff = () => {
+        if (localStorage.getItem('isLocked_master_logoff') === 'true') {
+            setShowLockModal(true);
+            return;
+        }
+
+        setShowLogoutConfirmModal(true);
+    };
 
     const menuItems = [
         { icon: Building2, label: 'Open Company', id: 'master_company', onClick: () => setShowCompanyBoard(true) },
@@ -72,7 +83,7 @@ const MasterSubModal = ({ isOpen, onClose }) => {
         { icon: UserSquare, label: 'Supplier Master', id: 'master_supplier', onClick: () => setShowSupplierMasterBoard(true) },
         { icon: Users, label: 'Customer Master', id: 'master_customer', onClick: () => setShowCustomerMasterBoard(true) },
         { icon: CreditCard, label: 'Card Sale Commission', id: 'master_cardSale', onClick: () => setShowCardCommissionBoard(true) },
-        { icon: PieChart, label: 'Chart of Accountant', id: 'master_chartOfAccount', hasSubmenu: true, onClick: () => setShowChartOfAccountantModal(true) },
+        { icon: PieChart, label: 'Chart of Accountant', id: 'master_chartOfAccount', onClick: () => setShowChartOfAccountantModal(true) },
         { icon: UserCog, label: 'User Profile Maintenance', id: 'master_userProfile', onClick: () => setShowUserProfileBoard(true) },
         { icon: Settings, label: 'Vendor Types', id: 'master_vendorTypes', onClick: () => setShowVendorTypesBoard(true) },
         { icon: Key, label: 'Change Password', id: 'master_changePassword', onClick: () => setShowChangePasswordBoard(true) },
@@ -82,91 +93,113 @@ const MasterSubModal = ({ isOpen, onClose }) => {
     return (
         <>
             <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+
                 {/* Backdrop */}
-                <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={onClose} />
+                <div
+                    className="absolute inset-0 bg-[#1e335c]/70 backdrop-blur-sm"
+                    onClick={onClose}
+                />
 
-                {/* Floating Modal Container - Completely Transparent & Borderless */}
-                <div className="relative w-full max-w-5xl flex flex-col animate-in zoom-in-95 duration-500">
-                    
-                    {/* Header - Floating Pill with Gap */}
-                    <div className="relative mb-12">
-                        {/* Independent Close Button - Floating Further Outside */}
-                        <button 
-                            onClick={onClose} 
-                            className="absolute -top-12 -right-12 w-10 h-10 flex items-center justify-center bg-red-50 hover:bg-red-100 text-red-600 rounded-[14px] transition-all active:scale-90 outline-none border-none group z-[300]"
-                            title="Close"
-                        >
-                            <X size={24} strokeWidth={4} className="group-hover:scale-110 transition-transform" />
-                        </button>
+                {/* Modal */}
+                <div className="relative w-full max-w-md bg-[#f8f8f8] rounded-[18px] shadow-2xl overflow-hidden border border-white/20 animate-in zoom-in-95 duration-300">
 
-                        <div className="bg-white px-8 py-6 flex items-center justify-center rounded-[14px] border-b border-gray-100/10 select-none relative overflow-hidden shadow-xl w-full">
-                            {/* System Color Left Accent */}
-                            <div 
-                                className="absolute left-0 top-0 bottom-0 w-2 transition-colors duration-500" 
-                                style={{ backgroundColor: localStorage.getItem('topBarColor') || '#0285fd' }}
-                            />
-                            
-                            <div className="flex items-center gap-3">
-                                <Layers size={22} className="text-[#0078d4] animate-pulse" />
-                                <span className="text-[19px] font-[900] text-slate-900 uppercase tracking-[8px] font-mono truncate ml-2">Master File Management</span>
-                            </div>
+                    {/* Header */}
+                    <div className="relative flex items-center justify-between px-6 py-5 border-b border-slate-200 bg-[#f8f8f8]">
+
+                        {/* Left Blue Border */}
+                        <div className="absolute left-0 top-0 bottom-0 w-[4px] bg-[#4f83ff]" />
+
+                        {/* Title */}
+                        <div className="flex items-center gap-3">
+                            <Layers size={15} className="text-[#4f83ff]" />
+
+                            <h2 className="text-[15px] font-black uppercase tracking-[0.35em] text-[#0f172a]">
+                                Master File Management
+                            </h2>
                         </div>
+
+                        {/* Close */}
+                        <button
+                            onClick={onClose}
+                            className="w-9 h-9 rounded-xl bg-red-50 hover:bg-red-100 flex items-center justify-center transition-all active:scale-90"
+                        >
+                            <X
+                                size={20}
+                                strokeWidth={3}
+                                className="text-red-600"
+                            />
+                        </button>
                     </div>
 
-                    {/* Floating Menu Grid - No backgrounds or borders */}
-                    <div className="p-12 flex-1 overflow-y-auto max-h-[80vh] no-scrollbar">
-                        <div className="grid grid-cols-6 gap-x-8 gap-y-10">
+                    {/* Menu List */}
+                    <div className="px-4 py-4 max-h-[75vh] overflow-y-auto">
+
+                        <div className="flex flex-col">
+
                             {menuItems.map((item, idx) => {
+
                                 const Icon = item.icon;
-                                const isLocked = localStorage.getItem(`isLocked_${item.id}`) === 'true';
+
+                                const isLocked =
+                                    localStorage.getItem(`isLocked_${item.id}`) === 'true';
 
                                 return (
-                                    <React.Fragment key={idx}>
-                                        {/* Row Separator after 6 items */}
-                                        {idx === 6 && (
-                                            <div className="col-span-6 my-1 h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent w-full" />
-                                        )}
-                                        
-                                        <div className="flex flex-col items-center group relative">
+                                    <button
+                                        key={idx}
+                                        onClick={() => {
 
-                                            <button
-                                                onClick={() => {
-                                                    if (isLocked) {
-                                                        setShowLockModal(true);
-                                                        return;
-                                                    }
-                                                    item.onClick();
-                                                }}
-                                                className={`w-24 h-24 bg-white rounded-[14px] shadow-lg hover:shadow-2xl hover:-translate-y-3 active:scale-90 transition-all duration-500 flex items-center justify-center relative overflow-hidden ${isLocked ? 'opacity-75 grayscale-[0.5]' : ''}`}
-                                            >
-                                                {/* Subtle Gradient Backdrop */}
-                                                <div className="absolute inset-0 bg-gradient-to-br from-transparent to-slate-50/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                                                
-                                                <Icon 
-                                                    size={32} 
-                                                    strokeWidth={1.5}
-                                                    className={`transition-all duration-500 group-hover:scale-110 ${item.color || (isLocked ? 'text-slate-400' : 'text-slate-500 group-hover:text-[#0078d4]')}`} 
+                                            if (isLocked) {
+                                                setShowLockModal(true);
+                                                return;
+                                            }
+
+                                            item.onClick();
+                                        }}
+                                        className="group w-full flex items-center justify-between px-4 py-3 rounded-2xl hover:bg-white transition-all duration-200"
+                                    >
+
+                                        {/* Left */}
+                                        <div className="flex items-center gap-4">
+
+                                            {/* Icon Box */}
+                                            <div className="w-9 h-9 rounded-xl bg-[#efefef] flex items-center justify-center shadow-sm">
+
+                                                <Icon
+                                                    size={17}
+                                                    strokeWidth={1.8}
+                                                    className={`${item.color || 'text-slate-500'}`}
                                                 />
+                                            </div>
 
-                                                {/* Decorative Corner Glow */}
-                                                {!isLocked && (
-                                                    <div className="absolute -right-6 -top-6 w-12 h-12 bg-[#0078d4]/10 rounded-full blur-xl group-hover:scale-150 transition-transform duration-700" />
-                                                )}
-                                            </button>
-                                            
-                                            <span className={`mt-5 text-[11px] font-[700] uppercase tracking-[0.25em] text-center leading-tight transition-all duration-300 font-['Inter',sans-serif] ${item.color || 'text-white group-hover:text-white/80'} ${isLocked ? 'opacity-60' : ''}`}>
+                                            {/* Label */}
+                                            <span className="text-[14px] font-[700] text-slate-700 tracking-tight">
                                                 {item.label}
                                             </span>
-                                            
-                                            {/* Minimalist Professional Secured Label */}
+                                        </div>
+
+                                        {/* Right */}
+                                        <div className="flex items-center gap-2">
+
                                             {isLocked && (
-                                                <div className="mt-2.5 flex items-center gap-1.5 px-2.5 py-0.5 bg-red-500/10 border border-red-500/20 rounded-full backdrop-blur-md shadow-sm">
-                                                    <Lock size={9} strokeWidth={3} className="text-red-400" />
-                                                    <span className="text-[8.5px] font-bold uppercase tracking-[0.2em] text-red-400">Secured</span>
+                                                <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-red-50 border border-red-100">
+
+                                                    <Lock
+                                                        size={9}
+                                                        className="text-red-500"
+                                                    />
+
+                                                    <span className="text-[9px] font-bold uppercase text-red-500">
+                                                        Locked
+                                                    </span>
                                                 </div>
                                             )}
+
+                                            <ChevronRight
+                                                size={15}
+                                                className="text-slate-300 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all"
+                                            />
                                         </div>
-                                    </React.Fragment>
+                                    </button>
                                 );
                             })}
                         </div>
@@ -174,11 +207,93 @@ const MasterSubModal = ({ isOpen, onClose }) => {
                 </div>
             </div>
 
+            {/* Feature Locked */}
             <FeatureLockedModal
                 isOpen={showLockModal}
                 onClose={() => setShowLockModal(false)}
             />
 
+            {/* Company */}
+            {showCompanyBoard && (
+                <CompanyBoard
+                    isOpen={showCompanyBoard}
+                    onClose={() => setShowCompanyBoard(false)}
+                />
+            )}
+
+            {/* Cost Center */}
+            {showCostCenterBoard && (
+                <CostCenterBoard
+                    isOpen={showCostCenterBoard}
+                    onClose={() => setShowCostCenterBoard(false)}
+                />
+            )}
+
+            {/* Department */}
+            {showDepartmentBoard && (
+                <DepartmentBoard
+                    isOpen={showDepartmentBoard}
+                    onClose={() => setShowDepartmentBoard(false)}
+                />
+            )}
+
+            {/* Category */}
+            {showCategoryBoard && (
+                <CategoryBoard
+                    isOpen={showCategoryBoard}
+                    onClose={() => setShowCategoryBoard(false)}
+                />
+            )}
+
+            {/* Supplier */}
+            {showSupplierMasterBoard && (
+                <SupplierMasterBoard
+                    isOpen={showSupplierMasterBoard}
+                    onClose={() => setShowSupplierMasterBoard(false)}
+                />
+            )}
+
+            {/* Customer */}
+            {showCustomerMasterBoard && (
+                <CustomerMasterBoard
+                    isOpen={showCustomerMasterBoard}
+                    onClose={() => setShowCustomerMasterBoard(false)}
+                />
+            )}
+
+            {/* Card Commission */}
+            {showCardCommissionBoard && (
+                <CardCommissionBoard
+                    isOpen={showCardCommissionBoard}
+                    onClose={() => setShowCardCommissionBoard(false)}
+                />
+            )}
+
+            {/* User Profile */}
+            {showUserProfileBoard && (
+                <UserProfileBoard
+                    isOpen={showUserProfileBoard}
+                    onClose={() => setShowUserProfileBoard(false)}
+                />
+            )}
+
+            {/* Vendor Types */}
+            {showVendorTypesBoard && (
+                <VendorTypesBoard
+                    isOpen={showVendorTypesBoard}
+                    onClose={() => setShowVendorTypesBoard(false)}
+                />
+            )}
+
+            {/* Change Password */}
+            {showChangePasswordBoard && (
+                <ChangePasswordBoard
+                    isOpen={showChangePasswordBoard}
+                    onClose={() => setShowChangePasswordBoard(false)}
+                />
+            )}
+
+            {/* Chart of Accounts */}
             {showChartOfAccountantModal && (
                 <ChartOfAccountantModal
                     isOpen={showChartOfAccountantModal}
@@ -210,6 +325,7 @@ const MasterSubModal = ({ isOpen, onClose }) => {
                 />
             )}
 
+            {/* New Account */}
             {showNewAccountBoard && (
                 <NewAccountBoard
                     isOpen={showNewAccountBoard}
@@ -217,6 +333,7 @@ const MasterSubModal = ({ isOpen, onClose }) => {
                 />
             )}
 
+            {/* Fixed Assets */}
             {showFixedAssetsBoard && (
                 <FixedAssetsBoard
                     isOpen={showFixedAssetsBoard}
@@ -224,6 +341,7 @@ const MasterSubModal = ({ isOpen, onClose }) => {
                 />
             )}
 
+            {/* Liability */}
             {showLiabilityBoard && (
                 <LongTermLiabilityBoard
                     isOpen={showLiabilityBoard}
@@ -231,6 +349,7 @@ const MasterSubModal = ({ isOpen, onClose }) => {
                 />
             )}
 
+            {/* Depreciation */}
             {showDepreciationBoard && (
                 <DepreciationBoard
                     isOpen={showDepreciationBoard}
@@ -238,6 +357,7 @@ const MasterSubModal = ({ isOpen, onClose }) => {
                 />
             )}
 
+            {/* Fixed Income */}
             {showFixedIncomeBoard && (
                 <FixedIncomeBoard
                     isOpen={showFixedIncomeBoard}
@@ -245,6 +365,7 @@ const MasterSubModal = ({ isOpen, onClose }) => {
                 />
             )}
 
+            {/* Fixed Expenses */}
             {showFixedExpensesBoard && (
                 <FixedExpensesBoard
                     isOpen={showFixedExpensesBoard}
@@ -252,76 +373,7 @@ const MasterSubModal = ({ isOpen, onClose }) => {
                 />
             )}
 
-            {showCompanyBoard && (
-                <CompanyBoard
-                    isOpen={showCompanyBoard}
-                    onClose={() => setShowCompanyBoard(false)}
-                />
-            )}
-
-            {showCostCenterBoard && (
-                <CostCenterBoard
-                    isOpen={showCostCenterBoard}
-                    onClose={() => setShowCostCenterBoard(false)}
-                />
-            )}
-
-            {showDepartmentBoard && (
-                <DepartmentBoard
-                    isOpen={showDepartmentBoard}
-                    onClose={() => setShowDepartmentBoard(false)}
-                />
-            )}
-
-            {showCategoryBoard && (
-                <CategoryBoard
-                    isOpen={showCategoryBoard}
-                    onClose={() => setShowCategoryBoard(false)}
-                />
-            )}
-
-            {showSupplierMasterBoard && (
-                <SupplierMasterBoard
-                    isOpen={showSupplierMasterBoard}
-                    onClose={() => setShowSupplierMasterBoard(false)}
-                />
-            )}
-
-            {showCustomerMasterBoard && (
-                <CustomerMasterBoard
-                    isOpen={showCustomerMasterBoard}
-                    onClose={() => setShowCustomerMasterBoard(false)}
-                />
-            )}
-
-            {showCardCommissionBoard && (
-                <CardCommissionBoard
-                    isOpen={showCardCommissionBoard}
-                    onClose={() => setShowCardCommissionBoard(false)}
-                />
-            )}
-
-            {showUserProfileBoard && (
-                <UserProfileBoard
-                    isOpen={showUserProfileBoard}
-                    onClose={() => setShowUserProfileBoard(false)}
-                />
-            )}
-
-            {showVendorTypesBoard && (
-                <VendorTypesBoard
-                    isOpen={showVendorTypesBoard}
-                    onClose={() => setShowVendorTypesBoard(false)}
-                />
-            )}
-
-            {showChangePasswordBoard && (
-                <ChangePasswordBoard
-                    isOpen={showChangePasswordBoard}
-                    onClose={() => setShowChangePasswordBoard(false)}
-                />
-            )}
-
+            {/* Logout */}
             <ThankYouModal
                 isOpen={showThankYouModal}
                 onClose={() => {
@@ -341,7 +393,5 @@ const MasterSubModal = ({ isOpen, onClose }) => {
         </>
     );
 };
-
-
 
 export default MasterSubModal;

@@ -64,8 +64,7 @@ const SystemAdminModal = ({ isOpen, onClose }) => {
         { icon: Eraser, label: 'Clear Temp Data', action: 'clear' },
         { icon: Lock, label: 'Period Lock Facility', action: 'lock' },
         { icon: Users, label: 'User & Role Management', action: 'users' },
-        { icon: Key, label: 'Change Password', action: 'changePassword' },
-        { icon: Settings, label: 'Admin Configuration', action: 'systemSettings' }
+        { icon: Key, label: 'Change Password', action: 'changePassword' }
     ];
 
     return (
@@ -107,15 +106,10 @@ const SystemAdminModal = ({ isOpen, onClose }) => {
                     <div className="p-2 bg-white flex-1 overflow-y-auto max-h-[75vh] no-scrollbar">
                         {menuItems.map((item, idx) => {
                             const Icon = item.icon;
-                            const isLocked = item.action !== 'systemSettings' && item.action !== 'users' && localStorage.getItem(`isLocked_${item.action}`) === 'true';
+                            const isLocked = item.action !== 'users' && localStorage.getItem(`isLocked_${item.action}`) === 'true';
 
                             return (
                                 <React.Fragment key={idx}>
-                                    {/* Separator before Admin Configuration */}
-                                    {item.action === 'systemSettings' && (
-                                        <div className="my-1.5 h-[1px] bg-gray-200 mx-2" />
-                                    )}
-                                    
                                     <button
                                         onClick={() => {
                                             if (isLocked) {

@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import SimpleModal from '../../SimpleModal';
 import CalendarModal from '../../CalendarModal';
+import ReportTemplate from '../../ReportTemplate';
+import { systemLogService } from '../../../services/systemLog.service';
 import { 
     History, 
     Calendar, 
@@ -16,10 +18,30 @@ const SystemLogReportModal = ({ isOpen, onClose }) => {
     const [showCalendarFrom, setShowCalendarFrom] = useState(false);
     const [showCalendarTo, setShowCalendarTo] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [showReport, setShowReport] = useState(false);
+    const [reportData, setReportData] = useState([]);
 
-    const handleDisplay = () => {
+    const handleDisplay = async () => {
         setLoading(true);
-        setTimeout(() => setLoading(false), 1500);
+        try {
+            const response = await systemLogService.getAllLogs();
+            const formattedData = response.map(log => ({
+                id: log.id || log.Id || log.logId || log.LogId,
+                date: log.date || log.Date || log.createdAt || log.CreatedAt,
+                action: log.action || log.Action || log.actionPerformed || log.ActionPerformed,
+                user: log.user || log.User || log.userName || log.UserName,
+                ip: log.ip || log.Ip || log.ipAddress || log.IpAddress,
+                status: log.status || log.Status
+            }));
+            // Filter by date range if needed here, or pass dates to the backend API
+            setReportData(formattedData);
+            setShowReport(true);
+        } catch (error) {
+            console.error("Failed to fetch logs", error);
+            setReportData([]);
+        } finally {
+            setLoading(false);
+        }
     };
 
     const handleClear = () => {
@@ -47,6 +69,33 @@ const SystemLogReportModal = ({ isOpen, onClose }) => {
 
     return (
         <>
+            {showReport ? (
+                <div className="fixed inset-0 z-[200]">
+                    <div className="absolute top-4 right-4 z-[300]">
+                        <button 
+                            onClick={() => setShowReport(false)} 
+                            className="w-10 h-10 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center shadow-lg transition-all active:scale-95"
+                        >
+                            <X size={20} />
+                        </button>
+                    </div>
+                    <ReportTemplate
+                        title="System Log & Audit Report"
+                        subtitle={`Audit Trail From ${dateFrom} To ${dateTo}`}
+                        data={reportData}
+                        columns={[
+                            { header: 'Log ID', key: 'id' },
+                            { header: 'Date', key: 'date' },
+                            { header: 'Action Performed', key: 'action' },
+                            { header: 'User', key: 'user' },
+                            { header: 'IP Address', key: 'ip' },
+                            { header: 'Status', key: 'status' }
+                        ]}
+                        companyName="Super Admin Portal"
+                        isStandalone={true}
+                    />
+                </div>
+            ) : (
             <SimpleModal
                 isOpen={isOpen}
                 onClose={onClose}
@@ -100,6 +149,7 @@ const SystemLogReportModal = ({ isOpen, onClose }) => {
                     </div>   
                 </div>
             </SimpleModal>
+            )}
 
             {/* Calendar Modals */}
             <CalendarModal 

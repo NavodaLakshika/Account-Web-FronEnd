@@ -1,9 +1,13 @@
 import api from './api';
 
 export const systemLocksService = {
-    getAllLocks: async () => {
+    getAllLocks: async (empCode = null, companyCode = null, roleId = null) => {
         try {
-            const response = await api.get('/SystemLocks/getAll');
+            const params = {};
+            if (empCode) params.empCode = empCode;
+            if (companyCode) params.companyCode = companyCode;
+            if (roleId) params.roleId = roleId;
+            const response = await api.get('/SystemLocks/getAll', { params });
             return response.data;
         } catch (error) {
             console.error('Error fetching system locks:', error);
@@ -11,11 +15,14 @@ export const systemLocksService = {
         }
     },
     
-    updateLock: async (moduleId, isLocked) => {
+    updateLock: async (moduleId, isLocked, empCode = null, companyCode = null, roleId = null) => {
         try {
             const response = await api.post('/SystemLocks/update', {
                 moduleId,
-                isLocked
+                isLocked,
+                empCode,
+                companyCode,
+                roleId
             });
             return response.data;
         } catch (error) {

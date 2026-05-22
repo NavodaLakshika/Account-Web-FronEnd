@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import api from '../services/api';
 import {
     LayoutDashboard,
@@ -17,10 +18,27 @@ import {
     Trash2,
     Activity,
     Menu,
-    ShieldAlert
+    ShieldAlert,
+    Settings,
+    CheckCircle,
+    X,
+    FileText,
+    ShieldCheck,
+    Puzzle,
+    CreditCard,
+    Server,
+    AppWindow
 } from 'lucide-react';
 import ConfirmModal from '../components/modals/ConfirmModal';
 import AlertModal from '../components/modals/AlertModal';
+import AdminVerificationModal from '../components/modals/AdminVerificationModal';
+import SystemSettingsBoard from '../HomeMaster/SystemSettingsBoard';
+import SystemAnalyticsBoard from '../HomeMaster/SystemAnalyticsBoard';
+import SecurityAuditBoard from '../HomeMaster/SecurityAuditBoard';
+import IntegrationsBoard from '../HomeMaster/IntegrationsBoard';
+import BillingBoard from '../HomeMaster/BillingBoard';
+import SystemAnalysisBoard from '../HomeMaster/SystemAnalysisBoard';
+import SystemLogReportModal from '../components/modals/AdminReports/SystemLogReportModal';
 
 const SuperAdminDashboard = () => {
     const navigate = useNavigate();
@@ -40,6 +58,8 @@ const SuperAdminDashboard = () => {
     const [selectedRoleId, setSelectedRoleId] = useState(1);
     const [selectedGroupName, setSelectedGroupName] = useState('Administrators');
     const [savingRole, setSavingRole] = useState(false);
+    const [showRolePasswordModal, setShowRolePasswordModal] = useState(false);
+    const [rolePasswordInput, setRolePasswordInput] = useState('');
 
     // Transaction Modal State
     const [selectedCompany, setSelectedCompany] = useState(null);
@@ -56,7 +76,97 @@ const SuperAdminDashboard = () => {
     const [permissions, setPermissions] = useState([]);
     const [loadingPermissions, setLoadingPermissions] = useState(false);
     const [savingPermissions, setSavingPermissions] = useState(false);
+    const [showPasswordConfirmModal, setShowPasswordConfirmModal] = useState(false);
+    const [confirmPasswordInput, setConfirmPasswordInput] = useState('');
+    const [showTogglePasswordModal, setShowTogglePasswordModal] = useState(false);
+    const [togglePasswordInput, setTogglePasswordInput] = useState('');
+    const [pendingToggleFunc, setPendingToggleFunc] = useState(null);
     const [permSearch, setPermSearch] = useState('');
+    const [selectedPermEmployee, setSelectedPermEmployee] = useState('');
+    const [selectedPermCompany, setSelectedPermCompany] = useState('');
+    const [showPermTargetModal, setShowPermTargetModal] = useState(false);
+    const [permEmpSearchText, setPermEmpSearchText] = useState('');
+    const [permCompSearchText, setPermCompSearchText] = useState('');
+    const [permEmpSearchTriggered, setPermEmpSearchTriggered] = useState(false);
+    const [permCompSearchTriggered, setPermCompSearchTriggered] = useState(false);
+
+    // Employee Detail View State
+    const [selectedEmployeeView, setSelectedEmployeeView] = useState(null);
+
+    // Company Detail View State
+    const [selectedCompanyView, setSelectedCompanyView] = useState(null);
+
+    // Filter companies based on selected employee for Permissions Editor
+    const fetchBackups = async () => {
+        try {
+            const res = await api.get('/Backup/history');
+            if (res.data) setBackups(res.data);
+        } catch (error) {
+            console.error("Failed to fetch backups", error);
+        }
+    };
+
+    useEffect(() => {
+        if (activeMenu === 'Database') {
+            fetchBackups();
+        }
+    }, [activeMenu]);
+
+    const handleCreateBackup = async () => {
+        setCreatingBackup(true);
+        try {
+            // Get default path
+            let defaultPath = "C:\\Backup";
+            try {
+                const pathRes = await api.get('/Backup/default-path');
+                if (pathRes.data?.path) defaultPath = pathRes.data.path;
+            } catch (e) { }
+
+            const res = await api.post('/Backup/create', {
+                DatabaseName: 'Acc_Web',
+                BackupPath: defaultPath,
+                UserName: 'SuperAdmin'
+            });
+
+            setAlertConfig({
+                isOpen: true,
+                title: 'Success',
+                message: res.data?.message || 'Backup created successfully',
+                variant: 'success'
+            });
+            fetchBackups(); // Refresh list
+        } catch (error) {
+            console.error("Backup failed", error);
+            setAlertConfig({
+                isOpen: true,
+                title: 'Error',
+                message: error.response?.data?.message || 'Failed to create backup',
+                variant: 'warning'
+            });
+        } finally {
+            setCreatingBackup(false);
+        }
+    };
+
+    const getAvailablePermCompanies = () => {
+        if (!selectedPermEmployee) return allCompanies;
+        const empNode = hierarchy.find(h => h.empCode === selectedPermEmployee || h.emp_Code === selectedPermEmployee);
+        if (empNode && empNode.companies) {
+            return empNode.companies.map(c => ({
+                code: c.companyCode || c.company_Code,
+                comp_Name: c.companyName || c.company_Name
+            }));
+        }
+        return [];
+    };
+
+    const availablePermCompanies = getAvailablePermCompanies();
+
+    useEffect(() => {
+        if (selectedPermCompany && !availablePermCompanies.find(c => c.code === selectedPermCompany)) {
+            setSelectedPermCompany('');
+        }
+    }, [selectedPermEmployee, availablePermCompanies, selectedPermCompany]);
 
     // Confirm Modal State
     const [confirmConfig, setConfirmConfig] = useState({
@@ -73,6 +183,11 @@ const SuperAdminDashboard = () => {
         message: '',
         variant: 'success'
     });
+
+    const [showAdminConfig, setShowAdminConfig] = useState(false);
+    const [backups, setBackups] = useState([]);
+    const [creatingBackup, setCreatingBackup] = useState(false);
+    const [showSystemLogReport, setShowSystemLogReport] = useState(false);
 
     const closeConfirm = () => setConfirmConfig(prev => ({ ...prev, isOpen: false }));
 
@@ -97,8 +212,25 @@ const SuperAdminDashboard = () => {
         }
     };
 
+    const handleInitiateUpdateRole = () => {
+        setRolePasswordInput('');
+        setShowRolePasswordModal(true);
+    };
+
     const handleUpdateRole = async () => {
         if (!editingEmp) return;
+
+        if (!rolePasswordInput) {
+            setAlertConfig({
+                isOpen: true,
+                title: 'Error',
+                message: 'Super Admin password is required to update employee role.',
+                variant: 'warning'
+            });
+            return;
+        }
+
+        setShowRolePasswordModal(false);
         setSavingRole(true);
         try {
             await api.put(`/SuperAdmin/employee/${editingEmp.emp_Code || editingEmp.empCode}/role`, {
@@ -154,6 +286,7 @@ const SuperAdminDashboard = () => {
                 navigate('/dashboard');
             } else {
                 fetchAdminData();
+                fetchSystemRoles();
             }
         } catch (e) {
             navigate('/');
@@ -172,10 +305,10 @@ const SuperAdminDashboard = () => {
     }, [activeMenu]);
 
     useEffect(() => {
-        if (activeMenu === 'Role Features' && selectedRole) {
+        if (activeMenu === 'Role Features' && selectedRole && !showPermTargetModal) {
             fetchRolePermissions(selectedRole);
         }
-    }, [activeMenu, selectedRole]);
+    }, [activeMenu, selectedRole, showPermTargetModal]);
 
     const fetchSystemRoles = async () => {
         try {
@@ -197,14 +330,23 @@ const SuperAdminDashboard = () => {
     const fetchRolePermissions = async (roleId) => {
         setLoadingPermissions(true);
         try {
-            const res = await api.get(`/UserRole/system-permissions?userRoleId=${roleId}`);
-            setPermissions(res.data || []);
+            const params = { userRoleId: roleId };
+            if (selectedPermEmployee) params.empCode = selectedPermEmployee;
+            if (selectedPermCompany) params.companyCode = selectedPermCompany;
+
+            const res = await api.get('/UserRole/system-permissions', { params });
+            const data = res.data || [];
+
+            // Remove duplicates from UI
+            const uniquePerms = Array.from(new Map(data.map(item => [item.system_Fuction || item.systemFuction || item.System_Fuction, item])).values());
+
+            setPermissions(uniquePerms);
         } catch (e) {
             console.error("Error fetching permissions", e);
             setAlertConfig({
                 isOpen: true,
                 title: 'Error',
-                message: 'Failed to load system permissions for the selected role.',
+                message: 'Failed to load system permissions for the selected role and target.',
                 variant: 'warning'
             });
         } finally {
@@ -212,10 +354,26 @@ const SuperAdminDashboard = () => {
         }
     };
 
-    const handleTogglePermission = (funcCode) => {
+    const handleInitiateToggle = (funcCode) => {
+        setPendingToggleFunc(funcCode);
+        setTogglePasswordInput('');
+        setShowTogglePasswordModal(true);
+    };
+
+    const confirmAndTogglePermission = () => {
+        if (!togglePasswordInput) {
+            setAlertConfig({
+                isOpen: true,
+                title: 'Error',
+                message: 'Super Admin password is required to toggle permission.',
+                variant: 'warning'
+            });
+            return;
+        }
+
         setPermissions(prev => prev.map(p => {
             const code = p.system_Fuction || p.systemFuction || p.System_Fuction;
-            if (code === funcCode) {
+            if (code === pendingToggleFunc) {
                 const currentAllow = p.allow_Fuction || p.allowFuction || p.Allow_Fuction;
                 const newAllow = currentAllow === 'T' ? 'F' : 'T';
                 return {
@@ -227,13 +385,43 @@ const SuperAdminDashboard = () => {
             }
             return p;
         }));
+
+        setShowTogglePasswordModal(false);
+        setPendingToggleFunc(null);
     };
 
-    const handleSavePermissions = async () => {
+    const handleAllowAllPermissions = () => {
+        setPermissions(prev => prev.map(p => ({
+            ...p,
+            allow_Fuction: 'T',
+            allowFuction: 'T',
+            Allow_Fuction: 'T'
+        })));
+    };
+
+    const handleInitiateSavePermissions = () => {
+        setConfirmPasswordInput('');
+        setShowPasswordConfirmModal(true);
+    };
+
+    const confirmAndSavePermissions = async () => {
+        if (!confirmPasswordInput) {
+            setAlertConfig({
+                isOpen: true,
+                title: 'Error',
+                message: 'Super Admin password is required to save permissions.',
+                variant: 'warning'
+            });
+            return;
+        }
+
+        setShowPasswordConfirmModal(false);
         setSavingPermissions(true);
         try {
             const payload = {
                 userRoleId: selectedRole.toString(),
+                empCode: selectedPermEmployee || null,
+                companyCode: selectedPermCompany || null,
                 permissions: permissions.map(p => ({
                     system_Fuction: p.system_Fuction || p.systemFuction || p.System_Fuction,
                     allow_Fuction: p.allow_Fuction || p.allowFuction || p.Allow_Fuction
@@ -243,7 +431,7 @@ const SuperAdminDashboard = () => {
             setAlertConfig({
                 isOpen: true,
                 title: 'Success',
-                message: 'System role permissions updated successfully and propagated to all companies.',
+                message: 'System role permissions updated successfully for the selected target.',
                 variant: 'success'
             });
         } catch (e) {
@@ -392,8 +580,15 @@ const SuperAdminDashboard = () => {
         { name: 'Companies', icon: Building2 },
         { name: 'Employees', icon: Users },
         { name: 'Role Features', icon: ShieldAlert },
+        { name: 'Admin Config', icon: Settings },
+                { name: 'Billing & Plans', icon: CreditCard },
         { name: 'Analytics', icon: Activity },
+        { name: 'System Analysis', icon: Server },
         { name: 'Database', icon: Database },
+        { name: 'Security Audit', icon: ShieldCheck },
+        { name: 'Integrations', icon: Puzzle },
+        { name: 'App List', icon: AppWindow }
+
     ];
 
     return (
@@ -417,8 +612,8 @@ const SuperAdminDashboard = () => {
                             key={item.name}
                             onClick={() => setActiveMenu(item.name)}
                             className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all ${activeMenu === item.name
-                                    ? 'bg-[#00acee]/10 text-[#00acee] font-bold'
-                                    : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900 font-medium'
+                                ? 'bg-[#00acee]/10 text-[#00acee] font-bold'
+                                : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900 font-medium'
                                 }`}
                         >
                             <item.icon className={`w-5 h-5 ${activeMenu === item.name ? 'text-[#00acee]' : 'text-slate-500'}`} />
@@ -445,7 +640,7 @@ const SuperAdminDashboard = () => {
                 <header className="h-20 bg-white border-b border-slate-200 flex items-center justify-between px-8 shrink-0">
                     <div className="flex items-center gap-4">
                         <Menu className="w-6 h-6 text-slate-900 md:hidden cursor-pointer" />
-                        <h2 className="text-slate-900 text-xl font-bold hidden sm:block">Super Admin Portal</h2>
+                        <h2 className="text-slate-900 text-[16px] font-bold hidden sm:block uppercase">Onimta Information Technology</h2>
                     </div>
 
                     <div className="flex items-center gap-6">
@@ -466,7 +661,7 @@ const SuperAdminDashboard = () => {
                                 <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
                             </button>
                             <div className="relative">
-                                <button 
+                                <button
                                     className="relative p-2 text-slate-500 hover:text-slate-900 transition-colors"
                                     onClick={() => setShowResets(!showResets)}
                                 >
@@ -475,7 +670,7 @@ const SuperAdminDashboard = () => {
                                         <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
                                     )}
                                 </button>
-                                
+
                                 {showResets && (
                                     <div className="absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200">
                                         <div className="p-4 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
@@ -499,7 +694,7 @@ const SuperAdminDashboard = () => {
                                                         </div>
                                                         <div className="bg-slate-100 p-2 rounded-lg flex items-center justify-between">
                                                             <code className="text-xs text-slate-600 font-mono truncate mr-2">{req.token}</code>
-                                                            <button 
+                                                            <button
                                                                 onClick={() => {
                                                                     navigator.clipboard.writeText(req.token);
                                                                     setAlertConfig({
@@ -570,125 +765,125 @@ const SuperAdminDashboard = () => {
                                 </div>
                             </div>
 
-                    {/* Main Table Card */}
-                    <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-                        <div className="p-6 border-b border-slate-100 flex items-center justify-between">
-                            <h2 className="text-xl font-bold text-slate-900">System Overview</h2>
-                            <button className="p-2 bg-slate-50 rounded-full text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors">
-                                <Search className="w-4 h-4" />
-                            </button>
-                        </div>
+                            {/* Main Table Card */}
+                            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                                <div className="p-6 border-b border-slate-100 flex items-center justify-between">
+                                    <h2 className="text-xl font-bold text-slate-900">System Overview</h2>
+                                    <button className="p-2 bg-slate-50 rounded-full text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors">
+                                        <Search className="w-4 h-4" />
+                                    </button>
+                                </div>
 
-                        <div className="w-full overflow-x-auto">
-                            <table className="w-full text-left border-collapse">
-                                <thead>
-                                    <tr className="border-b border-slate-100 bg-slate-50/50">
-                                        <th className="py-4 px-6 text-xs font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap">Employee</th>
-                                        <th className="py-4 px-6 text-xs font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap">Role</th>
-                                        <th className="py-4 px-6 text-xs font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap">Last Login</th>
-                                        <th className="py-4 px-6 text-xs font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap">Login Count</th>
-                                        <th className="py-4 px-6 text-xs font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap">Companies</th>
-                                        <th className="py-4 px-6 text-xs font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap text-right">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {filteredHierarchy.map((emp) => (
-                                        <React.Fragment key={emp.empCode}>
-                                            <tr className="border-b border-slate-50 hover:bg-slate-50/80 transition-colors cursor-pointer group" onClick={() => toggleEmp(emp.empCode)}>
-                                                <td className="py-4 px-6">
-                                                    <div className="flex items-center gap-3">
-                                                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#00acee] to-[#0082b3] text-white flex items-center justify-center font-bold text-sm shadow-sm">
-                                                            {emp.empName.charAt(0).toUpperCase()}
-                                                        </div>
-                                                        <div>
-                                                            <p className="text-sm font-bold text-slate-900">{emp.empName}</p>
-                                                            <p className="text-xs text-slate-500 font-mono mt-0.5">{emp.empCode} • {emp.email || 'No Email'}</p>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td className="py-4 px-6">
-                                                    <span className={`px-3 py-1 rounded-full text-[10px] uppercase tracking-widest font-bold ${emp.role === 99 ? 'bg-purple-100 text-purple-600' : 'bg-slate-100 text-slate-600'}`}>
-                                                        {emp.role === 99 ? 'Super Admin' : `Role ${emp.role}`}
-                                                    </span>
-                                                </td>
-                                                <td className="py-4 px-6 text-sm text-slate-700 font-medium">
-                                                    {emp.lastLogin ? new Date(emp.lastLogin).toLocaleDateString() : 'Never'}
-                                                </td>
-                                                <td className="py-4 px-6 text-sm text-slate-700 font-medium">
-                                                    {emp.loginCount || 0}
-                                                </td>
-                                                <td className="py-4 px-6">
-                                                    <div className="flex items-center gap-2">
-                                                        <span className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-xs font-bold">
-                                                            {emp.companies.length}
-                                                        </span>
-                                                        {expandedEmps[emp.empCode] ? <ChevronDown className="w-4 h-4 text-slate-400" /> : <ChevronRight className="w-4 h-4 text-slate-400" />}
-                                                    </div>
-                                                </td>
-                                                <td className="py-4 px-6 text-right">
-                                                    <div className="flex items-center justify-end gap-2">
-                                                        <button 
-                                                            className="p-2 text-slate-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition-all"
-                                                            onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                setEditingEmp(emp);
-                                                                setSelectedRoleId(emp.role);
-                                                                setSelectedGroupName(emp.memberId || 'Administrators');
-                                                            }}
-                                                            title="Edit User Role"
-                                                        >
-                                                            <Edit className="w-4 h-4" />
-                                                        </button>
-                                                        <button className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all" onClick={(e) => handleDeleteEmployee(e, emp.empCode)}>
-                                                            <Trash2 className="w-4 h-4" />
-                                                        </button>
-                                                    </div>
-                                                </td>
+                                <div className="w-full overflow-x-auto">
+                                    <table className="w-full text-left border-collapse">
+                                        <thead>
+                                            <tr className="border-b border-slate-100 bg-slate-50/50">
+                                                <th className="py-4 px-6 text-xs font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap">Employee</th>
+                                                <th className="py-4 px-6 text-xs font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap">Role</th>
+                                                <th className="py-4 px-6 text-xs font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap">Last Login</th>
+                                                <th className="py-4 px-6 text-xs font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap">Login Count</th>
+                                                <th className="py-4 px-6 text-xs font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap">Companies</th>
+                                                <th className="py-4 px-6 text-xs font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap text-right">Action</th>
                                             </tr>
-
-                                            {/* Nested Companies */}
-                                            {expandedEmps[emp.empCode] && (
-                                                <tr className="bg-slate-50/50 border-b border-slate-100">
-                                                    <td colSpan={6} className="py-6 px-8">
-                                                        {emp.companies.length === 0 ? (
-                                                            <p className="text-sm text-slate-500 italic text-center py-4 bg-white border border-slate-200 rounded-xl">No companies assigned.</p>
-                                                        ) : (
-                                                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                                                                {emp.companies.map(comp => (
-                                                                    <div key={comp.companyCode} onClick={() => openTransactionsModal(comp)} className="bg-white border border-slate-200 p-4 rounded-xl shadow-sm flex items-center justify-between hover:border-[#00acee] hover:shadow-md transition-all cursor-pointer group">
-                                                                        <div className="flex items-center gap-4">
-                                                                            <div className="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center group-hover:bg-[#00acee]/10 transition-colors">
-                                                                                <Building2 className="w-6 h-6 text-emerald-500 group-hover:text-[#00acee] transition-colors" />
-                                                                            </div>
-                                                                            <div>
-                                                                                <p className="text-sm font-bold text-slate-900">{comp.companyName || 'Unknown Company'}</p>
-                                                                                <p className="text-xs text-slate-500 font-mono mt-0.5">{comp.companyCode}</p>
-                                                                            </div>
-                                                                        </div>
-                                                                        <div className="flex items-center gap-6">
-                                                                            <div className="text-right">
-                                                                                <p className="text-[10px] tracking-widest uppercase text-slate-400 font-bold mb-1">Transactions</p>
-                                                                                <p className="text-lg font-bold text-slate-900 leading-none">{comp.transactions}</p>
-                                                                            </div>
-                                                                            <button className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all" onClick={(e) => handleDeleteCompany(e, comp.companyCode, emp.empCode)}>
-                                                                                <Trash2 className="w-4 h-4" />
-                                                                            </button>
-                                                                        </div>
-                                                                    </div>
-                                                                ))}
+                                        </thead>
+                                        <tbody>
+                                            {filteredHierarchy.map((emp) => (
+                                                <React.Fragment key={emp.empCode}>
+                                                    <tr className="border-b border-slate-50 hover:bg-slate-50/80 transition-colors cursor-pointer group" onClick={() => toggleEmp(emp.empCode)}>
+                                                        <td className="py-4 px-6">
+                                                            <div className="flex items-center gap-3">
+                                                                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#00acee] to-[#0082b3] text-white flex items-center justify-center font-bold text-sm shadow-sm">
+                                                                    {emp.empName.charAt(0).toUpperCase()}
+                                                                </div>
+                                                                <div>
+                                                                    <p className="text-sm font-bold text-slate-900">{emp.empName}</p>
+                                                                    <p className="text-xs text-slate-500 font-mono mt-0.5">{emp.empCode} • {emp.email || 'No Email'}</p>
+                                                                </div>
                                                             </div>
-                                                        )}
-                                                    </td>
-                                                </tr>
-                                            )}
-                                        </React.Fragment>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
+                                                        </td>
+                                                        <td className="py-4 px-6">
+                                                            <span className={`px-3 py-1 rounded-full text-[10px] uppercase tracking-widest font-bold ${emp.role === 99 ? 'bg-purple-100 text-purple-600' : 'bg-slate-100 text-slate-600'}`}>
+                                                                {emp.role === 99 ? 'Super Admin' : `Role ${emp.role}`}
+                                                            </span>
+                                                        </td>
+                                                        <td className="py-4 px-6 text-sm text-slate-700 font-medium">
+                                                            {emp.lastLogin ? new Date(emp.lastLogin).toLocaleDateString() : 'Never'}
+                                                        </td>
+                                                        <td className="py-4 px-6 text-sm text-slate-700 font-medium">
+                                                            {emp.loginCount || 0}
+                                                        </td>
+                                                        <td className="py-4 px-6">
+                                                            <div className="flex items-center gap-2">
+                                                                <span className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-xs font-bold">
+                                                                    {emp.companies.length}
+                                                                </span>
+                                                                {expandedEmps[emp.empCode] ? <ChevronDown className="w-4 h-4 text-slate-400" /> : <ChevronRight className="w-4 h-4 text-slate-400" />}
+                                                            </div>
+                                                        </td>
+                                                        <td className="py-4 px-6 text-right">
+                                                            <div className="flex items-center justify-end gap-2">
+                                                                <button
+                                                                    className="p-2 text-slate-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition-all"
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        setEditingEmp(emp);
+                                                                        setSelectedRoleId(emp.role);
+                                                                        setSelectedGroupName(emp.memberId || 'Administrators');
+                                                                    }}
+                                                                    title="Edit User Role"
+                                                                >
+                                                                    <Edit className="w-4 h-4" />
+                                                                </button>
+                                                                <button className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all" onClick={(e) => handleDeleteEmployee(e, emp.empCode)}>
+                                                                    <Trash2 className="w-4 h-4" />
+                                                                </button>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
 
-                        </div>
-                    </>
+                                                    {/* Nested Companies */}
+                                                    {expandedEmps[emp.empCode] && (
+                                                        <tr className="bg-slate-50/50 border-b border-slate-100">
+                                                            <td colSpan={6} className="py-6 px-8">
+                                                                {emp.companies.length === 0 ? (
+                                                                    <p className="text-sm text-slate-500 italic text-center py-4 bg-white border border-slate-200 rounded-xl">No companies assigned.</p>
+                                                                ) : (
+                                                                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                                                                        {emp.companies.map(comp => (
+                                                                            <div key={comp.companyCode} onClick={() => openTransactionsModal(comp)} className="bg-white border border-slate-200 p-4 rounded-xl shadow-sm flex items-center justify-between hover:border-[#00acee] hover:shadow-md transition-all cursor-pointer group">
+                                                                                <div className="flex items-center gap-4">
+                                                                                    <div className="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center group-hover:bg-[#00acee]/10 transition-colors">
+                                                                                        <Building2 className="w-6 h-6 text-emerald-500 group-hover:text-[#00acee] transition-colors" />
+                                                                                    </div>
+                                                                                    <div>
+                                                                                        <p className="text-sm font-bold text-slate-900">{comp.companyName || 'Unknown Company'}</p>
+                                                                                        <p className="text-xs text-slate-500 font-mono mt-0.5">{comp.companyCode}</p>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div className="flex items-center gap-6">
+                                                                                    <div className="text-right">
+                                                                                        <p className="text-[10px] tracking-widest uppercase text-slate-400 font-bold mb-1">Transactions</p>
+                                                                                        <p className="text-lg font-bold text-slate-900 leading-none">{comp.transactions}</p>
+                                                                                    </div>
+                                                                                    <button className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all" onClick={(e) => handleDeleteCompany(e, comp.companyCode, emp.empCode)}>
+                                                                                        <Trash2 className="w-4 h-4" />
+                                                                                    </button>
+                                                                                </div>
+                                                                            </div>
+                                                                        ))}
+                                                                    </div>
+                                                                )}
+                                                            </td>
+                                                        </tr>
+                                                    )}
+                                                </React.Fragment>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                            </div>
+                        </>
                     )}
 
                     {/* COMPANIES VIEW */}
@@ -710,17 +905,17 @@ const SuperAdminDashboard = () => {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {allCompanies.filter(c => 
-                                            c.comp_Name?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                                        {allCompanies.filter(c =>
+                                            c.comp_Name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                                             c.code?.toLowerCase().includes(searchTerm.toLowerCase())
                                         ).map(comp => (
-                                            <tr key={comp.code} className="border-b border-slate-50 hover:bg-slate-50 transition-colors">
+                                            <tr key={comp.code} onClick={() => setSelectedCompanyView(comp)} className="border-b border-slate-50 hover:bg-slate-50 cursor-pointer transition-colors">
                                                 <td className="py-4 px-6 font-mono text-sm text-slate-900 font-bold">{comp.code}</td>
                                                 <td className="py-4 px-6 text-sm text-slate-900 font-bold">{comp.comp_Name || 'N/A'}</td>
                                                 <td className="py-4 px-6 text-sm text-slate-500">{comp.email || 'N/A'}</td>
                                                 <td className="py-4 px-6 text-sm text-slate-500">{comp.phone || 'N/A'}</td>
                                                 <td className="py-4 px-6 text-right">
-                                                    <button className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all" onClick={(e) => handleDeleteCompany(e, comp.code, null)}>
+                                                    <button className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all" onClick={(e) => { e.stopPropagation(); handleDeleteCompany(e, comp.code, null); }}>
                                                         <Trash2 className="w-4 h-4" />
                                                     </button>
                                                 </td>
@@ -751,11 +946,11 @@ const SuperAdminDashboard = () => {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {allEmployees.filter(e => 
-                                            e.emp_Name?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                                        {allEmployees.filter(e =>
+                                            e.emp_Name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                                             e.emp_Code?.toLowerCase().includes(searchTerm.toLowerCase())
                                         ).map(emp => (
-                                            <tr key={emp.emp_Code} className="border-b border-slate-50 hover:bg-slate-50 transition-colors">
+                                            <tr key={emp.emp_Code} onClick={() => setSelectedEmployeeView(emp)} className="border-b border-slate-50 hover:bg-slate-50 cursor-pointer transition-colors">
                                                 <td className="py-4 px-6 font-mono text-sm text-slate-900 font-bold">{emp.emp_Code}</td>
                                                 <td className="py-4 px-6 text-sm text-slate-900 font-bold">{emp.emp_Name || 'N/A'}</td>
                                                 <td className="py-4 px-6 text-sm text-slate-500">{emp.email || 'N/A'}</td>
@@ -766,18 +961,18 @@ const SuperAdminDashboard = () => {
                                                 </td>
                                                 <td className="py-4 px-6 text-right">
                                                     <div className="flex items-center justify-end gap-2">
-                                                        <button 
+                                                        <button
                                                             className="p-2 text-slate-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition-all"
-                                                            onClick={() => {
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
                                                                 setEditingEmp(emp);
                                                                 setSelectedRoleId(emp.userRole_Id);
                                                                 setSelectedGroupName(emp.member_Id || 'Administrators');
                                                             }}
                                                             title="Edit User Role"
                                                         >
-                                                            <Edit className="w-4 h-4" />
                                                         </button>
-                                                        <button className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all" onClick={(e) => handleDeleteEmployee(e, emp.emp_Code)}>
+                                                        <button className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all" onClick={(e) => { e.stopPropagation(); handleDeleteEmployee(e, emp.emp_Code); }}>
                                                             <Trash2 className="w-4 h-4" />
                                                         </button>
                                                     </div>
@@ -790,12 +985,127 @@ const SuperAdminDashboard = () => {
                         </div>
                     )}                    {/* DATABASE VIEW */}
                     {activeMenu === 'Database' && (
-                        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-16 text-center animate-in fade-in zoom-in-95 duration-200">
-                            <div className="w-20 h-20 bg-[#00acee]/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                                <Database className="w-10 h-10 text-[#00acee]" />
+                        <div className="flex flex-col gap-6 animate-in fade-in zoom-in-95 duration-200 h-full max-h-[82vh] overflow-y-auto no-scrollbar pb-10">
+                            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0">
+                                <div>
+                                    <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+                                        <Database className="text-[#00acee]" size={20} />
+                                        Database Management
+                                    </h2>
+                                    <p className="text-slate-500 text-xs mt-1">Manage system backups, optimize performance, and monitor database health.</p>
+                                </div>
+                                <div className="flex items-center gap-3">
+                                    <button
+                                        onClick={handleCreateBackup}
+                                        disabled={creatingBackup}
+                                        className="px-5 py-2.5 bg-[#00acee] hover:bg-[#009adb] text-white text-xs font-bold rounded-xl shadow-md transition-all active:scale-95 flex items-center gap-2 disabled:opacity-50"
+                                    >
+                                        {creatingBackup ? <Loader2 size={14} className="animate-spin" /> : <Database size={14} />}
+                                        {creatingBackup ? 'Creating...' : 'Create Full Backup'}
+                                    </button>
+                                </div>
                             </div>
-                            <h2 className="text-2xl font-bold text-slate-900 mb-2">Database Management</h2>
-                            <p className="text-slate-550 max-w-md mx-auto">Raw database access and query execution tools are restricted. Please use the administrative panels to manage data.</p>
+
+                            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 shrink-0">
+                                <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+                                    <div className="flex items-center justify-between mb-4">
+                                        <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-500">
+                                            <Database size={18} />
+                                        </div>
+                                        <span className="px-2 py-1 bg-emerald-50 text-emerald-600 text-[10px] font-bold uppercase tracking-wider rounded-lg">Healthy</span>
+                                    </div>
+                                    <div>
+                                        <h3 className="text-slate-500 text-xs font-black uppercase tracking-widest mb-1">Database Size</h3>
+                                        <p className="text-2xl font-bold text-slate-900">N/A</p>
+                                    </div>
+                                </div>
+                                <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+                                    <div className="flex items-center justify-between mb-4">
+                                        <div className="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center text-purple-500">
+                                            <Users size={18} />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h3 className="text-slate-500 text-xs font-black uppercase tracking-widest mb-1">Total Records</h3>
+                                        <p className="text-2xl font-bold text-slate-900">
+                                            {allCompanies.length + allEmployees.length + hierarchy.reduce((acc, emp) => acc + (emp.companies ? emp.companies.reduce((sum, comp) => sum + (comp.transactions || comp.Transactions || 0), 0) : 0), 0)}
+                                        </p>
+                                    </div>
+                                </div>
+                                <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+                                    <div className="flex items-center justify-between mb-4">
+                                        <div className="w-10 h-10 rounded-xl bg-orange-50 flex items-center justify-center text-orange-500">
+                                            <Activity size={18} />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h3 className="text-slate-500 text-xs font-black uppercase tracking-widest mb-1">Active Connections</h3>
+                                        <p className="text-2xl font-bold text-slate-900">{allEmployees.length || 0}</p>
+                                    </div>
+                                </div>
+                                <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+                                    <div className="flex items-center justify-between mb-4">
+                                        <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-500">
+                                            <CheckCircle size={18} />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h3 className="text-slate-500 text-xs font-black uppercase tracking-widest mb-1">Last Backup</h3>
+                                        <p className="text-lg font-bold text-slate-900">
+                                            {backups.length > 0 && backups[0].createdAt
+                                                ? new Date(backups[backups.length - 1].createdAt || backups[0].createdAt).toLocaleString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true }).toUpperCase()
+                                                : 'No Backups'}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 shrink-0">
+                                <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+                                    <h3 className="text-sm font-bold text-slate-900 uppercase tracking-widest mb-4">Maintenance Operations</h3>
+                                    <div className="flex flex-col gap-3">
+                                        <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
+                                            <div>
+                                                <h4 className="text-sm font-bold text-slate-800">Rebuild Indexes</h4>
+                                                <p className="text-xs text-slate-500 mt-1">Improves database query performance by defragmenting indexes.</p>
+                                            </div>
+                                            <button className="px-4 py-2 bg-white border border-slate-200 hover:border-[#00acee] hover:text-[#00acee] text-slate-600 text-xs font-bold rounded-lg shadow-sm transition-all shrink-0">Run Now</button>
+                                        </div>
+                                        <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
+                                            <div>
+                                                <h4 className="text-sm font-bold text-slate-800">Clear Query Cache</h4>
+                                                <p className="text-xs text-slate-500 mt-1">Frees up memory by clearing the SQL server query plan cache.</p>
+                                            </div>
+                                            <button className="px-4 py-2 bg-white border border-slate-200 hover:border-orange-500 hover:text-orange-500 text-slate-600 text-xs font-bold rounded-lg shadow-sm transition-all shrink-0">Clear</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+                                    <h3 className="text-sm font-bold text-slate-900 uppercase tracking-widest mb-4">Recent Backups</h3>
+                                    <div className="flex flex-col gap-0 border border-slate-100 rounded-xl overflow-hidden">
+                                        {(backups.length > 0 ? backups.slice().reverse().slice(0, 5) : []).map((b, i) => {
+                                            const isFailed = b.status?.toLowerCase() === 'failed';
+                                            return (
+                                                <div key={i} className="flex items-center justify-between p-3 border-b border-slate-100 last:border-0 bg-white hover:bg-slate-50 transition-colors">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${isFailed ? 'bg-red-50 text-red-500' : 'bg-emerald-50 text-emerald-500'}`}>
+                                                            {isFailed ? <X size={14} /> : <CheckCircle size={14} />}
+                                                        </div>
+                                                        <div>
+                                                            <p className="text-xs font-bold text-slate-800" title={b.backupPath}>
+                                                                {b.createdAt ? new Date(b.createdAt).toLocaleString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true }).toUpperCase() : 'N/A'}
+                                                            </p>
+                                                            <p className="text-[10px] text-slate-500 uppercase tracking-wider">{b.createdBy || 'Manual'} • {b.status}</p>
+                                                        </div>
+                                                    </div>
+                                                    <button className="text-[#00acee] hover:text-[#009adb] text-xs font-bold px-3 py-1 bg-[#00acee]/10 rounded-lg shrink-0">Restore</button>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     )}
 
@@ -810,50 +1120,81 @@ const SuperAdminDashboard = () => {
                                     </h2>
                                     <p className="text-slate-500 text-xs mt-1">Configure default enabled/disabled features for each user role. Changes propagate globally to all tenant companies.</p>
                                 </div>
-                                <button
-                                    onClick={handleSavePermissions}
-                                    disabled={savingPermissions || loadingPermissions}
-                                    className="px-5 py-2.5 bg-[#00acee] hover:bg-[#009adb] text-white text-xs font-bold rounded-xl shadow-md transition-all active:scale-95 flex items-center gap-2 self-start"
-                                >
-                                    {savingPermissions ? (
-                                        <>
-                                            <Loader2 className="animate-spin" size={13} />
-                                            Saving Changes...
-                                        </>
-                                    ) : (
-                                        'Save Role Permissions'
-                                    )}
-                                </button>
+                                <div className="flex items-center gap-3 self-start">
+                                    <button
+                                        onClick={handleAllowAllPermissions}
+                                        disabled={loadingPermissions}
+                                        className="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold rounded-xl shadow-md transition-all active:scale-95 flex items-center gap-2"
+                                    >
+                                        <CheckCircle size={14} />
+                                        Allow All
+                                    </button>
+                                    <button
+                                        onClick={handleInitiateSavePermissions}
+                                        disabled={savingPermissions || loadingPermissions}
+                                        className="px-5 py-2.5 bg-[#00acee] hover:bg-[#009adb] text-white text-xs font-bold rounded-xl shadow-md transition-all active:scale-95 flex items-center gap-2"
+                                    >
+                                        {savingPermissions ? (
+                                            <>
+                                                <Loader2 className="animate-spin" size={13} />
+                                                Saving Changes...
+                                            </>
+                                        ) : (
+                                            'Save Role Permissions'
+                                        )}
+                                    </button>
+                                </div>
                             </div>
 
-                            {/* Role Select pills and search bar */}
-                            <div className="flex flex-col md:flex-row justify-between items-center gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200/60">
-                                <div className="flex flex-wrap items-center gap-2">
-                                    <span className="text-xs font-black text-slate-550 uppercase tracking-widest mr-2">Select Role:</span>
-                                    {systemRoles.map(role => (
-                                        <button
-                                            key={role.id}
-                                            onClick={() => setSelectedRole(role.id)}
-                                            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                                                selectedRole === role.id 
-                                                    ? 'bg-[#00acee] text-white shadow-sm'
-                                                    : 'bg-white hover:bg-slate-100 border border-slate-200 text-slate-600'
-                                            }`}
-                                        >
-                                            {role.name}
-                                        </button>
-                                    ))}
+                            <div className="bg-slate-50 rounded-xl p-4 border border-slate-200/60 flex flex-col gap-4">
+                                <div className="bg-white p-4 rounded-xl border border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
+                                    <div className="flex flex-col w-full sm:w-auto">
+                                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Configuration Target</span>
+                                        <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+                                            <span className="text-sm font-bold text-slate-700">
+                                                {selectedPermEmployee ? allEmployees.find(e => e.emp_Code === selectedPermEmployee)?.empName || allEmployees.find(e => e.emp_Code === selectedPermEmployee)?.emp_Name || selectedPermEmployee : 'Global Employees'}
+                                            </span>
+                                            <span className="hidden sm:inline text-slate-300">/</span>
+                                            <span className="text-sm font-bold text-[#00acee]">
+                                                {selectedPermCompany ? availablePermCompanies.find(c => c.code === selectedPermCompany || c.companyCode === selectedPermCompany)?.comp_Name || availablePermCompanies.find(c => c.code === selectedPermCompany || c.companyCode === selectedPermCompany)?.companyName || selectedPermCompany : 'Global Companies'}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <button
+                                        onClick={() => setShowPermTargetModal(true)}
+                                        className="w-full sm:w-auto px-5 py-2.5 bg-slate-50 border border-slate-200 hover:border-[#00acee] hover:text-[#00acee] text-slate-600 text-xs font-bold uppercase tracking-wider rounded-xl shadow-sm transition-all"
+                                    >
+                                        Change Target
+                                    </button>
                                 </div>
 
-                                <div className="relative w-full md:w-64">
-                                    <Search className="absolute left-3 top-2.5 text-slate-400 w-4 h-4" />
-                                    <input
-                                        type="text"
-                                        placeholder="Search functions..."
-                                        value={permSearch}
-                                        onChange={e => setPermSearch(e.target.value)}
-                                        className="pl-9 pr-4 py-2 border border-slate-250 bg-white rounded-xl text-xs w-full outline-none focus:border-[#00acee] focus:ring-1 focus:ring-[#00acee] transition-all"
-                                    />
+                                <div className="flex flex-col md:flex-row justify-between items-center gap-4 pt-2 border-t border-slate-200 border-dashed">
+                                    <div className="flex flex-wrap items-center gap-2">
+                                        <span className="text-xs font-black text-slate-550 uppercase tracking-widest mr-2">Select Role:</span>
+                                        {systemRoles.map(role => (
+                                            <button
+                                                key={role.id}
+                                                onClick={() => setSelectedRole(role.id)}
+                                                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${selectedRole === role.id
+                                                        ? 'bg-[#00acee] text-white shadow-sm'
+                                                        : 'bg-white hover:bg-slate-100 border border-slate-200 text-slate-600'
+                                                    }`}
+                                            >
+                                                {role.name}
+                                            </button>
+                                        ))}
+                                    </div>
+
+                                    <div className="relative w-full md:w-64">
+                                        <Search className="absolute left-3 top-2.5 text-slate-400 w-4 h-4" />
+                                        <input
+                                            type="text"
+                                            placeholder="Search functions..."
+                                            value={permSearch}
+                                            onChange={e => setPermSearch(e.target.value)}
+                                            className="pl-9 pr-4 py-2 border border-slate-250 bg-white rounded-xl text-xs w-full outline-none focus:border-[#00acee] focus:ring-1 focus:ring-[#00acee] transition-all"
+                                        />
+                                    </div>
                                 </div>
                             </div>
 
@@ -897,12 +1238,11 @@ const SuperAdminDashboard = () => {
                                                             </td>
                                                             <td className="px-4 py-3 text-center">
                                                                 <button
-                                                                    onClick={() => handleTogglePermission(code)}
-                                                                    className={`px-3 py-1 text-[10px] font-black uppercase tracking-wider rounded-full transition-all ${
-                                                                        isAllowed 
-                                                                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' 
+                                                                    onClick={() => handleInitiateToggle(code)}
+                                                                    className={`px-3 py-1 text-[10px] font-black uppercase tracking-wider rounded-full transition-all ${isAllowed
+                                                                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
                                                                             : 'bg-red-50 text-red-750 border border-red-200'
-                                                                    }`}
+                                                                        }`}
                                                                 >
                                                                     {isAllowed ? 'Allowed' : 'Denied'}
                                                                 </button>
@@ -919,12 +1259,62 @@ const SuperAdminDashboard = () => {
 
                     {/* ANALYTICS VIEW */}
                     {activeMenu === 'Analytics' && (
-                        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-16 text-center animate-in fade-in zoom-in-95 duration-200">
-                            <div className="w-20 h-20 bg-emerald-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                                <Activity className="w-10 h-10 text-emerald-500" />
+                        <div className="h-full w-full">
+                            <SystemAnalyticsBoard
+                                allEmployees={allEmployees}
+                                allCompanies={allCompanies}
+                                hierarchy={hierarchy}
+                                pendingResets={pendingResets}
+                            />
+                        </div>
+                    )}
+
+                    {/* ADMIN CONFIG VIEW */}
+                    {activeMenu === 'Admin Config' && (
+                        <SystemSettingsBoard isInline={true} />
+                    )}
+
+                    {/* SECURITY AUDIT VIEW */}
+                    {activeMenu === 'Security Audit' && (
+                        <div className="h-full w-full">
+                            <SecurityAuditBoard
+                                allEmployees={allEmployees}
+                                allCompanies={allCompanies}
+                                hierarchy={hierarchy}
+                            />
+                        </div>
+                    )}
+
+                    {/* INTEGRATIONS VIEW */}
+                    {activeMenu === 'Integrations' && (
+                        <div className="h-full w-full">
+                            <IntegrationsBoard />
+                        </div>
+                    )}
+
+                    {/* SYSTEM ANALYSIS VIEW */}
+                    {activeMenu === 'System Analysis' && (
+                        <div className="h-full w-full">
+                            <SystemAnalysisBoard />
+                        </div>
+                    )}
+
+                    {/* APP LIST VIEW */}
+                    {activeMenu === 'App List' && (
+                        <div className="flex flex-col items-center justify-center h-full gap-4 text-slate-400 animate-in fade-in zoom-in-95 duration-200">
+                            <div className="w-20 h-20 bg-indigo-50 rounded-full flex items-center justify-center mb-2">
+                                <AppWindow className="w-10 h-10 text-indigo-300" />
                             </div>
-                            <h2 className="text-2xl font-bold text-slate-900 mb-2">System Analytics</h2>
-                            <p className="text-slate-500 max-w-md mx-auto">Advanced usage statistics, traffic charts, and audit logs will appear here in the next update.</p>
+                            <h2 className="text-xl font-bold text-slate-900">Registered Applications</h2>
+                            <p className="text-sm max-w-md text-center">Manage internal system applications, client modules, and version control.</p>
+                            <button className="px-6 py-2.5 mt-4 bg-indigo-500 hover:bg-indigo-600 text-white text-sm font-bold uppercase tracking-wider rounded-xl shadow-md transition-all">Add New App</button>
+                        </div>
+                    )}
+
+                    {/* BILLING & PLANS VIEW */}
+                    {activeMenu === 'Billing & Plans' && (
+                        <div className="h-full w-full">
+                            <BillingBoard />
                         </div>
                     )}
                 </div>
@@ -950,91 +1340,91 @@ const SuperAdminDashboard = () => {
                         </div>
 
                         <div className="flex-1 overflow-auto bg-slate-50">
-                        {/* Company Details Section */}
-                        <div className="bg-white p-6 border-b border-slate-200">
-                            <h3 className="text-sm font-bold tracking-widest uppercase text-slate-400 mb-4">Contact Information</h3>
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                                <div>
-                                    <p className="text-xs text-slate-400 font-bold uppercase mb-1">Email</p>
-                                    <p className="text-sm text-slate-900 font-medium">{selectedCompany.email || 'N/A'}</p>
-                                </div>
-                                <div>
-                                    <p className="text-xs text-slate-400 font-bold uppercase mb-1">Phone</p>
-                                    <p className="text-sm text-slate-900 font-medium">{selectedCompany.phone || 'N/A'}</p>
-                                </div>
-                                <div>
-                                    <p className="text-xs text-slate-400 font-bold uppercase mb-1">Address</p>
-                                    <p className="text-sm text-slate-900 font-medium">{selectedCompany.address1 || 'N/A'}</p>
-                                </div>
-                                <div>
-                                    <p className="text-xs text-slate-400 font-bold uppercase mb-1">Country</p>
-                                    <p className="text-sm text-slate-900 font-medium">{selectedCompany.country || 'N/A'}</p>
+                            {/* Company Details Section */}
+                            <div className="bg-white p-6 border-b border-slate-200">
+                                <h3 className="text-sm font-bold tracking-widest uppercase text-slate-400 mb-4">Contact Information</h3>
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                                    <div>
+                                        <p className="text-xs text-slate-400 font-bold uppercase mb-1">Email</p>
+                                        <p className="text-sm text-slate-900 font-medium">{selectedCompany.email || 'N/A'}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-xs text-slate-400 font-bold uppercase mb-1">Phone</p>
+                                        <p className="text-sm text-slate-900 font-medium">{selectedCompany.phone || 'N/A'}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-xs text-slate-400 font-bold uppercase mb-1">Address</p>
+                                        <p className="text-sm text-slate-900 font-medium">{selectedCompany.address1 || 'N/A'}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-xs text-slate-400 font-bold uppercase mb-1">Country</p>
+                                        <p className="text-sm text-slate-900 font-medium">{selectedCompany.country || 'N/A'}</p>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <div className="p-6">
-                            <h3 className="text-sm font-bold tracking-widest uppercase text-slate-400 mb-4">Transaction History</h3>
-                            {loadingTx ? (
-                                <div className="flex justify-center items-center h-40">
-                                    <Loader2 className="w-8 h-8 text-[#00acee] animate-spin" />
-                                </div>
-                            ) : transactions.length === 0 ? (
-                                <div className="text-center py-16 bg-white border border-slate-200 rounded-xl shadow-sm">
-                                    <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                                        <Database className="w-8 h-8 text-slate-300" />
+                            <div className="p-6">
+                                <h3 className="text-sm font-bold tracking-widest uppercase text-slate-400 mb-4">Transaction History</h3>
+                                {loadingTx ? (
+                                    <div className="flex justify-center items-center h-40">
+                                        <Loader2 className="w-8 h-8 text-[#00acee] animate-spin" />
                                     </div>
-                                    <p className="text-slate-900 font-bold text-lg mb-1">No Transactions Found</p>
-                                    <p className="text-sm text-slate-500">This company has no recorded transactions in the system.</p>
-                                </div>
-                            ) : (
-                                <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-                                    <table className="w-full text-left border-collapse">
-                                        <thead>
-                                            <tr className="border-b border-slate-100 bg-slate-50/80">
-                                                <th className="py-4 px-6 text-xs font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap">Doc No</th>
-                                                <th className="py-4 px-6 text-xs font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap">Type</th>
-                                                <th className="py-4 px-6 text-xs font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap">Account</th>
-                                                <th className="py-4 px-6 text-xs font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap">Date</th>
-                                                <th className="py-4 px-6 text-xs font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap text-right">Amount</th>
-                                                <th className="py-4 px-6 text-xs font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap text-right">Actions</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {transactions.map(tx => (
-                                                <tr key={tx.docNo} className="border-b border-slate-50 hover:bg-slate-50 transition-colors">
-                                                    <td className="py-4 px-6 font-mono text-sm text-slate-900 font-bold">{tx.docNo}</td>
-                                                    <td className="py-4 px-6">
-                                                        <span className="px-2 py-1 bg-slate-100 text-slate-600 rounded text-xs font-medium">{tx.payType || 'N/A'}</span>
-                                                    </td>
-                                                    <td className="py-4 px-6 text-sm text-slate-700 font-medium">{tx.account || 'System'}</td>
-                                                    <td className="py-4 px-6 text-sm text-slate-500">{tx.postDate || 'N/A'}</td>
-                                                    <td className="py-4 px-6 text-sm font-bold text-[#00acee] text-right">{tx.amount ? `Rs ${tx.amount.toFixed(2)}` : 'Rs 0.00'}</td>
-                                                    <td className="py-4 px-6 text-right">
-                                                        <div className="flex items-center justify-end gap-2">
-                                                            <button onClick={() => setAlertConfig({
-                                                                isOpen: true,
-                                                                title: 'Coming Soon',
-                                                                message: 'Edit transaction feature requires form modal. Coming soon!',
-                                                                variant: 'info'
-                                                            })} className="p-2 text-slate-400 hover:text-[#00acee] hover:bg-[#00acee]/10 rounded-lg transition-all">
-                                                                <Edit className="w-4 h-4" />
-                                                            </button>
-                                                            <button onClick={() => handleDeleteTransaction(tx.docNo)} className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all">
-                                                                <Trash2 className="w-4 h-4" />
-                                                            </button>
-                                                        </div>
-                                                    </td>
+                                ) : transactions.length === 0 ? (
+                                    <div className="text-center py-16 bg-white border border-slate-200 rounded-xl shadow-sm">
+                                        <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                                            <Database className="w-8 h-8 text-slate-300" />
+                                        </div>
+                                        <p className="text-slate-900 font-bold text-lg mb-1">No Transactions Found</p>
+                                        <p className="text-sm text-slate-500">This company has no recorded transactions in the system.</p>
+                                    </div>
+                                ) : (
+                                    <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                                        <table className="w-full text-left border-collapse">
+                                            <thead>
+                                                <tr className="border-b border-slate-100 bg-slate-50/80">
+                                                    <th className="py-4 px-6 text-xs font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap">Doc No</th>
+                                                    <th className="py-4 px-6 text-xs font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap">Type</th>
+                                                    <th className="py-4 px-6 text-xs font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap">Account</th>
+                                                    <th className="py-4 px-6 text-xs font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap">Date</th>
+                                                    <th className="py-4 px-6 text-xs font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap text-right">Amount</th>
+                                                    <th className="py-4 px-6 text-xs font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap text-right">Actions</th>
                                                 </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            )}
+                                            </thead>
+                                            <tbody>
+                                                {transactions.map(tx => (
+                                                    <tr key={tx.docNo} className="border-b border-slate-50 hover:bg-slate-50 transition-colors">
+                                                        <td className="py-4 px-6 font-mono text-sm text-slate-900 font-bold">{tx.docNo}</td>
+                                                        <td className="py-4 px-6">
+                                                            <span className="px-2 py-1 bg-slate-100 text-slate-600 rounded text-xs font-medium">{tx.payType || 'N/A'}</span>
+                                                        </td>
+                                                        <td className="py-4 px-6 text-sm text-slate-700 font-medium">{tx.account || 'System'}</td>
+                                                        <td className="py-4 px-6 text-sm text-slate-500">{tx.postDate || 'N/A'}</td>
+                                                        <td className="py-4 px-6 text-sm font-bold text-[#00acee] text-right">{tx.amount ? `Rs ${tx.amount.toFixed(2)}` : 'Rs 0.00'}</td>
+                                                        <td className="py-4 px-6 text-right">
+                                                            <div className="flex items-center justify-end gap-2">
+                                                                <button onClick={() => setAlertConfig({
+                                                                    isOpen: true,
+                                                                    title: 'Coming Soon',
+                                                                    message: 'Edit transaction feature requires form modal. Coming soon!',
+                                                                    variant: 'info'
+                                                                })} className="p-2 text-slate-400 hover:text-[#00acee] hover:bg-[#00acee]/10 rounded-lg transition-all">
+                                                                    <Edit className="w-4 h-4" />
+                                                                </button>
+                                                                <button onClick={() => handleDeleteTransaction(tx.docNo)} className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all">
+                                                                    <Trash2 className="w-4 h-4" />
+                                                                </button>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
             )}
 
             {/* Edit Role Modal */}
@@ -1050,61 +1440,129 @@ const SuperAdminDashboard = () => {
                                 <LogOut className="w-5 h-5 rotate-180" />
                             </button>
                         </div>
-                        
+
                         <div className="p-6 space-y-5">
                             {/* Role level select */}
                             <div>
                                 <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Role Level (ID)</label>
-                                <select 
-                                    value={selectedRoleId} 
-                                    onChange={(e) => setSelectedRoleId(e.target.value)}
-                                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold outline-none focus:ring-2 focus:ring-[#00acee]/50 focus:border-[#00acee] transition-all"
-                                >
-                                    <option value="1">Admin / Tenant Owner (1)</option>
-                                    <option value="99">Super Admin (99)</option>
-                                    <option value="2">Custom Role (2)</option>
-                                    <option value="3">Custom Role (3)</option>
-                                    <option value="4">Custom Role (4)</option>
-                                    <option value="5">Custom Role (5)</option>
-                                </select>
+                                <div className="relative">
+                                    <select
+                                        value={selectedRoleId}
+                                        onChange={(e) => setSelectedRoleId(e.target.value)}
+                                        className="w-full appearance-none px-4 py-2.5 pr-10 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl text-sm font-semibold outline-none focus:ring-2 focus:ring-[#00acee]/50 focus:border-[#00acee] transition-colors cursor-pointer"
+                                    >
+                                        <option value="" disabled>Select a role...</option>
+                                        {systemRoles.map(role => (
+                                            <option key={role.id} value={role.id}>{role.name} ({role.id})</option>
+                                        ))}
+                                    </select>
+                                    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-600 pointer-events-none" size={16} />
+                                </div>
                                 <p className="text-[11px] text-slate-400 mt-1.5 leading-snug">Note: ID 99 grants full access to the Super Admin portal. ID 1 grants access to tenant configuration.</p>
                             </div>
 
                             {/* Member group select */}
                             <div>
                                 <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Member Group Name</label>
-                                <select 
-                                    value={selectedGroupName} 
-                                    onChange={(e) => setSelectedGroupName(e.target.value)}
-                                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold outline-none focus:ring-2 focus:ring-[#00acee]/50 focus:border-[#00acee] transition-all"
-                                >
-                                    <option value="Administrators">Administrators</option>
-                                    {userGroups.filter(g => g.group_Name !== 'Administrators').map(g => (
-                                        <option key={g.group_Id} value={g.group_Name}>{g.group_Name}</option>
-                                    ))}
-                                    <option value="Finance Team">Finance Team</option>
-                                    <option value="Sales Team">Sales Team</option>
-                                    <option value="HR Manager">HR Manager</option>
-                                </select>
+                                <div className="relative">
+                                    <select
+                                        value={selectedGroupName}
+                                        onChange={(e) => setSelectedGroupName(e.target.value)}
+                                        className="w-full appearance-none px-4 py-2.5 pr-10 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl text-sm font-semibold outline-none focus:ring-2 focus:ring-[#00acee]/50 focus:border-[#00acee] transition-colors cursor-pointer"
+                                    >
+                                        <option value="" disabled>Select a member group...</option>
+                                        {userGroups.map(g => (
+                                            <option key={g.group_Id} value={g.group_Name}>{g.group_Name}</option>
+                                        ))}
+                                    </select>
+                                    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-600 pointer-events-none" size={16} />
+                                </div>
                                 <p className="text-[11px] text-slate-400 mt-1.5 leading-snug">Maps user to access control matrices defined in Master settings.</p>
                             </div>
                         </div>
 
                         <div className="bg-slate-50 px-6 py-4 flex justify-end gap-3 border-t border-slate-100">
-                            <button 
-                                onClick={() => setEditingEmp(null)} 
+                            <button
+                                onClick={() => setEditingEmp(null)}
                                 className="px-5 py-2 text-slate-500 font-bold hover:bg-slate-200/60 rounded-xl transition-all text-sm"
                             >
                                 Cancel
                             </button>
-                            <button 
-                                onClick={handleUpdateRole}
+                            <button
+                                onClick={handleInitiateUpdateRole}
                                 disabled={savingRole}
                                 className="px-6 py-2 bg-[#00acee] hover:bg-[#0082b3] text-white font-bold rounded-xl transition-all shadow-md shadow-sky-100 flex items-center gap-2 text-sm disabled:opacity-70"
                             >
                                 {savingRole && <Loader2 className="w-4 h-4 animate-spin" />}
                                 Save Role
                             </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Employee Details View Modal */}
+            {selectedEmployeeView && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4">
+                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden animate-in fade-in zoom-in duration-200 flex flex-col font-sans">
+                        <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50 shrink-0">
+                            <div className="flex items-center gap-4">
+                                <div className="w-12 h-12 rounded-xl bg-purple-50 flex items-center justify-center">
+                                    <Users className="w-6 h-6 text-purple-500" />
+                                </div>
+                                <div>
+                                    <h2 className="text-xl font-bold text-slate-900">Employee Details</h2>
+                                    <p className="text-sm text-slate-500 mt-0.5">{selectedEmployeeView.emp_Name || selectedEmployeeView.empName || 'N/A'} ({selectedEmployeeView.emp_Code || selectedEmployeeView.empCode})</p>
+                                </div>
+                            </div>
+                            <button onClick={() => setSelectedEmployeeView(null)} className="p-2 text-slate-400 hover:text-slate-900 hover:bg-slate-200 rounded-full transition-all">
+                                <X className="w-5 h-5" />
+                            </button>
+                        </div>
+                        <div className="p-6 overflow-y-auto bg-slate-50/30">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {Object.entries({
+                                    ...selectedEmployeeView,
+                                    'PASSWORD': selectedEmployeeView.pass_Word || selectedEmployeeView.password || selectedEmployeeView.Pass_Word || '•••••••• (Encrypted by Backend)'
+                                }).map(([key, value]) => (
+                                    <div key={key} className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-center">
+                                        <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">{key.replace(/_/g, ' ')}</h3>
+                                        <p className="text-sm font-bold text-slate-800 break-all">{value !== null && value !== undefined && value !== '' ? String(value) : <span className="text-slate-300 font-normal italic">Empty</span>}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Company Details View Modal */}
+            {selectedCompanyView && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4">
+                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden animate-in fade-in zoom-in duration-200 flex flex-col font-sans">
+                        <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50 shrink-0">
+                            <div className="flex items-center gap-4">
+                                <div className="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center">
+                                    <Building2 className="w-6 h-6 text-emerald-500" />
+                                </div>
+                                <div>
+                                    <h2 className="text-xl font-bold text-slate-900">Company Details</h2>
+                                    <p className="text-sm text-slate-500 mt-0.5">{selectedCompanyView.comp_Name || selectedCompanyView.companyName || 'N/A'} ({selectedCompanyView.code || selectedCompanyView.companyCode})</p>
+                                </div>
+                            </div>
+                            <button onClick={() => setSelectedCompanyView(null)} className="p-2 text-slate-400 hover:text-slate-900 hover:bg-slate-200 rounded-full transition-all">
+                                <X className="w-5 h-5" />
+                            </button>
+                        </div>
+                        <div className="p-6 overflow-y-auto bg-slate-50/30">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {Object.entries(selectedCompanyView).map(([key, value]) => (
+                                    <div key={key} className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-center">
+                                        <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">{key.replace(/_/g, ' ')}</h3>
+                                        <p className="text-sm font-bold text-slate-800 break-all">{value !== null && value !== undefined && value !== '' ? String(value) : <span className="text-slate-300 font-normal italic">Empty</span>}</p>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1127,6 +1585,198 @@ const SuperAdminDashboard = () => {
                 title={alertConfig.title}
                 message={alertConfig.message}
                 variant={alertConfig.variant}
+            />
+
+            {/* Password Confirm Modal for Permissions */}
+            <AdminVerificationModal
+                isOpen={showPasswordConfirmModal}
+                onClose={() => setShowPasswordConfirmModal(false)}
+                onVerify={confirmAndSavePermissions}
+                message="PLEASE CONFIRM YOUR PASSWORD TO APPLY PERMISSION CHANGES"
+                verifyButtonText="VERIFY & SAVE"
+                value={confirmPasswordInput}
+                onChange={setConfirmPasswordInput}
+            />
+
+            {/* Password Confirm Modal for Individual Toggle */}
+            <AdminVerificationModal
+                isOpen={showTogglePasswordModal}
+                onClose={() => { setShowTogglePasswordModal(false); setPendingToggleFunc(null); }}
+                onVerify={confirmAndTogglePermission}
+                message="PLEASE CONFIRM YOUR PASSWORD TO TOGGLE THIS PERMISSION"
+                verifyButtonText="VERIFY & TOGGLE"
+                value={togglePasswordInput}
+                onChange={setTogglePasswordInput}
+            />
+
+            {/* Password Confirm Modal for Role Updates */}
+            <AdminVerificationModal
+                isOpen={showRolePasswordModal}
+                onClose={() => setShowRolePasswordModal(false)}
+                onVerify={handleUpdateRole}
+                message="PLEASE CONFIRM YOUR PASSWORD TO UPDATE EMPLOYEE ROLE"
+                verifyButtonText="VERIFY & UPDATE"
+                value={rolePasswordInput}
+                onChange={setRolePasswordInput}
+            />
+
+            {/* Target Selection Sub-Modal for Role Features */}
+            {showPermTargetModal && (
+                <div className="fixed inset-0 z-[200] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4 font-sans">
+                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-visible animate-in fade-in zoom-in-95 duration-200 flex flex-col">
+                        <div className="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50 rounded-t-2xl">
+                            <h3 className="text-sm font-bold tracking-wide uppercase text-slate-900">Select Target Scope</h3>
+                            <button onClick={() => setShowPermTargetModal(false)} className="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-200 transition-colors">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                            </button>
+                        </div>
+                        <div className="p-6 flex flex-col gap-5 h-full max-h-[70vh] overflow-visible">
+
+                            <div className="flex flex-col gap-4 relative z-20">
+                                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest">Search & Select Employee</label>
+                                <div className="relative">
+                                    <Search className="absolute left-3 top-3.5 text-slate-400 w-4 h-4" />
+                                    <input
+                                        type="text"
+                                        placeholder="Search Employee..."
+                                        value={permEmpSearchText}
+                                        onChange={e => {
+                                            setPermEmpSearchText(e.target.value);
+                                            setPermEmpSearchTriggered(false);
+                                        }}
+                                        onKeyDown={e => e.key === 'Enter' && setPermEmpSearchTriggered(true)}
+                                        className="w-full pl-9 pr-24 p-3 border border-slate-300 rounded-xl text-sm bg-white font-bold text-slate-700 outline-none focus:border-[#00acee] focus:ring-1 focus:ring-[#00acee] transition-all"
+                                    />
+                                    <button
+                                        onClick={() => setPermEmpSearchTriggered(true)}
+                                        className="absolute right-1.5 top-1.5 bottom-1.5 px-4 bg-[#00acee] hover:bg-[#009adb] text-white text-[11px] font-bold uppercase tracking-wider rounded-lg transition-colors shadow-sm"
+                                    >
+                                        Load
+                                    </button>
+
+                                    {permEmpSearchTriggered && (
+                                        <div className="absolute top-[100%] mt-2 left-0 w-full z-50 bg-white border border-slate-200 rounded-xl shadow-2xl max-h-[250px] overflow-y-auto flex flex-col">
+                                            <div
+                                                onClick={() => {
+                                                    setSelectedPermEmployee('');
+                                                    setPermEmpSearchText('-- All Employees (Global) --');
+                                                    setPermEmpSearchTriggered(false);
+                                                    setSelectedPermCompany('');
+                                                    setPermCompSearchText('-- All Companies (Global) --');
+                                                }}
+                                                className="p-3 border-b border-slate-100 text-sm cursor-pointer transition-all bg-[#00acee]/5 text-[#00acee] font-bold hover:bg-[#00acee]/10"
+                                            >
+                                                -- All Employees (Global) --
+                                            </div>
+                                            {(() => {
+                                                const filteredEmployees = allEmployees.filter(e => (e.emp_Name || e.empName || '').toLowerCase().includes(permEmpSearchText.toLowerCase()) || (e.emp_Code || '').toLowerCase().includes(permEmpSearchText.toLowerCase()));
+                                                return (
+                                                    <>
+                                                        {filteredEmployees.map(e => {
+                                                            const roleName = systemRoles.find(r => r.id === e.userRole_Id || r.id === e.role)?.name || 'No Role';
+                                                            return (
+                                                                <div
+                                                                    key={e.emp_Code}
+                                                                    onClick={() => {
+                                                                        setSelectedPermEmployee(e.emp_Code);
+                                                                        setPermEmpSearchText(e.emp_Name || e.empName);
+                                                                        setPermEmpSearchTriggered(false);
+
+                                                                        // Auto-load & auto-select company
+                                                                        const empNode = hierarchy.find(h => h.empCode === e.emp_Code || h.emp_Code === e.emp_Code);
+                                                                        if (empNode && empNode.companies && empNode.companies.length === 1) {
+                                                                            setSelectedPermCompany(empNode.companies[0].companyCode || empNode.companies[0].company_Code);
+                                                                            setPermCompSearchText(empNode.companies[0].companyName || empNode.companies[0].company_Name);
+                                                                        } else {
+                                                                            setSelectedPermCompany('');
+                                                                            setPermCompSearchText('');
+                                                                        }
+                                                                    }}
+                                                                    className="p-3 border-b border-slate-100 text-sm cursor-pointer transition-all text-slate-600 hover:bg-slate-50 font-medium"
+                                                                >
+                                                                    {e.emp_Name || e.empName} <span className="text-slate-400 font-normal ml-1">[{roleName}]</span>
+                                                                </div>
+                                                            );
+                                                        })}
+                                                    </>
+                                                );
+                                            })()}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+
+                            <div className="flex flex-col gap-4 relative z-10 mt-2">
+                                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest">Search & Select Company</label>
+                                <div className="relative">
+                                    <Search className="absolute left-3 top-3.5 text-slate-400 w-4 h-4" />
+                                    <input
+                                        type="text"
+                                        placeholder="Search Company..."
+                                        value={permCompSearchText}
+                                        onChange={e => {
+                                            setPermCompSearchText(e.target.value);
+                                            setPermCompSearchTriggered(false);
+                                        }}
+                                        onKeyDown={e => e.key === 'Enter' && setPermCompSearchTriggered(true)}
+                                        className="w-full pl-9 pr-24 p-3 border border-slate-300 rounded-xl text-sm bg-white font-bold text-slate-700 outline-none focus:border-[#00acee] focus:ring-1 focus:ring-[#00acee] transition-all"
+                                    />
+                                    <button
+                                        onClick={() => setPermCompSearchTriggered(true)}
+                                        className="absolute right-1.5 top-1.5 bottom-1.5 px-4 bg-[#00acee] hover:bg-[#009adb] text-white text-[11px] font-bold uppercase tracking-wider rounded-lg transition-colors shadow-sm"
+                                    >
+                                        Load
+                                    </button>
+
+                                    {permCompSearchTriggered && (
+                                        <div className="absolute top-[100%] mt-2 left-0 w-full z-50 bg-white border border-slate-200 rounded-xl shadow-2xl max-h-[250px] overflow-y-auto flex flex-col">
+                                            <div
+                                                onClick={() => {
+                                                    setSelectedPermCompany('');
+                                                    setPermCompSearchText('-- All Companies (Global) --');
+                                                    setPermCompSearchTriggered(false);
+                                                }}
+                                                className="p-3 border-b border-slate-100 text-sm cursor-pointer transition-all bg-[#00acee]/5 text-[#00acee] font-bold hover:bg-[#00acee]/10"
+                                            >
+                                                -- All Companies (Global) --
+                                            </div>
+                                            {(() => {
+                                                const filteredCompanies = availablePermCompanies.filter(c => (c.comp_Name || c.companyName || c.code || '').toLowerCase().includes(permCompSearchText.toLowerCase()));
+                                                return (
+                                                    <>
+                                                        {filteredCompanies.map(c => (
+                                                            <div
+                                                                key={c.code}
+                                                                onClick={() => {
+                                                                    setSelectedPermCompany(c.code);
+                                                                    setPermCompSearchText(c.comp_Name || c.companyName || c.code);
+                                                                    setPermCompSearchTriggered(false);
+                                                                }}
+                                                                className="p-3 border-b border-slate-100 text-sm cursor-pointer transition-all text-slate-600 hover:bg-slate-50 font-medium"
+                                                            >
+                                                                {c.comp_Name || c.companyName || c.code}
+                                                            </div>
+                                                        ))}
+                                                    </>
+                                                );
+                                            })()}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+
+                            <button onClick={() => setShowPermTargetModal(false)} className="w-full py-3 mt-4 bg-[#00acee] hover:bg-[#009adb] text-white text-sm font-bold uppercase tracking-wider rounded-xl shadow-md transition-all active:scale-[0.98] shrink-0">
+                                Apply Target Configuration
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* System Log Report Modal */}
+            <SystemLogReportModal
+                isOpen={showSystemLogReport}
+                onClose={() => setShowSystemLogReport(false)}
             />
         </div>
     );

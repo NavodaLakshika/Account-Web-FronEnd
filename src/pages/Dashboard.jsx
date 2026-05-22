@@ -229,7 +229,15 @@ const Dashboard = () => {
         // Sync system locks from backend on dashboard mount
         const syncLocks = async () => {
             try {
-                const locks = await systemLocksService.getAllLocks();
+                const currentUser = authService.getCurrentUser();
+                const companyRaw = localStorage.getItem('selectedCompany');
+                const company = companyRaw ? JSON.parse(companyRaw) : null;
+                
+                const empCode = currentUser?.EmpCode || currentUser?.empCode || currentUser?.emp_Code || currentUser?.id_No || currentUser?.Id_No || currentUser?.IdNo;
+                const companyCode = company?.Company_Id || company?.code || company?.companyCode;
+                const roleId = currentUser?.UserRoleId || currentUser?.userRoleId || currentUser?.role_Id || currentUser?.roleId;
+
+                const locks = await systemLocksService.getAllLocks(empCode, companyCode, roleId);
                 Object.entries(locks).forEach(([moduleId, isLocked]) => {
                     localStorage.setItem(moduleId, isLocked ? 'true' : 'false');
                 });
