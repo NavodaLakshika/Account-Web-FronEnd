@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import SimpleModal from '../components/SimpleModal';
-import { Search, Calendar, CheckCircle, RotateCcw, X, Plus } from 'lucide-react';
+import { Search, Calendar, CheckCircle, RotateCcw, X, Plus, Save } from 'lucide-react';
 import { makeDepositService } from '../services/makeDeposit.service';
 import { toast } from 'react-hot-toast';
 import CalendarModal from '../components/CalendarModal';
@@ -123,6 +123,28 @@ const MakeDepositBoard = ({ isOpen, onClose }) => {
         }
     };
 
+    const handleSaveDraft = async () => {
+        if (selectedDocNos.size === 0) {
+            toast.error('Please select at least one document to deposit.');
+            return;
+        }
+
+        try {
+            await makeDepositService.saveDraft({
+                company: formData.company,
+                costCenter: formData.costCenter,
+                payMode: formData.payMode,
+                selectedDocNos: Array.from(selectedDocNos),
+                totalAmount: totals.sum
+            });
+            toast.success('Deposit draft saved successfully!');
+            handleClear();
+            onClose();
+        } catch (error) {
+            toast.error(error.message || 'Failed to save deposit draft');
+        }
+    };
+
     const totals = useMemo(() => {
         let sum = 0;
         funds.forEach(f => {
@@ -151,10 +173,16 @@ const MakeDepositBoard = ({ isOpen, onClose }) => {
                     </div>
                     <div className="flex gap-3">
                         <button
+                            onClick={handleSaveDraft}
+                            className="px-6 h-10 bg-white text-[#0285fd] text-sm font-black rounded-[5px] border-2 border-[#0285fd] hover:bg-blue-50 transition-all active:scale-95 flex items-center justify-center gap-2"
+                        >
+                            <Save size={14} /> SAVE DRAFT
+                        </button>
+                        <button
                             onClick={handleDone}
                             className="px-6 h-10 bg-[#2bb744] text-white text-sm font-black rounded-[5px] shadow-md shadow-green-100 hover:bg-[#259b3a] transition-all active:scale-95 flex items-center gap-2 border-none"
                         >
-                            <CheckCircle size={14} /> PROCEED TO DEPOSIT
+                            <CheckCircle size={14} /> APPLY
                         </button>
                     </div>
                 </div>

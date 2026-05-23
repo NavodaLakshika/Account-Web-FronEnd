@@ -34,6 +34,13 @@ export const receivePaymentService = {
     } catch (error) { throw error; }
   },
 
+  saveDraft: async (data) => {
+    try {
+      const response = await api.post('/ReceivePayment/save', data);
+      return response.data;
+    } catch (error) { throw error; }
+  },
+
   generateDocNo: async (company) => {
     try {
       const response = await api.get('/ReceivePayment/generate-doc', { params: { company } });

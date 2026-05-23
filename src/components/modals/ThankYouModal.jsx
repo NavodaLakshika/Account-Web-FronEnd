@@ -19,16 +19,19 @@ const ThankYouModal = ({ isOpen, onClose }) => {
             // Progress percentage animation - 4.5 seconds
             const duration = 4700;
             const startTime = Date.now();
+            let animationFrameId;
 
-            const progressTimer = setInterval(() => {
+            const animateProgress = () => {
                 const elapsed = Date.now() - startTime;
-                const percent = Math.min(Math.round((elapsed / duration) * 100), 100);
+                const percent = Math.min((elapsed / duration) * 100, 100);
                 setProgress(percent);
 
-                if (percent >= 100) {
-                    clearInterval(progressTimer);
+                if (percent < 100) {
+                    animationFrameId = requestAnimationFrame(animateProgress);
                 }
-            }, 50);
+            };
+
+            animationFrameId = requestAnimationFrame(animateProgress);
 
             // Final Redirect
             const redirectTimer = setTimeout(() => {
@@ -38,7 +41,7 @@ const ThankYouModal = ({ isOpen, onClose }) => {
             }, duration);
 
             return () => {
-                clearInterval(progressTimer);
+                cancelAnimationFrame(animationFrameId);
                 clearTimeout(redirectTimer);
             };
         }
@@ -104,22 +107,22 @@ const ThankYouModal = ({ isOpen, onClose }) => {
                 <div className="absolute inset-0 pointer-events-none rounded-[15px] overflow-hidden">
                     {/* Top Bar (0-25%) - Blue */}
                     <div 
-                        className="absolute top-0 left-0 h-[6px] bg-[#0388cc] shadow-[0_0_10px_rgba(3,136,204,0.5)] transition-all duration-100" 
+                        className="absolute top-0 left-0 h-[6px] bg-[#0388cc] shadow-[0_0_10px_rgba(3,136,204,0.5)]" 
                         style={{ width: `${Math.min(100, Math.max(0, (progress / 25) * 100))}%` }} 
                     />
                     {/* Right Bar (25-50%) - Emerald */}
                     <div 
-                        className="absolute top-0 right-0 w-[6px] bg-[#10b981] shadow-[0_0_10px_rgba(16,185,129,0.5)] transition-all duration-100" 
+                        className="absolute top-0 right-0 w-[6px] bg-[#10b981] shadow-[0_0_10px_rgba(16,185,129,0.5)]" 
                         style={{ height: `${Math.min(100, Math.max(0, ((progress - 25) / 25) * 100))}%` }} 
                     />
                     {/* Bottom Bar (50-75%) - Amber */}
                     <div 
-                        className="absolute bottom-0 right-0 h-[6px] bg-[#f59e0b] shadow-[0_0_10px_rgba(245,158,11,0.5)] transition-all duration-100" 
+                        className="absolute bottom-0 right-0 h-[6px] bg-[#f59e0b] shadow-[0_0_10px_rgba(245,158,11,0.5)]" 
                         style={{ width: `${Math.min(100, Math.max(0, ((progress - 50) / 25) * 100))}%` }} 
                     />
                     {/* Left Bar (75-100%) - Red */}
                     <div 
-                        className="absolute bottom-0 left-0 w-[6px] bg-[#ef4444] shadow-[0_0_10px_rgba(239,68,68,0.5)] transition-all duration-100" 
+                        className="absolute bottom-0 left-0 w-[6px] bg-[#ef4444] shadow-[0_0_10px_rgba(239,68,68,0.5)]" 
                         style={{ height: `${Math.min(100, Math.max(0, ((progress - 75) / 25) * 100))}%` }} 
                     />
                 </div>

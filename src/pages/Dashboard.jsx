@@ -47,6 +47,7 @@ import TrialBalanceBoard from './TrialBalanceBoard';
 import DocumentSearchBoard from './DocumentSearchBoard';
 import PurchaseOrderBoard from '../HomeMaster/PurchaseOrderBoard';
 import GRNBoard from '../HomeMaster/GRNBoard';
+import BulkGRNBoard from '../HomeMaster/BulkGRNBoard';
 import PettyCashBoard from '../HomeMaster/PettyCashBoard';
 import SalesOrderBoard from '../HomeMaster/SalesOrderBoard';
 import SalesReceiptBoard from '../HomeMaster/SalesReceiptBoard';
@@ -124,6 +125,7 @@ const Dashboard = () => {
     const [showMarketingToolModal, setShowMarketingToolModal] = useState(false);
     const [showPurchaseOrderModal, setShowPurchaseOrderModal] = useState(false);
     const [showGRNModal, setShowGRNModal] = useState(false);
+    const [showBulkGRNModal, setShowBulkGRNModal] = useState(false);
     const [showPettyCashModal, setShowPettyCashModal] = useState(false);
     const [showSalesOrderModal, setShowSalesOrderModal] = useState(false);
     const [showSalesReceiptModal, setShowSalesReceiptModal] = useState(false);
@@ -516,6 +518,7 @@ const Dashboard = () => {
                     // Vendor Section
                     if (label === 'Purchase Order') setShowPurchaseOrderModal(true);
                     if (label === 'GRN') setShowGRNModal(true);
+                    if (label === 'Bulk GRN') setShowBulkGRNModal(true);
                     if (label === 'Petty Cash') setShowPettyCashModal(true);
                     if (label === 'Enter Bills') setShowEnterBillModal(true);
                     if (label === 'Pay Bills') setShowPayBillModal(true);
@@ -702,6 +705,8 @@ const Dashboard = () => {
             />
             <ChangePasswordBoard isOpen={showChangePasswordModal} onClose={() => setShowChangePasswordModal(false)} />
             <SystemSettingsBoard isOpen={showSystemSettingsModal} onClose={() => setShowSystemSettingsModal(false)} />
+            <GRNBoard isOpen={showGRNModal} onClose={() => setShowGRNModal(false)} />
+            <BulkGRNBoard isOpen={showBulkGRNModal} onClose={() => setShowBulkGRNModal(false)} />
             <AIChatbotBoard isOpen={showAIChatbotModal} onClose={() => setShowAIChatbotModal(false)} />
             <DepartmentBoard isOpen={showDepartmentModal} onClose={() => setShowDepartmentModal(false)} />
             <CalculatorBoard isOpen={showCalculatorModal} onClose={() => setShowCalculatorModal(false)} />

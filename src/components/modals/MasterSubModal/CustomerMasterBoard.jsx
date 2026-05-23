@@ -368,10 +368,10 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
                             {/* Phone and Fax */}
                             <div className="flex items-center gap-6">
                                 <label className="w-32 font-bold text-gray-700">Phone Number</label>
-                                <div className="flex-1 flex items-center gap-10">
-                                    <input type="text" name="Phone" value={formData.Phone} onChange={handleInputChange} className="flex-1 h-8 font-mono border border-gray-300 px-3 bg-white rounded-[5px] outline-none focus:border-blue-400 shadow-sm" />
-                                    <label className="w-20 font-bold text-gray-700 text-center">Fax</label>
-                                    <input type="text" name="Fax" value={formData.Fax} onChange={handleInputChange} className="flex-1 h-8 font-mono border border-gray-300 px-3 bg-white rounded-[5px] outline-none focus:border-blue-400 shadow-sm" />
+                                <div className="flex-1 grid grid-cols-[1fr_auto_1fr] items-center gap-6">
+                                    <input type="text" name="Phone" value={formData.Phone} onChange={handleInputChange} className="w-full h-8 font-mono border border-gray-300 px-3 bg-white rounded-[5px] outline-none focus:border-blue-400 shadow-sm" />
+                                    <label className="w-24 font-bold text-gray-700 text-center">Fax</label>
+                                    <input type="text" name="Fax" value={formData.Fax} onChange={handleInputChange} className="w-full h-8 font-mono border border-gray-300 px-3 bg-white rounded-[5px] outline-none focus:border-blue-400 shadow-sm" />
                                 </div>
                             </div>
 
@@ -389,22 +389,20 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
                             {/* Contact Person and NIC */}
                             <div className="flex items-center gap-6">
                                 <label className="w-32 font-bold text-gray-700">Contact Person</label>
-                                <div className="flex-1 flex items-center gap-10">
-                                    <input type="text" name="Contact_Person" value={formData.Contact_Person} onChange={handleInputChange} className="flex-1 h-8 font-mono border border-gray-300 px-3 bg-white rounded-[5px] outline-none focus:border-blue-400 shadow-sm" />
-                                    <label className="w-20 font-bold text-gray-700 text-center">NIC No</label>
-                                    <input type="text" name="NIC_No" value={formData.NIC_No} onChange={handleInputChange} className="flex-1 h-8 font-mono border border-gray-300 px-3 bg-white rounded-[5px] outline-none focus:border-blue-400 shadow-sm" />
+                                <div className="flex-1 grid grid-cols-[1fr_auto_1fr] items-center gap-6">
+                                    <input type="text" name="Contact_Person" value={formData.Contact_Person} onChange={handleInputChange} className="w-full h-8 font-mono border border-gray-300 px-3 bg-white rounded-[5px] outline-none focus:border-blue-400 shadow-sm" />
+                                    <label className="w-24 font-bold text-gray-700 text-center">NIC No</label>
+                                    <input type="text" name="NIC_No" value={formData.NIC_No} onChange={handleInputChange} className="w-full h-8 font-mono border border-gray-300 px-3 bg-white rounded-[5px] outline-none focus:border-blue-400 shadow-sm" />
                                 </div>
                             </div>
 
                             {/* Credit Limit and Period */}
                             <div className="flex items-center gap-6">
                                 <label className="w-32 font-bold text-gray-700">Credit Limit</label>
-                                <div className="flex-1 flex items-center gap-10">
-                                    <input type="text" name="Credit_Limit" value={formData.Credit_Limit} onChange={handleInputChange} className="w-[245px] h-8 border border-gray-300 px-3 bg-white rounded-[5px] outline-none focus:border-blue-400 text-right font-bold shadow-sm" />
-                                    <div className="flex-1 flex items-center gap-6">
-                                        <label className="w-24 font-bold text-gray-700 text-center">Credit Period</label>
-                                        <input type="text" name="Credit_Period" value={formData.Credit_Period} onChange={handleInputChange} className="w-[245px]  h-8 border border-gray-300 px-3 bg-white rounded-[5px] outline-none focus:border-blue-400 text-center shadow-sm" />
-                                    </div>
+                                <div className="flex-1 grid grid-cols-[1fr_auto_1fr] items-center gap-6">
+                                    <input type="text" name="Credit_Limit" value={formData.Credit_Limit} onChange={handleInputChange} className="w-full h-8 border border-gray-300 px-3 bg-white rounded-[5px] outline-none focus:border-blue-400 text-right font-bold shadow-sm" />
+                                    <label className="w-24 font-bold text-gray-700 text-center">Credit Period</label>
+                                    <input type="text" name="Credit_Period" value={formData.Credit_Period} onChange={handleInputChange} className="w-full h-8 border border-gray-300 px-3 bg-white rounded-[5px] outline-none focus:border-blue-400 text-center shadow-sm" />
                                 </div>
                             </div>
 
@@ -431,35 +429,33 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
                             {/* Branch and A/C No */}
                             <div className="flex items-center gap-6">
                                 <label className="w-32 font-bold text-gray-700">Branch Detail</label>
-                                <div className="flex-1 flex items-center gap-10">
-                                    <input type="text" name="Brunch" value={formData.Brunch} onChange={handleInputChange} placeholder="" className="flex-1 h-8 font-mono border border-gray-300 px-3 bg-white rounded-[5px] outline-none focus:border-blue-400 shadow-sm" />
-                                    <label className="w-20 font-bold text-gray-700 text-center">A/C No</label>
-                                    <input type="text" name="AC_Number" value={formData.AC_Number} onChange={handleInputChange} placeholder="" className="flex-1 h-8 font-mono border border-gray-300 px-3 bg-white rounded-[5px] outline-none focus:border-blue-400 shadow-sm" />
+                                <div className="flex-1 grid grid-cols-[1fr_auto_1fr] items-center gap-6">
+                                    <input type="text" name="Brunch" value={formData.Brunch} onChange={handleInputChange} placeholder="" className="w-full h-8 font-mono border border-gray-300 px-3 bg-white rounded-[5px] outline-none focus:border-blue-400 shadow-sm" />
+                                    <label className="w-24 font-bold text-gray-700 text-center">A/C No</label>
+                                    <input type="text" name="AC_Number" value={formData.AC_Number} onChange={handleInputChange} placeholder="" className="w-full h-8 font-mono border border-gray-300 px-3 bg-white rounded-[5px] outline-none focus:border-blue-400 shadow-sm" />
                                 </div>
                             </div>
 
                             {/* VAT and Customer Type */}
                             <div className="flex items-center gap-6">
                                 <label className="w-32 font-bold text-gray-700">VAT Reg. No</label>
-                                <div className="flex-1 flex items-center gap-10">
-                                    <input type="text" name="VAT_Number" value={formData.VAT_Number} onChange={handleInputChange} className="w-[245px] h-8 font-mono border border-gray-300 px-3 bg-white rounded-[5px] outline-none focus:border-blue-400 shadow-sm" />
-                                    <div className="flex-1 flex items-center gap-6">
-                                        <label className="w-24 font-bold text-gray-700 text-center">Cust. Type</label>
-                                        <div className="flex-1 flex gap-2">
-                                            <input 
-                                                type="text" 
-                                                value={formData.Cust_Typ} 
-                                                readOnly 
-                                                placeholder="" 
-                                                className="flex-1 h-8 border border-gray-300 px-3 bg-gray-50 rounded-[5px] outline-none shadow-sm" 
-                                            />
-                                            <button 
-                                                onClick={() => setShowTypeSearch(true)} 
-                                                className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95"
-                                            >
-                                                <Search size={18} />
-                                            </button>
-                                        </div>
+                                <div className="flex-1 grid grid-cols-[1fr_auto_1fr] items-center gap-6">
+                                    <input type="text" name="VAT_Number" value={formData.VAT_Number} onChange={handleInputChange} className="w-full h-8 font-mono border border-gray-300 px-3 bg-white rounded-[5px] outline-none focus:border-blue-400 shadow-sm" />
+                                    <label className="w-24 font-bold text-gray-700 text-center">Cust. Type</label>
+                                    <div className="w-full flex gap-2">
+                                        <input 
+                                            type="text" 
+                                            value={formData.Cust_Typ} 
+                                            readOnly 
+                                            placeholder="" 
+                                            className="flex-1 h-8 border border-gray-300 px-3 bg-gray-50 rounded-[5px] outline-none shadow-sm min-w-0" 
+                                        />
+                                        <button 
+                                            onClick={() => setShowTypeSearch(true)} 
+                                            className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0"
+                                        >
+                                            <Search size={18} />
+                                        </button>
                                     </div>
                                 </div>
                             </div>

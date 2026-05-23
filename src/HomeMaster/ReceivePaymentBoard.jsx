@@ -301,6 +301,33 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
         }
     };
 
+    const handleSaveDraft = async () => {
+        if (!formData.customerId) return showErrorToast("Please select a customer");
+        if (parseFloat(formData.amount) <= 0) return showErrorToast("Please enter receipt amount");
+
+        setIsSaving(true);
+        try {
+            const payload = {
+                ...formData,
+                postDate: formData.date,
+                bankId: formData.bankCode,
+                branch: formData.branchCode,
+                totalAllocated: totalAllocated,
+                totalDiscount: totalDiscount,
+                totalSetOff: totalSetOff,
+                overPayment: Math.max(0, parseFloat(formData.amount) - totalAllocated),
+                customerName: lookups.customers.find(c => (c.code || c.Code || c.id || c.Id || c.customerCode || c.customer_Code) === formData.customerId)?.name || lookups.customers.find(c => (c.code || c.Code || c.id || c.Id || c.customerCode || c.customer_Code) === formData.customerId)?.Cust_Name || lookups.customers.find(c => (c.code || c.Code || c.id || c.Id || c.customerCode || c.customer_Code) === formData.customerId)?.cust_Name || ''
+            };
+            await receivePaymentService.saveDraft(payload);
+            showSuccessToast("Draft Saved Successfully");
+            handleClear();
+        } catch (error) {
+            showErrorToast(error.message || "Failed to save draft");
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
     const handleDelete = async () => {
         if (!formData.docNo) return;
         setShowDeleteConfirm(true);
@@ -424,11 +451,18 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
                         </div>
                         <div className="flex gap-3">
                             <button
+                                onClick={handleSaveDraft}
+                                disabled={isSaving}
+                                className="px-6 h-10 bg-white text-[#0285fd] text-[12px] font-black rounded-[5px] border-2 border-[#0285fd] hover:bg-blue-50 transition-all active:scale-95 flex items-center gap-2 disabled:opacity-50"
+                            >
+                                <Save size={14} /> SAVE DRAFT
+                            </button>
+                            <button
                                 onClick={handleApply}
                                 disabled={isSaving}
                                 className="px-6 h-10 bg-[#2bb744] text-white text-[12px] font-black rounded-[5px] shadow-md shadow-green-100 hover:bg-[#259b3a] transition-all active:scale-95 flex items-center gap-2 border-none disabled:opacity-50"
                             >
-                                {isSaving ? <RotateCcw size={14} className="animate-spin" /> : <CheckCircle size={14} />} SAVE & APPLY
+                                {isSaving ? <RotateCcw size={14} className="animate-spin" /> : <CheckCircle size={14} />} APPLY
                             </button>
                         </div>
                     </div>

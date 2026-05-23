@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import SimpleModal from '../components/SimpleModal';
-import { Search, Calendar, RefreshCw, X, Save, RotateCcw, Loader2, Landmark, Wallet, Layers, Users } from 'lucide-react';
+import { Search, Calendar, RefreshCw, X, Save, RotateCcw, Loader2, Landmark, Wallet, Layers, Users, CheckCircle } from 'lucide-react';
 import { pettyCashService } from '../services/pettyCash.service';
 import { toast } from 'react-hot-toast';
 import { DotLottiePlayer } from '@dotlottie/react-player';
@@ -269,6 +269,48 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
     const totalAmount = totalExpenses + totalItems;
     const difference = Number(formData.billAmount) - totalAmount;
 
+    const handleSaveDraft = async () => {
+        try {
+            if (!formData.account) return showErrorToast('Please select the relevant petty cash account.');
+            if (formData.billAmount <= 0) return showErrorToast('Enter bill amount.');
+            if (!formData.payee && !formData.vendorId) return showErrorToast('Please enter Payee or Vendor.');
+            if (difference !== 0) return showErrorToast('Your bill amount and total amount not balanced.');
+
+            setLoading(true);
+            const payload = {
+                ...formData,
+                date: toISODate(formData.date),
+                dueDate: toISODate(formData.dueDate),
+                items: [
+                    ...expenseRows.filter(r => r.accCode || r.amount > 0).map(r => ({
+                        detailsType: 'Exp',
+                        code: r.accCode,
+                        amount: Number(r.amount),
+                        memo: r.memo,
+                        costCode: r.costCode || formData.costCenter
+                    })),
+                    ...itemRows.filter(r => r.prodCode || r.cost > 0).map(r => ({
+                        detailsType: 'ItP',
+                        code: r.prodCode,
+                        amount: Number(r.cost) * Number(r.qty),
+                        memo: r.memo,
+                        qty: Number(r.qty),
+                        cost: Number(r.cost),
+                        costCode: formData.costCenter
+                    }))
+                ]
+            };
+
+            const response = await pettyCashService.saveDraft(payload);
+            showSuccessToast(`${response.docNo} Draft Saved Successfully.`);
+            handleClear();
+        } catch (error) {
+            showErrorToast(error.response?.data || 'Failed to save Petty Cash draft');
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const handleSave = async () => {
         try {
             if (!formData.account) return showErrorToast('Please select the relevant petty cash account.');
@@ -302,10 +344,10 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
             };
 
             const response = await pettyCashService.applyPettyCash(payload);
-            showSuccessToast(`${response.docNo} Record Saved Successfully.`);
+            showSuccessToast(`${response.docNo} Record Applied Successfully.`);
             handleClear();
         } catch (error) {
-            showErrorToast(error.response?.data || 'Failed to save Petty Cash');
+            showErrorToast(error.response?.data || 'Failed to apply Petty Cash');
         } finally {
             setLoading(false);
         }
@@ -352,9 +394,12 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                             <button onClick={handleClear} className="px-6 h-10 bg-[#00adff] text-white text-sm font-bold rounded-[5px] hover:bg-[#0099e6] transition-all active:scale-95 flex items-center gap-2 border-none">
                                 <RotateCcw size={14} /> CLEAR FORM
                             </button>
-                            <button onClick={handleSave} disabled={loading} className={`px-6 h-10 bg-[#2bb744] text-white text-sm font-bold rounded-[5px] shadow-md shadow-green-100 hover:bg-[#259b3a] transition-all active:scale-95 flex items-center justify-center gap-2 ${loading ? 'opacity-50' : ''}`}>
-                                {loading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
-                                SAVE TRANSACTION
+                            <button onClick={handleSaveDraft} disabled={loading} className={`px-6 h-10 bg-white text-[#0285fd] text-sm font-black rounded-[5px] border-2 border-[#0285fd] hover:bg-blue-50 transition-all active:scale-95 flex items-center gap-2 ${loading ? 'opacity-50' : ''}`}>
+                                <Save size={14} /> SAVE DRAFT
+                            </button>
+                            <button onClick={handleSave} disabled={loading} className={`px-6 h-10 bg-[#2bb744] text-white text-sm font-bold rounded-[5px] shadow-md shadow-green-100 hover:bg-[#259b3a] transition-all active:scale-95 flex items-center justify-center gap-2 border-none ${loading ? 'opacity-50' : ''}`}>
+                                {loading ? <Loader2 size={14} className="animate-spin" /> : <CheckCircle size={14} />}
+                                APPLY
                             </button>
                         </div>
                     </div>

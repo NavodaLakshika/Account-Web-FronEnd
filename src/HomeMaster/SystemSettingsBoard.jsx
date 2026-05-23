@@ -36,12 +36,14 @@ const SystemSettingsBoard = ({ isOpen = true, onClose, isInline = false }) => {
         { label: 'Clear Temp Data', id: 'clear' },
         { label: 'Period Lock Facility', id: 'lock' },
         { label: 'Admin Change Pwd', id: 'changePassword' },
-        { label: 'User & Role Mgmt', id: 'users' }
+        { label: 'User & Role Mgmt', id: 'users' },
+        { label: 'Admin Config Setting', id: 'systemSettings' }
     ];
 
     const transactionItems = [
         { label: 'Purchase Order', id: 'trans_po' },
         { label: 'GRN', id: 'trans_grn' },
+        { label: 'Bulk GRN', id: 'trans_bulkGrn' },
         { label: 'Petty Cash', id: 'trans_pettyCash' },
         { label: 'Enter Bills', id: 'trans_enterBills' },
         { label: 'Pay Bills', id: 'trans_payBills' },

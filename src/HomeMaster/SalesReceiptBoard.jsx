@@ -257,6 +257,30 @@ const SalesReceiptBoard = ({ isOpen, onClose }) => {
         }
     };
 
+    const handleSaveDraft = async () => {
+        if (!formData.customerId) return showErrorToast("Please select a customer first.");
+
+        setIsSaving(true);
+        try {
+            const payload = {
+                ...formData,
+                items: rows.map(r => ({
+                    ...r,
+                    qty: parseFloat(r.qty),
+                    sellingPrice: parseFloat(r.sellingPrice),
+                    amount: parseFloat(r.amount)
+                }))
+            };
+            await salesReceiptService.saveDraft(payload);
+            showSuccessToast("Draft Saved Successfully.");
+            handleClear();
+        } catch (error) {
+            showErrorToast("Failed to save draft.");
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
     // --- Lookups ---
     const filteredCustomers = useMemo(() => {
         return lookups.customers.filter(c => 
@@ -310,12 +334,20 @@ const SalesReceiptBoard = ({ isOpen, onClose }) => {
                         </div>
                         <div className="flex gap-3">
                             <button
+                                onClick={handleSaveDraft}
+                                disabled={isSaving || isApplying}
+                                className="px-6 h-10 bg-white text-[#0285fd] text-sm font-black rounded-[5px] border-2 border-[#0285fd] hover:bg-blue-50 transition-all active:scale-95 flex items-center gap-2 disabled:opacity-50"
+                            >
+                                {isSaving ? <Loader2 className="animate-spin" size={16} /> : <Save size={16} />} 
+                                SAVE DRAFT
+                            </button>
+                            <button
                                 onClick={() => setShowConfirmModal(true)}
                                 disabled={isApplying || rows.length === 0}
                                 className={`px-8 h-10 ${isApplying || rows.length === 0 ? 'bg-gray-300' : 'bg-[#2bb744] shadow-md shadow-green-100 hover:bg-[#259b3a]'} text-white text-sm font-black rounded-[5px] transition-all active:scale-95 flex items-center gap-2 border-none`}
                             >
                                 {isApplying ? <Loader2 className="animate-spin" size={16} /> : <CheckCircle size={16} />} 
-                                SAVE & APPLY
+                                APPLY
                             </button>
                         </div>
                     </div>

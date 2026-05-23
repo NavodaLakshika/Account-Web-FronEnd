@@ -43,6 +43,13 @@ export const salesReceiptService = {
     } catch (error) { throw error; }
   },
 
+  saveDraft: async (data) => {
+    try {
+      const response = await api.post('/Job/save', data);
+      return response.data;
+    } catch (error) { throw error; }
+  },
+
   apply: async (data) => {
     try {
       const response = await api.post('/Job/apply', data);

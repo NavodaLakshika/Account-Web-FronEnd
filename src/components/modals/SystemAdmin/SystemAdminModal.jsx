@@ -64,7 +64,8 @@ const SystemAdminModal = ({ isOpen, onClose }) => {
         { icon: Eraser, label: 'Clear Temp Data', action: 'clear' },
         { icon: Lock, label: 'Period Lock Facility', action: 'lock' },
         { icon: Users, label: 'User & Role Management', action: 'users' },
-        { icon: Key, label: 'Change Password', action: 'changePassword' }
+        { icon: Key, label: 'Change Password', action: 'changePassword' },
+        { icon: Settings, label: 'Admin Config Setting', action: 'systemSettings' }
     ];
 
     return (

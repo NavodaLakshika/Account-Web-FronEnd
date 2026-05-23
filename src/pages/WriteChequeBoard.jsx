@@ -12,7 +12,8 @@ import {
     X,
     Plus,
     Package,
-    Receipt
+    Receipt,
+    CheckCircle
 } from 'lucide-react';
 import SimpleModal from '../components/SimpleModal';
 import CalendarModal from '../components/CalendarModal';
@@ -258,6 +259,79 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
         }
     };
 
+    const handleSaveDraft = async () => {
+        if (!formData.bankAcc) return showErrorToast('Select settlement bank.');
+        if (expenses.length === 0 && items.length === 0) return showErrorToast('Add at least one line item (Expense or Item).');
+        
+        const totalAmount = calculateTotal();
+        if (totalAmount <= 0) return showErrorToast('Total amount must be greater than zero.');
+
+        setLoading(true);
+        try {
+            // 1. Save Expenses
+            for (const exp of expenses) {
+                if (!exp.accCode) continue;
+                await writeChequeService.tempSaveExpense({
+                    DocNo: formData.docId,
+                    Company: formData.company,
+                    VendorId: formData.payeeId,
+                    AccCode: exp.accCode,
+                    AccName: lookups.accounts.find(a => a.code === exp.accCode)?.name || '',
+                    Amount: parseFloat(exp.amount) || 0,
+                    TotalAmount: totalAmount,
+                    Memo: exp.memo,
+                    CustJob: '',
+                    Date: formData.date,
+                    IdNo: '0',
+                    Type: 'WCH',
+                    CostCode: exp.costCenter || formData.costCenter,
+                    CostName: lookups.costCenters.find(cc => cc.code === (exp.costCenter || formData.costCenter))?.name || ''
+                });
+            }
+
+            // 2. Save Items
+            for (const item of items) {
+                if (!item.itemCode) continue;
+                await writeChequeService.tempSaveItem({
+                    DocNo: formData.docId,
+                    Company: formData.company,
+                    VendorId: formData.payeeId,
+                    ItemId: item.itemCode,
+                    Description: item.description,
+                    Qty: parseInt(item.qty) || 0,
+                    Cost: parseFloat(item.cost) || 0,
+                    CustJob: '',
+                    TotalAmount: totalAmount,
+                    Date: formData.date,
+                    IdNo: '0',
+                    Type: 'WCH'
+                });
+            }
+
+            // 3. Save Header
+            await writeChequeService.saveHeader({
+                DocNo: formData.docId,
+                BankCode: formData.bankAcc,
+                VendorId: formData.payeeId,
+                Memo: formData.address,
+                ChequeNo: formData.chqNo,
+                Date: formData.date,
+                RefNo: formData.chqNo,
+                TotalAmount: totalAmount,
+                ChequeDate: formData.chqDate,
+                Company: formData.company,
+                Payee: formData.payeeName
+            });
+
+            showSuccessToast(`Draft saved successfully.`);
+            onClose();
+        } catch (error) {
+            showErrorToast(error.toString());
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const handleClear = () => {
         setExpenses([]);
         setItems([]);
@@ -318,10 +392,16 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
                             <RotateCcw size={14} /> CLEAR 
                         </button>
                     </div>
-                    <button onClick={handleCommit} disabled={loading} className="px-6 h-10 bg-[#2bb744] text-white text-sm font-black rounded-[5px] shadow-md shadow-green-100 hover:bg-[#259b3a] transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-50 border-none">
-                        {loading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />} 
-                         APPLY
-                    </button>
+                    <div className="flex gap-3">
+                        <button onClick={handleSaveDraft} disabled={loading} className="px-6 h-10 bg-white text-[#0285fd] text-sm font-black rounded-[5px] border-2 border-[#0285fd] hover:bg-blue-50 transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-50">
+                            {loading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />} 
+                             SAVE DRAFT
+                        </button>
+                        <button onClick={handleCommit} disabled={loading} className="px-6 h-10 bg-[#2bb744] text-white text-sm font-black rounded-[5px] shadow-md shadow-green-100 hover:bg-[#259b3a] transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-50 border-none">
+                            {loading ? <Loader2 size={14} className="animate-spin" /> : <CheckCircle size={14} />} 
+                             APPLY
+                        </button>
+                    </div>
                 </div>
             }
         >

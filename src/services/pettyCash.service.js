@@ -62,6 +62,12 @@ export const pettyCashService = {
     return r.data;
   },
 
+  saveDraft: async (data) => {
+    const userName = getUserName();
+    const r = await api.post('/save', data, { params: { userName } });
+    return r.data;
+  },
+
   searchDocs: async (company) => {
     const r = await api.get('/search', { params: { company } });
     return r.data;

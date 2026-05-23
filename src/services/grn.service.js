@@ -91,6 +91,24 @@ export const grnService = {
     }
   },
 
+  async bulkApply(dataList) {
+    try {
+      const response = await api.post('/bulk-apply', dataList);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || 'Failed to bulk apply GRNs';
+    }
+  },
+
+  async bulkSave(dataList) {
+    try {
+      const response = await api.post('/bulk-save', dataList);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || 'Failed to bulk save GRNs';
+    }
+  },
+
   async delete(docNo, company) {
     try {
       const response = await api.delete(`/${docNo}`, { params: { company } });
