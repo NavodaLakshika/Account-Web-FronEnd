@@ -28,7 +28,9 @@ import {
     Bell,
     Receipt,
     PieChart,
-    LayoutGrid
+    LayoutGrid,
+    Star,
+    Clock
 } from 'lucide-react';
 
 import { authService } from '../services/auth.service';
@@ -93,6 +95,7 @@ import { reminderService } from '../services/reminder.service';
 
 import AIChatbotBoard from './AIChatbotBoard';
 import GetThingsDoneBoard from './GetThingsDoneBoard';
+import FeatureLockedModal from '../components/modals/FeatureLockedModal';
 import ExpensesDashboardBoard from './ExpensesDashboardBoard';
 import QuickLaunchGridModal from '../components/modals/QuickLaunchGridModal';
 import DepartmentBoard from './DepartmentBoard';
@@ -100,8 +103,13 @@ import CalculatorBoard from '../components/modals/ViewAndUtilityModels/Calculato
 import EstimateBoard from './EstimateBoard';
 import { Layers } from 'lucide-react';
 import ReportTemplate from '../components/ReportTemplate';
-import { toast } from 'react-hot-toast';
 
+import SubscriptionExpiredModal from '../components/modals/SubscriptionExpiredModal';
+import SubmitReviewModal from '../components/modals/SubmitReviewModal';
+import FirstTimeGuide from '../components/FirstTimeGuide';
+import CompanyPromoBoard from '../components/CompanyPromoBoard';
+import { showSuccessToast } from '../utils/toastUtils';
+import SubscriptionAdminBoard from '../components/Admin/SubscriptionAdminBoard';
 
 
 const Dashboard = () => {
@@ -147,6 +155,7 @@ const Dashboard = () => {
     const [showDirectBankTransactionModal, setShowDirectBankTransactionModal] = useState(false);
     const [showFundsTransferModal, setShowFundsTransferModal] = useState(false);
     const [showChequeCancelModal, setShowChequeCancelModal] = useState(false);
+    const [showReviewModal, setShowReviewModal] = useState(false);
     const [showCustomerChequeReturnModal, setShowCustomerChequeReturnModal] = useState(false);
 
     const [showChequeBookEntryModal, setShowChequeBookEntryModal] = useState(false);
@@ -173,11 +182,16 @@ const Dashboard = () => {
     const [showEstimateModal, setShowEstimateModal] = useState(false);
     const [showBIDashboard, setShowBIDashboard] = useState(false);
     const [showQuickLaunchModal, setShowQuickLaunchModal] = useState(false);
+    const [showPromoModal, setShowPromoModal] = useState(false);
+    const [showFirstTimeGuide, setShowFirstTimeGuide] = useState(false);
+    const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
+    const [showDashboardLockedModal, setShowDashboardLockedModal] = useState(false);
 
     const [showAIChatbotModal, setShowAIChatbotModal] = useState(false);
     const [showItemsServicesReport, setShowItemsServicesReport] = useState(false);
     const [itemsServicesData, setItemsServicesData] = useState([]);
     const [isReportLoading, setIsReportLoading] = useState(false);
+    const [showSubscriptionExpiredModal, setShowSubscriptionExpiredModal] = useState(false);
 
 
 
@@ -254,10 +268,28 @@ const Dashboard = () => {
         const savedIcons = localStorage.getItem('ribbon_icons');
 
         if (!currentUser) {
-            navigate('/login');
-        } else {
-            setUser(currentUser);
-            setSelectedCompany(company ? JSON.parse(company) : null);
+                navigate('/login');
+            } else {
+                setUser(currentUser);
+                setSelectedCompany(company ? JSON.parse(company) : null);
+
+                // Show first-time onboarding guide (per-user — only once per employee)
+                const userId = currentUser?.EmpCode || currentUser?.empCode || currentUser?.emp_Code || currentUser?.id_No || currentUser?.Id_No || currentUser?.IdNo || currentUser?.username || currentUser?.EmpName;
+                const onboardKey = `onboardingDone_${userId}`;
+                if (!localStorage.getItem(onboardKey)) {
+                    setTimeout(() => setShowFirstTimeGuide(true), 1000);
+                }
+            
+            const subEndDateStr = currentUser?.SubscriptionEndDate || currentUser?.subscriptionEndDate || currentUser?.subscription_End_Date;
+            
+            if (subEndDateStr) {
+                const endDate = new Date(subEndDateStr);
+                const now = new Date();
+                if (now > endDate) {
+                    setShowSubscriptionExpiredModal(true);
+                }
+            }
+
             if (savedIcons) {
                 let parsed = JSON.parse(savedIcons);
                 localStorage.setItem('ribbon_icons', JSON.stringify(parsed));
@@ -340,6 +372,23 @@ const Dashboard = () => {
 
         setActiveAlarmTask(null);
     };
+
+    // Show promo popup every 10 minutes (first after 8s)
+    useEffect(() => {
+        const showPromo = () => {
+            const lastShown = localStorage.getItem('promoLastShown');
+            const now = Date.now();
+            if (!lastShown || now - parseInt(lastShown) > 10 * 60 * 1000) {
+                setShowPromoModal(true);
+                localStorage.setItem('promoLastShown', String(now));
+            }
+        };
+
+        const onMount = setTimeout(showPromo, 8000);
+        const interval = setInterval(showPromo, 10 * 60 * 1000);
+
+        return () => { clearTimeout(onMount); clearInterval(interval); };
+    }, []);
 
     // Listen to messages from other tabs (like SpendOverviewPage)
     useEffect(() => {
@@ -439,7 +488,7 @@ const Dashboard = () => {
             const taskId = task.id_No || task.Id_No || task.idNo;
             await reminderService.expireReminder(taskId);
             handlePermanentDismiss(taskId); // Mark as permanently alerted today
-            toast.success("Task marked as completed!");
+            showSuccessToast("Task marked as completed!");
         } catch (error) {
             console.error("Error completing task:", error);
         }
@@ -691,6 +740,9 @@ const Dashboard = () => {
                 }}
             />
             <ReportsModal isOpen={showReportsModal} onClose={() => setShowReportsModal(false)} />
+            <SubmitReviewModal isOpen={showReviewModal} onClose={() => setShowReviewModal(false)} currentUser={user} />
+            <FirstTimeGuide isOpen={showFirstTimeGuide} onClose={() => setShowFirstTimeGuide(false)} onOpenMasterFile={() => setShowMasterFileModal(true)} onCloseMasterFile={() => setShowMasterFileModal(false)} user={user} />
+            <CompanyPromoBoard isOpen={showPromoModal} onClose={() => setShowPromoModal(false)} />
             <SystemAdminModal
                 isOpen={showSystemAdminModal}
                 onClose={() => setShowSystemAdminModal(false)}
@@ -704,6 +756,21 @@ const Dashboard = () => {
                 }}
             />
             <ChangePasswordBoard isOpen={showChangePasswordModal} onClose={() => setShowChangePasswordModal(false)} />
+
+            {/* Subscription Management Modal */}
+            {showSubscriptionModal && (
+                <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+                    <div className="bg-white rounded-2xl w-full max-w-5xl max-h-[85vh] overflow-y-auto shadow-2xl animate-in fade-in zoom-in-95 duration-200 relative">
+                        <button
+                            onClick={() => setShowSubscriptionModal(false)}
+                            className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors z-10"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                        </button>
+                        <SubscriptionAdminBoard />
+                    </div>
+                </div>
+            )}
             <SystemSettingsBoard isOpen={showSystemSettingsModal} onClose={() => setShowSystemSettingsModal(false)} />
             <GRNBoard isOpen={showGRNModal} onClose={() => setShowGRNModal(false)} />
             <BulkGRNBoard isOpen={showBulkGRNModal} onClose={() => setShowBulkGRNModal(false)} />
@@ -870,20 +937,26 @@ const Dashboard = () => {
                     </div>
 
                     <div className="flex items-center gap-3 ml-auto">
-                        <div className="flex items-center gap-4 h-[28px] bg-white/15 backdrop-blur-md px-4 rounded-[10px] border border-white/20 shadow-sm transition-all hover:bg-white/25 mb-1">
-                            <div className="flex items-center gap-2 border-r border-white/10 pr-4">
+                            <div className="flex items-center gap-2 h-[28px] bg-white/5 backdrop-blur-md px-3 rounded-[10px] border border-white/10 shadow-sm mb-1">
                                 <div className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse shadow-[0_0_8px_rgba(74,222,128,0.6)]" />
                                 <span className="text-[10px] font-black uppercase tracking-widest text-white drop-shadow-sm">
                                     {user?.EmpName || user?.empName || user?.Emp_Name || user?.username || 'Admin'}
                                 </span>
                             </div>
-                            <div className="flex items-center gap-2">
-                                <Building2 size={12} className="text-white/80" />
-                                <span className="text-[10px] font-bold text-white/90 tracking-tight">
+
+                            <div className="flex items-center gap-1.5 h-[28px] bg-white/5 backdrop-blur-md px-3 rounded-[10px] border border-white/10 shadow-sm mb-1">
+                                <Building2 size={12} className="text-white/50" />
+                                <span className="text-[10px] font-medium text-white/70 tracking-tight">
                                     {selectedCompany?.CompanyName || selectedCompany?.companyName || selectedCompany?.name || 'Enterprise'}
                                 </span>
                             </div>
-                        </div>
+
+                            <div className="flex items-center gap-1.5 h-[28px] bg-white/15 backdrop-blur-md px-3 rounded-[10px] border border-white/20 shadow-sm mb-1">
+                                <Clock size={10} className="text-white/70" />
+                                <span className="text-[10px] font-mono font-bold text-white/90 tabular-nums">
+                                    {currentTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true })}
+                                </span>
+                            </div>
 
                         <div className="w-[1px] h-4 bg-white/20 mx-1" />
                         <button
@@ -942,7 +1015,14 @@ const Dashboard = () => {
                             bank_rec: { icon: RefreshCcw, label: 'Bank Rec', onClick: () => setShowBankRecModal(true), active: showBankRecModal },
                             trial_balance: { icon: BarChart2, label: 'Trial Balance', onClick: () => setShowTrialBalanceModal(true), active: showTrialBalanceModal },
                             search: { icon: Search, label: 'Search', onClick: () => setShowSearchModal(true), active: showSearchModal },
-                            dashboard: { icon: PieChart, label: 'Dashboard', onClick: () => setShowBIDashboard(true), active: showBIDashboard, isHighlighted: true },
+                            dashboard: { icon: PieChart, label: 'Dashboard', onClick: () => {
+                                const isLocked = localStorage.getItem('isLocked_dashboardLock') === 'true';
+                                if (isLocked) {
+                                    setShowDashboardLockedModal(true);
+                                } else {
+                                    setShowBIDashboard(true);
+                                }
+                            }, active: showBIDashboard, isHighlighted: true },
                             ai_chat: { icon: Bot, label: 'AI Chat', onClick: handleAIClick, active: showAIChatbotModal },
                             department: { icon: Building2, label: 'Dept.', onClick: () => setShowDepartmentModal(true), active: showDepartmentModal },
                             calculator: { icon: Calculator, label: 'Calculator', onClick: () => window.open('ms-calculator:'), active: showCalculatorModal },
@@ -958,7 +1038,14 @@ const Dashboard = () => {
                             return (
                                 <button
                                     key="dashboard"
-                                    onClick={() => setShowBIDashboard(true)}
+                                    onClick={() => {
+                                        const isLocked = localStorage.getItem('isLocked_dashboardLock') === 'true';
+                                        if (isLocked) {
+                                            setShowDashboardLockedModal(true);
+                                        } else {
+                                            setShowBIDashboard(true);
+                                        }
+                                    }}
                                     className="relative flex flex-col items-center justify-center min-w-[75px] h-[75px] m-0.5 rounded-xl cursor-pointer border-0 outline-none group transition-all duration-200"
                                     style={{
                                         background: showBIDashboard ? 'rgba(255,255,255,0.20)' : 'transparent',
@@ -1056,8 +1143,15 @@ const Dashboard = () => {
 
 
 
-                    {/* New Sleek Search Trigger (Top Right Aligned) */}
-                    <div className="flex justify-end -mb-12 animate-in fade-in slide-in-from-right-10 duration-700">
+                    {/* Top Right Action Buttons */}
+                    <div className="flex justify-end gap-4 -mb-12 animate-in fade-in slide-in-from-right-10 duration-700">
+                        <button
+                            onClick={() => setShowReviewModal(true)}
+                            className="flex items-center gap-2 px-4 h-11 bg-white/40 backdrop-blur-md border border-white/20 rounded-[10px] shadow-lg hover:bg-[#f97316] hover:text-white hover:border-[#ea580c] hover:shadow-xl hover:scale-105 transition-all duration-300 group text-gray-500"
+                        >
+                            <Star size={18} className="group-hover:text-white transition-colors" />
+                            <span className="text-sm font-semibold tracking-tight">Rate System</span>
+                        </button>
                         <button
                             onClick={() => setShowSearchModal(true)}
                             className="flex items-center gap-3 px-5 h-11 bg-white/40 backdrop-blur-md border border-white/20 rounded-[10px] shadow-lg hover:bg-white/60 hover:shadow-xl hover:scale-105 transition-all duration-300 group"
@@ -1299,6 +1393,13 @@ const Dashboard = () => {
             <SoftwareAboutModal
                 isOpen={showSoftwareAboutModal}
                 onClose={() => setShowSoftwareAboutModal(false)}
+            />
+
+            <FeatureLockedModal
+                isOpen={showDashboardLockedModal}
+                onClose={() => setShowDashboardLockedModal(false)}
+                title="Dashboard Locked"
+                message="Please contact the administrator to unlock access."
             />
 
             <QuickLaunchGridModal

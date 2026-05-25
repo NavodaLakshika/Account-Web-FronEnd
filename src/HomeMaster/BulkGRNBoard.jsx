@@ -4,9 +4,9 @@ import ConfirmModal from '../components/modals/ConfirmModal';
 import { Search, CheckCircle, RotateCcw, FileUp, FileDown, Trash2, X } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import { grnService } from '../services/grn.service';
-import { toast } from 'react-hot-toast';
 import { getSessionData } from '../utils/session';
-import { DotLottiePlayer } from '@dotlottie/react-player';
+import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
+
 
 const BulkGRNBoard = ({ isOpen, onClose }) => {
     const [lookups, setLookups] = useState({ suppliers: [], products: [], pos: [], paymentMethods: [] });
@@ -40,42 +40,8 @@ const BulkGRNBoard = ({ isOpen, onClose }) => {
             const data = await grnService.getLookups(company);
             setLookups(data);
         } catch (error) {
-            toast.error('Failed to load lookups.');
+            showErrorToast('Failed to load lookups.');
         }
-    };
-
-    const showSuccessToast = (message) => {
-        toast.custom((t) => (
-            <div className={`${t.visible ? 'animate-in slide-in-from-right-10 fade-in duration-500' : 'animate-out slide-out-to-right-10 fade-out duration-300'} 
-                max-w-[550px] w-fit bg-white/95 backdrop-blur-xl border border-white/20 shadow-2xl rounded-[5px] flex flex-col pointer-events-auto overflow-hidden`}>
-                <div className="px-4 py-2.5 flex items-center gap-3">
-                    <div className="w-12 h-12 shrink-0">
-                        <DotLottiePlayer src="/lottiefile/Successffull.lottie" autoplay loop={false} />
-                    </div>
-                    <div className="flex-grow text-left py-1">
-                        <h3 className="text-slate-800 text-[12px] font-bold tracking-wider uppercase font-tahoma leading-relaxed">{message}</h3>
-                    </div>
-                    <button onClick={() => toast.dismiss(t.id)} className="text-slate-300 hover:text-slate-500 transition-colors"><X size={14} /></button>
-                </div>
-            </div>
-        ), { duration: 3000, position: 'top-right' });
-    };
-
-    const showErrorToast = (message) => {
-        toast.custom((t) => (
-            <div className={`${t.visible ? 'animate-in slide-in-from-right-10 fade-in duration-500' : 'animate-out slide-out-to-right-10 fade-out duration-300'} 
-                max-w-[550px] w-fit bg-white/95 backdrop-blur-xl border border-white/20 shadow-2xl rounded-[5px] flex flex-col pointer-events-auto overflow-hidden`}>
-                <div className="px-4 py-2.5 flex items-center gap-3">
-                    <div className="w-12 h-12 shrink-0">
-                        <DotLottiePlayer src="/lottiefile/Error Fail animation.lottie" autoplay loop={false} />
-                    </div>
-                    <div className="flex-grow text-left py-1">
-                        <h3 className="text-slate-800 text-[12px] font-bold tracking-wider uppercase font-tahoma leading-relaxed">{message}</h3>
-                    </div>
-                    <button onClick={() => toast.dismiss(t.id)} className="text-slate-300 hover:text-slate-500 transition-colors"><X size={14} /></button>
-                </div>
-            </div>
-        ), { duration: 3000, position: 'top-right' });
     };
 
     const downloadExcelTemplate = () => {
@@ -186,7 +152,7 @@ const BulkGRNBoard = ({ isOpen, onClose }) => {
                     showErrorToast("Could not parse any valid GRN groups.");
                 }
                 
-                if (skipCount > 0) toast.error(`Skipped ${skipCount} rows due to missing Supplier or Product Code.`);
+                if (skipCount > 0) showErrorToast(`Skipped ${skipCount} rows due to missing Supplier or Product Code.`);
                 
             } catch (err) {
                 showErrorToast("Failed to parse Excel file.");

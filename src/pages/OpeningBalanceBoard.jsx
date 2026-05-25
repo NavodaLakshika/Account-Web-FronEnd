@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import SimpleModal from '../components/SimpleModal';
 import { Search, Calendar, ChevronDown, Check, X, Save, RotateCcw, Loader2, RefreshCw, Layers, UserCircle, Briefcase } from 'lucide-react';
 import { openingBalanceService } from '../services/openingBalance.service';
-import { toast } from 'react-hot-toast';
+
 import { getSessionData } from '../utils/session';
+import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
+
 
 const OpeningBalanceBoard = ({ isOpen, onClose }) => {
     const [activeTab, setActiveTab] = useState('Vendor'); // 'Vendor', 'Customer', 'Account'
@@ -57,7 +59,7 @@ const OpeningBalanceBoard = ({ isOpen, onClose }) => {
             setLookups(lookupRes);
             setFormData(prev => ({ ...prev, docNo: docRes.docNo }));
         } catch (error) {
-            toast.error("Failed to load initial data");
+            showErrorToast("Failed to load initial data");
         } finally {
             setLoading(false);
         }
@@ -91,18 +93,18 @@ const OpeningBalanceBoard = ({ isOpen, onClose }) => {
 
     const handleSave = async () => {
         if (!formData.entityId || !formData.accountCode) {
-            toast.error(`Please select a ${activeTab} and an account.`);
+            showErrorToast(`Please select a ${activeTab} and an account.`);
             return;
         }
 
         try {
             setLoading(true);
             await openingBalanceService.save({ ...formData, type: activeTab });
-            toast.success('Opening Balance saved successfully!');
+            showSuccessToast('Opening Balance saved successfully!');
             handleClear();
             onClose();
         } catch (error) {
-            toast.error(error.toString());
+            showErrorToast(error.toString());
         } finally {
             setLoading(false);
         }

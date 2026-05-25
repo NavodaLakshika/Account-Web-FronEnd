@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import SimpleModal from '../components/SimpleModal';
 import { Search, RotateCcw, Save, Trash2, Loader2, X } from 'lucide-react';
 import { customerService } from '../services/customer.service';
-import { toast } from 'react-hot-toast';
+
 import { getSessionData } from '../utils/session';
+import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
+
 
 const CustomerBoard = ({ isOpen, onClose }) => {
     const initialState = {
@@ -80,16 +82,16 @@ const CustomerBoard = ({ isOpen, onClose }) => {
             CurrentUser: formData.CurrentUser
         });
         setIsEditMode(false);
-        toast.success('Form cleared');
+        showSuccessToast('Form cleared');
     };
 
     const handleSave = async () => {
         if (!formData.Cust_Name) {
-            toast.error('Customer Name is required');
+            showErrorToast('Customer Name is required');
             return;
         }
         if (!formData.Type) {
-            toast.error('Customer Type is required');
+            showErrorToast('Customer Type is required');
             return;
         }
 
@@ -103,18 +105,18 @@ const CustomerBoard = ({ isOpen, onClose }) => {
 
             if (isEditMode) {
                 await customerService.update(formData.Code, payload);
-                toast.success('Customer updated successfully');
+                showSuccessToast('Customer updated successfully');
             } else {
                 const response = await customerService.create(payload);
                 setFormData(prev => ({ ...prev, Code: response.code }));
-                toast.success(`Customer created: ${response.code}`);
+                showSuccessToast(`Customer created: ${response.code}`);
                 if (response.nameExists) {
-                    toast.error('Warning: A customer with this name already exists.');
+                    showErrorToast('Warning: A customer with this name already exists.');
                 }
                 setIsEditMode(true);
             }
         } catch (error) {
-            toast.error(typeof error === 'string' ? error : (error.message || 'Operation failed'));
+            showErrorToast(typeof error === 'string' ? error : (error.message || 'Operation failed'));
         } finally {
             setLoading(false);
         }
@@ -128,10 +130,10 @@ const CustomerBoard = ({ isOpen, onClose }) => {
         setLoading(true);
         try {
             await customerService.delete(formData.Code);
-            toast.success('Customer deleted');
+            showSuccessToast('Customer deleted');
             handleClear();
         } catch (error) {
-            toast.error(error);
+            showErrorToast(error);
         } finally {
             setLoading(false);
         }
@@ -144,7 +146,7 @@ const CustomerBoard = ({ isOpen, onClose }) => {
             setCustomersList(data);
             setShowSearchModal(true);
         } catch (error) {
-            toast.error('Failed to load customers');
+            showErrorToast('Failed to load customers');
         } finally {
             setLoading(false);
         }
@@ -180,9 +182,9 @@ const CustomerBoard = ({ isOpen, onClose }) => {
             });
             setIsEditMode(true);
             setShowSearchModal(false);
-            toast.success('Customer loaded');
+            showSuccessToast('Customer loaded');
         } catch (error) {
-            toast.error(error);
+            showErrorToast(error);
         } finally {
             setLoading(false);
         }

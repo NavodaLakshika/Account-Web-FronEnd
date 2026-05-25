@@ -3,7 +3,8 @@ import SimpleModal from '../../SimpleModal';
 import CalendarModal from '../../CalendarModal';
 import { Search, RotateCcw, Save, Calendar, Loader2, X, PlusCircle } from 'lucide-react';
 import { fixedAssetService } from '../../../services/fixedAsset.service';
-import { toast } from 'react-hot-toast';
+import { showSuccessToast, showErrorToast } from '../../../utils/toastUtils';
+
 
 const FixedAssetsBoard = ({ isOpen, onClose }) => {
     const initialState = {
@@ -131,15 +132,15 @@ const FixedAssetsBoard = ({ isOpen, onClose }) => {
 
     const handleSave = async () => {
         if (!formData.AssetsCode || !formData.AssetsName) {
-            toast.error('Enter Account Code and Account Name.');
+            showErrorToast('Enter Account Code and Account Name.');
             return;
         }
         if (!formData.AccCode || formData.AccCode === '< Select Account >') {
-            toast.error('Select Assets Account Name.');
+            showErrorToast('Select Assets Account Name.');
             return;
         }
         if (parseFloat(formData.PurchCost) === 0) {
-            toast.error('Enter Cost.');
+            showErrorToast('Enter Cost.');
             return;
         }
 
@@ -151,10 +152,10 @@ const FixedAssetsBoard = ({ isOpen, onClose }) => {
                 SellingPrice: parseFloat(formData.SellingPrice),
                 SalesExpense: parseFloat(formData.SalesExpense)
             });
-            toast.success(isEditMode ? 'Record Updated Successfully' : 'New record Added Successfully');
+            showSuccessToast(isEditMode ? 'Record Updated Successfully' : 'New record Added Successfully');
             handleClear();
         } catch (error) {
-            toast.error(error);
+            showErrorToast(error);
         } finally {
             setLoading(false);
         }
@@ -167,7 +168,7 @@ const FixedAssetsBoard = ({ isOpen, onClose }) => {
             setAssetsList(data);
             setShowSearchModal(true);
         } catch (err) {
-            toast.error('Failed to load assets list');
+            showErrorToast('Failed to load assets list');
         } finally {
             setLoading(false);
         }
@@ -202,7 +203,7 @@ const FixedAssetsBoard = ({ isOpen, onClose }) => {
             setIsEditMode(true);
             setShowSearchModal(false);
         } catch (error) {
-            toast.error('Failed to load asset details');
+            showErrorToast('Failed to load asset details');
         } finally {
             setLoading(false);
         }

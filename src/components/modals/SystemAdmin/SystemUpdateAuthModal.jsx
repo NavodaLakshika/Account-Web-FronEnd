@@ -25,7 +25,6 @@ const SystemUpdateAuthModal = ({ isOpen, onClose, onVerified }) => {
             });
 
             if (response.data.success) {
-                showSuccessToast("Identity Verified");
                 onVerified();
                 onClose();
             }

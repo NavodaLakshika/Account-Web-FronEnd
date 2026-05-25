@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import SimpleModal from '../components/SimpleModal';
 import { Search, X, RotateCcw, Loader2, Ban, Landmark, Calendar, FileText, CheckCircle2, ShieldAlert, AlertTriangle, ArrowRightLeft } from 'lucide-react';
 import { bankingService } from '../services/banking.service';
-import { toast } from 'react-hot-toast';
+
 import { getSessionData } from '../utils/session';
+import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
+
 
 const ChequeCancelBoard = ({ isOpen, onClose }) => {
     const [loading, setLoading] = useState(false);
@@ -52,7 +54,7 @@ const ChequeCancelBoard = ({ isOpen, onClose }) => {
             const res = await bankingService.getCancelLookups(compCode || formData.company);
             setLookups(res);
         } catch (error) {
-            toast.error("Failed to load search parameters");
+            showErrorToast("Failed to load search parameters");
         } finally {
             setLoading(false);
         }
@@ -60,7 +62,7 @@ const ChequeCancelBoard = ({ isOpen, onClose }) => {
 
     const handleSearchCheque = async () => {
         if (!formData.docNo && !formData.voucherNo && !formData.targetChequeNo) {
-            toast.error("Please enter a Document No or Cheque No to search.");
+            showErrorToast("Please enter a Document No or Cheque No to search.");
             return;
         }
 
@@ -85,12 +87,12 @@ const ChequeCancelBoard = ({ isOpen, onClose }) => {
                     voucherNo: cheque.voucherNo,
                     docNo: cheque.docNo
                 }));
-                toast.success("Cheque link details retrieved!");
+                showSuccessToast("Cheque link details retrieved!");
             } else {
-                toast.error("No valid cheque found with these details.");
+                showErrorToast("No valid cheque found with these details.");
             }
         } catch (error) {
-            toast.error("Search failed.");
+            showErrorToast("Search failed.");
         } finally {
             setLoading(false);
         }
@@ -98,22 +100,22 @@ const ChequeCancelBoard = ({ isOpen, onClose }) => {
 
     const handleSave = async () => {
         if (!formData.supplierCode || !formData.targetChequeNo) {
-            toast.error("Search and select a valid cheque record first.");
+            showErrorToast("Search and select a valid cheque record first.");
             return;
         }
         if (!formData.reason) {
-            toast.error("Reason for cancellation is strictly required for auditing.");
+            showErrorToast("Reason for cancellation is strictly required for auditing.");
             return;
         }
 
         try {
             setLoading(true);
             await bankingService.saveChequeCancel(formData);
-            toast.success('Cheque protocol finalized successfully!');
+            showSuccessToast('Cheque protocol finalized successfully!');
             handleClear();
             onClose();
         } catch (error) {
-            toast.error(error.toString());
+            showErrorToast(error.toString());
         } finally {
             setLoading(false);
         }

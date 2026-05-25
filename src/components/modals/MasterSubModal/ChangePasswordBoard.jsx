@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import SimpleModal from '../../SimpleModal';
 import ConfirmModal from '../ConfirmModal';
 import { Search, Save, RotateCcw, X, Loader2, CheckCircle2, UserCheck } from 'lucide-react';
-import { toast } from 'react-hot-toast';
+
 import axios from 'axios';
+import { showSuccessToast, showErrorToast } from '../../../utils/toastUtils';
+
 
 const api = axios.create({ baseURL: '/api/UserProfile', headers: { 'Content-Type': 'application/json' } });
 api.interceptors.request.use((config) => {
@@ -54,7 +56,7 @@ const ChangePasswordBoard = ({ isOpen, onClose }) => {
             setUsers(res.data);
         } catch (err) {
             console.error('Load users failed:', err);
-            toast.error('Could not load user list');
+            showErrorToast('Could not load user list');
         }
     };
 
@@ -65,10 +67,10 @@ const ChangePasswordBoard = ({ isOpen, onClose }) => {
     };
 
     const handleSave = () => {
-        if (!formData.EmpCode) return toast.error('Please select a user');
-        if (!formData.CurrentPassword) return toast.error('Current password is required');
-        if (!formData.NewPassword) return toast.error('New password is required');
-        if (formData.NewPassword !== formData.ConfirmPassword) return toast.error('Passwords do not match');
+        if (!formData.EmpCode) return showErrorToast('Please select a user');
+        if (!formData.CurrentPassword) return showErrorToast('Current password is required');
+        if (!formData.NewPassword) return showErrorToast('New password is required');
+        if (formData.NewPassword !== formData.ConfirmPassword) return showErrorToast('Passwords do not match');
         setShowSaveConfirm(true);
     };
 
@@ -83,10 +85,10 @@ const ChangePasswordBoard = ({ isOpen, onClose }) => {
                 NewPassword: formData.NewPassword,
                 LastModUser: formData.LastModUser
             });
-            toast.success(res.data?.message || 'Password changed successfully');
+            showSuccessToast(res.data?.message || 'Password changed successfully');
             setFormData({ ...initialState, LastModUser: formData.LastModUser });
         } catch (err) {
-            toast.error(err.response?.data?.message || err.message || 'Failed to change password');
+            showErrorToast(err.response?.data?.message || err.message || 'Failed to change password');
         } finally {
             setLoading(false);
         }

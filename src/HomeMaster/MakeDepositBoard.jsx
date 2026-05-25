@@ -2,8 +2,10 @@ import React, { useState, useEffect, useMemo } from 'react';
 import SimpleModal from '../components/SimpleModal';
 import { Search, Calendar, CheckCircle, RotateCcw, X, Plus, Save } from 'lucide-react';
 import { makeDepositService } from '../services/makeDeposit.service';
-import { toast } from 'react-hot-toast';
+
 import CalendarModal from '../components/CalendarModal';
+import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
+
 
 const MakeDepositBoard = ({ isOpen, onClose }) => {
     const [formData, setFormData] = useState({
@@ -64,7 +66,7 @@ const MakeDepositBoard = ({ isOpen, onClose }) => {
             setFunds(data || []);
             setSelectedDocNos(new Set());
         } catch (error) {
-            toast.error(error.message || 'Failed to load funds');
+            showErrorToast(error.message || 'Failed to load funds');
         } finally {
             setIsLoading(false);
         }
@@ -103,7 +105,7 @@ const MakeDepositBoard = ({ isOpen, onClose }) => {
 
     const handleDone = async () => {
         if (selectedDocNos.size === 0) {
-            toast.error('Please select at least one document to deposit.');
+            showErrorToast('Please select at least one document to deposit.');
             return;
         }
 
@@ -115,17 +117,17 @@ const MakeDepositBoard = ({ isOpen, onClose }) => {
                 selectedDocNos: Array.from(selectedDocNos),
                 totalAmount: totals.sum
             });
-            toast.success('Funds applied for deposit successfully!');
+            showSuccessToast('Funds applied for deposit successfully!');
             handleClear();
             onClose(); // Optional: close or keep open to process more
         } catch (error) {
-            toast.error(error.message || 'Failed to apply deposit');
+            showErrorToast(error.message || 'Failed to apply deposit');
         }
     };
 
     const handleSaveDraft = async () => {
         if (selectedDocNos.size === 0) {
-            toast.error('Please select at least one document to deposit.');
+            showErrorToast('Please select at least one document to deposit.');
             return;
         }
 
@@ -137,11 +139,11 @@ const MakeDepositBoard = ({ isOpen, onClose }) => {
                 selectedDocNos: Array.from(selectedDocNos),
                 totalAmount: totals.sum
             });
-            toast.success('Deposit draft saved successfully!');
+            showSuccessToast('Deposit draft saved successfully!');
             handleClear();
             onClose();
         } catch (error) {
-            toast.error(error.message || 'Failed to save deposit draft');
+            showErrorToast(error.message || 'Failed to save deposit draft');
         }
     };
 

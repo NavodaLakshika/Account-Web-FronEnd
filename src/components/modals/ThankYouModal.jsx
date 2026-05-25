@@ -107,23 +107,35 @@ const ThankYouModal = ({ isOpen, onClose }) => {
                 <div className="absolute inset-0 pointer-events-none rounded-[15px] overflow-hidden">
                     {/* Top Bar (0-25%) - Blue */}
                     <div 
-                        className="absolute top-0 left-0 h-[6px] bg-[#0388cc] shadow-[0_0_10px_rgba(3,136,204,0.5)]" 
-                        style={{ width: `${Math.min(100, Math.max(0, (progress / 25) * 100))}%` }} 
+                        className="absolute inset-0 border-[6px] border-transparent border-t-[#0388cc] rounded-[15px]" 
+                        style={{ 
+                            clipPath: `inset(0 ${100 - Math.min(100, Math.max(0, (progress / 25) * 100))}% 0 0)`,
+                            filter: 'drop-shadow(0 0 8px rgba(3,136,204,0.6))'
+                        }} 
                     />
                     {/* Right Bar (25-50%) - Emerald */}
                     <div 
-                        className="absolute top-0 right-0 w-[6px] bg-[#10b981] shadow-[0_0_10px_rgba(16,185,129,0.5)]" 
-                        style={{ height: `${Math.min(100, Math.max(0, ((progress - 25) / 25) * 100))}%` }} 
+                        className="absolute inset-0 border-[6px] border-transparent border-r-[#10b981] rounded-[15px]" 
+                        style={{ 
+                            clipPath: `inset(0 0 ${100 - Math.min(100, Math.max(0, ((progress - 25) / 25) * 100))}% 0)`,
+                            filter: 'drop-shadow(0 0 8px rgba(16,185,129,0.6))'
+                        }} 
                     />
                     {/* Bottom Bar (50-75%) - Amber */}
                     <div 
-                        className="absolute bottom-0 right-0 h-[6px] bg-[#f59e0b] shadow-[0_0_10px_rgba(245,158,11,0.5)]" 
-                        style={{ width: `${Math.min(100, Math.max(0, ((progress - 50) / 25) * 100))}%` }} 
+                        className="absolute inset-0 border-[6px] border-transparent border-b-[#f59e0b] rounded-[15px]" 
+                        style={{ 
+                            clipPath: `inset(0 0 0 ${100 - Math.min(100, Math.max(0, ((progress - 50) / 25) * 100))}%)`,
+                            filter: 'drop-shadow(0 0 8px rgba(245,158,11,0.6))'
+                        }} 
                     />
                     {/* Left Bar (75-100%) - Red */}
                     <div 
-                        className="absolute bottom-0 left-0 w-[6px] bg-[#ef4444] shadow-[0_0_10px_rgba(239,68,68,0.5)]" 
-                        style={{ height: `${Math.min(100, Math.max(0, ((progress - 75) / 25) * 100))}%` }} 
+                        className="absolute inset-0 border-[6px] border-transparent border-l-[#ef4444] rounded-[15px]" 
+                        style={{ 
+                            clipPath: `inset(${100 - Math.min(100, Math.max(0, ((progress - 75) / 25) * 100))}% 0 0 0)`,
+                            filter: 'drop-shadow(0 0 8px rgba(239,68,68,0.6))'
+                        }} 
                     />
                 </div>
             </div>

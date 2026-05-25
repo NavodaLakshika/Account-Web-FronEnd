@@ -3,7 +3,8 @@ import SimpleModal from '../../SimpleModal';
 import ConfirmModal from '../ConfirmModal';
 import { Search, Save, RotateCcw, X, Loader2, CheckCircle2, Layout } from 'lucide-react';
 import { vendorTypeService } from '../../../services/vendorType.service';
-import { toast } from 'react-hot-toast';
+import { showSuccessToast, showErrorToast } from '../../../utils/toastUtils';
+
 
 const VendorTypesBoard = ({ isOpen, onClose }) => {
     const initialState = {
@@ -89,7 +90,7 @@ const VendorTypesBoard = ({ isOpen, onClose }) => {
 
     const handleSave = () => {
         if (!formData.VendorType.trim()) {
-            toast.error('Vendor Type is required');
+            showErrorToast('Vendor Type is required');
             return;
         }
         setShowSaveConfirm(true);
@@ -100,11 +101,11 @@ const VendorTypesBoard = ({ isOpen, onClose }) => {
         setLoading(true);
         try {
             await vendorTypeService.save(formData);
-            toast.success('Vendor Type saved successfully');
+            showSuccessToast('Vendor Type saved successfully');
             setFormData({ ...initialState, CurrentUser: formData.CurrentUser, Company: formData.Company });
             fetchInitialData();
         } catch (error) {
-            toast.error(typeof error === 'string' ? error : (error.message || 'Failed to save'));
+            showErrorToast(typeof error === 'string' ? error : (error.message || 'Failed to save'));
         } finally {
             setLoading(false);
         }

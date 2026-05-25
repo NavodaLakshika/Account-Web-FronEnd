@@ -4,10 +4,10 @@ import ReportTemplate from '../components/ReportTemplate';
 import { reportService } from '../services/report.service';
 import { Loader2 } from 'lucide-react';
 
-const ItemsServicesReportPage = () => {
+const ItemsServicesReportPage = ({ companyCodeProp, companyNameProp }) => {
     const [searchParams] = useSearchParams();
-    const companyId = searchParams.get('company') || 'COM001';
-    const companyName = searchParams.get('name') || 'ONIMTA IT SOLUTIONS';
+    const companyId = companyCodeProp || searchParams.get('company') || 'COM001';
+    const companyName = companyNameProp || searchParams.get('name') || 'ONIMTA IT SOLUTIONS';
     
     const [data, setData] = useState([]);
     const [isLoading, setIsLoading] = useState(true);

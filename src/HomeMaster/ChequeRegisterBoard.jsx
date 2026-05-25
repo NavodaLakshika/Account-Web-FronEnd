@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import SimpleModal from '../components/SimpleModal';
 import { Search, Calendar, RotateCcw, Save, X, CheckCircle, Loader2 } from 'lucide-react';
 import { bankingService } from '../services/banking.service';
-import { toast } from 'react-hot-toast';
-import { DotLottiePlayer } from '@dotlottie/react-player';
+
+
 import CalendarModal from '../components/CalendarModal';
+import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
+
 
 const ChequeRegisterBoard = ({ isOpen, onClose }) => {
     const [loading, setLoading] = useState(false);
@@ -79,44 +81,6 @@ const ChequeRegisterBoard = ({ isOpen, onClose }) => {
             endNo: '',
             date: new Date().toLocaleDateString('en-GB')
         });
-    };
-
-    const showSuccessToast = (message) => {
-        toast.custom((t) => (
-            <div className={`${t.visible ? 'animate-in slide-in-from-right-10 fade-in duration-500' : 'animate-out slide-out-to-right-10 fade-out duration-300'} 
-                max-w-[550px] w-fit bg-white/95 backdrop-blur-xl border border-white/20 shadow-2xl rounded-[5px] flex flex-col pointer-events-auto overflow-hidden`}>
-                <div className="px-4 py-2.5 flex items-center gap-3">
-                    <div className="w-12 h-12 shrink-0">
-                        <DotLottiePlayer src="/lottiefile/Successffull.lottie" autoplay loop={false} />
-                    </div>
-                    <div className="flex-grow text-left py-1">
-                        <h3 className="text-slate-800 text-[12px] font-bold tracking-wider uppercase font-tahoma leading-relaxed">{message}</h3>
-                    </div>
-                    <button onClick={() => toast.dismiss(t.id)} className="text-slate-300 hover:text-slate-500 transition-colors">
-                        <X size={14} />
-                    </button>
-                </div>
-            </div>
-        ), { duration: 3000, position: 'top-right' });
-    };
-
-    const showErrorToast = (message) => {
-        toast.custom((t) => (
-            <div className={`${t.visible ? 'animate-in slide-in-from-right-10 fade-in duration-500' : 'animate-out slide-out-to-right-10 fade-out duration-300'} 
-                max-w-[550px] w-fit bg-white/95 backdrop-blur-xl border border-white/20 shadow-2xl rounded-[5px] flex flex-col pointer-events-auto overflow-hidden`}>
-                <div className="px-4 py-2.5 flex items-center gap-3">
-                    <div className="w-12 h-12 shrink-0">
-                        <DotLottiePlayer src="/lottiefile/error.lottie" autoplay loop={false} />
-                    </div>
-                    <div className="flex-grow text-left py-1">
-                        <h3 className="text-slate-800 text-[12px] font-bold tracking-wider uppercase font-tahoma leading-relaxed">{message}</h3>
-                    </div>
-                    <button onClick={() => toast.dismiss(t.id)} className="text-slate-300 hover:text-slate-500 transition-colors">
-                        <X size={14} />
-                    </button>
-                </div>
-            </div>
-        ), { duration: 4000, position: 'top-right' });
     };
 
     const handleSave = async () => {

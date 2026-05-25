@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, ShieldCheck, Database, RefreshCw, Download, Trash2, Search, FileEdit, Settings, CloudLightning, Eraser, Lock, FileText, Key, Layout, Users } from 'lucide-react';
+import { X, ShieldCheck, Database, RefreshCw, Download, Trash2, Search, FileEdit, Settings, CloudLightning, Eraser, Lock, FileText, Key, Layout, Users, MessageSquare } from 'lucide-react';
 import SimpleModal from '../../SimpleModal';
 import DatabaseBackupModal from './DatabaseBackupModal';
 import StockBalanceUpdateModal from './StockBalanceUpdateModal';
@@ -15,6 +15,7 @@ import SystemSettingsBoard from '../../../HomeMaster/SystemSettingsBoard';
 import ChangePasswordBoard from '../MasterSubModal/ChangePasswordBoard';
 import PeriodLockModal from './PeriodLockModal';
 import CompanyUsersModal from './CompanyUsersModal';
+import ReviewAdminBoard from '../../Admin/ReviewAdminBoard';
 
 const SystemAdminModal = ({ isOpen, onClose }) => {
     const [showBackupModal, setShowBackupModal] = useState(false);
@@ -31,6 +32,7 @@ const SystemAdminModal = ({ isOpen, onClose }) => {
     const [showChangePassword, setShowChangePassword] = useState(false);
     const [showUsersModal, setShowUsersModal] = useState(false);
     const [showFeatureLockedModal, setShowFeatureLockedModal] = useState(false);
+    const [showReviewAdmin, setShowReviewAdmin] = useState(false);
 
     if (!isOpen) return null;
 
@@ -49,6 +51,7 @@ const SystemAdminModal = ({ isOpen, onClose }) => {
             case 'systemSettings': setShowSystemSettings(true); break;
             case 'changePassword': setShowChangePassword(true); break;
             case 'users': setShowUsersModal(true); break;
+            case 'reviews': setShowReviewAdmin(true); break;
         }
     };
 
@@ -64,6 +67,7 @@ const SystemAdminModal = ({ isOpen, onClose }) => {
         { icon: Eraser, label: 'Clear Temp Data', action: 'clear' },
         { icon: Lock, label: 'Period Lock Facility', action: 'lock' },
         { icon: Users, label: 'User & Role Management', action: 'users' },
+        { icon: MessageSquare, label: 'Manage System Reviews', action: 'reviews' },
         { icon: Key, label: 'Change Password', action: 'changePassword' },
         { icon: Settings, label: 'Admin Config Setting', action: 'systemSettings' }
     ];
@@ -166,6 +170,7 @@ const SystemAdminModal = ({ isOpen, onClose }) => {
             <SystemSettingsBoard isOpen={showSystemSettings} onClose={() => setShowSystemSettings(false)} />
             <ChangePasswordBoard isOpen={showChangePassword} onClose={() => setShowChangePassword(false)} />
             <CompanyUsersModal isOpen={showUsersModal} onClose={() => setShowUsersModal(false)} />
+            <ReviewAdminBoard isOpen={showReviewAdmin} onClose={() => setShowReviewAdmin(false)} />
         </>
     );
 };

@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import SimpleModal from '../components/SimpleModal';
 import { Search, RotateCcw, Save, Trash2, Loader2, X } from 'lucide-react';
 import { supplierService } from '../services/supplier.service';
-import { toast } from 'react-hot-toast';
+
 import { getSessionData } from '../utils/session';
+import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
+
 
 const VendorBoard = ({ isOpen, onClose }) => {
     const initialState = {
@@ -78,16 +80,16 @@ const VendorBoard = ({ isOpen, onClose }) => {
             Company: formData.Company
         });
         setIsEditMode(false);
-        toast.success('Form cleared');
+        showSuccessToast('Form cleared');
     };
 
     const handleSave = async () => {
         if (!formData.Supplier_Name) {
-            toast.error('Supplier Name is required');
+            showErrorToast('Supplier Name is required');
             return;
         }
         if (!formData.Vend_Typ) {
-            toast.error('Vendor Type is required');
+            showErrorToast('Vendor Type is required');
             return;
         }
 
@@ -102,15 +104,15 @@ const VendorBoard = ({ isOpen, onClose }) => {
 
             if (isEditMode) {
                 await supplierService.update(formData.Code, payload);
-                toast.success('Supplier updated successfully');
+                showSuccessToast('Supplier updated successfully');
             } else {
                 const response = await supplierService.create(payload);
                 setFormData(prev => ({ ...prev, Code: response.code }));
-                toast.success(`Supplier created: ${response.code}`);
+                showSuccessToast(`Supplier created: ${response.code}`);
                 setIsEditMode(true);
             }
         } catch (error) {
-            toast.error(typeof error === 'string' ? error : (error.message || 'Operation failed'));
+            showErrorToast(typeof error === 'string' ? error : (error.message || 'Operation failed'));
         } finally {
             setLoading(false);
         }
@@ -123,10 +125,10 @@ const VendorBoard = ({ isOpen, onClose }) => {
         setLoading(true);
         try {
             await supplierService.delete(formData.Code);
-            toast.success('Supplier deleted');
+            showSuccessToast('Supplier deleted');
             handleClear();
         } catch (error) {
-            toast.error(error);
+            showErrorToast(error);
         } finally {
             setLoading(false);
         }
@@ -139,7 +141,7 @@ const VendorBoard = ({ isOpen, onClose }) => {
             setSuppliersList(data);
             setShowSearchModal(true);
         } catch (error) {
-            toast.error('Failed to load suppliers');
+            showErrorToast('Failed to load suppliers');
         } finally {
             setLoading(false);
         }
@@ -174,9 +176,9 @@ const VendorBoard = ({ isOpen, onClose }) => {
             });
             setIsEditMode(true);
             setShowSearchModal(false);
-            toast.success('Supplier loaded');
+            showSuccessToast('Supplier loaded');
         } catch (error) {
-            toast.error(error);
+            showErrorToast(error);
         } finally {
             setLoading(false);
         }

@@ -3,6 +3,8 @@ import { useNavigate, Link } from 'react-router-dom';
 import { User, Lock, Loader2, Github, Twitter, Facebook, Chrome, AlertCircle } from 'lucide-react';
 import { authService } from '../services/auth.service';
 import toast from 'react-hot-toast';
+import { showSuccessToast } from '../utils/toastUtils';
+
 
 const SUCCESS_SOUND_URL = '/Music/mrstokes302-success-videogame-sfx-423626.mp3';
 
@@ -32,7 +34,31 @@ const LoginPage = () => {
     setErrorMsg('');
     try {
       const result = await authService.login(formData.empName, formData.password);
-      toast.success(result.message || 'Login Successful!');
+      
+      const subStatus = result.subscriptionStatus || result.SubscriptionStatus;
+      const subEndDate = result.subscriptionEndDate || result.SubscriptionEndDate;
+
+      // Allow expired users to login so the Dashboard can show them the Subscription modal
+
+      let successMessage = result.message || 'Login Successful!';
+      
+      if (subStatus === 'Trial') {
+        const endDateStr = subEndDate ? new Date(subEndDate).toLocaleDateString() : '1 month';
+        toast((t) => (
+          <div className="flex flex-col gap-2">
+            <span className="font-bold text-slate-800">Free Trial Active</span>
+            <span className="text-sm text-slate-600">You are currently on a free trial which will expire on {endDateStr}.</span>
+            <button 
+              onClick={() => toast.dismiss(t.id)} 
+              className="mt-2 bg-blue-600 text-white rounded px-3 py-1 text-sm font-bold w-max"
+            >
+              Acknowledge
+            </button>
+          </div>
+        ), { duration: 8000, icon: '🎉' });
+      } else {
+        showSuccessToast(successMessage);
+      }
       
       // Play success sound
       const audio = new Audio(SUCCESS_SOUND_URL);

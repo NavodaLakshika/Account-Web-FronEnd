@@ -36,8 +36,8 @@ const RegisterPage = () => {
 
     const handleSendOtp = async (e) => {
         e?.preventDefault();
-        if (formData.Pass_Word !== formData.Conpass_Word) { toast.error('Passwords do not match'); return; }
-        if (!formData.Phone_Number) { toast.error('Phone number is required'); return; }
+        if (formData.Pass_Word !== formData.Conpass_Word) { showErrorToast('Passwords do not match'); return; }
+        if (!formData.Phone_Number) { showErrorToast('Phone number is required'); return; }
         setLoading(true);
         try {
             const sentOtp = await authService.sendSmsOtp(formData.Phone_Number);

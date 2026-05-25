@@ -16,7 +16,7 @@ import {
 import { authService } from '../services/auth.service';
 import AboutUsModal from '../components/modals/AboutUsModal';
 import CreateCompanyModal from '../components/modals/CreateCompanyModal';
-import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
+import { showSuccessToast, showErrorToast, showPendingToast } from '../utils/toastUtils';
 
 const SUCCESS_SOUND_URL = '/Music/mrstokes302-success-videogame-sfx-423626.mp3';
 
@@ -86,7 +86,7 @@ const SelectCompanyPage = () => {
         setLoading(true);
         try {
             await authService.openCompany(userName, selected.id);
-            showSuccessToast(`Accessing ${selected.name}...`);
+            showPendingToast(`Connecting to ${selected.name}...`, "Initializing workspace");
 
             // Play success sound
             const audio = new Audio(SUCCESS_SOUND_URL);

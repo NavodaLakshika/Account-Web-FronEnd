@@ -3,8 +3,10 @@ import SimpleModal from '../components/SimpleModal';
 import CalendarModal from '../components/CalendarModal';
 import { Landmark, Search, RotateCcw, Save, Calendar, Plus, X, Loader2, Wallet, Banknote, ListFilter, Users, ChevronRight, CheckCircle2, Filter } from 'lucide-react';
 import { bankingService } from '../services/banking.service';
-import { toast } from 'react-hot-toast';
+
 import { getSessionData } from '../utils/session';
+import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
+
 
 const MakeDepositBoard = ({ isOpen, onClose, incomingData }) => {
     const [loading, setLoading] = useState(false);
@@ -60,7 +62,7 @@ const MakeDepositBoard = ({ isOpen, onClose, incomingData }) => {
             const data = await bankingService.getDirectTransactionLookups(activeComp);
             setLookups(data);
         } catch (error) {
-            toast.error("Failed to load lookups");
+            showErrorToast("Failed to load lookups");
         }
     };
 
@@ -83,8 +85,8 @@ const MakeDepositBoard = ({ isOpen, onClose, incomingData }) => {
     const totalAmount = entries.reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
 
     const handleSave = async () => {
-        if (!formData.depositTo) return toast.error('Please select a destination bank account.');
-        if (totalAmount <= 0) return toast.error('Total deposit amount must be greater than zero.');
+        if (!formData.depositTo) return showErrorToast('Please select a destination bank account.');
+        if (totalAmount <= 0) return showErrorToast('Total deposit amount must be greater than zero.');
 
         setLoading(true);
         try {
@@ -103,11 +105,11 @@ const MakeDepositBoard = ({ isOpen, onClose, incomingData }) => {
 
             await bankingService.saveDirectTransaction(payload);
             
-            toast.success('Deposit successfully recorded!');
+            showSuccessToast('Deposit successfully recorded!');
             handleReset();
             onClose();
         } catch (error) {
-            toast.error(error.toString());
+            showErrorToast(error.toString());
         } finally {
             setLoading(false);
         }

@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import SimpleModal from '../components/SimpleModal';
 import CalendarModal from '../components/CalendarModal';
 import { Search, Calendar, ChevronDown, Database, User, Truck, Hash, FileSearch, Trash2, RotateCcw, Download, X, Loader2, ListFilter, LayoutGrid, ChevronRight, Activity } from 'lucide-react';
-import { toast } from 'react-hot-toast';
+import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
+
 
 const SearchBoard = ({ isOpen, onClose }) => {
     const [loading, setLoading] = useState(false);
@@ -58,9 +59,9 @@ const SearchBoard = ({ isOpen, onClose }) => {
         setLoading(true);
         try {
             await new Promise(resolve => setTimeout(resolve, 1800));
-            toast.success('Search Results Populated!');
+            showSuccessToast('Search Results Populated!');
         } catch (error) {
-            toast.error('Search failed.');
+            showErrorToast('Search failed.');
         } finally {
             setLoading(false);
         }

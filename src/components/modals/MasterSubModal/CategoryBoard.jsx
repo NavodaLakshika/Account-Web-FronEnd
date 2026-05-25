@@ -3,7 +3,8 @@ import SimpleModal from '../../SimpleModal';
 import { Search, RotateCcw, Save, Trash2, Loader2, X, Layers } from 'lucide-react';
 import { categoryService } from '../../../services/category.service';
 import { departmentService } from '../../../services/department.service';
-import { toast } from 'react-hot-toast';
+import { showSuccessToast, showErrorToast } from '../../../utils/toastUtils';
+
 
 const CategoryBoard = ({ isOpen, onClose }) => {
     const initialState = {
@@ -67,7 +68,7 @@ const CategoryBoard = ({ isOpen, onClose }) => {
 
     const handleSave = async () => {
         if (!formData.Dept_Code || !formData.Cat_Name) {
-            toast.error('Department and Category Name are required');
+            showErrorToast('Department and Category Name are required');
             return;
         }
 
@@ -75,15 +76,15 @@ const CategoryBoard = ({ isOpen, onClose }) => {
         try {
             const data = await categoryService.save(formData);
             if (data.message === 'inserted') {
-                toast.success('Category created');
+                showSuccessToast('Category created');
                 setFormData(prev => ({ ...prev, Code: data.code }));
                 setIsEditMode(true);
             } else {
-                toast.success('Category updated');
+                showSuccessToast('Category updated');
             }
         } catch (err) {
             const errorMsg = err.error || err.message || (typeof err === 'string' ? err : 'Failed to save');
-            toast.error(errorMsg, { duration: 5000 });
+            showErrorToast(errorMsg, { duration: 5000 });
             console.error('Save Error:', err);
         } finally {
             setLoading(false);
@@ -97,11 +98,11 @@ const CategoryBoard = ({ isOpen, onClose }) => {
         setLoading(true);
         try {
             await categoryService.delete(formData.Code, formData.Company);
-            toast.success('Category deleted');
+            showSuccessToast('Category deleted');
             handleClear();
         } catch (err) {
             const errorMsg = err.error || err.message || (typeof err === 'string' ? err : 'Failed to delete');
-            toast.error(errorMsg);
+            showErrorToast(errorMsg);
         } finally {
             setLoading(false);
         }
@@ -109,7 +110,7 @@ const CategoryBoard = ({ isOpen, onClose }) => {
 
     const openDeptSearch = async () => {
         if (!formData.Company) {
-            toast.error('Company not identified');
+            showErrorToast('Company not identified');
             return;
         }
         setLoading(true);
@@ -118,7 +119,7 @@ const CategoryBoard = ({ isOpen, onClose }) => {
             setDeptList(data || []);
             setShowDeptSearch(true);
         } catch (err) {
-            toast.error('Failed to load departments');
+            showErrorToast('Failed to load departments');
         } finally {
             setLoading(false);
         }
@@ -137,7 +138,7 @@ const CategoryBoard = ({ isOpen, onClose }) => {
 
     const openCatSearch = async () => {
         if (!formData.Dept_Code) {
-            toast.error('Select a department first');
+            showErrorToast('Select a department first');
             return;
         }
         setLoading(true);
@@ -146,7 +147,7 @@ const CategoryBoard = ({ isOpen, onClose }) => {
             setCatList(data || []);
             setShowCatSearch(true);
         } catch (err) {
-            toast.error('Failed to load categories');
+            showErrorToast('Failed to load categories');
         } finally {
             setLoading(false);
         }

@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import SimpleModal from '../components/SimpleModal';
 import { Search, X, RotateCcw, Loader2, Landmark, Calendar, FileText, CheckCircle2, User, Wallet, History, AlertCircle, Banknote, ShieldAlert } from 'lucide-react';
 import { bankingService } from '../services/banking.service';
-import { toast } from 'react-hot-toast';
+
 import { getSessionData } from '../utils/session';
+import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
+
 
 const CustomerChequeReturnBoard = ({ isOpen, onClose }) => {
     const [loading, setLoading] = useState(false);
@@ -55,7 +57,7 @@ const CustomerChequeReturnBoard = ({ isOpen, onClose }) => {
             setLookups(lookupRes);
             setFormData(prev => ({ ...prev, docNo: docRes.docNo }));
         } catch (error) {
-            toast.error("Failed to load initial search data");
+            showErrorToast("Failed to load initial search data");
         } finally {
             setLoading(false);
         }
@@ -63,7 +65,7 @@ const CustomerChequeReturnBoard = ({ isOpen, onClose }) => {
 
     const handleSearchCheque = async () => {
         if (!formData.chequeNo && !formData.receiptNo) {
-            toast.error("Please enter a Cheque No or Receipt No to fetch record.");
+            showErrorToast("Please enter a Cheque No or Receipt No to fetch record.");
             return;
         }
 
@@ -87,12 +89,12 @@ const CustomerChequeReturnBoard = ({ isOpen, onClose }) => {
                     receiptNo: cheque.receiptNo,
                     chequeNo: cheque.chequeNo
                 }));
-                toast.success("Cheque link details retrieved!");
+                showSuccessToast("Cheque link details retrieved!");
             } else {
-                toast.error("No pending or realized customer cheque found for these details.");
+                showErrorToast("No pending or realized customer cheque found for these details.");
             }
         } catch (error) {
-            toast.error("Search protocol failed.");
+            showErrorToast("Search protocol failed.");
         } finally {
             setLoading(false);
         }
@@ -100,18 +102,18 @@ const CustomerChequeReturnBoard = ({ isOpen, onClose }) => {
 
     const handleSave = async () => {
         if (!formData.customerCode || !formData.chequeNo || formData.chequeAmount <= 0) {
-            toast.error("Please verify and search for a valid cheque record first.");
+            showErrorToast("Please verify and search for a valid cheque record first.");
             return;
         }
 
         try {
             setLoading(true);
             await bankingService.saveChequeReturn(formData);
-            toast.success('Customer cheque return processed successfully!');
+            showSuccessToast('Customer cheque return processed successfully!');
             handleClear();
             onClose();
         } catch (error) {
-            toast.error(error.toString());
+            showErrorToast(error.toString());
         } finally {
             setLoading(false);
         }

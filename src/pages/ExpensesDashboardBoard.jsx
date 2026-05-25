@@ -7,7 +7,8 @@ import {
 } from 'lucide-react';
 import { expensesService } from '../services/expenses.service';
 import { getSessionData } from '../utils/session';
-import { toast } from 'react-hot-toast';
+import { showErrorToast } from '../utils/toastUtils';
+
 
 const ExpensesDashboardBoard = ({ 
   isOpen, 
@@ -65,7 +66,7 @@ const ExpensesDashboardBoard = ({
 
       setData(res);
     } catch (error) {
-      toast.error('Failed to load spend dashboard data.');
+      showErrorToast('Failed to load spend dashboard data.');
       console.error(error);
     } finally {
       setLoading(false);

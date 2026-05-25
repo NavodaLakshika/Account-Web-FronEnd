@@ -3,7 +3,7 @@ import ReportTemplate from '../components/ReportTemplate';
 import { Loader2 } from 'lucide-react';
 import { systemLogService } from '../services/systemLog.service';
 
-const SystemAnalyticsReportPage = () => {
+const SystemAnalyticsReportPage = ({ companyCodeProp, companyNameProp }) => {
     const [data, setData] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -53,7 +53,7 @@ const SystemAnalyticsReportPage = () => {
                 { header: 'IP Address', key: 'ip' },
                 { header: 'Status', key: 'status' }
             ]}
-            companyName="ONIMTA INFORMATION TECHNOLOGY (PVT) LTD"
+            companyName={companyNameProp || "ONIMTA INFORMATION TECHNOLOGY (PVT) LTD"}
             isStandalone={true}
         />
     );

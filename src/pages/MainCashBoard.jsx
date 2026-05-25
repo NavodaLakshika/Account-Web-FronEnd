@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import SimpleModal from '../components/SimpleModal';
 import { Search, Calendar, ChevronDown, Check, X, Save, RotateCcw, Loader2, Landmark, Wallet, Layers, Users, Trash2, Plus } from 'lucide-react';
 import { mainCashService } from '../services/mainCash.service';
-import { toast } from 'react-hot-toast';
+
 import { getSessionData } from '../utils/session';
+import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
+
 
 const MainCashBoard = ({ isOpen, onClose }) => {
     const [loading, setLoading] = useState(false);
@@ -60,7 +62,7 @@ const MainCashBoard = ({ isOpen, onClose }) => {
             setLookups(lookupRes);
             setFormData(prev => ({ ...prev, docNo: docRes.docNo }));
         } catch (error) {
-            toast.error("Failed to load initial data");
+            showErrorToast("Failed to load initial data");
         } finally {
             setLoading(false);
         }
@@ -115,18 +117,18 @@ const MainCashBoard = ({ isOpen, onClose }) => {
 
     const handleSave = async () => {
         if (!formData.accountId || formData.amount <= 0) {
-            toast.error("Please select an account and enter expense amounts.");
+            showErrorToast("Please select an account and enter expense amounts.");
             return;
         }
 
         try {
             setLoading(true);
             await mainCashService.save({ ...formData, items: rows });
-            toast.success('Main Cash entry saved successfully!');
+            showSuccessToast('Main Cash entry saved successfully!');
             handleClear();
             onClose();
         } catch (error) {
-            toast.error(error.toString());
+            showErrorToast(error.toString());
         } finally {
             setLoading(false);
         }

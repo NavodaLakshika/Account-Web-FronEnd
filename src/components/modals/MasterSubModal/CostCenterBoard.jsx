@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import SimpleModal from '../../SimpleModal';
 import { Search, RotateCcw, Save, Trash2, Loader2, X } from 'lucide-react';
 import { costCenterService } from '../../../services/costcenter.service';
-import { toast } from 'react-hot-toast';
+import { showSuccessToast, showErrorToast } from '../../../utils/toastUtils';
+
 
 const CostCenterBoard = ({ isOpen, onClose }) => {
     const initialState = {
@@ -45,12 +46,12 @@ const CostCenterBoard = ({ isOpen, onClose }) => {
             CurrentUser: formData.CurrentUser
         });
         setIsEditMode(false);
-        toast.success('Form cleared');
+        showSuccessToast('Form cleared');
     };
 
     const handleSave = async () => {
         if (!formData.Name) {
-            toast.error('Cost Center Name is required');
+            showErrorToast('Cost Center Name is required');
             return;
         }
 
@@ -64,15 +65,15 @@ const CostCenterBoard = ({ isOpen, onClose }) => {
             });
 
             if (data.message === 'inserted') {
-                toast.success('Cost Center added successfully');
+                showSuccessToast('Cost Center added successfully');
                 setFormData(prev => ({ ...prev, Code: data.code }));
                 setIsEditMode(true);
             } else if (data.message === 'updated') {
-                toast.success('Cost Center updated successfully');
+                showSuccessToast('Cost Center updated successfully');
             }
         } catch (error) {
             const errorMsg = error.error || error.message || (typeof error === 'string' ? error : 'Failed to save');
-            toast.error(errorMsg, { duration: 5000 });
+            showErrorToast(errorMsg, { duration: 5000 });
             console.error('Save Error:', error);
         } finally {
             setLoading(false);
@@ -86,10 +87,10 @@ const CostCenterBoard = ({ isOpen, onClose }) => {
         setLoading(true);
         try {
             await costCenterService.delete(formData.Code);
-            toast.success('Cost Center deleted');
+            showSuccessToast('Cost Center deleted');
             handleClear();
         } catch (error) {
-            toast.error(error.error || error.message || 'Deletion failed');
+            showErrorToast(error.error || error.message || 'Deletion failed');
         } finally {
             setLoading(false);
         }
@@ -102,7 +103,7 @@ const CostCenterBoard = ({ isOpen, onClose }) => {
             setCostCentersList(data);
             setShowSearchModal(true);
         } catch (error) {
-            toast.error('Failed to load cost centers');
+            showErrorToast('Failed to load cost centers');
         } finally {
             setLoading(false);
         }
@@ -117,7 +118,7 @@ const CostCenterBoard = ({ isOpen, onClose }) => {
         });
         setIsEditMode(true);
         setShowSearchModal(false);
-        toast.success('Cost Center loaded');
+        showSuccessToast('Cost Center loaded');
     };
 
     const footer = (

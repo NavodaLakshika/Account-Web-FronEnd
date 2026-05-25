@@ -38,6 +38,7 @@ import {
   PlayCircle,
 } from 'lucide-react';
 import { expensesService } from '../services/expenses.service';
+import { biDashboardService } from '../services/biDashboard.service';
 import { getSessionData } from '../utils/session';
 
 const TABS = [
@@ -600,6 +601,7 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction }
   const [activeTab, setActiveTab] = useState('expenses');
   const [isCustomising, setIsCustomising] = useState(false);
   const [isAddWidgetsOpen, setIsAddWidgetsOpen] = useState(false);
+  const [bankPage, setBankPage] = useState(0);
   const [selectedWidgets, setSelectedWidgets] = useState(() => {
     const saved = localStorage.getItem('onimta_gtd_widgets');
     if (saved) {
@@ -660,6 +662,7 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction }
     categoryBreakdown: [],
     recentTransactions: [],
   });
+  const [biData, setBiData] = useState(null);
   const tabScrollRef = useRef(null);
 
   // Persist preferences to localStorage when they change
@@ -696,34 +699,25 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction }
     const load = async () => {
       setLoading(true);
       try {
-        const [res, incomeRes] = await Promise.all([
-          expensesService.getDashboardData(companyCode, 'all'),
-          expensesService.getIncomeSummary(companyCode),
-        ]);
-        
-        // Workaround for backend duplicate category issue
-        if (res.categoryBreakdown && Array.isArray(res.categoryBreakdown)) {
-          const cleaned = [];
-          res.categoryBreakdown.forEach(cat => {
-            if (/^\d+$/.test(cat.categoryName)) {
-              const duplicate = res.categoryBreakdown.find(c => c.amount === cat.amount && !/^\d+$/.test(c.categoryName));
-              if (duplicate) return;
-            }
-            cleaned.push(cat);
-          });
-          const total = cleaned.reduce((sum, c) => sum + c.amount, 0);
-          cleaned.forEach(c => {
-            c.percentage = total > 0 ? Math.round((c.amount / total) * 100) : 0;
-          });
-          res.categoryBreakdown = cleaned;
-        }
+        const data = await biDashboardService.getSummary(companyCode);
+
+        // Build expenseData from biData for backward compat
+        const expenseRes = {
+          totalExpenses: data.totalExpenses || 0,
+          unpaidBills: data.unpaidBills || 0,
+          overdueBills: data.overdueBills || 0,
+          categoryBreakdown: data.categoryBreakdown || [],
+          recentTransactions: data.recentTransactions || [],
+        };
 
         if (!cancelled) {
-          setExpenseData(res);
-          setTotalIncome(incomeRes.totalIncome || 0);
+          setBiData(data);
+          setExpenseData(expenseRes);
+          setTotalIncome(data.totalIncome || 0);
         }
       } catch {
         if (!cancelled) {
+          setBiData(null);
           setExpenseData({
             totalExpenses: 0,
             unpaidBills: 0,
@@ -1269,30 +1263,51 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction }
                     onFooterButton={() => runAction('bank_rec')}
                     onHide={() => setWidgetToHide('bank_accounts')}
                   >
-                  <div className="space-y-3">
-                    {PLACEHOLDER_BANKS.map((b, i) => (
-                      <div
-                        key={i}
-                        className="flex items-center justify-between gap-3 border-b border-slate-100 pb-3 last:border-0 last:pb-0"
-                      >
-                        <div className="flex items-center gap-3 min-w-0">
-                          <div className="w-9 h-9 rounded-xl bg-slate-50 border border-slate-150 flex items-center justify-center shrink-0">
-                            <Landmark size={15} className="text-slate-500" />
-                          </div>
-                          <div className="min-w-0">
-                            <p className="text-[12px] font-bold text-slate-700 truncate">{b.name}</p>
-                          </div>
+                  {(function() {
+                    const banks = biData?.bankAccounts?.length > 0 ? biData.bankAccounts : PLACEHOLDER_BANKS;
+                    const perPage = 5;
+                    const totalPages = Math.ceil(banks.length / perPage);
+                    const page = Math.min(bankPage, Math.max(0, totalPages - 1));
+                    const pageBanks = banks.slice(page * perPage, (page + 1) * perPage);
+                    return (
+                      <div>
+                        <div className="grid grid-cols-2 gap-2">
+                          {pageBanks.map((b, i) => (
+                            <div key={i} className="flex items-center gap-2 p-2 rounded-xl bg-slate-50 border border-slate-100 min-w-0">
+                              <div className="w-8 h-8 rounded-lg bg-white border border-slate-150 flex items-center justify-center shrink-0">
+                                <Landmark size={13} className="text-slate-500" />
+                              </div>
+                              <span className="text-[11px] font-bold text-slate-700 truncate leading-tight">{b.bankName || b.name || b.bankCode}</span>
+                              <button type="button" className="ml-auto w-6 h-6 rounded-lg hover:bg-blue-50 text-blue-655 flex items-center justify-center shrink-0 transition-colors" aria-label="Add">
+                                <Plus size={14} strokeWidth={2.5} />
+                              </button>
+                            </div>
+                          ))}
                         </div>
-                        <button
-                          type="button"
-                          className="w-7 h-7 rounded-lg hover:bg-blue-50 text-blue-655 flex items-center justify-center shrink-0 transition-colors"
-                          aria-label="Add"
-                        >
-                          <Plus size={16} strokeWidth={2.5} />
-                        </button>
+                        {totalPages > 1 && (
+                          <div className="flex items-center justify-center gap-2 mt-3">
+                            <button
+                              type="button"
+                              disabled={page === 0}
+                              onClick={() => setBankPage(p => p - 1)}
+                              className="px-3 py-1 text-[11px] font-bold text-slate-500 hover:text-slate-800 disabled:opacity-30 disabled:cursor-default transition-colors"
+                            >
+                              Previous
+                            </button>
+                            <span className="text-[11px] font-bold text-slate-400">{page + 1} / {totalPages}</span>
+                            <button
+                              type="button"
+                              disabled={page >= totalPages - 1}
+                              onClick={() => setBankPage(p => p + 1)}
+                              className="px-3 py-1 text-[11px] font-bold text-slate-500 hover:text-slate-800 disabled:opacity-30 disabled:cursor-default transition-colors"
+                            >
+                              Next
+                            </button>
+                          </div>
+                        )}
                       </div>
-                    ))}
-                  </div>
+                    );
+                  })()}
                 </WidgetShell>
                 </EditWrapper>
               )}
@@ -1432,21 +1447,18 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction }
             </tr>
           </thead>
           <tbody className="text-[#393a3d]">
-            <tr className="border-b border-[#eceef1] border-dashed">
-              <td className="py-2 truncate max-w-[100px]">Product name</td>
-              <td className="py-2 text-right">--</td>
-              <td className="py-2 text-right">Reorder</td>
-            </tr>
-            <tr className="border-b border-[#eceef1] border-dashed">
-              <td className="py-2 truncate max-w-[100px]">Product name</td>
-              <td className="py-2 text-right">--</td>
-              <td className="py-2 text-right">Reorder</td>
-            </tr>
-            <tr>
-              <td className="py-2 text-[#8d9096]">--</td>
-              <td className="py-2"></td>
-              <td className="py-2"></td>
-            </tr>
+            {(biData?.lowStock?.length > 0 ? biData.lowStock : []).map((item, i) => (
+              <tr key={i} className="border-b border-[#eceef1] border-dashed">
+                <td className="py-2 truncate max-w-[100px]">{item.productName || item.productCode || 'Product name'}</td>
+                <td className="py-2 text-right">{item.quantity}</td>
+                <td className="py-2 text-right">Reorder</td>
+              </tr>
+            ))}
+            {(biData?.lowStock?.length || 0) === 0 && (
+              <tr>
+                <td className="py-2 text-[#8d9096]" colSpan={3}>No low stock items</td>
+              </tr>
+            )}
           </tbody>
         </table>
       </WidgetShell>
@@ -1472,12 +1484,12 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction }
               <span>UNPAID <span className="font-normal text-slate-400 ml-1">Last 365 days</span></span>
             </div>
             <div className="flex gap-1 h-[14px] mt-8">
-              <div className="w-1/2 bg-gradient-to-r from-red-500 to-rose-500 rounded-l-full relative">
-                <span className="absolute bottom-full left-0 mb-1 text-[13.5px] font-extrabold text-slate-800">LKR 0.00</span>
+              <div className={`relative ${(biData?.invoiceSummary?.totalOverdue || 0) > 0 ? 'bg-gradient-to-r from-red-500 to-rose-500' : 'bg-slate-200'} rounded-l-full`} style={{ width: `${(biData?.invoiceSummary?.totalOverdue || 0) > 0 ? 50 : 50}%` }}>
+                <span className="absolute bottom-full left-0 mb-1 text-[13.5px] font-extrabold text-slate-800">{formatLkr(biData?.invoiceSummary?.totalOverdue || 0)}</span>
                 <span className="absolute top-full left-0 mt-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Overdue</span>
               </div>
               <div className="w-1/2 bg-slate-200 rounded-r-full relative">
-                <span className="absolute bottom-full right-0 mb-1 text-[13.5px] font-extrabold text-slate-800">LKR 0.00</span>
+                <span className="absolute bottom-full right-0 mb-1 text-[13.5px] font-extrabold text-slate-800">{formatLkr((biData?.invoiceSummary?.totalUnpaid || 0) - (biData?.invoiceSummary?.totalOverdue || 0))}</span>
                 <span className="absolute top-full right-0 mt-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider text-right whitespace-nowrap">Not due yet</span>
               </div>
             </div>
@@ -1487,12 +1499,12 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction }
               <span>PAID <span className="font-normal text-slate-400 ml-1">Last 30 days</span></span>
             </div>
             <div className="flex gap-1 h-[14px] mt-8">
-              <div className="w-1/2 bg-gradient-to-r from-green-500 to-emerald-500 rounded-l-full relative">
-                <span className="absolute bottom-full left-0 mb-1 text-[13.5px] font-extrabold text-slate-800">LKR 0.00</span>
+              <div className={`relative ${(biData?.invoiceSummary?.totalPaid || 0) > 0 ? 'bg-gradient-to-r from-green-500 to-emerald-500' : 'bg-slate-200'} rounded-l-full`} style={{ width: `${(biData?.invoiceSummary?.totalPaid || 0) > 0 ? 50 : 50}%` }}>
+                <span className="absolute bottom-full left-0 mb-1 text-[13.5px] font-extrabold text-slate-800">{formatLkr(biData?.invoiceSummary?.totalNotDeposited || 0)}</span>
                 <span className="absolute top-full left-0 mt-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Not deposited</span>
               </div>
               <div className="w-1/2 bg-emerald-500 rounded-r-full relative">
-                <span className="absolute bottom-full right-0 mb-1 text-[13.5px] font-extrabold text-slate-800">LKR 0.00</span>
+                <span className="absolute bottom-full right-0 mb-1 text-[13.5px] font-extrabold text-slate-800">{formatLkr(biData?.invoiceSummary?.totalDeposited || 0)}</span>
                 <span className="absolute top-full right-0 mt-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider text-right whitespace-nowrap">Deposited</span>
               </div>
             </div>
@@ -1513,12 +1525,12 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction }
         <div className="absolute top-5 right-5 text-[11px] font-semibold text-slate-400">As of today</div>
         <div className="flex items-center justify-between gap-1 overflow-x-auto py-2 h-full mt-4 pb-4 no-scrollbar">
           {[
-            { label: 'Open opportunities', val: '0', color: '#34d399' },
-            { label: 'Open estimates', val: '0', color: '#10b981' },
-            { label: 'Open contracts', val: '0', color: '#059669' },
-            { label: 'In progress projects', val: '0', color: '#047857' },
-            { label: 'Unpaid invoices', val: '0', color: '#064e3b' },
-            { label: 'Reviews', val: '0', color: '#022c22' },
+            { label: 'Open opportunities', val: String(biData?.customerFunnel?.totalCustomers || '0'), color: '#34d399' },
+            { label: 'Open estimates', val: String(biData?.customerFunnel?.openEstimates || '0'), color: '#10b981' },
+            { label: 'Open contracts', val: String(biData?.customerFunnel?.openContracts || '0'), color: '#059669' },
+            { label: 'In progress projects', val: String(biData?.customerFunnel?.inProgressProjects || '0'), color: '#047857' },
+            { label: 'Unpaid invoices', val: String(biData?.customerFunnel?.unpaidInvoices || '0'), color: '#064e3b' },
+            { label: 'Reviews', val: String(biData?.customerFunnel?.reviewCount || '0'), color: '#022c22' },
           ].map((f, i, arr) => (
             <React.Fragment key={i}>
               <div className="border border-slate-100 rounded-2xl flex flex-col min-w-[115px] flex-1 shrink-0 h-[105px] overflow-hidden bg-slate-50/40 hover:bg-white hover:border-slate-200 hover:shadow-md transition-all duration-305 relative shadow-[0_1px_3px_rgba(0,0,0,0.01)]">
@@ -1550,16 +1562,25 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction }
           This year to date <ChevronDown size={12} />
         </div>
         <div className="mt-4 text-[11px] text-[#6b6c72]">Total Amount</div>
-        <div className="text-[20px] font-bold text-[#393a3d] mb-4">LRs0</div>
+        <div className="text-[20px] font-bold text-[#393a3d] mb-4">{formatLkr(biData?.salesSummary?.totalSalesYTD || 0)}</div>
         <div className="relative h-[80px] border-l border-[#d4d7dc] flex items-end ml-4 mt-6">
           <div className="absolute -left-5 bottom-[0%] text-[10px] text-[#8d9096]">0</div>
-          <div className="absolute -left-6 bottom-[25%] text-[10px] text-[#8d9096]">0.1</div>
-          <div className="absolute -left-6 bottom-[50%] text-[10px] text-[#8d9096]">0.2</div>
-          <div className="absolute -left-6 bottom-[75%] text-[10px] text-[#8d9096]">0.3</div>
-          <div className="absolute -left-6 bottom-[100%] text-[10px] text-[#8d9096]">0.4</div>
+          <div className="absolute -left-6 bottom-[25%] text-[10px] text-[#8d9096]">{formatShortK((biData?.salesSummary?.totalSalesYTD || 0) / 4)}</div>
+          <div className="absolute -left-6 bottom-[50%] text-[10px] text-[#8d9096]">{formatShortK((biData?.salesSummary?.totalSalesYTD || 0) / 2)}</div>
+          <div className="absolute -left-6 bottom-[75%] text-[10px] text-[#8d9096]">{formatShortK((biData?.salesSummary?.totalSalesYTD || 0) * 3 / 4)}</div>
+          <div className="absolute -left-6 bottom-[100%] text-[10px] text-[#8d9096]">{formatShortK(biData?.salesSummary?.totalSalesYTD || 0)}</div>
           {[0, 25, 50, 75, 100].map(p => (
             <div key={p} className="absolute left-0 right-0 border-t border-[#eceef1]" style={{ bottom: `${p}%` }} />
           ))}
+          {(biData?.salesSummary?.monthlySales || []).map((amt, i) => {
+            const max = Math.max(...(biData?.salesSummary?.monthlySales || [0]), 1);
+            const h = max > 0 ? Math.round((amt / max) * 100) : 0;
+            return (
+              <div key={i} className="flex-1 flex items-end justify-center h-full relative group cursor-pointer" title={`Month ${i+1}: ${formatLkr(amt)}`}>
+                <div className="w-[6px] bg-gradient-to-t from-blue-600 to-sky-400 rounded-t-sm transition-all duration-500" style={{ height: `${Math.max(2, h)}%` }} />
+              </div>
+            );
+          })}
         </div>
       </WidgetShell>
     </EditWrapper>
@@ -1574,15 +1595,17 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction }
       <WidgetShell title="Accounts Payable">
         <div className="absolute top-4 right-4 text-[11px] text-[#6b6c72]">As of today</div>
         <div className="mt-4 text-[11px] text-[#6b6c72]">Total</div>
-        <div className="text-[20px] font-bold text-[#393a3d] mb-4">LRs0</div>
+        <div className="text-[20px] font-bold text-[#393a3d] mb-4">{formatLkr(biData?.accountsPayable?.total || 0)}</div>
         <div className="flex items-center gap-6 mt-4">
-          <div className="relative w-[70px] h-[70px] rounded-full border-[12px] border-[#d4d7dc] shrink-0" />
+          <div className="relative w-[70px] h-[70px] rounded-full border-[12px] shrink-0" style={{
+            borderColor: (biData?.accountsPayable?.total || 0) > 0 ? '#2ca01c' : '#d4d7dc'
+          }} />
           <div className="text-[11px] space-y-1.5 text-[#393a3d]">
-            <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-[#2ca01c]"/>Current: LRs0</div>
-            <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-[#0078d4]"/>1 - 30: LRs0</div>
-            <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-[#7c3aed]"/>31 - 60: LRs0</div>
-            <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-[#0d9488]"/>61 - 90: LRs0</div>
-            <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-[#e33e07]"/>91 and over: LRs0</div>
+            <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-[#2ca01c]"/>Current: {formatLkr(biData?.accountsPayable?.current || 0)}</div>
+            <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-[#0078d4]"/>1 - 30: {formatLkr(biData?.accountsPayable?.aging1_30 || 0)}</div>
+            <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-[#7c3aed]"/>31 - 60: {formatLkr(biData?.accountsPayable?.aging31_60 || 0)}</div>
+            <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-[#0d9488]"/>61 - 90: {formatLkr(biData?.accountsPayable?.aging61_90 || 0)}</div>
+            <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-[#e33e07]"/>91 and over: {formatLkr(biData?.accountsPayable?.aging91Plus || 0)}</div>
           </div>
         </div>
       </WidgetShell>
@@ -1598,15 +1621,17 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction }
       <WidgetShell title="Accounts Receivable">
         <div className="absolute top-4 right-4 text-[11px] text-[#6b6c72]">As of today</div>
         <div className="mt-4 text-[11px] text-[#6b6c72]">Total</div>
-        <div className="text-[20px] font-bold text-[#393a3d] mb-4">LRs0</div>
+        <div className="text-[20px] font-bold text-[#393a3d] mb-4">{formatLkr(biData?.accountsReceivable?.total || 0)}</div>
         <div className="flex items-center gap-6 mt-4">
-          <div className="relative w-[70px] h-[70px] rounded-full border-[12px] border-[#d4d7dc] shrink-0" />
+          <div className="relative w-[70px] h-[70px] rounded-full border-[12px] shrink-0" style={{
+            borderColor: (biData?.accountsReceivable?.total || 0) > 0 ? '#2ca01c' : '#d4d7dc'
+          }} />
           <div className="text-[11px] space-y-1.5 text-[#393a3d]">
-            <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-[#2ca01c]"/>Current: LRs0</div>
-            <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-[#0078d4]"/>1 - 30: LRs0</div>
-            <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-[#7c3aed]"/>31 - 60: LRs0</div>
-            <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-[#0d9488]"/>61 - 90: LRs0</div>
-            <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-[#e33e07]"/>91 and over: LRs0</div>
+            <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-[#2ca01c]"/>Current: {formatLkr(biData?.accountsReceivable?.current || 0)}</div>
+            <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-[#0078d4]"/>1 - 30: {formatLkr(biData?.accountsReceivable?.aging1_30 || 0)}</div>
+            <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-[#7c3aed]"/>31 - 60: {formatLkr(biData?.accountsReceivable?.aging31_60 || 0)}</div>
+            <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-[#0d9488]"/>61 - 90: {formatLkr(biData?.accountsReceivable?.aging61_90 || 0)}</div>
+            <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-[#e33e07]"/>91 and over: {formatLkr(biData?.accountsReceivable?.aging91Plus || 0)}</div>
           </div>
         </div>
       </WidgetShell>
@@ -1629,21 +1654,18 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction }
             </tr>
           </thead>
           <tbody className="text-[#393a3d]">
-            <tr className="border-b border-[#eceef1] border-dashed">
-              <td className="py-2">SO</td>
-              <td className="py-2 text-center">--</td>
-              <td className="py-2 text-right">--</td>
-            </tr>
-            <tr className="border-b border-[#eceef1] border-dashed">
-              <td className="py-2">SO</td>
-              <td className="py-2 text-center">--</td>
-              <td className="py-2 text-right">--</td>
-            </tr>
-            <tr>
-              <td className="py-2 text-[#8d9096]">...</td>
-              <td className="py-2"></td>
-              <td className="py-2"></td>
-            </tr>
+            {(biData?.salesOrders?.length > 0 ? biData.salesOrders : []).map((so, i) => (
+              <tr key={i} className="border-b border-[#eceef1] border-dashed">
+                <td className="py-2">{so.docNo || 'SO'}</td>
+                <td className="py-2 text-center">{so.customer || '--'}</td>
+                <td className="py-2 text-right">{formatLkr(so.amount || 0)}</td>
+              </tr>
+            ))}
+            {(biData?.salesOrders?.length || 0) === 0 && (
+              <tr>
+                <td className="py-2 text-[#8d9096]" colSpan={3}>No open sales orders</td>
+              </tr>
+            )}
           </tbody>
         </table>
       </WidgetShell>
@@ -1680,13 +1702,37 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction }
       onRemove={() => setSelectedWidgets(prev => ({...prev, reviews: false}))}
     >
       <WidgetShell title="Reviews">
-        <div className="border border-[#0078d4] bg-[#f4f8fc] rounded-md p-3 text-[12px] text-[#393a3d] flex gap-2 mt-4 shadow-sm">
-          <Info size={16} className="text-[#0078d4] shrink-0 mt-0.5 fill-[#0078d4] text-white" />
-          <div className="leading-relaxed">
-            'Reviews' question is off and is no longer collecting reviews. To collect responses, enable the 'Reviews' question in <a href="#" className="text-[#0078d4] hover:underline">survey settings</a>.
+        {biData?.reviews?.reviewCount > 0 ? (
+          <div className="mt-4 space-y-4">
+            <div className="flex items-center gap-3">
+              <span className="text-[28px] font-extrabold text-slate-800">{biData.reviews.avgRating}</span>
+              <div className="flex items-center gap-0.5">
+                {[1,2,3,4,5].map(s => (
+                  <Star key={s} size={14} className={s <= Math.round(biData.reviews.avgRating) ? 'text-amber-400 fill-amber-400' : 'text-slate-300'} />
+                ))}
+              </div>
+              <span className="text-[12px] text-slate-500 ml-1">({biData.reviews.reviewCount} reviews)</span>
+            </div>
+            <div className="space-y-1.5">
+              {[5,4,3,2,1].map(s => {
+                const count = biData.reviews.ratingDistribution?.[s] || 0;
+                const pct = biData.reviews.reviewCount > 0 ? Math.round((count / biData.reviews.reviewCount) * 100) : 0;
+                return (
+                  <div key={s} className="flex items-center gap-2 text-[11px]">
+                    <span className="w-6 text-right font-bold text-slate-500">{s}</span>
+                    <Star size={10} className="text-amber-400 fill-amber-400 shrink-0" />
+                    <div className="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden">
+                      <div className="h-full bg-amber-400 rounded-full" style={{ width: `${pct}%` }} />
+                    </div>
+                    <span className="w-8 text-right text-slate-500">{count}</span>
+                  </div>
+                );
+              })}
+            </div>
           </div>
-        </div>
-        <div className="bg-[#f4f5f8] flex-1 mt-4 rounded-md border border-[#eceef1]" />
+        ) : (
+          <div className="mt-4 text-[13px] text-slate-500">No reviews yet. Be the first to rate the system!</div>
+        )}
       </WidgetShell>
     </EditWrapper>
   )}
@@ -1699,10 +1745,10 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction }
     >
       <WidgetShell title="Overdue Invoices">
         <div className="mt-4 text-[14px] font-bold text-[#393a3d] leading-snug pr-4">
-          You have LRs0.00 in invoices that are overdue.
+          You have {formatLkr(biData?.overdueInvoiceTotal || 0)} in invoices that are overdue.
         </div>
         <div className="text-[12px] text-[#6b6c72] mt-2">
-          Create an invoice for your next job!
+          {(biData?.overdueInvoiceTotal || 0) > 0 ? 'Review your overdue invoices to avoid late fees.' : 'Create an invoice for your next job!'}
         </div>
       </WidgetShell>
     </EditWrapper>

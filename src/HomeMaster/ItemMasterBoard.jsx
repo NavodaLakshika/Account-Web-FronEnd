@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import SimpleModal from '../components/SimpleModal';
 import { Search, Plus, Save, RotateCcw, X, Trash2, Calendar, CheckCircle, Image as ImageIcon, Camera } from 'lucide-react';
-import { toast } from 'react-hot-toast';
+
 import { productService } from '../services/product.service';
 import { getSessionData } from '../utils/session';
+import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
+
 
 const ItemMasterBoard = ({ isOpen, onClose }) => {
     const [lookups, setLookups] = useState({ 
@@ -68,7 +70,7 @@ const ItemMasterBoard = ({ isOpen, onClose }) => {
             const data = await productService.getLookups(company);
             setLookups(data);
         } catch (error) {
-            toast.error('Failed to load lookup data.');
+            showErrorToast('Failed to load lookup data.');
         }
     };
 
@@ -106,9 +108,9 @@ const ItemMasterBoard = ({ isOpen, onClose }) => {
     };
 
     const handleSave = async () => {
-        if (!formData.code) return toast.error('Please enter Item ID.');
-        if (!formData.prodName) return toast.error('Please enter Product Name.');
-        if (!formData.deptCode) return toast.error('Please select Department.');
+        if (!formData.code) return showErrorToast('Please enter Item ID.');
+        if (!formData.prodName) return showErrorToast('Please enter Product Name.');
+        if (!formData.deptCode) return showErrorToast('Please select Department.');
 
         setIsSaving(true);
         try {
@@ -139,9 +141,9 @@ const ItemMasterBoard = ({ isOpen, onClose }) => {
                 ImageSv: productImage || ''
             };
             await productService.save(payload);
-            toast.success('Product saved successfully.');
+            showSuccessToast('Product saved successfully.');
         } catch (error) {
-            toast.error('Error saving product.');
+            showErrorToast('Error saving product.');
         } finally {
             setIsSaving(false);
         }
@@ -153,10 +155,10 @@ const ItemMasterBoard = ({ isOpen, onClose }) => {
 
         try {
             await productService.delete(formData.code, formData.companyCode);
-            toast.success('Product deleted successfully');
+            showSuccessToast('Product deleted successfully');
             handleClear();
         } catch (error) {
-            toast.error('Failed to delete product');
+            showErrorToast('Failed to delete product');
         }
     };
 
@@ -170,7 +172,7 @@ const ItemMasterBoard = ({ isOpen, onClose }) => {
             const results = await productService.search(formData.companyCode, searchQuery);
             setSearchResults(results || []);
             setShowSearchModal(true);
-        } catch (error) { toast.error('Search failed.'); }
+        } catch (error) { showErrorToast('Search failed.'); }
     };
 
     const handleSelectResult = async (selectedItem) => {
@@ -206,7 +208,7 @@ const ItemMasterBoard = ({ isOpen, onClose }) => {
             setProductImage(data.imageSv ? 'data:image/jpeg;base64,' + data.imageSv : null);
             fetchStockInfo(data.code);
             setShowSearchModal(false);
-        } catch (error) { toast.error('Failed to load record.'); }
+        } catch (error) { showErrorToast('Failed to load record.'); }
     };
 
     const handleInputPick = (field, item) => {

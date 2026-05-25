@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import SimpleModal from '../components/SimpleModal';
 import CalendarModal from '../components/CalendarModal';
 import { trialBalanceService } from '../services/trialBalance.service';
-import { toast } from 'react-hot-toast';
-import { DotLottiePlayer } from '@dotlottie/react-player';
+
+
 import { 
     Printer, 
     Calendar, 
@@ -21,8 +21,10 @@ import {
     Save
 } from 'lucide-react';
 import { getCompanyCode } from '../utils/session';
+import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
 
-const TrialBalanceBoard = ({ isOpen, onClose }) => {
+
+const TrialBalanceBoard = ({ isOpen, onClose, companyCodeProp, companyNameProp }) => {
     const formatDate = (date) => {
         const d = new Date(date);
         const day = String(d.getDate()).padStart(2, '0');
@@ -59,7 +61,7 @@ const TrialBalanceBoard = ({ isOpen, onClose }) => {
 
     const loadLookups = async () => {
         try {
-            const data = await trialBalanceService.getLookups(getCompanyCode());
+            const data = await trialBalanceService.getLookups(companyCodeProp || getCompanyCode());
             setLookups(data);
         } catch (e) {
             console.error('Lookup load failed', e);
@@ -67,58 +69,6 @@ const TrialBalanceBoard = ({ isOpen, onClose }) => {
     };
 
     // Premium Toast Helpers
-    const showSuccessToast = (message) => {
-        toast.custom((t) => (
-            <div className={`${t.visible ? 'animate-in slide-in-from-right-10 fade-in duration-500' : 'animate-out slide-out-to-right-10 fade-out duration-300'} 
-                max-w-[550px] w-fit bg-white/95 backdrop-blur-xl border border-white/20 shadow-2xl rounded-[5px] flex flex-col pointer-events-auto overflow-hidden`}>
-                <div className="px-4 py-2.5 flex items-center gap-3">
-                    <div className="w-12 h-12 shrink-0">
-                        <DotLottiePlayer src="/lottiefile/Successffull.lottie" autoplay loop={false} />
-                    </div>
-                    <div className="flex-grow text-left py-1">
-                        <h3 className="text-[12px] font-bold tracking-wider uppercase font-tahoma leading-relaxed text-slate-800">{message}</h3>
-                        <div className="flex items-center gap-1.5 mt-0.5">
-                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.3)]" />
-                            <span className="text-emerald-600 text-[8px] font-mono font-bold tracking-widest uppercase">Verified</span>
-                        </div>
-                    </div>
-                    <button onClick={() => toast.dismiss(t.id)} className="text-slate-300 hover:text-slate-500 transition-colors">
-                        <X size={14} />
-                    </button>
-                </div>
-                <div className="h-[2px] w-full bg-emerald-50">
-                    <div className="h-full bg-emerald-500" style={{ animation: 'toastProgress 3s linear forwards' }} />
-                </div>
-            </div>
-        ), { duration: 3000, position: 'top-right' });
-    };
-
-    const showErrorToast = (message) => {
-        toast.custom((t) => (
-            <div className={`${t.visible ? 'animate-in slide-in-from-right-10 fade-in duration-500' : 'animate-out slide-out-to-right-10 fade-out duration-300'} 
-                max-w-[550px] w-fit bg-white/95 backdrop-blur-xl border border-white/20 shadow-2xl rounded-[5px] flex flex-col pointer-events-auto overflow-hidden`}>
-                <div className="px-4 py-2.5 flex items-center gap-3">
-                    <div className="w-12 h-12 shrink-0">
-                        <DotLottiePlayer src="/lottiefile/Error Fail animation.lottie" autoplay loop={false} />
-                    </div>
-                    <div className="flex-grow text-left py-1">
-                        <h3 className="text-[12px] font-bold tracking-wider uppercase font-tahoma leading-relaxed text-slate-800">{message}</h3>
-                        <div className="flex items-center gap-1.5 mt-0.5">
-                            <div className="w-1.5 h-1.5 rounded-full bg-red-500 shadow-[0_0_8_rgba(239,68,68,0.3)]" />
-                            <span className="text-red-600 text-[8px] font-mono font-bold tracking-widest uppercase">Failed</span>
-                        </div>
-                    </div>
-                    <button onClick={() => toast.dismiss(t.id)} className="text-slate-300 hover:text-slate-500 transition-colors">
-                        <X size={14} />
-                    </button>
-                </div>
-                <div className="h-[2px] w-full bg-red-50">
-                    <div className="h-full bg-red-500" style={{ animation: 'toastProgress 3s linear forwards' }} />
-                </div>
-            </div>
-        ), { duration: 3000, position: 'top-right' });
-    };
-
     // Calculate totals dynamically
     const totalDebit = reportResults.reduce((sum, row) => sum + (row.debit || 0), 0);
     const totalCredit = reportResults.reduce((sum, row) => sum + (row.credit || 0), 0);
@@ -127,7 +77,7 @@ const TrialBalanceBoard = ({ isOpen, onClose }) => {
         setLoading(true);
         try {
             const data = await trialBalanceService.generate({
-                companyCode: getCompanyCode(),
+                companyCode: companyCodeProp || getCompanyCode(),
                 dateFrom: formData.dateFrom,
                 dateTo: formData.dateTo,
                 costCenter: formData.costCenterCode,
@@ -203,7 +153,7 @@ const TrialBalanceBoard = ({ isOpen, onClose }) => {
             <SimpleModal
                 isOpen={isOpen}
                 onClose={onClose}
-                title="Strategic Portfolio Insight: Trial Balance"
+                title={companyNameProp ? `Trial Balance - ${companyNameProp}` : "Strategic Portfolio Insight: Trial Balance"}
                 maxWidth="max-w-[1250px]"
                 footer={footer}
             >

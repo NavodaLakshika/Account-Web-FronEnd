@@ -1,89 +1,206 @@
 import React from 'react';
 import { toast } from 'react-hot-toast';
-import { DotLottiePlayer } from '@dotlottie/react-player';
-import { X } from 'lucide-react';
+import { Check, X, AlertCircle, Clock } from 'lucide-react';
 
-/**
- * Professional toast notifications mirroring the Purchase Order style.
- */
-export const showSuccessToast = (message) => {
-    toast.custom((t) => (
-        <div className={`${t.visible ? 'animate-in slide-in-from-right-10 fade-in duration-500' : 'animate-out slide-out-to-right-10 fade-out duration-300'} 
-            max-w-[550px] w-fit bg-white/95 backdrop-blur-xl border border-white/20 shadow-2xl rounded-[5px] flex flex-col pointer-events-auto overflow-hidden`}>
-            <div className="px-4 py-2.5 flex items-center gap-3">
-                <div className="w-12 h-12 shrink-0">
-                    <DotLottiePlayer src="/lottiefile/Successffull.lottie" autoplay loop={false} />
-                </div>
-                <div className="flex-grow text-left py-1">
-                    <h3 className="text-slate-800 text-[12px] font-bold tracking-wider uppercase font-['Tahoma'] leading-relaxed">{message}</h3>
-                    <div className="flex items-center gap-1.5 mt-0.5">
-                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.3)]" />
-                        <span className="text-emerald-600 text-[8px] font-mono font-bold tracking-widest uppercase">Verified</span>
-                    </div>
-                </div>
-                <button onClick={() => toast.dismiss(t.id)} className="text-slate-300 hover:text-slate-500 transition-colors">
-                    <X size={14} />
-                </button>
-            </div>
-            <div className="h-[2px] w-full bg-emerald-50 relative overflow-hidden">
-                <div className="h-full bg-emerald-500 absolute left-0 top-0" style={{ animation: 'toastProgress 3s linear forwards' }} />
-            </div>
-        </div>
-    ), { duration: 3000, position: 'top-right' });
+const toastBaseStyle = `
+    max-w-[420px] w-full
+    bg-[#1a1b26]
+    border border-slate-800
+    shadow-[0_10px_40px_rgb(0,0,0,0.5)]
+    rounded-xl
+    overflow-hidden
+    pointer-events-auto
+    flex
+    flex-col
+    relative
+`;
+
+const animationStyle = (visible, position = 'top-right') => {
+    let slideIn = 'slide-in-from-top-5';
+    let slideOut = 'slide-out-to-top-5';
+
+    if (position === 'bottom-right') {
+        slideIn = 'slide-in-from-bottom-5';
+        slideOut = 'slide-out-to-bottom-5';
+    } else if (position === 'top-right') {
+        slideIn = 'slide-in-from-right-5';
+        slideOut = 'slide-out-to-right-5';
+    }
+    
+    return visible
+        ? `animate-in ${slideIn} fade-in zoom-in-95 duration-300`
+        : `animate-out ${slideOut} fade-out zoom-out-95 duration-200`;
 };
 
-export const showErrorToast = (message) => {
-    toast.custom((t) => (
-        <div className={`${t.visible ? 'animate-in slide-in-from-right-10 fade-in duration-500' : 'animate-out slide-out-to-right-10 fade-out duration-300'} 
-            max-w-[550px] w-fit bg-white/95 backdrop-blur-xl border border-white/20 shadow-2xl rounded-[5px] flex flex-col pointer-events-auto overflow-hidden`}>
-            <div className="px-4 py-2.5 flex items-center gap-3">
-                <div className="w-12 h-12 shrink-0">
-                    <DotLottiePlayer src="/lottiefile/Error Fail animation.lottie" autoplay loop={false} />
-                </div>
-                <div className="flex-grow text-left py-1">
-                    <h3 className="text-slate-800 text-[12px] font-bold tracking-wider uppercase font-['Tahoma'] leading-relaxed">{message}</h3>
-                    <div className="flex items-center gap-1.5 mt-0.5">
-                        <div className="w-1.5 h-1.5 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.3)]" />
-                        <span className="text-red-600 text-[8px] font-mono font-bold tracking-widest uppercase">Failed</span>
-                    </div>
-                </div>
-                <button onClick={() => toast.dismiss(t.id)} className="text-slate-300 hover:text-slate-500 transition-colors">
-                    <X size={14} />
-                </button>
+const ToastLayout = ({
+    t,
+    icon,
+    title,
+    subtitle,
+    gradientFrom,
+    titleColor,
+    progressColor,
+    duration = 2000,
+    position = 'top-right'
+}) => (
+    <div className={`${toastBaseStyle} ${animationStyle(t.visible, position)}`}>
+        
+        {/* Subtle Background Glow Gradient */}
+        <div className={`absolute inset-y-0 left-0 w-32 bg-gradient-to-r ${gradientFrom} to-transparent opacity-20 pointer-events-none`} />
+
+        {/* Main Content Area */}
+        <div className="flex flex-row w-full flex-1 items-center p-4 gap-4 relative z-10">
+            
+            {/* Icon */}
+            <div className="flex-shrink-0">
+                {icon}
             </div>
-            <div className="h-[2px] w-full bg-red-50 relative overflow-hidden">
-                <div className="h-full bg-red-500 absolute left-0 top-0" style={{ animation: 'toastProgress 3s linear forwards' }} />
+            
+            {/* Content Area */}
+            <div className="flex-1 min-w-0">
+                <h3 className={`text-[15px] font-semibold ${titleColor} leading-tight`}>
+                    {title}
+                </h3>
+                {subtitle && (
+                    <p className="text-[13px] text-slate-300 mt-1 opacity-90 leading-snug truncate">
+                        {subtitle}
+                    </p>
+                )}
             </div>
+            
+            {/* Dismiss overlay button (invisible but clickable over the whole toast or a tiny x) */}
+            <button
+                onClick={() => toast.dismiss(t.id)}
+                className="absolute top-2 right-2 p-1 text-slate-500 hover:text-slate-300 transition-colors opacity-0 hover:opacity-100"
+            >
+                <X size={14} />
+            </button>
         </div>
-    ), { duration: 3000, position: 'top-right' });
+
+        {/* Progress Bar Loader */}
+        <div className="w-full h-1 bg-slate-800 relative z-10">
+            <div 
+                className={`h-full ${progressColor}`} 
+                style={{ 
+                    animation: `toastProgress ${duration}ms linear forwards` 
+                }} 
+            />
+        </div>
+    </div>
+);
+
+/* SUCCESS */
+export const showSuccessToast = (message, subMessage) => {
+    const displayTitle = subMessage ? message : "Success";
+    const displaySubtitle = subMessage ? subMessage : (message || "Operation completed successfully");
+    toast.custom(
+        (t) => (
+            <ToastLayout
+                t={t}
+                title={displayTitle}
+                subtitle={displaySubtitle}
+                icon={
+                    <div className="w-8 h-8 rounded-full bg-[#22c55e] flex items-center justify-center shadow-lg shadow-green-500/20">
+                        <Check size={18} strokeWidth={4} className="text-[#064e3b]" />
+                    </div>
+                }
+                gradientFrom="from-[#22c55e]"
+                titleColor="text-[#4ade80]"
+                progressColor="bg-[#22c55e]"
+                position="top-right"
+                duration={2000}
+            />
+        ),
+        {
+            duration: 2000,
+            position: 'top-right',
+        }
+    );
 };
 
-export const showInfoToast = (message, subMessage = "Information") => {
-    toast.custom((t) => (
-        <div className={`${t.visible ? 'animate-in slide-in-from-right-10 fade-in duration-500' : 'animate-out slide-out-to-right-10 fade-out duration-300'} 
-            max-w-[550px] w-fit bg-white/95 backdrop-blur-xl border border-white/20 shadow-2xl rounded-[5px] flex flex-col pointer-events-auto overflow-hidden`}>
-            <div className="px-4 py-2.5 flex items-center gap-3">
-                <div className="w-12 h-12 shrink-0">
-                    <DotLottiePlayer src="/lottiefile/Successffull.lottie" autoplay loop={false} />
-                </div>
-                <div className="flex-grow text-left py-1">
-                    <h3 className="text-slate-800 text-[12px] font-bold tracking-wider uppercase font-['Tahoma'] leading-relaxed">{message}</h3>
-                    <div className="flex items-center gap-1.5 mt-0.5">
-                        <div className="w-1.5 h-1.5 rounded-full bg-sky-500 shadow-[0_0_8px_rgba(14,165,233,0.3)]" />
-                        <span className="text-sky-600 text-[8px] font-mono font-bold tracking-widest uppercase">{subMessage}</span>
+/* ERROR */
+export const showErrorToast = (message, subMessage) => {
+    const displayTitle = subMessage ? message : "Error";
+    const displaySubtitle = subMessage ? subMessage : (message || "An error occurred");
+    toast.custom(
+        (t) => (
+            <ToastLayout
+                t={t}
+                title={displayTitle}
+                subtitle={displaySubtitle}
+                icon={
+                    <div className="w-8 h-8 rounded-full bg-[#ef4444] flex items-center justify-center shadow-lg shadow-red-500/20">
+                        <X size={18} strokeWidth={4} className="text-[#450a0a]" />
                     </div>
-                </div>
-                <button onClick={() => toast.dismiss(t.id)} className="text-slate-300 hover:text-slate-500 transition-colors">
-                    <X size={14} />
-                </button>
-            </div>
-            <div className="h-[2px] w-full bg-sky-50 relative overflow-hidden">
-                <div className="h-full bg-sky-500 absolute left-0 top-0" style={{ animation: 'toastProgress 4s linear forwards' }} />
-            </div>
-        </div>
-    ), { duration: 4000, position: 'top-right' });
+                }
+                gradientFrom="from-[#ef4444]"
+                titleColor="text-[#f87171]"
+                progressColor="bg-[#ef4444]"
+                position="top-right"
+                duration={2000}
+            />
+        ),
+        {
+            duration: 2000,
+            position: 'top-right',
+        }
+    );
 };
 
+/* INFO */
+export const showInfoToast = (message, subMessage) => {
+    const displayTitle = subMessage ? message : "Information";
+    const displaySubtitle = subMessage ? subMessage : (message || "Here is some information");
+    toast.custom(
+        (t) => (
+            <ToastLayout
+                t={t}
+                title={displayTitle}
+                subtitle={displaySubtitle}
+                icon={
+                    <div className="w-8 h-8 rounded-full bg-[#3b82f6] flex items-center justify-center shadow-lg shadow-blue-500/20">
+                        <AlertCircle size={18} strokeWidth={3} className="text-[#1e3a8a]" />
+                    </div>
+                }
+                gradientFrom="from-[#3b82f6]"
+                titleColor="text-[#60a5fa]"
+                progressColor="bg-[#3b82f6]"
+                position="top-right"
+                duration={3000}
+            />
+        ),
+        {
+            duration: 3000,
+            position: 'top-right',
+        }
+    );
+};
 
-// Add this global style to your main CSS or layout if not already present
-// @keyframes toastProgress { 0% { width: 100%; } 100% { width: 0%; } }
+/* PENDING / WAIT */
+export const showPendingToast = (message, subMessage) => {
+    const displayTitle = subMessage ? message : "Pending";
+    const displaySubtitle = subMessage ? subMessage : (message || "Processing your request");
+    toast.custom(
+        (t) => (
+            <ToastLayout
+                t={t}
+                title={displayTitle}
+                subtitle={displaySubtitle}
+                icon={
+                    <div className="w-8 h-8 rounded-full bg-[#00D1FF] flex items-center justify-center shadow-lg shadow-cyan-500/20">
+                        <Clock size={18} strokeWidth={3} className="text-[#083344]" />
+                    </div>
+                }
+                gradientFrom="from-[#00D1FF]"
+                titleColor="text-[#00D1FF]"
+                progressColor="bg-[#00D1FF]"
+                position="top-right"
+                duration={3000}
+            />
+        ),
+        {
+            duration: 3000,
+            position: 'top-right',
+        }
+    );
+};

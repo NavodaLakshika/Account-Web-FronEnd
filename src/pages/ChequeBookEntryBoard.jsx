@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import SimpleModal from '../components/SimpleModal';
 import { Search, X, RotateCcw, Loader2, Landmark, Calendar, Hash, CheckCircle2, BookOpen, Layers, ShieldCheck, AlertCircle } from 'lucide-react';
 import { bankingService } from '../services/banking.service';
-import { toast } from 'react-hot-toast';
+
 import { getSessionData } from '../utils/session';
+import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
+
 
 const ChequeBookEntryBoard = ({ isOpen, onClose }) => {
     const [loading, setLoading] = useState(false);
@@ -44,28 +46,28 @@ const ChequeBookEntryBoard = ({ isOpen, onClose }) => {
             const res = await bankingService.getChequeBookLookups(compCode || formData.company);
             setLookups(res);
         } catch (error) {
-            toast.error("Failed to load bank account parameters");
+            showErrorToast("Failed to load bank account parameters");
         } finally {
             setLoading(false);
         }
     };
 
     const handleSave = async () => {
-        if (!formData.accountCode) return toast.error("Please select a valid Bank Account.");
-        if (!formData.startNo || !formData.endNo) return toast.error("Start and End cheque numbers are required.");
+        if (!formData.accountCode) return showErrorToast("Please select a valid Bank Account.");
+        if (!formData.startNo || !formData.endNo) return showErrorToast("Start and End cheque numbers are required.");
         
         const start = parseInt(formData.startNo);
         const end = parseInt(formData.endNo);
-        if (isNaN(start) || isNaN(end) || start > end) return toast.error("Invalid cheque range protocol.");
+        if (isNaN(start) || isNaN(end) || start > end) return showErrorToast("Invalid cheque range protocol.");
 
         try {
             setLoading(true);
             await bankingService.saveChequeBook(formData);
-            toast.success('New Cheque Book registered successfully!');
+            showSuccessToast('New Cheque Book registered successfully!');
             handleClear();
             onClose();
         } catch (error) {
-            toast.error(error.toString());
+            showErrorToast(error.toString());
         } finally {
             setLoading(false);
         }

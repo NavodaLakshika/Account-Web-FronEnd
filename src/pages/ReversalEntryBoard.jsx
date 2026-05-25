@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import SimpleModal from '../components/SimpleModal';
 import { Search, X, RotateCcw, Loader2, History, ShieldCheck, Key, FileSearch, CheckCircle2, AlertCircle } from 'lucide-react';
 import { reversalEntryService } from '../services/reversalEntry.service';
-import { toast } from 'react-hot-toast';
+import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
+
 
 const ReversalEntryBoard = ({ isOpen, onClose }) => {
     const [loading, setLoading] = useState(false);
@@ -55,7 +56,7 @@ const ReversalEntryBoard = ({ isOpen, onClose }) => {
             const lookupRes = await reversalEntryService.getLookups(companyCode);
             setLookups(lookupRes);
         } catch (error) {
-            toast.error("Failed to load initial data");
+            showErrorToast("Failed to load initial data");
         } finally {
             setLoading(false);
         }
@@ -82,22 +83,22 @@ const ReversalEntryBoard = ({ isOpen, onClose }) => {
 
     const handleApply = async () => {
         if (!formData.transactionType || (!formData.voucherNo && !formData.documentNo)) {
-            toast.error("Please provide transaction type and a reference number.");
+            showErrorToast("Please provide transaction type and a reference number.");
             return;
         }
         if (!formData.authPassword) {
-            toast.error("Authorization password is required.");
+            showErrorToast("Authorization password is required.");
             return;
         }
 
         try {
             setLoading(true);
             await reversalEntryService.apply(formData);
-            toast.success('Transaction reversed successfully!');
+            showSuccessToast('Transaction reversed successfully!');
             handleClear();
             onClose();
         } catch (error) {
-            toast.error(error.toString());
+            showErrorToast(error.toString());
         } finally {
             setLoading(false);
         }
@@ -105,16 +106,16 @@ const ReversalEntryBoard = ({ isOpen, onClose }) => {
 
     const handleView = async () => {
         if (!formData.voucherNo && !formData.documentNo) {
-             toast.error("Provide a Document No or Voucher No to view.");
+             showErrorToast("Provide a Document No or Voucher No to view.");
              return;
         }
         try {
             setLoading(true);
             const data = await reversalEntryService.view(formData.voucherNo || formData.documentNo, formData.transactionType);
-            toast.success("Transaction details loaded.");
+            showSuccessToast("Transaction details loaded.");
             // You could show a sub-modal or update state with details
         } catch (error) {
-            toast.error(error.toString());
+            showErrorToast(error.toString());
         } finally {
             setLoading(false);
         }

@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import SimpleModal from '../components/SimpleModal';
 import { Settings, Lock, Unlock, ShieldAlert, CheckCircle, X, Layers, ShieldCheck, ShoppingCart, Search, BarChart2 } from 'lucide-react';
-import { toast } from 'react-hot-toast';
-import { DotLottiePlayer } from '@dotlottie/react-player';
 import { systemLocksService } from '../services/systemLocks.service';
 import api from '../services/api';
 import SystemUpdateAuthModal from '../components/modals/SystemAdmin/SystemUpdateAuthModal';
+import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
+
 
 const SystemSettingsBoard = ({ isOpen = true, onClose, isInline = false }) => {
     // List of all keys we manage
@@ -37,7 +37,8 @@ const SystemSettingsBoard = ({ isOpen = true, onClose, isInline = false }) => {
         { label: 'Period Lock Facility', id: 'lock' },
         { label: 'Admin Change Pwd', id: 'changePassword' },
         { label: 'User & Role Mgmt', id: 'users' },
-        { label: 'Admin Config Setting', id: 'systemSettings' }
+        { label: 'Admin Config Setting', id: 'systemSettings' },
+        { label: 'Dashboard Access Lock', id: 'dashboardLock' }
     ];
 
     const transactionItems = [
@@ -189,32 +190,6 @@ const SystemSettingsBoard = ({ isOpen = true, onClose, isInline = false }) => {
             setSelectedCompany('');
         }
     }, [selectedEmployee, availableCompanies, selectedCompany]);
-
-    const showSuccessToast = (message) => {
-        toast.custom((t) => (
-            <div className={`${t.visible ? 'animate-in slide-in-from-right-10 fade-in duration-500' : 'animate-out slide-out-to-right-10 fade-out duration-300'} 
-                max-w-[550px] w-fit bg-white/95 backdrop-blur-xl border border-white/20 shadow-2xl rounded-[5px] flex flex-col pointer-events-auto overflow-hidden font-['Tahoma']`}>
-                <div className="px-4 py-2.5 flex items-center gap-3">
-                    <div className="w-12 h-12 shrink-0">
-                        <DotLottiePlayer src="/lottiefile/Successffull.lottie" autoplay loop={false} />
-                    </div>
-                    <div className="flex-grow text-left py-1">
-                        <h3 className="text-slate-800 text-[12px] font-bold tracking-wider uppercase leading-relaxed">{message}</h3>
-                        <div className="flex items-center gap-1.5 mt-0.5">
-                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.3)]" />
-                            <span className="text-emerald-600 text-[8px] font-mono font-bold tracking-widest uppercase">Verified</span>
-                        </div>
-                    </div>
-                    <button onClick={() => toast.dismiss(t.id)} className="text-slate-300 hover:text-slate-500 transition-colors">
-                        <X size={14} />
-                    </button>
-                </div>
-                <div className="h-[2px] w-full bg-emerald-50">
-                    <div className="h-full bg-emerald-500" style={{ animation: 'toastProgress 3s linear forwards' }} />
-                </div>
-            </div>
-        ), { duration: 3000, position: 'top-right' });
-    };
 
     const handleToggle = (id, label) => {
         setAuthModalConfig({

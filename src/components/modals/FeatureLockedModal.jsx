@@ -2,7 +2,7 @@ import React from 'react';
 import SimpleModal from '../SimpleModal';
 import { DotLottiePlayer } from '@dotlottie/react-player';
 
-const FeatureLockedModal = ({ isOpen, onClose }) => {
+const FeatureLockedModal = ({ isOpen, onClose, title = "Access Locked", message = "Please contact supporters to unlock this feature." }) => {
     return (
         <SimpleModal
             isOpen={isOpen}
@@ -16,10 +16,8 @@ const FeatureLockedModal = ({ isOpen, onClose }) => {
                     <DotLottiePlayer src="/lottiefile/Forgot Password1.lottie" autoplay loop />
                 </div>
                 <div className="space-y-1">
-                    <h3 className="text-[18px] font-bold text-red-600 uppercase tracking-tight">Access Locked</h3>
-                    <p className="text-[11px] text-slate-500 font-bold uppercase tracking-wider">
-                        Please contact supporters to unlock this feature.
-                    </p>
+                    <h3 className="text-[18px] font-bold text-red-600 uppercase tracking-tight">{title}</h3>
+                    <p className="text-[11px] text-slate-500 font-bold uppercase tracking-wider">{message}</p>
                 </div>
                 <button
                     onClick={onClose}

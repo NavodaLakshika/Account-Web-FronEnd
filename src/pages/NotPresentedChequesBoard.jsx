@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import SimpleModal from '../components/SimpleModal';
 import { Search, X, RotateCcw, Loader2, Landmark, Calendar, FileText, CheckCircle2, Plus, Trash2, Clock, History, Ban, ShieldCheck, MailQuestion } from 'lucide-react';
 import { bankingService } from '../services/banking.service';
-import { toast } from 'react-hot-toast';
+
 import { getSessionData } from '../utils/session';
+import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
+
 
 const NotPresentedChequesBoard = ({ isOpen, onClose }) => {
     const [loading, setLoading] = useState(false);
@@ -58,7 +60,7 @@ const NotPresentedChequesBoard = ({ isOpen, onClose }) => {
             setLookups(lookupRes);
             setHeader(prev => ({ ...prev, docNo: docRes.docNo }));
         } catch (error) {
-            toast.error("Banking protocol refresh failed");
+            showErrorToast("Banking protocol refresh failed");
         } finally {
             setLoading(false);
         }
@@ -66,7 +68,7 @@ const NotPresentedChequesBoard = ({ isOpen, onClose }) => {
 
     const handleAddItem = () => {
         if (!entry.chequeNo || entry.amount <= 0) {
-            toast.error("Please provide valid cheque number and valuation.");
+            showErrorToast("Please provide valid cheque number and valuation.");
             return;
         }
         setItems([...items, { ...entry, id: Date.now() }]);
@@ -84,17 +86,17 @@ const NotPresentedChequesBoard = ({ isOpen, onClose }) => {
     };
 
     const handleSave = async () => {
-        if (!header.bankCode) return toast.error("Please select a target Bank Portfolio.");
-        if (items.length === 0) return toast.error("Deployment list is empty. Add at least one instrument.");
+        if (!header.bankCode) return showErrorToast("Please select a target Bank Portfolio.");
+        if (items.length === 0) return showErrorToast("Deployment list is empty. Add at least one instrument.");
 
         try {
             setLoading(true);
             await bankingService.saveNotPresented({ ...header, items });
-            toast.success('Not presented cheques registered successfully!');
+            showSuccessToast('Not presented cheques registered successfully!');
             handleClear();
             onClose();
         } catch (error) {
-            toast.error(error.toString());
+            showErrorToast(error.toString());
         } finally {
             setLoading(false);
         }

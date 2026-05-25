@@ -3,7 +3,7 @@ import SimpleModal from '../SimpleModal';
 import { Search, Save, RotateCcw, X, Loader2, Lock, User, Key, Eye, EyeOff, CheckCircle2 } from 'lucide-react';
 import { userProfileService } from '../../services/userProfile.service';
 import { showSuccessToast, showErrorToast } from '../../utils/toastUtils';
-import { toast } from 'react-hot-toast';
+
 
 const ChangePasswordBoard = ({ isOpen, onClose }) => {
     const initialState = {
@@ -55,7 +55,7 @@ const ChangePasswordBoard = ({ isOpen, onClose }) => {
             const data = await userProfileService.searchUsers(companyCode);
             setUsers(data);
             if (data.length === 0 && companyCode) {
-                toast.error(`No users found for company: ${companyCode}`);
+                showErrorToast(`No users found for company: ${companyCode}`);
             }
         } catch (error) {
             console.error('Fetch users error:', error);

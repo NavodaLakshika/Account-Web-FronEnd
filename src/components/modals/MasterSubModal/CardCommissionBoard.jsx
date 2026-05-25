@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import SimpleModal from '../../SimpleModal';
 import { Save, RotateCcw, Loader2 , X, Search, CheckCircle2, AlertCircle } from 'lucide-react';
 import { cardCommissionService } from '../../../services/cardCommission.service';
-import { toast } from 'react-hot-toast';
+import { showSuccessToast, showErrorToast } from '../../../utils/toastUtils';
+
 
 const CardCommissionBoard = ({ isOpen, onClose }) => {
     const initialState = {
@@ -37,7 +38,7 @@ const CardCommissionBoard = ({ isOpen, onClose }) => {
             setCardTypes(data.cardTypes || []);
             setBankAccounts(data.bankAccounts || []);
         } catch (error) {
-            toast.error('Failed to load lookup data');
+            showErrorToast('Failed to load lookup data');
         }
     };
 
@@ -79,15 +80,15 @@ const CardCommissionBoard = ({ isOpen, onClose }) => {
         };
 const handleSave = async () => {
         if (!formData.BankAccCode) {
-            toast.error('Please select a Bank Account');
+            showErrorToast('Please select a Bank Account');
             return;
         }
         if (!formData.CardID) {
-            toast.error('Card Type Not Found.');
+            showErrorToast('Card Type Not Found.');
             return;
         }
         if (parseFloat(formData.Rate) === 0) {
-            toast.error('Commission Rate cannot be zero.');
+            showErrorToast('Commission Rate cannot be zero.');
             return;
         }
 
@@ -98,10 +99,10 @@ const handleSave = async () => {
                 ...formData,
                 Rate: parseFloat(formData.Rate)
             });
-            toast.success('Commission Rate Saved Successfully.');
+            showSuccessToast('Commission Rate Saved Successfully.');
             setFormData(prev => ({ ...prev, CardID: '', CardType: '', Rate: '0.0' }));
         } catch (error) {
-            toast.error(error);
+            showErrorToast(error);
         } finally {
             setLoading(false);
         }
@@ -116,10 +117,10 @@ const handleSave = async () => {
                 ...formData,
                 Rate: parseFloat(formData.Rate)
             });
-            toast.success('Commission Rate Saved Successfully.');
+            showSuccessToast('Commission Rate Saved Successfully.');
             setFormData(prev => ({ ...prev, CardID: '', CardType: '', Rate: '0.0' }));
         } catch (error) {
-            toast.error(error);
+            showErrorToast(error);
         } finally {
             setLoading(false);
         }

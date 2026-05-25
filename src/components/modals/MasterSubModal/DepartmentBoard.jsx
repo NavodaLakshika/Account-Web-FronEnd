@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import SimpleModal from '../../SimpleModal';
 import { Search, RotateCcw, Save, Trash2, Loader2, X, MapPin, Building2 } from 'lucide-react';
 import { departmentService } from '../../../services/department.service';
-import { toast } from 'react-hot-toast';
+import { showSuccessToast, showErrorToast } from '../../../utils/toastUtils';
+
 
 const DepartmentBoard = ({ isOpen, onClose }) => {
     const initialState = {
@@ -67,7 +68,7 @@ const DepartmentBoard = ({ isOpen, onClose }) => {
 
     const handleSave = async () => {
         if (!formData.Loca_Id || !formData.Dept_Name) {
-            toast.error('Location and Department Name are required');
+            showErrorToast('Location and Department Name are required');
             return;
         }
 
@@ -75,15 +76,15 @@ const DepartmentBoard = ({ isOpen, onClose }) => {
         try {
             const data = await departmentService.save(formData);
             if (data.message === 'inserted') {
-                toast.success('Department created');
+                showSuccessToast('Department created');
                 setFormData(prev => ({ ...prev, Code: data.code }));
                 setIsEditMode(true);
             } else {
-                toast.success('Department updated');
+                showSuccessToast('Department updated');
             }
         } catch (err) {
             const errorMsg = err.error || err.message || (typeof err === 'string' ? err : 'Failed to save');
-            toast.error(errorMsg, { duration: 5000 });
+            showErrorToast(errorMsg, { duration: 5000 });
             console.error('Save Error:', err);
         } finally {
             setLoading(false);
@@ -97,10 +98,10 @@ const DepartmentBoard = ({ isOpen, onClose }) => {
         setLoading(true);
         try {
             await departmentService.delete(formData.Code, formData.Loca_Id, formData.Company);
-            toast.success('Department deleted');
+            showSuccessToast('Department deleted');
             handleClear();
         } catch (err) {
-            toast.error(err.message || err);
+            showErrorToast(err.message || err);
         } finally {
             setLoading(false);
         }
@@ -108,7 +109,7 @@ const DepartmentBoard = ({ isOpen, onClose }) => {
 
     const openLocaSearch = async () => {
         if (!formData.Company) {
-            toast.error('Company not identified');
+            showErrorToast('Company not identified');
             return;
         }
         setLoading(true);
@@ -117,7 +118,7 @@ const DepartmentBoard = ({ isOpen, onClose }) => {
             setLocationsList(data || []);
             setShowLocaSearch(true);
         } catch (err) {
-            toast.error('Failed to load locations');
+            showErrorToast('Failed to load locations');
         } finally {
             setLoading(false);
         }
@@ -130,7 +131,7 @@ const DepartmentBoard = ({ isOpen, onClose }) => {
 
     const openDeptSearch = async () => {
         if (!formData.Loca_Id) {
-            toast.error('Select a location first');
+            showErrorToast('Select a location first');
             return;
         }
         setLoading(true);
@@ -139,7 +140,7 @@ const DepartmentBoard = ({ isOpen, onClose }) => {
             setDeptList(data || []);
             setShowDeptSearch(true);
         } catch (err) {
-            toast.error('Failed to load departments');
+            showErrorToast('Failed to load departments');
         } finally {
             setLoading(false);
         }
