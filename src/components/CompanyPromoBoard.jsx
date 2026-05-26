@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Database, Layout, Cpu, Globe, X, ChevronRight, Sparkles } from 'lucide-react';
+import { adService } from '../services/ad.service';
 
-const ads = [
+const defaultAds = [
     {
         title: 'Merit Plus Finance',
         desc: 'Cloud-native accounting platform with real-time multi-company reporting.',
@@ -40,12 +41,38 @@ const ads = [
     }
 ];
 
+const AVAILABLE_ICONS = { Database, Layout, Cpu, Globe };
+
 const CompanyPromoBoard = ({ isOpen, onClose }) => {
-    const adIndex = useMemo(() => Math.floor(Math.random() * ads.length), []);
+    const [ads, setAds] = useState([]);
+    const [adIndex, setAdIndex] = useState(0);
     const [exiting, setExiting] = useState(false);
 
     useEffect(() => {
-        if (!isOpen) return;
+        if (!isOpen) {
+            setExiting(false);
+            return;
+        }
+
+        const fetchAndSelectAd = async () => {
+            try {
+                const fetchedAds = await adService.getAllAds();
+                const activeAds = fetchedAds.filter(ad => ad.isActive);
+                if (activeAds.length > 0) {
+                    setAds(activeAds);
+                    setAdIndex(Math.floor(Math.random() * activeAds.length));
+                } else {
+                    setAds(defaultAds);
+                    setAdIndex(Math.floor(Math.random() * defaultAds.length));
+                }
+            } catch (error) {
+                setAds(defaultAds);
+                setAdIndex(Math.floor(Math.random() * defaultAds.length));
+            }
+        };
+
+        fetchAndSelectAd();
+
         const timer = setTimeout(() => {
             setExiting(true);
             setTimeout(onClose, 400);
@@ -53,10 +80,11 @@ const CompanyPromoBoard = ({ isOpen, onClose }) => {
         return () => clearTimeout(timer);
     }, [isOpen, onClose]);
 
-    if (!isOpen) return null;
+    if (!isOpen || ads.length === 0) return null;
 
     const ad = ads[adIndex];
-    const Icon = ad.icon;
+    if (!ad) return null;
+    const Icon = ad.iconName ? (AVAILABLE_ICONS[ad.iconName] || Globe) : (ad.icon || Globe);
 
     return (
         <div className="fixed bottom-24 left-6 z-[2060] w-full max-w-sm">

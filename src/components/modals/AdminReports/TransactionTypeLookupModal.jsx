@@ -1,25 +1,26 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import SimpleModal from '../../SimpleModal';
-import { Search, Check, ListChecks } from 'lucide-react';
+import { Search, Check, ListChecks, Loader2 } from 'lucide-react';
+import { transactionTypeService } from '../../../services/transactionType.service';
 
 const TransactionTypeLookupModal = ({ isOpen, onClose, onSelect }) => {
     const [searchTerm, setSearchTerm] = useState('');
+    const [transactionTypes, setTransactionTypes] = useState([]);
+    const [loading, setLoading] = useState(false);
 
-    const transactionTypes = [
-        { code: 'PUR', name: 'Purchase Order', category: 'Inventory' },
-        { code: 'GRN', name: 'Good Receive Note', category: 'Inventory' },
-        { code: 'SIN', name: 'Sales Invoice', category: 'Sales' },
-        { code: 'SRN', name: 'Sales Return Note', category: 'Sales' },
-        { code: 'PV', name: 'Payment Voucher', category: 'Finance' },
-        { code: 'RV', name: 'Receipt Voucher', category: 'Finance' },
-        { code: 'JE', name: 'Journal Entry', category: 'Finance' },
-        { code: 'STK', name: 'Stock Adjustment', category: 'Inventory' },
-        { code: 'PCV', name: 'Petty Cash Voucher', category: 'Finance' },
-    ];
+    useEffect(() => {
+        if (isOpen) {
+            setLoading(true);
+            transactionTypeService.getAll()
+                .then(data => setTransactionTypes(data || []))
+                .catch(() => setTransactionTypes([]))
+                .finally(() => setLoading(false));
+        }
+    }, [isOpen]);
 
     const filteredTypes = transactionTypes.filter(type => 
-        type.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        type.code.toLowerCase().includes(searchTerm.toLowerCase())
+        (type.Tr_Type || type.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (type.Iid || type.code || '').toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     if (!isOpen) return null;
@@ -53,15 +54,20 @@ const TransactionTypeLookupModal = ({ isOpen, onClose, onSelect }) => {
 
                 {/* List Content */}
                 <div className="max-h-[300px] overflow-y-auto border border-gray-100 rounded-b-[5px] no-scrollbar">
-                    {filteredTypes.length > 0 ? (
+                    {loading ? (
+                        <div className="py-10 flex items-center justify-center gap-2 text-slate-400">
+                            <Loader2 size={16} className="animate-spin" />
+                            <span className="text-[13px] italic">Loading...</span>
+                        </div>
+                    ) : filteredTypes.length > 0 ? (
                         filteredTypes.map((type, idx) => (
                             <button
                                 key={idx}
-                                onClick={() => onSelect(type.name)}
+                                onClick={() => onSelect(type.Tr_Type || type.name)}
                                 className="w-full grid grid-cols-12 gap-2 px-4 py-3 items-center hover:bg-blue-50 transition-colors border-b border-gray-50 last:border-none group text-left"
                             >
-                                <div className="col-span-3 font-bold text-[13px] text-[#0078d4] group-hover:scale-105 transition-transform">{type.code}</div>
-                                <div className="col-span-8 font-bold text-[13px] text-slate-700">{type.name}</div>
+                                <div className="col-span-3 font-bold text-[13px] text-[#0078d4] group-hover:scale-105 transition-transform">{type.Iid || type.code}</div>
+                                <div className="col-span-8 font-bold text-[13px] text-slate-700">{type.Tr_Type || type.name}</div>
                                 <div className="col-span-1 flex justify-end opacity-0 group-hover:opacity-100">
                                     <Check size={14} className="text-blue-500" />
                                 </div>

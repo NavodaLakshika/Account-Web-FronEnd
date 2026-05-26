@@ -21,7 +21,9 @@ const SystemSettingsBoard = ({ isOpen = true, onClose, isInline = false }) => {
         { label: 'User Profile Maint', id: 'master_userProfile' },
         { label: 'Vendor Types', id: 'master_vendorTypes' },
         { label: 'Change Password', id: 'master_changePassword' },
-        { label: 'System Logoff Action', id: 'master_logoff' }
+        { label: 'System Logoff Action', id: 'master_logoff' },
+        { label: 'Create Area', id: 'master_area' },
+        { label: 'Create Route', id: 'master_route' }
     ];
 
     const adminItems = [
@@ -117,6 +119,7 @@ const SystemSettingsBoard = ({ isOpen = true, onClose, isInline = false }) => {
     const [settings, setSettings] = useState({});
     const [showTargetModal, setShowTargetModal] = useState(false);
     const [authModalConfig, setAuthModalConfig] = useState({ isOpen: false, pendingLock: null });
+    const [globalSearch, setGlobalSearch] = useState('');
 
     // Filter states
     const [companies, setCompanies] = useState([]);
@@ -275,7 +278,13 @@ const SystemSettingsBoard = ({ isOpen = true, onClose, isInline = false }) => {
     };
 
     const renderSection = (title, IconComponent, items) => {
-        const chunks = chunkArray(items, 8);
+        const filteredItems = items.filter(item => 
+            item.label.toLowerCase().includes(globalSearch.toLowerCase()) || 
+            item.id.toLowerCase().includes(globalSearch.toLowerCase())
+        );
+        if (filteredItems.length === 0) return null;
+        
+        const chunks = chunkArray(filteredItems, 8);
         return (
             <div className="space-y-4">
                 <div className="flex items-center gap-3 px-5 py-3 bg-slate-50/80 rounded-[10px] border border-slate-100 shadow-sm sticky top-0 z-10 mx-2">
@@ -322,10 +331,23 @@ const SystemSettingsBoard = ({ isOpen = true, onClose, isInline = false }) => {
                 </div>
                 <button 
                     onClick={() => setShowTargetModal(true)} 
-                    className="w-full sm:w-auto px-5 py-2.5 bg-white border border-slate-200 hover:border-[#00acee] hover:text-[#00acee] text-slate-600 text-xs font-bold uppercase tracking-wider rounded-xl shadow-sm transition-all"
+                    className="w-full sm:w-auto px-5 py-2.5 bg-white border border-slate-200 hover:border-[#00acee] hover:text-[#00acee] text-slate-600 text-xs font-bold uppercase tracking-wider rounded-xl shadow-sm transition-all shrink-0"
                 >
                     Change Target
                 </button>
+            </div>
+
+            <div className="px-1 mb-4 shrink-0">
+                <div className="relative">
+                    <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                    <input 
+                        type="text" 
+                        placeholder="Search configuration items..." 
+                        className="w-full h-10 pl-10 pr-3 text-sm border border-slate-200 rounded-xl bg-white outline-none focus:border-[#00acee] focus:ring-1 focus:ring-[#00acee] transition-all shadow-sm font-['Tahoma']"
+                        value={globalSearch}
+                        onChange={(e) => setGlobalSearch(e.target.value)}
+                    />
+                </div>
             </div>
 
             <div className="overflow-y-auto no-scrollbar pr-2 flex-grow space-y-10 pb-6 opacity-100 transition-opacity">

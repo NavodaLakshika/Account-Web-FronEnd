@@ -1,9 +1,19 @@
 import React from 'react';
 import { X, ChevronRight, BarChart3, PieChart, Landmark, ClipboardList, UserSquare, Users, ShieldAlert } from 'lucide-react';
 import AdminReportsModal from './AdminReportsModal';
+import AccountingReportsModal from './AccountingReportsModal';
+import BankingReportsModal from './BankingReportsModal';
+import FinanceManagementModal from './FinanceManagementModal';
+import VendorCenterReportsModal from './VendorCenterReportsModal';
+import CustomerCenterReportsModal from './CustomerCenterReportsModal';
 
 const ReportsModal = ({ isOpen, onClose }) => {
     const [showAdminReports, setShowAdminReports] = React.useState(false);
+    const [showAccountingReports, setShowAccountingReports] = React.useState(false);
+    const [showBankingReports, setShowBankingReports] = React.useState(false);
+    const [showFinanceManagement, setShowFinanceManagement] = React.useState(false);
+    const [showVendorCenterReports, setShowVendorCenterReports] = React.useState(false);
+    const [showCustomerCenterReports, setShowCustomerCenterReports] = React.useState(false);
 
     if (!isOpen) return null;
 
@@ -52,6 +62,11 @@ const ReportsModal = ({ isOpen, onClose }) => {
                             <button
                                 key={idx}
                                 onClick={() => {
+                                    if (item.label === 'Accounting Reports') setShowAccountingReports(true);
+                                    if (item.label === 'Banking Reports') setShowBankingReports(true);
+                                    if (item.label === 'Finance Management') setShowFinanceManagement(true);
+                                    if (item.label === 'Vender Center Reports') setShowVendorCenterReports(true);
+                                    if (item.label === 'Customer Center Reports') setShowCustomerCenterReports(true);
                                     if (item.action === 'adminReports') setShowAdminReports(true);
                                 }}
                                 className="w-full flex items-center justify-between px-4 py-3 rounded-xl hover:bg-slate-50 group transition-all relative overflow-hidden text-left"
@@ -78,6 +93,26 @@ const ReportsModal = ({ isOpen, onClose }) => {
             <AdminReportsModal 
                 isOpen={showAdminReports} 
                 onClose={() => setShowAdminReports(false)} 
+            />
+            <AccountingReportsModal 
+                isOpen={showAccountingReports} 
+                onClose={() => setShowAccountingReports(false)} 
+            />
+            <BankingReportsModal 
+                isOpen={showBankingReports} 
+                onClose={() => setShowBankingReports(false)} 
+            />
+            <FinanceManagementModal 
+                isOpen={showFinanceManagement} 
+                onClose={() => setShowFinanceManagement(false)} 
+            />
+            <VendorCenterReportsModal 
+                isOpen={showVendorCenterReports} 
+                onClose={() => setShowVendorCenterReports(false)} 
+            />
+            <CustomerCenterReportsModal 
+                isOpen={showCustomerCenterReports} 
+                onClose={() => setShowCustomerCenterReports(false)} 
             />
         </div>
     );

@@ -6,7 +6,6 @@ import {
     Calendar,
     X,
     Play,
-    RotateCcw,
     Zap
 } from 'lucide-react';
 
@@ -28,19 +27,13 @@ const TransactionLogReportModal = ({ isOpen, onClose }) => {
     };
 
     const footer = (
-        <div className="bg-slate-50 px-6 w-full flex justify-end gap-3 border-t border-gray-100 mt-4 rounded-b-xl font-['Tahoma']">
+        <div className="w-full flex justify-end border-t border-gray-100 rounded-b-xl font-['Tahoma']">
             <button
                 onClick={handleDisplay}
                 disabled={loading}
-                className="px-10 h-10 bg-[#0285fd] text-white text-[13px] font-bold rounded-[5px] shadow-md shadow-blue-200 hover:bg-[#0073ff] transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-50"
+                className="px-7 h-8 bg-[#0285fd] text-white text-[11px] font-bold rounded-[4px] shadow-sm shadow-blue-200 hover:bg-[#0073ff] transition-all active:scale-95 flex items-center justify-center gap-1.5 disabled:opacity-50"
             >
-                <Play size={14} /> {loading ? 'Processing...' : 'Display'}
-            </button>
-            <button
-                onClick={handleClear}
-                className="px-8 h-10 bg-[#00adff] text-white text-[13px] font-bold rounded-[5px] hover:bg-[#0099e6] shadow-md shadow-blue-200 transition-all active:scale-95 border-none flex items-center justify-center gap-2"
-            >
-                <RotateCcw size={14} /> Clear
+                <Play size={11} /> {loading ? 'Processing...' : 'Display'}
             </button>
         </div>
     );
@@ -51,53 +44,52 @@ const TransactionLogReportModal = ({ isOpen, onClose }) => {
                 isOpen={isOpen}
                 onClose={onClose}
                 title="Transaction Log Report"
-                maxWidth="max-w-2xl"
+                maxWidth="max-w-[500px]"
                 footer={footer}
             >
-                <div className="py-1 select-none font-['Tahoma'] space-y-4 text-[12.5px] mt-1">
+                <div className="py-1 select-none font-['Tahoma'] space-y-3 text-[11px] mt-1">
                     {/* Date Range Selection Section */}
-                    <div className="bg-slate-50/50 p-4 border border-slate-100 rounded-[5px] flex items-center justify-center gap-10">
+                    <div className="bg-slate-50/50 p-3 border border-slate-100 rounded-[4px] flex items-center justify-center gap-5">
 
                         {/* Date From */}
-                        <div className="flex items-center gap-4">
-                            <label className="font-bold text-black text-[14px]">Date From</label>
+                        <div className="flex items-center gap-3">
+                            <label className="font-bold text-black text-[12px]">Date From</label>
                             <div className="flex items-center">
                                 <input
                                     type="text"
                                     value={dateFrom}
                                     readOnly
-                                    className="w-[140px] h-10 px-3 border border-gray-300 bg-white rounded-[5px] outline-none font-bold text-[14px] text-slate-700 cursor-default shadow-sm focus:border-blue-400"
+                                    className="w-[115px] h-8 px-2.5 border border-gray-300 bg-white rounded-[4px] outline-none font-bold text-[12px] text-slate-700 cursor-default shadow-sm focus:border-blue-400"
                                 />
                                 <button
                                     onClick={() => setShowCalendarFrom(true)}
-                                    className="w-11 h-10 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] transition-all shadow-md active:scale-95 ml-2 rounded-[5px]"
+                                    className="w-9 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] transition-all shadow-sm active:scale-95 ml-1.5 rounded-[4px]"
                                 >
-                                    <Calendar size={14} />
+                                    <Calendar size={11} />
                                 </button>
                             </div>
                         </div>
 
                         {/* Date To */}
-                        <div className="flex items-center gap-4">
-                            <label className="font-bold text-black text-[14px]">Date To</label>
+                        <div className="flex items-center gap-3">
+                            <label className="font-bold text-black text-[12px]">Date To</label>
                             <div className="flex items-center">
                                 <input
                                     type="text"
                                     value={dateTo}
                                     readOnly
-                                    className="w-[140px] h-10 px-3 border border-gray-300 bg-white rounded-[5px] outline-none font-bold text-[14px] text-slate-700 cursor-default shadow-sm focus:border-blue-400"
+                                    className="w-[115px] h-8 px-2.5 border border-gray-300 bg-white rounded-[4px] outline-none font-bold text-[12px] text-slate-700 cursor-default shadow-sm focus:border-blue-400"
                                 />
                                 <button
                                     onClick={() => setShowCalendarTo(true)}
-                                    className="w-11 h-10 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] transition-all shadow-md active:scale-95 ml-2 rounded-[5px]"
+                                    className="w-9 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] transition-all shadow-sm active:scale-95 ml-1.5 rounded-[4px]"
                                 >
-                                    <Calendar size={14} />
+                                    <Calendar size={11} />
                                 </button>
                             </div>
                         </div>
 
                     </div>
-
 
                 </div>
             </SimpleModal>

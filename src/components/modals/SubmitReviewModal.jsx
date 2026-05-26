@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Star, X, Send, Loader2 } from 'lucide-react';
 import { reviewService } from '../../services/review.service';
 import { showSuccessToast, showErrorToast } from '../../utils/toastUtils';
@@ -8,8 +8,55 @@ const SubmitReviewModal = ({ isOpen, onClose, currentUser }) => {
     const [hoveredRating, setHoveredRating] = useState(0);
     const [comment, setComment] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
+    
+    const [stats, setStats] = useState({
+        total: 0,
+        average: 0,
+        distribution: [
+            { stars: 5, pct: 0, count: 0 },
+            { stars: 4, pct: 0, count: 0 },
+            { stars: 3, pct: 0, count: 0 },
+            { stars: 2, pct: 0, count: 0 },
+            { stars: 1, pct: 0, count: 0 },
+        ]
+    });
 
     const MAX_CHARS = 500;
+
+    useEffect(() => {
+        if (isOpen) {
+            fetchStats();
+        }
+    }, [isOpen]);
+
+    const fetchStats = async () => {
+        try {
+            const allReviews = await reviewService.getAllReviews();
+            if (allReviews && allReviews.length > 0) {
+                const total = allReviews.length;
+                let sum = 0;
+                const counts = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+                allReviews.forEach(r => {
+                    const rRating = Math.floor(r.rating || 0);
+                    if (rRating >= 1 && rRating <= 5) {
+                        counts[rRating]++;
+                        sum += rRating;
+                    }
+                });
+                
+                const average = (sum / total).toFixed(1);
+                const distribution = [5, 4, 3, 2, 1].map(stars => ({
+                    stars,
+                    count: counts[stars],
+                    pct: Math.round((counts[stars] / total) * 100)
+                }));
+                
+                setStats({ total, average, distribution });
+            }
+        } catch (error) {
+            console.error('Failed to fetch reviews for stats', error);
+        }
+    };
 
     if (!isOpen) return null;
 
@@ -34,6 +81,7 @@ const SubmitReviewModal = ({ isOpen, onClose, currentUser }) => {
             showSuccessToast('Thank you for your feedback!');
             setRating(0);
             setComment('');
+            fetchStats(); // Update stats
             onClose();
         } catch (error) {
             showErrorToast('Failed to submit review.');
@@ -41,14 +89,6 @@ const SubmitReviewModal = ({ isOpen, onClose, currentUser }) => {
             setIsSubmitting(false);
         }
     };
-
-    const evaluations = [
-        { label: 'User Interface', pct: 85, color: 'bg-blue-500', text: 'text-blue-600', avg: 'Great' },
-        { label: 'Performance', pct: 92, color: 'bg-emerald-500', text: 'text-emerald-600', avg: 'Great' },
-        { label: 'Features', pct: 74, color: 'bg-violet-500', text: 'text-violet-600', avg: 'Good' },
-        { label: 'Support', pct: 62, color: 'bg-orange-500', text: 'text-orange-600', avg: 'So-so' },
-        { label: 'Mobile Access', pct: 35, color: 'bg-red-500', text: 'text-red-600', avg: 'Worst' }
-    ];
 
     return (
         <div className="fixed inset-0 z-[2050] flex items-center justify-center p-6 bg-slate-900/50">
@@ -59,63 +99,36 @@ const SubmitReviewModal = ({ isOpen, onClose, currentUser }) => {
                         <X size={15} />
                     </button>
 
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 min-h-[520px]">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 min-h-[420px]">
                         {/* LEFT */}
                         <div className="flex flex-col gap-5">
                             {/* Overall Rating Card */}
-                            <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6">
-                                <div className="flex items-center justify-center gap-4">
-                                    <div className="text-5xl font-bold text-slate-800 tracking-tight">3.75</div>
+                            <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6 flex flex-col justify-center items-center flex-1">
+                                <div className="flex items-center justify-center gap-6">
+                                    <div className="text-6xl font-bold text-slate-800 tracking-tight">{stats.average || "0.0"}</div>
                                     <div className="flex flex-col items-start">
-                                        <div className="flex items-center gap-0.5">
+                                        <div className="flex items-center gap-1 mb-1">
                                             {[1, 2, 3, 4, 5].map(s => (
-                                                <Star key={s} size={16} className={s <= 3 ? 'fill-yellow-400 text-yellow-400' : s === 4 ? 'fill-yellow-400 text-yellow-400 opacity-50' : 'text-slate-200 fill-slate-50'} />
+                                                <Star key={s} size={20} className={s <= Math.round(stats.average) ? 'fill-yellow-400 text-yellow-400' : 'text-slate-200 fill-slate-50'} />
                                             ))}
                                         </div>
-                                        <div className="text-xs text-slate-400 mt-0.5 font-medium">(1,297 Reviews)</div>
+                                        <div className="text-sm text-slate-400 font-medium">({stats.total} {stats.total === 1 ? 'Review' : 'Reviews'})</div>
                                     </div>
                                 </div>
                             </div>
 
                             {/* Rating Breakdown */}
-                            <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6">
-                                <h3 className="text-sm font-bold text-slate-700 mb-4">Rating Breakdown</h3>
-                                <div className="space-y-2.5">
-                                    {[
-                                        { stars: 5, pct: 58, count: 752 },
-                                        { stars: 4, pct: 22, count: 285 },
-                                        { stars: 3, pct: 12, count: 156 },
-                                        { stars: 2, pct: 5, count: 65 },
-                                        { stars: 1, pct: 3, count: 39 },
-                                    ].map((row) => (
-                                        <div key={row.stars} className="flex items-center gap-2.5">
+                            <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6 flex-1 flex flex-col justify-center">
+                                <h3 className="text-sm font-bold text-slate-700 mb-5">Rating Breakdown</h3>
+                                <div className="space-y-3">
+                                    {stats.distribution.map((row) => (
+                                        <div key={row.stars} className="flex items-center gap-3">
                                             <span className="text-xs font-semibold text-slate-600 w-4 text-right">{row.stars}</span>
-                                            <Star size={12} className="fill-yellow-400 text-yellow-400 shrink-0" />
-                                            <div className="flex-1 h-2.5 bg-slate-100 rounded-full overflow-hidden">
-                                                <div className="h-full rounded-full bg-yellow-400 transition-all" style={{ width: `${row.pct}%` }} />
+                                            <Star size={14} className="fill-yellow-400 text-yellow-400 shrink-0" />
+                                            <div className="flex-1 h-3 bg-slate-100 rounded-full overflow-hidden">
+                                                <div className="h-full rounded-full bg-yellow-400 transition-all duration-700" style={{ width: `${row.pct}%` }} />
                                             </div>
-                                            <span className="text-[11px] font-medium text-slate-400 w-10 text-right">{row.pct}%</span>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-
-                            {/* Element of Evaluation */}
-                            <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6">
-                                <h3 className="text-sm font-bold text-slate-700 mb-5">Element of Evaluation</h3>
-                                <div className="space-y-4">
-                                    {evaluations.map((ev, idx) => (
-                                        <div key={idx}>
-                                            <div className="flex items-center justify-between mb-1.5">
-                                                <span className="text-xs font-semibold text-slate-600">{ev.label}</span>
-                                                <div className="flex items-center gap-2">
-                                                    <span className="text-sm font-bold text-slate-800">{ev.pct}%</span>
-                                                    <span className={`text-[10px] font-bold uppercase tracking-wider ${ev.text}`}>{ev.avg}</span>
-                                                </div>
-                                            </div>
-                                            <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
-                                                <div className={`h-full rounded-full ${ev.color} transition-all duration-1000`} style={{ width: `${ev.pct}%` }} />
-                                            </div>
+                                            <span className="text-xs font-medium text-slate-400 w-10 text-right">{row.pct}%</span>
                                         </div>
                                     ))}
                                 </div>

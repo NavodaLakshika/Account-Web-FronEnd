@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { FileText, ClipboardList, ShieldAlert, Building2, Users, Search, BarChart3, Eye, X, PieChart, Landmark, UserSquare, Box, History, Trash2, ScrollText } from 'lucide-react';
+import { FileText, ClipboardList, ShieldAlert, Building2, Users, Search, BarChart3, Eye, X, PieChart, Landmark, UserSquare, Box, History, Trash2, ScrollText, BookOpen, Clock, RefreshCcw, ListChecks, Receipt, AlertCircle, List, Calendar, Scale } from 'lucide-react';
 import TrialBalanceBoard from '../pages/TrialBalanceBoard';
 import ItemsServicesReportPage from '../pages/ItemsServicesReportPage';
 import SystemAnalyticsReportPage from '../pages/SystemAnalyticsReportPage';
@@ -8,6 +8,7 @@ import TransactionLogReportModal from '../components/modals/AdminReports/Transac
 import CancelledTransactionReportModal from '../components/modals/AdminReports/CancelledTransactionReportModal';
 
 const hubReportCards = [
+    // ── Accounting ──
     {
         id: 'trial-balance',
         title: 'Trial Balance Report',
@@ -30,6 +31,302 @@ const hubReportCards = [
         hoverBorder: 'hover:border-emerald-400',
         category: 'Accounting'
     },
+    {
+        id: 'accounting-details',
+        title: 'Accounting Details',
+        description: 'Comprehensive accounting details and financial records.',
+        icon: FileText,
+        color: 'text-indigo-500',
+        bg: 'bg-indigo-500/10',
+        border: 'border-indigo-200/30',
+        hoverBorder: 'hover:border-indigo-400',
+        category: 'Accounting'
+    },
+    {
+        id: 'accounting-report',
+        title: 'Accounting Report',
+        description: 'Detailed accounting report with financial summaries.',
+        icon: BarChart3,
+        color: 'text-violet-500',
+        bg: 'bg-violet-500/10',
+        border: 'border-violet-200/30',
+        hoverBorder: 'hover:border-violet-400',
+        category: 'Accounting'
+    },
+    {
+        id: 'journal-entry-reports',
+        title: 'Journal Entry Reports',
+        description: 'View all journal entries with debit/credit breakdowns.',
+        icon: BookOpen,
+        color: 'text-sky-500',
+        bg: 'bg-sky-500/10',
+        border: 'border-sky-200/30',
+        hoverBorder: 'hover:border-sky-400',
+        category: 'Accounting'
+    },
+    {
+        id: 'double-entry-details',
+        title: 'Double Entry Details Report',
+        description: 'Detailed double entry accounting records and transactions.',
+        icon: ClipboardList,
+        color: 'text-teal-500',
+        bg: 'bg-teal-500/10',
+        border: 'border-teal-200/30',
+        hoverBorder: 'hover:border-teal-400',
+        category: 'Accounting'
+    },
+
+    // ── Banking ──
+    {
+        id: 'banking',
+        title: 'Banking',
+        description: 'Banking overview and account summaries.',
+        icon: Landmark,
+        color: 'text-emerald-500',
+        bg: 'bg-emerald-500/10',
+        border: 'border-emerald-200/30',
+        hoverBorder: 'hover:border-emerald-400',
+        category: 'Banking'
+    },
+    {
+        id: 'bank-statement',
+        title: 'Bank Statement',
+        description: 'View bank statements with transaction history.',
+        icon: FileText,
+        color: 'text-emerald-600',
+        bg: 'bg-emerald-600/10',
+        border: 'border-emerald-200/30',
+        hoverBorder: 'hover:border-emerald-500',
+        category: 'Banking'
+    },
+    {
+        id: 'bank-reconciliation-statement',
+        title: 'Bank Reconciliation Statement',
+        description: 'Reconciled bank statements with matched transactions.',
+        icon: RefreshCcw,
+        color: 'text-green-500',
+        bg: 'bg-green-500/10',
+        border: 'border-green-200/30',
+        hoverBorder: 'hover:border-green-400',
+        category: 'Banking'
+    },
+    {
+        id: 'reconciliation-summary',
+        title: 'Reconciliation Summary',
+        description: 'Summary of all bank reconciliation activities.',
+        icon: ClipboardList,
+        color: 'text-teal-500',
+        bg: 'bg-teal-500/10',
+        border: 'border-teal-200/30',
+        hoverBorder: 'hover:border-teal-400',
+        category: 'Banking'
+    },
+    {
+        id: 'reconciliation-detail-summary',
+        title: 'Reconciliation Detail Summary',
+        description: 'Detailed reconciliation records with line-item matching.',
+        icon: ListChecks,
+        color: 'text-cyan-600',
+        bg: 'bg-cyan-600/10',
+        border: 'border-cyan-200/30',
+        hoverBorder: 'hover:border-cyan-500',
+        category: 'Banking'
+    },
+    {
+        id: 'entered-cheque-books-report',
+        title: 'Entered Cheque Books Report',
+        description: 'Report of all entered cheque books and their status.',
+        icon: BookOpen,
+        color: 'text-amber-500',
+        bg: 'bg-amber-500/10',
+        border: 'border-amber-200/30',
+        hoverBorder: 'hover:border-amber-400',
+        category: 'Banking'
+    },
+    {
+        id: 'cheque-diary',
+        title: 'Cheque Diary',
+        description: 'Diary of all cheque transactions and movements.',
+        icon: ScrollText,
+        color: 'text-orange-500',
+        bg: 'bg-orange-500/10',
+        border: 'border-orange-200/30',
+        hoverBorder: 'hover:border-orange-400',
+        category: 'Banking'
+    },
+
+    // ── Finance ──
+    {
+        id: 'profit-loss-account',
+        title: 'Profit & Loss Account',
+        description: 'View profit and loss statements for the selected period.',
+        icon: PieChart,
+        color: 'text-purple-500',
+        bg: 'bg-purple-500/10',
+        border: 'border-purple-200/30',
+        hoverBorder: 'hover:border-purple-400',
+        category: 'Finance'
+    },
+    {
+        id: 'general-ledger',
+        title: 'General Ledger',
+        description: 'Complete general ledger with all account postings.',
+        icon: BookOpen,
+        color: 'text-violet-500',
+        bg: 'bg-violet-500/10',
+        border: 'border-violet-200/30',
+        hoverBorder: 'hover:border-violet-400',
+        category: 'Finance'
+    },
+    {
+        id: 'trial-balance-finance',
+        title: 'Trial Balance',
+        description: 'Trial balance with debit and credit summaries.',
+        icon: Scale,
+        color: 'text-blue-600',
+        bg: 'bg-blue-600/10',
+        border: 'border-blue-200/30',
+        hoverBorder: 'hover:border-blue-500',
+        category: 'Finance'
+    },
+    {
+        id: 'balance-sheet',
+        title: 'Balance Sheet',
+        description: 'Company balance sheet with assets, liabilities and equity.',
+        icon: FileText,
+        color: 'text-indigo-500',
+        bg: 'bg-indigo-500/10',
+        border: 'border-indigo-200/30',
+        hoverBorder: 'hover:border-indigo-400',
+        category: 'Finance'
+    },
+
+    // ── Vender ──
+    {
+        id: 'creditor-aging-analyst',
+        title: 'Creditor Aging Analyst',
+        description: 'Aging analysis of creditor accounts and outstanding balances.',
+        icon: Clock,
+        color: 'text-orange-500',
+        bg: 'bg-orange-500/10',
+        border: 'border-orange-200/30',
+        hoverBorder: 'hover:border-orange-400',
+        category: 'Vender'
+    },
+    {
+        id: 'creditor-statement',
+        title: 'Creditor Statement',
+        description: 'Detailed creditor statements with transaction history.',
+        icon: FileText,
+        color: 'text-orange-600',
+        bg: 'bg-orange-600/10',
+        border: 'border-orange-200/30',
+        hoverBorder: 'hover:border-orange-500',
+        category: 'Vender'
+    },
+    {
+        id: 'creditor-balance-report',
+        title: 'Creditor Balance Report',
+        description: 'Summary of creditor balances across all vendors.',
+        icon: BarChart3,
+        color: 'text-amber-500',
+        bg: 'bg-amber-500/10',
+        border: 'border-amber-200/30',
+        hoverBorder: 'hover:border-amber-400',
+        category: 'Vender'
+    },
+    {
+        id: 'unpaid-bills-details',
+        title: 'Unpaid Bills Details',
+        description: 'List of all unpaid bills with aging and amounts.',
+        icon: AlertCircle,
+        color: 'text-red-500',
+        bg: 'bg-red-500/10',
+        border: 'border-red-200/30',
+        hoverBorder: 'hover:border-red-400',
+        category: 'Vender'
+    },
+    {
+        id: 'transaction-list-by-vendor',
+        title: 'Transaction List by Vendor',
+        description: 'All transactions grouped and filtered by vendor.',
+        icon: List,
+        color: 'text-cyan-500',
+        bg: 'bg-cyan-500/10',
+        border: 'border-cyan-200/30',
+        hoverBorder: 'hover:border-cyan-400',
+        category: 'Vender'
+    },
+    {
+        id: 'creditor-statement-given-date',
+        title: 'Creditor Statement (Given Date)',
+        description: 'Creditor statements filtered by a specific date range.',
+        icon: Calendar,
+        color: 'text-blue-500',
+        bg: 'bg-blue-500/10',
+        border: 'border-blue-200/30',
+        hoverBorder: 'hover:border-blue-400',
+        category: 'Vender'
+    },
+    {
+        id: 'creditor-balance-given-date',
+        title: 'Creditor Balance Report (Given Date)',
+        description: 'Creditor balance summaries as of a specific date.',
+        icon: ClipboardList,
+        color: 'text-indigo-500',
+        bg: 'bg-indigo-500/10',
+        border: 'border-indigo-200/30',
+        hoverBorder: 'hover:border-indigo-400',
+        category: 'Vender'
+    },
+
+    // ── Customer ──
+    {
+        id: 'debtor-aging-analyst',
+        title: 'Debtor Aging Analyst',
+        description: 'Aging analysis of debtor accounts and outstanding receivables.',
+        icon: Clock,
+        color: 'text-cyan-500',
+        bg: 'bg-cyan-500/10',
+        border: 'border-cyan-200/30',
+        hoverBorder: 'hover:border-cyan-400',
+        category: 'Customer'
+    },
+    {
+        id: 'debtors-statement',
+        title: 'Debtors Statement',
+        description: 'Detailed debtor statements with transaction history.',
+        icon: FileText,
+        color: 'text-cyan-600',
+        bg: 'bg-cyan-600/10',
+        border: 'border-cyan-200/30',
+        hoverBorder: 'hover:border-cyan-500',
+        category: 'Customer'
+    },
+    {
+        id: 'debtors-balance-summary',
+        title: 'Debtors Balance Summary',
+        description: 'Summary of debtor balances across all customers.',
+        icon: BarChart3,
+        color: 'text-teal-500',
+        bg: 'bg-teal-500/10',
+        border: 'border-teal-200/30',
+        hoverBorder: 'hover:border-teal-400',
+        category: 'Customer'
+    },
+    {
+        id: 'invoice-details',
+        title: 'Invoice Details',
+        description: 'Detailed invoice records with payment status.',
+        icon: Receipt,
+        color: 'text-blue-500',
+        bg: 'bg-blue-500/10',
+        border: 'border-blue-200/30',
+        hoverBorder: 'hover:border-blue-400',
+        category: 'Customer'
+    },
+
+    // ── Admin ──
     {
         id: 'system-log',
         title: 'System Log & Audit Report',

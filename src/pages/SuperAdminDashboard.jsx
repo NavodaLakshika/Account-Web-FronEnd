@@ -30,7 +30,8 @@ import {
     AppWindow,
     CalendarClock,
     Sun,
-    Moon
+    Moon,
+    Megaphone
 } from 'lucide-react';
 import ConfirmModal from '../components/modals/ConfirmModal';
 import AlertModal from '../components/modals/AlertModal';
@@ -45,6 +46,8 @@ import SystemLogReportModal from '../components/modals/AdminReports/SystemLogRep
 import SubscriptionAdminBoard from '../components/Admin/SubscriptionAdminBoard';
 import CompanyOverviewBoard from '../HomeMaster/CompanyOverviewBoard';
 import AdminCompanyReportsBoard from '../HomeMaster/AdminCompanyReportsBoard';
+import EngagementAdminBoard from '../components/Admin/EngagementAdminBoard';
+import EmployeeMessageDropdown from '../components/Admin/EmployeeMessageDropdown';
 
 const SuperAdminDashboard = () => {
     const navigate = useNavigate();
@@ -53,6 +56,8 @@ const SuperAdminDashboard = () => {
     const [activeMenu, setActiveMenu] = useState('Dashboard');
     const [searchTerm, setSearchTerm] = useState('');
     const [expandedEmps, setExpandedEmps] = useState({});
+    const [showMessageDropdown, setShowMessageDropdown] = useState(false);
+    const [currentUserCode, setCurrentUserCode] = useState('');
 
     // Flat Lists State
     const [allCompanies, setAllCompanies] = useState([]);
@@ -76,6 +81,8 @@ const SuperAdminDashboard = () => {
     // Password Resets State
     const [pendingResets, setPendingResets] = useState([]);
     const [showResets, setShowResets] = useState(false);
+
+
 
     // Role Permissions Editor State
     const [selectedRole, setSelectedRole] = useState(2); // Default to Accountant
@@ -308,6 +315,9 @@ const SuperAdminDashboard = () => {
 
         try {
             const user = JSON.parse(userStr);
+            const empCode = user.Emp_Code || user.empCode || 'unknown';
+            setCurrentUserCode(empCode);
+
             if (user.userRoleId !== "99" && user.UserRoleId !== "99") {
                 navigate('/dashboard');
             } else {
@@ -605,7 +615,7 @@ const SuperAdminDashboard = () => {
         { name: 'Role Features', icon: ShieldAlert },
         { name: 'Admin Config', icon: Settings },
         { name: 'Reports', icon: FileText },
-
+        { name: 'Engagement', icon: Megaphone },
         { name: 'Subscriptions', icon: CalendarClock },
         { name: 'Analytics', icon: Activity },
         { name: 'System Analysis', icon: Server },
@@ -618,9 +628,8 @@ const SuperAdminDashboard = () => {
 
     return (
         <div className="flex h-screen bg-slate-50 dark:bg-slate-900 font-sans overflow-hidden">
-
             {/* Sidebar */}
-            <aside className={`bg-white dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700 flex flex-col h-full hidden md:flex transition-all duration-300 ${sidebarCollapsed ? 'w-16' : 'w-64'}`}>
+            <aside id="tour-sidebar" className={`bg-white dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700 flex flex-col h-full hidden md:flex transition-all duration-300 ${sidebarCollapsed ? 'w-16' : 'w-64'}`}>
                 <div className={`h-20 flex items-center border-b border-slate-100 dark:border-slate-700 ${sidebarCollapsed ? 'justify-center px-0' : 'px-8'}`}>
                     <div className={`flex items-center ${sidebarCollapsed ? 'justify-center' : 'gap-3'}`}>
                         <img src="/logo-removebg.png" alt="Onimta Logo" className="w-10 h-10 object-contain shrink-0" />
@@ -700,7 +709,7 @@ const SuperAdminDashboard = () => {
             )}
 
             {/* Main Content */}
-            <main className="flex-1 flex flex-col h-full overflow-hidden">
+            <main id="tour-main-content" className="flex-1 flex flex-col h-full overflow-hidden">
 
                 {/* Topbar */}
                 <header className="h-20 bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between px-8 shrink-0">
@@ -717,7 +726,7 @@ const SuperAdminDashboard = () => {
                     </div>
 
                     <div className="flex items-center gap-4">
-                        <div className="relative hidden md:block w-96">
+                        <div id="tour-topbar-search" className="relative hidden md:block w-96">
                             <Search className="w-4 h-4 text-slate-400 dark:text-slate-500 absolute left-4 top-1/2 -translate-y-1/2" />
                             <input
                                 type="text"
@@ -731,23 +740,43 @@ const SuperAdminDashboard = () => {
                         <div className="flex items-center gap-2">
                             <button
                                 onClick={() => setDarkMode(prev => !prev)}
-                                className="p-2 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-all"
+                                className="group p-2 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-all"
                                 title={darkMode ? 'Light Mode' : 'Dark Mode'}
                             >
-                                {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+                                {darkMode ? (
+                                    <Sun className="w-5 h-5 transition-transform duration-500 group-hover:rotate-180 group-hover:scale-110" />
+                                ) : (
+                                    <Moon className="w-5 h-5 transition-transform duration-500 group-hover:-rotate-12 group-hover:scale-110" />
+                                )}
                             </button>
-                            <button className="relative p-2 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
-                                <MessageSquare className="w-5 h-5" />
-                                <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-                            </button>
-                            <div className="relative">
+                            <div id="tour-topbar-messages" className="relative">
+                                <button 
+                                    className="group relative p-2 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-all border border-transparent hover:border-slate-200 dark:hover:border-slate-600"
+                                    onClick={() => setShowMessageDropdown(!showMessageDropdown)}
+                                >
+                                    <MessageSquare className="w-5 h-5 transition-all duration-300 group-hover:-translate-y-1 group-hover:scale-110" />
+                                    <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[9px] font-bold text-white group-hover:animate-ping"> </span>
+                                    <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[9px] font-bold text-white">{allEmployees.length}</span>
+                                </button>
+                                {showMessageDropdown && (
+                                    <EmployeeMessageDropdown 
+                                        allEmployees={allEmployees} 
+                                        onClose={() => setShowMessageDropdown(false)} 
+                                    />
+                                )}
+                            </div>
+                            <div id="tour-topbar-notifications" className="relative">
                                 <button
-                                    className="relative p-2 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
+                                    className="group relative p-2 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-all"
                                     onClick={() => setShowResets(!showResets)}
                                 >
-                                    <Bell className="w-5 h-5" />
+                                    <span className="absolute inset-0 rounded-lg border-2 border-[#00acee] opacity-0 group-hover:opacity-100 group-hover:animate-ping"></span>
+                                    <Bell className="w-5 h-5 transition-all duration-300 group-hover:-translate-y-1 group-hover:scale-110" />
                                     {pendingResets.length > 0 && (
-                                        <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+                                        <>
+                                            <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[9px] font-bold text-white group-hover:animate-ping"> </span>
+                                            <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[9px] font-bold text-white">{pendingResets.length}</span>
+                                        </>
                                     )}
                                 </button>
 
@@ -1470,6 +1499,10 @@ const SuperAdminDashboard = () => {
                         <SubscriptionAdminBoard />
                     )}
 
+                    {/* ENGAGEMENT VIEW */}
+                    {activeMenu === 'Engagement' && (
+                        <EngagementAdminBoard />
+                    )}
 
                 </div>
             </main>
@@ -1497,70 +1530,91 @@ const SuperAdminDashboard = () => {
             {editingEmp && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4">
                     <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200 font-sans">
-                        <div className="p-6 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between bg-slate-50/50 dark:bg-slate-800/50">
-                            <div>
-                                <h2 className="text-lg font-bold text-slate-900 dark:text-white">Manage Employee Role</h2>
-                                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Editing {editingEmp.empName || editingEmp.emp_Name} ({editingEmp.empCode || editingEmp.emp_Code})</p>
+                        {/* Header */}
+                        <div className="p-6 border-b border-slate-100 dark:border-slate-700">
+                            <div className="flex items-center justify-between">
+                                <h2 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                                    <ShieldAlert className="text-[#00acee]" size={18} />
+                                    Manage Employee Role
+                                </h2>
+                                <button onClick={() => setEditingEmp(null)} className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-all">
+                                    <X className="w-5 h-5" />
+                                </button>
                             </div>
-                            <button onClick={() => setEditingEmp(null)} className="p-2 text-slate-400 dark:text-slate-500 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full transition-all">
-                                <LogOut className="w-5 h-5 rotate-180" />
-                            </button>
+                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Editing <span className="font-bold text-slate-700 dark:text-slate-300">{editingEmp.empName || editingEmp.emp_Name}</span> ({editingEmp.empCode || editingEmp.emp_Code})</p>
                         </div>
 
-                        <div className="p-6 space-y-5">
-                            {/* Role level select */}
-                            <div>
-                                <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">Role Level (ID)</label>
-                                <div className="relative">
-                                    <select
-                                        value={selectedRoleId}
-                                        onChange={(e) => setSelectedRoleId(e.target.value)}
-className="w-full appearance-none px-4 py-1.5 pr-10 bg-slate-50 dark:bg-slate-700 hover:bg-slate-100 dark:hover:bg-slate-600 border border-slate-200 dark:border-slate-600 rounded-xl text-sm font-semibold outline-none focus:ring-2 focus:ring-[#00acee]/50 focus:border-[#00acee] transition-colors cursor-pointer"
-                                     >
-                                         <option value="" disabled>Select a role...</option>
-                                        {systemRoles.map(role => (
-                                            <option key={role.id} value={role.id}>{role.name} ({role.id})</option>
-                                        ))}
-                                    </select>
-                                    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-600 dark:text-slate-400 pointer-events-none" size={16} />
+                        {/* Body */}
+                        <div className="p-6 space-y-6">
+                            {/* Employee Info Card */}
+                            <div className="bg-slate-50 dark:bg-slate-700/50 rounded-xl p-4 border border-slate-200 dark:border-slate-600 flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-full bg-[#00acee]/10 text-[#00acee] flex items-center justify-center font-bold text-sm shrink-0">
+                                    {(editingEmp.empName || editingEmp.emp_Name || 'U')[0]}
                                 </div>
-                                <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-1.5 leading-snug">Note: ID 99 grants full access to the Super Admin portal. ID 1 grants access to tenant configuration.</p>
+                                <div>
+                                    <p className="text-sm font-bold text-slate-800 dark:text-white">{editingEmp.empName || editingEmp.emp_Name}</p>
+                                    <p className="text-xs text-slate-500 dark:text-slate-400">{editingEmp.empCode || editingEmp.emp_Code} • Current Role: {systemRoles.find(r => r.id === (editingEmp.role || editingEmp.userRole_Id))?.name || 'Unknown'}</p>
+                                </div>
                             </div>
 
-                            {/* Member group select */}
+                            {/* Role Level Select (Button Group like Role Features) */}
                             <div>
-                                <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">Member Group Name</label>
-                                <div className="relative">
-                                    <select
-                                        value={selectedGroupName}
-                                        onChange={(e) => setSelectedGroupName(e.target.value)}
-className="w-full appearance-none px-4 py-1.5 pr-10 bg-slate-50 dark:bg-slate-700 hover:bg-slate-100 dark:hover:bg-slate-600 border border-slate-200 dark:border-slate-600 rounded-xl text-sm font-semibold outline-none focus:ring-2 focus:ring-[#00acee]/50 focus:border-[#00acee] transition-colors cursor-pointer"
-                                     >
-                                         <option value="" disabled>Select a member group...</option>
-                                        {userGroups.map(g => (
-                                            <option key={g.group_Id} value={g.group_Name}>{g.group_Name}</option>
-                                        ))}
-                                    </select>
-                                    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-600 dark:text-slate-400 pointer-events-none" size={16} />
+                                <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-3">Role Level</label>
+                                <div className="flex flex-wrap gap-2">
+                                    {systemRoles.map(role => (
+                                        <button
+                                            key={role.id}
+                                            onClick={() => setSelectedRoleId(role.id)}
+                                            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                                                selectedRoleId === role.id
+                                                    ? 'bg-[#00acee] text-white shadow-sm'
+                                                    : 'bg-white dark:bg-slate-700 hover:bg-slate-100 dark:hover:bg-slate-600 border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300'
+                                            }`}
+                                        >
+                                            {role.name} ({role.id})
+                                        </button>
+                                    ))}
                                 </div>
-                                <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-1.5 leading-snug">Maps user to access control matrices defined in Master settings.</p>
+                                <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-2 leading-snug">ID 99 = Super Admin portal access &bull; ID 1 = Tenant configuration access</p>
+                            </div>
+
+                            {/* Member Group Select (Button Group) */}
+                            <div>
+                                <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-3">Member Group</label>
+                                <div className="flex flex-wrap gap-2">
+                                    {userGroups.map(g => (
+                                        <button
+                                            key={g.group_Id}
+                                            onClick={() => setSelectedGroupName(g.group_Name)}
+                                            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                                                selectedGroupName === g.group_Name
+                                                    ? 'bg-[#00acee] text-white shadow-sm'
+                                                    : 'bg-white dark:bg-slate-700 hover:bg-slate-100 dark:hover:bg-slate-600 border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300'
+                                            }`}
+                                        >
+                                            {g.group_Name}
+                                        </button>
+                                    ))}
+                                </div>
+                                <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-2 leading-snug">Maps user to access control matrices defined in Master settings.</p>
                             </div>
                         </div>
 
-                        <div className="bg-slate-50 dark:bg-slate-700/50 px-6 py-4 flex justify-end gap-3 border-t border-slate-100 dark:border-slate-700">
+                        {/* Footer */}
+                        <div className="bg-slate-50/50 dark:bg-slate-800/80 px-6 py-4 flex justify-end gap-3 border-t border-slate-100 dark:border-slate-700">
                             <button
                                 onClick={() => setEditingEmp(null)}
-                                className="px-5 py-2 text-slate-500 dark:text-slate-400 font-bold hover:bg-slate-200/60 dark:hover:bg-slate-700/50 rounded-xl transition-all text-sm"
+                                className="px-5 py-2.5 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 hover:border-[#00acee] text-slate-600 dark:text-slate-300 text-xs font-bold rounded-xl transition-all"
                             >
                                 Cancel
                             </button>
                             <button
                                 onClick={handleInitiateUpdateRole}
                                 disabled={savingRole}
-                                className="px-6 py-2 bg-[#00acee] hover:bg-[#0082b3] text-white font-bold rounded-xl transition-all shadow-md shadow-sky-100 dark:shadow-sky-900/30 flex items-center gap-2 text-sm disabled:opacity-70"
+                                className="px-6 py-2.5 bg-[#00acee] hover:bg-[#009adb] text-white text-xs font-bold rounded-xl shadow-md transition-all active:scale-[0.98] flex items-center gap-2 disabled:opacity-50"
                             >
                                 {savingRole && <Loader2 className="w-4 h-4 animate-spin" />}
-                                Save Role
+                                {savingRole ? 'Saving...' : 'Save Role'}
                             </button>
                         </div>
                     </div>

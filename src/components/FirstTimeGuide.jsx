@@ -1,75 +1,47 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
 
 const steps = [
     {
-        text: 'Start by clicking <b>Master File</b> in the top menu bar to begin setting up your system.',
-        find: () => {
-            const buttons = document.querySelectorAll('button');
-            return Array.from(buttons).find(b => b.textContent?.trim() === 'Master File');
-        },
-        onEnter: null
+        title: "Welcome to Dashboard!",
+        text: 'This is your <b>Main Navigation Bar</b>. You can access all primary modules like Master File, Transactions, and Reports from here.',
+        find: () => document.querySelector('[data-tour="main-menu"]'),
+        onEnter: null,
+        position: 'bottom'
     },
     {
-        text: 'Here is the <b>Master File</b> menu. This is where all your core configurations live.',
-        find: () => {
-            const modal = document.querySelector('[class*="z-[200]"]');
-            if (!modal) return null;
-            return modal.querySelector('.bg-white') || modal;
-        },
-        onEnter: 'openMasterFile'
+        title: "Quick Access",
+        text: 'Use the <b>Quick Launch Grid</b> for rapid access to commonly used features like Customers, Bills, and Accounts.',
+        find: () => document.querySelector('[data-tour="quick-launch"]'),
+        onEnter: null,
+        position: 'top'
     },
     {
-        text: 'Click <b>Cost Center Master</b> to define cost centers for tracking expenses.',
-        find: () => {
-            const modal = document.querySelector('[class*="z-[200]"]');
-            if (!modal) return null;
-            return Array.from(modal.querySelectorAll('button')).find(b => b.textContent?.trim() === 'Cost Center Master');
-        },
-        onEnter: null
+        title: "Global Search",
+        text: 'Looking for a specific document or record? The <b>Search System</b> helps you find anything instantly.',
+        find: () => document.querySelector('[data-tour="global-search"]'),
+        onEnter: null,
+        position: 'bottom'
     },
     {
-        text: 'Select <b>Create Department</b> to organize your business departments.',
-        find: () => {
-            const modal = document.querySelector('[class*="z-[200]"]');
-            if (!modal) return null;
-            return Array.from(modal.querySelectorAll('button')).find(b => b.textContent?.trim() === 'Create Department');
-        },
-        onEnter: null
+        title: "Share Your Feedback",
+        text: 'Use the <b>Rate System</b> to share your experience or report any issues directly to the admins.',
+        find: () => document.querySelector('[data-tour="rate-system"]'),
+        onEnter: null,
+        position: 'bottom'
     },
     {
-        text: 'Click <b>Supplier Master</b> to add your suppliers and vendor information.',
-        find: () => {
-            const modal = document.querySelector('[class*="z-[200]"]');
-            if (!modal) return null;
-            return Array.from(modal.querySelectorAll('button')).find(b => b.textContent?.trim() === 'Supplier Master');
-        },
-        onEnter: null
-    },
-    {
-        text: 'Use <b>Chart of Accountant</b> to build your accounts — income, expenses, assets, and liabilities.',
-        find: () => {
-            const modal = document.querySelector('[class*="z-[200]"]');
-            if (!modal) return null;
-            return Array.from(modal.querySelectorAll('button')).find(b => b.textContent?.trim() === 'Chart of Accountant');
-        },
-        onEnter: null
-    },
-    {
-        text: 'Go to <b>User Profile Maintenance</b> to add employee profiles with roles and permissions.',
-        find: () => {
-            const modal = document.querySelector('[class*="z-[200]"]');
-            if (!modal) return null;
-            return Array.from(modal.querySelectorAll('button')).find(b => b.textContent?.trim() === 'User Profile Maintenance');
-        },
-        onEnter: null
+        title: "Meet Your AI Assistant",
+        text: 'Need help or want to automate tasks? Click the <b>AI Chatbot</b> to interact with your intelligent assistant!',
+        find: () => document.querySelector('[data-tour="ai-chatbot"]'),
+        onEnter: null,
+        position: 'top'
     }
 ];
 
-const FirstTimeGuide = ({ isOpen, onClose, onOpenMasterFile, onCloseMasterFile, user }) => {
+const FirstTimeGuide = ({ isOpen, onClose, user }) => {
     const [currentStep, setCurrentStep] = useState(0);
     const [rect, setRect] = useState(null);
-    const [modalOpen, setModalOpen] = useState(false);
     const retryRef = useRef(null);
     const userId = user?.EmpCode || user?.empCode || user?.emp_Code || user?.id_No || user?.Id_No || user?.IdNo || user?.username || user?.EmpName || 'unknown';
     const onboardKey = `onboardingDone_${userId}`;
@@ -93,20 +65,9 @@ const FirstTimeGuide = ({ isOpen, onClose, onOpenMasterFile, onCloseMasterFile, 
         return false;
     }, [findTarget]);
 
-    // On step change or mount, refresh rect and handle onEnter
+    // On step change or mount, refresh rect
     useEffect(() => {
         if (!isOpen) return;
-
-        const step = steps[currentStep];
-
-        // Handle auto-open on step 2 (index 1)
-        if (step?.onEnter === 'openMasterFile' && !modalOpen) {
-            setModalOpen(true);
-            onOpenMasterFile();
-            // Retry finding modal content after delay
-            setTimeout(() => refreshRect(), 500);
-            return;
-        }
 
         // Try immediately, then retry a few times
         if (!refreshRect()) {
@@ -114,7 +75,7 @@ const FirstTimeGuide = ({ isOpen, onClose, onOpenMasterFile, onCloseMasterFile, 
             const tryFind = () => {
                 tries++;
                 if (refreshRect()) return;
-                if (tries < 10) retryRef.current = setTimeout(tryFind, 300);
+                if (tries < 15) retryRef.current = setTimeout(tryFind, 300);
             };
             retryRef.current = setTimeout(tryFind, 200);
         }
@@ -122,7 +83,7 @@ const FirstTimeGuide = ({ isOpen, onClose, onOpenMasterFile, onCloseMasterFile, 
         return () => {
             if (retryRef.current) clearTimeout(retryRef.current);
         };
-    }, [isOpen, currentStep, modalOpen, onOpenMasterFile, refreshRect]);
+    }, [isOpen, currentStep, refreshRect]);
 
     // Scroll to element
     useEffect(() => {
@@ -154,7 +115,6 @@ const FirstTimeGuide = ({ isOpen, onClose, onOpenMasterFile, onCloseMasterFile, 
 
     const handleNext = () => {
         if (isLast) {
-            if (modalOpen) onCloseMasterFile();
             localStorage.setItem(onboardKey, 'true');
             onClose();
         } else {
@@ -164,7 +124,6 @@ const FirstTimeGuide = ({ isOpen, onClose, onOpenMasterFile, onCloseMasterFile, 
     };
 
     const handleSkip = () => {
-        if (modalOpen) onCloseMasterFile();
         localStorage.setItem(onboardKey, 'true');
         onClose();
     };
@@ -174,86 +133,99 @@ const FirstTimeGuide = ({ isOpen, onClose, onOpenMasterFile, onCloseMasterFile, 
         setRect(null);
     };
 
-    const cx = rect.left + rect.width / 2;
+    // Calculate Tooltip Position
+    let tooltipTop = rect.bottom + 20;
+    let tooltipLeft = rect.left + (rect.width / 2) - 170; // Center tooltip
+    
+    // Boundary checks
+    if (tooltipLeft < 20) tooltipLeft = 20;
+    if (tooltipLeft + 360 > window.innerWidth) tooltipLeft = window.innerWidth - 380;
+    
+    if (step.position === 'top' || tooltipTop + 200 > window.innerHeight) {
+        tooltipTop = rect.top - 200; // Place above
+        if (tooltipTop < 20) tooltipTop = rect.bottom + 20; // Revert if too high
+    }
+
+    // Cursor position (pointing top-left from the bottom-right of the target)
+    const cursorX = rect.left + (rect.width / 2) + 20;
+    const cursorY = rect.top + (rect.height / 2) + 20;
 
     return (
         <div className="fixed inset-0 z-[3000]">
-            <div className="absolute inset-0 bg-slate-900/10" />
+            {/* Dark overlay backdrop */}
+            <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-[2px] transition-all duration-500" />
 
-            {/* Highlight glow */}
+            {/* Highlight glow ring around target element */}
             <div
-                className="absolute rounded-lg border-2 border-indigo-400 shadow-[0_0_16px_rgba(99,102,241,0.4)] animate-pulse pointer-events-none"
+                className="absolute rounded-xl border-2 border-[#00acee] shadow-[0_0_25px_rgba(0,172,238,0.5)] animate-pulse pointer-events-none transition-all duration-500 ease-in-out"
                 style={{
-                    left: rect.left - 6,
-                    top: rect.top - 6,
-                    width: rect.width + 12,
-                    height: rect.height + 12
+                    left: rect.left - 8,
+                    top: rect.top - 8,
+                    width: rect.width + 16,
+                    height: rect.height + 16
                 }}
             />
 
-            {/* Cursor hand - Tap/Click Gesture Icon pointing down */}
+            {/* Cursor hand - Custom Diagonal Pointer */}
             <div
-                className="absolute pointer-events-none animate-bounce"
+                className="absolute pointer-events-none z-[3020] transition-all duration-500 ease-out"
                 style={{
-                    left: cx - 18,
-                    top: rect.top - 68
+                    left: cursorX,
+                    top: cursorY,
                 }}
             >
-                <svg width="48" height="64" viewBox="0 0 48 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <defs>
-                        <filter id="handShadow" x="-10%" y="-10%" width="120%" height="130%">
-                            <feDropShadow dx="0" dy="3" stdDeviation="3" floodOpacity="0.15" />
-                        </filter>
-                    </defs>
-                    <g filter="url(#handShadow)">
-                        {/* Wrist/arm */}
-                        <rect x="16" y="1" width="12" height="18" rx="5" fill="white" stroke="#6366f1" strokeWidth="2" />
-                        {/* Palm */}
-                        <rect x="6" y="16" width="28" height="20" rx="8" fill="white" stroke="#6366f1" strokeWidth="2" />
-                        {/* Thumb */}
-                        <rect x="30" y="20" width="12" height="7" rx="3.5" transform="rotate(-30 30 20)" fill="white" stroke="#6366f1" strokeWidth="2" />
-                        {/* Index finger (extended down) */}
-                        <rect x="12" y="34" width="10" height="20" rx="5" fill="white" stroke="#6366f1" strokeWidth="2" />
-                        {/* Middle finger (curled) */}
-                        <rect x="22" y="34" width="8" height="14" rx="4" fill="white" stroke="#6366f1" strokeWidth="2" />
-                        {/* Ring finger (curled more) */}
-                        <path d="M4 34 L4 30 L7 34Z" fill="white" stroke="#6366f1" strokeWidth="2" strokeLinejoin="round" />
-                        {/* Pinky (curled most) */}
-                        <path d="M4 28 L4 24 L8 28Z" fill="white" stroke="#6366f1" strokeWidth="2" strokeLinejoin="round" />
-                        {/* Knuckle details */}
-                        <line x1="14" y1="20" x2="14" y2="26" stroke="#6366f1" strokeWidth="1" opacity="0.3" strokeLinecap="round" />
-                        <line x1="24" y1="20" x2="24" y2="26" stroke="#6366f1" strokeWidth="1" opacity="0.3" strokeLinecap="round" />
-                    </g>
-                    {/* Tap ripple at fingertip */}
-                    <circle cx="17" cy="56" r="3" fill="none" stroke="#818cf8" strokeWidth="2" opacity="0.8">
-                        <animate attributeName="r" values="3;12" dur="1.2s" repeatCount="indefinite" />
-                        <animate attributeName="opacity" values="0.8;0" dur="1.2s" repeatCount="indefinite" />
-                    </circle>
-                    <circle cx="17" cy="56" r="2.5" fill="#6366f1" />
+                <style>{`
+                    @keyframes diagonalBounce {
+                        0%, 100% { transform: translate(0, 0); }
+                        50% { transform: translate(-10px, -10px); }
+                    }
+                `}</style>
+                <svg width="72" height="72" viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg" className="animate-[diagonalBounce_1.2s_infinite] drop-shadow-[0_10px_20px_rgba(0,0,0,0.4)]">
+                    {/* Action Lines */}
+                    <path d="M14 26 L22 30" stroke="#00acee" strokeWidth="4" strokeLinecap="round" className="animate-[pulse_1s_infinite_100ms]" />
+                    <path d="M12 14 L20 18" stroke="#00acee" strokeWidth="4" strokeLinecap="round" className="animate-[pulse_1s_infinite_200ms]" />
+                    <path d="M22 6 L26 14" stroke="#00acee" strokeWidth="4" strokeLinecap="round" className="animate-[pulse_1s_infinite_300ms]" />
+                    
+                    {/* Hand Pointer rotated to point top-left */}
+                    <path d="M30 18 C30 16.9 30.9 16 32 16 C33.1 16 34 16.9 34 18 L34 32 L36.6 29.4 C37.4 28.6 38.6 28.6 39.4 29.4 C40.2 30.2 40.2 31.4 39.4 32.2 L32.6 39 C31.8 39.8 30.8 40.2 29.8 40.2 C28.8 40.2 27.8 39.8 27 39 L20.4 32.4 C19.6 31.6 19.6 30.4 20.4 29.6 C21.2 28.8 22.4 28.8 23.2 29.6 L26 32.4 L26 22 C26 20.9 26.9 20 28 20 C29.1 20 30 20.9 30 22 L30 18 Z" fill="white" stroke="#1e293b" strokeWidth="2.5" strokeLinejoin="round" transform="rotate(-45 32 32) scale(1.3) translate(4, 4)" />
                 </svg>
             </div>
 
-            {/* Tooltip at top-left */}
-            <div className="fixed top-20 left-6 pointer-events-auto animate-in fade-in slide-in-from-left-4 duration-300" style={{ maxWidth: 'calc(100vw - 48px)' }}>
-                <div className="bg-white rounded-xl shadow-lg border border-slate-200 px-5 py-3.5 min-w-[340px] max-w-[440px]">
-                    <p className="text-sm text-slate-700 leading-relaxed" dangerouslySetInnerHTML={{ __html: step.text }} />
-                    <div className="flex items-center justify-between mt-3 pt-2.5 border-t border-slate-100">
-                        <div className="flex items-center gap-1">
+            {/* Premium Glassmorphic Tooltip */}
+            <div 
+                className="absolute z-[3010] transition-all duration-500 ease-out pointer-events-auto animate-in fade-in zoom-in-95" 
+                style={{ top: tooltipTop, left: tooltipLeft }}
+            >
+                <div className="bg-[#0f172a]/85 backdrop-blur-2xl rounded-2xl shadow-[0_20px_40px_-10px_rgba(0,0,0,0.7)] border border-white/10 p-6 min-w-[340px] max-w-[400px]">
+                    {/* Decorative subtle gradient glow */}
+                    <div className="absolute -inset-[1px] bg-gradient-to-br from-[#00acee]/40 to-purple-500/40 rounded-2xl opacity-20 pointer-events-none" />
+                    
+                    <h3 className="text-lg font-bold text-white mb-2 flex items-center gap-2">
+                        <div className="p-1.5 rounded-lg bg-[#00acee]/20 text-[#00acee]">
+                            <Sparkles size={16} strokeWidth={2.5} />
+                        </div>
+                        {step.title}
+                    </h3>
+                    <p className="text-[13px] text-slate-300 leading-relaxed font-medium mt-3" dangerouslySetInnerHTML={{ __html: step.text }} />
+                    
+                    <div className="flex items-center justify-between mt-6 pt-4 border-t border-white/10 relative z-10">
+                        <div className="flex items-center gap-1.5">
                             {steps.map((_, idx) => (
-                                <div key={idx} className={`w-1.5 h-1.5 rounded-full transition-all ${idx === currentStep ? 'bg-indigo-500 w-3' : idx < currentStep ? 'bg-indigo-300' : 'bg-slate-300'}`} />
+                                <div key={idx} className={`h-1.5 rounded-full transition-all duration-300 ${idx === currentStep ? 'bg-gradient-to-r from-[#00acee] to-blue-500 w-5 shadow-[0_0_8px_rgba(0,172,238,0.6)]' : idx < currentStep ? 'bg-white/40 w-1.5' : 'bg-white/10 w-1.5'}`} />
                             ))}
                         </div>
-                        <div className="flex items-center gap-1">
-                            <button onClick={handleSkip} className="text-[10px] font-medium text-slate-400 hover:text-slate-600 px-2 py-1 rounded transition-all">
+                        <div className="flex items-center gap-2">
+                            <button onClick={handleSkip} className="text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-white px-3 py-1.5 rounded-lg transition-all hover:bg-white/5 active:scale-95">
                                 Skip
                             </button>
                             {currentStep > 0 && (
-                                <button onClick={handleBack} className="w-6 h-6 flex items-center justify-center rounded text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-all">
-                                    <ChevronLeft size={14} />
+                                <button onClick={handleBack} className="w-8 h-8 flex items-center justify-center rounded-lg text-slate-300 hover:text-white hover:bg-white/10 transition-all border border-transparent hover:border-white/10 active:scale-95">
+                                    <ChevronLeft size={16} strokeWidth={2.5} />
                                 </button>
                             )}
-                            <button onClick={handleNext} className="w-6 h-6 flex items-center justify-center rounded bg-indigo-500 hover:bg-indigo-600 text-white transition-all shadow-sm">
-                                <ChevronRight size={14} />
+                            <button onClick={handleNext} className="h-8 px-4 flex items-center justify-center gap-1.5 rounded-lg bg-gradient-to-r from-[#00acee] to-[#0082b3] text-white text-[10px] font-bold uppercase tracking-widest transition-all shadow-[0_0_15px_rgba(0,172,238,0.4)] hover:shadow-[0_0_25px_rgba(0,172,238,0.6)] active:scale-95 border border-white/10">
+                                {isLast ? 'Done' : 'Next'}
+                                {!isLast && <ChevronRight size={14} strokeWidth={2.5} />}
                             </button>
                         </div>
                     </div>

@@ -14,7 +14,9 @@ import {
     LogOut,
     Layers,
     Briefcase,
-    Lock
+    Lock,
+    MapPin,
+    Navigation
 } from 'lucide-react';
 
 import ChartOfAccountantModal from '../ChartOfAccountsModels/ChartOfAccountantModal';
@@ -29,6 +31,8 @@ import CompanyBoard from './CompanyBoard';
 import CostCenterBoard from './CostCenterBoard';
 import DepartmentBoard from './DepartmentBoard';
 import CategoryBoard from './CategoryBoard';
+import RouteBoard from './RouteBoard';
+import AreaBoard from './AreaBoard';
 import SupplierMasterBoard from './SupplierMasterBoard';
 import CustomerMasterBoard from './CustomerMasterBoard';
 import CardCommissionBoard from './CardCommissionBoard';
@@ -49,6 +53,8 @@ const MasterSubModal = ({ isOpen, onClose }) => {
     const [showCostCenterBoard, setShowCostCenterBoard] = useState(false);
     const [showDepartmentBoard, setShowDepartmentBoard] = useState(false);
     const [showCategoryBoard, setShowCategoryBoard] = useState(false);
+    const [showRouteBoard, setShowRouteBoard] = useState(false);
+    const [showAreaBoard, setShowAreaBoard] = useState(false);
     const [showSupplierMasterBoard, setShowSupplierMasterBoard] = useState(false);
     const [showCustomerMasterBoard, setShowCustomerMasterBoard] = useState(false);
     const [showCardCommissionBoard, setShowCardCommissionBoard] = useState(false);
@@ -80,6 +86,8 @@ const MasterSubModal = ({ isOpen, onClose }) => {
         { icon: Target, label: 'Cost Center Master', id: 'master_costCenter', onClick: () => setShowCostCenterBoard(true) },
         { icon: Briefcase, label: 'Create Department', id: 'master_department', onClick: () => setShowDepartmentBoard(true) },
         { icon: Layers, label: 'Create Category', id: 'master_category', onClick: () => setShowCategoryBoard(true) },
+        { icon: MapPin, label: 'Create Route', id: 'master_route', onClick: () => setShowRouteBoard(true) },
+        { icon: Navigation, label: 'Create Area', id: 'master_area', onClick: () => setShowAreaBoard(true) },
         { icon: UserSquare, label: 'Supplier Master', id: 'master_supplier', onClick: () => setShowSupplierMasterBoard(true) },
         { icon: Users, label: 'Customer Master', id: 'master_customer', onClick: () => setShowCustomerMasterBoard(true) },
         { icon: CreditCard, label: 'Card Sale Commission', id: 'master_cardSale', onClick: () => setShowCardCommissionBoard(true) },
@@ -242,6 +250,22 @@ const MasterSubModal = ({ isOpen, onClose }) => {
                 <CategoryBoard
                     isOpen={showCategoryBoard}
                     onClose={() => setShowCategoryBoard(false)}
+                />
+            )}
+
+            {/* Route */}
+            {showRouteBoard && (
+                <RouteBoard
+                    isOpen={showRouteBoard}
+                    onClose={() => setShowRouteBoard(false)}
+                />
+            )}
+
+            {/* Area */}
+            {showAreaBoard && (
+                <AreaBoard
+                    isOpen={showAreaBoard}
+                    onClose={() => setShowAreaBoard(false)}
                 />
             )}
 

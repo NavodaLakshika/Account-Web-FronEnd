@@ -911,6 +911,7 @@ const Dashboard = () => {
 
             {/* 2. Top Ribbon Navigation (Matches Reference Image) */}
             <header
+                data-tour="main-menu"
                 className={`z-50 text-white shadow-md transition-all duration-500 ease-in-out overflow-hidden backdrop-blur-md ${isTopBarCollapsed ? 'h-12' : 'h-[155px]'}`}
                 style={{ backgroundColor: `${topBarColor}F2` }} // Slightly transparent for glass effect
             >
@@ -1146,6 +1147,7 @@ const Dashboard = () => {
                     {/* Top Right Action Buttons */}
                     <div className="flex justify-end gap-4 -mb-12 animate-in fade-in slide-in-from-right-10 duration-700">
                         <button
+                            data-tour="rate-system"
                             onClick={() => setShowReviewModal(true)}
                             className="flex items-center gap-2 px-4 h-11 bg-white/40 backdrop-blur-md border border-white/20 rounded-[10px] shadow-lg hover:bg-[#f97316] hover:text-white hover:border-[#ea580c] hover:shadow-xl hover:scale-105 transition-all duration-300 group text-gray-500"
                         >
@@ -1153,6 +1155,7 @@ const Dashboard = () => {
                             <span className="text-sm font-semibold tracking-tight">Rate System</span>
                         </button>
                         <button
+                            data-tour="global-search"
                             onClick={() => setShowSearchModal(true)}
                             className="flex items-center gap-3 px-5 h-11 bg-white/40 backdrop-blur-md border border-white/20 rounded-[10px] shadow-lg hover:bg-white/60 hover:shadow-xl hover:scale-105 transition-all duration-300 group"
                         >
@@ -1162,7 +1165,7 @@ const Dashboard = () => {
                     </div>
 
                     {/* Standard Icon Grid (Excluding Search) */}
-                    <div className="grid  grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
+                    <div data-tour="quick-launch" className="grid  grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
                         {navItems.filter(item => item.label !== 'Search').map((item, idx) => {
                             const Icon = item.icon;
                             const isAnimated = item.gif && (item.label === 'Home' || item.label === 'Accounts' || item.label === 'Customers' || item.label === 'Vendors' || item.label === 'Billing' || item.label === 'Pay Bills' || item.label === 'Cheques' || item.label === 'Cash' || item.label === 'Deposit' || item.label === 'Journal' || item.label === 'Rec.' || item.label === 'Report');
@@ -1323,6 +1326,7 @@ const Dashboard = () => {
 
                 {/* Robot Lottie Button (Dynamic Alignment) */}
                 <button
+                    data-tour="ai-chatbot"
                     onClick={handleAIClick}
                     className="w-32 h-32 mr-10 mb-10 flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 group drop-shadow-2xl pointer-events-auto"
                 >
