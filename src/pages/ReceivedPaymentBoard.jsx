@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import SimpleModal from '../components/SimpleModal';
-import { Search, Calendar, RefreshCw, X, Save, RotateCcw, Loader2 } from 'lucide-react';
+import TransactionFormWrapper from '../components/TransactionFormWrapper';
+import { Search, Calendar, RefreshCw, X, Save, RotateCcw, Loader2, CreditCard } from 'lucide-react';
 import receivePaymentService from '../services/receivePayment.service';
 
 
@@ -128,11 +129,13 @@ const ReceivedPaymentBoard = ({ isOpen, onClose }) => {
                     }
                 `}
             </style>
-            <SimpleModal
+            <TransactionFormWrapper
                 isOpen={isOpen}
                 onClose={onClose}
                 title="Received Payment"
-                maxWidth="max-w-[1100px]"
+                subtitle="Received Payments"
+                icon={CreditCard}
+                maxWidth="max-w-full"
                 footer={
                     <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-gray-100 rounded-b-xl gap-3">
                         <div className="flex gap-3">
@@ -259,7 +262,7 @@ const ReceivedPaymentBoard = ({ isOpen, onClose }) => {
                     </div>
                 </div>
 
-            </SimpleModal>
+            </TransactionFormWrapper>
 
             {/* Search Modal */}
             <SimpleModal isOpen={activeModal !== null} onClose={() => setActiveModal(null)} title={activeModal === 'bank' ? 'Search Banks' : activeModal === 'payType' ? 'Select Payment Type' : 'Search Accounts'} maxWidth="max-w-[650px]">

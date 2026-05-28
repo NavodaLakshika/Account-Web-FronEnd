@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import SimpleModal from '../components/SimpleModal';
-import { Search, X, RotateCcw, Loader2, Landmark, Calendar, FileText, CheckCircle2, Plus, Trash2, Clock, History, Ban, ShieldCheck, MailQuestion } from 'lucide-react';
+import CalendarModal from '../components/CalendarModal';
+import { Search, X, RotateCcw, Loader2, Landmark, Calendar, FileText, CheckCircle2, Plus, Trash2, Clock, History, Ban, ShieldCheck } from 'lucide-react';
 import { bankingService } from '../services/banking.service';
 
 import { getSessionData } from '../utils/session';
@@ -34,6 +35,8 @@ const NotPresentedChequesBoard = ({ isOpen, onClose }) => {
 
     const [activeModal, setActiveModal] = useState(null); // 'bank'
     const [searchTerm, setSearchTerm] = useState('');
+    const [showWriteDatePicker, setShowWriteDatePicker] = useState(false);
+    const [showChequeDatePicker, setShowChequeDatePicker] = useState(false);
 
     useEffect(() => {
         if (isOpen) {
@@ -129,92 +132,89 @@ const NotPresentedChequesBoard = ({ isOpen, onClose }) => {
 
     return (
         <>
+            <style>
+                {`
+                    @keyframes toastProgress {
+                        0% { width: 100%; }
+                        100% { width: 0%; }
+                    }
+                `}
+            </style>
             <SimpleModal
                 isOpen={isOpen}
                 onClose={onClose}
                 title="Not Presented Outward Cheques Register"
                 maxWidth="max-w-[1300px]"
                 footer={
-                    <div className="bg-slate-50 px-6 py-4 w-full flex justify-end gap-3 border-t border-gray-100 rounded-b-xl font-['Plus_Jakarta_Sans']">
-                        <button onClick={handleSave} disabled={loading} className={`px-12 h-10 bg-[#0078d4] text-white text-sm font-bold rounded shadow-md hover:bg-[#005a9e] transition-all active:scale-95 flex items-center gap-2 ${loading ? 'opacity-50' : ''}`}>
-                            {loading ? <Loader2 size={16} className="animate-spin" /> : <ShieldCheck size={18} />} Secure Entries
-                        </button>
-                        <button onClick={handleClear} className="px-10 h-10 bg-white border border-gray-300 text-slate-600 text-sm font-bold rounded hover:bg-slate-50 transition-all flex items-center gap-2">
-                             <RotateCcw size={16} /> Clear
-                        </button>
-                        <button onClick={onClose} className="px-10 h-10 bg-white border border-gray-300 text-slate-600 text-sm font-bold rounded hover:bg-slate-50 transition-all flex items-center gap-2">
-                             <X size={16} /> Exit
-                        </button>
+                    <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-slate-200 rounded-b-xl">
+                        <div className="flex gap-3">
+                            <button onClick={handleClear} disabled={loading} className="px-6 py-3 bg-[#00adff] hover:bg-[#0099e6] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] transition-all active:scale-95 flex items-center justify-center gap-2 border-none">
+                                <RotateCcw size={14} /> CLEAR FORM
+                            </button>
+                        </div>
+                        <div className="flex gap-3">
+                            <button onClick={handleSave} disabled={loading} className={`px-6 py-3 bg-[#0285fd] hover:bg-[#0073ff] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] shadow-md shadow-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border-none ${loading ? 'opacity-50' : ''}`}>
+                                {loading ? <Loader2 size={14} className="animate-spin" /> : <ShieldCheck size={14} />} SECURE ENTRIES
+                            </button>
+                        </div>
                     </div>
                 }
             >
-                <div className="space-y-6 font-['Plus_Jakarta_Sans']">
+                <div className="space-y-4 font-['Tahoma']">
                     {/* Header Row */}
-                    <div className="bg-white p-8 border-2 border-slate-50 rounded-sm shadow-sm relative overflow-hidden">
-                        <div className="absolute top-0 right-0 p-4 opacity-[0.03] rotate-12 pointer-events-none">
-                             <Clock size={120} />
-                        </div>
-                        <div className="grid grid-cols-12 gap-8 items-center relative z-10">
-                            <div className="col-span-12 lg:col-span-8 flex items-center gap-6">
-                                <div className="flex flex-col">
-                                     <label className="text-[11px] font-black text-[#0078d4] uppercase tracking-widest mb-2 flex items-center gap-2">
-                                         <Landmark size={14} /> Source Bank Account
-                                     </label>
-                                     <div className="flex gap-2">
-                                        <div className="w-[500px] flex flex-col bg-slate-50 border-b-2 border-slate-200 px-5 py-2 group focus-within:border-[#0078d4] transition-all cursor-pointer" onClick={() => { setActiveModal('bank'); setSearchTerm(''); }}>
-                                             <span className="text-[10px] font-black text-slate-400 uppercase tracking-tighter leading-none mb-1">{header.bankCode || 'IDENTIFY PORTFOLIO'}</span>
-                                             <div className="flex items-center justify-between">
-                                                <span className={`text-[15px] font-bold ${header.bankName ? 'text-slate-800' : 'text-slate-300 italic'}`}>
-                                                    {header.bankName || 'Click magnifying glass to select...'}
-                                                </span>
-                                                <Search size={18} className="text-[#0078d4] opacity-50 group-hover:opacity-100 transition-opacity" />
-                                             </div>
-                                        </div>
-                                     </div>
+                    <div className="bg-slate-50/50 p-4 border border-slate-200 rounded-[5px] relative overflow-hidden">
+                        <div className="grid grid-cols-12 gap-x-6 gap-y-3.5 relative z-10">
+                            <div className="col-span-12 lg:col-span-8 flex items-center gap-2">
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-36 shrink-0">Source Bank Account</label>
+                                <div className="flex-1 flex gap-1 h-8 min-w-0">
+                                    <input type="text" readOnly value={header.bankName || header.bankCode} placeholder="Identify portfolio..." className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-bold text-gray-700 bg-white rounded outline-none cursor-pointer transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" onClick={() => { setActiveModal('bank'); setSearchTerm(''); }} />
+                                    <button onClick={() => { setActiveModal('bank'); setSearchTerm(''); }} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
+                                        <Search size={16} />
+                                    </button>
                                 </div>
                             </div>
-                            <div className="col-span-12 lg:col-span-4 flex flex-col items-end">
-                                <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">Protocol Reference</label>
-                                <div className="text-[20px] font-black text-[#0078d4] tracking-widest tabular-nums italic bg-blue-50/50 px-6 py-3 rounded border border-blue-100/50 shadow-inner min-w-[200px] text-right">
-                                    {header.docNo}
+                            <div className="col-span-12 lg:col-span-4 flex items-center gap-2 lg:pl-4">
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-32 shrink-0 text-right">Protocol Reference</label>
+                                <div className="flex-1 flex items-center">
+                                    <div className="text-[14px] font-black text-[#0285fd] tracking-tight tabular-nums italic bg-blue-50/50 px-3 py-1 rounded-[5px] border border-blue-100/50">
+                                        {header.docNo}
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     {/* Instrument Table */}
-                    <div className="bg-white border border-slate-100 rounded shadow-md overflow-hidden flex flex-col h-[450px]">
-                        <table className="w-full text-left border-collapse flex flex-col flex-1 overflow-hidden">
-                            <thead className="bg-slate-900 text-[10px] font-black text-white/60 uppercase tracking-[0.2em] sticky top-0 z-10 w-full flex">
+                    <div className="bg-white border border-slate-200 rounded-[5px] overflow-hidden flex flex-col h-[350px]">
+                        <table className="w-full text-left border-collapse flex-1 flex flex-col overflow-hidden">
+                            <thead className="bg-slate-50 text-[10px] font-bold text-gray-500 uppercase tracking-widest sticky top-0 border-b border-slate-200 z-10 w-full flex">
                                 <tr className="w-full flex">
-                                    <th className="p-4 w-36 border-r border-white/5">Write Date</th>
-                                    <th className="p-4 w-36 border-r border-white/5">Cheque Date</th>
-                                    <th className="p-4 flex-1 border-r border-white/5 pr-10">Memo / Description</th>
-                                    <th className="p-4 w-44 border-r border-white/5 text-center">Cheque No</th>
-                                    <th className="p-4 w-40 text-right pr-10 border-r border-white/5">Amount (LKR)</th>
-                                    <th className="p-4 w-14 text-center"></th>
+                                    <th className="p-3 w-32 border-r border-slate-200">Write Date</th>
+                                    <th className="p-3 w-32 border-r border-slate-200">Cheque Date</th>
+                                    <th className="p-3 flex-1 border-r border-slate-200">Memo / Description</th>
+                                    <th className="p-3 w-40 border-r border-slate-200 text-center">Cheque No</th>
+                                    <th className="p-3 w-36 text-right pr-10 border-r border-slate-200">Amount (LKR)</th>
+                                    <th className="p-3 w-16 text-center"></th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-slate-100 overflow-y-auto block flex-1 bg-white font-['Plus_Jakarta_Sans']">
+                            <tbody className="divide-y divide-slate-100 overflow-y-auto block flex-1">
                                 {items.length > 0 ? items.map((item, idx) => (
-                                    <tr key={item.id} className="hover:bg-blue-50/30 transition-colors group flex w-full">
-                                        <td className="p-4 w-36 border-r border-slate-50 font-bold text-slate-500 text-[12px]">{item.writeDate}</td>
-                                        <td className="p-4 w-36 border-r border-slate-50 font-black text-slate-800 text-[12px] tabular-nums italic">{item.chequeDate}</td>
-                                        <td className="p-4 flex-1 border-r border-slate-50 font-medium text-slate-500 text-[13px] italic pr-10">{item.memo || '-'}</td>
-                                        <td className="p-4 w-44 border-r border-slate-50 font-black text-[#0078d4] text-[15px] tracking-[0.15em] text-center italic">{item.chequeNo}</td>
-                                        <td className="p-4 w-40 text-right pr-10 border-r border-slate-50 font-black text-slate-900 text-[15px] tabular-nums bg-slate-50/10 italic">
-                                            {item.amount.toLocaleString(undefined, {minimumFractionDigits: 2})}
-                                        </td>
-                                        <td className="p-4 w-14 flex items-center justify-center">
-                                            <button onClick={() => handleRemoveItem(item.id)} className="w-7 h-7 rounded-full flex items-center justify-center bg-red-50 text-red-400 hover:bg-red-500 hover:text-white transition-all scale-0 group-hover:scale-100"><Trash2 size={14} /></button>
+                                    <tr key={item.id} className="hover:bg-blue-50/50 transition-colors group flex w-full">
+                                        <td className="p-3 w-32 border-r border-slate-100 font-mono text-slate-700 text-[12px] tabular-nums">{item.writeDate}</td>
+                                        <td className="p-3 w-32 border-r border-slate-100 font-mono text-slate-700 text-[12px] tabular-nums italic">{item.chequeDate}</td>
+                                        <td className="p-3 flex-1 border-r border-slate-100 font-mono text-slate-700 text-[12px] italic">{item.memo || '-'}</td>
+                                        <td className="p-3 w-40 border-r border-slate-100 font-mono font-black text-[#0078d4] text-[13px] tracking-widest text-center italic">{item.chequeNo}</td>
+                                        <td className="p-3 w-36 text-right pr-10 border-r border-slate-100 font-mono font-black text-[#0285fd] text-[13px] tabular-nums italic group-hover:bg-white">{item.amount.toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
+                                        <td className="p-3 w-16 flex items-center justify-center">
+                                            <button onClick={() => handleRemoveItem(item.id)} className="w-6 h-6 rounded flex items-center justify-center hover:bg-red-50 text-red-400 hover:text-red-500 transition-all opacity-0 group-hover:opacity-100"><Trash2 size={14} /></button>
                                         </td>
                                     </tr>
                                 )) : (
-                                    <tr className="flex w-full">
-                                        <td colSpan={6} className="p-32 text-center flex-1">
-                                            <div className="flex flex-col items-center gap-6 opacity-5 grayscale scale-125">
-                                                <Clock size={100} />
-                                                <span className="text-[18px] font-black uppercase tracking-[1em]">Suspended Protocol</span>
+                                    <tr className="flex w-full h-full">
+                                        <td colSpan={6} className="p-10 text-center flex-1 flex flex-col items-center justify-center">
+                                            <div className="flex flex-col items-center gap-4 opacity-20 grayscale">
+                                                <Clock size={60} />
+                                                <span className="text-[12px] font-bold uppercase tracking-[0.2em] text-slate-500">Suspended Protocol</span>
                                             </div>
                                         </td>
                                     </tr>
@@ -224,61 +224,73 @@ const NotPresentedChequesBoard = ({ isOpen, onClose }) => {
                     </div>
 
                     {/* Entry Protocol Bar */}
-                    <div className="bg-[#0f172a] p-8 rounded shadow-2xl relative overflow-hidden">
-                         <div className="absolute inset-0 bg-blue-600 opacity-[0.03] pointer-events-none" />
-                         <div className="grid grid-cols-12 gap-5 items-end relative z-10">
-                            <div className="col-span-2 flex flex-col gap-2">
-                                <label className="text-[9px] font-black uppercase text-blue-400 tracking-widest pl-1">Written On</label>
-                                <div className="flex items-center px-4 h-11 bg-white/5 border border-white/10 rounded group-focus-within:border-blue-500/50 transition-all">
-                                    <input type="date" value={entry.writeDate} onChange={e => setEntry({...entry, writeDate: e.target.value})} className="flex-1 text-[12px] font-bold text-white outline-none bg-transparent" />
-                                    <Calendar size={14} className="text-blue-500" />
+                    <div className="bg-white p-4 border border-slate-200 rounded-[5px] space-y-3.5 relative">
+                         <div className="flex items-center gap-2 mb-2 pb-2 border-b border-slate-100">
+                            <Plus size={14} className="text-[#0285fd]" />
+                            <span className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">Add Instrument</span>
+                         </div>
+                         <div className="grid grid-cols-12 gap-x-4 gap-y-3.5 items-end">
+                            <div className="col-span-2 flex flex-col gap-1.5">
+                                <label className="text-[10px] font-bold uppercase text-gray-500 ml-1">Written On</label>
+                                <div className="flex-1 flex gap-1 h-8 min-w-0">
+                                    <input type="text" readOnly value={entry.writeDate} className="flex-1 min-w-0 h-8 border border-slate-200 rounded px-2 text-[12px] font-bold outline-none bg-slate-50 text-gray-700 transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 cursor-pointer" onClick={() => setShowWriteDatePicker(true)} />
+                                    <button onClick={() => setShowWriteDatePicker(true)} className="w-8 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
+                                        <Calendar size={14} />
+                                    </button>
                                 </div>
                             </div>
-                            <div className="col-span-2 flex flex-col gap-2">
-                                <label className="text-[9px] font-black uppercase text-blue-400 tracking-widest pl-1">Instrument Date</label>
-                                <div className="flex items-center px-4 h-11 bg-white/5 border border-white/10 rounded">
-                                    <input type="date" value={entry.chequeDate} onChange={e => setEntry({...entry, chequeDate: e.target.value})} className="flex-1 text-[12px] font-bold text-white outline-none bg-transparent" />
-                                    <History size={14} className="text-blue-500" />
+                            <div className="col-span-2 flex flex-col gap-1.5">
+                                <label className="text-[10px] font-bold uppercase text-gray-500 ml-1">Instrument Date</label>
+                                <div className="flex-1 flex gap-1 h-8 min-w-0">
+                                    <input type="text" readOnly value={entry.chequeDate} className="flex-1 min-w-0 h-8 border border-slate-200 rounded px-2 text-[12px] font-bold outline-none bg-slate-50 text-gray-700 transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 cursor-pointer" onClick={() => setShowChequeDatePicker(true)} />
+                                    <button onClick={() => setShowChequeDatePicker(true)} className="w-8 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
+                                        <History size={14} />
+                                    </button>
                                 </div>
                             </div>
-                            <div className="col-span-3 flex flex-col gap-2">
-                                <label className="text-[9px] font-black uppercase text-blue-400 tracking-widest pl-1">Instrument Narrative</label>
-                                <input type="text" value={entry.memo} onChange={e => setEntry({...entry, memo: e.target.value})} placeholder="Payee / Purpose..." className="h-11 w-full border border-white/10 px-4 text-[13px] font-bold rounded outline-none focus:border-blue-500/50 bg-white/5 text-white italic placeholder:text-white/20" />
+                            <div className="col-span-3 flex flex-col gap-1.5">
+                                <label className="text-[10px] font-bold uppercase text-gray-500 ml-1">Narrative</label>
+                                <input type="text" value={entry.memo} onChange={e => setEntry({...entry, memo: e.target.value})} placeholder="Payee / Purpose..." className="h-8 w-full border border-slate-200 px-3 text-[12px] font-mono rounded outline-none focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 italic" />
                             </div>
-                            <div className="col-span-2 flex flex-col gap-2">
-                                <label className="text-[9px] font-black uppercase text-blue-400 tracking-widest pl-1">Cheque Serial</label>
-                                <input type="text" value={entry.chequeNo} onChange={e => setEntry({...entry, chequeNo: e.target.value})} placeholder="000000" className="h-11 w-full border border-white/10 px-4 text-[16px] font-black text-blue-400 rounded outline-none focus:border-blue-500/50 bg-white/5 tracking-widest text-center italic" />
+                            <div className="col-span-2 flex flex-col gap-1.5">
+                                <label className="text-[10px] font-bold uppercase text-gray-500 ml-1">Cheque Serial</label>
+                                <input type="text" value={entry.chequeNo} onChange={e => setEntry({...entry, chequeNo: e.target.value})} placeholder="000000" className="h-8 w-full border border-blue-200 px-3 text-[13px] font-mono font-black text-[#0078d4] tracking-widest text-center rounded outline-none focus:border-[#0285fd] shadow-inner transition-all italic" />
                             </div>
-                            <div className="col-span-2 flex flex-col gap-2">
-                                <label className="text-[9px] font-black uppercase text-pink-400 tracking-widest pl-1">Valuation (LKR)</label>
-                                <input type="number" step="0.01" value={entry.amount} onChange={e => setEntry({...entry, amount: parseFloat(e.target.value) || 0})} className="h-11 w-full border border-blue-500/30 px-6 text-[18px] font-black text-white rounded outline-none bg-white/10 tabular-nums italic text-right shadow-[0_0_15px_rgba(59,130,246,0.1)]" />
+                            <div className="col-span-2 flex flex-col gap-1.5 relative">
+                                <label className="text-[10px] font-bold uppercase text-gray-500 ml-1">Valuation (LKR)</label>
+                                <div className="flex-1 relative min-w-0 group">
+                                     <input type="number" step="0.01" value={entry.amount} onChange={e => setEntry({...entry, amount: parseFloat(e.target.value) || 0})} className="h-8 w-full border border-[#0285fd] px-3 text-[14px] font-mono font-black text-slate-800 rounded shadow-inner outline-none focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 tabular-nums italic pr-10" />
+                                     <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[9px] font-black text-slate-300 uppercase italic">LKR</span>
+                                </div>
                             </div>
                             <div className="col-span-1">
-                                <button onClick={handleAddItem} className="w-11 h-11 bg-blue-600 text-white flex items-center justify-center hover:bg-blue-500 rounded transition-all shadow-xl active:scale-95 group">
-                                    <Plus size={24} className="group-hover:rotate-90 transition-transform" />
+                                <button onClick={handleAddItem} className="w-full h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 group">
+                                    <Plus size={16} />
                                 </button>
                             </div>
                          </div>
                     </div>
 
                     {/* Aggregate Logic Footer */}
-                    <div className="bg-[#f8fafd] px-10 py-6 rounded border border-slate-100 flex justify-between items-center shadow-inner">
+                    <div className="bg-slate-50 p-4 rounded-[5px] border border-slate-200 flex justify-between items-center">
                         <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm border border-slate-100">
-                                <Ban size={22} className="text-slate-400" />
+                            <div className="p-2 bg-slate-200 rounded text-slate-500">
+                                <Ban size={20} />
                             </div>
                             <div className="space-y-0.5">
-                                <span className="text-[10px] font-black uppercase text-slate-400 tracking-widest leading-none">Status Identification</span>
-                                <h4 className="text-slate-800 text-[14px] font-bold italic">Instruments Awaiting Presentation/Clearance</h4>
+                                <span className="text-[10px] font-bold uppercase text-gray-500 tracking-widest leading-none">Status Identification</span>
+                                <h4 className="text-slate-700 text-[12px] font-bold">Instruments Awaiting Presentation/Clearance</h4>
                             </div>
                         </div>
-                        <div className="flex flex-col items-end gap-1 px-10 py-2 border-r-4 border-[#0078d4] bg-white rounded-l-xl shadow-sm">
-                             <span className="text-[10px] font-black text-[#0078d4] uppercase tracking-[0.3em]">Aggregate Liability</span>
-                             <div className="flex items-baseline gap-3">
-                                 <span className="text-3xl font-black text-slate-900 tabular-nums tracking-tighter italic">
-                                     {totalValuation.toLocaleString(undefined, {minimumFractionDigits: 2})}
-                                 </span>
-                                 <span className="text-[#0078d4] text-[12px] font-black italic">LKR</span>
+                        <div className="flex items-baseline gap-4 h-full pr-4">
+                             <div className="flex flex-col items-end gap-0.5">
+                                <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Aggregate Liability</span>
+                                <div className="flex items-baseline gap-2">
+                                    <span className="text-[9px] font-black text-slate-400 italic">Rs.</span>
+                                    <span className="text-[18px] font-mono font-black text-slate-700 tabular-nums italic">
+                                        {totalValuation.toLocaleString(undefined, {minimumFractionDigits: 2})}
+                                    </span>
+                                </div>
                              </div>
                         </div>
                     </div>
@@ -286,55 +298,70 @@ const NotPresentedChequesBoard = ({ isOpen, onClose }) => {
             </SimpleModal>
 
             {/* Selection Modals */}
-            {activeModal && (
-                <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setActiveModal(null)} />
-                    <div className="relative w-full max-w-xl bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col max-h-[80vh] font-['Plus_Jakarta_Sans']">
-                        <div className="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-50 uppercase tracking-widest font-black text-[12px] text-slate-500">
-                            Identify Bank Portfolio
-                            <button onClick={() => setActiveModal(null)} className="w-10 h-10 flex items-center justify-center hover:bg-red-50 text-slate-400 rounded-full transition-all group"><X size={28} className="group-hover:scale-110 transition-transform" /></button>
+            <SimpleModal
+                isOpen={!!activeModal}
+                onClose={() => setActiveModal(null)}
+                title={`Lookup Directory`}
+                maxWidth="max-w-[600px]"
+            >
+                <div className="space-y-4 font-['Tahoma']">
+                    <div className="flex items-center gap-4 p-3 rounded-[5px] border border-slate-200 bg-white mb-2">
+                        <span className="text-[12px] font-bold text-gray-500 uppercase tracking-widest">Search Facility</span>
+                        <div className="relative flex-1">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
+                            <input
+                                type="text"
+                                className="w-full h-9 pl-10 pr-4 border border-slate-200 rounded outline-none text-sm bg-slate-50 transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20"
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                autoFocus
+                            />
                         </div>
-                        <div className="p-4 border-b border-gray-100 bg-white">
-                            <div className="relative">
-                                <Search size={20} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                                <input 
-                                    type="text" 
-                                    placeholder="Search by bank name or identifier..." 
-                                    className="w-full h-11 border border-gray-100 pl-11 pr-4 text-sm rounded-lg focus:border-blue-500 outline-none shadow-inner font-medium" 
-                                    value={searchTerm} 
-                                    onChange={(e) => setSearchTerm(e.target.value)} 
-                                    autoFocus
-                                />
-                            </div>
-                        </div>
-                        <div className="overflow-y-auto p-2 font-['Plus_Jakarta_Sans']">
-                            <table className="w-full text-sm text-left border-collapse">
-                                <thead className="bg-[#f8fafd] sticky top-0 text-slate-400 font-bold uppercase text-[10px] tracking-widest">
+                    </div>
+                    <div className="border border-slate-200 rounded-[5px] overflow-hidden shadow-sm">
+                        <div className="max-h-[400px] overflow-y-auto no-scrollbar">
+                            <table className="w-full text-left">
+                                <thead className="bg-slate-50/80 sticky top-0 text-[10px] font-mono font-bold text-gray-400 uppercase tracking-widest border-b border-slate-200">
                                     <tr>
-                                        <th className="p-4 border-b">IFSC</th>
-                                        <th className="p-4 border-b">Bank Account Title</th>
-                                        <th className="p-4 border-b text-center">Action</th>
+                                        <th className="px-5 py-3">Code</th>
+                                        <th className="px-5 py-3">Record Name</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody className="divide-y divide-slate-100">
                                     {filteredLookup().map((item, idx) => (
-                                        <tr key={idx} className="hover:bg-blue-50 transition-colors group cursor-pointer" onClick={() => {
+                                        <tr key={idx} className="group hover:bg-blue-50/50 cursor-pointer transition-colors" onClick={() => {
                                             setHeader({...header, bankCode: item.code, bankName: item.name});
                                             setActiveModal(null);
                                         }}>
-                                            <td className="p-4 border-b font-black text-slate-700">{item.code}</td>
-                                            <td className="p-4 border-b font-bold text-[#0078d4] uppercase tracking-tight">{item.name}</td>
-                                            <td className="p-4 border-b text-center">
-                                                <button className="bg-[#0078d4] text-white text-[10px] px-5 py-2 rounded-sm font-black tracking-widest hover:bg-[#005a9e]">IDENTIFY</button>
-                                            </td>
+                                            <td className="px-5 py-3 font-mono text-[12px] font-mono text-gray-700">{item.code}</td>
+                                            <td className="px-5 py-3 text-[12px] font-mono text-gray-700 uppercase group-hover:text-blue-600">{item.name}</td>
                                         </tr>
                                     ))}
+                                    {filteredLookup().length === 0 && (
+                                        <tr>
+                                            <td colSpan="2" className="text-center py-6 text-gray-300 text-[12px] font-bold uppercase tracking-widest">No records found</td>
+                                        </tr>
+                                    )}
                                 </tbody>
                             </table>
                         </div>
                     </div>
                 </div>
-            )}
+            </SimpleModal>
+            
+            <CalendarModal
+                isOpen={showWriteDatePicker}
+                onClose={() => setShowWriteDatePicker(false)}
+                currentDate={entry.writeDate}
+                onDateSelect={(date) => setEntry({...entry, writeDate: date})}
+            />
+            
+            <CalendarModal
+                isOpen={showChequeDatePicker}
+                onClose={() => setShowChequeDatePicker(false)}
+                currentDate={entry.chequeDate}
+                onDateSelect={(date) => setEntry({...entry, chequeDate: date})}
+            />
         </>
     );
 };

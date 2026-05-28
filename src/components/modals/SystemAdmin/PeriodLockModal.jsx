@@ -97,20 +97,17 @@ const PeriodLockModal = ({ isOpen, onClose }) => {
     };
 
     const footer = (
-        <div className="bg-slate-50 px-6 py-4 w-full flex justify-end gap-3 border-t border-gray-100 rounded-b-xl font-['Tahoma']">
-            <button
-                onClick={handleSave}
-                disabled={isSaving}
-                className="px-10 h-10 bg-[#2bb744] text-white text-[13px] font-bold rounded-[5px] shadow-md shadow-green-200 hover:bg-[#259b3a] transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-50"
-            >
-                {isSaving ? "SAVING..." : <><ShieldCheck size={14} /> OK</>}
-            </button>
-            <button
-                onClick={fetchData}
-                className="px-8 h-10 bg-[#00adff] text-white text-[13px] font-bold rounded-[5px] hover:bg-[#0099e6] shadow-md shadow-blue-200 transition-all active:scale-95 border-none flex items-center justify-center gap-2"
-            >
-                <RotateCcw size={14} /> Clear
-            </button>
+        <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-slate-200 rounded-b-xl">
+            <div className="flex gap-3">
+                <button onClick={fetchData} disabled={loading || isSaving} className="px-6 py-3 bg-[#00adff] hover:bg-[#0099e6] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] transition-all active:scale-95 flex items-center justify-center gap-2 border-none">
+                    <RotateCcw size={14} /> CLEAR FORM
+                </button>
+            </div>
+            <div className="flex gap-3">
+                <button onClick={handleSave} disabled={loading || isSaving} className={`px-6 py-3 bg-[#0285fd] hover:bg-[#0073ff] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] shadow-md shadow-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border-none ${isSaving ? 'opacity-50' : ''}`}>
+                    {isSaving ? <RotateCcw size={14} className="animate-spin" /> : <ShieldCheck size={14} />} SECURE PERIOD
+                </button>
+            </div>
         </div>
     );
 
@@ -137,18 +134,19 @@ const PeriodLockModal = ({ isOpen, onClose }) => {
                         <div className="flex items-center justify-between gap-10">
                             <div className="flex items-center gap-8">
                                 {/* Date From */}
-                                <div className="flex items-center gap-4">
-                                    <label className="font-bold text-gray-500 uppercase tracking-widest text-[11px]">Date From</label>
-                                    <div className="flex items-center gap-1 h-9">
+                                <div className="flex items-center gap-2">
+                                    <label className="text-[11px] font-bold text-gray-500 uppercase tracking-widest w-24 shrink-0">Date From</label>
+                                    <div className="flex items-center gap-1 h-8">
                                         <input
                                             type="text"
                                             value={dateFrom}
                                             readOnly
-                                            className="w-[130px] h-9 border border-gray-300 rounded-[5px] px-3 text-sm outline-none font-bold text-[#0078d4] cursor-default text-center bg-white shadow-sm"
+                                            onClick={() => setShowCalendarFrom(true)}
+                                            className="w-[130px] h-8 border border-slate-200 rounded px-3 text-[12px] font-bold text-slate-700 cursor-default text-center bg-white outline-none focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 transition-all"
                                         />
                                         <button
                                             onClick={() => setShowCalendarFrom(true)}
-                                            className="w-10 h-9 bg-[#0078d4] text-white flex items-center justify-center hover:bg-[#005a9e] rounded-[5px] transition-all shadow-md shadow-blue-500/10 active:scale-95 shrink-0 border-none"
+                                            className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0 border-none"
                                         >
                                             <Calendar size={16} />
                                         </button>
@@ -156,18 +154,19 @@ const PeriodLockModal = ({ isOpen, onClose }) => {
                                 </div>
 
                                 {/* Date To */}
-                                <div className="flex items-center gap-4">
-                                    <label className="font-bold text-gray-500 uppercase tracking-widest text-[11px]">Date To</label>
-                                    <div className="flex items-center gap-1 h-9">
+                                <div className="flex items-center gap-2">
+                                    <label className="text-[11px] font-bold text-gray-500 uppercase tracking-widest w-20 shrink-0 text-right">Date To</label>
+                                    <div className="flex items-center gap-1 h-8">
                                         <input
                                             type="text"
                                             value={dateTo}
                                             readOnly
-                                            className="w-[130px] h-9 border border-gray-300 rounded-[5px] px-3 text-sm outline-none font-bold text-[#0078d4] cursor-default text-center bg-white shadow-sm"
+                                            onClick={() => setShowCalendarTo(true)}
+                                            className="w-[130px] h-8 border border-slate-200 rounded px-3 text-[12px] font-bold text-slate-700 cursor-default text-center bg-white outline-none focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 transition-all"
                                         />
                                         <button
                                             onClick={() => setShowCalendarTo(true)}
-                                            className="w-10 h-9 bg-[#0078d4] text-white flex items-center justify-center hover:bg-[#005a9e] rounded-[5px] transition-all shadow-md shadow-blue-500/10 active:scale-95 shrink-0 border-none"
+                                            className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0 border-none"
                                         >
                                             <Calendar size={16} />
                                         </button>

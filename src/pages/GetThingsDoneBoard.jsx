@@ -597,7 +597,7 @@ const HeaderIconBtn = ({ children, label, onClick }) => (
   </button>
 );
 
-const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction }) => {
+const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, isInline = false }) => {
   const [activeTab, setActiveTab] = useState('expenses');
   const [isCustomising, setIsCustomising] = useState(false);
   const [isAddWidgetsOpen, setIsAddWidgetsOpen] = useState(false);
@@ -783,7 +783,7 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction }
   const topActions = activeTab === 'accounting' ? favActions.map(id => ALL_ACTIONS_MAP[id]).filter(Boolean) : (TAB_EXTRA_ACTIONS[activeTab] || []);
 
   return (
-    <div className="fixed inset-0 z-[9999] flex flex-col font-['Plus_Jakarta_Sans'] text-slate-700 bg-[#f8fafc] overflow-hidden animate-in fade-in duration-300">
+    <div className={`${isInline ? 'relative w-full h-full' : 'fixed inset-0 z-[9999]'} flex flex-col font-['Plus_Jakarta_Sans'] text-slate-700 bg-[#f8fafc] overflow-hidden animate-in fade-in duration-300`}>
       {/* QBO-style top header */}
         <header className="shrink-0 bg-white/95 border-b border-slate-200/60 px-4 sm:px-5 lg:px-7 py-3">
           <div className="flex items-center gap-2 lg:gap-4 min-h-[44px]">
@@ -854,14 +854,6 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction }
               <HeaderIconBtn label="Assistant" onClick={() => runAction('header_ai')}>
                 <Sparkles size={18} strokeWidth={2} className="text-blue-600" />
               </HeaderIconBtn>
-              <button
-                type="button"
-                onClick={onClose}
-                className="ml-2 w-9 h-9 flex items-center justify-center bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-xl transition-all active:scale-95 border-none shrink-0"
-                title="Close"
-              >
-                <X size={16} strokeWidth={2.5} />
-              </button>
             </div>
           </div>
         </header>

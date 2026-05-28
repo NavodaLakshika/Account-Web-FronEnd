@@ -119,21 +119,14 @@ const StockBalanceUpdateModal = ({ isOpen, onClose }) => {
                 maxWidth="max-w-[750px]"
                 showHeaderClose={true}
                 footer={
-                    <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-gray-100 rounded-b-xl font-['Tahoma']">
+                    <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-slate-200 rounded-b-xl">
                         <div className="flex gap-3">
-                            <button
-                                onClick={handleClear}
-                                className="px-6 h-10 bg-[#00adff] text-white text-sm font-black rounded-[5px] hover:bg-[#0099e6] transition-all active:scale-95 flex items-center gap-2 border-none"
-                            >
-                                <RotateCcw size={14} /> CLEAR 
+                            <button onClick={handleClear} disabled={loading} className="px-6 py-3 bg-[#00adff] hover:bg-[#0099e6] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] transition-all active:scale-95 flex items-center justify-center gap-2 border-none">
+                                <RotateCcw size={14} /> CLEAR
                             </button>
                         </div>
                         <div className="flex gap-3">
-                            <button
-                                onClick={handleSaveClick}
-                                disabled={loading}
-                                className="px-6 h-10 bg-[#2bb744] text-white text-sm font-black rounded-[5px] shadow-md shadow-green-100 hover:bg-[#259b3a] transition-all active:scale-95 flex items-center gap-2 border-none disabled:opacity-50"
-                            >
+                            <button onClick={handleSaveClick} disabled={loading} className={`px-6 py-3 bg-[#2bb744] hover:bg-[#259b3a] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] shadow-md shadow-green-100 transition-all active:scale-95 flex items-center justify-center gap-2 border-none ${loading ? 'opacity-50' : ''}`}>
                                 <CheckCircle size={14} /> SAVE & APPLY
                             </button>
                         </div>
@@ -142,7 +135,7 @@ const StockBalanceUpdateModal = ({ isOpen, onClose }) => {
             >
                 <div className="space-y-4 overflow-y-auto no-scrollbar font-['Tahoma']">
                     {/* Header Controls */}
-                    <div className="bg-white p-4 border border-gray-100 rounded-lg shadow-sm space-y-4 relative">
+                    <div className="bg-slate-50/50 p-4 border border-slate-200 rounded-[5px] relative overflow-hidden">
                         {loading && (
                             <div className="absolute inset-0 bg-white/60 backdrop-blur-[2px] z-[60] flex flex-col items-center justify-center rounded-lg animate-in fade-in duration-300">
                                 <div className="w-24 h-24">
@@ -154,15 +147,15 @@ const StockBalanceUpdateModal = ({ isOpen, onClose }) => {
                             </div>
                         )}
                         
-                        <div className="grid grid-cols-12 gap-x-6 gap-y-3.5">
+                        <div className="grid grid-cols-12 gap-x-6 gap-y-3.5 relative z-10">
                             <div className="col-span-8 flex items-center gap-2">
-                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Stock Date</label>
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Stock Date</label>
                                 <div className="flex-1 flex gap-1 h-8 min-w-0">
                                     <input
                                         type="text"
                                         readOnly
                                         value={stockDate}
-                                        className="flex-1 min-w-0 h-8 border border-gray-300 rounded-[5px] px-3 text-[12px] outline-none bg-white text-gray-700 font-bold cursor-pointer shadow-sm"
+                                        className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-bold text-gray-700 bg-white rounded outline-none cursor-pointer transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20"
                                         onClick={() => setShowCalendar(true)}
                                     />
                                     <button
@@ -177,7 +170,7 @@ const StockBalanceUpdateModal = ({ isOpen, onClose }) => {
                                 <button 
                                     onClick={handleLoad}
                                     disabled={loading}
-                                    className="h-8 px-6 bg-[#0285fd] text-white text-[12px] font-bold uppercase tracking-widest rounded-[5px] hover:bg-[#0073ff] transition-all shadow-md active:scale-95 flex items-center gap-2"
+                                    className="h-8 px-6 bg-[#0285fd] text-white font-mono font-bold text-xs uppercase tracking-widest rounded-[5px] hover:bg-[#0073ff] transition-all shadow-md active:scale-95 flex items-center gap-2"
                                 >
                                     <Search size={14} /> Load
                                 </button>

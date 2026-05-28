@@ -133,27 +133,30 @@ const AccountBoard = ({ isOpen, onClose, selectedType, initialData }) => {
     };
 
     // --- PURCHASE ORDER STYLE CONSTANTS ---
-    const labelStyle = "text-[12.5px] font-bold text-gray-700 w-32 shrink-0";
-    const inputStyle = "flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-gray-700 bg-white rounded-[5px] outline-none shadow-sm focus:border-[#0285fd]";
-    const pickerStyle = "flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-blue-600 bg-gray-50 rounded-[5px] outline-none shadow-sm cursor-pointer flex items-center justify-between overflow-hidden";
+    const labelStyle = "text-[11px] font-bold text-gray-500 uppercase w-36 shrink-0";
+    const inputStyle = "flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-bold text-gray-700 bg-white rounded outline-none transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20";
+    const pickerStyle = "flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-bold text-blue-600 bg-slate-50 rounded outline-none transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 cursor-pointer flex items-center justify-between overflow-hidden";
     const iconBtnStyle = "w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0";
 
     const footer = (
-        <div className="bg-slate-50 px-6 py-4 w-full flex justify-end gap-3 border-t border-gray-100 rounded-b-xl">
-            <button
-                onClick={() => setFormData({ ...formData, accountId: '', accountName: '', description: '', note: '' })}
-                className="px-6 h-10 bg-[#00adff] text-white text-[13px] font-black rounded-[5px] hover:bg-[#0099e6] transition-all active:scale-95 flex items-center  gap-2 border-none uppercase shadow-md shadow-blue-100"
-            >
-                <RotateCcw size={14} /> Clear 
-            </button>
-            <button
-                onClick={handleSave}
-                disabled={loading}
-                className="px-10 h-10 bg-[#2bb744] text-white text-[13px] font-black rounded-[5px] shadow-md shadow-green-100 hover:bg-[#259b3a] transition-all active:scale-95 flex items-center gap-2 border-none uppercase disabled:opacity-50"
-            >
-                {loading ? <RotateCcw className="animate-spin" size={16} /> : <Save size={16} />}
-                 Save
-            </button>
+        <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-slate-200 rounded-b-xl">
+            <div className="flex gap-3">
+                <button
+                    onClick={() => setFormData({ ...formData, accountId: '', accountName: '', description: '', note: '' })}
+                    className="px-6 py-3 bg-[#00adff] hover:bg-[#0099e6] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] transition-all active:scale-95 flex items-center justify-center gap-2 border-none"
+                >
+                    <RotateCcw size={14} /> CLEAR
+                </button>
+            </div>
+            <div className="flex gap-3">
+                <button
+                    onClick={handleSave}
+                    disabled={loading}
+                    className="px-8 py-3 bg-[#2bb744] hover:bg-[#259b3a] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] shadow-md shadow-green-100 transition-all active:scale-95 flex items-center justify-center gap-2 border-none disabled:opacity-50"
+                >
+                    {loading ? <RotateCcw className="animate-spin" size={14} /> : <Save size={14} />} SAVE
+                </button>
+            </div>
         </div>
     );
 
@@ -176,7 +179,7 @@ const AccountBoard = ({ isOpen, onClose, selectedType, initialData }) => {
             >
                 <div className="p-1 space-y-4 font-['Tahoma'] select-none">
                     {/* Header Section */}
-                    <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm space-y-4">
+                    <div className="bg-white p-4 rounded-[5px] border border-slate-200 shadow-sm space-y-4">
                         <div className="flex items-center gap-4">
                             <label className={labelStyle}>Primary Category</label>
                             <div className="flex-1 flex gap-1 h-8">
@@ -211,7 +214,7 @@ const AccountBoard = ({ isOpen, onClose, selectedType, initialData }) => {
                             <div className="flex gap-2 flex-1">
                                 <input
                                     type="text"
-                                    className="w-32 h-8 border border-gray-300 px-3 text-[12px] font-mono font-black text-blue-600 rounded-[5px] outline-none shadow-sm focus:border-[#0285fd]"
+                                    className="w-32 h-8 border border-slate-200 px-3 text-[12px] font-mono font-black text-blue-600 bg-white rounded outline-none transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20"
                                     value={formData.accountId}
                                     onChange={(e) => setFormData({ ...formData, accountId: e.target.value })}
                                 />
@@ -257,27 +260,27 @@ const AccountBoard = ({ isOpen, onClose, selectedType, initialData }) => {
                     </div>
 
                     {/* Metadata Section */}
-                    <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm bg-white">
-                        <div className="bg-slate-50 px-5 py-2.5 border-b border-gray-100 flex items-center gap-2">
+                    <div className="border border-slate-200 rounded-[5px] overflow-hidden bg-white mt-4">
+                        <div className="bg-slate-50 px-5 py-2.5 border-b border-slate-200 flex items-center gap-2">
                             <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Contextual Metadata</span>
                         </div>
-                        <div className="p-5 space-y-4">
+                        <div className="p-4 space-y-4">
                             <div className="flex gap-4">
-                                <label className="text-[12px] font-bold text-slate-500 w-32 pt-1 uppercase">Description</label>
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-36 pt-1">Description</label>
                                 <textarea
                                     rows={2}
                                     placeholder=""
-                                    className="flex-1 px-4 py-2 border border-gray-200 rounded-lg text-[12px] font-medium outline-none focus:border-blue-500 resize-none shadow-sm bg-slate-50/30"
+                                    className="flex-1 px-3 py-2 border border-slate-200 rounded text-[12px] font-bold text-gray-700 bg-white outline-none transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 resize-none"
                                     value={formData.description}
                                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                                 />
                             </div>
                             <div className="flex gap-4 items-center">
-                                <label className="text-[12px] font-bold text-slate-500 w-32 uppercase">Internal Note</label>
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-36">Internal Note</label>
                                 <input
                                     type="text"
                                     placeholder=""
-                                    className="flex-1 h-10 px-4 border border-gray-200 rounded-lg text-[12px] font-medium outline-none focus:border-blue-500 shadow-sm bg-slate-50/30"
+                                    className="flex-1 h-8 px-3 border border-slate-200 rounded text-[12px] font-bold text-gray-700 bg-white outline-none transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20"
                                     value={formData.note}
                                     onChange={(e) => setFormData({ ...formData, note: e.target.value })}
                                 />
@@ -286,8 +289,8 @@ const AccountBoard = ({ isOpen, onClose, selectedType, initialData }) => {
                     </div>
 
                     {/* Hierarchy Visualizer */}
-                    <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm bg-white">
-                        <div className="bg-slate-50 px-5 py-2.5 border-b border-gray-100 flex items-center justify-between">
+                    <div className="border border-slate-200 rounded-[5px] overflow-hidden bg-white mt-4">
+                        <div className="bg-slate-50 px-5 py-2.5 border-b border-slate-200 flex items-center justify-between">
                             <div className="flex items-center gap-2">
                                 <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Account Hierarchy</span>
                             </div>

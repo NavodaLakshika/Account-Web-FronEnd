@@ -1,26 +1,26 @@
 import React from 'react';
 import { X, FileText, Files } from 'lucide-react';
 
+const accent = localStorage.getItem('topBarColor') || '#0388cc';
+
 const OfficeDocumentModal = ({ isOpen, onClose }) => {
     if (!isOpen) return null;
 
     const menuItems = [
-        { 
-            icon: FileText, 
-            label: 'Word Document', 
+        {
+            icon: FileText,
+            label: 'Word Document',
             color: 'text-blue-500',
             onClick: () => {
-                // Fetching from backend is much more reliable than browser protocols
                 fetch('/api/utility/open-word');
                 onClose();
             }
         },
-        { 
-            icon: Files, 
-            label: 'Excel Spreadsheet', 
+        {
+            icon: Files,
+            label: 'Excel Spreadsheet',
             color: 'text-green-500',
             onClick: () => {
-                // Fetching from backend is much more reliable than browser protocols
                 fetch('/api/utility/open-excel');
                 onClose();
             }
@@ -29,51 +29,39 @@ const OfficeDocumentModal = ({ isOpen, onClose }) => {
 
     return (
         <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4">
-            {/* Backdrop */}
-            <div 
-                className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" 
-                onClick={onClose} 
-            />
-            
-            {/* Modal Container */}
-            <div 
-                className="relative w-full max-w-[260px] bg-white border border-gray-100 rounded-xl shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-200"
-                onClick={(e) => e.stopPropagation()}
-            >
-                
-                {/* Title Bar */}
-                <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-100 select-none relative overflow-hidden">
-                    {/* System Color Left Accent */}
-                    <div 
-                        className="absolute left-0 top-0 bottom-0 w-1.5 transition-colors duration-500" 
-                        style={{ backgroundColor: localStorage.getItem('topBarColor') || '#0078d4' }}
-                    />
-                    
-                    <div className="flex items-center gap-2">
-                        <Files size={14} className="text-[#0078d4]" />
-                        <span className="text-lg font-bold text-slate-800 tracking-tight">Office Integration</span>
+            <div className="absolute inset-0 bg-slate-900/70 backdrop-blur-sm" onClick={onClose} />
+
+            <div className="relative w-full max-w-[280px] bg-white rounded-2xl shadow-2xl overflow-hidden border border-white/10 animate-in zoom-in-95 duration-300 flex flex-col max-h-[90vh]">
+                <div className="absolute left-0 top-0 bottom-0 w-[4px]" style={{ backgroundColor: accent }} />
+
+                <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-white">
+                    <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-xl bg-[#4f83ff]/10 flex items-center justify-center">
+                            <Files size={16} className="text-[#4f83ff]" />
+                        </div>
+                        <div>
+                            <h2 className="text-[15px] font-black uppercase tracking-[0.25em] text-slate-900 leading-tight">Office Integration</h2>
+                            <p className="text-[10px] text-slate-400 font-medium tracking-wider">Create New Documents</p>
+                        </div>
                     </div>
-                    <button
-                        onClick={onClose}
-                        className="w-9 h-8 flex items-center justify-center bg-red-50 hover:bg-red-100 text-red-600 rounded-[8px] transition-all active:scale-90 outline-none border-none group"
-                        title="Close"
-                    >
-                        <X size={18} strokeWidth={4} className="group-hover:scale-110 transition-transform" />
+                    <button onClick={onClose} className="w-9 h-9 rounded-xl bg-red-50 hover:bg-red-100 flex items-center justify-center transition-all active:scale-90">
+                        <X size={18} strokeWidth={3} className="text-red-600" />
                     </button>
                 </div>
 
-                {/* Body */}
-                <div className="p-1 bg-white m-1 border border-gray-200 rounded flex-1 overflow-y-auto no-scrollbar shadow-inner">
+                <div className="flex-1 overflow-y-auto custom-scrollbar p-3">
                     {menuItems.map((item, idx) => {
                         const Icon = item.icon;
                         return (
                             <button
                                 key={idx}
                                 onClick={item.onClick}
-                                className="w-full flex items-center gap-3 px-3 py-3 rounded-md hover:bg-[#0078d4] group transition-all text-left"
+                                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-50 transition-all text-left group border border-transparent hover:border-slate-100 hover:shadow-sm"
                             >
-                                <Icon size={20} className={`${item.color} group-hover:text-white transition-colors`} />
-                                <span className="text-[14px] font-semibold text-gray-700 group-hover:text-white transition-colors">
+                                <div className="w-9 h-9 rounded-lg bg-white border border-slate-100 flex items-center justify-center shadow-sm group-hover:border-[#4f83ff]/20 group-hover:bg-[#4f83ff]/5 transition-all shrink-0">
+                                    <Icon size={16} className={`${item.color} group-hover:text-[#4f83ff] transition-colors`} />
+                                </div>
+                                <span className="text-[11px] font-[700] tracking-widest text-slate-700 uppercase">
                                     {item.label}
                                 </span>
                             </button>
@@ -81,9 +69,8 @@ const OfficeDocumentModal = ({ isOpen, onClose }) => {
                     })}
                 </div>
 
-                {/* Status Bar */}
-                <div className="bg-slate-50 px-6 py-4 flex justify-end gap-3 border-t border-gray-100">
-                    <span className="text-[10px] text-[#0078d4] font-bold uppercase tracking-widest italic">Ready</span>
+                <div className="bg-slate-50 border-t border-slate-200 flex items-center justify-between shrink-0 px-6 py-4 rounded-b-[5px]">
+                    <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Ready</span>
                 </div>
             </div>
         </div>

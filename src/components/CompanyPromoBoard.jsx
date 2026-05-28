@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Database, Layout, Cpu, Globe, X, ChevronRight, Sparkles } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Database, Layout, Cpu, Globe, X, ChevronRight, ExternalLink, Clock } from 'lucide-react';
 import { adService } from '../services/ad.service';
 
 const defaultAds = [
@@ -42,22 +42,37 @@ const defaultAds = [
 ];
 
 const AVAILABLE_ICONS = { Database, Layout, Cpu, Globe };
+const AUTO_CLOSE_SECONDS = 12;
 
 const CompanyPromoBoard = ({ isOpen, onClose }) => {
     const [ads, setAds] = useState([]);
     const [adIndex, setAdIndex] = useState(0);
+    const [countdown, setCountdown] = useState(AUTO_CLOSE_SECONDS);
     const [exiting, setExiting] = useState(false);
+    const [entering, setEntering] = useState(true);
+
+    const handleClose = useCallback(() => {
+        if (exiting) return;
+        setExiting(true);
+        setTimeout(onClose, 400);
+    }, [exiting, onClose]);
 
     useEffect(() => {
         if (!isOpen) {
             setExiting(false);
+            setEntering(true);
+            setCountdown(AUTO_CLOSE_SECONDS);
             return;
         }
+
+        const enterTimer = setTimeout(() => {
+            setEntering(false);
+        }, 100);
 
         const fetchAndSelectAd = async () => {
             try {
                 const fetchedAds = await adService.getAllAds();
-                const activeAds = fetchedAds.filter(ad => ad.isActive);
+                const activeAds = fetchedAds.filter(ad => ad.isActive || ad.IsActive);
                 if (activeAds.length > 0) {
                     setAds(activeAds);
                     setAdIndex(Math.floor(Math.random() * activeAds.length));
@@ -72,64 +87,120 @@ const CompanyPromoBoard = ({ isOpen, onClose }) => {
         };
 
         fetchAndSelectAd();
+        setCountdown(AUTO_CLOSE_SECONDS);
 
-        const timer = setTimeout(() => {
-            setExiting(true);
-            setTimeout(onClose, 400);
-        }, 8000);
-        return () => clearTimeout(timer);
-    }, [isOpen, onClose]);
+        return () => {
+            clearTimeout(enterTimer);
+        };
+    }, [isOpen]);
+
+    useEffect(() => {
+        if (!isOpen || entering || exiting) return;
+
+        const interval = setInterval(() => {
+            setCountdown(prev => {
+                if (prev <= 1) {
+                    clearInterval(interval);
+                    handleClose();
+                    return 0;
+                }
+                return prev - 1;
+            });
+        }, 1000);
+
+        return () => clearInterval(interval);
+    }, [isOpen, entering, exiting, handleClose]);
 
     if (!isOpen || ads.length === 0) return null;
 
     const ad = ads[adIndex];
     if (!ad) return null;
-    const Icon = ad.iconName ? (AVAILABLE_ICONS[ad.iconName] || Globe) : (ad.icon || Globe);
+    
+    const iconNameStr = ad.iconName || ad.IconName;
+    const Icon = iconNameStr ? (AVAILABLE_ICONS[iconNameStr] || Globe) : (ad.icon || Globe);
+    const title = ad.title || ad.Title || '';
+    const desc = ad.desc || ad.Desc || '';
+    const accentColor = ad.accent || '#0388cc';
+    const progress = ((AUTO_CLOSE_SECONDS - countdown) / AUTO_CLOSE_SECONDS) * 100;
 
     return (
-        <div className="fixed bottom-24 left-6 z-[2060] w-full max-w-sm">
-            <div className={`transition-all duration-400 ease-in-out ${exiting ? 'opacity-0 -translate-x-4 scale-95' : 'opacity-100 translate-x-0 scale-100'}`}>
-                <div className={`bg-white rounded-xl shadow-lg border ${ad.border} overflow-hidden`}>
-                    {/* Top accent bar */}
-                    <div className="h-1 w-full" style={{ backgroundColor: ad.accent }} />
+        <div className="fixed inset-0 z-[2060] flex items-center justify-center p-4">
+            <div 
+                className={`absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity duration-400 ${entering ? 'opacity-0' : 'opacity-100'}`}
+                onClick={handleClose}
+            />
+            <div 
+                className={`relative w-full max-w-[420px] bg-white rounded-2xl shadow-2xl overflow-hidden transition-all duration-400 ${
+                    entering || exiting ? 'opacity-0 scale-95 translate-y-4' : 'opacity-100 scale-100 translate-y-0'
+                }`}
+            >
+                {/* Progress bar at top */}
+                <div className="h-1 bg-slate-100 w-full">
+                    <div 
+                        className="h-full transition-all duration-1000 ease-linear rounded-full"
+                        style={{ 
+                            width: `${progress}%`, 
+                            backgroundColor: accentColor,
+                            transitionDuration: `${exiting ? '0ms' : '1000ms'}`
+                        }}
+                    />
+                </div>
 
-                    <div className="px-4 py-3.5">
-                        <div className="flex items-start gap-3">
-                            <div className={`w-8 h-8 rounded-lg ${ad.iconBg} flex items-center justify-center shrink-0 shadow-sm`}>
-                                <Icon size={15} className="text-white" />
-                            </div>
-                            <div className="min-w-0 flex-1">
-                                <div className="flex items-center justify-between gap-2">
-                                    <h3 className="text-sm font-bold text-slate-800">{ad.title}</h3>
-                                    <button onClick={onClose} className="w-5 h-5 flex items-center justify-center rounded text-slate-300 hover:text-slate-500 hover:bg-slate-100 transition-all shrink-0">
-                                        <X size={11} />
-                                    </button>
-                                </div>
-                                <p className="text-[11px] text-slate-500 leading-relaxed mt-1">{ad.desc}</p>
-                                <div className="flex items-center gap-2 mt-2.5">
-                                    <a href="https://www.onimta.com" target="_blank" rel="noreferrer" className="text-[10px] font-bold uppercase tracking-wider hover:underline flex items-center gap-1" style={{ color: ad.accent }}>
-                                        Learn more <ChevronRight size={10} />
-                                    </a>
-                                    <div className="h-3 w-px bg-slate-200" />
-                                    <span className="text-[9px] font-medium text-slate-400">Sponsored</span>
-                                </div>
+                {/* Close button */}
+                <button
+                    onClick={handleClose}
+                    className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-full bg-white/80 hover:bg-white text-slate-400 hover:text-slate-700 shadow-sm border border-slate-200 transition-all z-10 cursor-pointer"
+                >
+                    <X size={15} />
+                </button>
+
+                {/* Ad content */}
+                <div className="p-6">
+                    <div className="flex flex-col items-center text-center gap-4">
+                        {/* Icon */}
+                        <div 
+                            className="w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg"
+                            style={{ backgroundColor: `${accentColor}15` }}
+                        >
+                            <Icon size={28} style={{ color: accentColor }} />
+                        </div>
+
+                        {/* Title */}
+                        <h3 className="text-[17px] font-bold text-slate-800 leading-tight">
+                            {title}
+                        </h3>
+
+                        {/* Description */}
+                        {desc && (
+                            <p className="text-[13px] text-slate-500 leading-relaxed">
+                                {desc}
+                            </p>
+                        )}
+
+                        {/* CTA */}
+                        <a
+                            href="https://www.onimtait.com"
+                            target="_blank"
+                            rel="noreferrer"
+                            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-[13px] font-bold text-white transition-all active:scale-95 shadow-md hover:shadow-lg"
+                            style={{ backgroundColor: accentColor }}
+                        >
+                            <ExternalLink size={15} />
+                            Learn More
+                        </a>
+
+                        {/* Sponsored + countdown */}
+                        <div className="flex items-center gap-3 pt-2">
+                            <span className="text-[9px] font-bold text-slate-300 uppercase tracking-widest">Sponsored</span>
+                            <div className="w-px h-3 bg-slate-200" />
+                            <div className="flex items-center gap-1.5 text-[11px] font-mono font-bold text-slate-400">
+                                <Clock size={12} />
+                                <span>{countdown}s</span>
                             </div>
                         </div>
                     </div>
-
-                    {/* Progress bar */}
-                    <div className="h-[2px] bg-slate-100">
-                        <div className="h-full rounded-full" style={{ backgroundColor: ad.accent, width: '100%', animation: 'adProgress 8s linear' }} />
-                    </div>
                 </div>
             </div>
-
-            <style>{`
-                @keyframes adProgress {
-                    from { width: 0%; }
-                    to { width: 100%; }
-                }
-            `}</style>
         </div>
     );
 };

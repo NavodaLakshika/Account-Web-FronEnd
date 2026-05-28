@@ -89,8 +89,17 @@ const ToastLayout = ({
     </div>
 );
 
+const parseArgs = (arg) => {
+    if (typeof arg === 'object' && arg !== null && !Array.isArray(arg) && !React.isValidElement(arg)) {
+        return { subMessage: null, options: arg };
+    }
+    return { subMessage: arg, options: {} };
+};
+
 /* SUCCESS */
-export const showSuccessToast = (message, subMessage) => {
+export const showSuccessToast = (message, subMessageOrOptions) => {
+    const { subMessage, options } = parseArgs(subMessageOrOptions);
+    const duration = options.duration || 2000;
     const displayTitle = subMessage ? message : "Success";
     const displaySubtitle = subMessage ? subMessage : (message || "Operation completed successfully");
     toast.custom(
@@ -108,18 +117,21 @@ export const showSuccessToast = (message, subMessage) => {
                 titleColor="text-[#4ade80]"
                 progressColor="bg-[#22c55e]"
                 position="top-right"
-                duration={2000}
+                duration={duration}
             />
         ),
         {
-            duration: 2000,
+            duration: duration,
             position: 'top-right',
+            ...options
         }
     );
 };
 
 /* ERROR */
-export const showErrorToast = (message, subMessage) => {
+export const showErrorToast = (message, subMessageOrOptions) => {
+    const { subMessage, options } = parseArgs(subMessageOrOptions);
+    const duration = options.duration || 2000;
     const displayTitle = subMessage ? message : "Error";
     const displaySubtitle = subMessage ? subMessage : (message || "An error occurred");
     toast.custom(
@@ -137,18 +149,21 @@ export const showErrorToast = (message, subMessage) => {
                 titleColor="text-[#f87171]"
                 progressColor="bg-[#ef4444]"
                 position="top-right"
-                duration={2000}
+                duration={duration}
             />
         ),
         {
-            duration: 2000,
+            duration: duration,
             position: 'top-right',
+            ...options
         }
     );
 };
 
 /* INFO */
-export const showInfoToast = (message, subMessage) => {
+export const showInfoToast = (message, subMessageOrOptions) => {
+    const { subMessage, options } = parseArgs(subMessageOrOptions);
+    const duration = options.duration || 3000;
     const displayTitle = subMessage ? message : "Information";
     const displaySubtitle = subMessage ? subMessage : (message || "Here is some information");
     toast.custom(
@@ -166,18 +181,21 @@ export const showInfoToast = (message, subMessage) => {
                 titleColor="text-[#60a5fa]"
                 progressColor="bg-[#3b82f6]"
                 position="top-right"
-                duration={3000}
+                duration={duration}
             />
         ),
         {
-            duration: 3000,
+            duration: duration,
             position: 'top-right',
+            ...options
         }
     );
 };
 
 /* PENDING / WAIT */
-export const showPendingToast = (message, subMessage) => {
+export const showPendingToast = (message, subMessageOrOptions) => {
+    const { subMessage, options } = parseArgs(subMessageOrOptions);
+    const duration = options.duration || 3000;
     const displayTitle = subMessage ? message : "Pending";
     const displaySubtitle = subMessage ? subMessage : (message || "Processing your request");
     toast.custom(
@@ -195,12 +213,14 @@ export const showPendingToast = (message, subMessage) => {
                 titleColor="text-[#00D1FF]"
                 progressColor="bg-[#00D1FF]"
                 position="top-right"
-                duration={3000}
+                duration={duration}
             />
         ),
         {
-            duration: 3000,
+            duration: duration,
             position: 'top-right',
+            ...options
         }
     );
 };
+

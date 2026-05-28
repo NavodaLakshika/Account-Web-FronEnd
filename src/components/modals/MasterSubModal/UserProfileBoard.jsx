@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import SimpleModal from '../../SimpleModal';
-import { User, Key, Calendar, ShieldCheck, ShieldAlert, Save, Trash2, Search, RotateCcw, Loader2, Users, Eye, EyeOff } from 'lucide-react';
+import { User, Key, Calendar, ShieldCheck, Save, Trash2, Search, RotateCcw, Loader2, Users, Eye, EyeOff, AlertTriangle } from 'lucide-react';
 import CalendarModal from '../../CalendarModal';
 import UserSearchModal from '../UserSearchModal';
 import UserGroupSearchModal from '../UserGroupSearchModal';
 import CostCenterAuthModal from './CostCenterAuthModal';
 import { userProfileService } from '../../../services/userProfile.service';
 import { showSuccessToast, showErrorToast } from '../../../utils/toastUtils';
+import { MasterFormWrapper, MasterFieldRow, MasterInput, MasterLookupInput } from '../../MasterFormComponents';
 
 const UserProfileBoard = ({ isOpen, onClose }) => {
-    // Individual states for each field
     const [emp_Code, setEmp_Code] = useState('');
     const [emp_Name, setEmp_Name] = useState('');
     const [pass_Word, setPass_Word] = useState('');
@@ -26,229 +25,171 @@ const UserProfileBoard = ({ isOpen, onClose }) => {
     const [showCostCenterAuth, setShowCostCenterAuth] = useState(false);
     const [showCalendar, setShowCalendar] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
-    
     const [fetching, setFetching] = useState(false);
     const [saving, setSaving] = useState(false);
     const [deleting, setDeleting] = useState(false);
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
     const isEditing = emp_Code !== '';
 
     useEffect(() => {
         if (isOpen) {
             const user = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null;
-            if (user) {
-                setLast_Modified_User(user.empName || user.emp_Name || 'SYSTEM');
-            }
+            if (user) setLast_Modified_User(user.empName || user.emp_Name || 'SYSTEM');
         }
     }, [isOpen]);
 
     const handleClear = () => {
-        setEmp_Code('');
-        setEmp_Name('');
-        setPass_Word('');
-        setConpass_Word('');
-        setMust_Change('0');
-        setCant_Change('0');
-        setAcc_Desable('0');
-        setExp_Date('');
-        setMember_Id('Administrators');
-        setShowPassword(false);
+        setEmp_Code(''); setEmp_Name(''); setPass_Word(''); setConpass_Word('');
+        setMust_Change('0'); setCant_Change('0'); setAcc_Desable('0');
+        setExp_Date(''); setMember_Id('Administrators'); setShowPassword(false);
     };
 
     const handleUserSelect = async (user) => {
         const selectedCode = user.emp_Code || user.Emp_Code;
         if (!selectedCode) return;
-        
         setFetching(true);
         try {
             const profile = await userProfileService.getUserProfile(selectedCode);
-            setEmp_Code(profile.emp_Code);
-            setEmp_Name(profile.emp_Name || '');
-            setPass_Word(profile.pass_Word || '');
-            setConpass_Word(profile.pass_Word || '');
-            setMust_Change(profile.must_Change || '0');
-            setCant_Change(profile.cant_Change || '0');
-            setAcc_Desable(profile.acc_Desable || '0');
-            setExp_Date(profile.exp_Date || '');
+            setEmp_Code(profile.emp_Code); setEmp_Name(profile.emp_Name || '');
+            setPass_Word(profile.pass_Word || ''); setConpass_Word(profile.pass_Word || '');
+            setMust_Change(profile.must_Change || '0'); setCant_Change(profile.cant_Change || '0');
+            setAcc_Desable(profile.acc_Desable || '0'); setExp_Date(profile.exp_Date || '');
             setMember_Id(profile.member_Id || 'Administrators');
-        } catch (error) {
-            showErrorToast('Failed to load user profile');
-        } finally {
-            setFetching(false);
-        }
+        } catch (error) { showErrorToast('Failed to load user profile'); } finally { setFetching(false); }
     };
 
     const handleSave = async () => {
         if (!emp_Name.trim()) return showErrorToast('Employee Name is required');
         if (!pass_Word.trim()) return showErrorToast('Password is required');
         if (pass_Word !== conpass_Word) return showErrorToast('Passwords do not match');
-
         setSaving(true);
         try {
             const payload = { emp_Code, emp_Name, pass_Word, must_Change, cant_Change, acc_Desable, exp_Date, member_Id, last_Modified_User };
             const result = await userProfileService.saveProfile(payload);
             if (!emp_Code && result.empCode) setEmp_Code(result.empCode);
             showSuccessToast(result.message || 'User profile saved successfully');
-        } catch (error) {
-            showErrorToast(error.message || 'Failed to save user profile');
-        } finally {
-            setSaving(false);
-        }
+        } catch (error) { showErrorToast(error.message || 'Failed to save user profile'); } finally { setSaving(false); }
     };
 
-    const handleDelete = async () => {
+    const handleDelete = () => {
         if (!emp_Code) return showErrorToast('No user selected for deletion');
-        if (!window.confirm('Do you really want to delete this user?')) return;
+        setShowDeleteConfirm(true);
+    };
 
+    const confirmDelete = async () => {
         setDeleting(true);
-        try {
-            await userProfileService.deleteUser(emp_Code);
-            showSuccessToast('User profile deleted successfully');
-            handleClear();
-        } catch (error) {
-            showErrorToast(error.message || 'Failed to delete user profile');
-        } finally {
-            setDeleting(false);
-        }
+        try { await userProfileService.deleteUser(emp_Code); showSuccessToast('User profile deleted successfully'); handleClear(); setShowDeleteConfirm(false); } catch (error) { showErrorToast(error.message || 'Failed to delete user profile'); } finally { setDeleting(false); }
     };
 
     return (
         <>
-            <SimpleModal
+            <MasterFormWrapper
                 isOpen={isOpen}
                 onClose={onClose}
                 title="User Profile Maintenance"
-                maxWidth="max-w-[550px]"
-                footer={
-                    <div className="bg-slate-50 px-6 py-4 w-full flex justify-end gap-3 border-t border-gray-100 rounded-b-xl">
-                        <button onClick={handleSave} disabled={saving} className="px-8 h-10 bg-[#50af60] text-white text-[13px] font-bold rounded-[5px] shadow-md shadow-green-100 hover:bg-[#24db4e] transition-all active:scale-95 flex items-center justify-center gap-2">
-                            {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
-                            {isEditing ? 'Update' : 'Add User'}
+                subtitle="Manage system user accounts & access"
+                icon={User}
+                maxWidth="max-w-[600px]"
+                isEditMode={isEditing}
+                loading={saving}
+                onClear={handleClear}
+                onSave={handleSave}
+                onDelete={handleDelete}
+                customFooter={
+                    <div className="flex items-center justify-end gap-3 w-full">
+                        <button onClick={handleClear} className="px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-500 font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] transition-all active:scale-95 flex items-center justify-center gap-2 border-none">
+                            <RotateCcw size={14} /> CLEAR FORM
                         </button>
-                        <button onClick={handleDelete} disabled={!isEditing || deleting} className="px-8 h-10 bg-[#ff3b30] text-white text-[13px] font-bold rounded-[5px] hover:bg-[#e03127] shadow-md shadow-red-100 transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-50">
-                            <Trash2 size={16} /> Delete
-                        </button>
-                        <button onClick={handleClear} className="px-8 h-10 bg-[#00adff] text-white text-[13px] font-bold rounded-[5px] hover:bg-[#0099e6] shadow-md shadow-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2">
-                            <RotateCcw size={16} /> Clear
+                        {isEditing && (
+                            <button onClick={handleDelete} disabled={!isEditing || deleting} className="px-6 py-3 bg-red-500 hover:bg-red-600 text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] transition-all active:scale-95 flex items-center justify-center gap-2 border-none disabled:opacity-50 shadow-md shadow-red-100">
+                                {deleting ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />} DELETE
+                            </button>
+                        )}
+                        <button onClick={handleSave} disabled={saving} className={`px-6 py-3 text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] transition-all active:scale-95 flex items-center justify-center gap-2 border-none disabled:opacity-50 shadow-md ${isEditing ? 'bg-[#00adff] hover:bg-[#0099e6] shadow-blue-100' : 'bg-[#2bb744] hover:bg-[#259b3a] shadow-green-100'}`}>
+                            {saving ? <Loader2 size={14} className="animate-spin" /> : (isEditing ? <Save size={14} /> : <Save size={14} />)}
+                            {isEditing ? 'UPDATE' : 'ADD USER'}
                         </button>
                     </div>
                 }
             >
-                <div className="py-4 select-none font-['Tahoma'] space-y-4 text-[12.5px]">
-                    
-                    {/* User Code */}
-                    <div className="flex items-center gap-3 px-2">
-                        <label className="w-32 font-bold text-gray-700 uppercase">User Code</label>
-                        <div className="w-[325px] flex items-center gap-2">
-                            <div className="w-[275px] h-8 border border-gray-300 px-3 bg-white rounded-[5px] flex items-center font-bold text-[#0078d4] shadow-sm">
-                                {fetching ? 'LOADING...' : (emp_Code || '')}
-                            </div>
-                            <button onClick={() => setShowSearchModal(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 flex-shrink-0">
-                                <Search size={18} />
-                            </button>
-                        </div>
+                <MasterFieldRow label="User Code" colSpan="col-span-12">
+                    <div className="flex-1 flex gap-1 min-w-0 items-center">
+                        <div className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-sm font-mono font-bold text-[#0285fd] bg-slate-50 rounded outline-none flex items-center">{fetching ? 'LOADING...' : (emp_Code || '')}</div>
+                        <button onClick={() => setShowSearchModal(true)} className="w-8 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0"><Search size={14} /></button>
                     </div>
-
-                    {/* User Name */}
-                    <div className="flex items-center gap-3 px-2">
-                        <label className="w-32 font-bold text-gray-700 uppercase">User Name</label>
-                        <div className="w-[325px] flex items-center gap-2">
-                            <input type="text" value={emp_Name} onChange={(e) => setEmp_Name(e.target.value)} className="w-[275px] h-8 border border-gray-300 px-3 bg-white rounded-[5px] outline-none focus:border-blue-400 font-bold uppercase shadow-sm" />
-                            <div className="w-10 flex-shrink-0" />
-                        </div>
+                </MasterFieldRow>
+                <MasterFieldRow label="User Name" colSpan="col-span-12">
+                    <MasterInput name="emp_Name" value={emp_Name} onChange={(e) => setEmp_Name(e.target.value)} placeholder="Enter user name" className="uppercase" />
+                </MasterFieldRow>
+                <MasterFieldRow label="Member Group" colSpan="col-span-12">
+                    <div className="flex-1 flex gap-1 min-w-0 items-center">
+                        <input type="text" value={member_Id} readOnly className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-sm font-mono font-bold text-gray-700 bg-slate-50 rounded outline-none cursor-default" />
+                        <button onClick={() => setShowGroupModal(true)} className="w-8 h-8 bg-[#e49e1b] text-white flex items-center justify-center hover:bg-[#cb9b34] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0"><Users size={14} /></button>
                     </div>
-
-                    {/* Member Group */}
-                    <div className="flex items-center gap-3 px-2">
-                        <label className="w-32 font-bold text-gray-700 uppercase">Member Group</label>
-                        <div className="w-[325px] flex items-center gap-2">
-                            <input type="text" value={member_Id} readOnly className="w-[275px] h-8 border border-gray-300 px-3 bg-slate-50 text-slate-500 rounded-[5px] font-bold uppercase" />
-                            <button onClick={() => setShowGroupModal(true)} className="w-10 h-8 bg-[#e49e1b] text-white flex items-center justify-center hover:bg-[#cb9b34] rounded-[5px] transition-all shadow-md active:scale-95 flex-shrink-0">
-                                <Users size={18} />
-                            </button>
-                        </div>
+                </MasterFieldRow>
+                <MasterFieldRow label="Password" colSpan="col-span-12">
+                    <div className="flex-1 flex gap-1 min-w-0 items-center">
+                        <input type={showPassword ? "text" : "password"} value={pass_Word} onChange={(e) => setPass_Word(e.target.value)} className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-sm font-mono font-bold text-slate-700 bg-slate-50 rounded outline-none focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 transition-all" placeholder="Enter password" />
+                        <button onClick={() => setShowPassword(!showPassword)} className="w-8 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">{showPassword ? <EyeOff size={14} /> : <Eye size={14} />}</button>
                     </div>
-
-                    {/* Password */}
-                    <div className="flex items-center gap-3 px-2">
-                        <label className="w-32 font-bold text-gray-700 uppercase">Password</label>
-                        <div className="w-[325px] flex items-center gap-2">
-                            <input 
-                                type={showPassword ? "text" : "password"} 
-                                value={pass_Word} 
-                                onChange={(e) => setPass_Word(e.target.value)} 
-                                className="w-[275px] h-8 border border-gray-300 px-3 bg-white rounded-[5px] outline-none focus:border-blue-400 shadow-sm" 
-                            />
-                            <button 
-                                onClick={() => setShowPassword(!showPassword)}
-                                className="w-10 h-8 bg-slate-100 text-slate-500 flex items-center justify-center hover:bg-slate-200 rounded-[5px] transition-all active:scale-95 flex-shrink-0 border border-slate-200"
-                            >
-                                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                            </button>
-                        </div>
+                </MasterFieldRow>
+                <MasterFieldRow label="Confirm Pwd" colSpan="col-span-12">
+                    <input type={showPassword ? "text" : "password"} value={conpass_Word} onChange={(e) => setConpass_Word(e.target.value)} className={`flex-1 min-w-0 h-8 border border-slate-200 px-3 text-sm font-mono font-bold text-slate-700 bg-slate-50 rounded outline-none focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 transition-all ${conpass_Word && pass_Word === conpass_Word ? 'border-green-400 bg-green-50/20' : ''}`} placeholder="Confirm password" />
+                </MasterFieldRow>
+                <MasterFieldRow label="Expiry Date" colSpan="col-span-12">
+                    <div className="flex-1 flex gap-1 min-w-0 items-center">
+                        <input type="text" value={exp_Date} readOnly onClick={() => setShowCalendar(true)} className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-sm font-mono font-bold text-gray-700 bg-slate-50 rounded outline-none cursor-pointer transition-all" placeholder="Select date..." />
+                        <button onClick={() => setShowCalendar(true)} className="w-8 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0"><Calendar size={14} /></button>
                     </div>
+                </MasterFieldRow>
 
-                    {/* Confirm Password */}
-                    <div className="flex items-center gap-3 px-2">
-                        <label className="w-32 font-bold text-gray-700 uppercase">Confirm Pwd</label>
-                        <div className="w-[325px] flex items-center gap-2">
-                            <input 
-                                type={showPassword ? "text" : "password"} 
-                                value={conpass_Word} 
-                                onChange={(e) => setConpass_Word(e.target.value)} 
-                                className={`w-[275px] h-8 border ${conpass_Word && pass_Word === conpass_Word ? 'border-green-500 bg-green-50/20' : 'border-gray-300 bg-white'} px-3 rounded-[5px] outline-none focus:border-blue-400 shadow-sm`} 
-                            />
-                            <div className="w-10 flex-shrink-0" />
-                        </div>
-                    </div>
-
-                    {/* Expiry Date */}
-                    <div className="flex items-center gap-3 px-2 pt-2">
-                        <label className="w-32 font-bold text-gray-700 uppercase">Expiry Date</label>
-                        <div className="w-[325px] flex items-center gap-2">
-                            <input type="text" value={exp_Date} readOnly onClick={() => setShowCalendar(true)} className="flex-1 h-8 border border-gray-300 px-3 bg-white rounded-[5px] font-bold text-slate-700 shadow-sm cursor-pointer" placeholder="DD/MM/YYYY" />
-                            <button onClick={() => setShowCalendar(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 flex-shrink-0">
-                                <Calendar size={18} />
-                            </button>
-                        </div>
-                    </div>
-
-                    {/* Checkboxes Area */}
-                    <div className="flex flex-col gap-2.5 ml-[10px] pt-1">
-                        <label className="flex items-center gap-3 cursor-pointer">
-                            <input type="checkbox" checked={must_Change === '1'} onChange={(e) => setMust_Change(e.target.checked ? '1' : '0')} className="w-4 h-4 rounded border-gray-300 text-[#0285fd]" />
-                            <span className="font-bold text-gray-600 uppercase text-[11px]">Must Change Password Next Login</span>
+                <div className="col-span-12 mt-4">
+                    <div className="text-[11px] font-bold text-gray-500 uppercase mb-3">Account Options</div>
+                    <div className="bg-white border border-slate-200 rounded-[5px] p-4 space-y-3">
+                        <label className="flex items-center gap-3 cursor-pointer h-8">
+                            <input type="checkbox" checked={must_Change === '1'} onChange={(e) => setMust_Change(e.target.checked ? '1' : '0')} className="w-4 h-4 rounded border-gray-300 text-[#0285fd] focus:ring-[#00D1FF]" />
+                            <span className="text-[12px] font-bold text-slate-600 select-none">Must Change Password Next Login</span>
                         </label>
-                        <label className="flex items-center gap-3 cursor-pointer">
-                            <input type="checkbox" checked={cant_Change === '1'} onChange={(e) => setCant_Change(e.target.checked ? '1' : '0')} className="w-4 h-4 rounded border-gray-300 text-[#0285fd]" />
-                            <span className="font-bold text-gray-600 uppercase text-[11px]">User Cannot Change Password</span>
+                        <label className="flex items-center gap-3 cursor-pointer h-8">
+                            <input type="checkbox" checked={cant_Change === '1'} onChange={(e) => setCant_Change(e.target.checked ? '1' : '0')} className="w-4 h-4 rounded border-gray-300 text-[#0285fd] focus:ring-[#00D1FF]" />
+                            <span className="text-[12px] font-bold text-slate-600 select-none">User Cannot Change Password</span>
                         </label>
-                        <label className="flex items-center gap-3 cursor-pointer text-red-600">
-                            <input type="checkbox" checked={acc_Desable === '1'} onChange={(e) => setAcc_Desable(e.target.checked ? '1' : '0')} className="w-4 h-4 rounded border-gray-300 text-red-600" />
-                            <span className="font-bold uppercase text-[11px]">Account Disabled</span>
+                        <label className="flex items-center gap-3 cursor-pointer h-8">
+                            <input type="checkbox" checked={acc_Desable === '1'} onChange={(e) => setAcc_Desable(e.target.checked ? '1' : '0')} className="w-4 h-4 rounded border-gray-300 text-red-500 focus:ring-red-400" />
+                            <span className="text-[12px] font-bold text-red-600 select-none">Account Disabled</span>
                         </label>
-                    </div>
-
-                    {/* Advanced Actions */}
-                    <div className="pt-4 border-t border-gray-100 flex justify-center">
-                        <button onClick={() => setShowCostCenterAuth(true)} className="px-10 h-8 bg-[#0078d4] text-white text-[10px] font-black rounded-[5px] hover:bg-[#005a9e] shadow-md shadow-blue-100 transition-all active:scale-95 flex items-center justify-center uppercase tracking-[0.1em]">
-                            Cost Center Authentication
-                        </button>
-                    </div>
-
-                    {/* Status Info */}
-                    <div className="pt-2 text-[9px] font-bold text-slate-400 flex items-center gap-2 justify-center italic uppercase tracking-widest">
-                        <div className="w-1.5 h-1.5 rounded-full bg-slate-300"></div>
-                        Last Modified By: {last_Modified_User}
+                        <div className="pt-2 border-t border-slate-200">
+                            <button onClick={() => setShowCostCenterAuth(true)} disabled={!emp_Code} className="w-full h-9 bg-[#0285fd] text-white text-[10px] font-mono font-bold rounded-[5px] hover:bg-[#0073ff] shadow-sm transition-all active:scale-95 flex items-center justify-center uppercase tracking-widest gap-2 disabled:opacity-40">
+                                <ShieldCheck size={14} /> Cost Center Authentication
+                            </button>
+                        </div>
                     </div>
                 </div>
-            </SimpleModal>
+            </MasterFormWrapper>
 
-            {/* Sub Modals */}
             <UserSearchModal isOpen={showSearchModal} onClose={() => setShowSearchModal(false)} onSelect={handleUserSelect} />
             <UserGroupSearchModal isOpen={showGroupModal} onClose={() => setShowGroupModal(false)} onSelect={setMember_Id} />
             <CostCenterAuthModal isOpen={showCostCenterAuth} onClose={() => setShowCostCenterAuth(false)} empCode={emp_Code} empName={emp_Name} userRole={member_Id} />
             <CalendarModal isOpen={showCalendar} onClose={() => setShowCalendar(false)} onSelectDate={(date) => { setExp_Date(date); setShowCalendar(false); }} initialDate={exp_Date} />
+
+            {showDeleteConfirm && (
+                <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4">
+                    <div className="absolute inset-0 bg-slate-900/70 backdrop-blur-sm" onClick={() => !deleting && setShowDeleteConfirm(false)} />
+                    <div className="relative w-full max-w-md bg-white rounded-2xl shadow-2xl border border-white/10 overflow-hidden animate-in zoom-in-95 duration-300">
+                        <div className="p-8 text-center">
+                            <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6 border-4 border-white shadow-lg"><AlertTriangle size={40} className="text-red-500" /></div>
+                            <h3 className="text-lg font-black text-slate-800 mb-2 uppercase tracking-wider">Confirm Deletion</h3>
+                            <p className="text-slate-500 text-[12px] font-medium leading-relaxed mb-8">Are you sure you want to delete user <span className="font-bold text-slate-800 uppercase">"{emp_Name || emp_Code}"</span>?<br />This action is permanent and cannot be undone.</p>
+                            <div className="flex gap-3">
+                                <button onClick={() => setShowDeleteConfirm(false)} disabled={deleting} className="flex-1 h-11 bg-slate-100 text-slate-600 text-[11px] font-black rounded-xl hover:bg-slate-200 transition-all uppercase tracking-widest disabled:opacity-50">Cancel</button>
+                                <button onClick={confirmDelete} disabled={deleting} className="flex-1 h-11 bg-red-500 text-white text-[11px] font-black rounded-xl hover:bg-red-600 shadow-lg shadow-red-200 transition-all flex items-center justify-center gap-2 uppercase tracking-widest disabled:opacity-50">{deleting ? <Loader2 size={16} className="animate-spin" /> : 'Delete Now'}</button>
+                            </div>
+                        </div>
+                        <div className="bg-slate-50 py-3 border-t border-slate-100"><span className="text-[9px] text-slate-400 font-black uppercase tracking-[0.2em] block text-center">Security Verification Required</span></div>
+                    </div>
+                </div>
+            )}
         </>
     );
 };

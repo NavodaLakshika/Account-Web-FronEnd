@@ -16,6 +16,7 @@ const SystemSettingsBoard = ({ isOpen = true, onClose, isInline = false }) => {
         { label: 'Create Category', id: 'master_category' },
         { label: 'Supplier Master', id: 'master_supplier' },
         { label: 'Customer Master', id: 'master_customer' },
+        { label: 'Customer Types', id: 'master_customerType' },
         { label: 'Card Sale Commission', id: 'master_cardSale' },
         { label: 'Chart of Accountant', id: 'master_chartOfAccount' },
         { label: 'User Profile Maint', id: 'master_userProfile' },

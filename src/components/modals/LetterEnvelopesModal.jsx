@@ -1,6 +1,8 @@
 import React from 'react';
 import { X, Mail, FileText, Send, Scroll, Mailbox, Briefcase } from 'lucide-react';
 
+const accent = localStorage.getItem('topBarColor') || '#0388cc';
+
 const LetterEnvelopesModal = ({ isOpen, onClose }) => {
     if (!isOpen) return null;
 
@@ -14,45 +16,39 @@ const LetterEnvelopesModal = ({ isOpen, onClose }) => {
 
     return (
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
-            {/* Backdrop */}
-            <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={onClose} />
-            
-            {/* Modal Container */}
-            <div className="relative w-full max-w-[280px] bg-white border border-gray-100 rounded-xl shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
-                
-                {/* Header */}
-                <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-100 select-none relative overflow-hidden">
-                    {/* System Color Left Accent */}
-                    <div 
-                        className="absolute left-0 top-0 bottom-0 w-1.5 transition-colors duration-500" 
-                        style={{ backgroundColor: localStorage.getItem('topBarColor') || '#0078d4' }}
-                    />
-                    
-                    <div className="flex items-center gap-2">
-                        <Briefcase size={14} className="text-[#0078d4]" />
-                        <span className="text-lg font-bold text-slate-800 tracking-tight">Letters and Envelopes</span>
+            <div className="absolute inset-0 bg-slate-900/70 backdrop-blur-sm" onClick={onClose} />
+
+            <div className="relative w-full max-w-[280px] bg-white rounded-2xl shadow-2xl overflow-hidden border border-white/10 animate-in zoom-in-95 duration-300 flex flex-col max-h-[90vh]">
+                <div className="absolute left-0 top-0 bottom-0 w-[4px]" style={{ backgroundColor: accent }} />
+
+                <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-white">
+                    <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-xl bg-[#4f83ff]/10 flex items-center justify-center">
+                            <Briefcase size={16} className="text-[#4f83ff]" />
+                        </div>
+                        <div>
+                            <h2 className="text-[15px] font-black uppercase tracking-[0.25em] text-slate-900 leading-tight">Letters & Envelopes</h2>
+                            <p className="text-[10px] text-slate-400 font-medium tracking-wider">Corporate Communications</p>
+                        </div>
                     </div>
-                    <button 
-                        onClick={onClose} 
-                        className="w-9 h-8 flex items-center justify-center bg-red-50 hover:bg-red-100 text-red-600 rounded-[8px] transition-all active:scale-90 outline-none border-none group"
-                        title="Close"
-                    >
-                        <X size={18} strokeWidth={4} className="group-hover:scale-110 transition-transform" />
+                    <button onClick={onClose} className="w-9 h-9 rounded-xl bg-red-50 hover:bg-red-100 flex items-center justify-center transition-all active:scale-90">
+                        <X size={18} strokeWidth={3} className="text-red-600" />
                     </button>
                 </div>
 
-                {/* Menu Content */}
-                <div className="p-6 bg-white flex-1 overflow-y-auto no-scrollbar">
+                <div className="flex-1 overflow-y-auto custom-scrollbar p-3">
                     {menuItems.map((item, idx) => {
                         const Icon = item.icon;
                         return (
                             <button
                                 key={idx}
-                                className="w-full flex items-center justify-between px-3 py-2.5 rounded-sm hover:bg-[#0078d4] group transition-all text-left"
+                                className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl hover:bg-slate-50 transition-all text-left group border border-transparent hover:border-slate-100 hover:shadow-sm"
                             >
                                 <div className="flex items-center gap-3">
-                                    <Icon size={16} className={`text-gray-500 group-hover:text-white transition-colors`} />
-                                    <span className={`text-[13px] font-medium text-gray-700 group-hover:text-white transition-colors`}>
+                                    <div className="w-9 h-9 rounded-lg bg-white border border-slate-100 flex items-center justify-center shadow-sm group-hover:border-[#4f83ff]/20 group-hover:bg-[#4f83ff]/5 transition-all shrink-0">
+                                        <Icon size={16} className="text-slate-500 group-hover:text-[#4f83ff] transition-colors" />
+                                    </div>
+                                    <span className="text-[13px] font-[700] tracking-tight text-slate-700">
                                         {item.label}
                                     </span>
                                 </div>
@@ -61,9 +57,8 @@ const LetterEnvelopesModal = ({ isOpen, onClose }) => {
                     })}
                 </div>
 
-                {/* Footer */}
-                <div className="bg-slate-50 px-6 py-4 flex justify-end gap-3 border-t border-gray-100">
-                    <span className="text-[10px] text-[#0078d4] font-bold uppercase tracking-widest italic font-sans">Corporate Communications</span>
+                <div className="bg-slate-50/80 border-t border-slate-100 flex items-center justify-between shrink-0 px-6 py-3">
+                    <span className="text-[9px] text-slate-400 font-medium">Communication Tools</span>
                 </div>
             </div>
         </div>

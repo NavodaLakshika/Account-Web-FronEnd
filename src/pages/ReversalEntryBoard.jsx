@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import SimpleModal from '../components/SimpleModal';
+import CalendarModal from '../components/CalendarModal';
 import { Search, X, RotateCcw, Loader2, History, ShieldCheck, Key, FileSearch, CheckCircle2, AlertCircle } from 'lucide-react';
 import { reversalEntryService } from '../services/reversalEntry.service';
 import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
@@ -25,6 +26,8 @@ const ReversalEntryBoard = ({ isOpen, onClose }) => {
 
     const [activeModal, setActiveModal] = useState(null); // 'type', 'user'
     const [searchTerm, setSearchTerm] = useState('');
+    const [showDatePicker, setShowDatePicker] = useState(false);
+    const [datePickerField, setDatePickerField] = useState('date');
 
     useEffect(() => {
         if (isOpen) {
@@ -129,116 +132,127 @@ const ReversalEntryBoard = ({ isOpen, onClose }) => {
 
     return (
         <>
+            <style>
+                {`
+                    @keyframes toastProgress {
+                        0% { width: 100%; }
+                        100% { width: 0%; }
+                    }
+                `}
+            </style>
             <SimpleModal
                 isOpen={isOpen}
                 onClose={onClose}
                 title="Reversal Entry Form"
                 maxWidth="max-w-[1000px]"
                 footer={
-                    <div className="bg-slate-50 px-6 py-4 w-full flex justify-end gap-3 border-t border-gray-100 rounded-b-xl font-['Inter']">
-                        <button onClick={handleApply} disabled={loading} className={`px-10 h-10 bg-[#0078d4] text-white text-sm font-bold rounded shadow-md hover:bg-[#005a9e] transition-all active:scale-95 flex items-center gap-2 ${loading ? 'opacity-50' : ''}`}>
-                            {loading ? <Loader2 size={16} className="animate-spin" /> : <CheckCircle2 size={18} />} Apply
-                        </button>
-                        <button onClick={handleView} disabled={loading} className="px-10 h-10 bg-white border border-[#0078d4] text-[#0078d4] text-sm font-bold rounded hover:bg-blue-50 transition-all flex items-center gap-2">
-                            <FileSearch size={18} /> View
-                        </button>
-                        <button onClick={handleClear} disabled={loading} className="px-8 h-10 bg-white border border-gray-300 text-slate-600 text-sm font-bold rounded hover:bg-slate-50 transition-all flex items-center gap-2">
-                             <RotateCcw size={16} /> Clear
-                        </button>
-                        <button onClick={onClose} className="px-8 h-10 bg-white border border-gray-300 text-slate-600 text-sm font-bold rounded hover:bg-slate-50 transition-all flex items-center gap-2">
-                             <X size={16} /> Exit
-                        </button>
+                    <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-slate-200 rounded-b-xl">
+                        <div className="flex gap-3">
+                            <button onClick={handleClear} disabled={loading} className="px-6 py-3 bg-[#00adff] hover:bg-[#0099e6] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] transition-all active:scale-95 flex items-center justify-center gap-2 border-none">
+                                <RotateCcw size={14} /> CLEAR FORM
+                            </button>
+                        </div>
+                        <div className="flex gap-3">
+                            
+                            <button onClick={handleView} disabled={loading} className="px-6 py-3 bg-white border-2 border-[#0285fd] text-[#0285fd] font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] hover:bg-blue-50 transition-all flex items-center justify-center gap-2">
+                                <FileSearch size={14} /> VIEW
+                            </button>
+                            <button onClick={handleApply} disabled={loading} className={`px-6 py-3 bg-[#0285fd] hover:bg-[#0073ff] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] shadow-md shadow-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border-none ${loading ? 'opacity-50' : ''}`}>
+                                {loading ? <Loader2 size={14} className="animate-spin" /> : <CheckCircle2 size={14} />} APPLY
+                            </button>
+                        </div>
                     </div>
                 }
             >
-                <div className="space-y-6 font-['Plus_Jakarta_Sans']">
+                <div className="space-y-4 font-['Tahoma']">
                     {/* Main Form Section */}
-                    <div className="bg-white p-8 border border-gray-200 rounded-sm shadow-sm relative overflow-hidden">
+                    <div className="bg-white p-4 border border-slate-200 rounded-[5px] relative overflow-hidden space-y-4">
                         <div className="absolute top-0 right-0 p-6 opacity-[0.05] pointer-events-none">
                             <History size={150} className="text-blue-900" />
                         </div>
                         
-                        <div className="grid grid-cols-12 gap-8 relative z-10">
-                            <div className="col-span-12 lg:col-span-12 flex items-center gap-4">
-                                <label className="text-[13px] font-bold text-gray-700 w-32 shrink-0">Transaction Type</label>
-                                <div className="flex-1 max-w-[400px] flex gap-2">
+                        <div className="grid grid-cols-12 gap-x-6 gap-y-3.5 relative z-10">
+                            {/* Transaction Type - Full Width */}
+                            <div className="col-span-12 flex items-center gap-2">
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-32 shrink-0">Transaction Type</label>
+                                <div className="flex-1 max-w-[400px] flex gap-1 h-8 min-w-0">
                                     <input 
                                         type="text" 
                                         readOnly 
                                         value={formData.transactionTypeName ? `${formData.transactionType} - ${formData.transactionTypeName}` : ''} 
-                                        placeholder="Click search to select transaction type..." 
-                                        className="flex-1 h-9 border border-gray-300 px-4 text-[13px] font-bold text-[#0078d4] rounded-sm bg-gray-50/50 outline-none" 
+                                        className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-bold text-gray-700 bg-slate-50 rounded outline-none cursor-pointer transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" 
+                                        onClick={() => { setActiveModal('type'); setSearchTerm(''); }}
                                     />
-                                    <button onClick={() => { setActiveModal('type'); setSearchTerm(''); }} className="w-12 h-9 bg-[#0078d4] text-white flex items-center justify-center hover:bg-[#005a9e] rounded-sm transition-all shadow-md active:scale-90">
-                                        <Search size={20} />
+                                    <button onClick={() => { setActiveModal('type'); setSearchTerm(''); }} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
+                                        <Search size={16} />
                                     </button>
                                 </div>
                             </div>
 
-                            <div className="col-span-12 lg:col-span-4 flex items-center gap-4">
-                                <label className="text-[13px] font-bold text-gray-700 w-32 shrink-0">Voucher No</label>
-                                <input name="voucherNo" value={formData.voucherNo} onChange={handleInputChange} type="text" className="flex-1 h-9 border border-gray-300 px-4 text-[13px] rounded-sm bg-white outline-none focus:border-blue-500 shadow-sm" />
+                            {/* Reference Numbers - 3 Columns */}
+                            <div className="col-span-12 lg:col-span-4 flex items-center gap-2">
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-32 shrink-0">Voucher No</label>
+                                <input name="voucherNo" value={formData.voucherNo} onChange={handleInputChange} type="text" className="flex-1 min-w-0 h-8 border border-slate-200 rounded px-3 text-[12px] font-mono outline-none bg-slate-50 text-gray-700 transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" />
                             </div>
 
-                            <div className="col-span-12 lg:col-span-4 flex items-center gap-4">
-                                <label className="text-[13px] font-bold text-gray-700 w-32 shrink-0">Document No.</label>
-                                <input name="documentNo" value={formData.documentNo} onChange={handleInputChange} type="text" className="flex-1 h-9 border border-gray-300 px-4 text-[13px] rounded-sm bg-white outline-none focus:border-blue-500 shadow-sm" />
+                            <div className="col-span-12 lg:col-span-4 flex items-center gap-2">
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-32 shrink-0">Document No.</label>
+                                <input name="documentNo" value={formData.documentNo} onChange={handleInputChange} type="text" className="flex-1 min-w-0 h-8 border border-slate-200 rounded px-3 text-[12px] font-mono outline-none bg-slate-50 text-gray-700 transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" />
                             </div>
 
-                            <div className="col-span-12 lg:col-span-4 flex items-center gap-4">
-                                <label className="text-[13px] font-bold text-gray-700 w-32 shrink-0">Cheque No</label>
-                                <input name="chequeNo" value={formData.chequeNo} onChange={handleInputChange} type="text" className="flex-1 h-9 border border-gray-300 px-4 text-[13px] rounded-sm bg-white outline-none focus:border-blue-500 shadow-sm" />
+                            <div className="col-span-12 lg:col-span-4 flex items-center gap-2">
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-32 shrink-0">Cheque No</label>
+                                <input name="chequeNo" value={formData.chequeNo} onChange={handleInputChange} type="text" className="flex-1 min-w-0 h-8 border border-slate-200 rounded px-3 text-[12px] font-mono outline-none bg-slate-50 text-gray-700 transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" />
                             </div>
 
-                            <div className="col-span-12 flex items-start gap-4 pt-2">
-                                <label className="text-[13px] font-bold text-gray-700 w-32 shrink-0 mt-2">Reason</label>
-                                <textarea name="reason" value={formData.reason} onChange={handleInputChange} className="flex-1 h-24 border border-gray-200 p-4 text-[13px] rounded-sm outline-none resize-none bg-gray-50/20 hover:border-blue-300 focus:border-blue-500 transition-all font-medium italic text-gray-600" placeholder="Please specify the reason for reversing this record..." />
+                            <div className="col-span-12 flex items-start gap-2 pt-2">
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-32 shrink-0 mt-2">Reason</label>
+                                <textarea name="reason" value={formData.reason} onChange={handleInputChange} className="flex-1 min-w-0 h-24 border border-slate-200 rounded px-3 py-2 font-mono text-[12px] outline-none bg-slate-50 text-gray-700 transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 resize-none italic" />
                             </div>
                         </div>
                     </div>
 
                     {/* Authorization Section */}
-                    <div className="bg-slate-50 p-6 border border-gray-200 rounded-sm border-l-4 border-l-[#0078d4]">
-                        <div className="flex items-center gap-2 mb-6 ml-1">
-                            <ShieldCheck size={18} className="text-[#0078d4]" />
-                            <h3 className="text-[11px] font-black uppercase text-slate-500 tracking-[0.2em]">Mandatory Authorization</h3>
+                    <div className="bg-slate-50 p-4 border border-slate-200 rounded-[5px] border-l-4 border-l-[#0285fd]">
+                        <div className="flex items-center gap-2 mb-4 ml-1">
+                            <ShieldCheck size={16} className="text-[#0285fd]" />
+                            <h3 className="text-[10px] font-mono font-bold uppercase text-slate-500 tracking-widest">Mandatory Authorization</h3>
                         </div>
                         
-                        <div className="grid grid-cols-12 gap-10">
-                            <div className="col-span-12 lg:col-span-6 flex items-center gap-4">
-                                <label className="text-[13px] font-bold text-gray-700 w-32 shrink-0">User Name</label>
-                                <div className="flex-1 flex gap-2">
+                        <div className="grid grid-cols-12 gap-x-6 gap-y-3.5">
+                            <div className="col-span-12 lg:col-span-6 flex items-center gap-2">
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-32 shrink-0">User Name</label>
+                                <div className="flex-1 flex gap-1 h-8 min-w-0">
                                     <input 
                                         type="text" 
                                         readOnly 
                                         value={formData.authUsername} 
-                                        placeholder="Select authorized user..." 
-                                        className="flex-1 h-9 border border-gray-300 px-4 text-[13px] font-bold rounded-sm bg-white outline-none" 
+                                        className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-bold text-gray-700 bg-white rounded outline-none cursor-pointer transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" 
+                                        onClick={() => { setActiveModal('user'); setSearchTerm(''); }}
                                     />
-                                    <button onClick={() => { setActiveModal('user'); setSearchTerm(''); }} className="w-10 h-9 bg-slate-800 text-white flex items-center justify-center hover:bg-slate-700 rounded-sm transition-all shadow-sm active:scale-90">
+                                    <button onClick={() => { setActiveModal('user'); setSearchTerm(''); }} className="w-10 h-8 bg-slate-800 text-white flex items-center justify-center hover:bg-slate-700 rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
                                         <Search size={16} />
                                     </button>
                                 </div>
                             </div>
-                            <div className="col-span-12 lg:col-span-6 flex items-center gap-4">
-                                <label className="text-[13px] font-bold text-gray-700 w-32 shrink-0">Password</label>
-                                <div className="flex-1 relative">
+                            <div className="col-span-12 lg:col-span-6 flex items-center gap-2">
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-32 shrink-0">Password</label>
+                                <div className="flex-1 relative h-8 min-w-0">
                                     <input 
                                         name="authPassword" 
                                         type="password" 
                                         value={formData.authPassword} 
                                         onChange={handleInputChange} 
-                                        className="w-full h-9 border border-gray-300 pl-10 pr-4 text-[13px] rounded-sm outline-none focus:border-red-500 bg-white" 
-                                        placeholder="••••••••" 
+                                        className="w-full h-8 border border-slate-200 pl-8 pr-3 text-[12px] font-mono rounded outline-none bg-white transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" 
                                     />
-                                    <Key size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                                    <Key size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400" />
                                 </div>
                             </div>
                         </div>
                         
-                        <div className="mt-6 flex items-center gap-3 px-4 py-3 bg-blue-50/50 rounded-sm border border-blue-100/50">
-                            <AlertCircle size={14} className="text-[#0078d4]" />
-                            <p className="text-[10px] font-bold text-blue-800 tracking-wide uppercase italic">
+                        <div className="mt-4 flex items-center gap-2 px-3 py-2 bg-blue-50/50 rounded-[5px] border border-blue-100/50">
+                            <AlertCircle size={14} className="text-[#0285fd]" />
+                            <p className="text-[10px] font-mono font-bold text-blue-800 uppercase tracking-widest italic">
                                 Note: Reversing a transaction will create a counter-entry to offset the original financial impact.
                             </p>
                         </div>
@@ -247,47 +261,47 @@ const ReversalEntryBoard = ({ isOpen, onClose }) => {
             </SimpleModal>
 
             {/* Selection Modals */}
-            {activeModal && (
-                <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4 font-['Plus_Jakarta_Sans']">
-                    <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setActiveModal(null)} />
-                    <div className="relative w-full max-w-xl bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col max-h-[80vh]">
-                        <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
-                            <h3 className="text-lg font-bold text-slate-800 tracking-tight uppercase">
-                                Search {activeModal === 'type' ? 'Transaction Types' : 'Authorized Users'}
-                            </h3>
-                            <button 
-                                onClick={() => setActiveModal(null)} 
-                                className="w-10 h-10 flex items-center justify-center bg-red-50 hover:bg-red-100 text-red-600 rounded-[8px] transition-all active:scale-90 outline-none border-none group"
-                                title="Close"
-                            >
-                                <X size={20} strokeWidth={4} className="group-hover:scale-110 transition-transform" />
-                            </button>
+
+            <CalendarModal
+                isOpen={showDatePicker}
+                onClose={() => setShowDatePicker(false)}
+                currentDate={formData[datePickerField]}
+                onDateSelect={(date) => setFormData({...formData, [datePickerField]: date})}
+            />
+
+            <SimpleModal
+                isOpen={!!activeModal}
+                onClose={() => setActiveModal(null)}
+                title={`Lookup Directory`}
+                maxWidth="max-w-[600px]"
+            >
+                <div className="space-y-4 font-['Tahoma']">
+                    <div className="flex items-center gap-4 p-3 rounded-[5px] border border-slate-200 bg-white mb-2">
+                        <span className="text-[12px] font-bold text-gray-500 uppercase tracking-widest">Search Facility</span>
+                        <div className="relative flex-1">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
+                            <input
+                                type="text"
+                                placeholder={`Find ${activeModal === 'type' ? 'Transaction Types' : 'Authorized Users'} by code or name...`}
+                                className="w-full h-9 pl-10 pr-4 border border-slate-200 rounded outline-none text-sm bg-slate-50 transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20"
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                autoFocus
+                            />
                         </div>
-                        <div className="p-4 border-b border-gray-100 bg-white">
-                            <div className="relative">
-                                <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                                <input 
-                                    type="text" 
-                                    placeholder="Type to search..." 
-                                    className="w-full h-11 border border-gray-200 pl-10 pr-4 text-sm rounded-lg focus:border-blue-500 outline-none shadow-inner" 
-                                    value={searchTerm} 
-                                    onChange={(e) => setSearchTerm(e.target.value)} 
-                                    autoFocus
-                                />
-                            </div>
-                        </div>
-                        <div className="overflow-y-auto p-2 font-['Inter']">
-                            <table className="w-full text-sm text-left">
-                                <thead className="bg-slate-50 sticky top-0 text-slate-400 font-bold uppercase text-[10px] tracking-widest">
+                    </div>
+                    <div className="border border-slate-200 rounded-[5px] overflow-hidden shadow-sm">
+                        <div className="max-h-[400px] overflow-y-auto no-scrollbar">
+                            <table className="w-full text-left">
+                                <thead className="bg-slate-50/80 sticky top-0 text-[10px] font-mono font-bold text-gray-400 uppercase tracking-widest border-b border-slate-200">
                                     <tr>
-                                        <th className="p-3 border-b">Code</th>
-                                        <th className="p-3 border-b">Name</th>
-                                        <th className="p-3 border-b text-center">Action</th>
+                                        <th className="px-5 py-3">Code</th>
+                                        <th className="px-5 py-3">Record Name</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody className="divide-y divide-slate-100">
                                     {filteredLookup().map((item, idx) => (
-                                        <tr key={idx} className="hover:bg-blue-50 transition-colors group cursor-pointer" onClick={() => {
+                                        <tr key={idx} className="group hover:bg-blue-50/50 cursor-pointer transition-colors" onClick={() => {
                                             if (activeModal === 'type') {
                                                 setFormData(prev => ({ ...prev, transactionType: item.code, transactionTypeName: item.name }));
                                             } else {
@@ -295,24 +309,24 @@ const ReversalEntryBoard = ({ isOpen, onClose }) => {
                                             }
                                             setActiveModal(null);
                                         }}>
-                                            <td className="p-3 border-b font-black text-slate-700">{item.code}</td>
-                                            <td className="p-3 border-b font-bold text-[#0078d4] uppercase tracking-tight">{item.name}</td>
-                                            <td className="p-3 border-b text-center">
-                                                <button className="bg-[#0078d4] text-white text-[10px] px-4 py-1.5 rounded-sm font-black hover:bg-[#005a9e] tracking-[0.1em]">SELECT</button>
-                                            </td>
+                                            <td className="px-5 py-3 font-mono text-[12px] font-mono text-gray-700">{item.code}</td>
+                                            <td className="px-5 py-3 text-[12px] font-mono text-gray-700 uppercase group-hover:text-blue-600">{item.name}</td>
                                         </tr>
                                     ))}
                                     {filteredLookup().length === 0 && (
-                                        <tr><td colSpan="3" className="p-10 text-center text-gray-400 italic">No matching results found...</td></tr>
+                                        <tr>
+                                            <td colSpan="2" className="text-center py-6 text-gray-300 text-[12px] font-bold uppercase tracking-widest">No records found</td>
+                                        </tr>
                                     )}
                                 </tbody>
                             </table>
                         </div>
                     </div>
                 </div>
-            )}
+            </SimpleModal>
         </>
     );
 };
+
 
 export default ReversalEntryBoard;

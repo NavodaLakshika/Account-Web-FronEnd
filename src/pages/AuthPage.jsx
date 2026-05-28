@@ -87,9 +87,9 @@ const AuthPage = () => {
             const result = await authService.login(loginData.empName, loginData.password);
             const user = authService.getCurrentUser();
             setCurrentUser(user);
-            
+
             showSuccessToast(result.message || 'Verification Successful');
-            
+
             // Show the welcome modal after toast animation starts
             setTimeout(() => {
                 setShowWelcome(true);
@@ -108,7 +108,7 @@ const AuthPage = () => {
         try {
             const result = await authService.forgotPassword(forgotEmail);
             showSuccessToast(result.message || 'Recovery instruction sent');
-            
+
             // Second alert for the 24 hour wait as requested
             setTimeout(() => {
                 showInfoToast('Waiting for 24 hours recovery and reset your password', 'Protocol Init');
@@ -176,12 +176,12 @@ const AuthPage = () => {
 
             {/* Restored Video Background */}
             <div className="absolute inset-0 z-0">
-                <video 
-                    ref={videoRef} 
-                    autoPlay 
-                    loop 
-                    muted 
-                    playsInline 
+                <video
+                    ref={videoRef}
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
                     className="absolute w-full h-full object-cover scale-110"
                     style={{ filter: 'blur(24px) brightness(0.3)' }}
                 >
@@ -190,19 +190,19 @@ const AuthPage = () => {
             </div>
 
             <div className="relative z-10 w-full max-w-6xl px-12 flex items-center justify-between">
-                
+
                 {/* Left Branding Panel */}
                 <div className="flex-1 flex flex-col items-center justify-center text-center pr-12">
                     <div className="relative mb-6">
                         <h1 className="text-[85px] font-bold tracking-[0.05em] uppercase animate-shimmer leading-none relative z-10">ONIMTA</h1>
-                        
+
                         {/* Decorative Rotating Logo Circle */}
                         <div className="absolute -right-12 -top-12 w-48 h-48 flex items-center justify-center opacity-80 select-none pointer-events-none">
                             <div className="absolute inset-0 border-2 border-dashed border-white/40 rounded-full animate-[spin_30s_linear_infinite]" />
-                            <img 
-                                src="/logo-removebg.png" 
-                                alt="Onimta Logo" 
-                                className="w-24 h-24 object-contain animate-[pulse_4s_easeInOut_infinite]" 
+                            <img
+                                src="/logo-removebg.png"
+                                alt="Onimta Logo"
+                                className="w-24 h-24 object-contain animate-[pulse_4s_easeInOut_infinite]"
                             />
                         </div>
                     </div>
@@ -222,35 +222,35 @@ const AuthPage = () => {
                             </h2>
                             <form onSubmit={handleLogin} className="space-y-4">
                                 <div className="space-y-1">
-                                    <input 
-                                        type="text" 
-                                        name="empName" 
-                                        value={loginData.empName} 
-                                        onChange={handleLoginChange} 
-                                        placeholder={t.username} 
-                                        className="w-full px-4 py-3 bg-white font-mono text-slate-800 placeholder-slate-400 font-bold outline-none focus:ring-4 focus:ring-[#00acee]/30 transition-all" 
-                                        required 
+                                    <input
+                                        type="text"
+                                        name="empName"
+                                        value={loginData.empName}
+                                        onChange={handleLoginChange}
+                                        placeholder={t.username}
+                                        className="w-full px-4 py-3 bg-white font-mono text-slate-800 placeholder-slate-400 font-bold outline-none focus:ring-4 focus:ring-[#00acee]/30 transition-all"
+                                        required
                                     />
                                 </div>
                                 <div className="space-y-1">
-                                    <input 
-                                        type="password" 
-                                        name="password" 
-                                        value={loginData.password} 
-                                        onChange={handleLoginChange} 
-                                        placeholder={t.password} 
-                                        className="w-full px-4 py-3 bg-white font-mono text-slate-800 placeholder-slate-400 font-bold outline-none focus:ring-4 focus:ring-[#00acee]/30 transition-all" 
-                                        required 
+                                    <input
+                                        type="password"
+                                        name="password"
+                                        value={loginData.password}
+                                        onChange={handleLoginChange}
+                                        placeholder={t.password}
+                                        className="w-full px-4 py-3 bg-white font-mono text-slate-800 placeholder-slate-400 font-bold outline-none focus:ring-4 focus:ring-[#00acee]/30 transition-all"
+                                        required
                                     />
                                 </div>
                                 <div className="flex flex-col gap-6 pt-4">
-                                    <button 
-                                        disabled={loading} 
+                                    <button
+                                        disabled={loading}
                                         className="w-full py-4 bg-[#00acee] hover:bg-[#0092cc] text-white font-mono font-bold tracking-[0.2em] transition-all active:scale-[0.98] disabled:opacity-70 uppercase shadow-lg shadow-black/10"
                                     >
                                         {loading ? <Loader2 className="animate-spin mx-auto text-white" /> : t.login}
                                     </button>
-                                    <button 
+                                    <button
                                         type="button"
                                         onClick={() => setShowForgot(true)}
                                         className="text-white/60 font-mono text-sm hover:text-white transition-all text-center bg-transparent border-none cursor-pointer"
@@ -279,59 +279,59 @@ const AuthPage = () => {
                                 {recoveryStep === 1 ? 'Account Recovery' : 'Reset Password'}
                             </h2>
                             <p className="text-white/60 font-mono text-sm mb-8 leading-relaxed">
-                                {recoveryStep === 1 
+                                {recoveryStep === 1
                                     ? <>Enter your <span className="text-[#00acee] font-bold">Username or Corporate Email</span> and we will send you a recovery protocol.</>
                                     : <>Enter the <span className="text-[#00acee] font-bold">Recovery Token</span> sent to you and your <span className="text-[#00acee] font-bold">New Password</span>.</>
                                 }
                             </p>
-                            
-                            <form 
-                                onSubmit={recoveryStep === 1 ? handleForgotPassword : handleResetPassword} 
+
+                            <form
+                                onSubmit={recoveryStep === 1 ? handleForgotPassword : handleResetPassword}
                                 className="space-y-6"
                             >
                                 {recoveryStep === 1 ? (
                                     <div className="space-y-1">
-                                        <input 
-                                            type="text" 
-                                            value={forgotEmail} 
-                                            onChange={(e) => setForgotEmail(e.target.value)} 
-                                            placeholder="Username / Email" 
-                                            className="w-full px-4 py-3 bg-white font-mono text-slate-800 placeholder-slate-400 font-bold outline-none focus:ring-4 focus:ring-[#00acee]/30 transition-all" 
-                                            required 
+                                        <input
+                                            type="text"
+                                            value={forgotEmail}
+                                            onChange={(e) => setForgotEmail(e.target.value)}
+                                            placeholder="Username / Email"
+                                            className="w-full px-4 py-3 bg-white font-mono text-slate-800 placeholder-slate-400 font-bold outline-none focus:ring-4 focus:ring-[#00acee]/30 transition-all"
+                                            required
                                         />
                                     </div>
                                 ) : (
                                     <>
                                         <div className="space-y-1">
-                                            <input 
-                                                type="text" 
-                                                value={resetToken} 
-                                                onChange={(e) => setResetToken(e.target.value)} 
-                                                placeholder="Recovery Token" 
-                                                className="w-full px-4 py-3 bg-white font-mono text-slate-800 placeholder-slate-400 font-bold outline-none focus:ring-4 focus:ring-[#00acee]/30 transition-all" 
-                                                required 
+                                            <input
+                                                type="text"
+                                                value={resetToken}
+                                                onChange={(e) => setResetToken(e.target.value)}
+                                                placeholder="Recovery Token"
+                                                className="w-full px-4 py-3 bg-white font-mono text-slate-800 placeholder-slate-400 font-bold outline-none focus:ring-4 focus:ring-[#00acee]/30 transition-all"
+                                                required
                                             />
                                         </div>
                                         <div className="space-y-1">
-                                            <input 
-                                                type="password" 
-                                                value={newPassword} 
-                                                onChange={(e) => setNewPassword(e.target.value)} 
-                                                placeholder="New Password" 
-                                                className="w-full px-4 py-3 bg-white font-mono text-slate-800 placeholder-slate-400 font-bold outline-none focus:ring-4 focus:ring-[#00acee]/30 transition-all" 
-                                                required 
+                                            <input
+                                                type="password"
+                                                value={newPassword}
+                                                onChange={(e) => setNewPassword(e.target.value)}
+                                                placeholder="New Password"
+                                                className="w-full px-4 py-3 bg-white font-mono text-slate-800 placeholder-slate-400 font-bold outline-none focus:ring-4 focus:ring-[#00acee]/30 transition-all"
+                                                required
                                             />
                                         </div>
                                     </>
                                 )}
                                 <div className="space-y-4">
-                                    <button 
-                                        disabled={loading} 
+                                    <button
+                                        disabled={loading}
                                         className="w-full py-4 bg-[#00acee] hover:bg-[#0092cc] text-white font-mono font-bold tracking-[0.2em] transition-all active:scale-[0.98] disabled:opacity-70 uppercase"
                                     >
                                         {loading ? <Loader2 className="animate-spin mx-auto" /> : (recoveryStep === 1 ? 'Request Reset' : 'Update Password')}
                                     </button>
-                                    <button 
+                                    <button
                                         type="button"
                                         onClick={() => {
                                             if (recoveryStep === 2) {
@@ -352,12 +352,11 @@ const AuthPage = () => {
             </div>
 
             {/* Social Media Icons (Top Left) - Appears on Toggle */}
-            <div 
-                className={`absolute top-8 left-12 z-20 flex items-center transition-all duration-700 ${
-                    showSocialLinks 
-                    ? 'opacity-100 translate-x-0' 
-                    : 'opacity-0 -translate-x-10 pointer-events-none'
-                }`}
+            <div
+                className={`absolute top-8 left-12 z-20 flex items-center transition-all duration-700 ${showSocialLinks
+                        ? 'opacity-100 translate-x-0'
+                        : 'opacity-0 -translate-x-10 pointer-events-none'
+                    }`}
             >
                 <ul className="flex items-center gap-4 list-none m-0 p-0">
                     {/* Facebook */}
@@ -385,7 +384,7 @@ const AuthPage = () => {
                         <span className="absolute top-[50px] px-3 py-1.5 bg-[#00acee] text-white text-[12px] font-bold rounded-[5px] opacity-0 group-hover:opacity-100 group-hover:top-[55px] transition-all duration-300 pointer-events-none shadow-lg shadow-[#00acee]/30 after:content-[''] after:absolute after:top-[-5px] after:left-1/2 after:-translate-x-1/2 after:border-l-[6px] after:border-l-transparent after:border-r-[6px] after:border-r-transparent after:border-b-[6px] after:border-b-[#00acee]">
                             Website
                         </span>
-                        <a href="https://www.onimta.com" target="_blank" rel="noreferrer" className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center text-white/60 hover:text-white hover:bg-[#00acee] transition-all duration-300 shadow-xl group-hover:scale-110">
+                        <a href="https://www.onimtait.com" target="_blank" rel="noreferrer" className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center text-white/60 hover:text-white hover:bg-[#00acee] transition-all duration-300 shadow-xl group-hover:scale-110">
                             <Globe size={18} />
                         </a>
                     </li>
@@ -394,13 +393,12 @@ const AuthPage = () => {
 
             {/* Toggle Button (Top Right) */}
             <div className="absolute top-8 right-12 z-20">
-                <button 
+                <button
                     onClick={() => setShowSocialLinks(!showSocialLinks)}
-                    className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-500 shadow-2xl relative z-30 ${
-                        showSocialLinks 
-                        ? 'bg-white/20 text-white rotate-[360deg]' 
-                        : 'bg-white/10 text-white/40 hover:text-white hover:bg-white/20'
-                    }`}
+                    className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-500 shadow-2xl relative z-30 ${showSocialLinks
+                            ? 'bg-white/20 text-white rotate-[360deg]'
+                            : 'bg-white/10 text-white/40 hover:text-white hover:bg-white/20'
+                        }`}
                 >
                     {showSocialLinks ? <X size={20} /> : <Settings size={20} className="animate-[spin_4s_linear_infinite]" />}
                 </button>
@@ -409,28 +407,27 @@ const AuthPage = () => {
             {/* Bottom Footer Section */}
             {/* Bottom Footer Section (Right Side Links Connected to Toggle) */}
             <div className="absolute bottom-6 right-10 z-20 overflow-hidden">
-                <div 
-                    className={`flex items-center gap-6 text-[12px] text-white/40 font-mono transition-all duration-700 ${
-                        showSocialLinks 
-                        ? 'opacity-100 translate-y-0' 
-                        : 'opacity-0 translate-y-10 pointer-events-none'
-                    }`}
+                <div
+                    className={`flex items-center gap-6 text-[12px] text-white/40 font-mono transition-all duration-700 ${showSocialLinks
+                            ? 'opacity-100 translate-y-0'
+                            : 'opacity-0 translate-y-10 pointer-events-none'
+                        }`}
                 >
-                    <button 
+                    <button
                         onClick={() => setShowAboutUs(true)}
                         className="cursor-pointer hover:text-white transition-colors"
                     >
                         About us
                     </button>
                     <span>|</span>
-                    <button 
+                    <button
                         onClick={() => setShowContact(true)}
                         className="cursor-pointer hover:text-white transition-colors "
                     >
                         Contact
                     </button>
                     <span>|</span>
-                    <button 
+                    <button
                         onClick={() => setShowHelp(true)}
                         className="hover:text-white transition-colors "
                     >
@@ -444,8 +441,8 @@ const AuthPage = () => {
             </div>
 
             {/* Welcome Modal */}
-            <WelcomeModal 
-                isOpen={showWelcome} 
+            <WelcomeModal
+                isOpen={showWelcome}
                 user={currentUser}
                 onComplete={() => {
                     setShowWelcome(false);
@@ -458,29 +455,29 @@ const AuthPage = () => {
             />
 
             {/* Company Selection Modal */}
-            <CompanySelectModal 
-                isOpen={showSelection} 
-                onClose={() => setShowSelection(false)} 
+            <CompanySelectModal
+                isOpen={showSelection}
+                onClose={() => setShowSelection(false)}
                 onSelect={handleCompanySelected}
                 user={currentUser}
             />
 
             {/* About Us Sidebar Modal */}
-            <AboutUsModal 
-                isOpen={showAboutUs} 
-                onClose={() => setShowAboutUs(false)} 
+            <AboutUsModal
+                isOpen={showAboutUs}
+                onClose={() => setShowAboutUs(false)}
             />
 
             {/* Contact Bottom Modal */}
-            <ContactModal 
-                isOpen={showContact} 
-                onClose={() => setShowContact(false)} 
+            <ContactModal
+                isOpen={showContact}
+                onClose={() => setShowContact(false)}
             />
 
             {/* Help Side Drawer Modal */}
-            <HelpModal 
-                isOpen={showHelp} 
-                onClose={() => setShowHelp(false)} 
+            <HelpModal
+                isOpen={showHelp}
+                onClose={() => setShowHelp(false)}
             />
         </div>
     );

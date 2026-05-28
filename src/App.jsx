@@ -8,6 +8,7 @@ import ItemsServicesReportPage from './pages/ItemsServicesReportPage';
 import SuperAdminDashboard from './pages/SuperAdminDashboard';
 
 import SystemAnalyticsReportPage from './pages/SystemAnalyticsReportPage';
+import BIDashboardPage from './pages/BIDashboardPage';
 
 function App() {
   return (
@@ -48,6 +49,7 @@ function App() {
 
           <Route path="/report/items-services" element={<ItemsServicesReportPage />} />
           <Route path="/report/system-analytics" element={<SystemAnalyticsReportPage />} />
+          <Route path="/bi-dashboard" element={<BIDashboardPage />} />
           {/* Default Route */}
           <Route path="/" element={<Navigate to="/login" replace />} />
           

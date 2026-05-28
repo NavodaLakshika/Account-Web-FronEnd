@@ -1,18 +1,18 @@
 import api from './api';
 
 export const costCenterService = {
-  async getAll() {
+  async getAll(company) {
     try {
-      const response = await api.get('/CostCenter/all');
+      const response = await api.get(`/CostCenter/all?company=${company}`);
       return response.data;
     } catch (error) {
       throw error.response?.data || 'Failed to fetch cost centers';
     }
   },
 
-  async getByCode(code) {
+  async getByCode(code, company) {
     try {
-      const response = await api.get(`/CostCenter/details/${code}`);
+      const response = await api.get(`/CostCenter/details/${code}?company=${company}`);
       return response.data;
     } catch (error) {
       throw error.response?.data || 'Cost center not found';
@@ -28,9 +28,9 @@ export const costCenterService = {
     }
   },
 
-  async delete(code) {
+  async delete(code, company) {
     try {
-      const response = await api.delete(`/CostCenter/delete/${code}`);
+      const response = await api.delete(`/CostCenter/delete/${code}?company=${company}`);
       return response.data;
     } catch (error) {
       throw error.response?.data || 'Failed to delete cost center';

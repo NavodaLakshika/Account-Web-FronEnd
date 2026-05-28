@@ -29,15 +29,15 @@ const SearchModal = ({ isOpen, onClose, title, items, onSelect, searchPlaceholde
 
     return (
         <SimpleModal isOpen={isOpen} onClose={onClose} title={title} maxWidth="max-w-[600px]">
-            <div className="space-y-4 font-['Tahoma']">
-                <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-lg border border-gray-100 mb-2">
-                    <span className="text-[12px] font-bold text-gray-500 uppercase tracking-widest shrink-0">Search Facility</span>
+            <div className="space-y-4">
+                <div className="flex items-center gap-4 p-3 rounded-[5px] border border-slate-200 bg-white">
+                    <span className="text-[11px] font-bold text-gray-500 uppercase shrink-0">Search</span>
                     <div className="relative flex-1">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
                         <input
                             type="text"
                             placeholder={searchPlaceholder}
-                            className="w-full h-9 pl-10 pr-4 border border-gray-300 rounded-[5px] outline-none text-sm focus:border-[#0285fd] bg-white shadow-sm font-sans"
+                            className="w-full h-8 pl-10 pr-4 border border-slate-200 px-3 text-sm bg-slate-50 rounded outline-none focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 transition-all"
                             value={query}
                             onChange={(e) => setQuery(e.target.value)}
                             autoFocus
@@ -45,35 +45,35 @@ const SearchModal = ({ isOpen, onClose, title, items, onSelect, searchPlaceholde
                     </div>
                 </div>
 
-                <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm">
+                <div className="border border-slate-200 rounded-[5px] overflow-hidden">
                     <div className="max-h-[400px] overflow-y-auto no-scrollbar">
                         <table className="w-full text-left">
-                            <thead className="bg-[#f8fafd] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">
+                            <thead className="bg-slate-50/80 sticky top-0 text-[10px] font-mono font-bold text-gray-400 uppercase tracking-widest border-b border-slate-200">
                                 <tr>
-                                    <th className="px-5 py-3 w-32">Identifier</th>
-                                    <th className="px-5 py-3">Credential / Name</th>
-                                    <th className="px-5 py-3 text-right">Action</th>
+                                    <th className="px-5 py-2.5 w-32">Identifier</th>
+                                    <th className="px-5 py-2.5">Credential / Name</th>
+                                    <th className="px-5 py-2.5 text-right">Action</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-gray-50">
+                            <tbody className="divide-y divide-slate-100">
                                 {filtered.length === 0 ? (
                                     <tr>
-                                        <td colSpan="3" className="py-20 text-center text-gray-300 font-bold uppercase tracking-widest text-[10px]">
+                                        <td colSpan="3" className="py-20 text-center text-gray-300 font-mono font-bold uppercase tracking-widest text-[10px]">
                                             No matching records discovered
                                         </td>
                                     </tr>
                                 ) : filtered.map((item, idx) => (
                                     <tr 
                                         key={idx} 
-                                        className="group hover:bg-blue-50/50 cursor-pointer transition-all" 
+                                        className="group hover:bg-slate-50 cursor-pointer transition-all" 
                                         onClick={() => { onSelect(item); onClose(); }}
                                     >
-                                        <td className="px-5 py-3 font-mono text-[12px] text-gray-700">{item.code}</td>
-                                        <td className="px-5 py-3 text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors">
+                                        <td className="px-5 py-2.5 font-mono text-[12px] text-slate-700">{item.code}</td>
+                                        <td className="px-5 py-2.5 text-[12px] font-bold text-slate-700 uppercase group-hover:text-[#0285fd] transition-colors">
                                             {item.name}
                                         </td>
-                                        <td className="px-5 py-3 text-right">
-                                            <button className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95 border-none uppercase">
+                                        <td className="px-5 py-2.5 text-right">
+                                            <button className="bg-[#e49e1b] text-white text-[9px] px-4 py-1.5 rounded-[5px] font-mono font-bold uppercase tracking-widest hover:bg-[#cb9b34] transition-all active:scale-95 border-none">
                                                 SELECT
                                             </button>
                                         </td>
@@ -292,45 +292,44 @@ const AdvancePayBoard = ({ isOpen, onClose }) => {
                 isOpen={isOpen}
                 onClose={onClose}
                 title="Advance Issued (Advance Pay)"
-                maxWidth="max-w-[1000px]"
+                maxWidth="max-w-6xl"
                 footer={
-                    <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-gray-100 rounded-b-xl">
+                    <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-slate-200 rounded-b-[5px]">
                         <div>
                             <button 
                                 onClick={handleClear} 
                                 disabled={loading} 
-                                className="px-6 h-10 bg-[#00adff] text-white text-sm font-black rounded-[5px] hover:bg-[#0099e6] transition-all active:scale-95 flex items-center justify-center gap-2 border-none"
+                                className="px-6 py-3 bg-[#00adff] hover:bg-[#0099e6] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] transition-all active:scale-95 flex items-center justify-center gap-2 border-none"
                             >
-                                <RotateCcw size={14} /> Clear Form
+                                <RotateCcw size={14} /> CLEAR FORM
                             </button>
                         </div>
                         <div className="flex gap-3">
                             <button 
                                 onClick={handleSave} 
                                 disabled={loading} 
-                                className={`px-6 h-10 bg-[#2bb744] text-white text-sm font-black rounded-[5px] shadow-md shadow-green-100 hover:bg-[#259b3a] transition-all active:scale-95 flex items-center justify-center gap-2 border-none ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                className={`px-6 py-3 bg-[#2bb744] hover:bg-[#259b3a] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] shadow-md shadow-green-100 transition-all active:scale-95 flex items-center justify-center gap-2 border-none ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                             >
-                                {loading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />} 
-                                Save & Apply
+                                {loading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />} SAVE & APPLY
                             </button>
                         </div>
                     </div>
                 }
             >
-                <div className="space-y-4 font-['Tahoma']">
+                <div className="space-y-4">
                     {/* Unified Fields Grid */}
-                    <div className="bg-white p-5 border border-gray-100 rounded-lg shadow-sm space-y-4">
+                    <div className="bg-white p-4 border border-slate-200 rounded-[5px] space-y-4">
                         <div className="grid grid-cols-12 gap-x-6 gap-y-3.5">
                             
                             {/* A/P Account */}
                             <div className="col-span-8 flex items-center gap-2">
-                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">A/P Account</label>
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">A/P Account</label>
                                 <div className="flex-1 flex gap-1 h-8 min-w-0">
                                     <input 
                                         type="text" 
                                         readOnly 
                                         value={formData.apAccount ? `${formData.apAccount} - ${formData.apAccountName}` : ''} 
-                                        className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-slate-700 bg-gray-50 rounded-[5px] outline-none shadow-sm cursor-pointer"
+                                        className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-sm font-mono font-bold text-slate-700 bg-slate-50 rounded outline-none cursor-pointer transition-all"
                                         onClick={() => setActiveModal('account')}
                                     />
                                     <button 
@@ -344,24 +343,24 @@ const AdvancePayBoard = ({ isOpen, onClose }) => {
 
                             {/* Document ID */}
                             <div className="col-span-4 flex items-center gap-2">
-                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0 text-right pr-2">Doc ID</label>
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0 text-right pr-2">Doc ID</label>
                                 <input 
                                     type="text" 
                                     value={formData.docNo} 
                                     readOnly 
-                                    className="flex-1 h-8 border border-[#0285fd]/30 px-3 text-[12.5px] font-bold text-blue-600 bg-blue-50/20 rounded-[5px] outline-none shadow-inner" 
+                                    className="flex-1 h-8 border border-slate-200 px-3 text-sm font-mono font-bold text-blue-600 bg-slate-50 rounded outline-none" 
                                 />
                             </div>
 
                             {/* Supplier / Vendor */}
                             <div className="col-span-8 flex items-center gap-2">
-                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Supplier</label>
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Supplier</label>
                                 <div className="flex-1 flex gap-1 h-8 min-w-0">
                                     <input 
                                         type="text" 
                                         readOnly 
                                         value={formData.vendId ? `${formData.vendId} - ${formData.vender}` : ''} 
-                                        className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-red-600 bg-gray-50 rounded-[5px] outline-none shadow-sm cursor-pointer"
+                                        className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-sm font-mono font-bold text-red-600 bg-slate-50 rounded outline-none cursor-pointer transition-all"
                                         onClick={() => setActiveModal('vendor')}
                                     />
                                     <button 
@@ -375,13 +374,13 @@ const AdvancePayBoard = ({ isOpen, onClose }) => {
 
                             {/* Post Date */}
                             <div className="col-span-4 flex items-center gap-2">
-                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0 text-right pr-2">Post Date</label>
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0 text-right pr-2">Post Date</label>
                                 <div className="flex-1 flex gap-1 h-8 min-w-0">
                                     <input 
                                         type="text" 
                                         readOnly 
                                         value={formData.postDate ? formatDateToDMY(formData.postDate) : ''} 
-                                        className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-slate-700 bg-gray-50 rounded-[5px] outline-none shadow-sm cursor-pointer"
+                                        className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-sm font-mono font-bold text-slate-700 bg-slate-50 rounded outline-none cursor-pointer transition-all"
                                         onClick={() => setShowDatePicker(true)}
                                     />
                                     <button 
@@ -396,13 +395,13 @@ const AdvancePayBoard = ({ isOpen, onClose }) => {
 
                             {/* From Cost Center */}
                             <div className="col-span-4 flex items-center gap-2">
-                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">From CC</label>
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">From CC</label>
                                 <div className="flex-1 flex gap-1 h-8 min-w-0">
                                     <input 
                                         type="text" 
                                         readOnly 
                                         value={lookups.costCenters.find(c => c.code === formData.fromCostCenter)?.name || formData.fromCostCenter || ''} 
-                                        className="flex-1 min-w-0 h-8 border border-gray-300 px-2.5 text-[12px] text-gray-700 bg-white rounded-[5px] outline-none shadow-sm cursor-pointer"
+                                        className="flex-1 min-w-0 h-8 border border-slate-200 px-2.5 text-sm font-mono text-slate-700 bg-slate-50 rounded outline-none cursor-pointer transition-all"
                                         onClick={() => setActiveModal('fromCc')}
                                     />
                                     <button 
@@ -416,13 +415,13 @@ const AdvancePayBoard = ({ isOpen, onClose }) => {
 
                             {/* To Cost Center */}
                             <div className="col-span-4 flex items-center gap-2">
-                                <label className="text-[12.5px] font-bold text-gray-700 w-20 shrink-0 text-right pr-2">To CC</label>
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-20 shrink-0 text-right pr-2">To CC</label>
                                 <div className="flex-1 flex gap-1 h-8 min-w-0">
                                     <input 
                                         type="text" 
                                         readOnly 
                                         value={lookups.costCenters.find(c => c.code === formData.costCenter)?.name || formData.costCenter || ''} 
-                                        className="flex-1 min-w-0 h-8 border border-gray-300 px-2.5 text-[12px] text-gray-700 bg-white rounded-[5px] outline-none shadow-sm cursor-pointer"
+                                        className="flex-1 min-w-0 h-8 border border-slate-200 px-2.5 text-sm font-mono text-slate-700 bg-slate-50 rounded outline-none cursor-pointer transition-all"
                                         onClick={() => setActiveModal('toCc')}
                                     />
                                     <button 
@@ -436,70 +435,70 @@ const AdvancePayBoard = ({ isOpen, onClose }) => {
 
                             {/* Vouch No */}
                             <div className="col-span-4 flex items-center gap-2">
-                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0 text-right pr-2">Vouch No</label>
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0 text-right pr-2">Vouch No</label>
                                 <input 
                                     name="vouNo" 
                                     value={formData.vouNo} 
                                     onChange={handleInputChange} 
                                     type="text" 
-                                    className="flex-1 h-8 border border-gray-300 px-3 text-[12px] rounded-[5px] outline-none bg-white shadow-sm focus:border-[#0285fd]" 
+                                    className="flex-1 h-8 border border-slate-200 rounded px-3 font-mono text-sm outline-none bg-slate-50 text-slate-700 transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" 
                                 />
                             </div>
 
                             {/* Address */}
                             <div className="col-span-8 flex items-start gap-2">
-                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0 mt-1.5">Address</label>
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0 mt-1.5">Address</label>
                                 <textarea 
                                     name="address" 
                                     value={formData.address} 
                                     onChange={handleInputChange} 
                                     rows="2" 
-                                    className="flex-1 border border-gray-300 px-3 py-2 text-[12px] rounded-[5px] outline-none bg-white resize-none shadow-sm focus:border-[#0285fd] font-mono" 
+                                    className="flex-1 border border-slate-200 px-3 py-2 text-sm font-mono rounded outline-none bg-slate-50 resize-none transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" 
                                 />
                             </div>
 
                             {/* Ref No */}
                             <div className="col-span-4 flex items-center gap-2">
-                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0 text-right pr-2">Ref No</label>
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0 text-right pr-2">Ref No</label>
                                 <input 
                                     name="refNo" 
                                     value={formData.refNo} 
                                     onChange={handleInputChange} 
                                     type="text" 
-                                    className="flex-1 h-8 border border-gray-300 px-3 text-[12px] rounded-[5px] outline-none bg-white shadow-sm focus:border-[#0285fd]" 
+                                    className="flex-1 h-8 border border-slate-200 rounded px-3 font-mono text-sm outline-none bg-slate-50 text-slate-700 transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" 
                                 />
                             </div>
 
                             {/* Memo */}
                             <div className="col-span-12 flex items-center gap-2">
-                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Memo</label>
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Memo</label>
                                 <input 
                                     name="memo" 
                                     value={formData.memo} 
                                     onChange={handleInputChange} 
                                     type="text" 
-                                    className="flex-1 h-8 border border-gray-300 px-3 text-[12px] rounded-[5px] outline-none bg-white shadow-sm focus:border-[#0285fd]" 
+                                    className="flex-1 h-8 border border-slate-200 rounded px-3 font-mono text-sm outline-none bg-slate-50 text-slate-700 transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" 
                                 />
                             </div>
                         </div>
 
                         {/* Payment Details Section */}
-                        <div className="pt-5 border-t border-gray-100 flex flex-col gap-4">
+                        <div className="pt-5 border-t border-slate-200 flex flex-col gap-4">
                             <div className="flex items-center gap-4">
-                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Pay Method</label>
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Pay Method</label>
                                 <div className="flex gap-2">
                                     {['Cash', 'Cheque', 'Online'].map((type) => (
                                         <button
                                             key={type}
                                             type="button"
                                             onClick={() => handlePayTypeChange(type)}
-                                            className={`px-5 py-2 text-xs font-black rounded-[5px] border transition-all active:scale-95 ${
+                                            className={`px-5 py-2 text-xs font-mono font-bold uppercase tracking-widest rounded-[5px] border transition-all active:scale-95 ${
                                                 formData.payType === type
                                                     ? 'bg-[#0285fd] text-white border-[#0285fd] shadow-md shadow-blue-100'
-                                                    : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
+                                                    : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
                                             }`}
                                         >
-                                            {type.toUpperCase()}
+                                            {type}
                                         </button>
                                     ))}
                                 </div>
@@ -508,20 +507,20 @@ const AdvancePayBoard = ({ isOpen, onClose }) => {
                             <div className="grid grid-cols-12 gap-x-6 gap-y-3.5 items-center">
                                 {/* Amount Input */}
                                 <div className="col-span-4 flex items-center gap-2">
-                                    <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Net Amount</label>
+                                    <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Net Amount</label>
                                     <input 
                                         name="amount" 
                                         value={formData.amount} 
                                         onChange={handleInputChange} 
                                         type="number" 
                                         step="0.01" 
-                                        className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[14px] text-right font-black text-[#b91c1c] bg-white rounded-[5px] outline-none focus:border-[#0285fd] shadow-sm font-mono" 
+                                        className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-sm text-right font-black text-[#b91c1c] bg-slate-50 rounded outline-none transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 font-mono" 
                                     />
                                 </div>
                                 
                                 {/* Cheque Number */}
                                 <div className="col-span-4 flex items-center gap-2">
-                                    <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0 text-right pr-2">Cheque No</label>
+                                    <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0 text-right pr-2">Cheque No</label>
                                     <div className="relative flex-1">
                                         <input 
                                             name="chqNo" 
@@ -530,7 +529,7 @@ const AdvancePayBoard = ({ isOpen, onClose }) => {
                                             onBlur={handleChequeBlur}
                                             disabled={formData.payType !== 'Cheque'} 
                                             type="text" 
-                                            className="w-full h-8 border border-gray-300 px-3 pr-8 text-[12px] font-bold rounded-[5px] outline-none disabled:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed focus:border-[#0285fd] font-mono" 
+                                            className="w-full h-8 border border-slate-200 px-3 pr-8 text-sm font-bold rounded outline-none disabled:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 font-mono bg-slate-50 transition-all" 
                                         />
                                         <div className="absolute right-2.5 top-1/2 -translate-y-1/2 flex items-center">
                                             {chequeStatus === 'checking' && <Loader2 size={14} className="animate-spin text-blue-500" />}
@@ -542,14 +541,14 @@ const AdvancePayBoard = ({ isOpen, onClose }) => {
 
                                 {/* Cheque Date */}
                                 <div className="col-span-4 flex items-center gap-2">
-                                    <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0 text-right pr-2">Cheq Date</label>
+                                    <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0 text-right pr-2">Cheq Date</label>
                                     <div className="flex-1 flex gap-1 h-8 min-w-0">
                                         <input 
                                             type="text" 
                                             readOnly 
                                             value={formData.chqDate ? formatDateToDMY(formData.chqDate) : ''} 
                                             disabled={formData.payType !== 'Cheque'} 
-                                            className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-slate-700 disabled:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed bg-gray-50 rounded-[5px] outline-none shadow-sm cursor-pointer"
+                                            className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-sm font-mono font-bold text-slate-700 disabled:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed bg-slate-50 rounded outline-none cursor-pointer transition-all"
                                             onClick={() => formData.payType === 'Cheque' && setShowChqDatePicker(true)}
                                         />
                                         <button 

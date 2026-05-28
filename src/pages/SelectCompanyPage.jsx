@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-    Building2, 
-    Search, 
-    X, 
+import {
+    Building2,
+    Search,
+    X,
     Loader2,
-    ChevronRight, 
+    ChevronRight,
     ChevronLeft,
     Facebook,
     Linkedin,
@@ -132,12 +132,12 @@ const SelectCompanyPage = () => {
 
             {/* Video Background (Identical to Login) */}
             <div className="absolute inset-0 z-0">
-                <video 
-                    ref={videoRef} 
-                    autoPlay 
-                    loop 
-                    muted 
-                    playsInline 
+                <video
+                    ref={videoRef}
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
                     className="absolute w-full h-full object-cover scale-110"
                     style={{ filter: 'blur(24px) brightness(0.3)' }}
                 >
@@ -146,17 +146,17 @@ const SelectCompanyPage = () => {
             </div>
 
             <div className="relative z-10 w-full max-w-6xl px-12 flex items-center justify-between">
-                
+
                 {/* Left Branding Panel (Identical to Login) */}
                 <div className="flex-1 flex flex-col items-center justify-center text-center pr-12">
                     <div className="relative mb-6">
                         <h1 className="text-[85px] font-bold tracking-[0.05em] uppercase animate-shimmer leading-none relative z-10">ONIMTA</h1>
                         <div className="absolute -right-12 -top-12 w-48 h-48 flex items-center justify-center opacity-80 select-none pointer-events-none">
                             <div className="absolute inset-0 border-2 border-dashed border-white/40 rounded-full animate-[spin_30s_linear_infinite]" />
-                            <img 
-                                src="/logo-removebg.png" 
-                                alt="Onimta Logo" 
-                                className="w-24 h-24 object-contain animate-[pulse_4s_easeInOut_infinite]" 
+                            <img
+                                src="/logo-removebg.png"
+                                alt="Onimta Logo"
+                                className="w-24 h-24 object-contain animate-[pulse_4s_easeInOut_infinite]"
                             />
                         </div>
                     </div>
@@ -171,14 +171,14 @@ const SelectCompanyPage = () => {
                 <div className="flex-1 max-w-md w-full py-12 flex flex-col">
                     <div className="flex items-center justify-between mb-8">
                         <h2 className="text-white text-3xl font-bold font-tahoma">Select Entity</h2>
-                        <button 
+                        <button
                             onClick={() => setShowCreateCompanyModal(true)}
                             className="px-4 py-2 border border-[#00acee] hover:bg-[#00acee] text-[#00acee] hover:text-white transition-all text-[11px] font-mono font-bold tracking-wider uppercase rounded"
                         >
                             + New Company
                         </button>
                     </div>
-                    
+
                     <div className="space-y-3 flex-grow min-h-[300px]">
                         {fetching ? (
                             <div className="h-full flex flex-col items-center justify-center gap-4 text-white/20 py-20">
@@ -189,7 +189,7 @@ const SelectCompanyPage = () => {
                             <div className="h-full flex flex-col items-center justify-center gap-4 text-white/10 py-20">
                                 <Building2 size={40} strokeWidth={1} />
                                 <p className="text-[10px] font-mono tracking-[0.4em] uppercase mb-2">No active entities</p>
-                                <button 
+                                <button
                                     onClick={() => setShowCreateCompanyModal(true)}
                                     className="px-6 py-2.5 bg-[#00acee] hover:bg-[#0092cc] text-white font-mono text-[11px] font-bold tracking-widest uppercase transition-all active:scale-95 rounded shadow-lg shadow-cyan-500/20"
                                 >
@@ -203,11 +203,10 @@ const SelectCompanyPage = () => {
                                     <button
                                         key={company.id}
                                         onClick={() => setSelectedCompanyId(company.id)}
-                                        className={`w-full group relative flex items-center justify-between p-5 transition-all duration-300 border ${
-                                            isSelected 
-                                            ? 'bg-[#00acee] border-[#00acee] translate-x-3 shadow-[0_0_30px_rgba(0,172,238,0.3)]' 
-                                            : 'bg-white/5 border-white/10 hover:bg-white/10'
-                                        }`}
+                                        className={`w-full group relative flex items-center justify-between p-5 transition-all duration-300 border ${isSelected
+                                                ? 'bg-[#00acee] border-[#00acee] translate-x-3 shadow-[0_0_30px_rgba(0,172,238,0.3)]'
+                                                : 'bg-white/5 border-white/10 hover:bg-white/10'
+                                            }`}
                                     >
                                         <div className="flex items-center gap-4">
                                             <div className={`w-10 h-10 flex items-center justify-center transition-colors ${isSelected ? 'text-white' : 'text-white/20'}`}>
@@ -232,14 +231,14 @@ const SelectCompanyPage = () => {
                     {/* Navigation and Launch Actions */}
                     <div className="mt-8 space-y-4">
                         <div className="flex items-center justify-between gap-4">
-                            <button 
+                            <button
                                 onClick={() => setCurrentPage(p => Math.max(0, p - 1))}
                                 disabled={currentPage === 0}
                                 className="flex-1 py-3 bg-white/5 hover:bg-white/10 text-white/40 hover:text-white transition-all text-[10px] font-mono font-bold tracking-widest uppercase disabled:opacity-0"
                             >
                                 <ChevronLeft size={16} className="inline mr-1" /> Prev
                             </button>
-                            <button 
+                            <button
                                 onClick={() => setCurrentPage(p => Math.min(totalPages - 1, p + 1))}
                                 disabled={currentPage >= totalPages - 1}
                                 className="flex-1 py-3 bg-white/5 hover:bg-white/10 text-white/40 hover:text-white transition-all text-[10px] font-mono font-bold tracking-widest uppercase disabled:opacity-0"
@@ -248,7 +247,7 @@ const SelectCompanyPage = () => {
                             </button>
                         </div>
 
-                        <button 
+                        <button
                             disabled={loading || !selectedCompanyId}
                             onClick={handleOpen}
                             className="w-full py-5 bg-[#00acee] hover:bg-[#0092cc] text-white font-mono font-bold tracking-[0.3em] transition-all active:scale-[0.98] disabled:opacity-30 uppercase shadow-lg shadow-black/20 text-lg flex items-center justify-center"
@@ -260,12 +259,11 @@ const SelectCompanyPage = () => {
             </div>
 
             {/* Social Media Icons (Top Left) - Appears on Toggle */}
-            <div 
-                className={`absolute top-8 left-12 z-20 flex items-center transition-all duration-700 ${
-                    showSocialLinks 
-                    ? 'opacity-100 translate-x-0' 
-                    : 'opacity-0 -translate-x-10 pointer-events-none'
-                }`}
+            <div
+                className={`absolute top-8 left-12 z-20 flex items-center transition-all duration-700 ${showSocialLinks
+                        ? 'opacity-100 translate-x-0'
+                        : 'opacity-0 -translate-x-10 pointer-events-none'
+                    }`}
             >
                 <ul className="flex items-center gap-4 list-none m-0 p-0">
                     {/* Facebook */}
@@ -293,7 +291,7 @@ const SelectCompanyPage = () => {
                         <span className="absolute top-[50px] px-3 py-1.5 bg-[#00acee] text-white text-[12px] font-bold rounded-[5px] opacity-0 group-hover:opacity-100 group-hover:top-[55px] transition-all duration-300 pointer-events-none shadow-lg shadow-[#00acee]/30 after:content-[''] after:absolute after:top-[-5px] after:left-1/2 after:-translate-x-1/2 after:border-l-[6px] after:border-l-transparent after:border-r-[6px] after:border-r-transparent after:border-b-[6px] after:border-b-[#00acee]">
                             Website
                         </span>
-                        <a href="https://www.onimta.com" target="_blank" rel="noreferrer" className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center text-white/60 hover:text-white hover:bg-[#00acee] transition-all duration-300 shadow-xl group-hover:scale-110">
+                        <a href="https://www.onimtait.com" target="_blank" rel="noreferrer" className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center text-white/60 hover:text-white hover:bg-[#00acee] transition-all duration-300 shadow-xl group-hover:scale-110">
                             <Globe size={18} />
                         </a>
                     </li>
@@ -302,13 +300,12 @@ const SelectCompanyPage = () => {
 
             {/* Toggle Button (Top Right) */}
             <div className="absolute top-8 right-12 z-20">
-                <button 
+                <button
                     onClick={() => setShowSocialLinks(!showSocialLinks)}
-                    className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-500 shadow-2xl relative z-30 ${
-                        showSocialLinks 
-                        ? 'bg-white/20 text-white rotate-[360deg]' 
-                        : 'bg-white/10 text-white/40 hover:text-white hover:bg-white/20'
-                    }`}
+                    className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-500 shadow-2xl relative z-30 ${showSocialLinks
+                            ? 'bg-white/20 text-white rotate-[360deg]'
+                            : 'bg-white/10 text-white/40 hover:text-white hover:bg-white/20'
+                        }`}
                 >
                     {showSocialLinks ? <X size={20} /> : <Settings size={20} className="animate-[spin_4s_linear_infinite]" />}
                 </button>
@@ -316,14 +313,13 @@ const SelectCompanyPage = () => {
 
             {/* Bottom Footer Section (Right Side Links Connected to Toggle) */}
             <div className="absolute bottom-6 right-10 z-20 overflow-hidden">
-                <div 
-                    className={`flex items-center gap-6 text-[12px] text-white/40 font-mono transition-all duration-700 ${
-                        showSocialLinks 
-                        ? 'opacity-100 translate-y-0' 
-                        : 'opacity-0 translate-y-10 pointer-events-none'
-                    }`}
+                <div
+                    className={`flex items-center gap-6 text-[12px] text-white/40 font-mono transition-all duration-700 ${showSocialLinks
+                            ? 'opacity-100 translate-y-0'
+                            : 'opacity-0 translate-y-10 pointer-events-none'
+                        }`}
                 >
-                    <button 
+                    <button
                         onClick={() => setShowAboutUs(true)}
                         className="cursor-pointer hover:text-white transition-colors"
                     >
@@ -341,9 +337,9 @@ const SelectCompanyPage = () => {
             </div>
 
             {/* About Us Sidebar Modal */}
-            <AboutUsModal 
-                isOpen={showAboutUs} 
-                onClose={() => setShowAboutUs(false)} 
+            <AboutUsModal
+                isOpen={showAboutUs}
+                onClose={() => setShowAboutUs(false)}
             />
 
             {/* Create Company Modal */}

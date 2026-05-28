@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import SimpleModal from '../components/SimpleModal';
+import TransactionFormWrapper from '../components/TransactionFormWrapper';
 import CalendarModal from '../components/CalendarModal';
-import { Search, Calendar, ChevronDown, Trash2, X, Save, RotateCcw, Loader2 } from 'lucide-react';
+import { Search, Calendar, ChevronDown, Trash2, X, Save, RotateCcw, Loader2, FileText } from 'lucide-react';
 import { enterBillService } from '../services/enterBill.service';
 
 
@@ -241,156 +242,166 @@ const EnterBillBoard = ({ isOpen, onClose }) => {
                     }
                 `}
             </style>
-            <SimpleModal
+            <TransactionFormWrapper
                 isOpen={isOpen}
                 onClose={onClose}
                 title="Bill Management Facility"
-                maxWidth="max-w-[1000px]"
+                subtitle="Bill Management"
+                icon={FileText}
+                maxWidth="max-w-[1200px]"
                 footer={
-                    <div className="bg-slate-50 px-6 py-4 w-full flex justify-end gap-3 border-t border-gray-100 rounded-b-xl">
-                        <button onClick={handleSave} disabled={loading} className={`px-6 h-10 bg-[#50af60] text-white text-sm font-bold rounded-md shadow-md hover:bg-[#24db4e] transition-all active:scale-95 flex items-center justify-center gap-2 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}>
-                            {loading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
-                            Save Bill
-                        </button>
-                        <button onClick={handleClear} disabled={loading} className="px-6 h-10 bg-[#00adff] text-white text-sm font-bold rounded-md hover:bg-[#0099e6] transition-all active:scale-95 flex items-center justify-center gap-2 border-none font-bold">
-                            <RotateCcw size={14} /> Clear Form
-                        </button>
+                    <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-slate-200 rounded-b-xl">
+                        <div className="flex gap-3">
+                            <button onClick={handleClear} disabled={loading} className="px-6 py-3 bg-[#00adff] hover:bg-[#0099e6] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] transition-all active:scale-95 flex items-center justify-center gap-2 border-none">
+                                <RotateCcw size={14} /> CLEAR FORM
+                            </button>
+                        </div>
+                        <div className="flex gap-3">
+                            <button onClick={handleSave} disabled={loading} className={`px-6 py-3 bg-[#2bb744] hover:bg-[#259b3a] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] shadow-md shadow-green-100 transition-all active:scale-95 flex items-center justify-center gap-2 border-none ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                                {loading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />} SAVE BILL
+                            </button>
+                        </div>
                     </div>
                 }
             >
                 <div className="select-none font-['Tahoma']">
                     {/* Header Information Section */}
-                    <div className="bg-white p-4 border border-gray-100 rounded-lg shadow-sm space-y-4">
-                        <div className="flex items-center justify-between border-b border-gray-100 pb-3 mb-2">
-                             <div className="flex items-center gap-3">
-                                <label className="text-[12.5px] font-bold text-gray-700 w-20 shrink-0">Doc No</label>
-                                <div className="flex gap-2">
+                    <div className="bg-white p-4 border border-slate-200 rounded-[5px] space-y-4">
+                        <div className="flex items-center justify-between border-b border-slate-200 pb-3 mb-2">
+                             <div className="flex items-center gap-2">
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Doc No</label>
+                                <div className="flex gap-1 h-8">
                                     <input
                                         type="text"
                                         name="docNo"
                                         value={formData.docNo}
                                         readOnly
-                                        className="w-32 h-8 font-mono border border-gray-300 px-3 text-[13px] font-bold text-blue-600 bg-gray-50 rounded-[5px] outline-none text-center shadow-inner"
+                                        className="w-32 h-8 border border-slate-200 px-3 text-[12px] font-bold text-blue-600 bg-slate-50 rounded outline-none transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 text-center"
                                     />
-                                    <button onClick={() => setShowSearchModal(true)} className="w-8 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95">
-                                        <Search size={14} />
+                                    <button onClick={() => setShowSearchModal(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
+                                        <Search size={16} />
                                     </button>
                                 </div>
                             </div>
 
-                            <div className="flex items-center bg-gray-100 p-1 rounded-lg shadow-inner">
+                            <div className="flex items-center bg-slate-100 p-1 rounded-[5px]">
                                 <button 
                                     onClick={() => setBillType('Bill')}
-                                    className={`px-8 py-1.5 text-[11px] font-black rounded-md transition-all uppercase tracking-widest ${billType === 'Bill' ? 'bg-white text-blue-600 shadow-md transform scale-105' : 'text-gray-400 hover:text-gray-600'}`}
+                                    className={`px-8 py-1 text-[11px] font-bold rounded-[5px] transition-all uppercase tracking-widest ${billType === 'Bill' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}
                                 >
                                     BILL
                                 </button>
                                 <button 
                                     onClick={() => setBillType('Credit')}
-                                    className={`px-8 py-1.5 text-[11px] font-black rounded-md transition-all uppercase tracking-widest ${billType === 'Credit' ? 'bg-white text-red-600 shadow-md transform scale-105' : 'text-gray-400 hover:text-gray-600'}`}
+                                    className={`px-8 py-1 text-[11px] font-bold rounded-[5px] transition-all uppercase tracking-widest ${billType === 'Credit' ? 'bg-white text-red-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}
                                 >
                                     CREDIT
                                 </button>
                             </div>
 
-                            <div className="flex items-center gap-3">
-                                <label className="text-[12.5px] font-bold text-gray-700">Post Date</label>
+                            <div className="flex items-center gap-2">
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Post Date</label>
                                 <div className="flex h-8 gap-1">
                                     <input 
                                         type="text" 
                                         readOnly 
                                         value={formData.postDate} 
-                                        className="w-[110px] px-2 text-[13px] border border-gray-300 rounded-[5px] outline-none text-gray-700 font-mono font-bold bg-gray-50 text-center shadow-sm" 
+                                        className="w-[110px] h-8 border border-slate-200 px-3 text-[12px] font-bold text-gray-700 bg-slate-50 rounded outline-none transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 text-center" 
+                                        onClick={() => openCalendar('postDate')}
                                     />
-                                    <button onClick={() => openCalendar('postDate')} className="w-9 h-8 bg-[#0285fd] border border-gray-300 text-white flex items-center justify-center  rounded-[5px] transition-all shadow-sm active:scale-90">
-                                        <Calendar size={14} />
+                                    <button onClick={() => openCalendar('postDate')} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
+                                        <Calendar size={16} />
                                     </button>
                                 </div>
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-12 gap-x-10 gap-y-4">
+                        <div className="grid grid-cols-12 gap-x-6 gap-y-3.5">
                             {/* Left Column Fields */}
-                            <div className="col-span-6 space-y-3">
-                                <div className="flex items-center gap-4">
-                                    <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Vendor Name</label>
-                                    <div className="flex-1 flex gap-2">
+                            <div className="col-span-6 space-y-3.5">
+                                <div className="flex items-center gap-2">
+                                    <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Vendor Name</label>
+                                    <div className="flex-1 flex gap-1 h-8 min-w-0">
                                         <input
                                             type="text"
                                             readOnly
                                             value={lookups.vendors.find(v => v.code === formData.vendorId)?.name || ''}
-                                            className="flex-1 h-8 font-mono border border-gray-300 px-3 text-[13px] outline-none rounded-[5px] bg-gray-50 font-bold text-blue-700 truncate shadow-sm"
+                                            className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-bold text-blue-600 bg-slate-50 rounded outline-none transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20"
+                                            onClick={() => setShowVendorModal(true)}
                                         />
-                                        <button onClick={() => setShowVendorModal(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95">
+                                        <button onClick={() => setShowVendorModal(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
                                             <Search size={16} />
                                         </button>
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-4">
-                                    <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Cost Center</label>
-                                    <div className="flex-1 flex gap-2">
+                                <div className="flex items-center gap-2">
+                                    <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Cost Center</label>
+                                    <div className="flex-1 flex gap-1 h-8 min-w-0">
                                         <input
                                             type="text"
                                             readOnly
                                             value={lookups.costCenters.find(c => c.code === formData.costCenter)?.name || ''}
-                                            className="flex-1 h-8 font-mono border border-gray-300 px-3 text-[13px] outline-none rounded-[5px] bg-gray-50 truncate shadow-sm font-bold text-gray-600"
+                                            className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-bold text-gray-700 bg-slate-50 rounded outline-none transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20"
+                                            onClick={() => { setCcSource('header'); setShowCostCenterModal(true); }}
                                         />
-                                        <button onClick={() => { setCcSource('header'); setShowCostCenterModal(true); }} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95">
+                                        <button onClick={() => { setCcSource('header'); setShowCostCenterModal(true); }} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
                                             <Search size={16} />
                                         </button>
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-4">
-                                    <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Bill Terms</label>
-                                    <input name="terms" value={formData.terms} onChange={handleInputChange} type="text" className="flex-1 h-8 font-mono border border-gray-300 px-3 text-[13px] rounded-[5px] bg-white text-gray-700 outline-none focus:border-blue-400 shadow-sm transition-all" />
+                                <div className="flex items-center gap-2">
+                                    <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Bill Terms</label>
+                                    <input name="terms" value={formData.terms} onChange={handleInputChange} type="text" className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-bold text-gray-700 bg-slate-50 rounded outline-none transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" />
                                 </div>
-                                <div className="flex items-center gap-4">
-                                    <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">General Memo</label>
-                                    <input name="memo" value={formData.memo} onChange={handleInputChange} type="text" className="flex-1 h-8 font-mono border border-gray-300 px-3 text-[13px] rounded-[5px] bg-white text-gray-700 outline-none focus:border-blue-400 shadow-sm transition-all" />
+                                <div className="flex items-center gap-2">
+                                    <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">General Memo</label>
+                                    <input name="memo" value={formData.memo} onChange={handleInputChange} type="text" className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-bold text-gray-700 bg-slate-50 rounded outline-none transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" />
                                 </div>
                             </div>
 
                             {/* Right Column Fields */}
-                            <div className="col-span-6 space-y-3">
-                                <div className="flex items-center gap-4">
-                                    <label className="text-[12.5px] font-bold text-gray-700 w-32 shrink-0">A/P Account (GL)</label>
-                                    <div className="flex-1 flex gap-2">
+                            <div className="col-span-6 space-y-3.5">
+                                <div className="flex items-center gap-2">
+                                    <label className="text-[11px] font-bold text-gray-500 uppercase w-32 shrink-0">A/P Account (GL)</label>
+                                    <div className="flex-1 flex gap-1 h-8 min-w-0">
                                         <input
                                             type="text"
                                             readOnly
                                             value={lookups.payAccounts.find(a => a.code === formData.accId)?.name ? `${formData.accId} - ${lookups.payAccounts.find(a => a.code === formData.accId)?.name}` : ''}
-                                            className="flex-1 h-8 font-mono border border-gray-300 px-3 text-[12px] outline-none rounded-[5px] bg-gray-50 font-bold text-gray-600 truncate shadow-sm"
+                                            className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-bold text-gray-700 bg-slate-50 rounded outline-none transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20"
+                                            onClick={() => setShowAPModal(true)}
                                         />
-                                        <button onClick={() => setShowAPModal(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95">
+                                        <button onClick={() => setShowAPModal(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
                                             <Search size={16} />
                                         </button>
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-4">
-                                    <label className="text-[12.5px] font-bold text-gray-700 w-32 shrink-0">Supplier Bill No</label>
-                                    <input name="billNo" value={formData.billNo} onChange={handleInputChange} type="text" className="flex-1 h-8 font-mono border border-gray-300 px-3 text-[13px] rounded-[5px] bg-white text-blue-800 font-bold outline-none focus:border-blue-400 shadow-sm" />
+                                <div className="flex items-center gap-2">
+                                    <label className="text-[11px] font-bold text-gray-500 uppercase w-32 shrink-0">Supplier Bill No</label>
+                                    <input name="billNo" value={formData.billNo} onChange={handleInputChange} type="text" className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-bold text-blue-800 bg-slate-50 rounded outline-none transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" />
                                 </div>
-                                <div className="flex items-center gap-4">
-                                    <label className="text-[12.5px] font-bold text-gray-700 w-32 shrink-0">Reference No</label>
-                                    <input name="refNo" value={formData.refNo} onChange={handleInputChange} type="text" className="flex-1 h-8 font-mono border border-gray-300 px-3 text-[13px] rounded-[5px] bg-white text-gray-700 outline-none focus:border-blue-400 shadow-sm" />
+                                <div className="flex items-center gap-2">
+                                    <label className="text-[11px] font-bold text-gray-500 uppercase w-32 shrink-0">Reference No</label>
+                                    <input name="refNo" value={formData.refNo} onChange={handleInputChange} type="text" className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-bold text-gray-700 bg-slate-50 rounded outline-none transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" />
                                 </div>
-                                <div className="flex items-center gap-4">
-                                    <label className="text-[12.5px] font-bold text-gray-700 w-32 shrink-0">Due Date</label>
-                                    <div className="flex-1 flex gap-2">
+                                <div className="flex items-center gap-2">
+                                    <label className="text-[11px] font-bold text-gray-500 uppercase w-32 shrink-0">Due Date</label>
+                                    <div className="flex-1 flex gap-1 h-8 min-w-0">
                                         <input
                                             type="text"
                                             readOnly
                                             value={formData.billDueDate}
-                                            className="flex-1 h-8 font-mono border border-gray-300 px-3 text-[13px] outline-none rounded-[5px] font-bold text-blue-800 bg-gray-50 shadow-sm text-center"
+                                            className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-bold text-blue-800 bg-slate-50 rounded outline-none transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 text-center"
+                                            onClick={() => openCalendar('billDueDate')}
                                         />
-                                        <button onClick={() => openCalendar('billDueDate')} className="w-9 h-8 bg-[#0285fd] border border-gray-300 text-white flex items-center justify-center hover:bg-blue-50 rounded-[5px] transition-all shadow-sm active:scale-90">
+                                        <button onClick={() => openCalendar('billDueDate')} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
                                             <Calendar size={16} />
                                         </button>
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-4 pt-1">
-                                    <label className="text-[12.5px] font-bold text-gray-700 w-32 shrink-0">Total Due Amount</label>
-                                    <div className="flex-1 h-9 font-mono border border-red-100 bg-red-50/50 px-3 text-[16px] font-black text-red-600 text-right flex items-center justify-end rounded-[5px] shadow-inner">
+                                <div className="flex items-center gap-2 pt-1">
+                                    <label className="text-[11px] font-bold text-gray-500 uppercase w-32 shrink-0">Total Due Amount</label>
+                                    <div className="flex-1 h-8 border border-red-200 bg-red-50/50 px-3 text-[14px] font-bold text-red-600 text-right flex items-center justify-end rounded-[5px]">
                                         {calculateTotal()}
                                     </div>
                                 </div>
@@ -442,38 +453,40 @@ const EnterBillBoard = ({ isOpen, onClose }) => {
                                     </table>
 
                                     {/* Entry Input Row */}
-                                    <div className="mt-auto border-t-2 border-blue-50 bg-[#f8fafc] p-2 flex gap-3 items-center">
-                                        <div className="flex-[2] flex gap-1">
-                                            <div className="flex-1 relative">
-                                                <input
-                                                    type="text"
-                                                    readOnly
-                                                    value={lookups.expAccounts.find(a => a.code === currentLine.accCode)?.name ? `${currentLine.accCode} - ${lookups.expAccounts.find(a => a.code === currentLine.accCode)?.name}` : ''}
-                                                    className="w-full h-9 font-mono border border-gray-300 px-3 text-[12px] font-bold bg-white rounded-[5px] outline-none focus:border-blue-400 shadow-sm transition-all"
-                                                />
-                                            </div>
-                                            <button onClick={() => setShowExpModal(true)} className="w-10 h-9 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95">
+                                    <div className="mt-auto border-t border-slate-200 bg-slate-50 p-2 flex gap-3 items-center">
+                                        <div className="flex-[2] flex gap-1 h-8">
+                                            <input
+                                                type="text"
+                                                readOnly
+                                                value={lookups.expAccounts.find(a => a.code === currentLine.accCode)?.name ? `${currentLine.accCode} - ${lookups.expAccounts.find(a => a.code === currentLine.accCode)?.name}` : ''}
+                                                className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-bold text-gray-700 bg-white rounded outline-none transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 cursor-pointer"
+                                                onClick={() => setShowExpModal(true)}
+                                                placeholder="Expense Account"
+                                            />
+                                            <button onClick={() => setShowExpModal(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
                                                 <Search size={16} />
                                             </button>
                                         </div>
-                                        <div className="flex-[1.2] flex gap-1">
+                                        <div className="flex-[1.2] flex gap-1 h-8">
                                             <input
                                                 type="text"
                                                 readOnly
                                                 value={lookups.costCenters.find(c => c.code === currentLine.costCenter)?.name || ''}
-                                                className="flex-1 h-9 font-mono border border-gray-300 px-3 text-[12px] font-bold bg-white rounded-[5px] outline-none focus:border-blue-400 shadow-sm"
+                                                className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-bold text-gray-700 bg-white rounded outline-none transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 cursor-pointer"
+                                                onClick={() => { setCcSource('line'); setShowCostCenterModal(true); }}
+                                                placeholder="Cost Center"
                                             />
-                                            <button onClick={() => { setCcSource('line'); setShowCostCenterModal(true); }} className="w-10 h-9 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95">
+                                            <button onClick={() => { setCcSource('line'); setShowCostCenterModal(true); }} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
                                                 <Search size={16} />
                                             </button>
                                         </div>
-                                        <div className="flex-1">
-                                            <input name="amount" value={currentLine.amount} onChange={handleLineChange} onKeyDown={handleAddLine} type="number" className="w-full h-9 font-mono border border-gray-300 px-3 text-[14px] text-right font-black text-blue-700 rounded-[5px] shadow-inner outline-none focus:border-blue-400 bg-white" placeholder="Amount" />
+                                        <div className="flex-1 h-8">
+                                            <input name="amount" value={currentLine.amount} onChange={handleLineChange} onKeyDown={handleAddLine} type="number" className="w-full h-8 border border-slate-200 px-3 text-[13px] text-right font-black text-blue-700 rounded outline-none transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 bg-white" placeholder="Amount" />
                                         </div>
-                                        <div className="flex-[2] flex gap-2">
-                                            <input name="memo" value={currentLine.memo} onChange={handleLineChange} onKeyDown={handleAddLine} type="text" className="flex-1 h-9 font-mono border border-gray-300 px-3 text-[12px] font-bold rounded-[5px] shadow-inner outline-none focus:border-blue-400 bg-white" placeholder="Memo" />
-                                            <button onClick={handleAddLine} className="px-6 h-9 bg-[#0078d4] text-white font-black text-[11px] uppercase tracking-widest rounded-sm hover:bg-[#005a9e] whitespace-nowrap transition-all active:scale-95 shadow-md flex items-center gap-2">
-                                                Add Line
+                                        <div className="flex-[2] flex gap-2 h-8">
+                                            <input name="memo" value={currentLine.memo} onChange={handleLineChange} onKeyDown={handleAddLine} type="text" className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-bold rounded outline-none transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 bg-white" placeholder="Memo" />
+                                            <button onClick={handleAddLine} className="px-6 h-8 bg-[#00adff] text-white font-mono font-bold text-[12px] uppercase tracking-widest rounded-[5px] hover:bg-[#0099e6] whitespace-nowrap transition-all active:scale-95 shadow-md flex items-center gap-2 border-none">
+                                                ADD LINE
                                             </button>
                                         </div>
                                         <div className="w-10" />
@@ -481,7 +494,7 @@ const EnterBillBoard = ({ isOpen, onClose }) => {
                         </div>
                     </div>
                 </div>
-            </SimpleModal>
+            </TransactionFormWrapper>
 
             {/* Vendor Search Modal */}
             <SimpleModal isOpen={showVendorModal} onClose={() => setShowVendorModal(false)} title={`Vendor Records - ${lookups.vendors.length} Found`} maxWidth="max-w-xl">

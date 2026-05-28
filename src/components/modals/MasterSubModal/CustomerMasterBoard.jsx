@@ -1,151 +1,89 @@
 import React, { useState, useEffect } from 'react';
-import SimpleModal from '../../SimpleModal';
-
-import { Search, RotateCcw, Save, Trash2, RefreshCcw, UserCircle, Loader2, X, Briefcase, MapPin, Navigation, Building2, UserPlus } from 'lucide-react';
+import SimpleModal from '../../../components/SimpleModal';
+import { Search, Save, RotateCcw, Trash2, CheckCircle } from 'lucide-react';
 import { customerService } from '../../../services/customer.service';
-import ConfirmModal from '../../modals/ConfirmModal';
+import { authService } from '../../../services/auth.service';
 import { showSuccessToast, showErrorToast } from '../../../utils/toastUtils';
 
-
 const CustomerMasterBoard = ({ isOpen, onClose }) => {
-    // Custom Toast Handlers
-    const initialState = {
-        Code: '',
-        Cust_Name: '',
-        Address1: '',
-        Address2: '',
-        Phone: '',
-        Fax: '',
-        Email: '',
-        Web: '',
-        Contact_Person: '',
-        NIC_No: '',
-        Credit_Limit: '0.00',
-        Credit_Period: '0',
-        Bank_Name: '',
-        Bank_Code: '',
-        Brunch: '',
-        AC_Number: '',
-        VAT_Number: '',
-        Cust_Typ: '',
-        Area_Code: '',
-        Area_Name: '',
-        Route_Code: '',
-        Route_Name: '',
-        Locked: false,
-        Company: '',
-        CurrentUser: ''
+    const initialState = { 
+        Code: '', Name: '', Type_Code: '', Type_Name: '', Address1: '', Address2: '', 
+        Email: '', Web: '', Phone_No: '', Area: '', AreaName: '', Credit_Limit: 0, 
+        Credit_Period: 0, Vat_Reg_No: '', Inactive: false, CurrentUser: 'SYSTEM', Company: '' 
     };
 
     const [formData, setFormData] = useState(initialState);
-    const [banks, setBanks] = useState([]);
-    const [customerTypes, setCustomerTypes] = useState([]);
-    const [areas, setAreas] = useState([]);
-    const [routes, setRoutes] = useState([]);
-    const [showSearchModal, setShowSearchModal] = useState(false);
-    const [showBankSearch, setShowBankSearch] = useState(false);
-    const [showAreaSearch, setShowAreaSearch] = useState(false);
-    const [showRouteSearch, setShowRouteSearch] = useState(false);
-    const [showTypeSearch, setShowTypeSearch] = useState(false);
-    const [customersList, setCustomersList] = useState([]);
-    const [bankSearchQuery, setBankSearchQuery] = useState('');
-    const [areaSearchQuery, setAreaSearchQuery] = useState('');
-    const [routeSearchQuery, setRouteSearchQuery] = useState('');
-    const [typeSearchQuery, setTypeSearchQuery] = useState('');
-    const [searchQuery, setSearchQuery] = useState('');
     const [loading, setLoading] = useState(false);
     const [isEditMode, setIsEditMode] = useState(false);
-    const [showConfirmModal, setShowConfirmModal] = useState(false);
+
+    // Lookups
+    const [showSearchModal, setShowSearchModal] = useState(false);
+    const [customerList, setCustomerList] = useState([]);
+    const [custSearch, setCustSearch] = useState('');
+
+    const [showTypeModal, setShowTypeModal] = useState(false);
+    const [typeList, setTypeList] = useState([]);
+    const [typeSearch, setTypeSearch] = useState('');
+
+    const [showAreaModal, setShowAreaModal] = useState(false);
+    const [areaList, setAreaList] = useState([]);
+    const [areaSearch, setAreaSearch] = useState('');
 
     useEffect(() => {
         if (isOpen) {
-            fetchLookups();
-            const user = JSON.parse(localStorage.getItem('user'));
+            handleClear();
+            const user = authService.getCurrentUser();
             const companyData = localStorage.getItem('selectedCompany');
-
-            let companyCode = '';
-            if (companyData) {
-                try {
-                    const parsed = JSON.parse(companyData);
-                    companyCode = parsed.companyCode || parsed.CompanyCode || parsed.code || parsed.Code || companyData;
-                } catch (e) {
-                    companyCode = companyData;
-                }
+            let companyCode = 'C001';
+            if (companyData) { 
+                try { 
+                    const p = JSON.parse(companyData); 
+                    companyCode = p.company_Code || p.companyCode || p.CompanyCode || companyData; 
+                } catch (e) { 
+                    companyCode = companyData; 
+                } 
             }
-
             if (user) {
-                setFormData(prev => ({
-                    ...prev,
-                    CurrentUser: user.empName || user.EmpName || user.Emp_Name || user.emp_Name || user.username || '',
-                    Company: companyCode
-                }));
+                setFormData(prev => ({ ...prev, CurrentUser: user.empName || user.username || 'SYSTEM', Company: companyCode }));
             }
         }
     }, [isOpen]);
 
-    const fetchLookups = async () => {
-        try {
-            const [banksData, typesData, areasData, routesData] = await Promise.all([
-                customerService.getBanks(),
-                customerService.getTypes(),
-                customerService.getAreas(),
-                customerService.getRoutes()
-            ]);
-            setBanks(banksData || []);
-            setCustomerTypes(typesData || []);
-            setAreas(areasData || []);
-            setRoutes(routesData || []);
-        } catch (error) {
-            console.error('Lookup fetch error:', error);
-        }
-    };
-
-    const handleInputChange = (e) => {
+    const handleInput = (e) => {
         const { name, value, type, checked } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: type === 'checkbox' ? checked : value
-        }));
+        setFormData(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
     };
 
     const handleClear = () => {
-        setFormData(prev => ({
-            ...initialState,
-            CurrentUser: prev.CurrentUser,
-            Company: prev.Company
-        }));
+        const user = authService.getCurrentUser();
+        const companyData = localStorage.getItem('selectedCompany');
+        let companyCode = 'C001';
+        if (companyData) { 
+            try { 
+                const p = JSON.parse(companyData); 
+                companyCode = p.company_Code || p.companyCode || p.CompanyCode || companyData; 
+            } catch (e) {} 
+        }
+        setFormData({ ...initialState, CurrentUser: user?.empName || user?.username || 'SYSTEM', Company: companyCode });
         setIsEditMode(false);
     };
 
     const handleSave = async () => {
-        if (!formData.Cust_Name) {
-            showErrorToast('Customer Name is required');
-            return;
-        }
-
+        if (!formData.Name) return showErrorToast('Customer Name is required');
+        if (!formData.Type_Code) return showErrorToast('Customer Type is required');
+        
         setLoading(true);
         try {
-            const payload = {
-                ...formData,
-                Cont_Person: formData.Contact_Person,
-                NIC: formData.NIC_No,
-                Bank: formData.Bank_Name,
-                Type: formData.Cust_Typ,
-                Credit_Limit: parseFloat(formData.Credit_Limit) || 0,
-                Credit_Period: (formData.Credit_Period || "0").toString()
-            };
-
-            if (isEditMode) {
-                await customerService.update(formData.Code, payload);
-                showSuccessToast('Customer updated successfully');
-            } else {
-                const response = await customerService.create(payload);
-                setFormData(prev => ({ ...prev, Code: response.code }));
-                showSuccessToast('Customer saved successfully');
+            const data = await customerService.save(formData);
+            if (data.message === 'inserted') {
+                showSuccessToast('Customer created successfully');
+                setFormData(prev => ({ ...prev, Code: data.code }));
                 setIsEditMode(true);
+            } else if (data.message === 'updated') {
+                showSuccessToast('Customer updated successfully');
             }
         } catch (error) {
-            showErrorToast(typeof error === 'string' ? error : (error.message || 'Operation failed'));
+            showErrorToast(error.error || error.message || 'Failed to save');
         } finally {
             setLoading(false);
         }
@@ -153,683 +91,372 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
 
     const handleDelete = async () => {
         if (!isEditMode || !formData.Code) return;
-        setShowConfirmModal(true);
-    };
-
-    const confirmDelete = async () => {
+        if (!window.confirm(`Are you sure you want to delete customer "${formData.Name}"?`)) return;
         setLoading(true);
         try {
-            await customerService.delete(formData.Code);
-            showSuccessToast('Customer deleted successfully');
+            await customerService.delete(formData.Code, formData.Company);
+            showSuccessToast('Customer deleted');
             handleClear();
-            setShowConfirmModal(false);
         } catch (error) {
-            showErrorToast(error.toString());
+            showErrorToast(error.error || error.message || 'Deletion failed');
         } finally {
             setLoading(false);
         }
     };
 
-    const openSearch = async () => {
-        setLoading(true);
+    // Open Lookups
+    const openCustomerSearch = async () => {
         try {
-            const data = await customerService.getAll();
-            setCustomersList(data);
+            const data = await customerService.getAll(formData.Company);
+            setCustomerList(data);
             setShowSearchModal(true);
-        } catch (err) {
-            showErrorToast('Failed to load customers');
-        } finally {
-            setLoading(false);
-        }
+        } catch (error) { showErrorToast('Failed to load customers'); }
     };
 
-    const selectCustomer = async (code) => {
-        setLoading(true);
+    const openTypeSearch = async () => {
         try {
-            const data = await customerService.getByCode(code);
-            setFormData({
-                Code: data.code || data.Code || '',
-                Cust_Name: data.cust_Name || data.Cust_Name || '',
-                Address1: data.address1 || data.Address1 || '',
-                Address2: data.address2 || data.Address2 || '',
-                Phone: data.phone || data.Phone || '',
-                Fax: data.fax || data.Fax || '',
-                Email: data.email || data.Email || '',
-                Web: data.web || data.Web || '',
-                Contact_Person: data.cont_Person || data.cont_Person || data.contact_Person || data.Contact_Person || '',
-                NIC_No: data.nic || data.NIC || data.niC_No || data.NIC_No || '',
-                Credit_Limit: (data.credit_Limit || data.Credit_Limit || '0.00').toString(),
-                Credit_Period: (data.credit_Period || data.Credit_Period || '0').toString(),
-                Bank_Name: data.bank || data.Bank || data.bank_Name || data.Bank_Name || '',
-                Bank_Code: String(data.bank_Code || data.Bank_Code || ''),
-                Brunch: data.brunch || data.Brunch || '',
-                AC_Number: data.ac_Number || data.AC_Number || '',
-                VAT_Number: data.vat_Number || data.VAT_Number || '',
-                Cust_Typ: data.type || data.Type || data.cust_Typ || data.Cust_Typ || '',
-                Area_Code: data.area_Code || data.Area_Code || '',
-                Area_Name: data.area_Name || data.Area_Name || '',
-                Route_Code: data.route_Code || data.Route_Code || '',
-                Route_Name: data.route_Name || data.Route_Name || '',
-                Locked: (data.locked || data.Locked) === 1 || data.locked === true || data.Locked === "1",
-                Company: formData.Company,
-                CurrentUser: formData.CurrentUser
-            });
-            setIsEditMode(true);
-            setShowSearchModal(false);
-        } catch (error) {
-            showErrorToast('Failed to load customer details');
-        } finally {
-            setLoading(false);
-        }
+            const data = await customerService.getCustomerTypes(formData.Company);
+            setTypeList(data);
+            setShowTypeModal(true);
+        } catch (error) { showErrorToast('Failed to load types'); }
     };
 
-    const selectArea = (area) => {
-        setFormData(prev => ({
-            ...prev,
-            Area_Code: area.code,
-            Area_Name: area.name
-        }));
-        setShowAreaSearch(false);
+    const openAreaSearch = async () => {
+        try {
+            const data = await customerService.getAreas(formData.Company);
+            setAreaList(data);
+            setShowAreaModal(true);
+        } catch (error) { showErrorToast('Failed to load areas'); }
     };
 
-    const selectRoute = (route) => {
-        setFormData(prev => ({
-            ...prev,
-            Route_Code: route.code,
-            Route_Name: route.name
-        }));
-        setShowRouteSearch(false);
+    const loadCustomer = (item) => {
+        setFormData({ 
+            Code: item.code || item.Code, 
+            Name: item.name || item.Name, 
+            Type_Code: item.type_Code || item.Type_Code, 
+            Type_Name: item.type_Name || item.Type_Name || '', 
+            Address1: item.address1 || item.Address1 || '', 
+            Address2: item.address2 || item.Address2 || '', 
+            Email: item.email || item.Email || '', 
+            Web: item.web || item.Web || '', 
+            Phone_No: item.phone_No || item.Phone_No || '', 
+            Area: item.area || item.Area || '', 
+            AreaName: item.areaName || item.AreaName || '',
+            Credit_Limit: item.credit_Limit || item.Credit_Limit || 0, 
+            Credit_Period: item.credit_Period || item.Credit_Period || 0, 
+            Vat_Reg_No: item.vat_Reg_No || item.Vat_Reg_No || '', 
+            Inactive: item.inactive || item.Inactive, 
+            CurrentUser: formData.CurrentUser, 
+            Company: formData.Company 
+        });
+        setIsEditMode(true);
+        setShowSearchModal(false);
     };
 
-    const selectBank = (bank) => {
-        setFormData(prev => ({
-            ...prev,
-            Bank_Code: bank.code,
-            Bank_Name: bank.name
-        }));
-        setShowBankSearch(false);
-        setBankSearchQuery('');
-    };
-
-    const selectType = (type) => {
-        setFormData(prev => ({
-            ...prev,
-            Cust_Typ: type
-        }));
-        setShowTypeSearch(false);
-        setTypeSearchQuery('');
-    };
-
-    const footer = (
-        <div className="bg-slate-50 px-6  w-full flex justify-end gap-3 border-t border-gray-100 mt-1 rounded-b-xl">
-            <button onClick={handleSave} disabled={loading} className={`px-6 h-10 bg-[#50af60] text-white text-sm font-bold rounded-md shadow-md shadow-blue-200 hover:bg-[#24db4e] transition-all active:scale-95 flex items-center justify-center gap-2 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}>
-                {loading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />} 
-                {isEditMode ? 'Update' : 'Save'}
-            </button>
-            <button onClick={handleDelete} disabled={!isEditMode || loading} className={`px-6 h-10 bg-[#d13438] text-white text-sm font-bold rounded-md shadow-md shadow-red-200 hover:bg-[#a4262c] transition-all active:scale-95 flex items-center justify-center gap-2 ${(!isEditMode || loading) ? 'opacity-50 cursor-not-allowed' : ''}`}>
-                <Trash2 size={14} /> Delete
-            </button>
-            <button onClick={handleClear} className="px-6 h-10 bg-[#00adff] text-white text-sm font-bold rounded-md hover:bg-[#0099e6] transition-all active:scale-95 flex items-center justify-center gap-2 border-none">
-                <RotateCcw size={14} /> Clear
-            </button>
-        </div>
-    );
+    const inputClass = "flex-1 min-w-0 h-8 border border-slate-200 rounded px-3 text-[12px] font-bold text-gray-700 bg-slate-50 outline-none transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20";
+    const labelClass = "text-[11px] font-bold text-gray-500 uppercase w-32 shrink-0";
 
     return (
         <>
-            <style>
-                {`
-                    @keyframes toastProgress {
-                        0% { width: 100%; }
-                        100% { width: 0%; }
-                    }
-                `}
-            </style>
-            <SimpleModal isOpen={isOpen} onClose={onClose} title="Customer Master File" maxWidth="max-w-[950px]" footer={footer}>
-                <div className="py-2 select-none font-['Tahoma']">
-                    <div className="border-b border-gray-200 pb-4 flex items-center justify-center">
-                        <h2 className="text-[17px] font-bold text-black uppercase tracking-tight">Enter New Customer Details & Update</h2>
+            <SimpleModal
+                isOpen={isOpen}
+                onClose={onClose}
+                title="Customer Profile & Directory"
+                maxWidth="max-w-[1050px]"
+                footer={
+                    <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-slate-200 rounded-b-xl">
+                        <div className="flex gap-3">
+                            <button
+                                onClick={handleDelete}
+                                disabled={!isEditMode || loading}
+                                className={`px-6 py-3 font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] transition-all flex items-center justify-center gap-2 border-none ${(!isEditMode || loading) ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-[#ff3b30] hover:bg-[#e03127] text-white shadow-md shadow-red-100 active:scale-95'}`}
+                            >
+                                <Trash2 size={14} /> DELETE DOC
+                            </button>
+                            <button
+                                onClick={handleClear}
+                                className="px-6 py-3 bg-[#00adff] hover:bg-[#0099e6] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] transition-all active:scale-95 flex items-center justify-center gap-2 border-none"
+                            >
+                                <RotateCcw size={14} /> CLEAR FORM
+                            </button>
+                        </div>
+                        <div className="flex gap-3">
+                            <button
+                                onClick={handleSave}
+                                disabled={loading}
+                                className="px-6 py-3 bg-[#2bb744] hover:bg-[#259b3a] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] shadow-md shadow-green-100 transition-all active:scale-95 flex items-center justify-center gap-2 border-none"
+                            >
+                                <CheckCircle size={14} /> {isEditMode ? 'UPDATE & SAVE' : 'SAVE & APPLY'}
+                            </button>
+                        </div>
                     </div>
-
-                        <div className="space-y-4 text-[12.5px] mt-4">
-                            {/* Row 1: ID and Name */}
-                            <div className="flex items-center gap-6">
-                                <label className="w-32 font-bold text-gray-700">Customer ID / Name</label>
-                                <div className="flex-1 flex gap-3">
-                                    <input type="text" name="Code" value={formData.Code} readOnly className="w-32 h-8 border border-gray-300 px-2 bg-white rounded-[5px] outline-none focus:border-blue-400 font-bold text-blue-600 shadow-sm" />
-                                    <input type="text" name="Cust_Name" value={formData.Cust_Name} onChange={handleInputChange} placeholder="" className="flex-1 h-8 font-mono border border-gray-300 px-3 bg-white rounded-[5px] outline-none focus:border-blue-400 shadow-sm transition-all focus:shadow-md" />
-                                    <button onClick={openSearch} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95">
-                                        <Search size={18} />
+                }
+            >
+                <div className="space-y-4 overflow-y-auto no-scrollbar font-['Tahoma']">
+                    <div className="bg-white p-4 border border-slate-200 rounded-[5px] space-y-4">
+                        <div className="grid grid-cols-12 gap-x-6 gap-y-4">
+                            
+                            {/* Row 1 */}
+                            <div className="col-span-6 flex items-center gap-2">
+                                <label className={labelClass}>Cust Code</label>
+                                <div className="flex-1 flex gap-1 h-8 min-w-0">
+                                    <input 
+                                        type="text" 
+                                        name="Code" 
+                                        value={formData.Code} 
+                                        onChange={handleInput} 
+                                        className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-bold text-blue-600 bg-slate-50 rounded outline-none transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" 
+                                        placeholder="Auto Gen"
+                                        readOnly
+                                    />
+                                    <button onClick={openCustomerSearch} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
+                                        <Search size={16} />
                                     </button>
                                 </div>
                             </div>
-
-                            {/* Address Lines */}
-                            <div className="flex items-center gap-6">
-                                <label className="w-32 font-bold text-gray-700">Address 1</label>
-                                <input type="text" name="Address1" value={formData.Address1} onChange={handleInputChange} className="flex-1 h-8 font-mono border border-gray-300 px-3 bg-white rounded-[5px] outline-none focus:border-blue-400 shadow-sm" />
-                            </div>
-                            <div className="flex items-center gap-6">
-                                <label className="w-32 font-bold text-gray-700">Address 2</label>
-                                <input type="text" name="Address2" value={formData.Address2} onChange={handleInputChange} className="flex-1 h-8 font-mono border border-gray-300 px-3 bg-white rounded-[5px] outline-none focus:border-blue-400 shadow-sm" />
+                            
+                            <div className="col-span-6 flex items-center gap-2">
+                                <label className={labelClass}>Customer Name</label>
+                                <input type="text" name="Name" value={formData.Name} onChange={handleInput} className={inputClass} />
                             </div>
 
-                            {/* Phone and Fax */}
-                            <div className="flex items-center gap-6">
-                                <label className="w-32 font-bold text-gray-700">Phone Number</label>
-                                <div className="flex-1 grid grid-cols-[1fr_auto_1fr] items-center gap-6">
-                                    <input type="text" name="Phone" value={formData.Phone} onChange={handleInputChange} className="w-full h-8 font-mono border border-gray-300 px-3 bg-white rounded-[5px] outline-none focus:border-blue-400 shadow-sm" />
-                                    <label className="w-24 font-bold text-gray-700 text-center">Fax</label>
-                                    <input type="text" name="Fax" value={formData.Fax} onChange={handleInputChange} className="w-full h-8 font-mono border border-gray-300 px-3 bg-white rounded-[5px] outline-none focus:border-blue-400 shadow-sm" />
-                                </div>
-                            </div>
-
-                            {/* Email and Web */}
-                            <div className="flex items-center gap-6">
-                                <label className="w-32 font-bold text-gray-700">E-Mail Address</label>
-                                <input type="text" name="Email" value={formData.Email} onChange={handleInputChange} className="flex-1 h-8 font-mono border border-gray-300 px-3 bg-white rounded-[5px] outline-none focus:border-blue-400 shadow-sm" />
-                            </div>
-
-                            <div className="flex items-center gap-6">
-                                <label className="w-32 font-bold text-gray-700">Web Site</label>
-                                <input type="text" name="Web" value={formData.Web} onChange={handleInputChange} className="flex-1 h-8 font-mono border border-gray-300 px-3 bg-white rounded-[5px] outline-none focus:border-blue-400 shadow-sm" />
-                            </div>
-
-                            {/* Contact Person and NIC */}
-                            <div className="flex items-center gap-6">
-                                <label className="w-32 font-bold text-gray-700">Contact Person</label>
-                                <div className="flex-1 grid grid-cols-[1fr_auto_1fr] items-center gap-6">
-                                    <input type="text" name="Contact_Person" value={formData.Contact_Person} onChange={handleInputChange} className="w-full h-8 font-mono border border-gray-300 px-3 bg-white rounded-[5px] outline-none focus:border-blue-400 shadow-sm" />
-                                    <label className="w-24 font-bold text-gray-700 text-center">NIC No</label>
-                                    <input type="text" name="NIC_No" value={formData.NIC_No} onChange={handleInputChange} className="w-full h-8 font-mono border border-gray-300 px-3 bg-white rounded-[5px] outline-none focus:border-blue-400 shadow-sm" />
-                                </div>
-                            </div>
-
-                            {/* Credit Limit and Period */}
-                            <div className="flex items-center gap-6">
-                                <label className="w-32 font-bold text-gray-700">Credit Limit</label>
-                                <div className="flex-1 grid grid-cols-[1fr_auto_1fr] items-center gap-6">
-                                    <input type="text" name="Credit_Limit" value={formData.Credit_Limit} onChange={handleInputChange} className="w-full h-8 border border-gray-300 px-3 bg-white rounded-[5px] outline-none focus:border-blue-400 text-right font-bold shadow-sm" />
-                                    <label className="w-24 font-bold text-gray-700 text-center">Credit Period</label>
-                                    <input type="text" name="Credit_Period" value={formData.Credit_Period} onChange={handleInputChange} className="w-full h-8 border border-gray-300 px-3 bg-white rounded-[5px] outline-none focus:border-blue-400 text-center shadow-sm" />
-                                </div>
-                            </div>
-
-                            {/* Bank Detail */}
-                            <div className="flex items-center gap-6">
-                                <label className="w-32 font-bold text-gray-700">Bank Detail</label>
-                                <div className="flex-1 flex gap-3">
+                            {/* Row 2 */}
+                            <div className="col-span-6 flex items-center gap-2">
+                                <label className={labelClass}>Customer Type</label>
+                                <div className="flex-1 flex gap-1 h-8 min-w-0">
                                     <input
                                         type="text"
-                                        value={formData.Bank_Name}
                                         readOnly
-                                        placeholder=""
-                                        className="flex-1 h-8 border border-gray-300 px-3 bg-gray-50 rounded-[5px] outline-none shadow-sm"
+                                        value={formData.Type_Name}
+                                        placeholder="Select Type..."
+                                        className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-bold text-red-600 bg-slate-50 rounded outline-none cursor-pointer transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20"
+                                        onClick={openTypeSearch}
                                     />
-                                    <button
-                                        onClick={() => setShowBankSearch(true)}
-                                        className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95"
-                                    >
-                                        <Search size={18} />
+                                    <button onClick={openTypeSearch} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
+                                        <Search size={16} />
                                     </button>
                                 </div>
                             </div>
 
-                            {/* Branch and A/C No */}
-                            <div className="flex items-center gap-6">
-                                <label className="w-32 font-bold text-gray-700">Branch Detail</label>
-                                <div className="flex-1 grid grid-cols-[1fr_auto_1fr] items-center gap-6">
-                                    <input type="text" name="Brunch" value={formData.Brunch} onChange={handleInputChange} placeholder="" className="w-full h-8 font-mono border border-gray-300 px-3 bg-white rounded-[5px] outline-none focus:border-blue-400 shadow-sm" />
-                                    <label className="w-24 font-bold text-gray-700 text-center">A/C No</label>
-                                    <input type="text" name="AC_Number" value={formData.AC_Number} onChange={handleInputChange} placeholder="" className="w-full h-8 font-mono border border-gray-300 px-3 bg-white rounded-[5px] outline-none focus:border-blue-400 shadow-sm" />
+                            <div className="col-span-6 flex items-center gap-2">
+                                <label className={labelClass}>Phone Number</label>
+                                <input type="text" name="Phone_No" value={formData.Phone_No} onChange={handleInput} className={inputClass} />
+                            </div>
+
+                            {/* Row 3 */}
+                            <div className="col-span-6 flex items-center gap-2">
+                                <label className={labelClass}>Address Line 1</label>
+                                <input type="text" name="Address1" value={formData.Address1} onChange={handleInput} className={inputClass} />
+                            </div>
+                            
+                            <div className="col-span-6 flex items-center gap-2">
+                                <label className={labelClass}>Area</label>
+                                <div className="flex-1 flex gap-1 h-8 min-w-0">
+                                    <input
+                                        type="text"
+                                        readOnly
+                                        value={formData.AreaName}
+                                        placeholder="Select Area..."
+                                        className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-bold text-red-600 bg-slate-50 rounded outline-none cursor-pointer transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20"
+                                        onClick={openAreaSearch}
+                                    />
+                                    <button onClick={openAreaSearch} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
+                                        <Search size={16} />
+                                    </button>
                                 </div>
                             </div>
 
-                            {/* VAT and Customer Type */}
-                            <div className="flex items-center gap-6">
-                                <label className="w-32 font-bold text-gray-700">VAT Reg. No</label>
-                                <div className="flex-1 grid grid-cols-[1fr_auto_1fr] items-center gap-6">
-                                    <input type="text" name="VAT_Number" value={formData.VAT_Number} onChange={handleInputChange} className="w-full h-8 font-mono border border-gray-300 px-3 bg-white rounded-[5px] outline-none focus:border-blue-400 shadow-sm" />
-                                    <label className="w-24 font-bold text-gray-700 text-center">Cust. Type</label>
-                                    <div className="w-full flex gap-2">
-                                        <input 
-                                            type="text" 
-                                            value={formData.Cust_Typ} 
-                                            readOnly 
-                                            placeholder="" 
-                                            className="flex-1 h-8 border border-gray-300 px-3 bg-gray-50 rounded-[5px] outline-none shadow-sm min-w-0" 
-                                        />
-                                        <button 
-                                            onClick={() => setShowTypeSearch(true)} 
-                                            className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0"
-                                        >
-                                            <Search size={18} />
-                                        </button>
-                                    </div>
-                                </div>
+                            {/* Row 4 */}
+                            <div className="col-span-6 flex items-center gap-2">
+                                <label className={labelClass}>Address Line 2</label>
+                                <input type="text" name="Address2" value={formData.Address2} onChange={handleInput} className={inputClass} />
                             </div>
 
-                            <div className="flex items-center justify-end pr-2">
-                                <label className="flex items-center gap-3 cursor-pointer group">
-                                    <input type="checkbox" name="Locked" checked={formData.Locked} onChange={handleInputChange} className="w-5 h-5 rounded-[5px] border-gray-300 text-[#0078d4] focus:ring-[#0078d4] shadow-sm transition-all" /> 
-                                    <span className={`font-bold transition-colors ${formData.Locked ? 'text-red-500' : 'text-gray-700'}`}>Customer is Inactive</span>
+                            <div className="col-span-6 flex items-center gap-2">
+                                <label className={labelClass}>Email Address</label>
+                                <input type="email" name="Email" value={formData.Email} onChange={handleInput} className={inputClass} />
+                            </div>
+
+                            {/* Row 5 */}
+                            <div className="col-span-6 flex items-center gap-2">
+                                <label className={labelClass}>Web URL</label>
+                                <input type="text" name="Web" value={formData.Web} onChange={handleInput} className={inputClass} />
+                            </div>
+
+                            <div className="col-span-6 flex items-center gap-2">
+                                <label className={labelClass}>VAT Reg No</label>
+                                <input type="text" name="Vat_Reg_No" value={formData.Vat_Reg_No} onChange={handleInput} className={inputClass} />
+                            </div>
+
+                            {/* Row 6 */}
+                            <div className="col-span-4 flex items-center gap-2">
+                                <label className={labelClass}>Credit Limit</label>
+                                <input type="number" name="Credit_Limit" value={formData.Credit_Limit} onChange={handleInput} className={`${inputClass} text-right font-mono`} />
+                            </div>
+
+                            <div className="col-span-4 flex items-center gap-2">
+                                <label className={labelClass}>Credit Period</label>
+                                <input type="number" name="Credit_Period" value={formData.Credit_Period} onChange={handleInput} className={`${inputClass} text-right font-mono`} />
+                            </div>
+
+                            <div className="col-span-4 flex items-center justify-end">
+                                <label className="flex items-center gap-3 cursor-pointer p-1.5 border border-slate-200 rounded-[5px] bg-slate-50 px-3 hover:bg-slate-100 transition-colors">
+                                    <input type="checkbox" name="Inactive" checked={formData.Inactive} onChange={handleInput} className="w-4 h-4 text-[#0285fd] border-slate-300 rounded focus:ring-[#00D1FF]" />
+                                    <span className="text-[11px] font-bold text-gray-600 select-none uppercase tracking-widest">Mark as Inactive</span>
                                 </label>
                             </div>
-
-                            {/* Area Selection */}
-                            <div className="flex items-center gap-6 pt-1">
-                                <label className="w-32 font-bold text-gray-700">Area Selection</label>
-                                <div className="flex-1 flex gap-2 items-center">
-                                    <button onClick={fetchLookups} className="w-10 h-8 bg-white border border-gray-300 flex items-center justify-center hover:bg-gray-50 rounded-[5px] text-[#0078d4] shadow-sm transition-all active:scale-95"><RefreshCcw size={16} /></button>
-                                    <input type="text" value={formData.Area_Code} readOnly className="w-24 h-8 border border-gray-300 px-3 bg-gray-50 rounded-[5px] outline-none shadow-sm font-mono text-center" />
-                                    <input type="text" value={formData.Area_Name} readOnly placeholder="" className="flex-1 h-8 border border-gray-300 px-3 bg-gray-50 rounded-[5px] outline-none shadow-sm" />
-                                    <button onClick={() => setShowAreaSearch(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] shadow-md transition-all active:scale-95"><Search size={18} /></button>
-                                </div>
-                            </div>
-
-                            {/* Route Selection */}
-                            <div className="flex items-center gap-6 pt-1">
-                                <label className="w-32 font-bold text-gray-700">Route Selection</label>
-                                <div className="flex-1 flex gap-2 items-center">
-                                    <button onClick={fetchLookups} className="w-10 h-8 bg-white border border-gray-300 flex items-center justify-center hover:bg-gray-50 rounded-sm text-[#0078d4] shadow-sm transition-all active:scale-95"><RefreshCcw size={16} /></button>
-                                    <input type="text" value={formData.Route_Code} readOnly className="w-24 h-8 border border-gray-300 px-3 bg-gray-50 rounded-sm outline-none shadow-sm font-mono text-center" />
-                                    <input type="text" value={formData.Route_Name} readOnly placeholder="" className="flex-1 h-8 border border-gray-300 px-3 bg-gray-50 rounded-sm outline-none shadow-sm" />
-                                    <button onClick={() => setShowRouteSearch(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] shadow-md transition-all active:scale-95"><Search size={18} /></button>
-                                </div>
-                            </div>
                         </div>
                     </div>
+                </div>
             </SimpleModal>
 
-            {/* Customer Search Modal */}
-            {showSearchModal && (
-                <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4 font-['Tahoma']">
-                    <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setShowSearchModal(false)} />
-                    <div className="relative w-full max-w-2xl bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
-                        {/* Header */}
-                        <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-100 select-none relative overflow-hidden">
-                            {/* System Color Left Accent */}
-                            <div 
-                                className="absolute left-0 top-0 bottom-0 w-1.5 transition-colors duration-500" 
-                                style={{ backgroundColor: localStorage.getItem('topBarColor') || '#0285fd' }}
-                            />
-                            <div className="flex items-center gap-2">
-                                <Search size={16} className="text-[#0078d4]" />
-                                <span className="text-[15px] font-[700] text-slate-900 uppercase tracking-[3px] font-mono truncate">Customer Records Lookup</span>
-                            </div>
-                            <button
-                                onClick={() => setShowSearchModal(false)}
-                                className="w-9 h-8 flex items-center justify-center bg-red-50 hover:bg-red-100 text-red-600 rounded-[8px] transition-all active:scale-90 outline-none border-none group"
-                                title="Close"
-                            >
-                                <X size={18} strokeWidth={4} className="group-hover:scale-110 transition-transform" />
-                            </button>
-                        </div>
-
-                        {/* Search Input Area */}
-                        <div className="p-3 bg-slate-50 border-b border-gray-100 flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                                <Search size={14} className="text-gray-400" />
-                                <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest text-center">Search Facility</span>
-                            </div>
-                            <input 
-                                type="text" 
-                                placeholder="Find by Name, Code or Phone..." 
-                                className="h-10 border border-gray-300 px-4 text-sm rounded-md w-80 focus:border-[#0285fd] outline-none shadow-sm transition-all" 
-                                value={searchQuery} 
-                                onChange={(e) => setSearchQuery(e.target.value)} 
+            {/* Lookups Modals */}
+            
+            {/* Customer Search */}
+            <SimpleModal
+                isOpen={showSearchModal}
+                onClose={() => setShowSearchModal(false)}
+                title="Customer Directory Lookup"
+                maxWidth="max-w-[600px]"
+            >
+                <div className="space-y-4 font-['Tahoma']">
+                    <div className="flex items-center gap-4 p-3 rounded-[5px] border border-slate-200 bg-white mb-2">
+                        <span className="text-[12px] font-bold text-gray-500 uppercase tracking-widest">Search Facility</span>
+                        <div className="relative flex-1">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
+                            <input
+                                type="text"
+                                placeholder="Find customer by name or code..."
+                                className="w-full h-9 pl-10 pr-4 border border-slate-200 rounded outline-none text-sm bg-slate-50 transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20"
+                                value={custSearch}
+                                onChange={(e) => setCustSearch(e.target.value)}
+                                autoFocus
                             />
                         </div>
-
-                        {/* Results List */}
-                        <div className="p-2">
-                            <div className=" px-3 py-1.5 flex text-[10px] font-bold text-gray-600 border-b border-gray-200 uppercase tracking-wider">
-                                <span className="w-24 text-center">Code</span>
-                                <span className="flex-1 px-3">Customer Name</span>
-                                <span className="pr-40">Phone</span>
-                            </div>
-                            <div className="max-h-[400px] overflow-y-auto custom-scrollbar">
-                                {customersList.filter(c => (c.cust_Name || '').toLowerCase().includes(searchQuery.toLowerCase()) || (c.code || '').toLowerCase().includes(searchQuery.toLowerCase())).map(c => (
-                                    <button 
-                                        key={c.code || c.Code} 
-                                        onClick={() => selectCustomer(c.code || c.Code)}
-                                        className="w-full flex items-center justify-between px-3 py-2 text-xs border-b border-gray-100 hover:bg-blue-50 transition-all text-left group"
-                                    >
-                                        <div className="flex items-center gap-2 flex-1">
-                                            <span className="w-24 text-center font-mono text-[11px] font-bold text-[#0078d4]">
-                                                {c.code || c.Code}
-                                            </span>
-                                            <span className="flex-1 px-3 font-mono font-medium text-gray-700 uppercase">
-                                                {c.cust_Name || c.Cust_Name}
-                                            </span>
-                                            <span className="w-32 px-3 font-mono text-gray-500">
-                                                {c.phone || c.Phone}
-                                            </span>
-                                        </div>
-                                        <div className="bg-[#e49e1b] text-white text-[10px] px-5 py-1.5 rounded-md font-bold hover:bg-[#cb9b34] shadow-sm transition-all active:scale-95 uppercase">Select</div>
-                                    </button>
-                                ))}
-                                {customersList.length === 0 && (
-                                    <div className="p-8 text-center text-gray-400 italic text-sm">No customers found.</div>
-                                )}
-                            </div>
-                        </div>
-
-                        {/* Footer */}
-                        <div className="bg-gray-50 px-4 py-2 border-t border-gray-200 flex justify-between items-center text-[10px] text-gray-400">
-                            <span>{customersList.length} Result(s) Found</span>
+                    </div>
+                    <div className="border border-slate-200 rounded-[5px] overflow-hidden shadow-sm">
+                        <div className="max-h-[400px] overflow-y-auto no-scrollbar">
+                            <table className="w-full text-left">
+                                <thead className="bg-slate-50/80 sticky top-0 text-[10px] font-mono font-bold text-gray-400 uppercase tracking-widest border-b border-slate-200">
+                                    <tr>
+                                        <th className="px-5 py-3">Code</th>
+                                        <th className="px-5 py-3">Customer Name</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-slate-100 bg-white">
+                                    {customerList
+                                        .filter(c => ((c.name || c.Name) || '').toLowerCase().includes(custSearch.toLowerCase()) || ((c.code || c.Code) || '').toLowerCase().includes(custSearch.toLowerCase()))
+                                        .map((c, i) => (
+                                        <tr key={i} className="group hover:bg-blue-50/50 cursor-pointer transition-colors" onClick={() => loadCustomer(c)}>
+                                            <td className="px-5 py-3 font-mono text-[12px] text-gray-700">{c.code || c.Code}</td>
+                                            <td className="px-5 py-3 text-[12px] font-bold text-gray-700 group-hover:text-blue-600">{c.name || c.Name}</td>
+                                        </tr>
+                                    ))}
+                                    {customerList.length === 0 && (
+                                        <tr>
+                                            <td colSpan="2" className="text-center py-6 text-gray-300 text-[12px] font-bold uppercase tracking-widest">No records found</td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
-            )}
+            </SimpleModal>
 
-            {/* Area Search Modal */}
-            {showAreaSearch && (
-                <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4 font-['Tahoma']">
-                    <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setShowAreaSearch(false)} />
-                    <div className="relative w-full max-w-lg bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
-                        {/* Header */}
-                        <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-100 select-none relative overflow-hidden">
-                            {/* System Color Left Accent */}
-                            <div 
-                                className="absolute left-0 top-0 bottom-0 w-1.5 transition-colors duration-500" 
-                                style={{ backgroundColor: localStorage.getItem('topBarColor') || '#0285fd' }}
-                            />
-                            <div className="flex items-center gap-2">
-                                <Search size={16} className="text-[#0078d4]" />
-                                <span className="text-[15px] font-[700] text-slate-900 uppercase tracking-[3px] font-mono truncate">Area Directory Lookup</span>
-                            </div>
-                            <button
-                                onClick={() => setShowAreaSearch(false)}
-                                className="w-9 h-8 flex items-center justify-center bg-red-50 hover:bg-red-100 text-red-600 rounded-[8px] transition-all active:scale-90 outline-none border-none group"
-                                title="Close"
-                            >
-                                <X size={18} strokeWidth={4} className="group-hover:scale-110 transition-transform" />
-                            </button>
-                        </div>
-
-                        {/* Search Input Area */}
-                        <div className="p-3 bg-slate-50 border-b border-gray-100 flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                                <Search size={14} className="text-gray-400" />
-                                <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest text-center">Search Facility</span>
-                            </div>
-                            <input 
-                                type="text" 
-                                placeholder="Search by code or name..." 
-                                className="h-9 border border-gray-300 px-3 text-xs rounded-[5px] w-72 focus:border-[#0285fd] outline-none shadow-sm transition-all" 
-                                value={areaSearchQuery} 
-                                onChange={(e) => setAreaSearchQuery(e.target.value)} 
+            {/* Type Search */}
+            <SimpleModal
+                isOpen={showTypeModal}
+                onClose={() => setShowTypeModal(false)}
+                title="Customer Type Directory"
+                maxWidth="max-w-[500px]"
+            >
+                <div className="space-y-4 font-['Tahoma']">
+                    <div className="flex items-center gap-4 p-3 rounded-[5px] border border-slate-200 bg-white mb-2">
+                        <span className="text-[12px] font-bold text-gray-500 uppercase tracking-widest">Search Facility</span>
+                        <div className="relative flex-1">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
+                            <input
+                                type="text"
+                                placeholder="Find customer type..."
+                                className="w-full h-9 pl-10 pr-4 border border-slate-200 rounded outline-none text-sm bg-slate-50 transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20"
+                                value={typeSearch}
+                                onChange={(e) => setTypeSearch(e.target.value)}
+                                autoFocus
                             />
                         </div>
-
-                        {/* Results List */}
-                        <div className="p-2">
-                            <div className=" px-3 py-1.5 flex text-[10px] font-bold text-gray-600 border-b border-gray-200 uppercase tracking-wider">
-                                <span className="w-24 text-center">Code</span>
-                                <span className="flex-1 px-3">Area Name</span>
-                            </div>
-                            <div className="max-h-[350px] overflow-y-auto custom-scrollbar">
-                                {areas.filter(a => (a.name || '').toLowerCase().includes(areaSearchQuery.toLowerCase()) || (a.code || '').toLowerCase().includes(areaSearchQuery.toLowerCase())).map(a => (
-                                    <button 
-                                        key={a.code} 
-                                        onClick={() => selectArea(a)}
-                                        className="w-full flex items-center justify-between px-3 py-2 text-xs border-b border-gray-100 hover:bg-blue-50 transition-all text-left group"
-                                    >
-                                        <div className="flex items-center gap-2 flex-1">
-                                            <span className="w-24 text-center font-mono text-[11px] font-bold text-[#0078d4]">
-                                                {a.code}
-                                            </span>
-                                            <span className="flex-1 px-3 font-mono font-medium text-gray-700 uppercase">
-                                                {a.name}
-                                            </span>
-                                        </div>
-                                        <div className="bg-[#e49e1b] text-white text-[10px] px-5 py-1.5 rounded-md font-bold hover:bg-[#cb9b34] shadow-sm transition-all active:scale-95 uppercase">Select</div>
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-
-                        {/* Footer */}
-                        <div className="bg-gray-50 px-4 py-2 border-t border-gray-200 flex justify-between items-center text-[10px] text-gray-400">
-                            <span>{areas.length} Areas Available</span>
+                    </div>
+                    <div className="border border-slate-200 rounded-[5px] overflow-hidden shadow-sm">
+                        <div className="max-h-[300px] overflow-y-auto no-scrollbar">
+                            <table className="w-full text-left">
+                                <thead className="bg-slate-50/80 sticky top-0 text-[10px] font-mono font-bold text-gray-400 uppercase tracking-widest border-b border-slate-200">
+                                    <tr>
+                                        <th className="px-5 py-3">Code</th>
+                                        <th className="px-5 py-3">Type Name</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-slate-100 bg-white">
+                                    {typeList
+                                        .filter(t => ((t.name || t.Name) || '').toLowerCase().includes(typeSearch.toLowerCase()) || ((t.code || t.Code) || '').toLowerCase().includes(typeSearch.toLowerCase()))
+                                        .map((t, i) => (
+                                        <tr key={i} className="group hover:bg-blue-50/50 cursor-pointer transition-colors" onClick={() => { setFormData(prev => ({ ...prev, Type_Code: t.code || t.Code, Type_Name: t.name || t.Name })); setShowTypeModal(false); setTypeSearch(''); }}>
+                                            <td className="px-5 py-3 font-mono text-[12px] text-gray-700">{t.code || t.Code}</td>
+                                            <td className="px-5 py-3 text-[12px] font-bold text-gray-700 group-hover:text-blue-600">{t.name || t.Name}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
-            )}
+            </SimpleModal>
 
-            {/* Route Search Modal */}
-            {showRouteSearch && (
-                <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4 font-['Tahoma']">
-                    <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setShowRouteSearch(false)} />
-                    <div className="relative w-full max-w-lg bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
-                        {/* Header */}
-                        <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-100 select-none relative overflow-hidden">
-                            {/* System Color Left Accent */}
-                            <div 
-                                className="absolute left-0 top-0 bottom-0 w-1.5 transition-colors duration-500" 
-                                style={{ backgroundColor: localStorage.getItem('topBarColor') || '#0285fd' }}
-                            />
-                            <div className="flex items-center gap-2">
-                                <Search size={16} className="text-[#0078d4]" />
-                                <span className="text-[15px] font-[700] text-slate-900 uppercase tracking-[3px] font-mono truncate">Route Directory Lookup</span>
-                            </div>
-                            <button
-                                onClick={() => setShowRouteSearch(false)}
-                                className="w-9 h-8 flex items-center justify-center bg-red-50 hover:bg-red-100 text-red-600 rounded-[8px] transition-all active:scale-90 outline-none border-none group"
-                                title="Close"
-                            >
-                                <X size={18} strokeWidth={4} className="group-hover:scale-110 transition-transform" />
-                            </button>
-                        </div>
-
-                        {/* Search Input Area */}
-                        <div className="p-3 bg-slate-50 border-b border-gray-100 flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                                <Search size={14} className="text-gray-400" />
-                                <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest text-center">Search Facility</span>
-                            </div>
-                            <input 
-                                type="text" 
-                                placeholder="Search by code or name..." 
-                                className="h-9 border border-gray-300 px-3 text-xs rounded-[5px] w-72 focus:border-[#0285fd] outline-none shadow-sm transition-all" 
-                                value={routeSearchQuery} 
-                                onChange={(e) => setRouteSearchQuery(e.target.value)} 
+            {/* Area Search */}
+            <SimpleModal
+                isOpen={showAreaModal}
+                onClose={() => setShowAreaModal(false)}
+                title="Area Directory Lookup"
+                maxWidth="max-w-[500px]"
+            >
+                <div className="space-y-4 font-['Tahoma']">
+                    <div className="flex items-center gap-4 p-3 rounded-[5px] border border-slate-200 bg-white mb-2">
+                        <span className="text-[12px] font-bold text-gray-500 uppercase tracking-widest">Search Facility</span>
+                        <div className="relative flex-1">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
+                            <input
+                                type="text"
+                                placeholder="Find area..."
+                                className="w-full h-9 pl-10 pr-4 border border-slate-200 rounded outline-none text-sm bg-slate-50 transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20"
+                                value={areaSearch}
+                                onChange={(e) => setAreaSearch(e.target.value)}
+                                autoFocus
                             />
                         </div>
-
-                        {/* Results List */}
-                        <div className="p-2">
-                            <div className=" px-3 py-1.5 flex text-[10px] font-bold text-gray-600 border-b border-gray-200 uppercase tracking-wider">
-                                <span className="w-24 text-center">Code</span>
-                                <span className="flex-1 px-3">Route Name</span>
-                            </div>
-                            <div className="max-h-[350px] overflow-y-auto custom-scrollbar">
-                                {routes.filter(r => (r.name || '').toLowerCase().includes(routeSearchQuery.toLowerCase()) || (r.code || '').toLowerCase().includes(routeSearchQuery.toLowerCase())).map(r => (
-                                    <button 
-                                        key={r.code} 
-                                        onClick={() => selectRoute(r)}
-                                        className="w-full flex items-center justify-between px-3 py-2 text-xs border-b border-gray-100 hover:bg-blue-50 transition-all text-left group"
-                                    >
-                                        <div className="flex items-center gap-2 flex-1">
-                                            <span className="w-24 text-center font-mono text-[11px] font-bold text-[#0078d4]">
-                                                {r.code}
-                                            </span>
-                                            <span className="flex-1 px-3 font-mono font-medium text-gray-700 uppercase">
-                                                {r.name}
-                                            </span>
-                                        </div>
-                                        <div className="bg-[#e49e1b] text-white text-[10px] px-5 py-1.5 rounded-md font-bold hover:bg-[#cb9b34] shadow-sm transition-all active:scale-95 uppercase">Select</div>
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-
-                        {/* Footer */}
-                        <div className="bg-gray-50 px-4 py-2 border-t border-gray-200 flex justify-between items-center text-[10px] text-gray-400">
-                            <span>{routes.length} Routes Available</span>
+                    </div>
+                    <div className="border border-slate-200 rounded-[5px] overflow-hidden shadow-sm">
+                        <div className="max-h-[300px] overflow-y-auto no-scrollbar">
+                            <table className="w-full text-left">
+                                <thead className="bg-slate-50/80 sticky top-0 text-[10px] font-mono font-bold text-gray-400 uppercase tracking-widest border-b border-slate-200">
+                                    <tr>
+                                        <th className="px-5 py-3">Code</th>
+                                        <th className="px-5 py-3">Area Name</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-slate-100 bg-white">
+                                    {areaList
+                                        .filter(a => ((a.name || a.Name) || '').toLowerCase().includes(areaSearch.toLowerCase()) || ((a.code || a.Code) || '').toLowerCase().includes(areaSearch.toLowerCase()))
+                                        .map((a, i) => (
+                                        <tr key={i} className="group hover:bg-blue-50/50 cursor-pointer transition-colors" onClick={() => { setFormData(prev => ({ ...prev, Area: a.code || a.Code, AreaName: a.name || a.Name })); setShowAreaModal(false); setAreaSearch(''); }}>
+                                            <td className="px-5 py-3 font-mono text-[12px] text-gray-700">{a.code || a.Code}</td>
+                                            <td className="px-5 py-3 text-[12px] font-bold text-gray-700 group-hover:text-blue-600">{a.name || a.Name}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
-            )}
-
-            {/* Bank Search Modal */}
-            {showBankSearch && (
-                <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4 font-['Tahoma']">
-                    <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setShowBankSearch(false)} />
-                    <div className="relative w-full max-w-xl bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
-                        {/* Header */}
-                        <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-100 select-none relative overflow-hidden">
-                            {/* System Color Left Accent */}
-                            <div 
-                                className="absolute left-0 top-0 bottom-0 w-1.5 transition-colors duration-500" 
-                                style={{ backgroundColor: localStorage.getItem('topBarColor') || '#0285fd' }}
-                            />
-                            <div className="flex items-center gap-2">
-                                <Search size={16} className="text-[#0078d4]" />
-                                <span className="text-[15px] font-[700] text-slate-900 uppercase tracking-[3px] font-mono truncate">Bank Directory Lookup</span>
-                            </div>
-                            <button
-                                onClick={() => setShowBankSearch(false)}
-                                className="w-9 h-8 flex items-center justify-center bg-red-50 hover:bg-red-100 text-red-600 rounded-[8px] transition-all active:scale-90 outline-none border-none group"
-                                title="Close"
-                            >
-                                <X size={18} strokeWidth={4} className="group-hover:scale-110 transition-transform" />
-                            </button>
-                        </div>
-
-                        {/* Search Input Area */}
-                        <div className="p-3 bg-slate-50 border-b border-gray-100 flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                                <Search size={14} className="text-gray-400" />
-                                <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest text-center">Search Facility</span>
-                            </div>
-                            <input 
-                                type="text" 
-                                placeholder="Select and search bank repository..." 
-                                className="h-9 border border-gray-300 px-3 text-xs rounded-[5px] w-72 focus:border-[#0285fd] outline-none shadow-sm transition-all" 
-                                value={bankSearchQuery} 
-                                onChange={(e) => setBankSearchQuery(e.target.value)} 
-                            />
-                        </div>
-
-                        {/* Results List */}
-                        <div className="p-2">
-                            <div className=" px-3 py-1.5 flex text-[10px] font-bold text-gray-600 border-b border-gray-200 uppercase tracking-wider">
-                                <span className="w-24 text-center">Code</span>
-                                <span className="flex-1 px-3">Bank Name</span>
-                            </div>
-                            <div className="max-h-[350px] overflow-y-auto custom-scrollbar">
-                                {banks.filter(b => (b.name || '').toLowerCase().includes(bankSearchQuery.toLowerCase()) || (b.code || '').toLowerCase().includes(bankSearchQuery.toLowerCase())).map((b, idx) => (
-                                    <button 
-                                        key={idx} 
-                                        onClick={() => selectBank(b)}
-                                        className="w-full flex items-center justify-between px-3 py-2 text-xs border-b border-gray-100 hover:bg-blue-50 transition-all text-left group"
-                                    >
-                                        <div className="flex items-center gap-2 flex-1">
-                                            <span className="w-24 text-center font-mono text-[11px] font-bold text-[#0078d4]">
-                                                {b.code}
-                                            </span>
-                                            <span className="flex-1 px-3 font-mono font-medium text-gray-700 uppercase">
-                                                {b.name}
-                                            </span>
-                                        </div>
-                                        <div className="bg-[#e49e1b] text-white text-[10px] px-5 py-1.5 rounded-md font-bold hover:bg-[#cb9b34] shadow-sm transition-all active:scale-95 uppercase">Select</div>
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-
-                        {/* Footer */}
-                        <div className="bg-gray-50 px-4 py-2 border-t border-gray-200 flex justify-between items-center text-[10px] text-gray-400">
-                            <span>{banks.length} Banks Registered</span>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* Customer Type Search Modal */}
-            {showTypeSearch && (
-                <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4 font-['Tahoma']">
-                    <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setShowTypeSearch(false)} />
-                    <div className="relative w-full max-w-lg bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
-                        {/* Header */}
-                        <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-100 select-none relative overflow-hidden">
-                            {/* System Color Left Accent */}
-                            <div 
-                                className="absolute left-0 top-0 bottom-0 w-1.5 transition-colors duration-500" 
-                                style={{ backgroundColor: localStorage.getItem('topBarColor') || '#0285fd' }}
-                            />
-                            <div className="flex items-center gap-2">
-                                <Search size={16} className="text-[#0078d4]" />
-                                <span className="text-[15px] font-[700] text-slate-900 uppercase tracking-[3px] font-mono truncate">Customer Type Directory Lookup</span>
-                            </div>
-                            <button
-                                onClick={() => setShowTypeSearch(false)}
-                                className="w-9 h-8 flex items-center justify-center bg-red-50 hover:bg-red-100 text-red-600 rounded-[8px] transition-all active:scale-90 outline-none border-none group"
-                                title="Close"
-                            >
-                                <X size={18} strokeWidth={4} className="group-hover:scale-110 transition-transform" />
-                            </button>
-                        </div>
-
-                        {/* Search Input Area */}
-                        <div className="p-3 bg-slate-50 border-b border-gray-100 flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                                <Search size={14} className="text-gray-400" />
-                                <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest text-center">Search Facility</span>
-                            </div>
-                            <input 
-                                type="text" 
-                                placeholder="Search types..." 
-                                className="h-9 border border-gray-300 px-3 text-xs rounded-[5px] w-72 focus:border-[#0285fd] outline-none shadow-sm transition-all" 
-                                value={typeSearchQuery} 
-                                onChange={(e) => setTypeSearchQuery(e.target.value)} 
-                            />
-                        </div>
-
-                        {/* Results List */}
-                        <div className="p-2">
-                            <div className=" px-3 py-1.5 flex text-[10px] font-bold text-gray-600 border-b border-gray-200 uppercase tracking-wider">
-                                <span className="flex-1 px-3">Type Name</span>
-                            </div>
-                            <div className="max-h-[300px] overflow-y-auto custom-scrollbar">
-                                {customerTypes.filter(t => (t || '').toLowerCase().includes(typeSearchQuery.toLowerCase())).map((t, idx) => (
-                                    <button 
-                                        key={idx} 
-                                        onClick={() => selectType(t)}
-                                        className="w-full flex items-center justify-between px-3 py-2 text-xs border-b border-gray-100 hover:bg-blue-50 transition-all text-left group"
-                                    >
-                                        <div className="flex items-center gap-2 flex-1">
-                                            <span className="flex-1 px-3 font-mono font-medium text-gray-700 uppercase">
-                                                {t}
-                                            </span>
-                                        </div>
-                                        <div className="bg-[#e49e1b] text-white text-[10px] px-5 py-1.5 rounded-md font-bold hover:bg-[#cb9b34] shadow-sm transition-all active:scale-95 uppercase">Select</div>
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-
-                        {/* Footer */}
-                        <div className="bg-gray-50 px-4 py-2 border-t border-gray-200 flex justify-between items-center text-[10px] text-gray-400">
-                            <span>{customerTypes.length} Types Found</span>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-
-            <ConfirmModal 
-                isOpen={showConfirmModal} 
-                onClose={() => setShowConfirmModal(false)} 
-                onConfirm={confirmDelete} 
-                title="Delete Customer" 
-                message={`Are you sure you want to delete customer ${formData.Cust_Name}? All records for this customer will be permanently removed.`} 
-                variant="danger" 
-                loading={loading} 
-                confirmText="Delete Now"
-            />
+            </SimpleModal>
         </>
     );
 };

@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { X, ShieldCheck, Database, RefreshCw, Download, Trash2, Search, FileEdit, Settings, CloudLightning, Eraser, Lock, FileText, Key, Layout, Users } from 'lucide-react';
-import SimpleModal from '../../SimpleModal';
+import { X, Database, RefreshCw, Download, Trash2, Search, FileEdit, CloudLightning, Eraser, Lock, FileText, Key, Layout, Users } from 'lucide-react';
 import DatabaseBackupModal from './DatabaseBackupModal';
 import StockBalanceUpdateModal from './StockBalanceUpdateModal';
 import InventoryDownloadModal from './InventoryDownloadModal';
@@ -30,6 +29,7 @@ const SystemAdminModal = ({ isOpen, onClose }) => {
     const [showChangePassword, setShowChangePassword] = useState(false);
     const [showUsersModal, setShowUsersModal] = useState(false);
     const [showFeatureLockedModal, setShowFeatureLockedModal] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
 
     if (!isOpen) return null;
 
@@ -64,84 +64,100 @@ const SystemAdminModal = ({ isOpen, onClose }) => {
         { icon: Lock, label: 'Period Lock Facility', action: 'lock' },
         { icon: Users, label: 'User & Role Management', action: 'users' },
         { icon: Key, label: 'Change Password', action: 'changePassword' },
-        { icon: Settings, label: 'Admin Config Setting', action: 'systemSettings' }
     ];
+
+    const filteredItems = searchQuery
+        ? menuItems.filter(item =>
+            item.label.toLowerCase().includes(searchQuery.toLowerCase())
+          )
+        : menuItems;
+
+    const totalModules = menuItems.length;
 
     return (
         <>
             <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
-                {/* Backdrop */}
                 <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={onClose} />
 
-                {/* List Style Modal Container */}
                 <div className="relative w-full max-w-sm bg-white border border-gray-100 rounded-xl shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
-                    
-                    {/* Header */}
-                    <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-100 select-none relative overflow-hidden">
-                        {/* System Color Left Accent */}
-                        <div 
-                            className="absolute left-0 top-0 bottom-0 w-1.5 transition-colors duration-500 bg-[#0078d4]" 
-                        />
-                        
-                        <div className="flex items-center gap-3">
-                            <Layout size={14} className="text-[#0078d4]" />
+                    <div className="bg-white px-5 py-3.5 flex items-center justify-between border-b border-gray-100 select-none relative overflow-hidden">
+                        <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#0285fd]" />
+
+                        <div className="flex items-center gap-2.5 pl-2">
+                            <div className="w-7 h-7 rounded-lg bg-slate-100 flex items-center justify-center">
+                                <Layout size={13} className="text-[#0285fd]" />
+                            </div>
                             <div className="flex flex-col">
-                                <span className="text-[14px] font-[700] text-slate-900 uppercase tracking-[2px] font-mono leading-none">System Admin Hub</span>
-                                <div className="flex items-center gap-1.5 mt-1">
-                                    <div className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.5)]" />
-                                    <span className="text-[8px] font-black text-red-500 uppercase tracking-widest opacity-80">Security Engine Active</span>
-                                </div>
+                                <span className="text-[13px] font-[700] text-slate-900 uppercase tracking-[2px] font-mono leading-none">System Admin Hub</span>
+                                <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Security & System Management</span>
                             </div>
                         </div>
-                        <button 
-                            onClick={onClose} 
-                            className="w-9 h-8 flex items-center justify-center bg-red-50 hover:bg-red-100 text-red-600 rounded-[8px] transition-all active:scale-90 outline-none border-none group"
-                            title="Close"
-                        >
-                            <X size={18} strokeWidth={4} className="group-hover:scale-110 transition-transform" />
+                        <button onClick={onClose} className="w-8 h-7 flex items-center justify-center bg-red-50 hover:bg-red-100 text-red-600 rounded-[8px] transition-all active:scale-90 outline-none border-none group">
+                            <X size={16} strokeWidth={4} className="group-hover:scale-110 transition-transform" />
                         </button>
                     </div>
 
-                    {/* Menu Content */}
-                    <div className="p-2 bg-white flex-1 overflow-y-auto max-h-[75vh] no-scrollbar">
-                        {menuItems.map((item, idx) => {
+                    <div className="px-3 py-2 bg-white border-b border-gray-100">
+                        <div className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg border border-gray-200 bg-white">
+                            <Search size={12} className="text-slate-400 shrink-0" />
+                            <input
+                                type="text"
+                                placeholder="Search modules..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className="w-full h-6 text-[11px] font-bold text-slate-700 bg-transparent outline-none placeholder:text-slate-300"
+                            />
+                        </div>
+                    </div>
+
+                    <div className="p-2 bg-white flex-1 overflow-y-auto max-h-[65vh] no-scrollbar">
+                        {filteredItems.length === 0 ? (
+                            <div className="py-10 text-center">
+                                <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-2">
+                                    <Search size={18} className="text-slate-300" />
+                                </div>
+                                <p className="text-[11px] font-bold text-slate-400">No modules found</p>
+                                <button onClick={() => setSearchQuery('')} className="mt-1.5 text-[9px] font-bold text-[#0285fd] uppercase tracking-wider hover:underline">Clear search</button>
+                            </div>
+                        ) : (
+                            filteredItems.map((item, idx) => {
                             const Icon = item.icon;
                             const isLocked = item.action !== 'users' && localStorage.getItem(`isLocked_${item.action}`) === 'true';
 
                             return (
-                                <React.Fragment key={idx}>
-                                    <button
-                                        onClick={() => {
-                                            if (isLocked) {
-                                                setShowFeatureLockedModal(true);
-                                                return;
-                                            }
-                                            handleAction(item.action);
-                                        }}
-                                        className="w-full flex items-center justify-between px-4 py-3 rounded-xl hover:bg-slate-50 group transition-all relative overflow-hidden text-left"
-                                    >
-                                        {/* Hover Indicator Bar */}
-                                        <div 
-                                            className="absolute left-0 top-0 bottom-0 w-1 opacity-0 group-hover:opacity-100 transition-all duration-300 bg-[#0078d4]"
-                                        />
+                                <button
+                                    key={idx}
+                                    onClick={() => {
+                                        if (isLocked) { setShowFeatureLockedModal(true); return; }
+                                        handleAction(item.action);
+                                    }}
+                                    className="group w-full flex items-center justify-between px-4 py-2.5 rounded-xl hover:bg-slate-50 transition-all relative overflow-hidden text-left border-none"
+                                >
+                                    <div className="absolute left-0 top-0 bottom-0 w-1 opacity-0 group-hover:opacity-100 transition-all duration-300 bg-[#0285fd]" />
 
-                                        <div className="flex items-center gap-3 relative z-10 w-full">
-                                            <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors shadow-sm group-hover:shadow-md ${isLocked ? 'bg-red-50 group-hover:bg-red-100' : 'bg-slate-100 group-hover:bg-white'}`}>
-                                                {isLocked ? <Lock size={16} className="text-red-500 transition-colors" /> : <Icon size={16} className="text-slate-500 group-hover:text-[#0078d4] transition-colors" />}
-                                            </div>
-                                            <div className="flex flex-col">
-                                                {isLocked && (
-                                                    <span className="text-[8px] font-black text-red-500 uppercase tracking-[0.2em] mb-0.5 opacity-80">Secured Module</span>
-                                                )}
-                                                <span className={`text-[14px] font-bold transition-colors ${isLocked ? 'text-slate-400' : 'text-slate-700 group-hover:text-slate-900'}`}>
-                                                    {item.label}
-                                                </span>
-                                            </div>
+                                    <div className="flex items-center gap-3 relative z-10 w-full">
+                                        <div className={`w-7 h-7 rounded-lg flex items-center justify-center transition-colors shadow-sm ${isLocked ? 'bg-red-50' : 'bg-slate-100 group-hover:bg-white'}`}>
+                                            {isLocked ? <Lock size={14} className="text-red-500" /> : <Icon size={14} className="text-slate-500 group-hover:text-[#0285fd] transition-colors" />}
                                         </div>
-                                    </button>
-                                </React.Fragment>
+                                        <div className="flex flex-col">
+                                            {isLocked && (
+                                                <span className="text-[7px] font-black text-red-500 uppercase tracking-[0.2em] mb-0.5">Secured Module</span>
+                                            )}
+                                            <span className={`text-[12px] font-bold transition-colors ${isLocked ? 'text-slate-400' : 'text-slate-700 group-hover:text-slate-900'}`}>
+                                                {item.label}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </button>
                             );
-                        })}
+                        }))}
+                    </div>
+
+                    <div className="px-4 py-2 bg-white border-t border-gray-100 flex items-center justify-between">
+                        <span className="text-[8px] font-bold text-slate-400 uppercase tracking-wider">
+                            {totalModules} Modules
+                        </span>
+                        <span className="text-[8px] font-bold text-slate-400 uppercase tracking-wider">Admin Panel</span>
                     </div>
                 </div>
             </div>

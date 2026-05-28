@@ -66,11 +66,11 @@ const SystemUpdateModal = ({ isOpen, onClose }) => {
                 {/* Clean Header */}
                 <div className="flex items-start justify-between mb-8 pb-4 border-b border-slate-100">
                     <div className="space-y-1">
-                        <h2 className="text-[20px] font-bold text-[#0078d4] tracking-tight">System Update</h2>
+                        <h2 className="text-[20px] font-bold text-[#0285fd] tracking-tight">System Update</h2>
                         <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em]">Maintenance Utility | Build 2024.05</p>
                     </div>
                     <div className="p-2 bg-blue-50 rounded">
-                        <Settings size={20} className="text-[#0078d4]" />
+                        <Settings size={20} className="text-[#0285fd]" />
                     </div>
                 </div>
 
@@ -79,7 +79,7 @@ const SystemUpdateModal = ({ isOpen, onClose }) => {
                     
                     {status === 'idle' && (
                         <div className="space-y-6">
-                            <div className="p-4 border-l-4 border-[#0078d4] bg-blue-50/30">
+                            <div className="p-4 border-l-4 border-[#0285fd] bg-blue-50/30">
                                 <p className="text-[12px] text-slate-600 leading-relaxed font-medium">
                                     New configuration patches and security definitions are available for deployment. This process will run in the background.
                                 </p>
@@ -87,7 +87,7 @@ const SystemUpdateModal = ({ isOpen, onClose }) => {
                             <div className="pt-2">
                                 <button 
                                     onClick={handleBeginUpdate}
-                                    className="w-full h-12 bg-[#0078d4] hover:bg-[#005a9e] text-white rounded text-[11px] font-bold uppercase tracking-[0.2em] transition-colors shadow-lg shadow-blue-500/10 flex items-center justify-center gap-2"
+                                    className="w-full h-10 bg-[#0285fd] hover:bg-[#0073ff] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] shadow-md shadow-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border-none"
                                 >
                                     <Terminal size={14} />
                                     Execute Update Sequence
@@ -104,14 +104,14 @@ const SystemUpdateModal = ({ isOpen, onClose }) => {
                             <div className="space-y-2">
                                 <div className="flex items-center justify-between text-[10px] font-bold text-slate-500 uppercase tracking-widest">
                                     <div className="flex items-center gap-2">
-                                        <RefreshCw size={12} className="animate-spin text-[#0078d4]" />
+                                        <RefreshCw size={12} className="animate-spin text-[#0285fd]" />
                                         <span>Deployment in progress...</span>
                                     </div>
-                                    <span className="text-[#0078d4]">{progress}%</span>
+                                    <span className="text-[#0285fd]">{progress}%</span>
                                 </div>
                                 <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
                                     <div 
-                                        className="h-full bg-gradient-to-r from-[#0078d4] to-[#42a5f5] transition-all duration-500"
+                                        className="h-full bg-gradient-to-r from-[#0285fd] to-[#00adff] transition-all duration-500"
                                         style={{ width: `${progress}%` }}
                                     />
                                 </div>
@@ -122,7 +122,7 @@ const SystemUpdateModal = ({ isOpen, onClose }) => {
                                     <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Verifying Integrity</span>
                                 </div>
                                 <div className="flex items-center gap-3">
-                                    <div className="w-1.5 h-1.5 rounded-full bg-[#0078d4] animate-pulse" />
+                                    <div className="w-1.5 h-1.5 rounded-full bg-[#0285fd] animate-pulse" />
                                     <span className="text-[9px] font-bold text-slate-600 uppercase tracking-widest">Synchronizing Repository</span>
                                 </div>
                             </div>
@@ -140,7 +140,7 @@ const SystemUpdateModal = ({ isOpen, onClose }) => {
                             </div>
                             <button 
                                 onClick={onClose}
-                                className="w-full h-12 bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 rounded text-[11px] font-bold uppercase tracking-[0.2em] transition-all"
+                                className="w-full h-10 bg-[#00adff] hover:bg-[#0099e6] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] transition-all active:scale-95 flex items-center justify-center gap-2 border-none"
                             >
                                 Close Console
                             </button>

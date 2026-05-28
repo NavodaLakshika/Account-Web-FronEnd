@@ -216,10 +216,10 @@ const CollectionToDepositBoard = ({ isOpen, onClose, onComplete }) => {
                 title="Collection to Deposit Selection"
                 maxWidth="max-w-[1150px]"
                 footer={
-                    <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-gray-100 rounded-b-xl">
+                    <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-slate-200 rounded-b-[5px]">
                         <button 
                             onClick={handleClear} 
-                            className="px-6 h-10 bg-[#00adff] text-white text-sm font-black rounded-[5px] hover:bg-[#0099e6] transition-all flex items-center gap-2 border-none active:scale-95 shadow-md"
+                            className="px-6 h-10 bg-[#00adff] text-white text-[13px] font-mono font-bold tracking-widest uppercase rounded-[5px] hover:bg-[#0099e6] transition-all flex items-center gap-2 border-none active:scale-95 shadow-md shadow-blue-100"
                         >
                             <RotateCcw size={14} /> CLEAR 
                         </button>
@@ -227,7 +227,7 @@ const CollectionToDepositBoard = ({ isOpen, onClose, onComplete }) => {
                             <button 
                                 onClick={handleSave} 
                                 disabled={loading || selectedIds.length === 0} 
-                                className={`px-8 h-10 bg-[#2bb744] text-white text-sm font-black rounded-[5px] shadow-md shadow-green-100 hover:bg-[#259b3a] transition-all flex items-center gap-2 active:scale-95 border-none ${loading || selectedIds.length === 0 ? 'opacity-50 grayscale cursor-not-allowed' : ''}`}
+                                className={`px-8 h-10 bg-[#2bb744] text-white text-[13px] font-mono font-bold tracking-widest uppercase rounded-[5px] shadow-md shadow-green-100 hover:bg-[#259b3a] transition-all flex items-center gap-2 active:scale-95 border-none ${loading || selectedIds.length === 0 ? 'opacity-50 grayscale cursor-not-allowed' : ''}`}
                             >
                                 {loading ? <Loader2 size={14} className="animate-spin" /> : <CheckCircle size={14} />} CONFIRM 
                             </button>
@@ -238,26 +238,26 @@ const CollectionToDepositBoard = ({ isOpen, onClose, onComplete }) => {
                 <div className="space-y-4 font-['Tahoma'] overflow-y-auto no-scrollbar">
                     
                     {/* Header Controls Grid */}
-                    <div className="bg-white p-4 border border-gray-100 rounded-lg shadow-sm space-y-4">
+                    <div className="bg-white p-4 border border-slate-200 rounded-[5px] shadow-sm space-y-4">
                         <div className="grid grid-cols-12 gap-x-6 gap-y-3.5">
                             
                             {/* Column 1 */}
                             <div className="col-span-12 lg:col-span-4 flex items-center gap-2">
-                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Document ID</label>
-                                <div className="flex-1 h-8 bg-white border border-gray-300 rounded-[5px] px-3 flex items-center shadow-sm">
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Document ID</label>
+                                <div className="flex-1 h-8 bg-white border border-slate-200 rounded px-3 flex items-center shadow-sm">
                                     <span className="text-[12px] font-bold text-blue-600 font-mono uppercase">{formData.docNo}</span>
                                 </div>
                             </div>
 
                             <div className="col-span-12 lg:col-span-4 flex items-center gap-2">
-                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Date From</label>
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Date From</label>
                                 <div className="flex-1 flex gap-1 h-8 min-w-0">
                                     <input 
                                         type="text" 
                                         readOnly 
                                         value={formData.dateFrom} 
                                         onClick={() => { setDatePickerField('dateFrom'); setShowDatePicker(true); }} 
-                                        className="flex-1 h-8 border border-gray-300 rounded-[5px] px-3 text-[12px] font-bold text-gray-700 outline-none focus:border-[#0285fd] bg-white cursor-pointer shadow-sm" 
+                                        className="flex-1 h-full border border-slate-200 rounded px-3 text-[12px] font-bold text-gray-700 outline-none transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 bg-white cursor-pointer shadow-sm" 
                                     />
                                     <button onClick={() => { setDatePickerField('dateFrom'); setShowDatePicker(true); }} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center rounded-[5px] shadow-md hover:bg-blue-600 transition-all active:scale-95 shrink-0">
                                         <Calendar size={16} />
@@ -266,14 +266,14 @@ const CollectionToDepositBoard = ({ isOpen, onClose, onComplete }) => {
                             </div>
 
                             <div className="col-span-12 lg:col-span-4 flex items-center gap-2">
-                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Date To</label>
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Date To</label>
                                 <div className="flex-1 flex gap-1 h-8 min-w-0">
                                     <input 
                                         type="text" 
                                         readOnly 
                                         value={formData.dateTo} 
                                         onClick={() => { setDatePickerField('dateTo'); setShowDatePicker(true); }} 
-                                        className="flex-1 h-8 border border-gray-300 rounded-[5px] px-3 text-[12px] font-bold text-gray-700 outline-none focus:border-[#0285fd] bg-white cursor-pointer shadow-sm" 
+                                        className="flex-1 h-full border border-slate-200 rounded px-3 text-[12px] font-bold text-gray-700 outline-none transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 bg-white cursor-pointer shadow-sm" 
                                     />
                                     <button onClick={() => { setDatePickerField('dateTo'); setShowDatePicker(true); }} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center rounded-[5px] shadow-md hover:bg-blue-600 transition-all active:scale-95 shrink-0">
                                         <Calendar size={16} />
@@ -283,14 +283,14 @@ const CollectionToDepositBoard = ({ isOpen, onClose, onComplete }) => {
 
                             {/* Row 2 */}
                             <div className="col-span-12 lg:col-span-8 flex items-center gap-2">
-                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Cost Center</label>
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Cost Center</label>
                                 <div className="flex-1 flex gap-1 h-8 min-w-0">
                                     <input 
                                         type="text" 
                                         readOnly 
                                         value={formData.costCenterName || ''} 
                                         onClick={() => setActiveModal('costCenter')} 
-                                        className="flex-1 h-8 border border-gray-300 rounded-[5px] px-3 text-[12px] font-bold text-gray-700 outline-none focus:border-[#0285fd] bg-white cursor-pointer shadow-sm" 
+                                        className="flex-1 h-full border border-slate-200 rounded px-3 text-[12px] font-bold text-gray-700 outline-none transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 bg-white cursor-pointer shadow-sm" 
                                     />
                                     <button onClick={() => setActiveModal('costCenter')} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center rounded-[5px] shadow-md hover:bg-blue-600 transition-all active:scale-95 shrink-0">
                                         <Search size={16} />
@@ -299,14 +299,14 @@ const CollectionToDepositBoard = ({ isOpen, onClose, onComplete }) => {
                             </div>
 
                             <div className="col-span-12 lg:col-span-4 flex items-center gap-2">
-                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Pay Type</label>
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Pay Type</label>
                                 <div className="flex-1 flex gap-1 h-8 min-w-0">
                                     <input 
                                         type="text" 
                                         readOnly 
                                         value={formData.paymentMode || ''} 
                                         onClick={() => setActiveModal('paymentMode')} 
-                                        className="flex-1 h-8 border border-gray-300 rounded-[5px] px-3 text-[12px] font-bold text-gray-700 outline-none focus:border-[#0285fd] bg-white cursor-pointer shadow-sm" 
+                                        className="flex-1 h-full border border-slate-200 rounded px-3 text-[12px] font-bold text-gray-700 outline-none transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 bg-white cursor-pointer shadow-sm" 
                                     />
                                     <button onClick={() => setActiveModal('paymentMode')} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center rounded-[5px] shadow-md hover:bg-blue-600 transition-all active:scale-95 shrink-0">
                                         <Search size={16} />
@@ -317,11 +317,11 @@ const CollectionToDepositBoard = ({ isOpen, onClose, onComplete }) => {
                             {/* Row 3 */}
                             <div className="col-span-12 lg:col-span-8 flex items-center gap-2">
                                 <div className="w-24 shrink-0 flex items-center gap-2">
-                                    <input type="checkbox" id="chkCustomer" checked={formData.customerReceipt} onChange={e => setFormData({...formData, customerReceipt: e.target.checked})} className="w-4 h-4 rounded border-gray-300 cursor-pointer" />
-                                    <label htmlFor="chkCustomer" className="text-[12.5px] font-bold text-gray-700 cursor-pointer">Customer</label>
+                                    <input type="checkbox" id="chkCustomer" checked={formData.customerReceipt} onChange={e => setFormData({...formData, customerReceipt: e.target.checked})} className="w-4 h-4 rounded border-slate-300 text-[#00D1FF] focus:ring-[#00D1FF] transition-all cursor-pointer" />
+                                    <label htmlFor="chkCustomer" className="text-[11px] font-bold text-gray-500 uppercase cursor-pointer">Customer</label>
                                 </div>
                                 <div className={`flex-1 flex gap-1 h-8 min-w-0 ${!formData.customerReceipt ? 'opacity-30 grayscale pointer-events-none' : ''}`}>
-                                    <input type="text" readOnly value={formData.customerName || ''} onClick={() => setActiveModal('customer')} className="flex-1 h-8 border border-gray-300 rounded-[5px] px-3 text-[12px] font-bold text-gray-700 outline-none focus:border-[#0285fd] bg-white cursor-pointer shadow-sm" />
+                                    <input type="text" readOnly value={formData.customerName || ''} onClick={() => setActiveModal('customer')} className="flex-1 h-full border border-slate-200 rounded px-3 text-[12px] font-bold text-gray-700 outline-none transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 bg-white cursor-pointer shadow-sm" />
                                     <button onClick={() => setActiveModal('customer')} className="w-10 h-8 bg-gray-200 text-gray-400 flex items-center justify-center rounded-[5px] shadow-sm shrink-0">
                                         <Search size={16} />
                                     </button>
@@ -329,9 +329,9 @@ const CollectionToDepositBoard = ({ isOpen, onClose, onComplete }) => {
                             </div>
 
                             <div className="col-span-12 lg:col-span-4 flex items-center gap-2">
-                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Dept Unit</label>
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Dept Unit</label>
                                 <div className="flex-1 flex gap-1 h-8 min-w-0">
-                                    <input type="text" readOnly value={formData.departmentName || ''} onClick={() => setActiveModal('dept')} className="flex-1 h-8 border border-gray-300 rounded-[5px] px-3 text-[12px] font-bold text-gray-700 outline-none focus:border-[#0285fd] bg-white cursor-pointer shadow-sm" />
+                                    <input type="text" readOnly value={formData.departmentName || ''} onClick={() => setActiveModal('dept')} className="flex-1 h-full border border-slate-200 rounded px-3 text-[12px] font-bold text-gray-700 outline-none transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 bg-white cursor-pointer shadow-sm" />
                                     <button onClick={() => setActiveModal('dept')} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center rounded-[5px] shadow-md hover:bg-blue-600 transition-all active:scale-95 shrink-0">
                                         <Search size={16} />
                                     </button>
@@ -339,16 +339,16 @@ const CollectionToDepositBoard = ({ isOpen, onClose, onComplete }) => {
                             </div>
 
                             {/* Actions & Checkbox Bar */}
-                            <div className="col-span-12 flex items-center justify-between pt-2 border-t border-gray-50">
+                            <div className="col-span-12 flex items-center justify-between pt-2 border-t border-slate-100">
                                 <div className="flex items-center gap-4">
                                     <div 
                                         onClick={toggleSelectAll}
-                                        className="flex items-center gap-2 bg-white px-4 py-1.5 rounded-[5px] border-2 border-blue-100 cursor-pointer hover:bg-blue-50 transition-all shadow-sm group"
+                                        className="flex items-center gap-2 bg-white px-4 py-1.5 rounded-[5px] border border-blue-200 cursor-pointer hover:bg-blue-50 transition-all shadow-sm group"
                                     >
-                                        <div className={`w-4 h-4 rounded border-2 flex items-center justify-center transition-all ${collections.length > 0 && selectedIds.length === collections.length ? 'bg-[#0285fd] border-[#0285fd]' : 'border-gray-300'}`}>
+                                        <div className={`w-4 h-4 rounded border-2 flex items-center justify-center transition-all ${collections.length > 0 && selectedIds.length === collections.length ? 'bg-[#00D1FF] border-[#00D1FF]' : 'border-slate-300'}`}>
                                             {(collections.length > 0 && selectedIds.length === collections.length) && <CheckSquare size={12} className="text-white" />}
                                         </div>
-                                        <span className="text-[11px] font-black text-blue-700 uppercase tracking-widest">Select All</span>
+                                        <span className="text-[11px] font-black text-blue-600 uppercase tracking-widest">Select All</span>
                                     </div>
                                     <div className="text-[11px] font-bold text-slate-400 ">
                                         * Use filters above to narrow down the collection queue
@@ -357,7 +357,7 @@ const CollectionToDepositBoard = ({ isOpen, onClose, onComplete }) => {
                                 <button 
                                     onClick={handleFetchCollections} 
                                     disabled={loading} 
-                                    className="h-9 px-8 bg-[#0285fd] text-white text-[11px] font-black uppercase tracking-widest rounded-[5px] shadow-lg shadow-blue-100 hover:bg-blue-600 transition-all flex items-center gap-2 active:scale-95 border-none"
+                                    className="h-8 px-8 bg-[#0285fd] text-white text-[11px] font-black uppercase tracking-widest rounded-[5px] shadow-md shadow-blue-100 hover:bg-blue-600 transition-all flex items-center gap-2 active:scale-95 border-none"
                                 >
                                     {loading ? <Loader2 size={14} className="animate-spin" /> : <Filter size={14} />} Load Records
                                 </button>
@@ -366,17 +366,17 @@ const CollectionToDepositBoard = ({ isOpen, onClose, onComplete }) => {
                     </div>
 
                     {/* Collection Queue Table */}
-                    <div className="border border-gray-100 rounded-lg bg-white shadow-sm flex flex-col min-h-[300px] overflow-hidden">
-                        <div className="flex bg-slate-50/80 border-b border-gray-100 text-[10px] font-black text-gray-400 uppercase tracking-widest items-center sticky top-0 z-10">
-                            <div className="w-14 py-2.5 px-3 border-r border-gray-100 text-center">Sel</div>
-                            <div className="flex-1 py-2.5 px-4 border-r border-gray-100">Document Trace ID</div>
-                            <div className="w-32 py-2.5 px-4 border-r border-gray-100 text-center">Post Date</div>
-                            <div className="w-24 py-2.5 px-4 border-r border-gray-100 text-center">Origin</div>
-                            <div className="flex-1 py-2.5 px-4 border-r border-gray-100">Client / Payer Reference</div>
-                            <div className="w-36 py-2.5 px-4 border-r border-gray-100 text-right">Ledger Value</div>
-                            <div className="w-36 py-2.5 px-4 text-right bg-blue-50/30 text-blue-600">Liquidity Bal</div>
+                    <div className="border border-slate-200 rounded-[5px] bg-white shadow-sm flex flex-col min-h-[300px] overflow-hidden">
+                        <div className="flex bg-slate-50 border-b border-slate-200 text-[10px] font-black text-gray-400 uppercase tracking-widest items-center sticky top-0 z-10">
+                            <div className="w-14 py-3 px-3 text-center">Sel</div>
+                            <div className="flex-1 py-3 px-4">Document Trace ID</div>
+                            <div className="w-32 py-3 px-4 text-center">Post Date</div>
+                            <div className="w-24 py-3 px-4 text-center">Origin</div>
+                            <div className="flex-1 py-3 px-4">Client / Payer Reference</div>
+                            <div className="w-36 py-3 px-4 text-right">Ledger Value</div>
+                            <div className="w-36 py-3 px-4 text-right text-blue-600">Liquidity Bal</div>
                         </div>
-                        <div className="flex-1 bg-white overflow-y-auto max-h-[350px] divide-y divide-gray-50">
+                        <div className="flex-1 bg-white overflow-y-auto max-h-[350px] divide-y divide-slate-100">
                             {collections.length === 0 ? (
                                 <div className="h-64 flex flex-col items-center justify-center text-gray-300 gap-4">
                                     <Landmark size={48} className="opacity-20" />
@@ -386,24 +386,24 @@ const CollectionToDepositBoard = ({ isOpen, onClose, onComplete }) => {
                                 <div 
                                     key={c.documentNo} 
                                     onClick={() => toggleSelect(c.documentNo)} 
-                                    className={`flex border-b border-gray-100 text-[11px] font-bold hover:bg-blue-50 transition-colors cursor-pointer group ${selectedIds.includes(c.documentNo) ? 'bg-blue-50/80 border-l-[3px] border-[#0285fd]' : 'text-slate-700'}`}
+                                    className={`flex text-[11px] font-bold hover:bg-slate-50 transition-colors cursor-pointer group ${selectedIds.includes(c.documentNo) ? 'bg-blue-50/30' : 'text-slate-700'}`}
                                 >
-                                    <div className="w-14 py-2 px-3 border-r border-gray-100 flex items-center justify-center">
-                                        <div className={`w-4 h-4 rounded flex items-center justify-center border-2 transition-all ${selectedIds.includes(c.documentNo) ? 'bg-[#2bb744] border-[#2bb744] text-white' : 'border-gray-200 bg-white'}`}>
+                                    <div className="w-14 py-2 px-3 flex items-center justify-center">
+                                        <div className={`w-4 h-4 rounded flex items-center justify-center border-2 transition-all ${selectedIds.includes(c.documentNo) ? 'bg-[#00D1FF] border-[#00D1FF] text-white' : 'border-slate-300 bg-white'}`}>
                                             {selectedIds.includes(c.documentNo) && <CheckCircle size={10} strokeWidth={4} />}
                                         </div>
                                     </div>
-                                    <div className="flex-1 py-2 px-4 border-r border-gray-100 text-blue-600 font-mono flex items-center gap-2 font-bold">
+                                    <div className="flex-1 py-2 px-4 text-blue-600 font-mono flex items-center gap-2 font-bold">
                                         <CornerDownRight size={12} className="text-gray-300" />
                                         {c.documentNo}
                                     </div>
-                                    <div className="w-32 py-2 px-4 border-r border-gray-100 text-center text-slate-500 font-mono font-bold">{c.date}</div>
-                                    <div className="w-24 py-2 px-4 border-r border-gray-100 text-center flex justify-center">
-                                        <span className="px-1.5 py-0.5 rounded-[3px] bg-gray-100 text-gray-500 text-[9px] font-black uppercase tracking-widest">{c.type}</span>
+                                    <div className="w-32 py-2 px-4 text-center text-gray-500 font-mono font-bold">{c.date}</div>
+                                    <div className="w-24 py-2 px-4 text-center flex justify-center">
+                                        <span className="px-1.5 py-0.5 rounded-[3px] bg-slate-100 text-gray-500 text-[9px] font-black uppercase tracking-widest">{c.type}</span>
                                     </div>
-                                    <div className="flex-1 py-2 px-4 border-r border-gray-100 truncate italic text-slate-500 group-hover:text-slate-800 transition-colors font-bold">{c.name || 'INTERNAL RECONCILIATION'}</div>
-                                    <div className="w-36 py-2 px-4 border-r border-gray-100 text-right text-gray-400 font-mono font-bold">{c.amount?.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
-                                    <div className="w-36 py-2 px-4 text-right font-black text-slate-900 group-hover:text-blue-700 transition-colors font-mono">{c.balance?.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
+                                    <div className="flex-1 py-2 px-4 truncate italic text-gray-500 group-hover:text-gray-700 transition-colors font-bold">{c.name || 'INTERNAL RECONCILIATION'}</div>
+                                    <div className="w-36 py-2 px-4 text-right text-gray-400 font-mono font-bold">{c.amount?.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
+                                    <div className="w-36 py-2 px-4 text-right font-black text-slate-800 group-hover:text-blue-600 transition-colors font-mono">{c.balance?.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
                                 </div>
                             ))}
                         </div>
@@ -411,17 +411,17 @@ const CollectionToDepositBoard = ({ isOpen, onClose, onComplete }) => {
 
                     {/* Summary Total Box */}
                     <div className="flex justify-end pt-2">
-                        <div className="w-[350px] bg-white border border-gray-100 rounded-lg p-4 space-y-3 shadow-sm">
+                        <div className="w-[350px] bg-white border border-slate-200 rounded-[5px] p-4 space-y-3 shadow-sm">
                             <div className="flex items-center justify-between">
-                                <span className="text-[12.5px] font-bold text-gray-500 uppercase tracking-tight">Selected Entities</span>
-                                <div className="text-[14px] font-mono font-black text-slate-800 bg-slate-50 px-2 py-0.5 rounded-[4px]">
-                                    {selectedIds.length} <span className="text-gray-300 font-normal ml-1 text-[10px]">RECORDS</span>
+                                <span className="text-[11px] font-bold text-gray-500 uppercase tracking-tight">Selected Entities</span>
+                                <div className="text-[14px] font-mono font-black text-gray-800 bg-slate-50 px-2 py-0.5 rounded border border-slate-100">
+                                    {selectedIds.length} <span className="text-gray-400 font-normal ml-1 text-[10px]">RECORDS</span>
                                 </div>
                             </div>
-                            <div className="h-[1px] bg-gray-100" />
-                            <div className="bg-slate-50 p-3 rounded-md flex flex-col gap-0.5">
-                                <span className="text-[11px] font-black text-blue-600 uppercase tracking-widest">Aggregate Liquidity Value</span>
-                                <div className="text-[22px] font-mono font-black text-blue-700 tracking-tighter leading-none">
+                            <div className="h-[1px] bg-slate-100" />
+                            <div className="bg-slate-50 p-3 rounded flex flex-col gap-0.5">
+                                <span className="text-[10px] font-black text-[#00D1FF] uppercase tracking-widest">Aggregate Liquidity Value</span>
+                                <div className="text-[22px] font-mono font-black text-[#00D1FF] tracking-tighter leading-none">
                                     {totalToDeposit.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                 </div>
                             </div>

@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { Search, RotateCcw, Save, Trash2, Loader2, Layers, AlertTriangle, MapPin } from 'lucide-react';
-import { routeService } from '../../../services/route.service';
+import { RotateCcw, Save, Trash2, Loader2, AlertTriangle, Users } from 'lucide-react';
+import { customerTypeService } from '../../../services/customerType.service';
 import { showSuccessToast, showErrorToast } from '../../../utils/toastUtils';
 import { MasterFormWrapper, MasterFieldRow, MasterInput, MasterLookupInput, MasterLookupModal } from '../../MasterFormComponents';
 
-const RouteBoard = ({ isOpen, onClose }) => {
-    const initialState = { Code: '', Route_Name: '', Company: '', CurrentUser: '' };
+const CustomerTypeBoard = ({ isOpen, onClose }) => {
+    const initialState = { Code: '', Type_Name: '', Company: '', CurrentUser: '' };
 
     const [formData, setFormData] = useState(initialState);
     const [loading, setLoading] = useState(false);
     const [isEditMode, setIsEditMode] = useState(false);
-    const [showRouteSearch, setShowRouteSearch] = useState(false);
-    const [routeList, setRouteList] = useState([]);
+    const [showSearch, setShowSearch] = useState(false);
+    const [typeList, setTypeList] = useState([]);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
     useEffect(() => {
@@ -40,15 +40,15 @@ const RouteBoard = ({ isOpen, onClose }) => {
     };
 
     const handleSave = async () => {
-        if (!formData.Route_Name) { showErrorToast('Route Name is required'); return; }
+        if (!formData.Type_Name) { showErrorToast('Type Name is required'); return; }
         setLoading(true);
         try {
-            const data = await routeService.save(formData);
+            const data = await customerTypeService.save(formData);
             if (data.message === 'inserted') {
-                showSuccessToast('Route created');
+                showSuccessToast('Customer Type created');
                 setFormData(prev => ({ ...prev, Code: data.code }));
                 setIsEditMode(true);
-            } else { showSuccessToast('Route updated'); }
+            } else { showSuccessToast('Customer Type updated'); }
         } catch (err) { showErrorToast(err.error || err.message || (typeof err === 'string' ? err : 'Failed to save'), { duration: 5000 }); } finally { setLoading(false); }
     };
 
@@ -60,27 +60,26 @@ const RouteBoard = ({ isOpen, onClose }) => {
     const confirmDelete = async () => {
         setLoading(true);
         try {
-            await routeService.delete(formData.Code, formData.Company);
-            showSuccessToast('Route deleted');
+            await customerTypeService.delete(formData.Code);
+            showSuccessToast('Customer Type deleted');
             handleClear();
             setShowDeleteConfirm(false);
         } catch (err) { showErrorToast(err.message || err); } finally { setLoading(false); }
     };
 
-    const openRouteSearch = async () => {
-        if (!formData.Company) { showErrorToast('Company not identified'); return; }
+    const openSearch = async () => {
         setLoading(true);
         try {
-            const data = await routeService.searchRoutes(formData.Company, '');
-            setRouteList(data || []);
-            setShowRouteSearch(true);
-        } catch (err) { showErrorToast('Failed to load routes'); } finally { setLoading(false); }
+            const data = await customerTypeService.getAll();
+            setTypeList(data || []);
+            setShowSearch(true);
+        } catch (err) { showErrorToast('Failed to load customer types'); } finally { setLoading(false); }
     };
 
-    const selectRoute = (route) => {
-        setFormData(prev => ({ ...prev, Code: route.code, Route_Name: route.name }));
+    const selectType = (type) => {
+        setFormData(prev => ({ ...prev, Code: type.code, Type_Name: type.name }));
         setIsEditMode(true);
-        setShowRouteSearch(false);
+        setShowSearch(false);
     };
 
     return (
@@ -88,9 +87,9 @@ const RouteBoard = ({ isOpen, onClose }) => {
             <MasterFormWrapper
                 isOpen={isOpen}
                 onClose={onClose}
-                title="Route Profile"
-                subtitle="Manage delivery route master data"
-                icon={MapPin}
+                title="Customer Type Profile"
+                subtitle="Manage customer classification types"
+                icon={Users}
                 maxWidth="max-w-2xl"
                 isEditMode={isEditMode}
                 loading={loading}
@@ -98,26 +97,26 @@ const RouteBoard = ({ isOpen, onClose }) => {
                 onSave={handleSave}
                 onDelete={handleDelete}
             >
-                <MasterFieldRow label="Route ID" colSpan="col-span-12">
-                    <MasterLookupInput value={formData.Code || ''} onSearchClick={openRouteSearch} isIdField />
+                <MasterFieldRow label="Type ID" colSpan="col-span-12">
+                    <MasterLookupInput value={formData.Code || ''} onSearchClick={openSearch} isIdField />
                 </MasterFieldRow>
-                <MasterFieldRow label="Route Name" colSpan="col-span-12">
-                    <MasterInput name="Route_Name" value={formData.Route_Name} onChange={handleInputChange} placeholder="Enter route name" />
+                <MasterFieldRow label="Type Name" colSpan="col-span-12">
+                    <MasterInput name="Type_Name" value={formData.Type_Name} onChange={handleInputChange} placeholder="Enter customer type name" />
                 </MasterFieldRow>
             </MasterFormWrapper>
 
             <MasterLookupModal
-                isOpen={showRouteSearch}
-                onClose={() => setShowRouteSearch(false)}
-                title="Route Search"
+                isOpen={showSearch}
+                onClose={() => setShowSearch(false)}
+                title="Customer Types"
                 columns={[
                     { label: 'CODE', key: 'code', isId: true, width: 'w-[100px]', render: (item) => <span className="font-mono text-[11px] font-bold text-[#0285fd]">{item.code}</span> },
-                    { label: 'ROUTE NAME', key: 'name', render: (item) => <span className="font-bold text-slate-700 uppercase text-[11px]">{item.name}</span> },
+                    { label: 'TYPE NAME', key: 'name', render: (item) => <span className="font-bold text-slate-700 uppercase text-[11px]">{item.name}</span> },
                 ]}
-                items={routeList}
+                items={typeList}
                 loading={loading}
-                onSelect={selectRoute}
-                emptyMsg="No routes found"
+                onSelect={selectType}
+                emptyMsg="No customer types found"
             />
 
             {showDeleteConfirm && (
@@ -127,7 +126,7 @@ const RouteBoard = ({ isOpen, onClose }) => {
                         <div className="p-8 text-center">
                             <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6 border-4 border-white shadow-lg"><AlertTriangle size={40} className="text-red-500" /></div>
                             <h3 className="text-lg font-black text-slate-800 mb-2 uppercase tracking-wider">Confirm Deletion</h3>
-                            <p className="text-slate-500 text-[12px] font-medium leading-relaxed mb-8">Are you sure you want to delete route <span className="font-bold text-slate-800 uppercase">"{formData.Route_Name || formData.Code}"</span>?<br />This action cannot be undone.</p>
+                            <p className="text-slate-500 text-[12px] font-medium leading-relaxed mb-8">Are you sure you want to delete <span className="font-bold text-slate-800 uppercase">"{formData.Type_Name || formData.Code}"</span>?<br />This action is permanent and cannot be undone.</p>
                             <div className="flex gap-3">
                                 <button onClick={() => setShowDeleteConfirm(false)} disabled={loading} className="flex-1 h-11 bg-slate-100 text-slate-600 text-[11px] font-black rounded-xl hover:bg-slate-200 transition-all uppercase tracking-widest disabled:opacity-50">Cancel</button>
                                 <button onClick={confirmDelete} disabled={loading} className="flex-1 h-11 bg-red-500 text-white text-[11px] font-black rounded-xl hover:bg-red-600 shadow-lg shadow-red-200 transition-all flex items-center justify-center gap-2 uppercase tracking-widest disabled:opacity-50">{loading ? <Loader2 size={16} className="animate-spin" /> : 'Delete Now'}</button>
@@ -141,4 +140,4 @@ const RouteBoard = ({ isOpen, onClose }) => {
     );
 };
 
-export default RouteBoard;
+export default CustomerTypeBoard;

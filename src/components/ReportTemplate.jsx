@@ -71,10 +71,16 @@ const ReportTemplate = ({
         pagePadding: '10mm',
         signatureStyle: 'dotted',
         customWidth: 210,
-        customHeight: 297
+        customHeight: 297,
+        zoomLevel: 80,
+        tableBorderStyle: 'none',
+        tableBorderColor: '#e2e8f0'
     };
 
     // --- State Management ---
+    const [zoomLevel, setZoomLevel] = useState(DEFAULTS.zoomLevel);
+    const [tableBorderStyle, setTableBorderStyle] = useState(DEFAULTS.tableBorderStyle);
+    const [tableBorderColor, setTableBorderColor] = useState(DEFAULTS.tableBorderColor);
     const [currentPage, setCurrentPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState('');
     const [showSettings, setShowSettings] = useState(false);
@@ -142,6 +148,9 @@ const ReportTemplate = ({
                 setSignatureStyle(config.signatureStyle ?? DEFAULTS.signatureStyle);
                 setCustomWidth(config.customWidth ?? DEFAULTS.customWidth);
                 setCustomHeight(config.customHeight ?? DEFAULTS.customHeight);
+                setZoomLevel(config.zoomLevel ?? DEFAULTS.zoomLevel);
+                setTableBorderStyle(config.tableBorderStyle ?? DEFAULTS.tableBorderStyle);
+                setTableBorderColor(config.tableBorderColor ?? DEFAULTS.tableBorderColor);
                 if (config.cellStyles) setCellStyles(config.cellStyles);
                 if (config.hiddenColumns) setHiddenColumns(config.hiddenColumns);
             } catch (e) { console.error("Persistence Load Failure", e); }
@@ -153,7 +162,8 @@ const ReportTemplate = ({
         const config = {
             isLandscape, reportSize, workspaceTheme, rowSpacing, colSpacing,
             fontFamily, fontSize, fontColor, isBold, isItalic, isUnderline,
-            cellStyles, hiddenColumns, signatureStyle, customWidth, customHeight
+            cellStyles, hiddenColumns, signatureStyle, customWidth, customHeight, zoomLevel,
+            tableBorderStyle, tableBorderColor
         };
         localStorage.setItem(`report_settings_${title}`, JSON.stringify(config));
         setShowSettings(false);
@@ -174,6 +184,9 @@ const ReportTemplate = ({
         setSignatureStyle(DEFAULTS.signatureStyle);
         setCustomWidth(DEFAULTS.customWidth);
         setCustomHeight(DEFAULTS.customHeight);
+        setZoomLevel(DEFAULTS.zoomLevel);
+        setTableBorderStyle(DEFAULTS.tableBorderStyle);
+        setTableBorderColor(DEFAULTS.tableBorderColor);
         setCellStyles({});
         setHiddenColumns([]);
         setHiddenCells([]);
@@ -258,6 +271,12 @@ const ReportTemplate = ({
                 case 'size': return style.size ?? (activeCell.rowIndex === 'special' ? (activeCell.columnKey === 'company_name' ? 36 : (activeCell.columnKey === 'report_title' ? 14 : (activeCell.columnKey.startsWith('header_') ? 11 : 13))) : fontSize);
                 case 'color': return style.color ?? (activeCell.rowIndex === 'special' ? (activeCell.columnKey === 'company_name' ? fontColor : (activeCell.columnKey === 'report_title' ? '#ffffff' : (activeCell.columnKey.startsWith('header_') ? fontColor : '#64748b'))) : fontColor);
                 case 'family': return style.family ?? fontFamily;
+                case 'borderTop': return style.borderTop || false;
+                case 'borderBottom': return style.borderBottom || false;
+                case 'borderLeft': return style.borderLeft || false;
+                case 'borderRight': return style.borderRight || false;
+                case 'borderSize': return style.borderSize || 1;
+                case 'borderColor': return style.borderColor || fontColor;
                 default: return null;
             }
         }
@@ -303,7 +322,11 @@ const ReportTemplate = ({
             fontWeight: style.bold !== undefined ? (style.bold ? 'bold' : 'normal') : defaultStyle.fontWeight,
             fontStyle: style.italic !== undefined ? (style.italic ? 'italic' : 'normal') : defaultStyle.fontStyle,
             textDecoration: style.underline !== undefined ? (style.underline ? 'underline' : 'none') : defaultStyle.textDecoration,
-            fontFamily: style.family || defaultStyle.fontFamily
+            fontFamily: style.family || defaultStyle.fontFamily,
+            borderTop: style.borderTop ? `${style.borderSize || 1}px solid ${style.borderColor || fontColor}` : defaultStyle.borderTop,
+            borderBottom: style.borderBottom ? `${style.borderSize || 1}px solid ${style.borderColor || fontColor}` : defaultStyle.borderBottom,
+            borderLeft: style.borderLeft ? `${style.borderSize || 1}px solid ${style.borderColor || fontColor}` : defaultStyle.borderLeft,
+            borderRight: style.borderRight ? `${style.borderSize || 1}px solid ${style.borderColor || fontColor}` : defaultStyle.borderRight
         };
     };
 
@@ -321,7 +344,7 @@ const ReportTemplate = ({
                         .cell-hidden { display: none !important; }
                     }
                     .report-workspace { flex: 1; overflow: auto; padding: 40px; display: flex; flex-direction: column; align-items: center; }
-                    .print-area { width: ${dims.w}; min-height: ${dims.h}; background: white; padding: ${pagePadding}; box-shadow: ${workspaceTheme === 'classic' ? '10px 10px 5px rgba(0,0,0,0.4)' : '0 20px 50px rgba(0,0,0,0.1)'}; position: relative; box-sizing: border-box; transition: all 0.3s ease; flex-shrink: 0; margin-bottom: 40px; }
+                    .print-area { zoom: ${zoomLevel / 100}; width: ${dims.w}; min-height: ${dims.h}; background: white; padding: ${pagePadding}; box-shadow: ${workspaceTheme === 'classic' ? '10px 10px 5px rgba(0,0,0,0.4)' : '0 20px 50px rgba(0,0,0,0.1)'}; position: relative; box-sizing: border-box; transition: all 0.3s ease; flex-shrink: 0; margin-bottom: 40px; }
                     .dynamic-report-text { color: ${fontColor}; font-size: ${fontSize}px; font-weight: ${isBold ? 'bold' : 'normal'}; font-style: ${isItalic ? 'italic' : 'normal'}; text-decoration: ${isUnderline ? 'underline' : 'none'}; font-family: ${fontFamily}; }
                     .cell-selected { outline: 2px solid #3b82f6 !important; outline-offset: 4px; background: rgba(59, 130, 246, 0.05); }
                     .cell-hidden { opacity: 0.1; background: repeating-linear-gradient(45deg, #f1f5f9, #f1f5f9 10px, #ffffff 10px, #ffffff 20px); }
@@ -443,98 +466,153 @@ const ReportTemplate = ({
             </div>
 
             {/* Top Toolbar */}
-            <div className="h-14 bg-white border-b border-slate-200 flex items-center px-4 gap-3 no-print shrink-0 shadow-sm z-[100] font-sans text-slate-800">
-                <div className="flex items-center gap-1 border-r border-slate-200 pr-4">
-                    <button onClick={() => window.print()} className="w-9 h-9 flex items-center justify-center hover:bg-slate-100 rounded-lg text-slate-600 hover:text-blue-600" title="Print"><Printer size={18} /></button>
-                    <button onClick={() => window.location.reload()} className="w-9 h-9 flex items-center justify-center hover:bg-slate-100 rounded-lg text-slate-600 hover:text-emerald-600" title="Refresh"><RefreshCw size={16} /></button>
-                    <button onClick={() => { setIsLandscape(!isLandscape); setCurrentPage(1); }} className={`w-9 h-9 flex items-center justify-center rounded-lg transition-all ${isLandscape ? 'bg-blue-50 text-blue-600' : 'hover:bg-slate-100 text-slate-600'}`} title="Orientation">
-                        {isLandscape ? <Monitor size={18} /> : <Smartphone size={18} />}
+            <div className="h-10 bg-white border-b border-slate-200 flex items-center px-3 gap-2 no-print shrink-0 shadow-sm z-[100] font-sans text-slate-800">
+                <div className="flex items-center gap-1 border-r border-slate-200 pr-3">
+                    <button onClick={() => window.print()} className="w-7 h-7 flex items-center justify-center hover:bg-slate-100 rounded-lg text-slate-600 hover:text-blue-600" title="Print"><Printer size={14} /></button>
+                    <button onClick={() => window.location.reload()} className="w-7 h-7 flex items-center justify-center hover:bg-slate-100 rounded-lg text-slate-600 hover:text-emerald-600" title="Refresh"><RefreshCw size={14} /></button>
+                    <button onClick={() => { setIsLandscape(!isLandscape); setCurrentPage(1); }} className={`w-7 h-7 flex items-center justify-center rounded-lg transition-all ${isLandscape ? 'bg-blue-50 text-blue-600' : 'hover:bg-slate-100 text-slate-600'}`} title="Orientation">
+                        {isLandscape ? <Monitor size={14} /> : <Smartphone size={14} />}
                     </button>
                 </div>
 
-                <div className="flex items-center gap-1 border-r border-slate-200 px-4">
-                    <button onClick={handleFirstPage} disabled={currentPage === 1} className="w-9 h-9 flex items-center justify-center hover:bg-slate-100 rounded-lg disabled:opacity-20 text-slate-600"><ChevronsLeft size={18} /></button>
-                    <button onClick={handlePrevPage} disabled={currentPage === 1} className="w-9 h-9 flex items-center justify-center hover:bg-slate-100 rounded-lg disabled:opacity-20 text-slate-600"><ChevronLeft size={18} /></button>
-                    <div className="flex items-center gap-2 mx-3">
-                        <input type="text" value={currentPage} className="w-12 h-8 bg-slate-50 border border-slate-200 rounded-md text-center text-sm font-bold text-slate-700 outline-none" readOnly />
-                        <span className="text-sm font-bold text-slate-400">/ {totalPages || 1}</span>
+                <div className="flex items-center gap-1.5 border-r border-slate-200 px-3">
+                    <button onClick={() => setZoomLevel(prev => Math.max(20, prev - 10))} className="w-6 h-6 flex items-center justify-center hover:bg-slate-100 rounded text-slate-600 font-bold" title="Zoom Out">-</button>
+                    <span className="text-[10px] font-bold text-slate-600 w-10 text-center" title="Zoom Level">{zoomLevel}%</span>
+                    <button onClick={() => setZoomLevel(prev => Math.min(200, prev + 10))} className="w-6 h-6 flex items-center justify-center hover:bg-slate-100 rounded text-slate-600 font-bold" title="Zoom In">+</button>
+                </div>
+
+                <div className="flex items-center gap-1 border-r border-slate-200 px-3">
+                    <button onClick={handleFirstPage} disabled={currentPage === 1} className="w-7 h-7 flex items-center justify-center hover:bg-slate-100 rounded-lg disabled:opacity-20 text-slate-600"><ChevronsLeft size={14} /></button>
+                    <button onClick={handlePrevPage} disabled={currentPage === 1} className="w-7 h-7 flex items-center justify-center hover:bg-slate-100 rounded-lg disabled:opacity-20 text-slate-600"><ChevronLeft size={14} /></button>
+                    <div className="flex items-center gap-1.5 mx-2">
+                        <input type="text" value={currentPage} className="w-10 h-6 bg-slate-50 border border-slate-200 rounded text-center text-xs font-bold text-slate-700 outline-none" readOnly />
+                        <span className="text-xs font-bold text-slate-400">/ {totalPages || 1}</span>
                     </div>
-                    <button onClick={handleNextPage} disabled={currentPage === totalPages} className="w-9 h-9 flex items-center justify-center hover:bg-slate-100 rounded-lg disabled:opacity-20 text-slate-600"><ChevronRight size={18} /></button>
-                    <button onClick={handleLastPage} disabled={currentPage === totalPages} className="w-9 h-9 flex items-center justify-center hover:bg-slate-100 rounded-lg disabled:opacity-20 text-slate-600"><ChevronsRight size={18} /></button>
+                    <button onClick={handleNextPage} disabled={currentPage === totalPages} className="w-7 h-7 flex items-center justify-center hover:bg-slate-100 rounded-lg disabled:opacity-20 text-slate-600"><ChevronRight size={14} /></button>
+                    <button onClick={handleLastPage} disabled={currentPage === totalPages} className="w-7 h-7 flex items-center justify-center hover:bg-slate-100 rounded-lg disabled:opacity-20 text-slate-600"><ChevronsRight size={14} /></button>
                 </div>
 
-                <div className="flex-1 max-w-md relative">
-                    <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
-                    <input type="text" placeholder="Search report content..." value={searchTerm} onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }} className="w-full h-10 pl-11 pr-4 bg-slate-50 border border-slate-200 rounded-[5px] text-sm outline-none focus:border-blue-500 transition-all shadow-sm" />
+                <div className="flex-1 max-w-sm relative">
+                    <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
+                    <input type="text" placeholder="Search report content..." value={searchTerm} onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }} className="w-full h-7 pl-8 pr-3 bg-slate-50 border border-slate-200 rounded text-xs outline-none focus:border-blue-500 transition-all shadow-sm" />
                 </div>
 
-                <div className="ml-auto flex items-center gap-4 relative">
-                    <button onClick={() => setShowSettings(!showSettings)} className={`w-9 h-9 flex items-center justify-center rounded-lg transition-all ${showSettings ? 'bg-slate-100 text-blue-600 shadow-inner' : 'hover:bg-slate-100 text-slate-400'}`}>
-                        <Settings2 size={20} className={showSettings ? 'rotate-90 duration-300' : 'duration-300'} />
+                <div className="ml-auto flex items-center gap-3 relative">
+                    <button onClick={() => setShowSettings(!showSettings)} className={`w-7 h-7 flex items-center justify-center rounded-lg transition-all ${showSettings ? 'bg-slate-100 text-blue-600 shadow-inner' : 'hover:bg-slate-100 text-slate-400'}`}>
+                        <Settings2 size={16} className={showSettings ? 'rotate-90 duration-300' : 'duration-300'} />
                     </button>
 
                     {showSettings && (
-                        <div className="absolute top-12 right-0 w-[300px] bg-white border border-gray-200 shadow-xl rounded-[10px] p-4 z-[110] animate-in zoom-in-95 duration-150 font-sans text-slate-800 overflow-y-auto max-h-[85vh] no-scrollbar">
-                            <div className="flex items-center justify-between mb-3 pb-2 border-b border-gray-50 sticky top-0 bg-white z-10">
-                                <h3 className="text-[10px] font-black text-slate-900 uppercase tracking-widest flex items-center gap-1.5"><Settings2 size={12} className="text-blue-500" /> Report Settings</h3>
+                        <div className="absolute top-10 right-0 w-[300px] bg-white border border-gray-200 shadow-xl rounded-[5px] p-4 z-[110] animate-in zoom-in-95 duration-150 font-sans text-slate-800 overflow-y-auto max-h-[85vh] no-scrollbar">
+                            <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-200 sticky top-0 bg-white z-10">
+                                <h3 className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">Report Settings</h3>
                                 <button onClick={() => setShowSettings(false)} className="text-gray-400 hover:text-red-500 transition-colors"><X size={14} /></button>
                             </div>
-                            <div className="grid grid-cols-2 gap-2 mb-4">
-                                <button onClick={handleSaveSettings} className="h-8 rounded-lg bg-blue-600 text-white text-[9px] font-black flex items-center justify-center gap-2 hover:bg-blue-700 transition-all shadow-lg shadow-blue-100"><Save size={12}/> SAVE STYLE</button>
-                                <button onClick={handleResetDefaults} className="h-8 rounded-lg bg-slate-100 text-slate-600 text-[9px] font-black flex items-center justify-center gap-2 hover:bg-slate-200 transition-all border border-slate-200"><RotateCcw size={12}/> RESET ALL</button>
+                            <div className="flex gap-2 mb-4">
+                                <button onClick={handleSaveSettings} className="flex-1 h-9 rounded-[5px] bg-[#0285fd] text-white text-[11px] font-bold flex items-center justify-center gap-2 hover:bg-[#0073ff] transition-all shadow-md active:scale-95"><Save size={12}/> SAVE STYLE</button>
+                                <button onClick={handleResetDefaults} className="flex-1 h-9 rounded-[5px] bg-white text-[#0285fd] border-2 border-[#0285fd] text-[11px] font-bold flex items-center justify-center gap-2 hover:bg-blue-50 transition-all active:scale-95"><RotateCcw size={12}/> RESET ALL</button>
                             </div>
-                            <div className="flex gap-1 bg-slate-50 p-1 rounded-lg mb-4">
-                                <button onClick={() => setStyleMode('global')} className={`flex-1 h-7 rounded-[6px] text-[9px] font-black flex items-center justify-center gap-1.5 transition-all ${styleMode === 'global' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-400'}`}><Globe size={10} /> GLOBAL</button>
-                                <button onClick={() => { if(activeCell) setStyleMode('selection'); }} className={`flex-1 h-7 rounded-[6px] text-[9px] font-black flex items-center justify-center gap-1.5 transition-all ${!activeCell ? 'opacity-30 cursor-not-allowed' : ''} ${styleMode === 'selection' ? 'bg-white text-orange-600 shadow-sm' : 'text-slate-400'}`}><MousePointer2 size={10} /> SELECTED CELL</button>
+                            <div className="flex gap-1 bg-slate-50 p-1 border border-slate-200 rounded-[5px] mb-4">
+                                <button onClick={() => setStyleMode('global')} className={`flex-1 h-8 rounded text-[11px] font-bold transition-all ${styleMode === 'global' ? 'bg-white text-[#0285fd] shadow-sm border border-slate-200' : 'text-gray-500 hover:text-gray-700'}`}>GLOBAL</button>
+                                <button onClick={() => { if(activeCell) setStyleMode('selection'); }} className={`flex-1 h-8 rounded text-[11px] font-bold transition-all ${!activeCell ? 'opacity-30 cursor-not-allowed' : ''} ${styleMode === 'selection' ? 'bg-white text-[#0285fd] shadow-sm border border-slate-200' : 'text-gray-500 hover:text-gray-700'}`}>SELECTED CELL</button>
                             </div>
                             <div className="space-y-4">
                                 {styleMode === 'selection' && activeCell && (
-                                    <div className="animate-in slide-in-from-top-1 flex gap-2">
-                                        <button onClick={toggleCellVisibility} className={`flex-1 h-8 rounded-lg border text-[10px] font-black flex items-center justify-center gap-2 transition-all ${hiddenCells.includes(activeCell.rowIndex === 'special' ? activeCell.columnKey : `${activeCell.rowIndex}_${activeCell.columnKey}`) ? 'bg-red-600 text-white border-red-600' : 'bg-orange-50 text-orange-600 border-orange-100 hover:bg-orange-100'}`}>
-                                            {hiddenCells.includes(activeCell.rowIndex === 'special' ? activeCell.columnKey : `${activeCell.rowIndex}_${activeCell.columnKey}`) ? <Eye size={14}/> : <EyeOff size={14}/>}
-                                            {hiddenCells.includes(activeCell.rowIndex === 'special' ? activeCell.columnKey : `${activeCell.rowIndex}_${activeCell.columnKey}`) ? 'RESTORE' : 'HIDE'}
-                                        </button>
-                                        <button onClick={() => setActiveCell(null)} className="h-8 px-3 rounded-lg border border-gray-100 bg-gray-50 text-gray-400 hover:bg-gray-100 transition-all"><X size={14}/></button>
+                                    <div className="animate-in slide-in-from-top-1 space-y-4">
+                                        <div className="flex gap-2">
+                                            <button onClick={toggleCellVisibility} className={`flex-1 h-8 rounded-[5px] border text-[11px] font-bold flex items-center justify-center gap-2 transition-all active:scale-95 ${hiddenCells.includes(activeCell.rowIndex === 'special' ? activeCell.columnKey : `${activeCell.rowIndex}_${activeCell.columnKey}`) ? 'bg-[#ff3b30] text-white border-[#ff3b30] hover:bg-[#e03127]' : 'bg-white text-gray-600 border-slate-200 hover:bg-slate-50'}`}>
+                                                {hiddenCells.includes(activeCell.rowIndex === 'special' ? activeCell.columnKey : `${activeCell.rowIndex}_${activeCell.columnKey}`) ? <Eye size={14}/> : <EyeOff size={14}/>}
+                                                {hiddenCells.includes(activeCell.rowIndex === 'special' ? activeCell.columnKey : `${activeCell.rowIndex}_${activeCell.columnKey}`) ? 'RESTORE' : 'HIDE'}
+                                            </button>
+                                            <button onClick={() => setActiveCell(null)} className="h-8 px-3 rounded-[5px] border border-slate-200 bg-white text-gray-500 hover:bg-slate-50 transition-all active:scale-95"><X size={14}/></button>
+                                        </div>
+                                        <div className="p-4 border border-slate-200 rounded-[5px] bg-white space-y-4">
+                                            <label className="text-[11px] font-bold text-gray-500 uppercase block border-b border-slate-100 pb-2 mb-2">Cell Borders</label>
+                                            
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-[11px] font-bold text-gray-500 uppercase">Size</span>
+                                                <div className="flex items-center gap-2"><input type="number" min="1" max="10" value={getActiveStyle('borderSize') || 1} onChange={(e) => updateStyle('borderSize', parseInt(e.target.value) || 1)} className="w-14 h-8 bg-slate-50 border border-slate-200 rounded-[5px] text-[12px] font-bold text-gray-700 outline-none focus:border-[#00D1FF] text-center px-1"/><span className="text-[11px] font-bold text-gray-400">px</span></div>
+                                            </div>
+                                            
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-[11px] font-bold text-gray-500 uppercase">Color</span>
+                                                <div className="w-14 h-8 bg-slate-50 border border-slate-200 rounded-[5px] flex items-center justify-center">
+                                                     <input type="color" value={getActiveStyle('borderColor') || fontColor} onChange={(e) => updateStyle('borderColor', e.target.value)} className="w-6 h-6 rounded cursor-pointer border-none p-0 overflow-hidden" />
+                                                </div>
+                                            </div>
+                                            
+                                            <div className="grid grid-cols-4 gap-2">
+                                                <button onClick={() => updateStyle('borderTop', !getActiveStyle('borderTop'))} className={`h-8 rounded-[5px] border text-[11px] font-bold transition-all active:scale-95 ${getActiveStyle('borderTop') ? 'bg-[#0285fd] text-white border-[#0285fd]' : 'bg-slate-50 text-gray-500 border-slate-200 hover:bg-slate-100'}`}>TOP</button>
+                                                <button onClick={() => updateStyle('borderBottom', !getActiveStyle('borderBottom'))} className={`h-8 rounded-[5px] border text-[11px] font-bold transition-all active:scale-95 ${getActiveStyle('borderBottom') ? 'bg-[#0285fd] text-white border-[#0285fd]' : 'bg-slate-50 text-gray-500 border-slate-200 hover:bg-slate-100'}`}>BTM</button>
+                                                <button onClick={() => updateStyle('borderLeft', !getActiveStyle('borderLeft'))} className={`h-8 rounded-[5px] border text-[11px] font-bold transition-all active:scale-95 ${getActiveStyle('borderLeft') ? 'bg-[#0285fd] text-white border-[#0285fd]' : 'bg-slate-50 text-gray-500 border-slate-200 hover:bg-slate-100'}`}>LFT</button>
+                                                <button onClick={() => updateStyle('borderRight', !getActiveStyle('borderRight'))} className={`h-8 rounded-[5px] border text-[11px] font-bold transition-all active:scale-95 ${getActiveStyle('borderRight') ? 'bg-[#0285fd] text-white border-[#0285fd]' : 'bg-slate-50 text-gray-500 border-slate-200 hover:bg-slate-100'}`}>RGT</button>
+                                            </div>
+                                            
+                                            <div className="grid grid-cols-2 gap-2">
+                                                <button onClick={() => { updateStyle('borderTop', true); updateStyle('borderBottom', true); updateStyle('borderLeft', true); updateStyle('borderRight', true); }} className="h-8 rounded-[5px] border border-slate-200 bg-slate-50 text-gray-600 hover:bg-slate-100 text-[11px] font-bold transition-all active:scale-95">ALL (BOX)</button>
+                                                <button onClick={() => { updateStyle('borderTop', false); updateStyle('borderBottom', false); updateStyle('borderLeft', false); updateStyle('borderRight', false); }} className="h-8 rounded-[5px] border border-slate-200 bg-slate-50 hover:bg-[#ff3b30] hover:text-white hover:border-[#ff3b30] text-gray-600 text-[11px] font-bold transition-all active:scale-95">NONE</button>
+                                            </div>
+                                        </div>
                                     </div>
                                 )}
-                                <div className="space-y-3">
-                                    <div className="flex items-center justify-between"><label className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">Typography</label><button onClick={() => { setShowFontModal(true); setShowColorModal(false); setShowCustomSizeModal(false); setShowVisibilityModal(false); }} className="w-32 h-7 text-[10px] font-bold bg-blue-50 text-blue-600 rounded border border-blue-100 hover:bg-blue-100 transition-all truncate px-2">{getActiveStyle('family')?.replace(/'/g, '').split(',')[0] || "Default"}</button></div>
-                                    <div className="flex items-center justify-between"><label className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">Font Style</label><div className="flex gap-1"><button onClick={() => updateStyle('bold', !getActiveStyle('bold'))} className={`w-7 h-6 rounded flex items-center justify-center border transition-all ${getActiveStyle('bold') ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-slate-400 border-gray-100'}`}><Bold size={12} /></button><button onClick={() => updateStyle('italic', !getActiveStyle('italic'))} className={`w-7 h-6 rounded flex items-center justify-center border transition-all ${getActiveStyle('italic') ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-slate-400 border-gray-100'}`}><Italic size={12} /></button><button onClick={() => updateStyle('underline', !getActiveStyle('underline'))} className={`w-7 h-6 rounded flex items-center justify-center border transition-all ${getActiveStyle('underline') ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-slate-400 border-gray-100'}`}><Underline size={12} /></button></div></div>
-                                    <div className="flex items-center justify-between"><div className="flex items-center gap-2"><label className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">Size</label><input type="number" value={getActiveStyle('size')} onChange={(e) => updateStyle('size', parseInt(e.target.value) || 8)} className="w-10 h-5 bg-slate-50 border border-slate-200 rounded text-[10px] font-bold text-slate-700 outline-none focus:border-blue-300 text-center"/><span className="text-[9px] font-bold text-slate-300">PX</span></div><input type="range" min="8" max="150" value={getActiveStyle('size')} onChange={(e) => updateStyle('size', parseInt(e.target.value))} className="w-24 accent-blue-600 h-1" /></div>
-                                    <div className="flex items-center justify-between"><label className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">Color</label><button onClick={() => { setShowColorModal(true); setShowFontModal(false); setShowCustomSizeModal(false); setShowVisibilityModal(false); }} className="w-32 h-7 flex items-center gap-2 px-2 bg-slate-50 border border-slate-100 rounded hover:bg-slate-100 transition-all shadow-sm"><div className="w-3 h-3 rounded-full shrink-0 border border-black/10" style={{ backgroundColor: getActiveStyle('color') }} /><span className="text-[10px] font-mono font-bold text-slate-600 truncate">{getActiveStyle('color')?.toUpperCase()}</span></button></div>
+                                <div className="space-y-4">
+                                    <div className="flex items-center justify-between"><label className="text-[11px] font-bold text-gray-500 uppercase">Typography</label><button onClick={() => { setShowFontModal(true); setShowColorModal(false); setShowCustomSizeModal(false); setShowVisibilityModal(false); }} className="w-32 h-8 text-[11px] font-bold bg-slate-50 text-gray-700 rounded-[5px] border border-slate-200 hover:bg-slate-100 transition-all truncate px-2">{getActiveStyle('family')?.replace(/'/g, '').split(',')[0] || "Default"}</button></div>
+                                    <div className="flex items-center justify-between"><label className="text-[11px] font-bold text-gray-500 uppercase">Font Style</label><div className="flex gap-2"><button onClick={() => updateStyle('bold', !getActiveStyle('bold'))} className={`w-8 h-8 rounded-[5px] flex items-center justify-center border transition-all active:scale-95 ${getActiveStyle('bold') ? 'bg-[#0285fd] text-white border-[#0285fd]' : 'bg-slate-50 text-gray-500 border-slate-200'}`}><Bold size={12} /></button><button onClick={() => updateStyle('italic', !getActiveStyle('italic'))} className={`w-8 h-8 rounded-[5px] flex items-center justify-center border transition-all active:scale-95 ${getActiveStyle('italic') ? 'bg-[#0285fd] text-white border-[#0285fd]' : 'bg-slate-50 text-gray-500 border-slate-200'}`}><Italic size={12} /></button><button onClick={() => updateStyle('underline', !getActiveStyle('underline'))} className={`w-8 h-8 rounded-[5px] flex items-center justify-center border transition-all active:scale-95 ${getActiveStyle('underline') ? 'bg-[#0285fd] text-white border-[#0285fd]' : 'bg-slate-50 text-gray-500 border-slate-200'}`}><Underline size={12} /></button></div></div>
+                                    <div className="flex items-center justify-between"><div className="flex items-center gap-2"><label className="text-[11px] font-bold text-gray-500 uppercase">Size</label><input type="number" value={getActiveStyle('size')} onChange={(e) => updateStyle('size', parseInt(e.target.value) || 8)} className="w-12 h-8 bg-slate-50 border border-slate-200 rounded-[5px] text-[12px] font-bold text-gray-700 outline-none focus:border-[#00D1FF] text-center"/><span className="text-[11px] font-bold text-gray-400">px</span></div><input type="range" min="8" max="150" value={getActiveStyle('size')} onChange={(e) => updateStyle('size', parseInt(e.target.value))} className="w-20 accent-[#0285fd] h-1" /></div>
+                                    <div className="flex items-center justify-between"><label className="text-[11px] font-bold text-gray-500 uppercase">Color</label><button onClick={() => { setShowColorModal(true); setShowFontModal(false); setShowCustomSizeModal(false); setShowVisibilityModal(false); }} className="w-32 h-8 flex items-center gap-2 px-3 bg-slate-50 border border-slate-200 rounded-[5px] hover:bg-slate-100 transition-all"><div className="w-4 h-4 rounded-full shrink-0 border border-black/10" style={{ backgroundColor: getActiveStyle('color') }} /><span className="text-[11px] font-mono font-bold text-gray-600 truncate">{getActiveStyle('color')?.toUpperCase()}</span></button></div>
                                 </div>
-                                <div className="h-[1px] bg-gray-50" />
-                                <div className="space-y-3">
-                                    <div className="flex items-center gap-2 mb-2"><Maximize2 size={12} className="text-blue-500" /><label className="text-[9px] font-black text-slate-900 uppercase tracking-widest">Layout Spacing</label></div>
-                                    <div className="space-y-4 p-3 bg-slate-50/50 rounded-lg border border-slate-100">
+                                <div className="h-[1px] bg-slate-100 my-4" />
+                                <div className="space-y-4">
+                                    <label className="text-[11px] font-bold text-gray-500 uppercase block">Layout Spacing</label>
+                                    <div className="p-4 border border-slate-200 bg-white rounded-[5px] space-y-4">
                                         <div className="space-y-2">
                                             <div className="flex items-center justify-between">
-                                                <span className="text-[9px] font-black text-slate-400 uppercase flex items-center gap-1"><MoveVertical size={10}/> Line Space</span>
-                                                <div className="flex items-center gap-1.5"><input type="number" value={rowSpacing} onChange={(e) => setRowSpacing(parseInt(e.target.value) || 0)} className="w-10 h-5 bg-white border border-slate-200 rounded text-[9px] font-bold text-blue-600 text-center outline-none focus:border-blue-300 shadow-sm"/><span className="text-[8px] font-black text-slate-300">PX</span></div>
+                                                <span className="text-[11px] font-bold text-gray-500 uppercase">Line Space</span>
+                                                <div className="flex items-center gap-2"><input type="number" value={rowSpacing} onChange={(e) => setRowSpacing(parseInt(e.target.value) || 0)} className="w-12 h-8 bg-slate-50 border border-slate-200 rounded-[5px] text-[12px] font-bold text-gray-700 text-center outline-none focus:border-[#00D1FF]"/><span className="text-[11px] font-bold text-gray-400">px</span></div>
                                             </div>
-                                            <input type="range" min="2" max="50" value={rowSpacing} onChange={(e) => setRowSpacing(parseInt(e.target.value))} className="w-full h-1 accent-blue-600 bg-slate-200 rounded-lg cursor-pointer" />
+                                            <input type="range" min="2" max="50" value={rowSpacing} onChange={(e) => setRowSpacing(parseInt(e.target.value))} className="w-full h-1 accent-[#0285fd] bg-slate-200 rounded cursor-pointer" />
                                         </div>
                                         <div className="space-y-2">
                                             <div className="flex items-center justify-between">
-                                                <span className="text-[9px] font-black text-slate-400 uppercase flex items-center gap-1"><MoveHorizontal size={10}/> Col Space</span>
-                                                <div className="flex items-center gap-1.5"><input type="number" value={colSpacing} onChange={(e) => setColSpacing(parseInt(e.target.value) || 0)} className="w-10 h-5 bg-white border border-slate-200 rounded text-[9px] font-bold text-blue-600 text-center outline-none focus:border-blue-300 shadow-sm"/><span className="text-[8px] font-black text-slate-300">PX</span></div>
+                                                <span className="text-[11px] font-bold text-gray-500 uppercase">Col Space</span>
+                                                <div className="flex items-center gap-2"><input type="number" value={colSpacing} onChange={(e) => setColSpacing(parseInt(e.target.value) || 0)} className="w-12 h-8 bg-slate-50 border border-slate-200 rounded-[5px] text-[12px] font-bold text-gray-700 text-center outline-none focus:border-[#00D1FF]"/><span className="text-[11px] font-bold text-gray-400">px</span></div>
                                             </div>
-                                            <input type="range" min="4" max="80" value={colSpacing} onChange={(e) => setColSpacing(parseInt(e.target.value))} className="w-full h-1 accent-blue-600 bg-slate-200 rounded-lg cursor-pointer" />
+                                            <input type="range" min="4" max="80" value={colSpacing} onChange={(e) => setColSpacing(parseInt(e.target.value))} className="w-full h-1 accent-[#0285fd] bg-slate-200 rounded cursor-pointer" />
                                         </div>
                                     </div>
                                 </div>
-                                <div className="h-[1px] bg-gray-50" />
+                                <div className="h-[1px] bg-slate-100 my-4" />
+                                <div className="space-y-4">
+                                    <label className="text-[11px] font-bold text-gray-500 uppercase block">Grid Lines</label>
+                                    <div className="p-4 border border-slate-200 bg-white rounded-[5px] space-y-4">
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-[11px] font-bold text-gray-500 uppercase">Line Style</span>
+                                            <div className="flex gap-1">
+                                                {['none', 'solid', 'dotted', 'double'].map(style => (
+                                                    <button key={style} onClick={() => setTableBorderStyle(style)} className={`px-2 h-8 text-[10px] font-bold rounded-[5px] border transition-all uppercase active:scale-95 ${tableBorderStyle === style ? 'bg-[#0285fd] text-white border-[#0285fd]' : 'bg-slate-50 text-gray-500 border-slate-200 hover:bg-slate-100'}`}>{style === 'none' ? 'Hide' : style}</button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-[11px] font-bold text-gray-500 uppercase">Line Color</span>
+                                            <div className="w-14 h-8 bg-slate-50 border border-slate-200 rounded-[5px] flex items-center justify-center">
+                                                 <input type="color" value={tableBorderColor} onChange={(e) => setTableBorderColor(e.target.value)} className="w-6 h-6 rounded cursor-pointer border-none p-0 overflow-hidden" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="h-[1px] bg-slate-100 my-4" />
                                 <div className="space-y-2">
-                                    <button onClick={() => { setShowVisibilityModal(true); setShowSettings(false); setShowFontModal(false); setShowColorModal(false); setShowCustomSizeModal(false); }} className="w-full h-10 bg-slate-900 text-white rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-black transition-all flex items-center justify-center gap-2 shadow-lg shadow-slate-100">
+                                    <button onClick={() => { setShowVisibilityModal(true); setShowSettings(false); setShowFontModal(false); setShowColorModal(false); setShowCustomSizeModal(false); }} className="w-full h-10 bg-slate-800 text-white rounded-[5px] text-[11px] font-bold uppercase tracking-widest hover:bg-slate-900 transition-all flex items-center justify-center gap-2 shadow-md active:scale-95">
                                         <LayoutTemplate size={14} /> Visibility Hub
                                     </button>
                                 </div>
-                                <div className="h-[1px] bg-gray-50" />
-                                <div className="space-y-3">
-                                    <div className="flex items-center justify-between"><label className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">Page Size</label><div className="flex gap-1">{['A4', 'A3', 'Custom'].map(s => ( <button key={s} onClick={() => { setReportSize(s); if(s === 'Custom') { setShowCustomSizeModal(true); setShowFontModal(false); setShowColorModal(false); setShowVisibilityModal(false); } }} className={`px-2 h-6 text-[9px] font-bold rounded border transition-all ${reportSize === s ? 'bg-slate-900 text-white border-slate-900' : 'bg-white text-slate-400 border-gray-100'}`}>{s}</button> ))}</div></div>
-                                    <div className="flex items-center justify-between"><label className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">Signature</label><div className="flex gap-1">{['dotted', 'solid'].map(style => ( <button key={style} onClick={() => setSignatureStyle(style)} className={`px-2 h-6 text-[9px] font-bold rounded border transition-all uppercase ${signatureStyle === style ? 'bg-slate-900 text-white border-slate-900' : 'bg-white text-slate-400 border-gray-100'}`}>{style}</button> ))}</div></div>
+                                <div className="h-[1px] bg-slate-100 my-4" />
+                                <div className="space-y-4">
+                                    <div className="flex items-center justify-between"><label className="text-[11px] font-bold text-gray-500 uppercase">Page Size</label><div className="flex gap-2">{['A4', 'A3', 'Custom'].map(s => ( <button key={s} onClick={() => { setReportSize(s); if(s === 'Custom') { setShowCustomSizeModal(true); setShowFontModal(false); setShowColorModal(false); setShowVisibilityModal(false); } }} className={`px-3 h-8 text-[11px] font-bold rounded-[5px] border transition-all active:scale-95 ${reportSize === s ? 'bg-[#0285fd] text-white border-[#0285fd]' : 'bg-slate-50 text-gray-500 border-slate-200 hover:bg-slate-100'}`}>{s}</button> ))}</div></div>
+                                    <div className="flex items-center justify-between"><label className="text-[11px] font-bold text-gray-500 uppercase">Signature</label><div className="flex gap-2">{['dotted', 'solid'].map(style => ( <button key={style} onClick={() => setSignatureStyle(style)} className={`px-3 h-8 text-[11px] font-bold rounded-[5px] border transition-all uppercase active:scale-95 ${signatureStyle === style ? 'bg-[#0285fd] text-white border-[#0285fd]' : 'bg-slate-50 text-gray-500 border-slate-200 hover:bg-slate-100'}`}>{style}</button> ))}</div></div>
                                 </div>
-                                <div className="pt-2"><button onClick={() => setWorkspaceTheme(workspaceTheme === 'classic' ? 'modern' : 'classic')} className="w-full h-8 text-[10px] font-bold bg-slate-50 text-slate-600 rounded-lg hover:bg-slate-100 transition-all border border-slate-100">SWITCH THEME</button></div>
+                                <div className="pt-4"><button onClick={() => setWorkspaceTheme(workspaceTheme === 'classic' ? 'modern' : 'classic')} className="w-full h-8 text-[11px] font-bold bg-slate-50 text-gray-500 rounded-[5px] hover:bg-slate-100 transition-all border border-slate-200 active:scale-95">SWITCH THEME</button></div>
                             </div>
                         </div>
                     )}
@@ -552,9 +630,9 @@ const ReportTemplate = ({
                     <div className="min-h-[400px] mt-[-40px]">
                         <table className="w-full border-collapse"> 
                             <thead><tr className="border-y-2 border-slate-900 bg-slate-50/50" style={{ borderColor: fontColor }}>{visibleColumns.map((col, idx) => { const headerKey = `header_${col.key}`; const isSelected = activeCell?.rowIndex === 'special' && activeCell?.columnKey === headerKey; return ( <th key={idx} contentEditable={true} suppressContentEditableWarning={true} onClick={() => { setActiveCell({ rowIndex: 'special', columnKey: headerKey }); setStyleMode('selection'); }} onBlur={(e) => handleCellBlur(headerKey, e)} className={`py-3 px-4 text-[11px] font-black uppercase tracking-widest cursor-text transition-all outline-none ${isSelected ? 'cell-selected' : ''} ${col.align === 'right' ? 'text-right' : 'text-left'}`} style={{ ...getSpecialStyle(headerKey, { color: fontColor, fontSize: '11px', fontWeight: '900' }), paddingTop: `${rowSpacing}px`, paddingBottom: `${rowSpacing}px`, paddingLeft: `${colSpacing/2}px`, paddingRight: `${colSpacing/2}px` }}>{editedCells[headerKey] || col.header}</th> ); })}</tr></thead>
-                            <tbody className="divide-y divide-slate-100">
+                            <tbody>
                                 {currentData && currentData.length > 0 ? currentData.map((row, rowIdx) => (
-                                    <tr key={rowIdx} className="hover:bg-slate-50/50 transition-colors">{visibleColumns.map((col, colIdx) => { const cellKey = `${startIndex + rowIdx}_${col.key}`; const style = cellStyles[cellKey] || {}; const isSelected = activeCell?.rowIndex === (startIndex + rowIdx) && activeCell?.columnKey === col.key; const isHidden = hiddenCells.includes(cellKey); const originalVal = col.format ? col.format(row[col.key], row) : row[col.key]; const currentVal = editedCells[cellKey] !== undefined ? editedCells[cellKey] : originalVal; return ( <td key={colIdx} contentEditable={!isHidden} suppressContentEditableWarning={true} onFocus={() => { setActiveCell({ rowIndex: startIndex + rowIdx, columnKey: col.key }); setStyleMode('selection'); }} onBlur={(e) => handleCellBlur(cellKey, e)} className={`transition-all cursor-text dynamic-report-text editable-cell ${isSelected ? 'cell-selected' : ''} ${isHidden ? 'cell-hidden' : ''} ${col.align === 'right' ? 'text-right' : 'text-left'}`} style={{ color: isHidden ? 'transparent' : (style.color || undefined), fontSize: style.size ? `${style.size}px` : undefined, fontWeight: style.bold !== undefined ? (style.bold ? 'bold' : 'normal') : undefined, fontStyle: style.italic !== undefined ? (style.italic ? 'italic' : 'normal') : undefined, textDecoration: style.underline !== undefined ? (style.underline ? 'underline' : 'none') : undefined, fontFamily: style.family || undefined, paddingTop: `${rowSpacing}px`, paddingBottom: `${rowSpacing}px`, paddingLeft: `${colSpacing/2}px`, paddingRight: `${colSpacing/2}px` }}>{isHidden ? '' : currentVal}</td> ); })}</tr>
+                                    <tr key={rowIdx} className="hover:bg-slate-50/50 transition-colors">{visibleColumns.map((col, colIdx) => { const cellKey = `${startIndex + rowIdx}_${col.key}`; const style = cellStyles[cellKey] || {}; const isSelected = activeCell?.rowIndex === (startIndex + rowIdx) && activeCell?.columnKey === col.key; const isHidden = hiddenCells.includes(cellKey); const originalVal = col.format ? col.format(row[col.key], row) : row[col.key]; const currentVal = editedCells[cellKey] !== undefined ? editedCells[cellKey] : originalVal; return ( <td key={colIdx} contentEditable={!isHidden} suppressContentEditableWarning={true} onFocus={() => { setActiveCell({ rowIndex: startIndex + rowIdx, columnKey: col.key }); setStyleMode('selection'); }} onBlur={(e) => handleCellBlur(cellKey, e)} className={`transition-all cursor-text dynamic-report-text editable-cell ${isSelected ? 'cell-selected' : ''} ${isHidden ? 'cell-hidden' : ''} ${col.align === 'right' ? 'text-right' : 'text-left'}`} style={{ color: isHidden ? 'transparent' : (style.color || undefined), fontSize: style.size ? `${style.size}px` : undefined, fontWeight: style.bold !== undefined ? (style.bold ? 'bold' : 'normal') : undefined, fontStyle: style.italic !== undefined ? (style.italic ? 'italic' : 'normal') : undefined, textDecoration: style.underline !== undefined ? (style.underline ? 'underline' : 'none') : undefined, fontFamily: style.family || undefined, paddingTop: `${rowSpacing}px`, paddingBottom: `${rowSpacing}px`, paddingLeft: `${colSpacing/2}px`, paddingRight: `${colSpacing/2}px`, borderBottomWidth: tableBorderStyle !== 'none' ? (tableBorderStyle === 'double' ? '3px' : '1px') : '0', borderBottomStyle: tableBorderStyle !== 'none' ? tableBorderStyle : 'solid', borderBottomColor: tableBorderColor }}>{isHidden ? '' : currentVal}</td> ); })}</tr>
                                 )) : ( <tr><td colSpan={visibleColumns.length} className="py-32 text-center text-slate-300 text-[14px] font-black uppercase tracking-[0.5em]">Void Dataset</td></tr> )}
                             </tbody>
                         </table>

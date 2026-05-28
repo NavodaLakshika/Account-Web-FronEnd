@@ -483,28 +483,28 @@ const JournalEntryBoard = ({ isOpen, onClose, onComplete }) => {
                 title="General Journal Entries"
                 maxWidth="max-w-[1100px]"
                 footer={
-                    <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-gray-100 rounded-b-xl">
-                        <div className="flex gap-3">
+                    <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-slate-200 rounded-b-[5px]">
+                        <div className="flex gap-4">
                             <button
                                 onClick={() => { setTempEntries([]); resetLine(); }}
-                                className="px-6 h-10 bg-[#00adff] text-white text-sm font-black rounded-[5px] shadow-md shadow-blue-50 hover:bg-[#0099e6] transition-all active:scale-95 flex items-center gap-2 border-none uppercase"
+                                className="px-6 h-10 bg-[#00adff] text-white text-[13px] font-mono font-bold tracking-widest uppercase rounded-[5px] hover:bg-[#0099e6] transition-all flex items-center gap-2 border-none active:scale-95 shadow-md shadow-blue-100"
                             >
                                 <RotateCcw size={14} /> CLEAR
                             </button>
                             <button
                                 onClick={() => setActiveModal('history')}
-                                className="px-6 h-10 bg-white text-[#0285fd] text-sm font-black rounded-[5px] border-2 border-[#0285fd] hover:bg-blue-50 transition-all active:scale-95 flex items-center gap-2 uppercase"
+                                className="px-6 h-10 bg-white text-blue-600 border border-blue-200 text-[13px] font-mono font-bold tracking-widest uppercase rounded-[5px] hover:bg-blue-50 transition-all active:scale-95 flex items-center gap-2"
                             >
                                 <History size={14} /> JOURNAL
                             </button>
                         </div>
-                        <div className="flex gap-3">
+                        <div className="flex gap-4">
                             <button
                                 onClick={handleSave}
                                 disabled={loading || tempEntries.length === 0 || totalDebit !== totalCredit}
-                                className={`px-10 h-10 bg-[#2bb744] text-white text-sm font-black rounded-[5px] shadow-md shadow-green-100 hover:bg-[#259b3a] transition-all flex items-center gap-2 active:scale-95 uppercase border-none ${loading || tempEntries.length === 0 || totalDebit !== totalCredit ? 'opacity-50 grayscale cursor-not-allowed' : ''}`}
+                                className={`px-10 h-10 bg-[#2bb744] text-white text-[13px] font-mono font-bold tracking-widest uppercase rounded-[5px] shadow-md shadow-green-100 hover:bg-[#259b3a] transition-all flex items-center gap-2 active:scale-95 border-none ${loading || tempEntries.length === 0 || totalDebit !== totalCredit ? 'opacity-50 grayscale cursor-not-allowed' : ''}`}
                             >
-                                {loading ? <Loader2 size={16} className="animate-spin" /> : <CheckCircle2 size={16} />} Apply
+                                {loading ? <Loader2 size={14} className="animate-spin" /> : <CheckCircle2 size={14} />} APPLY
                             </button>
                         </div>
                     </div>
@@ -520,9 +520,9 @@ const JournalEntryBoard = ({ isOpen, onClose, onComplete }) => {
                                     type="checkbox"
                                     checked={header.editSaved}
                                     onChange={e => setHeader(prev => ({ ...prev, editSaved: e.target.checked }))}
-                                    className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500 border-gray-300 transition-all cursor-pointer"
+                                    className="w-4 h-4 rounded text-[#00D1FF] focus:ring-[#00D1FF] border-slate-300 transition-all cursor-pointer"
                                 />
-                                <span className="text-[11px] font-black uppercase tracking-widest text-gray-500 group-hover:text-blue-600 transition-colors">Edit Mode</span>
+                                <span className="text-[11px] font-bold uppercase tracking-widest text-gray-500 group-hover:text-[#00D1FF] transition-colors">Edit Mode</span>
                             </label>
                         </div>
                         <div className="flex items-center gap-2">
@@ -535,14 +535,14 @@ const JournalEntryBoard = ({ isOpen, onClose, onComplete }) => {
                             />
                             <button
                                 onClick={handleDownloadTemplate}
-                                className="h-8 px-4 bg-white text-emerald-600 border-2 border-emerald-500 text-[10px] font-black rounded-[5px] hover:bg-emerald-50 transition-all flex items-center gap-2 uppercase active:scale-95 shadow-sm"
+                                className="h-8 px-4 bg-white text-emerald-600 border border-emerald-500 text-[10px] font-black rounded-[5px] hover:bg-emerald-50 transition-all flex items-center gap-2 uppercase active:scale-95 shadow-sm"
                             >
                                 <FileDown size={14} /> TEMPLATE
                             </button>
                             <button
                                 onClick={() => fileInputRef.current?.click()}
                                 disabled={isLoadingExcel}
-                                className="h-8 px-4 bg-white text-blue-600 border-2 border-blue-500 text-[10px] font-black rounded-[5px] hover:bg-blue-50 transition-all flex items-center gap-2 uppercase active:scale-95 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="h-8 px-4 bg-white text-blue-600 border border-blue-500 text-[10px] font-black rounded-[5px] hover:bg-blue-50 transition-all flex items-center gap-2 uppercase active:scale-95 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 {isLoadingExcel ? <Loader2 size={14} className="animate-spin" /> : <FileUp size={14} />}
                                 {isLoadingExcel ? 'LOADING...' : 'LOAD EXCEL'}
@@ -551,30 +551,30 @@ const JournalEntryBoard = ({ isOpen, onClose, onComplete }) => {
                     </div>
 
                     {/* Document Header - PO Board Style */}
-                    <div className="bg-white p-4 border border-gray-100 rounded-lg shadow-sm">
+                    <div className="bg-white p-4 border border-slate-200 rounded-[5px] shadow-sm">
                         <div className="grid grid-cols-12 gap-x-6 gap-y-3.5">
 
                             {/* Entry No */}
                             <div className="col-span-3 flex items-center gap-2">
-                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Entry No</label>
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Entry No</label>
                                 <input
                                     type="text"
                                     value={header.entryNo}
                                     onChange={e => setHeader({ ...header, entryNo: e.target.value })}
-                                    className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-blue-600 bg-gray-50 rounded-[5px] outline-none focus:border-[#0285fd] shadow-sm"
+                                    className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-bold text-blue-600 bg-slate-50 rounded outline-none transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 shadow-sm"
                                 />
                             </div>
 
                             {/* Post Date */}
                             <div className="col-span-3 flex items-center gap-2">
-                                <label className="text-[12.5px] font-bold text-gray-700 shrink-0">Post Date</label>
+                                <label className="text-[11px] font-bold text-gray-500 uppercase shrink-0">Post Date</label>
                                 <div className="flex-1 flex gap-1 h-8 min-w-0">
                                     <input
                                         type="text"
                                         readOnly
                                         value={header.date}
                                         onClick={() => setShowDatePicker(true)}
-                                        className="flex-1 min-w-28 h-8 border border-gray-300 rounded-[5px] px-3 text-[12px] outline-none bg-white text-gray-700 font-bold cursor-pointer shadow-sm"
+                                        className="flex-1 min-w-28 h-full border border-slate-200 rounded px-3 text-[12px] outline-none bg-white text-gray-700 font-bold cursor-pointer transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 shadow-sm"
                                     />
                                     <button onClick={() => setShowDatePicker(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
                                         <Calendar size={16} />
@@ -584,7 +584,7 @@ const JournalEntryBoard = ({ isOpen, onClose, onComplete }) => {
 
                             {/* Last Entry */}
                             <div className="col-span-3 flex items-center gap-2">
-                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Last Entry</label>
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Last Entry</label>
                                 <div className="flex-1 h-8 bg-red-50/50 border border-red-100 rounded-[5px] flex items-center justify-center font-mono text-[13px] font-black text-red-500 shadow-inner">
                                     {String(header.lastEntryNo || '0').padStart(5, '0')}
                                 </div>
@@ -592,8 +592,8 @@ const JournalEntryBoard = ({ isOpen, onClose, onComplete }) => {
 
                             {/* System Doc */}
                             <div className="col-span-3 flex items-center gap-2">
-                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">System Doc</label>
-                                <div className="flex-1 h-8 border border-gray-300 px-3 text-[11px] font-mono font-bold text-blue-500 bg-gray-50 rounded-[5px] flex items-center overflow-hidden shadow-sm">
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">System Doc</label>
+                                <div className="flex-1 h-8 border border-slate-200 px-3 text-[11px] font-mono font-bold text-blue-500 bg-slate-50 rounded-[5px] flex items-center overflow-hidden shadow-sm">
                                     <span className="truncate">{header.docNo}</span>
                                 </div>
                             </div>
@@ -601,12 +601,12 @@ const JournalEntryBoard = ({ isOpen, onClose, onComplete }) => {
                     </div>
 
                     {/* Line Entry Section - PO Board Style */}
-                    <div className="bg-white p-4 border border-gray-100 rounded-lg shadow-sm">
+                    <div className="bg-white p-4 border border-slate-200 rounded-[5px] shadow-sm">
                         <div className="grid grid-cols-12 gap-x-6 gap-y-3.5">
 
                             {/* Ledger Account */}
                             <div className="col-span-8 flex items-center gap-2">
-                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Ledger Account</label>
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Ledger Account</label>
                                 <div className="flex-1 flex gap-1 h-8 min-w-0">
                                     <input
                                         type="text"
@@ -614,7 +614,7 @@ const JournalEntryBoard = ({ isOpen, onClose, onComplete }) => {
                                         value={currentLine.accName}
                                         placeholder=""
                                         onClick={() => setActiveModal('account')}
-                                        className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-red-600 bg-gray-50 rounded-[5px] outline-none shadow-sm cursor-pointer"
+                                        className="flex-1 min-w-0 h-full border border-slate-200 px-3 text-[12px] font-bold text-blue-600 bg-white rounded outline-none transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 shadow-sm cursor-pointer"
                                     />
                                     <button onClick={() => setActiveModal('account')} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
                                         <Search size={16} />
@@ -624,7 +624,7 @@ const JournalEntryBoard = ({ isOpen, onClose, onComplete }) => {
 
                             {/* Strategic Unit */}
                             <div className="col-span-4 flex items-center gap-2">
-                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Strategic Unit</label>
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Strategic Unit</label>
                                 <div className="flex-1 flex gap-1 h-8 min-w-0">
                                     <input
                                         type="text"
@@ -632,7 +632,7 @@ const JournalEntryBoard = ({ isOpen, onClose, onComplete }) => {
                                         value={currentLine.costCenterName}
                                         placeholder=""
                                         onClick={() => setActiveModal('costCenter')}
-                                        className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-gray-700 bg-white rounded-[5px] outline-none shadow-sm cursor-pointer"
+                                        className="flex-1 min-w-0 h-full border border-slate-200 px-3 text-[12px] font-bold text-gray-700 bg-white rounded outline-none transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 shadow-sm cursor-pointer"
                                     />
                                     <button onClick={() => setActiveModal('costCenter')} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
                                         <Search size={16} />
@@ -642,21 +642,21 @@ const JournalEntryBoard = ({ isOpen, onClose, onComplete }) => {
 
                             {/* Brief Memo - full width */}
                             <div className="col-span-12 flex items-center gap-2">
-                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Brief Memo</label>
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Brief Memo</label>
                                 <input
                                     type="text"
                                     value={currentLine.memo}
                                     onChange={e => setCurrentLine({ ...currentLine, memo: e.target.value })}
                                     placeholder=""
-                                    className="flex-1 min-w-0 h-8 border border-gray-300 rounded-[5px] px-3 font-mono text-[12px] outline-none bg-white text-gray-700 shadow-sm focus:border-[#0285fd]"
+                                    className="flex-1 min-w-0 h-8 border border-slate-200 rounded px-3 text-[12px] font-bold text-gray-700 outline-none transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 bg-white shadow-sm"
                                 />
                             </div>
 
                             {/* Financials & Action */}
-                            <div className="col-span-12 flex items-center justify-between border-t border-gray-50 pt-3">
+                            <div className="col-span-12 flex items-center justify-between border-t border-slate-100 pt-3">
                                 <div className="flex gap-5">
                                     <div className="flex items-center gap-2">
-                                        <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Debit (DR)</label>
+                                        <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Debit (DR)</label>
                                         <div className="relative w-36">
                                             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-[10px]">Rs.</span>
                                             <input
@@ -664,15 +664,15 @@ const JournalEntryBoard = ({ isOpen, onClose, onComplete }) => {
                                                 value={currentLine.debit}
                                                 disabled={!currentLine.drMode}
                                                 onChange={e => setCurrentLine({ ...currentLine, debit: e.target.value })}
-                                                className={`w-full h-8 border rounded-[5px] pl-9 pr-3 text-[13px] font-black outline-none text-right shadow-sm transition-colors
+                                                className={`w-full h-8 border rounded pl-9 pr-3 text-[13px] font-black outline-none text-right shadow-sm transition-colors focus:ring-2 focus:ring-[#00D1FF]/20
                                                     ${currentLine.drMode
-                                                        ? 'border-blue-400 bg-white text-blue-700 focus:border-[#0285fd]'
-                                                        : 'border-gray-200 bg-gray-50 text-gray-300 cursor-not-allowed'}`}
+                                                        ? 'border-[#00D1FF] bg-white text-blue-600 focus:border-[#00D1FF]'
+                                                        : 'border-slate-200 bg-slate-50 text-gray-300 cursor-not-allowed'}`}
                                             />
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-2">
-                                        <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Credit (CR)</label>
+                                        <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Credit (CR)</label>
                                         <div className="relative w-36">
                                             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-[10px]">Rs.</span>
                                             <input
@@ -680,39 +680,39 @@ const JournalEntryBoard = ({ isOpen, onClose, onComplete }) => {
                                                 value={currentLine.credit}
                                                 disabled={currentLine.drMode}
                                                 onChange={e => setCurrentLine({ ...currentLine, credit: e.target.value })}
-                                                className={`w-full h-8 border rounded-[5px] pl-9 pr-3 text-[13px] font-black outline-none text-right shadow-sm transition-colors
+                                                className={`w-full h-8 border rounded pl-9 pr-3 text-[13px] font-black outline-none text-right shadow-sm transition-colors focus:ring-2 focus:ring-red-400/20
                                                     ${!currentLine.drMode
-                                                        ? 'border-red-300 bg-white text-red-600 focus:border-red-400'
-                                                        : 'border-gray-200 bg-gray-50 text-gray-300 cursor-not-allowed'}`}
+                                                        ? 'border-red-400 bg-white text-red-600 focus:border-red-400'
+                                                        : 'border-slate-200 bg-slate-50 text-gray-300 cursor-not-allowed'}`}
                                             />
                                         </div>
                                     </div>
                                 </div>
 
                                 <div className="flex items-center gap-3">
-                                    <div className="flex bg-slate-50 border border-gray-200 rounded-[5px] h-8 items-center px-3 gap-4">
-                                        <label className="flex items-center gap-1.5 cursor-pointer">
+                                    <div className="flex bg-slate-50 border border-slate-200 rounded-[5px] h-8 items-center px-3 gap-4 shadow-sm">
+                                        <label className="flex items-center gap-1.5 cursor-pointer group">
                                             <input
                                                 type="radio" name="drCrToggle"
                                                 checked={currentLine.drMode}
                                                 onChange={() => setCurrentLine({ ...currentLine, drMode: true, credit: '0.00' })}
-                                                className="w-3.5 h-3.5 text-blue-600"
+                                                className="w-3.5 h-3.5 text-[#00D1FF] focus:ring-[#00D1FF] border-slate-300 cursor-pointer"
                                             />
-                                            <span className={`text-[10px] font-black uppercase ${currentLine.drMode ? 'text-blue-600' : 'text-gray-400'}`}>DR</span>
+                                            <span className={`text-[10px] font-black uppercase transition-colors group-hover:text-blue-500 ${currentLine.drMode ? 'text-[#00D1FF]' : 'text-gray-400'}`}>DR</span>
                                         </label>
-                                        <label className="flex items-center gap-1.5 cursor-pointer">
+                                        <label className="flex items-center gap-1.5 cursor-pointer group">
                                             <input
                                                 type="radio" name="drCrToggle"
                                                 checked={!currentLine.drMode}
                                                 onChange={() => setCurrentLine({ ...currentLine, drMode: false, debit: '0.00' })}
-                                                className="w-3.5 h-3.5 text-slate-600"
+                                                className="w-3.5 h-3.5 text-red-500 focus:ring-red-500 border-slate-300 cursor-pointer"
                                             />
-                                            <span className={`text-[10px] font-black uppercase ${!currentLine.drMode ? 'text-red-500' : 'text-gray-400'}`}>CR</span>
+                                            <span className={`text-[10px] font-black uppercase transition-colors group-hover:text-red-400 ${!currentLine.drMode ? 'text-red-500' : 'text-gray-400'}`}>CR</span>
                                         </label>
                                     </div>
                                     <button
                                         onClick={handleAddLine}
-                                        className="px-8 h-8 bg-[#0285fd] text-white text-[11px] font-black rounded-[5px] shadow-md hover:bg-[#0073ff] flex items-center gap-2 uppercase transition-all active:scale-95 border-none"
+                                        className="px-8 h-8 bg-[#0285fd] text-white text-[11px] font-black uppercase tracking-widest rounded-[5px] shadow-md shadow-blue-100 hover:bg-blue-600 transition-all flex items-center gap-2 active:scale-95 border-none"
                                     >
                                         <Plus size={16} strokeWidth={3} /> ADD RECORD
                                     </button>
@@ -722,38 +722,38 @@ const JournalEntryBoard = ({ isOpen, onClose, onComplete }) => {
                     </div>
 
                     {/* Journal Grid Table - Controlled Height */}
-                    <div className="border border-gray-100 rounded-lg bg-white shadow-sm overflow-hidden">
-                        <div className="flex bg-slate-50/80 border-b border-gray-100 text-[10px] font-black text-gray-400 uppercase tracking-widest items-center sticky top-0 z-10">
-                            <div className="w-12 py-2 px-3 text-center border-r border-gray-100">No</div>
-                            <div className="flex-1 py-2 px-4 border-r border-gray-100">Account Descriptor</div>
-                            <div className="w-32 py-2 px-4 border-r border-gray-100">Cost Center</div>
-                            <div className="w-36 py-2 px-4 border-r border-gray-100 text-right">Debit</div>
-                            <div className="w-36 py-2 px-4 border-r border-gray-100 text-right">Credit</div>
-                            <div className="flex-1 py-2 px-4">Narrative</div>
+                    <div className="border border-slate-200 rounded-[5px] bg-white shadow-sm flex flex-col overflow-hidden">
+                        <div className="flex bg-slate-50 border-b border-slate-200 text-[10px] font-black text-gray-400 uppercase tracking-widest items-center sticky top-0 z-10">
+                            <div className="w-12 py-3 px-3 text-center">No</div>
+                            <div className="flex-1 py-3 px-4">Account Descriptor</div>
+                            <div className="w-32 py-3 px-4">Cost Center</div>
+                            <div className="w-36 py-3 px-4 text-right">Debit</div>
+                            <div className="w-36 py-3 px-4 text-right">Credit</div>
+                            <div className="flex-1 py-3 px-4">Narrative</div>
                             <div className="w-9"></div>
                         </div>
-                        <div className="bg-white overflow-y-auto max-h-[160px] divide-y divide-gray-50 no-scrollbar">
+                        <div className="bg-white overflow-y-auto max-h-[160px] divide-y divide-slate-100 no-scrollbar">
                             {tempEntries.length === 0 ? (
                                 <div className="h-20 flex items-center justify-center text-gray-300">
                                     <span className="text-[11px] font-bold uppercase tracking-widest ">Queue is Empty</span>
                                 </div>
                             ) : tempEntries.map((entry, idx) => (
-                                <div key={idx} className="flex border-b border-gray-100 text-[11px] font-bold text-slate-700 hover:bg-blue-50/30 items-center transition-colors group">
-                                    <div className="w-12 py-1.5 px-3 border-r border-gray-50 text-center font-mono text-gray-400">{idx + 1}</div>
-                                    <div className="flex-1 py-1.5 px-4 border-r border-gray-50">
+                                <div key={idx} className="flex text-[11px] font-bold text-slate-700 hover:bg-slate-50 items-center transition-colors group">
+                                    <div className="w-12 py-2 px-3 text-center font-mono text-gray-400">{idx + 1}</div>
+                                    <div className="flex-1 py-2 px-4">
                                         <div className="flex items-center gap-2">
                                             <span className="text-blue-600 font-mono text-[10px]">{entry.acc_Id}</span>
-                                            <span className="truncate">{entry.acc_Name}</span>
+                                            <span className="truncate text-gray-700 group-hover:text-blue-600 transition-colors">{entry.acc_Name}</span>
                                         </div>
                                     </div>
-                                    <div className="w-32 py-1.5 px-4 border-r border-gray-50  text-gray-400 truncate">{entry.costCenter}</div>
-                                    <div className="w-36 py-1.5 px-4 border-r border-gray-50 text-right font-mono font-black text-slate-800">
+                                    <div className="w-32 py-2 px-4 text-gray-400 truncate">{entry.costCenter}</div>
+                                    <div className="w-36 py-2 px-4 text-right font-mono font-black text-slate-800">
                                         {entry.debit > 0 ? entry.debit.toLocaleString(undefined, { minimumFractionDigits: 2 }) : '-'}
                                     </div>
-                                    <div className="w-36 py-1.5 px-4 border-r border-gray-50 text-right font-mono font-black text-slate-800">
+                                    <div className="w-36 py-2 px-4 text-right font-mono font-black text-slate-800">
                                         {entry.credit > 0 ? entry.credit.toLocaleString(undefined, { minimumFractionDigits: 2 }) : '-'}
                                     </div>
-                                    <div className="flex-1 py-1.5 px-4 truncate text-gray-500 font-mono text-[10px]">{entry.memo}</div>
+                                    <div className="flex-1 py-2 px-4 truncate text-gray-500 font-mono text-[10px]">{entry.memo}</div>
                                     <div className="w-9 flex justify-center">
                                         <button
                                             onClick={() => handleDeleteClick(entry)}
@@ -769,17 +769,17 @@ const JournalEntryBoard = ({ isOpen, onClose, onComplete }) => {
 
                     {/* Summary & History Section - Compact Side-by-Side feel */}
                     <div className="flex flex-col gap-3">
-                        <div className="flex justify-end">
-                            <div className="w-[420px] bg-slate-50/50 border border-gray-100 rounded-lg p-3.5 space-y-2.5 shadow-sm">
-                                <div className="flex items-center justify-between text-[12px] font-bold text-gray-500 uppercase tracking-tight">
+                        <div className="flex justify-end pt-2">
+                            <div className="w-[420px] bg-white border border-slate-200 rounded-[5px] p-3.5 space-y-2.5 shadow-sm">
+                                <div className="flex items-center justify-between text-[11px] font-bold text-gray-500 uppercase tracking-tight">
                                     <span>Aggregated Journal Totals</span>
-                                    <div className="flex gap-4">
+                                    <div className="flex gap-4 font-mono">
                                         <span className="text-blue-600">DR: {totalDebit.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                                         <span className="text-red-600">CR: {totalCredit.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                                     </div>
                                 </div>
-                                <div className={`flex items-center justify-between px-3 py-2.5 rounded-md border-2 transition-all ${difference === 0 ? 'bg-green-50/50 border-green-200 text-green-700' : 'bg-amber-50/50 border-amber-200 text-amber-700'}`}>
-                                    <span className="text-[13px] font-black uppercase tracking-widest">{difference === 0 ? 'BALANCED' : 'UNBALANCED'}</span>
+                                <div className={`flex items-center justify-between px-3 py-2.5 rounded-[5px] border-2 transition-all ${difference === 0 ? 'bg-green-50/50 border-green-300 text-green-700' : 'bg-amber-50/50 border-amber-300 text-amber-700'}`}>
+                                    <span className="text-[12px] font-black uppercase tracking-widest">{difference === 0 ? 'BALANCED' : 'UNBALANCED'}</span>
                                     <div className={`text-[20px] font-mono font-black ${difference === 0 ? 'text-green-600' : 'text-amber-600'}`}>Rs. {difference.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
                                 </div>
                             </div>

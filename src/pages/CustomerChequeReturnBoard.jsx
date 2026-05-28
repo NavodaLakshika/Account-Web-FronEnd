@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import SimpleModal from '../components/SimpleModal';
+import CalendarModal from '../components/CalendarModal';
 import { Search, X, RotateCcw, Loader2, Landmark, Calendar, FileText, CheckCircle2, User, Wallet, History, AlertCircle, Banknote, ShieldAlert } from 'lucide-react';
 import { bankingService } from '../services/banking.service';
 
@@ -31,6 +32,7 @@ const CustomerChequeReturnBoard = ({ isOpen, onClose }) => {
 
     const [activeModal, setActiveModal] = useState(null); // 'customer', 'bank'
     const [searchTerm, setSearchTerm] = useState('');
+    const [showDatePicker, setShowDatePicker] = useState(false);
 
     useEffect(() => {
         if (isOpen) {
@@ -145,125 +147,136 @@ const CustomerChequeReturnBoard = ({ isOpen, onClose }) => {
 
     return (
         <>
+            <style>
+                {`
+                    @keyframes toastProgress {
+                        0% { width: 100%; }
+                        100% { width: 0%; }
+                    }
+                `}
+            </style>
             <SimpleModal
                 isOpen={isOpen}
                 onClose={onClose}
                 title="Customer Cheque Return Protocol"
                 maxWidth="max-w-[1000px]"
                 footer={
-                    <div className="bg-slate-50 px-6 py-4 w-full flex justify-end gap-3 border-t border-gray-100 rounded-b-xl font-['Inter']">
-                        <button onClick={handleSave} disabled={loading} className={`px-12 h-10 bg-[#0078d4] text-white text-sm font-bold rounded shadow-md hover:bg-[#005a9e] transition-all active:scale-95 flex items-center gap-2 ${loading ? 'opacity-50' : ''}`}>
-                            {loading ? <Loader2 size={16} className="animate-spin" /> : <RotateCcw size={18} />} Return Instrument
-                        </button>
-                        <button onClick={handleClear} className="px-10 h-10 bg-white border border-gray-300 text-slate-600 text-sm font-bold rounded hover:bg-slate-50 transition-all flex items-center gap-2">
-                             <RotateCcw size={16} /> Clear
-                        </button>
-                        <button onClick={onClose} className="px-10 h-10 bg-white border border-gray-300 text-slate-600 text-sm font-bold rounded hover:bg-slate-50 transition-all flex items-center gap-2">
-                             <X size={16} /> Exit
-                        </button>
+                    <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-slate-200 rounded-b-xl">
+                        <div className="flex gap-3">
+                            <button onClick={handleClear} disabled={loading} className="px-6 py-3 bg-[#00adff] hover:bg-[#0099e6] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] transition-all active:scale-95 flex items-center justify-center gap-2 border-none">
+                                <RotateCcw size={14} /> CLEAR FORM
+                            </button>
+                        </div>
+                        <div className="flex gap-3">
+                            <button onClick={handleSave} disabled={loading} className={`px-6 py-3 bg-[#0285fd] hover:bg-[#0073ff] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] shadow-md shadow-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border-none ${loading ? 'opacity-50' : ''}`}>
+                                {loading ? <Loader2 size={14} className="animate-spin" /> : <RotateCcw size={14} />} RETURN INSTRUMENT
+                            </button>
+                        </div>
                     </div>
                 }
             >
-                <div className="space-y-6 font-['Plus_Jakarta_Sans']">
+                <div className="space-y-4 font-['Tahoma']">
                     {/* Header Section */}
-                    <div className="bg-white p-6 border border-gray-200 rounded-sm shadow-sm relative overflow-hidden">
+                    <div className="bg-slate-50/50 p-4 border border-slate-200 rounded-[5px] relative overflow-hidden">
                         <div className="absolute top-0 right-0 p-4 opacity-[0.03] pointer-events-none">
                             <History size={160} />
                         </div>
                         
-                        <div className="grid grid-cols-12 gap-8 relative z-10">
+                        <div className="grid grid-cols-12 gap-x-6 gap-y-3.5 relative z-10">
                             {/* Row 1: Document No & Return Date */}
-                            <div className="col-span-12 lg:col-span-6 flex items-center gap-4">
-                                <label className="text-[13px] font-bold text-gray-700 w-32 shrink-0">Document No</label>
-                                <div className="text-[14px] font-black text-[#0078d4] tracking-tight tabular-nums italic bg-blue-50/50 px-3 py-1 rounded border border-blue-100/50">
-                                    {formData.docNo}
+                            <div className="col-span-12 lg:col-span-6 flex items-center gap-2">
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-32 shrink-0">Document No</label>
+                                <div className="flex-1 flex items-center">
+                                    <div className="text-[14px] font-black text-[#0285fd] tracking-tight tabular-nums italic bg-blue-50/50 px-3 py-1 rounded-[5px] border border-blue-100/50">
+                                        {formData.docNo}
+                                    </div>
                                 </div>
                             </div>
-                            <div className="col-span-12 lg:col-span-6 flex items-center gap-4 lg:pl-10">
-                                <label className="text-[13px] font-bold text-gray-700 w-32 shrink-0">Return Date</label>
-                                <div className="flex-1 flex items-center px-3 h-9 border border-gray-200 bg-white shadow-sm rounded-sm hover:border-blue-400 transition-colors">
-                                    <input type="date" value={formData.returnDate} onChange={e => setFormData({...formData, returnDate: e.target.value})} className="flex-1 text-[13px] font-bold text-slate-700 outline-none bg-transparent" />
-                                    <Calendar size={14} className="text-[#0078d4]" />
+                            <div className="col-span-12 lg:col-span-6 flex items-center gap-2 lg:pl-4">
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-28 shrink-0 text-right">Return Date</label>
+                                <div className="flex-1 flex gap-1 h-8 min-w-0">
+                                    <input type="text" readOnly value={formData.returnDate} className="flex-1 min-w-0 h-8 border border-slate-200 rounded px-3 text-[12px] font-bold outline-none bg-slate-50 text-gray-700 transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 cursor-pointer" onClick={() => setShowDatePicker(true)} />
+                                    <button onClick={() => setShowDatePicker(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
+                                        <Calendar size={16} />
+                                    </button>
                                 </div>
                             </div>
 
                             {/* Row 2: Customer */}
-                            <div className="col-span-12 flex items-center gap-4">
-                                <label className="text-[13px] font-bold text-gray-700 w-32 shrink-0">Customer</label>
-                                <div className="flex-1 flex gap-2">
-                                    <input type="text" readOnly value={formData.customerCode} className="w-32 h-9 border border-gray-200 px-4 text-[13px] font-black text-slate-700 rounded-sm bg-slate-50/50" placeholder="CODE" />
-                                    <input type="text" readOnly value={formData.customerName} className="flex-1 h-9 border border-gray-200 px-4 text-[13px] font-bold text-slate-700 rounded-sm bg-slate-50/50" placeholder="Select customer to filter cheques..." />
-                                    <button onClick={() => { setActiveModal('customer'); setSearchTerm(''); }} className="w-12 h-9 bg-slate-800 text-white flex items-center justify-center hover:bg-black rounded-sm group transition-all shadow-md active:scale-90">
-                                        <Search size={18} className="group-hover:scale-110 transition-transform" />
+                            <div className="col-span-12 flex items-center gap-2">
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-32 shrink-0">Customer</label>
+                                <div className="flex-1 flex gap-1 h-8 min-w-0">
+                                    <input type="text" readOnly value={formData.customerName} className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-bold text-gray-700 bg-white rounded outline-none cursor-pointer transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" onClick={() => { setActiveModal('customer'); setSearchTerm(''); }} />
+                                    <button onClick={() => { setActiveModal('customer'); setSearchTerm(''); }} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
+                                        <Search size={16} />
                                     </button>
                                 </div>
                             </div>
 
                             {/* Row 3: Cheque No & Receipt No */}
-                            <div className="col-span-12 lg:col-span-6 flex items-center gap-4">
-                                <label className="text-[13px] font-bold text-gray-700 w-32 shrink-0">Cheque No</label>
-                                <div className="flex-1 relative group">
-                                    <input type="text" value={formData.chequeNo} onChange={e => setFormData({...formData, chequeNo: e.target.value})} className="w-full h-9 border border-gray-200 px-4 text-[14px] font-black text-[#0078d4] rounded-sm bg-white outline-none focus:border-blue-500 shadow-sm transition-all" placeholder="Enter cheque digit suffix..." />
-                                    <button onClick={handleSearchCheque} className="absolute right-1 top-1 w-7 h-7 bg-blue-50 text-[#0078d4] flex items-center justify-center rounded hover:bg-[#0078d4] hover:text-white transition-all">
-                                        <Search size={12} />
+                            <div className="col-span-12 lg:col-span-6 flex items-center gap-2">
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-32 shrink-0">Cheque No</label>
+                                <div className="flex-1 flex gap-1 h-8 min-w-0">
+                                    <input type="text" value={formData.chequeNo} onChange={e => setFormData({...formData, chequeNo: e.target.value})} className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-bold rounded bg-white outline-none focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 transition-all font-mono" />
+                                    <button onClick={handleSearchCheque} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
+                                        <Search size={16} />
                                     </button>
                                 </div>
                             </div>
-                            <div className="col-span-12 lg:col-span-6 flex items-center gap-4 lg:pl-10">
-                                <label className="text-[13px] font-bold text-gray-700 w-32 shrink-0">Receipt No</label>
-                                <input type="text" value={formData.receiptNo} onChange={e => setFormData({...formData, receiptNo: e.target.value})} className="flex-1 h-9 border border-gray-200 px-4 text-[13px] font-bold text-slate-700 rounded-sm outline-none focus:border-blue-300 bg-white shadow-sm" placeholder="Search by linked receipt..." />
+                            <div className="col-span-12 lg:col-span-6 flex items-center gap-2 lg:pl-4">
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-28 shrink-0">Receipt No</label>
+                                <input type="text" value={formData.receiptNo} onChange={e => setFormData({...formData, receiptNo: e.target.value})} className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-bold rounded bg-white outline-none focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 transition-all font-mono" />
                             </div>
 
                             {/* Row 4: Bank Account */}
-                            <div className="col-span-12 flex items-center gap-4">
-                                <label className="text-[13px] font-bold text-gray-700 w-32 shrink-0">Bank Account</label>
-                                <div className="flex-1 flex gap-2">
-                                    <input type="text" readOnly value={formData.bankName} placeholder="Deposit target bank account..." className="flex-1 h-9 border border-gray-200 px-4 text-[13px] font-bold rounded-sm bg-slate-50/50 outline-none" />
-                                    <button onClick={() => { setActiveModal('bank'); setSearchTerm(''); }} className="w-12 h-9 bg-slate-800 text-white flex items-center justify-center hover:bg-black rounded-sm transition-all shadow-md active:scale-90">
-                                        <Search size={18} />
+                            <div className="col-span-12 flex items-center gap-2">
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-32 shrink-0">Bank Account</label>
+                                <div className="flex-1 flex gap-1 h-8 min-w-0">
+                                    <input type="text" readOnly value={formData.bankName} className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-bold text-gray-700 bg-white rounded outline-none cursor-pointer transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" onClick={() => { setActiveModal('bank'); setSearchTerm(''); }} />
+                                    <button onClick={() => { setActiveModal('bank'); setSearchTerm(''); }} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
+                                        <Search size={16} />
                                     </button>
                                 </div>
                             </div>
 
                             {/* Row 5: Cheque Date & Amount */}
-                            <div className="col-span-12 lg:col-span-6 flex items-center gap-4">
-                                <label className="text-[13px] font-bold text-gray-700 w-32 shrink-0">Cheque Date</label>
-                                <div className="flex-1 flex items-center px-3 h-9 border border-gray-200 bg-slate-50/50 rounded-sm">
-                                    <input type="date" value={formData.chequeDate} readOnly className="flex-1 text-[13px] font-bold text-slate-500 outline-none bg-transparent" />
-                                </div>
+                            <div className="col-span-12 lg:col-span-6 flex items-center gap-2">
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-32 shrink-0">Cheque Date</label>
+                                <input type="date" value={formData.chequeDate} readOnly className="flex-1 min-w-0 h-8 border border-slate-200 rounded px-3 text-[12px] font-bold text-gray-700 outline-none bg-slate-100" />
                             </div>
-                            <div className="col-span-12 lg:col-span-6 flex items-center gap-4 lg:pl-10">
-                                <label className="text-[13px] font-bold text-gray-700 w-32 shrink-0">Cheque Amount</label>
-                                <div className="flex-1 h-11 bg-white border-2 border-slate-100 flex items-baseline gap-2 px-5 rounded shadow-inner">
-                                     <span className="text-[11px] font-black text-slate-300 italic">Rs.</span>
-                                     <span className="text-[18px] font-black text-red-600 tabular-nums italic">{formData.chequeAmount.toLocaleString(undefined, {minimumFractionDigits: 2})}</span>
+                            <div className="col-span-12 lg:col-span-6 flex items-center gap-2 lg:pl-4">
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-28 shrink-0">Cheque Amount</label>
+                                <div className="flex-1 flex items-baseline gap-2 px-3 h-8 bg-slate-100 border border-slate-200 rounded">
+                                     <span className="text-[9px] font-black text-slate-400 italic">Rs.</span>
+                                     <span className="text-[13px] font-mono font-black text-[#0285fd] tabular-nums italic py-1.5">{formData.chequeAmount.toLocaleString(undefined, {minimumFractionDigits: 2})}</span>
                                 </div>
                             </div>
 
                             {/* Row 6: Extra Charges & Remarks */}
-                            <div className="col-span-12 lg:col-span-6 flex items-center gap-4">
-                                <label className="text-[13px] font-bold text-gray-700 w-32 shrink-0">Extra Charges</label>
-                                <div className="flex-1 relative group">
-                                     <input type="number" step="0.01" value={formData.extraCharges} onChange={e => setFormData({...formData, extraCharges: parseFloat(e.target.value) || 0})} className="w-full h-11 border border-gray-300 px-5 text-[18px] font-black text-red-700 rounded-sm outline-none focus:border-red-400 tabular-nums shadow-sm transition-all" />
-                                     <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-black text-slate-300 uppercase italic">LKR</span>
+                            <div className="col-span-12 lg:col-span-6 flex items-center gap-2">
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-32 shrink-0">Extra Charges</label>
+                                <div className="flex-1 relative min-w-0 group">
+                                     <input type="number" step="0.01" value={formData.extraCharges} onChange={e => setFormData({...formData, extraCharges: parseFloat(e.target.value) || 0})} className="w-full h-8 border border-red-200 px-3 text-[14px] font-mono font-black text-red-600 rounded shadow-inner outline-none focus:border-[#f04e3e] tabular-nums transition-all" />
+                                     <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[9px] font-black text-slate-300 uppercase italic">LKR</span>
                                 </div>
                             </div>
-                            <div className="col-span-12 lg:col-span-12 flex items-center gap-4 mt-2">
-                                <label className="text-[13px] font-bold text-gray-700 w-32 shrink-0">Remarks / Reason</label>
+                            
+                            <div className="col-span-12 flex items-center gap-2 pt-1">
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-32 shrink-0">Remarks / Reason</label>
                                 <div className="flex-1 relative">
-                                    <input type="text" value={formData.remarks} onChange={e => setFormData({...formData, remarks: e.target.value})} className="w-full h-10 border border-gray-200 px-4 text-[13px] font-medium italic rounded-sm outline-none focus:border-blue-400 bg-slate-50/20" placeholder="Specific details regarding instrument return (e.g., Insufficient funds, Signature mismatch)..." />
-                                    <AlertCircle size={14} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none" />
+                                    <input type="text" value={formData.remarks} onChange={e => setFormData({...formData, remarks: e.target.value})} className="w-full h-8 border border-slate-200 px-3 text-[12px] font-mono italic rounded outline-none focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" />
+                                    <AlertCircle size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none" />
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     {/* Operational Warning Section */}
-                    <div className="bg-orange-50/50 p-6 border-l-4 border-l-orange-400 rounded-sm flex items-start gap-4">
-                        <ShieldAlert size={28} className="text-orange-500 shrink-0 mt-1" />
+                    <div className="bg-orange-50/50 p-4 border-l-[3px] border-l-[#f04e3e] rounded-[5px] flex items-start gap-4">
+                        <ShieldAlert size={24} className="text-[#f04e3e] shrink-0 mt-0.5" />
                         <div className="space-y-1">
-                            <h4 className="text-[11px] font-black uppercase text-orange-600 tracking-[0.2em]">Operational Financial Warning</h4>
-                            <p className="text-[12px] text-slate-600 font-medium leading-relaxed">
+                            <h4 className="text-[10px] font-black uppercase text-[#f04e3e] tracking-widest font-mono">Operational Financial Warning</h4>
+                            <p className="text-[11px] text-slate-600 font-bold leading-relaxed">
                                 Processing a customer cheque return will automatically revert the linked receipt valuation and update the customer ledger balance. Extra charges entered above will be debited to the customer's account as an administrative fee.
                             </p>
                         </div>
@@ -272,56 +285,64 @@ const CustomerChequeReturnBoard = ({ isOpen, onClose }) => {
             </SimpleModal>
 
             {/* Selection Modals */}
-            {activeModal && (
-                <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setActiveModal(null)} />
-                    <div className="relative w-full max-w-xl bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col max-h-[80vh] font-['Plus_Jakarta_Sans']">
-                        <div className="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-50 uppercase tracking-widest font-black text-[12px] text-slate-500">
-                            Search {activeModal === 'customer' ? 'Customer Master' : 'Bank Portfolio'}
-                            <button onClick={() => setActiveModal(null)} className="w-10 h-10 flex items-center justify-center hover:bg-red-50 text-slate-400 rounded-full transition-all group"><X size={28} className="group-hover:scale-110 transition-transform" /></button>
+            <SimpleModal
+                isOpen={!!activeModal}
+                onClose={() => setActiveModal(null)}
+                title={`Lookup Directory`}
+                maxWidth="max-w-[600px]"
+            >
+                <div className="space-y-4 font-['Tahoma']">
+                    <div className="flex items-center gap-4 p-3 rounded-[5px] border border-slate-200 bg-white mb-2">
+                        <span className="text-[12px] font-bold text-gray-500 uppercase tracking-widest">Search Facility</span>
+                        <div className="relative flex-1">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
+                            <input
+                                type="text"
+                                className="w-full h-9 pl-10 pr-4 border border-slate-200 rounded outline-none text-sm bg-slate-50 transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20"
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                autoFocus
+                            />
                         </div>
-                        <div className="p-4 border-b border-gray-100 bg-white">
-                            <div className="relative">
-                                <Search size={20} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                                <input 
-                                    type="text" 
-                                    placeholder="Begin typing to filter..." 
-                                    className="w-full h-11 border border-gray-100 pl-11 pr-4 text-sm rounded-lg focus:border-blue-500 outline-none shadow-inner font-medium" 
-                                    value={searchTerm} 
-                                    onChange={(e) => setSearchTerm(e.target.value)} 
-                                    autoFocus
-                                />
-                            </div>
-                        </div>
-                        <div className="overflow-y-auto p-2 font-['Inter']">
-                            <table className="w-full text-sm text-left border-collapse">
-                                <thead className="bg-[#f8fafd] sticky top-0 text-slate-400 font-bold uppercase text-[10px] tracking-widest">
+                    </div>
+                    <div className="border border-slate-200 rounded-[5px] overflow-hidden shadow-sm">
+                        <div className="max-h-[400px] overflow-y-auto no-scrollbar">
+                            <table className="w-full text-left">
+                                <thead className="bg-slate-50/80 sticky top-0 text-[10px] font-mono font-bold text-gray-400 uppercase tracking-widest border-b border-slate-200">
                                     <tr>
-                                        <th className="p-4 border-b">Code</th>
-                                        <th className="p-4 border-b">Title / Account</th>
-                                        <th className="p-4 border-b text-center">Action</th>
+                                        <th className="px-5 py-3">Code</th>
+                                        <th className="px-5 py-3">Record Name</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody className="divide-y divide-slate-100">
                                     {filteredLookup().map((item, idx) => (
-                                        <tr key={idx} className="hover:bg-blue-50 transition-colors group cursor-pointer" onClick={() => {
+                                        <tr key={idx} className="group hover:bg-blue-50/50 cursor-pointer transition-colors" onClick={() => {
                                             if (activeModal === 'customer') setFormData({...formData, customerCode: item.code, customerName: item.name});
                                             if (activeModal === 'bank') setFormData({...formData, bankCode: item.code, bankName: item.name});
                                             setActiveModal(null);
                                         }}>
-                                            <td className="p-4 border-b font-black text-slate-700">{item.code}</td>
-                                            <td className="p-4 border-b font-bold text-[#0078d4] uppercase tracking-tight">{item.name}</td>
-                                            <td className="p-4 border-b text-center">
-                                                <button className="bg-[#0078d4] text-white text-[10px] px-5 py-2 rounded-sm font-black tracking-widest hover:bg-[#005a9e]">IDENTIFY</button>
-                                            </td>
+                                            <td className="px-5 py-3 font-mono text-[12px] font-mono text-gray-700">{item.code}</td>
+                                            <td className="px-5 py-3 text-[12px] font-mono text-gray-700 uppercase group-hover:text-blue-600">{item.name}</td>
                                         </tr>
                                     ))}
+                                    {filteredLookup().length === 0 && (
+                                        <tr>
+                                            <td colSpan="2" className="text-center py-6 text-gray-300 text-[12px] font-bold uppercase tracking-widest">No records found</td>
+                                        </tr>
+                                    )}
                                 </tbody>
                             </table>
                         </div>
                     </div>
                 </div>
-            )}
+            </SimpleModal>
+            
+            <CalendarModal
+                isOpen={showDatePicker}
+                onClose={() => setShowDatePicker(false)}
+                currentDate={formData.returnDate}
+                onDateSelect={(date) => setFormData({...formData, returnDate: date})}
+            />
         </>
     );
 };

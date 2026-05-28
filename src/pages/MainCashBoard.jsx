@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import SimpleModal from '../components/SimpleModal';
+import CalendarModal from '../components/CalendarModal';
 import { Search, Calendar, ChevronDown, Check, X, Save, RotateCcw, Loader2, Landmark, Wallet, Layers, Users, Trash2, Plus } from 'lucide-react';
 import { mainCashService } from '../services/mainCash.service';
 
@@ -36,6 +37,8 @@ const MainCashBoard = ({ isOpen, onClose }) => {
     const [activeModal, setActiveModal] = useState(null); // 'account', 'cc', 'payee', 'row_acc', 'row_cc'
     const [activeRowIdx, setActiveRowIdx] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
+    const [showDatePicker, setShowDatePicker] = useState(false);
+    const [datePickerField, setDatePickerField] = useState('date');
 
     useEffect(() => {
         if (isOpen) {
@@ -144,114 +147,127 @@ const MainCashBoard = ({ isOpen, onClose }) => {
 
     return (
         <>
+            <style>
+                {`
+                    @keyframes toastProgress {
+                        0% { width: 100%; }
+                        100% { width: 0%; }
+                    }
+                `}
+            </style>
             <SimpleModal
                 isOpen={isOpen}
                 onClose={onClose}
                 title="Main Cash Entry"
-                maxWidth="max-w-[1200px]"
+                maxWidth="max-w-[1050px]"
                 footer={
-                    <div className="bg-slate-50 px-6 py-4 w-full flex justify-end gap-3 border-t border-gray-100 rounded-b-xl font-['Inter']">
-                        <button onClick={handleSave} disabled={loading} className={`px-8 h-10 bg-[#0078d4] text-white text-sm font-bold rounded shadow-md hover:bg-[#005a9e] transition-all active:scale-95 flex items-center gap-2 ${loading ? 'opacity-50' : ''}`}>
-                            {loading ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />} Save
-                        </button>
-                        <button onClick={handleClear} disabled={loading} className="px-8 h-10 bg-white border border-gray-300 text-slate-600 text-sm font-bold rounded hover:bg-slate-50 transition-all flex items-center gap-2">
-                            <RotateCcw size={16} /> Clear
-                        </button>
-                        <button onClick={onClose} className="px-8 h-10 bg-white border border-gray-300 text-slate-600 text-sm font-bold rounded hover:bg-slate-50 transition-all flex items-center gap-2">
-                            <X size={16} /> Exit
-                        </button>
+                    <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-slate-200 rounded-b-xl">
+                        <div className="flex gap-3">
+                            <button onClick={handleClear} disabled={loading} className="px-6 py-3 bg-[#00adff] hover:bg-[#0099e6] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] transition-all active:scale-95 flex items-center justify-center gap-2 border-none">
+                                <RotateCcw size={14} /> CLEAR FORM
+                            </button>
+                        </div>
+                        <div className="flex gap-3">
+                            
+                            <button onClick={handleSave} disabled={loading} className={`px-6 py-3 bg-[#0285fd] hover:bg-[#0073ff] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] shadow-md shadow-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border-none ${loading ? 'opacity-50' : ''}`}>
+                                {loading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />} SAVE ENTRY
+                            </button>
+                        </div>
                     </div>
                 }
             >
-                <div className="space-y-4 font-['Plus_Jakarta_Sans']">
+                <div className="space-y-4 overflow-y-auto no-scrollbar font-['Tahoma']">
                     {/* Header Section */}
-                    <div className="bg-white p-6 border border-gray-200 rounded-sm shadow-sm space-y-4">
-                        <div className="grid grid-cols-12 gap-x-12 gap-y-3">
+                    <div className="bg-white p-4 border border-slate-200 rounded-[5px] space-y-4">
+                        <div className="grid grid-cols-12 gap-x-6 gap-y-3.5">
                             {/* Left Side */}
-                            <div className="col-span-12 lg:col-span-7 space-y-3">
-                                <div className="flex items-center gap-3">
-                                    <label className="text-[13px] font-bold text-gray-700 w-28 shrink-0">Doc No</label>
-                                    <input type="text" value={formData.docNo} readOnly className="flex-1 h-7 border border-[#0078d4]/30 px-3 text-[13px] font-bold text-[#0078d4] bg-blue-50/20 rounded-sm outline-none tracking-widest" />
+                            <div className="col-span-12 lg:col-span-7 space-y-3.5">
+                                <div className="flex items-center gap-2">
+                                    <label className="text-[11px] font-bold text-gray-500 uppercase w-28 shrink-0">Doc No</label>
+                                    <input type="text" value={formData.docNo} readOnly className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-bold text-blue-600 bg-slate-50 rounded outline-none transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" />
                                 </div>
                                 
-                                <div className="flex items-center gap-3">
-                                    <label className="text-[13px] font-bold text-gray-700 w-28 shrink-0">Account</label>
-                                    <div className="flex-1 flex gap-1">
+                                <div className="flex items-center gap-2">
+                                    <label className="text-[11px] font-bold text-gray-500 uppercase w-28 shrink-0">Account</label>
+                                    <div className="flex-1 flex gap-1 h-8 min-w-0">
                                         <input 
                                             type="text" 
                                             readOnly 
                                             value={formData.accountName ? `${formData.accountId} - ${formData.accountName}` : ''} 
-                                            placeholder="Select Main Cash Account..." 
-                                            className="flex-1 h-7 border border-gray-300 px-3 text-[13px] font-bold rounded-sm bg-gray-50/50 outline-none" 
+                                            className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-bold text-gray-700 bg-slate-50 rounded outline-none cursor-pointer transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" 
+                                            onClick={() => { setActiveModal('account'); setSearchTerm(''); }}
                                         />
-                                        <button onClick={() => { setActiveModal('account'); setSearchTerm(''); }} className="w-9 h-7 bg-[#0078d4] text-white flex items-center justify-center hover:bg-[#005a9e] rounded-sm transition-all shadow-sm active:scale-90">
-                                            <Search size={15} />
+                                        <button onClick={() => { setActiveModal('account'); setSearchTerm(''); }} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
+                                            <Search size={16} />
                                         </button>
                                     </div>
                                 </div>
 
-                                <div className="flex items-center gap-3">
-                                    <label className="text-[13px] font-bold text-gray-700 w-28 shrink-0">Cost Center</label>
-                                    <div className="flex-1 flex gap-1">
+                                <div className="flex items-center gap-2">
+                                    <label className="text-[11px] font-bold text-gray-500 uppercase w-28 shrink-0">Cost Center</label>
+                                    <div className="flex-1 flex gap-1 h-8 min-w-0">
                                         <input 
                                             type="text" 
                                             readOnly 
                                             value={formData.costCenterName ? `${formData.costCenterId} - ${formData.costCenterName}` : ''} 
-                                            className="flex-1 h-7 border border-gray-300 px-3 text-[13px] rounded-sm bg-gray-50/50 outline-none" 
+                                            className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-bold text-gray-700 bg-slate-50 rounded outline-none cursor-pointer transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" 
+                                            onClick={() => { setActiveModal('cc'); setSearchTerm(''); }}
                                         />
-                                        <button onClick={() => { setActiveModal('cc'); setSearchTerm(''); }} className="w-9 h-7 bg-[#0078d4] text-white flex items-center justify-center hover:bg-[#005a9e] rounded-sm transition-all shadow-sm active:scale-90">
-                                            <Search size={15} />
+                                        <button onClick={() => { setActiveModal('cc'); setSearchTerm(''); }} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
+                                            <Search size={16} />
                                         </button>
                                     </div>
                                 </div>
 
-                                <div className="flex items-center gap-3 font-semibold">
-                                    <label className="text-[13px] font-bold text-gray-700 w-28 shrink-0 tracking-tight">Pay to the Order</label>
-                                    <div className="flex-1 flex gap-1">
+                                <div className="flex items-center gap-2">
+                                    <label className="text-[11px] font-bold text-gray-500 uppercase w-28 shrink-0">Pay to the Order</label>
+                                    <div className="flex-1 flex gap-1 h-8 min-w-0">
                                         <input 
                                             type="text" 
                                             readOnly 
                                             value={formData.payeeName ? `${formData.payeeId} - ${formData.payeeName}` : ''} 
-                                            placeholder="Select Payee..." 
-                                            className="flex-1 h-7 border border-gray-300 px-3 text-[13px] rounded-sm bg-[#fafafa] outline-none" 
+                                            className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-bold text-gray-700 bg-slate-50 rounded outline-none cursor-pointer transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" 
+                                            onClick={() => { setActiveModal('payee'); setSearchTerm(''); }}
                                         />
-                                        <button onClick={() => { setActiveModal('payee'); setSearchTerm(''); }} className="w-9 h-7 bg-[#0078d4] text-white flex items-center justify-center hover:bg-[#005a9e] rounded-sm transition-all shadow-sm active:scale-90">
-                                            <Search size={15} />
+                                        <button onClick={() => { setActiveModal('payee'); setSearchTerm(''); }} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
+                                            <Search size={16} />
                                         </button>
                                     </div>
                                 </div>
 
-                                <div className="flex items-start gap-3">
-                                    <label className="text-[13px] font-bold text-gray-700 w-28 shrink-0 mt-1">Address</label>
-                                    <textarea name="address" value={formData.address} onChange={handleInputChange} className="flex-1 h-16 border border-gray-200 p-2 text-[12px] rounded-sm outline-none resize-none bg-gray-50/20" />
+                                <div className="flex items-start gap-2">
+                                    <label className="text-[11px] font-bold text-gray-500 uppercase w-28 shrink-0 mt-2">Address</label>
+                                    <textarea name="address" value={formData.address} onChange={handleInputChange} className="flex-1 min-w-0 h-16 border border-slate-200 rounded px-3 py-2 font-mono text-[12px] outline-none bg-slate-50 text-gray-700 transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 resize-none" />
                                 </div>
 
-                                <div className="flex items-start gap-3">
-                                    <label className="text-[13px] font-bold text-gray-700 w-28 shrink-0 mt-1">Memo</label>
-                                    <textarea name="memo" value={formData.memo} onChange={handleInputChange} className="flex-1 h-14 border border-gray-200 p-2 text-[12px] rounded-sm outline-none resize-none bg-gray-50/20 italic text-gray-500" placeholder="Internal receipt remarks..." />
+                                <div className="flex items-start gap-2">
+                                    <label className="text-[11px] font-bold text-gray-500 uppercase w-28 shrink-0 mt-2">Memo</label>
+                                    <textarea name="memo" value={formData.memo} onChange={handleInputChange} className="flex-1 min-w-0 h-14 border border-slate-200 rounded px-3 py-2 font-mono text-[12px] outline-none bg-slate-50 text-gray-700 transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 resize-none italic" />
                                 </div>
                             </div>
 
                             {/* Right Side */}
-                            <div className="col-span-12 lg:col-span-5 space-y-3">
-                                <div className="flex items-center gap-3">
-                                    <label className="text-[13px] font-bold text-gray-700 w-24 shrink-0">Date</label>
-                                    <input name="date" type="date" value={formData.date} onChange={handleInputChange} className="flex-1 h-7 border border-gray-300 px-3 text-[13px] outline-none rounded-sm font-bold text-gray-600" />
+                            <div className="col-span-12 lg:col-span-5 space-y-3.5">
+                                <div className="flex items-center gap-2">
+                                    <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Date</label>
+                                    <input name="date" type="date" value={formData.date} onChange={handleInputChange} className="flex-1 min-w-0 h-8 border border-slate-200 rounded px-3 text-[12px] font-bold outline-none bg-slate-50 text-gray-700 transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" />
                                 </div>
-                                <div className="flex items-center gap-3">
-                                    <label className="text-[13px] font-bold text-gray-700 w-24 shrink-0 font-['Inter']">Ending Bal</label>
-                                    <div className="flex-1 h-7 flex items-center justify-end px-3 bg-slate-50 text-[14px] font-black text-slate-800 rounded-sm border border-gray-200">
+                                <div className="flex items-center gap-2">
+                                    <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Ending Bal</label>
+                                    <div className="flex-1 min-w-0 h-8 flex items-center justify-end px-3 bg-slate-50 text-[13px] font-mono font-black text-slate-800 rounded border border-slate-200">
                                         Rs. {formData.endingBal.toLocaleString()}
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-3">
-                                    <label className="text-[13px] font-bold text-gray-700 w-24 shrink-0">Ref No</label>
-                                    <input name="refNo" value={formData.refNo} onChange={handleInputChange} type="text" className="flex-1 h-7 border border-gray-300 px-3 text-[13px] outline-none rounded-sm" />
+                                <div className="flex items-center gap-2">
+                                    <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Ref No</label>
+                                    <input name="refNo" value={formData.refNo} onChange={handleInputChange} type="text" className="flex-1 min-w-0 h-8 border border-slate-200 rounded px-3 text-[12px] font-mono outline-none bg-slate-50 text-gray-700 transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" />
                                 </div>
-                                <div className="pt-8 flex flex-col items-center justify-center p-6 bg-blue-50/50 rounded-sm border border-blue-100">
-                                    <span className="text-[11px] font-black text-[#0078d4] uppercase tracking-widest mb-1">Total Amount</span>
-                                    <div className="text-[32px] font-black text-[#b91c1c] tracking-tighter leading-none">
-                                        Rs. {parseFloat(formData.amount).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                <div className="pt-6">
+                                    <div className="bg-slate-50 border border-slate-200 rounded-[5px] p-6 flex flex-col items-center justify-center h-[156px]">
+                                        <span className="text-[11px] font-mono font-bold text-[#0285fd] uppercase tracking-widest mb-2">Total Amount</span>
+                                        <div className="text-[28px] font-mono font-black text-[#b91c1c] tracking-tighter leading-none">
+                                            Rs. {parseFloat(formData.amount).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -259,79 +275,75 @@ const MainCashBoard = ({ isOpen, onClose }) => {
                     </div>
 
                     {/* Tabs & Grid */}
-                    <div className="bg-white border border-gray-200 rounded-sm shadow-sm flex flex-col">
-                        <div className="flex border-b border-gray-200 bg-gray-50/50 overflow-x-auto no-scrollbar">
-                           <button onClick={() => setActiveTab('Expenses')} className={`px-10 py-3 text-[12px] font-bold flex items-center gap-2 relative transition-all ${activeTab === 'Expenses' ? 'text-[#0078d4] bg-white' : 'text-gray-400 hover:text-gray-600'}`}>
+                    <div className="bg-white border border-slate-200 rounded-[5px] flex flex-col min-h-[300px] overflow-hidden">
+                        <div className="flex border-b border-slate-200 bg-slate-50/80 overflow-x-auto no-scrollbar">
+                           <button onClick={() => setActiveTab('Expenses')} className={`px-10 py-3 text-[11px] font-bold uppercase tracking-widest flex items-center gap-2 relative transition-all ${activeTab === 'Expenses' ? 'text-[#0285fd] bg-white' : 'text-gray-400 hover:text-gray-600'}`}>
                                <Layers size={14} /> Expenses
-                               {activeTab === 'Expenses' && <div className="absolute top-0 left-0 right-0 h-1 bg-[#0078d4]" />}
+                               {activeTab === 'Expenses' && <div className="absolute top-0 left-0 right-0 h-0.5 bg-[#0285fd]" />}
                            </button>
-                           <button onClick={() => setActiveTab('Cost Center')} className={`px-10 py-3 text-[12px] font-bold flex items-center gap-2 relative transition-all ${activeTab === 'Cost Center' ? 'text-[#0078d4] bg-white' : 'text-gray-400 hover:text-gray-600'}`}>
+                           <button onClick={() => setActiveTab('Cost Center')} className={`px-10 py-3 text-[11px] font-bold uppercase tracking-widest flex items-center gap-2 relative transition-all ${activeTab === 'Cost Center' ? 'text-[#0285fd] bg-white' : 'text-gray-400 hover:text-gray-600'}`}>
                                <Landmark size={14} /> Cost Center
-                               {activeTab === 'Cost Center' && <div className="absolute top-0 left-0 right-0 h-1 bg-[#0078d4]" />}
+                               {activeTab === 'Cost Center' && <div className="absolute top-0 left-0 right-0 h-0.5 bg-[#0285fd]" />}
                            </button>
                         </div>
 
-                        <div className="p-0 overflow-hidden min-h-[300px]">
-                            <table className="w-full text-left border-collapse">
-                                <thead className="bg-[#f8f9fa] border-b border-gray-300 sticky top-0 z-10 font-bold text-[11px] text-gray-600 uppercase tracking-wider">
-                                    <tr>
-                                        <th className="px-4 py-2 border-r border-gray-200 w-[40px] text-center">#</th>
-                                        <th className="px-4 py-2 border-r border-gray-200 w-[250px]">Expense Account</th>
-                                        <th className="px-4 py-2 border-r border-gray-200 w-[200px]">Cost Center</th>
-                                        <th className="px-4 py-2 border-r border-gray-200 w-[150px] text-right">Amount</th>
-                                        <th className="px-4 py-2 border-r border-gray-200">Memo</th>
-                                        <th className="px-4 py-2 w-[50px] text-center">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="text-[12px] text-gray-700">
-                                    {rows.map((row, idx) => (
-                                        <tr key={idx} className="border-b border-gray-100 hover:bg-blue-50/30 transition-colors group">
-                                            <td className="px-4 py-1.5 border-r border-gray-100 text-center font-bold text-gray-400">{idx + 1}</td>
-                                            <td className="p-0 border-r border-gray-100">
-                                                <div className="flex h-10">
-                                                    <input type="text" readOnly value={row.expAccName ? `${row.expAccCode} - ${row.expAccName}` : ''} className="flex-1 bg-transparent px-3 outline-none font-bold text-slate-700" placeholder="Select Account..." />
-                                                    <button onClick={() => { setActiveRowIdx(idx); setActiveModal('row_acc'); setSearchTerm(''); }} className="w-8 h-10 flex items-center justify-center text-blue-500 hover:bg-blue-50 group-hover:bg-blue-100/50">
-                                                        <Search size={14} />
-                                                    </button>
-                                                </div>
-                                            </td>
-                                            <td className="p-0 border-r border-gray-100">
-                                                <div className="flex h-10">
-                                                    <input type="text" readOnly value={row.ccCode} className="flex-1 bg-transparent px-3 outline-none" placeholder="Select CC..." />
-                                                    <button onClick={() => { setActiveRowIdx(idx); setActiveModal('row_cc'); setSearchTerm(''); }} className="w-8 h-10 flex items-center justify-center text-blue-500 hover:bg-blue-50 group-hover:bg-blue-100/50">
-                                                        <Search size={14} />
-                                                    </button>
-                                                </div>
-                                            </td>
-                                            <td className="p-0 border-r border-gray-100">
-                                                <input 
-                                                    type="number" 
-                                                    step="0.01" 
-                                                    value={row.amount} 
-                                                    onChange={(e) => handleRowChange(idx, 'amount', e.target.value)} 
-                                                    className="w-full h-10 px-4 text-right bg-transparent outline-none focus:bg-blue-50 font-black text-slate-800" 
-                                                />
-                                            </td>
-                                            <td className="p-0 border-r border-gray-100">
-                                                <input 
-                                                    type="text" 
-                                                    value={row.memo} 
-                                                    onChange={(e) => handleRowChange(idx, 'memo', e.target.value)} 
-                                                    className="w-full h-10 px-4 bg-transparent outline-none italic font-medium text-gray-500" 
-                                                    placeholder="Line remark..."
-                                                />
-                                            </td>
-                                            <td className="px-4 py-1.5 text-center">
-                                                <button onClick={() => deleteRow(idx)} className="text-red-300 hover:text-red-500 transition-colors p-1">
-                                                    <Trash2 size={16} />
+                        <div className="flex-1 bg-white overflow-hidden flex flex-col">
+                            <div className="flex bg-slate-50/80 border-b border-slate-200 text-[10px] font-mono font-bold text-gray-400 uppercase tracking-widest items-center">
+                                <div className="w-10 py-2.5 px-3 border-r border-slate-200 text-center">#</div>
+                                <div className="flex-[2] py-2.5 px-4 border-r border-slate-200">Expense Account</div>
+                                <div className="flex-[1.5] py-2.5 px-4 border-r border-slate-200">Cost Center</div>
+                                <div className="w-32 py-2.5 px-4 border-r border-slate-200 text-right">Amount</div>
+                                <div className="flex-[2] py-2.5 px-4 border-r border-slate-200">Memo</div>
+                                <div className="w-12 text-center py-2.5">Action</div>
+                            </div>
+
+                            <div className="flex-1 overflow-y-auto max-h-[220px] divide-y divide-slate-100">
+                                {rows.map((row, idx) => (
+                                    <div key={idx} className="flex border-b border-slate-200 text-[11px] font-bold text-slate-700 hover:bg-blue-50/30 items-center transition-colors group">
+                                        <div className="w-10 py-2 px-3 border-r border-slate-200 text-center text-gray-400">{idx + 1}</div>
+                                        <div className="flex-[2] border-r border-slate-200 bg-white group-hover:bg-transparent">
+                                            <div className="flex h-8">
+                                                <input type="text" readOnly value={row.expAccName ? `${row.expAccCode} - ${row.expAccName}` : ''} className="flex-1 bg-transparent px-3 outline-none text-[11px] font-bold text-slate-700 cursor-pointer" onClick={() => { setActiveRowIdx(idx); setActiveModal('row_acc'); setSearchTerm(''); }} />
+                                                <button onClick={() => { setActiveRowIdx(idx); setActiveModal('row_acc'); setSearchTerm(''); }} className="w-8 h-8 flex items-center justify-center text-blue-500 hover:bg-blue-50 group-hover:bg-blue-100/50">
+                                                    <Search size={14} />
                                                 </button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                            <div className="p-3 bg-gray-50/50 flex justify-start">
-                                <button onClick={addRow} className="px-5 h-8 bg-[#0078d4] text-white text-[11px] font-bold rounded-sm flex items-center gap-2 hover:bg-[#005a9e] shadow-sm active:scale-95 transition-all">
+                                            </div>
+                                        </div>
+                                        <div className="flex-[1.5] border-r border-slate-200 bg-white group-hover:bg-transparent">
+                                            <div className="flex h-8">
+                                                <input type="text" readOnly value={row.ccCode} className="flex-1 bg-transparent px-3 outline-none text-[11px] font-bold cursor-pointer" onClick={() => { setActiveRowIdx(idx); setActiveModal('row_cc'); setSearchTerm(''); }} />
+                                                <button onClick={() => { setActiveRowIdx(idx); setActiveModal('row_cc'); setSearchTerm(''); }} className="w-8 h-8 flex items-center justify-center text-blue-500 hover:bg-blue-50 group-hover:bg-blue-100/50">
+                                                    <Search size={14} />
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div className="w-32 border-r border-slate-200 bg-white group-hover:bg-transparent">
+                                            <input 
+                                                type="number" 
+                                                step="0.01" 
+                                                value={row.amount} 
+                                                onChange={(e) => handleRowChange(idx, 'amount', e.target.value)} 
+                                                className="w-full h-8 px-3 text-right bg-transparent outline-none focus:bg-white text-[12px] font-mono font-black text-slate-800" 
+                                            />
+                                        </div>
+                                        <div className="flex-[2] border-r border-slate-200 bg-white group-hover:bg-transparent">
+                                            <input 
+                                                type="text" 
+                                                value={row.memo} 
+                                                onChange={(e) => handleRowChange(idx, 'memo', e.target.value)} 
+                                                className="w-full h-8 px-3 bg-transparent outline-none italic font-mono text-[11px] text-gray-500"
+                                            />
+                                        </div>
+                                        <div className="w-12 flex justify-center py-1">
+                                            <button onClick={() => deleteRow(idx)} className="text-red-300 hover:text-red-500 transition-all p-1.5 hover:bg-red-50 rounded-[5px]">
+                                                <Trash2 size={13} />
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                            <div className="p-4 border-t border-slate-200 bg-white">
+                                <button onClick={addRow} className="px-5 py-2 bg-[#0285fd] text-white font-mono font-bold text-[11px] uppercase tracking-widest rounded-[5px] hover:bg-[#0073ff] shadow-md active:scale-95 transition-all flex items-center justify-center gap-2 w-fit">
                                     <Plus size={14} /> Add Spend Item
                                 </button>
                             </div>
@@ -341,44 +353,47 @@ const MainCashBoard = ({ isOpen, onClose }) => {
             </SimpleModal>
 
             {/* Selection Modals */}
-            {activeModal && (
-                <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setActiveModal(null)} />
-                    <div className="relative w-full max-w-2xl bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col max-h-[85vh]">
-                        <div className="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-50 font-['Plus_Jakarta_Sans']">
-                            <h3 className="text-lg font-bold text-slate-800 tracking-tight uppercase">
-                                Search {activeModal.replace('row_', '').replace('cc', 'cost center')}
-                            </h3>
-                            <div className="flex gap-4">
-                                <input 
-                                    type="text" 
-                                    placeholder="Search by code or name..." 
-                                    className="h-9 border border-gray-300 px-3 text-sm rounded-md w-64 focus:border-blue-500 outline-none" 
-                                    value={searchTerm} 
-                                    onChange={(e) => setSearchTerm(e.target.value)} 
-                                    autoFocus
-                                />
-                                <button 
-                                    onClick={() => setActiveModal(null)} 
-                                    className="w-9 h-8 flex items-center justify-center bg-red-50 hover:bg-red-100 text-red-600 rounded-[8px] transition-all active:scale-90 outline-none border-none group"
-                                    title="Close"
-                                >
-                                    <X size={18} strokeWidth={4} className="group-hover:scale-110 transition-transform" />
-                                </button>
-                            </div>
+
+            <CalendarModal
+                isOpen={showDatePicker}
+                onClose={() => setShowDatePicker(false)}
+                currentDate={formData[datePickerField]}
+                onDateSelect={(date) => setFormData({...formData, [datePickerField]: date})}
+            />
+
+            <SimpleModal
+                isOpen={!!activeModal}
+                onClose={() => setActiveModal(null)}
+                title={`Lookup Directory`}
+                maxWidth="max-w-[600px]"
+            >
+                <div className="space-y-4 font-['Tahoma']">
+                    <div className="flex items-center gap-4 p-3 rounded-[5px] border border-slate-200 bg-white mb-2">
+                        <span className="text-[12px] font-bold text-gray-500 uppercase tracking-widest">Search Facility</span>
+                        <div className="relative flex-1">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
+                            <input
+                                type="text"
+                                placeholder={`Find ${activeModal?.replace('row_', '').replace('cc', 'cost center')} by code or name...`}
+                                className="w-full h-9 pl-10 pr-4 border border-slate-200 rounded outline-none text-sm bg-slate-50 transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20"
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                autoFocus
+                            />
                         </div>
-                        <div className="overflow-y-auto p-2 font-['Inter']">
-                            <table className="w-full text-sm text-left">
-                                <thead className="bg-slate-50 sticky top-0 text-gray-600 font-bold uppercase text-[11px] tracking-wider">
+                    </div>
+                    <div className="border border-slate-200 rounded-[5px] overflow-hidden shadow-sm">
+                        <div className="max-h-[400px] overflow-y-auto no-scrollbar">
+                            <table className="w-full text-left">
+                                <thead className="bg-slate-50/80 sticky top-0 text-[10px] font-mono font-bold text-gray-400 uppercase tracking-widest border-b border-slate-200">
                                     <tr>
-                                        <th className="p-3 border-b">Code</th>
-                                        <th className="p-3 border-b">Name</th>
-                                        <th className="p-3 border-b text-center">Action</th>
+                                        <th className="px-5 py-3">Code</th>
+                                        <th className="px-5 py-3">Record Name</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody className="divide-y divide-slate-100">
                                     {filteredLookup().map((item, idx) => (
-                                        <tr key={idx} className="hover:bg-blue-50 transition-colors group cursor-pointer" onClick={() => {
+                                        <tr key={idx} className="group hover:bg-blue-50/50 cursor-pointer transition-colors" onClick={() => {
                                             if (activeModal === 'account') {
                                                 setFormData(prev => ({ ...prev, accountId: item.code, accountName: item.name }));
                                             } else if (activeModal === 'cc') {
@@ -397,22 +412,21 @@ const MainCashBoard = ({ isOpen, onClose }) => {
                                             }
                                             setActiveModal(null);
                                         }}>
-                                            <td className="p-3 border-b font-medium text-gray-700">{item.code}</td>
-                                            <td className="p-3 border-b font-medium uppercase text-blue-600">{item.name}</td>
-                                            <td className="p-3 border-b text-center">
-                                                <button className="bg-[#0078d4] text-white text-[10px] px-3 py-1.5 rounded-sm font-bold hover:bg-[#005a9e]">SELECT</button>
-                                            </td>
+                                            <td className="px-5 py-3 font-mono text-[12px] font-mono text-gray-700">{item.code}</td>
+                                            <td className="px-5 py-3 text-[12px] font-mono text-gray-700 uppercase group-hover:text-blue-600">{item.name}</td>
                                         </tr>
                                     ))}
                                     {filteredLookup().length === 0 && (
-                                        <tr><td colSpan="3" className="p-8 text-center text-gray-400 font-medium italic">No results found for "{searchTerm}"</td></tr>
+                                        <tr>
+                                            <td colSpan="2" className="text-center py-6 text-gray-300 text-[12px] font-bold uppercase tracking-widest">No records found</td>
+                                        </tr>
                                     )}
                                 </tbody>
                             </table>
                         </div>
                     </div>
                 </div>
-            )}
+            </SimpleModal>
         </>
     );
 };

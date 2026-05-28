@@ -7,7 +7,8 @@ import {
     Search, 
     Folder,
     Activity,
-    History as HistoryIcon
+    History as HistoryIcon,
+    Database
 } from 'lucide-react';
 import { backupService } from '../../../services/backup.service';
 
@@ -115,48 +116,30 @@ const DatabaseBackupModal = ({ isOpen, onClose }) => {
                         0% { width: 100%; }
                         100% { width: 0%; }
                     }
-                    .dashed-box {
-                        background-image: url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' stroke='%23d1d5db' stroke-width='1.5' stroke-dasharray='4%2c 4' stroke-dashoffset='0' stroke-linecap='square'/%3e%3c/svg%3e");
-                    }
-                    .custom-scrollbar::-webkit-scrollbar {
-                        width: 6px;
-                    }
-                    .custom-scrollbar::-webkit-scrollbar-track {
-                        background: transparent;
-                    }
-                    .custom-scrollbar::-webkit-scrollbar-thumb {
-                        background: #e2e8f0;
-                        border-radius: 10px;
-                    }
-                    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-                        background: #cbd5e1;
-                    }
                 `}
             </style>
             <SimpleModal
                 isOpen={isOpen}
                 onClose={() => !loading && onClose()}
                 title="Backup Utility"
-                maxWidth="max-w-[420px]"
+                maxWidth="max-w-[500px]"
                 showHeaderClose={!loading}
                 footer={
-                    <div className="bg-slate-50 px-5 py-3 w-full flex justify-between items-center border-t border-gray-100 rounded-b-xl font-['Tahoma']">
-                        <button
-                            onClick={handleClear}
-                            className="px-4 h-8 bg-[#00adff] text-white text-[12px] font-black rounded-[4px] hover:bg-[#0099e6] transition-all active:scale-95 flex items-center gap-2 border-none shadow-sm"
-                        >
-                            <RotateCcw size={12} /> CLEAR
-                        </button>
-                        <button
-                            onClick={() => setShowHistoryModal(true)}
-                            className="px-4 h-8 bg-white border-2 border-gray-200 text-gray-500 text-[12px] font-black rounded-[4px] hover:bg-gray-50 transition-all active:scale-95 flex items-center gap-2 shadow-sm"
-                        >
-                            <HistoryIcon size={12} /> HISTORY
-                        </button>
+                    <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-slate-200 rounded-b-xl">
+                        <div className="flex gap-3">
+                            <button onClick={handleClear} disabled={loading} className="px-6 py-3 bg-[#00adff] hover:bg-[#0099e6] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] transition-all active:scale-95 flex items-center justify-center gap-2 border-none">
+                                <RotateCcw size={14} /> CLEAR
+                            </button>
+                        </div>
+                        <div className="flex gap-3">
+                            <button onClick={() => setShowHistoryModal(true)} disabled={loading} className="px-6 py-3 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] shadow-sm transition-all active:scale-95 flex items-center justify-center gap-2">
+                                <HistoryIcon size={14} /> HISTORY
+                            </button>
+                        </div>
                     </div>
                 }
             >
-                <div className="relative space-y-3 font-['Tahoma'] select-none">
+                <div className="relative space-y-4 font-['Tahoma'] select-none p-2">
                     {/* Loading Overlay */}
                     {loading && (
                         <div className="absolute inset-0 -m-1 bg-white/80 backdrop-blur-[2px] z-[60] flex flex-col items-center justify-center rounded-xl animate-in fade-in duration-300">
@@ -179,67 +162,70 @@ const DatabaseBackupModal = ({ isOpen, onClose }) => {
                     )}
 
                     {/* Compact Settings */}
-                    <div className="relative border border-gray-100 rounded-lg p-3 bg-white shadow-sm mt-1">
-                        <span className="absolute -top-2 left-3 px-2 bg-white text-[10px] font-black text-gray-500 uppercase tracking-widest border-x border-white">Settings</span>
-                        <div className="dashed-box w-full h-16 rounded flex items-center justify-center bg-gray-50/20">
-                            <div className="flex flex-col items-center">
-                                <h2 className={`text-2xl font-bold tracking-tight ${loading ? 'text-blue-600 animate-pulse' : 'text-slate-700'}`}>
-                                    {statusMessage}
-                                </h2>
-                            </div>
+                    <div className="relative border border-slate-200 rounded-[5px] p-4 bg-slate-50/50 shadow-sm mt-1 overflow-hidden">
+                        <div className="absolute top-0 right-0 p-4 opacity-[0.03] pointer-events-none">
+                            <Activity size={80} />
+                        </div>
+                        <div className="flex flex-col items-center justify-center py-2 relative z-10">
+                            <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">Status Indicator</span>
+                            <h2 className={`text-2xl font-black tracking-widest uppercase ${loading ? 'text-[#0285fd] animate-pulse' : 'text-slate-700'}`}>
+                                {statusMessage}
+                            </h2>
                         </div>
                     </div>
 
                     {/* Compact Backup */}
-                    <div className="relative border border-gray-100 rounded-lg p-4 bg-white shadow-sm space-y-3 pt-5">
-                        <span className="absolute -top-2 left-3 px-2 bg-white text-[10px] font-black text-gray-500 uppercase tracking-widest border-x border-white">Backup</span>
+                    <div className="relative border border-slate-200 rounded-[5px] p-4 bg-white shadow-sm space-y-4">
+                        <div className="flex items-center gap-2 mb-2 pb-2 border-b border-slate-100">
+                            <Database size={14} className="text-[#0285fd]" />
+                            <span className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">Backup Parameters</span>
+                        </div>
                         
-                        <div className="flex items-center gap-3">
-                            <label className="text-[12px] font-bold text-gray-700 w-20 shrink-0">Database:</label>
-                            <div className="flex-1 flex gap-1 h-7 min-w-0">
+                        <div className="flex flex-col gap-1.5">
+                            <label className="text-[11px] font-bold text-gray-500 uppercase">Target Database</label>
+                            <div className="flex gap-1 h-8 min-w-0">
                                 <input 
                                     type="text" 
                                     readOnly 
                                     value={formData.databaseName} 
                                     onClick={() => setShowDbLookup(true)}
                                     placeholder="Click to Select..."
-                                    className="flex-1 min-w-0 h-full border border-gray-300 px-3 text-[11.5px] font-bold text-blue-600 bg-gray-50 rounded-[4px] outline-none shadow-sm cursor-pointer hover:bg-gray-100 transition-colors" 
+                                    className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-bold text-slate-700 bg-white rounded outline-none cursor-pointer transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" 
                                 />
                                 <button 
                                     onClick={() => setShowDbLookup(true)}
-                                    className="w-8 h-full bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[4px] transition-all shadow-md active:scale-95 shrink-0"
+                                    className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0"
                                 >
-                                    <Search size={14} />
+                                    <Search size={16} />
                                 </button>
                             </div>
                         </div>
 
-                        <div className="space-y-1.5">
-                             <label className="text-[12px] font-bold text-gray-700 block">Copy To:</label>
-                             <div className="flex gap-1 h-7">
+                        <div className="flex flex-col gap-1.5">
+                             <label className="text-[11px] font-bold text-gray-500 uppercase">Destination Path</label>
+                             <div className="flex gap-1 h-8 min-w-0">
                                 <input 
                                     type="text" 
                                     value={formData.backupPath} 
                                     onChange={(e) => setFormData(prev => ({ ...prev, backupPath: e.target.value }))}
-                                    className="flex-1 min-w-0 h-full border border-gray-300 px-3 font-mono text-[11px] font-bold outline-none bg-white text-gray-700 shadow-sm focus:border-[#0285fd] rounded-[4px]" 
+                                    className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-mono font-bold outline-none bg-white text-slate-700 transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 rounded-[5px]" 
                                 />
                                 <button 
                                     onClick={() => setShowPathLookup(true)}
-                                    className="w-8 h-full bg-gray-100 text-gray-500 flex items-center justify-center rounded-[4px] border border-gray-300 hover:bg-gray-200 transition-all active:scale-95"
+                                    className="w-10 h-8 bg-white border border-slate-300 text-slate-500 flex items-center justify-center rounded-[5px] hover:bg-slate-50 transition-all active:scale-95 shrink-0"
                                 >
-                                    <Folder size={12} />
+                                    <Folder size={16} />
                                 </button>
                              </div>
                         </div>
 
-                        <div className="pt-1">
+                        <div className="pt-2">
                             <button
                                 onClick={handleCreateBackup}
                                 disabled={loading}
-                                className="w-full h-11 bg-white border-2 border-gray-100 rounded-lg text-[16px] font-bold text-slate-700 hover:bg-blue-50 hover:border-blue-200 hover:text-blue-700 transition-all active:scale-[0.98] shadow-sm flex items-center justify-center gap-2 group"
+                                className="w-full h-10 bg-[#0285fd] hover:bg-[#0073ff] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] shadow-md shadow-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border-none"
                             >
-                                <Save size={18} className="group-hover:scale-110 transition-transform" />
-                                Create Backup
+                                <Save size={16} /> Create Backup
                             </button>
                         </div>
                     </div>

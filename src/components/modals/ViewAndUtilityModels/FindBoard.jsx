@@ -1,154 +1,160 @@
 import React, { useState } from 'react';
-import SimpleModal from '../../SimpleModal';
-import { Search, RotateCcw, Calendar, ChevronDown , X} from 'lucide-react';
+import { Search, RotateCcw, Calendar, X, Filter, FileText, Hash } from 'lucide-react';
+
+const accent = localStorage.getItem('topBarColor') || '#0388cc';
 
 const FindBoard = ({ isOpen, onClose }) => {
     const [activeTab, setActiveTab] = useState('General');
+    const [docNo, setDocNo] = useState('');
+    const [amount, setAmount] = useState('');
+    const [dateFrom, setDateFrom] = useState('13/03/2026');
+    const [dateTo, setDateTo] = useState('13/03/2026');
+    const [results] = useState([]);
+
+    if (!isOpen) return null;
 
     return (
-        <SimpleModal
-            isOpen={isOpen}
-            onClose={onClose}
-            title="Find"
-            maxWidth="max-w-5xl"
-            footer={
-                <div className="flex items-center justify-between w-full px-2">
-                    <div className="flex items-center gap-2">
-                         <span className="text-[18px] font-bold text-gray-400 italic tracking-wider opacity-60">onimta IT</span>
-                    </div>
+        <div className="fixed inset-0 z-[300] flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-slate-900/70 backdrop-blur-sm" onClick={onClose} />
+
+            <div className="relative w-full max-w-5xl bg-white rounded-2xl shadow-2xl overflow-hidden border border-white/10 animate-in zoom-in-95 duration-300 flex flex-col max-h-[90vh]">
+                <div className="absolute left-0 top-0 bottom-0 w-[4px]" style={{ backgroundColor: accent }} />
+
+                <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-white">
                     <div className="flex items-center gap-3">
-                        <button className="px-6 h-10 bg-slate-100 text-slate-600 text-sm font-bold rounded-md hover:bg-slate-200 transition-all active:scale-95 border-none flex items-center gap-2">
-                            <Search size={14} /> Find
-                        </button>
-                        <button className="px-6 h-10 bg-slate-100 text-slate-600 text-sm font-bold rounded-md hover:bg-slate-200 transition-all active:scale-95 border-none flex items-center gap-2">
-                            <RotateCcw size={14} /> Clear
-                        </button>
-                        <button onClick={onClose} className="px-6 h-10 bg-slate-100 text-slate-600 text-sm font-bold rounded-md hover:bg-slate-200 transition-all active:scale-95 border-none flex items-center gap-2">
-                            <X size={14} /> Exit
-                        </button>
+                        <div className="w-9 h-9 rounded-xl bg-[#4f83ff]/10 flex items-center justify-center">
+                            <Search size={16} className="text-[#4f83ff]" />
+                        </div>
+                        <div>
+                            <h2 className="text-[15px] font-black uppercase tracking-[0.25em] text-slate-900 leading-tight">Document Find</h2>
+                            <p className="text-[10px] text-slate-400 font-medium tracking-wider">Search & Retrieval</p>
+                        </div>
                     </div>
-                </div>
-            }
-        >
-            <div className="space-y-4">
-                {/* Tabs */}
-                <div className="flex bg-gray-100/50 p-1 rounded-sm gap-1 border-b border-gray-300">
-                    <button 
-                        onClick={() => setActiveTab('General')}
-                        className={`px-8 py-1.5 text-[12px] font-bold rounded-t-sm transition-all border-x border-t ${
-                            activeTab === 'General' 
-                            ? 'bg-white text-blue-600 border-gray-300 -mb-[1px] shadow-sm' 
-                            : 'text-gray-500 border-transparent hover:text-gray-700'
-                        }`}
-                    >
-                        General
-                    </button>
-                    <button 
-                        onClick={() => setActiveTab('Advance')}
-                        className={`px-8 py-1.5 text-[12px] font-bold rounded-t-sm transition-all border-x border-t ${
-                            activeTab === 'Advance' 
-                            ? 'bg-white text-blue-600 border-gray-300 -mb-[1px] shadow-sm' 
-                            : 'text-gray-500 border-transparent hover:text-gray-700'
-                        }`}
-                    >
-                        Advance
+                    <button onClick={onClose} className="w-9 h-9 rounded-xl bg-red-50 hover:bg-red-100 flex items-center justify-center transition-all active:scale-90">
+                        <X size={18} strokeWidth={3} className="text-red-600" />
                     </button>
                 </div>
 
-                {/* Search Criteria Box */}
-                <div className="bg-white p-4 border border-gray-300 rounded-sm shadow-sm space-y-4">
-                    <div className="grid grid-cols-12 gap-y-3 gap-x-6">
-                        {/* Transaction Type */}
-                        <div className="col-span-4 flex items-center gap-2">
-                            <label className="text-[12px] font-semibold text-gray-700 w-32 shrink-0">Transaction Type</label>
-                            <select className="flex-1 h-7 border border-gray-300 px-2 text-sm focus:border-blue-500 outline-none rounded-sm bg-white">
-                                <option value=""></option>
-                            </select>
+                <div className="flex-1 overflow-y-auto custom-scrollbar p-6">
+                    <div className="select-none space-y-4">
+                        <div className="flex bg-slate-100/50 p-1 rounded-xl gap-1">
+                            {['General', 'Advance'].map(tab => (
+                                <button
+                                    key={tab}
+                                    onClick={() => setActiveTab(tab)}
+                                    className={`flex-1 h-9 rounded-[8px] text-[11px] font-black tracking-widest transition-all uppercase ${
+                                        activeTab === tab
+                                            ? 'bg-white text-[#4f83ff] shadow-sm border border-slate-100'
+                                            : 'text-slate-400 hover:text-slate-600'
+                                    }`}
+                                >
+                                    {tab}
+                                </button>
+                            ))}
                         </div>
 
-                        {/* Radio Options */}
-                        <div className="col-span-8 flex items-center gap-6">
-                            <label className="flex items-center gap-2 cursor-pointer group">
-                                <input type="radio" name="criteria" className="w-3.5 h-3.5 text-blue-600" />
-                                <span className="text-[12px] font-semibold text-gray-700 group-hover:text-blue-600">Location</span>
-                            </label>
-                            <label className="flex items-center gap-2 cursor-pointer group">
-                                <input type="radio" name="criteria" className="w-3.5 h-3.5 text-blue-600" />
-                                <span className="text-[12px] font-semibold text-gray-700 group-hover:text-blue-600">Payee</span>
-                            </label>
-                            <label className="flex items-center gap-2 cursor-pointer group">
-                                <input type="radio" name="criteria" className="w-3.5 h-3.5 text-blue-600" />
-                                <span className="text-[12px] font-semibold text-gray-700 group-hover:text-blue-600">Vender</span>
-                            </label>
-                            <select className="flex-1 h-7 border border-gray-300 px-2 text-sm focus:border-blue-500 outline-none rounded-sm bg-white min-w-[150px]">
-                                <option value=""></option>
-                            </select>
-                        </div>
+                        <div className="bg-slate-50/50 p-5 border border-slate-100 rounded-xl space-y-4">
+                            <div className="grid grid-cols-12 gap-y-4 gap-x-6">
+                                <div className="col-span-4 flex items-center gap-3">
+                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest w-28 shrink-0">Trans Type</label>
+                                    <select className="flex-1 h-8 px-3 border border-slate-200 rounded-[5px] text-[12px] font-bold text-slate-700 bg-white outline-none focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 transition-all shadow-sm">
+                                        <option value="">All Types</option>
+                                    </select>
+                                </div>
 
-                        {/* Document No */}
-                        <div className="col-span-4 flex items-center gap-2">
-                            <label className="text-[12px] font-semibold text-gray-700 w-32 shrink-0">Document No</label>
-                            <input 
-                                type="text"
-                                className="flex-1 h-7 border border-gray-300 px-2 text-sm focus:border-blue-500 outline-none rounded-sm bg-white"
-                            />
-                        </div>
+                                <div className="col-span-8 flex items-center gap-6">
+                                    {['Location', 'Payee', 'Vendor'].map(opt => (
+                                        <label key={opt} className="flex items-center gap-2 cursor-pointer group">
+                                            <input type="radio" name="criteria" className="w-3.5 h-3.5 accent-[#4f83ff]" />
+                                            <span className="text-[11px] font-bold text-slate-600 group-hover:text-[#4f83ff] transition-colors uppercase tracking-wider">{opt}</span>
+                                        </label>
+                                    ))}
+                                    <select className="flex-1 h-8 px-3 border border-slate-200 rounded-[5px] text-[12px] font-bold text-slate-700 bg-white outline-none focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 transition-all shadow-sm min-w-[150px]">
+                                        <option value=""></option>
+                                    </select>
+                                </div>
 
-                        {/* Amount */}
-                        <div className="col-span-8 flex justify-end">
-                            <div className="flex items-center gap-2 w-[350px]">
-                                <label className="text-[12px] font-semibold text-gray-700 w-20 text-right">Amount</label>
-                                <input 
-                                    type="text"
-                                    className="flex-1 h-7 border border-gray-300 px-2 text-sm focus:border-blue-500 outline-none rounded-sm bg-white"
-                                />
+                                <div className="col-span-4 flex items-center gap-3">
+                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest w-28 shrink-0">Doc No</label>
+                                    <input
+                                        type="text"
+                                        value={docNo}
+                                        onChange={(e) => setDocNo(e.target.value)}
+                                        className="flex-1 h-8 px-3 border border-slate-200 rounded-[5px] text-[12px] font-bold text-slate-700 bg-white outline-none focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 transition-all shadow-sm"
+                                        placeholder="Document number..."
+                                    />
+                                </div>
+
+                                <div className="col-span-8 flex justify-end">
+                                    <div className="flex items-center gap-3 w-[350px]">
+                                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest w-20 text-right">Amount</label>
+                                        <input
+                                            type="text"
+                                            value={amount}
+                                            onChange={(e) => setAmount(e.target.value)}
+                                            className="flex-1 h-8 px-3 border border-slate-200 rounded-[5px] text-[12px] font-bold text-slate-700 bg-white outline-none focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 transition-all shadow-sm"
+                                            placeholder="0.00"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="col-span-12 flex items-center gap-4">
+                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest w-28 shrink-0">Date Range</label>
+                                    <div className="flex items-center gap-2">
+                                        <div className="relative">
+                                            <input
+                                                type="text"
+                                                value={dateFrom}
+                                                readOnly
+                                                className="w-[130px] h-8 px-3 border border-slate-200 rounded-[5px] text-[12px] font-bold text-slate-700 bg-white outline-none focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 shadow-sm transition-all"
+                                            />
+                                        </div>
+                                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">To</span>
+                                        <div className="relative">
+                                            <input
+                                                type="text"
+                                                value={dateTo}
+                                                readOnly
+                                                className="w-[130px] h-8 px-3 border border-slate-200 rounded-[5px] text-[12px] font-bold text-slate-700 bg-white outline-none focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 shadow-sm transition-all"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
-                        {/* Date Range */}
-                        <div className="col-span-12 flex items-center gap-4">
-                            <label className="text-[12px] font-semibold text-gray-700 w-32 shrink-0">Date</label>
-                            <div className="flex items-center border border-gray-300 bg-white">
-                                <input 
-                                    type="text" 
-                                    defaultValue="13/03/2026"
-                                    className="w-[140px] h-7 px-2 text-sm outline-none"
-                                />
-                                <button className="h-7 w-7 border-l border-gray-300 bg-gray-50 flex items-center justify-center hover:bg-gray-100 text-gray-600">
-                                    <Calendar size={13} />
-                                    <ChevronDown size={11} className="ml-0.5" />
-                                </button>
+                        <div className="border border-slate-100 rounded-xl overflow-hidden flex flex-col shadow-sm bg-white">
+                            <div className="flex bg-slate-800 text-white text-[10px] font-black uppercase tracking-widest select-none">
+                                <div className="w-28 px-4 py-3 border-r border-slate-700">Doc No</div>
+                                <div className="w-32 px-4 py-3 border-r border-slate-700">Date</div>
+                                <div className="flex-1 px-4 py-3 border-r border-slate-700">Name</div>
+                                <div className="w-28 px-4 py-3 border-r border-slate-700">Type</div>
+                                <div className="flex-1 px-4 py-3 border-r border-slate-700">Memo</div>
+                                <div className="w-28 px-4 py-3 text-right">Amount</div>
                             </div>
-                            <span className="text-[12px] font-semibold text-gray-600 px-2">To</span>
-                            <div className="flex items-center border border-gray-300 bg-white">
-                                <input 
-                                    type="text" 
-                                    defaultValue="13/03/2026"
-                                    className="w-[140px] h-7 px-2 text-sm outline-none"
-                                />
-                                <button className="h-7 w-7 border-l border-gray-300 bg-gray-50 flex items-center justify-center hover:bg-gray-100 text-gray-600">
-                                    <Calendar size={13} />
-                                    <ChevronDown size={11} className="ml-0.5" />
-                                </button>
+                            <div className="min-h-[250px] flex items-center justify-center bg-slate-50/30">
+                                <div className="flex flex-col items-center gap-3 text-slate-300">
+                                    <Search size={40} strokeWidth={1} />
+                                    <p className="text-[11px] font-black uppercase tracking-[3px]">Apply filters and press find</p>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                {/* Results Table */}
-                <div className="border border-gray-300 rounded-sm overflow-hidden flex flex-col min-h-[350px] bg-white shadow-inner">
-                    <div className="flex bg-gray-50 border-b border-gray-300 select-none">
-                        <div className="w-24 px-3 py-1.5 text-[11px] font-bold text-gray-600 border-r border-gray-300">Doc_No</div>
-                        <div className="w-32 px-3 py-1.5 text-[11px] font-bold text-gray-600 border-r border-gray-300">Date</div>
-                        <div className="flex-1 px-3 py-1.5 text-[11px] font-bold text-gray-600 border-r border-gray-300">Name</div>
-                        <div className="w-32 px-3 py-1.5 text-[11px] font-bold text-gray-600 border-r border-gray-300">Type</div>
-                        <div className="flex-1 px-3 py-1.5 text-[11px] font-bold text-gray-600 border-r border-gray-300">Memo</div>
-                        <div className="w-32 px-3 py-1.5 text-[11px] font-bold text-gray-600 text-right">Amount</div>
+                <div className="bg-slate-50 border-t border-slate-200 flex items-center justify-between shrink-0 px-6 py-4 rounded-b-[5px]">
+                    <span className="text-[12px] font-black text-slate-300 italic tracking-wider opacity-50">onimta IT</span>
+                    <div className="flex gap-4">
+                        <button className="px-8 h-10 bg-[#00adff] hover:bg-[#0099e6] text-white font-mono font-bold text-[13px] uppercase tracking-widest rounded-[5px] shadow-md shadow-blue-100 transition-all active:scale-95 flex items-center gap-2 border-none">
+                            <Search size={14} strokeWidth={3} /> FIND
+                        </button>
+                        <button className="px-8 h-10 bg-white text-[#00adff] border-2 border-[#00adff] hover:bg-blue-50 font-mono font-bold text-[13px] uppercase tracking-widest rounded-[5px] transition-all active:scale-95 flex items-center gap-2 shadow-sm">
+                            <RotateCcw size={14} /> CLEAR
+                        </button>
                     </div>
-                    <div className="flex-1 bg-[#a3a3a3]/10" />
                 </div>
             </div>
-        </SimpleModal>
+        </div>
     );
 };
 

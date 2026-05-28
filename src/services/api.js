@@ -17,13 +17,15 @@ api.interceptors.request.use(
     
     const companyStr = localStorage.getItem('selectedCompany');
     if (companyStr) {
+      let companyCode = '';
       try {
         const companyObj = JSON.parse(companyStr);
-        if (companyObj && companyObj.companyCode) {
-          config.headers['x-company-code'] = companyObj.companyCode;
-        }
+        companyCode = companyObj.companyCode || companyObj.CompanyCode || companyObj.code || companyObj.Code || companyStr;
       } catch (e) {
-        console.error('Error parsing selectedCompany', e);
+        companyCode = companyStr;
+      }
+      if (companyCode) {
+        config.headers['x-company-code'] = companyCode;
       }
     }
     return config;

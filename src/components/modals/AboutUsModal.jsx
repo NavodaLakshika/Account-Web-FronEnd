@@ -5,23 +5,21 @@ const AboutUsModal = ({ isOpen, onClose }) => {
     return (
         <>
             {/* Soft Backdrop */}
-            <div 
-                className={`fixed inset-0 bg-[#001c3d]/20 backdrop-blur-md z-[999] transition-opacity duration-700 ${
-                    isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
-                }`}
+            <div
+                className={`fixed inset-0 bg-[#001c3d]/20 backdrop-blur-md z-[999] transition-opacity duration-700 ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
+                    }`}
                 onClick={onClose}
             />
 
             {/* Floating Banner Style Modal - Professional Light Top-Down */}
-            <div 
-                className={`fixed top-4 left-1/2 -translate-x-1/2 w-[90%] max-w-[1150px] h-[230px] bg-white/95 backdrop-blur-[40px] z-[1000] rounded-[2px] border border-gray-100 transition-all duration-1000 ease-[cubic-bezier(0.19,1,0.22,1)] ${
-                    isOpen ? 'translate-y-0 opacity-100 shadow-[0_40px_80px_rgba(0,0,0,0.1)]' : '-translate-y-[calc(100%+80px)] opacity-0 pointer-events-none'
-                }`}
+            <div
+                className={`fixed top-4 left-1/2 -translate-x-1/2 w-[90%] max-w-[1150px] h-[230px] bg-white/95 backdrop-blur-[40px] z-[1000] rounded-[2px] border border-gray-100 transition-all duration-1000 ease-[cubic-bezier(0.19,1,0.22,1)] ${isOpen ? 'translate-y-0 opacity-100 shadow-[0_40px_80px_rgba(0,0,0,0.1)]' : '-translate-y-[calc(100%+80px)] opacity-0 pointer-events-none'
+                    }`}
                 style={{ fontFamily: "'Tahoma', sans-serif" }}
             >
                 {/* Styled Collapse Handle - Only visible when open */}
                 {isOpen && (
-                    <button 
+                    <button
                         onClick={onClose}
                         className="absolute bottom-[-16px] left-1/2 -translate-x-1/2 w-24 h-6 bg-gradient-to-b from-white to-gray-50 shadow-[0_10px_20px_rgba(0,0,0,0.1)] rounded-[2px] flex items-center justify-center gap-2 text-gray-400 hover:text-[#ff0008] transition-all hover:scale-105 active:scale-95 z-[1020] border-x border-b border-gray-100 border-t-2 border-[#0091ca] group animate-in fade-in zoom-in duration-500 delay-300"
                     >
@@ -41,15 +39,15 @@ const AboutUsModal = ({ isOpen, onClose }) => {
                                     Software <span className="text-gray-400 font-light">Engineering</span>
                                 </h2>
                             </div>
-                            
+
                             <p className="text-gray-500 text-[11px] leading-relaxed max-w-[340px] font-mono">
                                 Architecting enterprise-grade accounting architectures and intelligent automation solutions with precision.
                             </p>
 
                             <div className="flex items-center gap-6 pt-2">
-                                <a href="https://www.onimta.com" target="_blank" rel="noreferrer" className="flex items-center gap-2 text-gray-400 hover:text-[#0091ca] transition-colors">
+                                <a href="https://www.onimtait.com" target="_blank" rel="noreferrer" className="flex items-center gap-2 text-gray-400 hover:text-[#0091ca] transition-colors">
                                     <Globe size={14} />
-                                    <span className="text-[12px] font-mono font-bold tracking-widest uppercase">www.onimta.com</span>
+                                    <span className="text-[12px] font-mono font-bold tracking-widest uppercase">www.onimtait.com</span>
                                 </a>
                                 <span className="text-gray-200 text-[10px] font-mono tracking-widest">EST. 2013</span>
                             </div>
@@ -63,29 +61,29 @@ const AboutUsModal = ({ isOpen, onClose }) => {
 
                         {/* REAN Style Items */}
                         {[
-                            { 
-                                title: 'ERP Systems', 
-                                color: 'bg-[#0f172a]', 
-                                icon: <Database size={14} />, 
-                                desc: 'Cloud-native accounting architecture for large scale enterprises.' 
+                            {
+                                title: 'ERP Systems',
+                                color: 'bg-[#0f172a]',
+                                icon: <Database size={14} />,
+                                desc: 'Cloud-native accounting architecture for large scale enterprises.'
                             },
-                            { 
-                                title: 'Web Solutions', 
-                                color: 'bg-[#1e293b]', 
-                                icon: <Layout size={14} />, 
-                                desc: 'High-performance web platforms for textile & restaurant operations.' 
+                            {
+                                title: 'Web Solutions',
+                                color: 'bg-[#1e293b]',
+                                icon: <Layout size={14} />,
+                                desc: 'High-performance web platforms for textile & restaurant operations.'
                             },
-                            { 
-                                title: 'AI Company', 
-                                color: 'bg-[#334155]', 
-                                icon: <Cpu size={14} />, 
-                                desc: 'Intelligent automation and predictive analytics for data-driven growth.' 
+                            {
+                                title: 'AI Company',
+                                color: 'bg-[#334155]',
+                                icon: <Cpu size={14} />,
+                                desc: 'Intelligent automation and predictive analytics for data-driven growth.'
                             },
-                            { 
-                                title: 'HQ Location', 
-                                color: 'bg-[#000000]', 
-                                icon: <MapPin size={14} />, 
-                                desc: 'Lake Road, Maharagama, Colombo. Global Operational Headquarters.' 
+                            {
+                                title: 'HQ Location',
+                                color: 'bg-[#000000]',
+                                icon: <MapPin size={14} />,
+                                desc: 'Lake Road, Maharagama, Colombo. Global Operational Headquarters.'
                             }
                         ].map((item, idx) => (
                             <div key={idx} className="flex items-center group">
@@ -111,7 +109,8 @@ const AboutUsModal = ({ isOpen, onClose }) => {
                     <div className="h-full bg-gradient-to-r from-[#4285F4] via-[#34A853] via-[#FBBC05] to-[#ff0008] animate-[loading_4s_ease-in-out_infinite] origin-left shadow-[0_0_10px_rgba(0,145,202,0.2)]" style={{ width: '40%' }} />
                 </div>
 
-                <style dangerouslySetInnerHTML={{ __html: `
+                <style dangerouslySetInnerHTML={{
+                    __html: `
                     @keyframes loading {
                         0% { width: 0%; opacity: 0.3; }
                         50% { width: 70%; opacity: 1; }

@@ -7,20 +7,20 @@ const ContactSupportModal = ({ isOpen, onClose }) => {
     return (
         <>
             {/* Subtle Backdrop with Blur */}
-            <div 
+            <div
                 className={`fixed inset-0 z-[105] bg-black/10 backdrop-blur-[4px] transition-opacity duration-700 cursor-pointer ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
                 onClick={onClose}
             />
 
             <div className={`fixed right-4 bottom-4 md:right-12 md:bottom-12 z-[110] transition-transform duration-700 ease-out ${isOpen ? 'translate-y-0' : 'translate-y-[calc(100%+48px)]'}`}>
-                <div 
+                <div
                     className="w-[calc(100vw-32px)] md:w-[420px] h-[280px] relative transition-all duration-700 [perspective:1000px]"
                 >
                     <div className={`relative w-full h-full transition-all duration-700 [transform-style:preserve-3d] ${isFlipped ? '[transform:rotateY(180deg)]' : ''}`}>
-                        
+
                         {/* FRONT SIDE (Direct Contact) */}
                         <div className="absolute inset-0 w-full h-full bg-white rounded-[5px] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] border border-gray-100 p-7 [backface-visibility:hidden] flex flex-col justify-center overflow-y-auto custom-scrollbar">
-                            <button 
+                            <button
                                 onClick={onClose}
                                 className="absolute top-4 right-4 p-2 text-gray-300 hover:text-[#00acee] transition-colors"
                             >
@@ -34,18 +34,18 @@ const ContactSupportModal = ({ isOpen, onClose }) => {
                                 </div>
 
                                 <div className="space-y-3">
-                                    <a 
-                                        href="https://wa.me/94771234567" 
-                                        target="_blank" 
-                                        rel="noreferrer" 
+                                    <a
+                                        href="https://wa.me/94771234567"
+                                        target="_blank"
+                                        rel="noreferrer"
                                         className="w-full py-3.5 bg-[#25D366] hover:bg-[#20bd5c] text-white flex items-center justify-center gap-3 rounded-[5px] transition-all active:scale-[0.97] group shadow-lg shadow-green-500/10"
                                     >
                                         <MessageCircle size={16} />
                                         <span className="font-bold text-[10px] uppercase tracking-widest">WhatsApp Support</span>
                                     </a>
-                                    
-                                    <a 
-                                        href="mailto:it-help@onimta.com" 
+
+                                    <a
+                                        href="mailto:it-help@onimta.com"
                                         className="w-full py-3.5 bg-[#00D1FF] hover:bg-[#00acee] text-white flex items-center justify-center gap-3 rounded-[5px] transition-all active:scale-[0.97] group shadow-lg shadow-cyan-500/10"
                                     >
                                         <Mail size={16} />
@@ -56,7 +56,7 @@ const ContactSupportModal = ({ isOpen, onClose }) => {
 
                             {/* Company Profile Trigger - Fixed Bottom Tab Style */}
                             <div className="absolute inset-x-0 bottom-0">
-                                <button 
+                                <button
                                     onClick={() => setIsFlipped(true)}
                                     className="w-full h-10 bg-gray-50/80 hover:bg-[#00acee]/10 text-gray-400 hover:text-[#00acee] transition-all flex items-center justify-center gap-2 border-t border-gray-100 group"
                                 >
@@ -69,10 +69,10 @@ const ContactSupportModal = ({ isOpen, onClose }) => {
 
                         {/* BACK SIDE (Folded-Tab Style) */}
                         <div className="absolute inset-0 w-full h-full bg-white rounded-[5px] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] [backface-visibility:hidden] [transform:rotateY(180deg)] flex flex-col overflow-hidden border border-gray-100">
-                            
+
                             {/* Top Content (White Branding Area) */}
                             <div className="flex-grow flex flex-col items-center justify-center relative px-8">
-                                <button 
+                                <button
                                     onClick={onClose}
                                     className="absolute top-4 right-4 p-2 text-gray-200 hover:text-[#00acee] transition-colors z-20"
                                 >
@@ -100,12 +100,12 @@ const ContactSupportModal = ({ isOpen, onClose }) => {
                                     <p className="text-white text-[7px] tracking-[0.3em] opacity-80 font-bold uppercase">
                                         Innovative Enterprise Solutions
                                     </p>
-                                    <a href="https://www.onimta.com" target="_blank" rel="noreferrer" className="text-white text-[10px] font-black tracking-[0.1em] uppercase hover:underline">
-                                        WWW.ONIMTA.COM
+                                    <a href="https://www.onimtait.com" target="_blank" rel="noreferrer" className="text-white text-[10px] font-black tracking-[0.1em] uppercase hover:underline">
+                                        www.onimtait.com
                                     </a>
                                 </div>
-                                
-                                <button 
+
+                                <button
                                     onClick={() => setIsFlipped(false)}
                                     className="absolute left-4 bottom-3 z-30 text-white/30 hover:text-white transition-colors"
                                 >

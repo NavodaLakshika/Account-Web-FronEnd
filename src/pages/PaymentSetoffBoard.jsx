@@ -161,198 +161,162 @@ const PaymentSetoffBoard = ({ isOpen, onClose }) => {
                 title="Payment Set Off"
                 maxWidth="max-w-[1400px]"
                 footer={
-                    <div className="bg-slate-50 px-6 py-4 w-full flex justify-end gap-3 border-t border-gray-100 rounded-b-xl font-['Inter']">
-                        <button onClick={handleApplySetoff} disabled={loading} className={`px-12 h-10 bg-[#0078d4] text-white text-sm font-bold rounded shadow-md hover:bg-[#005a9e] transition-all active:scale-95 flex items-center gap-2 ${loading ? 'opacity-50' : ''}`}>
-                            {loading ? <Loader2 size={16} className="animate-spin" /> : <CheckCircle2 size={18} />} Apply
+                    <div className="bg-slate-50/80 px-6 py-3 w-full flex justify-end gap-3 border-t border-slate-200 rounded-b-[5px]">
+                        <button onClick={handleApplySetoff} disabled={loading} className={`px-6 py-3 bg-[#2bb744] hover:bg-[#259b3a] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] shadow-md shadow-green-100 transition-all active:scale-95 flex items-center justify-center gap-2 border-none ${loading ? 'opacity-50' : ''}`}>
+                            {loading ? <Loader2 size={16} className="animate-spin" /> : <CheckCircle2 size={18} />} APPLY SETOFF
                         </button>
-                        <button onClick={onClose} className="px-10 h-10 bg-white border border-gray-300 text-slate-600 text-sm font-bold rounded hover:bg-slate-50 transition-all flex items-center gap-2">
-                             <X size={16} /> Exit
+                        <button onClick={onClose} className="px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-500 font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] transition-all active:scale-95 flex items-center justify-center gap-2 border-none">
+                             <X size={16} /> EXIT
                         </button>
                     </div>
                 }
             >
-                <div className="space-y-4 font-['Plus_Jakarta_Sans']">
+                <div className="space-y-4">
                     {/* Header Section */}
-                    <div className="bg-white p-4 border border-gray-200 rounded-sm shadow-sm flex items-center justify-between">
+                    <div className="bg-white p-4 border border-slate-200 rounded-[5px] flex items-center justify-between">
                          <div className="flex items-center gap-4 flex-1">
-                            <label className="text-[13px] font-bold text-gray-700 w-20 shrink-0">Supplier</label>
+                            <label className="text-[11px] font-bold text-gray-500 uppercase w-20 shrink-0">Supplier</label>
                             <div className="flex-1 max-w-[500px] flex gap-2">
                                 <input 
                                     type="text" 
                                     readOnly 
                                     value={formData.supplierName ? `${formData.supplierId} - ${formData.supplierName}` : ''} 
                                     placeholder="Search supplier to load pending payments & returns..." 
-                                    className="flex-1 h-9 border border-gray-300 px-4 text-[13px] font-bold text-[#0078d4] rounded-sm bg-gray-50/20 outline-none" 
+                                    className="flex-1 h-8 border border-slate-200 px-4 text-sm font-mono font-bold text-[#0285fd] rounded bg-slate-50 outline-none" 
                                 />
-                                <button onClick={() => { setActiveSupplierModal(true); setSearchTerm(''); }} className="w-12 h-9 bg-[#0078d4] text-white flex items-center justify-center hover:bg-[#005a9e] rounded-sm transition-all shadow-md active:scale-90">
-                                    <Search size={20} />
+                                <button onClick={() => { setActiveSupplierModal(true); setSearchTerm(''); }} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-90 border-none">
+                                    <Search size={16} />
                                 </button>
                             </div>
                         </div>
                         <div className="flex items-center gap-6">
                             <div className="flex items-center gap-3">
-                                <label className="text-[13px] font-bold text-gray-700">Document No:</label>
-                                <input type="text" value={formData.docNo} readOnly className="w-40 h-8 border border-gray-300 px-3 text-[13px] font-black text-[#0078d4] bg-blue-50/20 rounded-sm italic outline-none" />
+                                <label className="text-[11px] font-bold text-gray-500 uppercase">Document No:</label>
+                                <input type="text" value={formData.docNo} readOnly className="w-40 h-8 border border-slate-200 px-3 text-sm font-mono font-bold text-[#0285fd] bg-slate-50 rounded outline-none" />
                             </div>
                             <div className="flex items-center gap-3">
-                                <label className="text-[13px] font-bold text-gray-700">Date:</label>
-                                <input type="date" value={formData.date} readOnly className="w-44 h-8 border border-gray-300 px-3 text-[13px] font-bold rounded-sm bg-gray-50/50" />
+                                <label className="text-[11px] font-bold text-gray-500 uppercase">Date:</label>
+                                <input type="date" value={formData.date} readOnly className="w-44 h-8 border border-slate-200 px-3 text-sm font-mono font-bold rounded bg-slate-50 outline-none" />
                             </div>
                         </div>
                     </div>
 
                     <div className="grid grid-cols-12 gap-4">
                         {/* Pending Payments Section */}
-                        <div className="col-span-12 lg:col-span-6 bg-white border border-gray-200 rounded-sm shadow-sm flex flex-col">
-                            <div className="bg-slate-50/50 px-4 py-2.5 border-b border-gray-200 flex justify-between items-center">
+                        <div className="col-span-12 lg:col-span-6 bg-white border border-slate-200 rounded-[5px] flex flex-col">
+                            <div className="bg-slate-50/80 px-4 py-2.5 border-b border-slate-200 flex justify-between items-center">
                                 <div className="flex items-center gap-2">
-                                    <History size={16} className="text-[#0078d4]" />
-                                    <span className="text-[11px] font-black uppercase text-slate-500 tracking-wider">Pending Payments</span>
+                                    <History size={14} className="text-slate-500" />
+                                    <span className="text-[10px] font-mono font-bold uppercase text-gray-400 tracking-widest">Pending Payments</span>
                                 </div>
                             </div>
                             <div className="h-[250px] overflow-y-auto overflow-x-hidden">
                                 <table className="w-full text-left text-[12px] border-collapse sticky-header">
-                                    <thead className="bg-[#f8f9fa] border-b border-gray-200 font-bold text-gray-600 uppercase">
+                                    <thead className="bg-slate-50/80 border-b border-slate-200 text-[10px] font-mono font-bold text-gray-400 uppercase tracking-widest">
                                         <tr>
-                                            <th className="px-4 py-2 border-r">Document No</th>
-                                            <th className="px-4 py-2 border-r">Date</th>
-                                            <th className="px-4 py-2 border-r text-right">Amount</th>
-                                            <th className="px-4 py-2 text-right">Balance</th>
+                                            <th className="px-4 py-2.5 border-r border-slate-200">Document No</th>
+                                            <th className="px-4 py-2.5 border-r border-slate-200">Date</th>
+                                            <th className="px-4 py-2.5 border-r border-slate-200 text-right">Amount</th>
+                                            <th className="px-4 py-2.5 text-right">Balance</th>
                                         </tr>
                                     </thead>
-                                    <tbody className="divide-y divide-gray-100">
+                                    <tbody className="divide-y divide-slate-100">
                                         {pendingPayments.map((p, i) => (
-                                            <tr key={i} className="hover:bg-blue-50/50 transition-colors cursor-pointer group">
-                                                <td className="px-4 py-2 font-bold text-gray-700">{p.documentNo}</td>
-                                                <td className="px-4 py-2 text-gray-500">{p.date}</td>
-                                                <td className="px-4 py-2 text-right font-medium">{p.amount.toLocaleString()}</td>
-                                                <td className="px-4 py-2 text-right font-bold text-red-600">{p.balanceAmount.toLocaleString()}</td>
+                                            <tr key={i} className="hover:bg-slate-50 transition-colors cursor-pointer group">
+                                                <td className="px-4 py-2 font-mono text-[12px] font-bold text-slate-700">{p.documentNo}</td>
+                                                <td className="px-4 py-2 font-mono text-[12px] text-slate-500">{p.date}</td>
+                                                <td className="px-4 py-2 text-right font-mono text-[12px]">{p.amount.toLocaleString()}</td>
+                                                <td className="px-4 py-2 text-right font-mono text-[12px] font-bold text-red-600">{p.balanceAmount.toLocaleString()}</td>
                                             </tr>
                                         ))}
-                                        {pendingPayments.length === 0 && <tr><td colSpan={4} className="p-8 text-center text-gray-300 italic">No records found...</td></tr>}
+                                        {pendingPayments.length === 0 && <tr><td colSpan={4} className="p-8 text-center text-gray-300 font-mono text-[11px]">No records found...</td></tr>}
                                     </tbody>
                                 </table>
                             </div>
-                            <div className="p-4 bg-slate-50 border-t border-gray-200 space-y-3">
+                            <div className="p-4 bg-slate-50/50 border-t border-slate-200 space-y-3">
                                 <div className="flex justify-between items-center px-2">
-                                    <span className="text-[13px] font-bold text-gray-500">Total Outstanding:</span>
-                                    <span className="text-[18px] font-black text-[#b91c1c]">Rs. {formData.totalOutstanding.toLocaleString()}</span>
-                                </div>
-                                <div className="grid grid-cols-4 gap-1 p-2 bg-blue-50/40 border border-blue-100/50 rounded-sm">
-                                    <div className="flex flex-col gap-1">
-                                        <span className="text-[10px] text-gray-400 font-bold uppercase">Document</span>
-                                        <input type="text" readOnly className="h-7 border border-gray-300 bg-white px-2 text-[11px] font-bold" />
-                                    </div>
-                                    <div className="flex flex-col gap-1">
-                                        <span className="text-[10px] text-gray-400 font-bold uppercase">Date</span>
-                                        <input type="text" readOnly className="h-7 border border-gray-300 bg-white px-2 text-[11px]" />
-                                    </div>
-                                    <div className="flex flex-col gap-1">
-                                        <span className="text-[10px] text-gray-400 font-bold uppercase">Amount</span>
-                                        <input type="text" readOnly className="h-7 border border-gray-300 bg-white px-2 text-[11px] text-right" />
-                                    </div>
-                                    <div className="flex flex-col gap-1">
-                                        <span className="text-[10px] text-gray-400 font-bold uppercase text-blue-600">Set Off Amount</span>
-                                        <input type="number" step="0.01" className="h-7 border border-[#0078d4] bg-white px-2 text-[12px] font-black text-right outline-none focus:ring-1 ring-blue-500" />
-                                    </div>
+                                    <span className="text-[11px] font-bold text-gray-500 uppercase">Total Outstanding:</span>
+                                    <span className="text-[18px] font-black text-[#b91c1c] font-mono">{formData.totalOutstanding.toLocaleString()}</span>
                                 </div>
                             </div>
                         </div>
 
                         {/* Returns Section */}
-                        <div className="col-span-12 lg:col-span-6 bg-white border border-gray-200 rounded-sm shadow-sm flex flex-col">
-                            <div className="bg-slate-50/50 px-4 py-2.5 border-b border-gray-200 flex justify-between items-center">
+                        <div className="col-span-12 lg:col-span-6 bg-white border border-slate-200 rounded-[5px] flex flex-col">
+                            <div className="bg-slate-50/80 px-4 py-2.5 border-b border-slate-200 flex justify-between items-center">
                                 <div className="flex items-center gap-2">
-                                    <ArrowRightLeft size={16} className="text-[#0078d4]" />
-                                    <span className="text-[11px] font-black uppercase text-slate-500 tracking-wider">Returns & Advances</span>
+                                    <ArrowRightLeft size={14} className="text-slate-500" />
+                                    <span className="text-[10px] font-mono font-bold uppercase text-gray-400 tracking-widest">Returns & Advances</span>
                                 </div>
                             </div>
                             <div className="h-[250px] overflow-y-auto overflow-x-hidden">
                                <table className="w-full text-left text-[12px] border-collapse sticky-header">
-                                    <thead className="bg-[#f8f9fa] border-b border-gray-200 font-bold text-gray-600 uppercase">
+                                    <thead className="bg-slate-50/80 border-b border-slate-200 text-[10px] font-mono font-bold text-gray-400 uppercase tracking-widest">
                                         <tr>
-                                            <th className="px-4 py-2 border-r">Document No</th>
-                                            <th className="px-4 py-2 border-r">Date</th>
-                                            <th className="px-4 py-2 border-r text-right">Amount</th>
-                                            <th className="px-4 py-2 text-right">Balance</th>
+                                            <th className="px-4 py-2.5 border-r border-slate-200">Document No</th>
+                                            <th className="px-4 py-2.5 border-r border-slate-200">Date</th>
+                                            <th className="px-4 py-2.5 border-r border-slate-200 text-right">Amount</th>
+                                            <th className="px-4 py-2.5 text-right">Balance</th>
                                         </tr>
                                     </thead>
-                                    <tbody className="divide-y divide-gray-100">
+                                    <tbody className="divide-y divide-slate-100">
                                         {returns.map((r, i) => (
-                                            <tr key={i} className="hover:bg-blue-50/50 transition-colors cursor-pointer group">
-                                                <td className="px-4 py-2 font-bold text-gray-700">{r.documentNo}</td>
-                                                <td className="px-4 py-2 text-gray-500">{r.date || '---'}</td>
-                                                <td className="px-4 py-2 text-right font-medium">{r.amount.toLocaleString()}</td>
-                                                <td className="px-4 py-2 text-right font-bold text-[#0078d4]">{r.balanceAmount.toLocaleString()}</td>
+                                            <tr key={i} className="hover:bg-slate-50 transition-colors cursor-pointer group">
+                                                <td className="px-4 py-2 font-mono text-[12px] font-bold text-slate-700">{r.documentNo}</td>
+                                                <td className="px-4 py-2 font-mono text-[12px] text-slate-500">{r.date || '---'}</td>
+                                                <td className="px-4 py-2 text-right font-mono text-[12px]">{r.amount.toLocaleString()}</td>
+                                                <td className="px-4 py-2 text-right font-mono text-[12px] font-bold text-[#0285fd]">{r.balanceAmount.toLocaleString()}</td>
                                             </tr>
                                         ))}
-                                        {returns.length === 0 && <tr><td colSpan={4} className="p-8 text-center text-gray-300 italic">No records found...</td></tr>}
+                                        {returns.length === 0 && <tr><td colSpan={4} className="p-8 text-center text-gray-300 font-mono text-[11px]">No records found...</td></tr>}
                                     </tbody>
                                 </table>
                             </div>
-                            <div className="p-4 bg-slate-50 border-t border-gray-200 space-y-3">
+                            <div className="p-4 bg-slate-50/50 border-t border-slate-200 space-y-3">
                                 <div className="flex justify-between items-center px-2">
-                                    <span className="text-[13px] font-bold text-gray-500">Total Returns & Advance:</span>
-                                    <span className="text-[18px] font-black text-[#0078d4]">Rs. {formData.totalReturns.toLocaleString()}</span>
-                                </div>
-                                <div className="grid grid-cols-4 gap-1 p-2 bg-blue-50/40 border border-blue-100/50 rounded-sm">
-                                    <div className="flex flex-col gap-1">
-                                        <span className="text-[10px] text-gray-400 font-bold uppercase">Document</span>
-                                        <input type="text" readOnly className="h-7 border border-gray-300 bg-white px-2 text-[11px] font-bold" />
-                                    </div>
-                                    <div className="flex flex-col gap-1">
-                                        <span className="text-[10px] text-gray-400 font-bold uppercase">Date</span>
-                                        <input type="text" readOnly className="h-7 border border-gray-300 bg-white px-2 text-[11px]" />
-                                    </div>
-                                    <div className="flex flex-col gap-1">
-                                        <span className="text-[10px] text-gray-400 font-bold uppercase">Amount</span>
-                                        <input type="text" readOnly className="h-7 border border-gray-300 bg-white px-2 text-[11px] text-right" />
-                                    </div>
-                                    <div className="flex flex-col gap-1">
-                                        <span className="text-[10px] text-gray-400 font-bold uppercase text-blue-600">Set Off Amount</span>
-                                        <input type="number" step="0.01" className="h-7 border border-[#0078d4] bg-white px-2 text-[12px] font-black text-right outline-none focus:ring-1 ring-blue-500" />
-                                    </div>
+                                    <span className="text-[11px] font-bold text-gray-500 uppercase">Total Returns & Advance:</span>
+                                    <span className="text-[18px] font-black text-[#0285fd] font-mono">{formData.totalReturns.toLocaleString()}</span>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     {/* Selected Set Off Summary Grid */}
-                    <div className="bg-white border border-gray-200 rounded-sm shadow-sm flex flex-col overflow-hidden">
-                        <div className="bg-slate-50 border-b border-gray-200 px-4 py-2 flex items-center gap-2">
-                             <FileCheck size={16} className="text-green-600" />
-                             <h4 className="text-[11px] font-black uppercase text-slate-500 tracking-[0.15em]">Selected Payment Set Off Allocation</h4>
+                    <div className="bg-white border border-slate-200 rounded-[5px] flex flex-col overflow-hidden">
+                        <div className="bg-slate-50/80 border-b border-slate-200 px-4 py-2.5 flex items-center gap-2">
+                             <FileCheck size={14} className="text-green-600" />
+                             <h4 className="text-[10px] font-mono font-bold uppercase text-gray-400 tracking-widest">Selected Payment Set Off Allocation</h4>
                         </div>
                         <div className="min-h-[200px] max-h-[300px] overflow-y-auto">
                             <table className="w-full text-left text-[11px] border-collapse sticky-header">
-                                <thead className="bg-[#f1f5f9] border-b border-slate-300 text-slate-700 font-bold uppercase">
+                                <thead className="bg-slate-50/80 border-b border-slate-200 text-[10px] font-mono font-bold text-gray-400 uppercase tracking-widest">
                                     <tr>
-                                        <th className="px-3 py-3 border-r border-slate-200">Selected Doc</th>
-                                        <th className="px-3 py-3 border-r border-slate-200">Date</th>
-                                        <th className="px-3 py-3 border-r border-slate-200 text-right">Balance Amt</th>
-                                        <th className="px-3 py-3 border-r border-slate-200 text-right text-blue-700">Set-Off Amount</th>
-                                        <th className="px-3 py-3 border-r border-slate-200">Set-Off Document</th>
-                                        <th className="px-3 py-3 border-r border-slate-200">Date</th>
-                                        <th className="px-3 py-3 border-r border-slate-200 text-right font-black">Line Total</th>
-                                        <th className="px-3 py-3 text-right text-red-600">Rem. Balance</th>
+                                        <th className="px-3 py-2.5 border-r border-slate-200">Selected Doc</th>
+                                        <th className="px-3 py-2.5 border-r border-slate-200">Date</th>
+                                        <th className="px-3 py-2.5 border-r border-slate-200 text-right">Balance Amt</th>
+                                        <th className="px-3 py-2.5 border-r border-slate-200 text-right">Set-Off Amount</th>
+                                        <th className="px-3 py-2.5 border-r border-slate-200">Set-Off Document</th>
+                                        <th className="px-3 py-2.5 border-r border-slate-200">Date</th>
+                                        <th className="px-3 py-2.5 border-r border-slate-200 text-right font-black">Line Total</th>
+                                        <th className="px-3 py-2.5 text-right text-red-600">Rem. Balance</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-slate-100">
                                     {selectedSetoffs.map((s, idx) => (
-                                        <tr key={idx} className="hover:bg-blue-50/30 transition-colors">
-                                            <td className="px-3 py-2 border-r border-slate-100 font-bold text-slate-700">{s.pendDoc}</td>
-                                            <td className="px-3 py-2 border-r border-slate-100 text-slate-500">{s.pendDate}</td>
-                                            <td className="px-3 py-2 border-r border-slate-100 text-right font-bold">{s.pendBal.toLocaleString()}</td>
-                                            <td className="px-3 py-2 border-r border-slate-100 text-right font-black text-blue-600 tabular-nums">{s.setoffAmount.toLocaleString()}</td>
-                                            <td className="px-3 py-2 border-r border-slate-100 font-bold text-slate-700">{s.retDoc}</td>
-                                            <td className="px-3 py-2 border-r border-slate-100 text-slate-500">{s.retDate}</td>
-                                            <td className="px-3 py-2 border-r border-slate-100 text-right font-bold text-green-700 font-black">{s.retAmount.toLocaleString()}</td>
-                                            <td className="px-3 py-2 text-right font-bold text-red-700">{(s.pendBal - s.setoffAmount).toLocaleString()}</td>
+                                        <tr key={idx} className="hover:bg-slate-50 transition-colors">
+                                            <td className="px-3 py-2 border-r border-slate-100 font-mono text-[11px] font-bold text-slate-700">{s.pendDoc}</td>
+                                            <td className="px-3 py-2 border-r border-slate-100 font-mono text-[11px] text-slate-500">{s.pendDate}</td>
+                                            <td className="px-3 py-2 border-r border-slate-100 text-right font-mono text-[11px] font-bold">{s.pendBal.toLocaleString()}</td>
+                                            <td className="px-3 py-2 border-r border-slate-100 text-right font-mono text-[11px] font-black text-blue-600 tabular-nums">{s.setoffAmount.toLocaleString()}</td>
+                                            <td className="px-3 py-2 border-r border-slate-100 font-mono text-[11px] font-bold text-slate-700">{s.retDoc}</td>
+                                            <td className="px-3 py-2 border-r border-slate-100 font-mono text-[11px] text-slate-500">{s.retDate}</td>
+                                            <td className="px-3 py-2 border-r border-slate-100 text-right font-mono text-[11px] font-bold text-green-700 font-black">{s.retAmount.toLocaleString()}</td>
+                                            <td className="px-3 py-2 text-right font-mono text-[11px] font-bold text-red-700">{(s.pendBal - s.setoffAmount).toLocaleString()}</td>
                                         </tr>
                                     ))}
                                     {selectedSetoffs.length === 0 && (
                                         <tr>
-                                            <td colSpan={8} className="p-12 text-center text-slate-300 font-medium italic">
+                                            <td colSpan={8} className="p-12 text-center text-slate-300 font-mono text-[11px] uppercase tracking-widest">
                                                 Select pending invoices and matching return documents to build your set-off schedule.
                                             </td>
                                         </tr>
@@ -367,51 +331,51 @@ const PaymentSetoffBoard = ({ isOpen, onClose }) => {
             {/* Supplier Search Modal */}
             {activeSupplierModal && (
                 <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setActiveSupplierModal(false)} />
-                    <div className="relative w-full max-w-2xl bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col max-h-[85vh] font-['Plus_Jakarta_Sans']">
-                        <div className="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-50">
-                            <h3 className="text-lg font-bold text-slate-800 tracking-tight uppercase">Search Suppliers</h3>
+                    <div className="absolute inset-0 bg-black/60 backdrop-blur-md" onClick={() => setActiveSupplierModal(false)} />
+                    <div className="relative w-full max-w-2xl bg-white shadow-2xl rounded-[5px] border border-slate-200 overflow-hidden flex flex-col max-h-[85vh]">
+                        <div className="px-6 py-3.5 border-b border-slate-200 flex justify-between items-center bg-white">
+                            <h3 className="text-[15px] font-mono font-bold text-slate-800 uppercase tracking-widest">Search Suppliers</h3>
                             <button 
                                 onClick={() => setActiveSupplierModal(false)} 
-                                className="w-10 h-10 flex items-center justify-center bg-red-50 hover:bg-red-100 text-red-600 rounded-[8px] transition-all active:scale-90 outline-none border-none group"
+                                className="w-8 h-8 bg-white/10 hover:bg-slate-100 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-600 transition-all border-none"
                                 title="Close"
                             >
-                                <X size={20} strokeWidth={4} className="group-hover:scale-110 transition-transform" />
+                                <X size={15} strokeWidth={2} />
                             </button>
                         </div>
-                        <div className="p-4 border-b border-gray-100 bg-white">
+                        <div className="p-4 border-b border-slate-200 bg-white">
                             <div className="relative">
-                                <Search size={20} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                                <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                                 <input 
                                     type="text" 
                                     placeholder="Search by supplier name or code..." 
-                                    className="w-full h-12 border border-blue-100 pl-11 pr-4 text-sm rounded-lg focus:border-blue-500 outline-none shadow-inner" 
+                                    className="w-full h-8 border border-slate-200 pl-10 pr-4 text-sm bg-slate-50 rounded outline-none focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 transition-all" 
                                     value={searchTerm} 
                                     onChange={(e) => setSearchTerm(e.target.value)} 
                                     autoFocus
                                 />
                             </div>
                         </div>
-                        <div className="overflow-y-auto p-2 font-['Inter']">
-                            <table className="w-full text-sm text-left">
-                                <thead className="bg-slate-50 sticky top-0 text-slate-400 font-bold uppercase text-[10px] tracking-widest">
+                        <div className="overflow-y-auto no-scrollbar">
+                            <table className="w-full text-left">
+                                <thead className="bg-slate-50/80 sticky top-0 text-[10px] font-mono font-bold text-gray-400 uppercase tracking-widest border-b border-slate-200">
                                     <tr>
-                                        <th className="p-3 border-b">Code</th>
-                                        <th className="p-3 border-b">Supplier Name</th>
-                                        <th className="p-3 border-b text-center">Action</th>
+                                        <th className="px-5 py-2.5 border-b border-slate-200">Code</th>
+                                        <th className="px-5 py-2.5 border-b border-slate-200">Supplier Name</th>
+                                        <th className="px-5 py-2.5 border-b border-slate-200 text-center">Action</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody className="divide-y divide-slate-100">
                                     {filteredSuppliers().length > 0 ? filteredSuppliers().map((s, idx) => (
-                                        <tr key={idx} className="hover:bg-blue-50 transition-colors group cursor-pointer" onClick={() => handleSupplierSelect(s)}>
-                                            <td className="p-3 border-b font-black text-slate-600">{s.code}</td>
-                                            <td className="p-3 border-b font-bold text-[#0078d4] uppercase">{s.name}</td>
-                                            <td className="p-3 border-b text-center">
-                                                <button className="bg-[#0078d4] text-white text-[10px] px-4 py-2 rounded-sm font-black hover:bg-[#005a9e] tracking-wider">SELECT</button>
+                                        <tr key={idx} className="hover:bg-slate-50 transition-colors group cursor-pointer" onClick={() => handleSupplierSelect(s)}>
+                                            <td className="px-5 py-2.5 border-b border-slate-100 font-mono text-[12px] font-bold text-slate-600">{s.code}</td>
+                                            <td className="px-5 py-2.5 border-b border-slate-100 font-mono text-[12px] font-bold text-[#0285fd] uppercase">{s.name}</td>
+                                            <td className="px-5 py-2.5 border-b border-slate-100 text-center">
+                                                <button className="bg-[#e49e1b] text-white text-[9px] px-4 py-1.5 rounded-[5px] font-mono font-bold uppercase tracking-widest hover:bg-[#cb9b34] transition-all active:scale-95">SELECT</button>
                                             </td>
                                         </tr>
                                     )) : (
-                                        <tr><td colSpan={3} className="p-10 text-center text-gray-400 italic">No suppliers matching "{searchTerm}" found.</td></tr>
+                                        <tr><td colSpan={3} className="p-10 text-center text-slate-300 font-mono text-[11px] uppercase tracking-widest">No suppliers found.</td></tr>
                                     )}
                                 </tbody>
                             </table>

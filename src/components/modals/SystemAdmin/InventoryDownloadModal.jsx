@@ -222,22 +222,15 @@ const InventoryDownloadModal = ({ isOpen, onClose }) => {
                 maxWidth="max-w-[1000px]"
                 showHeaderClose={true}
                 footer={
-                    <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-gray-100 rounded-b-xl font-['Tahoma']">
+                    <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-slate-200 rounded-b-xl">
                         <div className="flex gap-3">
-                            <button
-                                onClick={handleClear}
-                                className="px-6 h-10 bg-[#00adff] text-white text-sm font-black rounded-[5px] hover:bg-[#0099e6] transition-all active:scale-95 flex items-center gap-2 border-none"
-                            >
-                                <RotateCcw size={14} /> CLEAR 
+                            <button onClick={handleClear} disabled={loading} className="px-6 py-3 bg-[#00adff] hover:bg-[#0099e6] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] transition-all active:scale-95 flex items-center justify-center gap-2 border-none">
+                                <RotateCcw size={14} /> CLEAR
                             </button>
                         </div>
                         <div className="flex gap-3">
-                            <button
-                                onClick={handleSave}
-                                disabled={loading}
-                                className="px-6 h-10 bg-[#2bb744] text-white text-sm font-black rounded-[5px] shadow-md shadow-green-100 hover:bg-[#259b3a] transition-all active:scale-95 flex items-center gap-2 border-none disabled:opacity-50"
-                            >
-                        <CheckCircle size={14} /> SAVE & APPLY
+                            <button onClick={handleSave} disabled={loading} className={`px-6 py-3 bg-[#2bb744] hover:bg-[#259b3a] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] shadow-md shadow-green-100 transition-all active:scale-95 flex items-center justify-center gap-2 border-none ${loading ? 'opacity-50' : ''}`}>
+                                <CheckCircle size={14} /> SAVE & APPLY
                             </button>
                         </div>
                     </div>
@@ -272,18 +265,18 @@ const InventoryDownloadModal = ({ isOpen, onClose }) => {
                     </div>
 
                     {/* Filters Section - Mirroring PO Board Container Styles */}
-                    <div className="bg-white p-4 border border-gray-100 rounded-lg shadow-sm space-y-4">
-                        <div className="grid grid-cols-12 gap-x-6 gap-y-3.5">
+                    <div className="bg-slate-50/50 p-4 border border-slate-200 rounded-[5px] relative overflow-hidden space-y-4">
+                        <div className="grid grid-cols-12 gap-x-6 gap-y-3.5 relative z-10">
                             
                             {/* Date From - Column 1 */}
                             <div className="col-span-4 flex items-center gap-2">
-                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Date From</label>
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Date From</label>
                                 <div className="flex-1 flex gap-1 h-8 min-w-0">
                                     <input
                                         type="text"
                                         readOnly
                                         value={dateFrom}
-                                        className="flex-1 min-w-0 h-8 border border-gray-300 rounded-[5px] px-3 text-[12px] outline-none bg-white text-gray-700 font-bold cursor-pointer shadow-sm focus:border-[#0285fd]"
+                                        className="flex-1 min-w-0 h-8 border border-slate-200 rounded-[5px] px-3 text-[12px] outline-none bg-white text-gray-700 font-bold cursor-pointer shadow-sm focus:border-[#0285fd]"
                                         onClick={() => openCalendar('from')}
                                     />
                                     <button onClick={() => openCalendar('from')} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
@@ -294,13 +287,13 @@ const InventoryDownloadModal = ({ isOpen, onClose }) => {
 
                             {/* Date To - Column 2 */}
                             <div className="col-span-4 flex items-center gap-2">
-                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Date To</label>
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Date To</label>
                                 <div className="flex-1 flex gap-1 h-8 min-w-0">
                                     <input
                                         type="text"
                                         readOnly
                                         value={dateTo}
-                                        className="flex-1 min-w-0 h-8 border border-gray-300 rounded-[5px] px-3 text-[12px] outline-none bg-white text-gray-700 font-bold cursor-pointer shadow-sm focus:border-[#0285fd]"
+                                        className="flex-1 min-w-0 h-8 border border-slate-200 rounded-[5px] px-3 text-[12px] outline-none bg-white text-gray-700 font-bold cursor-pointer shadow-sm focus:border-[#0285fd]"
                                         onClick={() => openCalendar('to')}
                                     />
                                     <button onClick={() => openCalendar('to')} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
@@ -311,13 +304,13 @@ const InventoryDownloadModal = ({ isOpen, onClose }) => {
 
                             {/* Location - Column 3 */}
                             <div className="col-span-4 flex items-center gap-2">
-                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Location</label>
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Location</label>
                                 <div className="flex-1 flex gap-1 h-8 min-w-0">
                                     <input
                                         type="text"
                                         readOnly
                                         value={selectedLocation.code ? `${selectedLocation.code} - ${selectedLocation.name}` : ''}
-                                        className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-blue-600 bg-gray-50 rounded-[5px] outline-none shadow-sm cursor-pointer truncate"
+                                        className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-bold text-blue-600 bg-gray-50 rounded-[5px] outline-none shadow-sm cursor-pointer truncate"
                                         onClick={() => setShowLocationSearch(true)}
                                     />
                                     <button onClick={() => setShowLocationSearch(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
@@ -328,8 +321,8 @@ const InventoryDownloadModal = ({ isOpen, onClose }) => {
 
                             {/* Secondary Location/Detail Row */}
                             <div className="col-span-8 flex items-center gap-2">
-                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Sub Branch</label>
-                                <div className="flex-1 h-8 border border-gray-300 rounded-[5px] bg-slate-50 flex items-center px-3 cursor-not-allowed">
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Sub Branch</label>
+                                <div className="flex-1 h-8 border border-slate-200 rounded-[5px] bg-slate-50 flex items-center px-3 cursor-not-allowed">
                                 </div>
                             </div>
                         </div>

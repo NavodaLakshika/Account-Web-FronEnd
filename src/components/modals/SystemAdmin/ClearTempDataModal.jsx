@@ -42,19 +42,17 @@ const ClearTempDataModal = ({ isOpen, onClose }) => {
     };
 
     const footer = (
-        <div className="bg-slate-50 px-6 py-4 w-full flex justify-end gap-3 border-t border-gray-100 mt-4 rounded-b-xl font-['Tahoma']">
-            <button 
-                onClick={handleProcess} 
-                className="px-8 h-10 bg-[#0285fd] text-white text-[13px] font-bold rounded-[5px] shadow-md shadow-blue-200 hover:bg-[#0073ff] transition-all active:scale-95 flex items-center justify-center gap-2"
-            >
-                <Play size={14} /> Process Clear
-            </button>
-            <button 
-                onClick={onClose} 
-                className="px-8 h-10 bg-[#d13438] text-white text-[13px] font-bold rounded-[5px] shadow-md shadow-red-200 hover:bg-[#a4262c] transition-all active:scale-95 flex items-center justify-center gap-2"
-            >
-                <X size={14} /> Exit
-            </button>
+        <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-slate-200 rounded-b-xl">
+            <div className="flex gap-3">
+                <button onClick={() => setOptions({appCache: false, sessionLogs: false, tempRecords: false, auditHistory: false})} disabled={loading} className="px-6 py-3 bg-[#00adff] hover:bg-[#0099e6] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] transition-all active:scale-95 flex items-center justify-center gap-2 border-none">
+                    <RotateCcw size={14} /> CLEAR FORM
+                </button>
+            </div>
+            <div className="flex gap-3">
+                <button onClick={handleProcess} disabled={loading} className={`px-6 py-3 bg-[#0285fd] hover:bg-[#0073ff] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] shadow-md shadow-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border-none ${loading ? 'opacity-50' : ''}`}>
+                    <Play size={14} /> PROCESS CLEAR
+                </button>
+            </div>
         </div>
     );
 

@@ -227,36 +227,29 @@ const DeleteAccountModal = ({ isOpen, onClose }) => {
                 title="Delete Account"
                 maxWidth="max-w-[500px]"
                 footer={
-                    <div className="bg-slate-50 px-6 py-4 w-full flex justify-end items-center gap-3 border-t border-gray-100 rounded-b-xl font-['Tahoma']">
-                        <button
-                            onClick={handleDeleteClick}
-                            disabled={loading}
-                            className="px-6 h-10 bg-[#ff3b30] text-white text-sm font-black rounded-[5px] shadow-md shadow-red-100 hover:bg-[#e03127] transition-all active:scale-95 flex items-center gap-2 border-none uppercase tracking-widest group"
-                        >
-                            <Trash2 size={14} className="group-hover:rotate-12 transition-transform" /> DELETE 
+                    <div className="bg-slate-50 px-6 py-4 w-full flex justify-center items-center gap-3 border-t border-slate-200 rounded-b-xl">
+                        <button onClick={handleDeleteClick} disabled={loading} className={`px-6 py-3 bg-[#ff3b30] hover:bg-[#e03127] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] shadow-md shadow-red-100 transition-all active:scale-95 flex items-center justify-center gap-2 border-none ${loading ? 'opacity-50' : ''}`}>
+                            <Trash2 size={14} /> DELETE
                         </button>
-                         <button
-                            onClick={handleClear}
-                            className="px-6 h-10 bg-[#00adff] text-white text-sm font-black rounded-[5px] hover:bg-[#0099e6] transition-all active:scale-95 flex items-center gap-2 border-none uppercase tracking-widest shadow-md group"
-                        >
-                            <RotateCcw size={14} className="group-hover:rotate-[-45deg] transition-transform" /> CLEAR 
+                        <button onClick={handleClear} disabled={loading} className="px-6 py-3 bg-[#00adff] hover:bg-[#0099e6] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] transition-all active:scale-95 flex items-center justify-center gap-2 border-none">
+                            <RotateCcw size={14} /> CLEAR
                         </button>
                     </div>
                 }
             >
                 <div className="space-y-4 font-['Tahoma']">
-                    <div className="bg-white p-6 border border-gray-100 rounded-lg shadow-sm space-y-6">
-                        <div className="grid grid-cols-12 gap-y-5">
+                    <div className="bg-slate-50/50 p-6 border border-slate-200 rounded-[5px] relative overflow-hidden space-y-6">
+                        <div className="grid grid-cols-12 gap-y-5 relative z-10">
                             
                             {/* Account Row */}
-                            <div className="col-span-12 flex flex-col gap-2">
-                                <label className="text-[12.5px] font-bold text-gray-700">Account</label>
+                            <div className="col-span-12 flex flex-col gap-1.5">
+                                <label className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">Account</label>
                                 <div className="flex gap-1 h-8">
                                     <input
                                         type="text"
                                         readOnly
                                         value={selectedAccount.code || ''}
-                                        className="w-24 h-8 border border-gray-300 px-3 text-[12px] font-bold text-blue-600 bg-gray-50 rounded-[5px] outline-none cursor-pointer"
+                                        className="w-24 h-8 border border-slate-200 px-3 text-[12px] font-bold text-gray-700 bg-white rounded-[5px] outline-none cursor-pointer transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20"
                                         onClick={() => setShowAccountSearch(true)}
                                         placeholder=""
                                     />
@@ -264,7 +257,7 @@ const DeleteAccountModal = ({ isOpen, onClose }) => {
                                         type="text"
                                         readOnly
                                         value={selectedAccount.name || ''}
-                                        className="flex-1 h-8 border border-gray-300 px-3 text-[12px] font-bold text-red-600 bg-gray-50 rounded-[5px] outline-none cursor-pointer truncate"
+                                        className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-bold text-gray-700 bg-white rounded-[5px] outline-none cursor-pointer truncate transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20"
                                         onClick={() => setShowAccountSearch(true)}
                                         placeholder=" "
                                     />
@@ -275,14 +268,14 @@ const DeleteAccountModal = ({ isOpen, onClose }) => {
                             </div>
 
                             {/* Authorize Row */}
-                            <div className="col-span-12 flex flex-col gap-2">
-                                <label className="text-[12.5px] font-bold text-gray-700">Authorize</label>
+                            <div className="col-span-12 flex flex-col gap-1.5">
+                                <label className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">Authorize</label>
                                 <div className="flex gap-1 h-8">
                                     <input
                                         type="text"
                                         readOnly
                                         value={selectedUser.name || ''}
-                                        className="flex-1 h-8 border border-gray-300 rounded-[5px] px-3 text-[12px] font-bold text-gray-700 bg-white outline-none cursor-pointer"
+                                        className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-bold text-gray-700 bg-white rounded-[5px] outline-none cursor-pointer truncate transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20"
                                         onClick={() => setShowUserSearch(true)}
                                         placeholder=""
                                     />
@@ -293,15 +286,15 @@ const DeleteAccountModal = ({ isOpen, onClose }) => {
                             </div>
 
                             {/* Password Row */}
-                            <div className="col-span-12 flex flex-col gap-2">
-                                <label className="text-[12.5px] font-bold text-gray-700">Password</label>
+                            <div className="col-span-12 flex flex-col gap-1.5">
+                                <label className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">Password</label>
                                 <div className="relative">
                                     <input
                                         type={showPassword ? "text" : "password"}
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
                                         placeholder="••••••••"
-                                        className="w-full h-8 border border-gray-300 rounded-[5px] pl-3 pr-10 text-[12px] font-bold text-slate-700 bg-white outline-none shadow-sm focus:border-[#0285fd] transition-colors"
+                                        className="w-full h-8 border border-slate-200 px-3 pr-10 text-[12px] font-bold text-slate-700 bg-white rounded-[5px] outline-none shadow-sm transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20"
                                     />
                                     <button
                                         type="button"

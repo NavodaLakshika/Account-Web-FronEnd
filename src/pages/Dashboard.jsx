@@ -140,7 +140,7 @@ const Dashboard = () => {
     const [showReceivePaymentModal, setShowReceivePaymentModal] = useState(false);
     const [showChequeRegisterModal, setShowChequeRegisterModal] = useState(false);
 
-    const [topBarColor, setTopBarColor] = useState(localStorage.getItem('topBarColor') || '#0078d4');
+    const [topBarColor, setTopBarColor] = useState(localStorage.getItem('topBarColor') || '#0388cc');
     const [showAccountBalanceModal, setShowAccountBalanceModal] = useState(false);
     const [showAdvancePayModal, setShowAdvancePayModal] = useState(false);
     const [showCustomerAdvanceModal, setShowCustomerAdvanceModal] = useState(false);
@@ -186,6 +186,7 @@ const Dashboard = () => {
     const [showFirstTimeGuide, setShowFirstTimeGuide] = useState(false);
     const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
     const [showDashboardLockedModal, setShowDashboardLockedModal] = useState(false);
+    const [showFeatureLockedModal, setShowFeatureLockedModal] = useState(false);
 
     const [showAIChatbotModal, setShowAIChatbotModal] = useState(false);
     const [showItemsServicesReport, setShowItemsServicesReport] = useState(false);
@@ -214,6 +215,7 @@ const Dashboard = () => {
                 let parsed = JSON.parse(saved);
                 // Always ensure 'dashboard' is present after 'ai_chat'
                 if (!parsed.includes('dashboard')) {
+                    
                     const aiIdx = parsed.indexOf('ai_chat');
                     if (aiIdx !== -1) {
                         parsed.splice(aiIdx + 1, 0, 'dashboard');
@@ -376,12 +378,7 @@ const Dashboard = () => {
     // Show promo popup every 10 minutes (first after 8s)
     useEffect(() => {
         const showPromo = () => {
-            const lastShown = localStorage.getItem('promoLastShown');
-            const now = Date.now();
-            if (!lastShown || now - parseInt(lastShown) > 10 * 60 * 1000) {
-                setShowPromoModal(true);
-                localStorage.setItem('promoLastShown', String(now));
-            }
+            setShowPromoModal(true);
         };
 
         const onMount = setTimeout(showPromo, 8000);
@@ -495,6 +492,10 @@ const Dashboard = () => {
     };
 
     const handleAIClick = () => {
+        if (localStorage.getItem('isLocked_util_aiChatbot') === 'true') {
+            setShowFeatureLockedModal(true);
+            return;
+        }
         setIsAIThinking(true);
         setTimeout(() => {
             setIsAIThinking(false);
@@ -551,12 +552,12 @@ const Dashboard = () => {
 
 
     return (
-        <div className="h-screen w-screen flex flex-col font-['Plus_Jakarta_Sans'] bg-white select-none text-slate-800 overflow-hidden">
+        <div className="h-screen w-screen flex flex-col font-['Plus_Jakarta_Sans'] bg-white select-none text-slate-800 overflow-hidden antialiased">
             {/* 1. Modal Overlays */}
             <HomeBoard
                 isOpen={showHomeModal}
                 onClose={() => setShowHomeModal(false)}
-                onOpenDashboard={() => { setShowHomeModal(false); setShowBIDashboard(true); }}
+                onOpenDashboard={() => { setShowHomeModal(false); window.open('/bi-dashboard', '_blank'); }}
                 onOpenModal={(label) => {
                     // Item Mapping from Legend/Original Home Page
                     if (label === 'Home') setShowHomeModal(true);
@@ -590,7 +591,13 @@ const Dashboard = () => {
                     if (label === 'Journal Entry') setShowJournalEntryModal(true);
                     if (label === 'Items and Servies' || label === 'Items & Services') handleOpenItemsServicesReport();
                     if (label === 'Marketing Tool') setShowMarketingToolModal(true);
-                    if (label === 'AI Chat') setShowAIChatbotModal(true);
+                    if (label === 'AI Chat') {
+                        if (localStorage.getItem('isLocked_util_aiChatbot') === 'true') {
+                            setShowFeatureLockedModal(true);
+                        } else {
+                            setShowAIChatbotModal(true);
+                        }
+                    }
 
 
                     // Close home board after selecting an option (except when selecting Home)
@@ -631,7 +638,6 @@ const Dashboard = () => {
                 onOpenCalculator={() => window.open('ms-calculator:')}
                 onOpenNotepad={() => fetch('/api/utility/open-notepad')}
                 onOpenPrinter={() => fetch('/api/utility/open-printer')}
-                onOpenReminder={() => setShowReminderModal(true)}
                 currentTopBarColor={topBarColor}
                 onColorSelect={(color) => {
                     setTopBarColor(color);
@@ -772,6 +778,7 @@ const Dashboard = () => {
                 </div>
             )}
             <SystemSettingsBoard isOpen={showSystemSettingsModal} onClose={() => setShowSystemSettingsModal(false)} />
+            <FeatureLockedModal isOpen={showFeatureLockedModal} onClose={() => setShowFeatureLockedModal(false)} />
             <GRNBoard isOpen={showGRNModal} onClose={() => setShowGRNModal(false)} />
             <BulkGRNBoard isOpen={showBulkGRNModal} onClose={() => setShowBulkGRNModal(false)} />
             <AIChatbotBoard isOpen={showAIChatbotModal} onClose={() => setShowAIChatbotModal(false)} />
@@ -912,11 +919,11 @@ const Dashboard = () => {
             {/* 2. Top Ribbon Navigation (Matches Reference Image) */}
             <header
                 data-tour="main-menu"
-                className={`z-50 text-white shadow-md transition-all duration-500 ease-in-out overflow-hidden backdrop-blur-md ${isTopBarCollapsed ? 'h-12' : 'h-[155px]'}`}
-                style={{ backgroundColor: `${topBarColor}F2` }} // Slightly transparent for glass effect
+                className={`z-50 text-white shadow-lg transition-all duration-500 ease-in-out overflow-hidden ${isTopBarCollapsed ? 'h-12' : 'h-[155px]'}`}
+                style={{ background: `linear-gradient(135deg, ${topBarColor} 0%, ${topBarColor}dd 100%)` }}
             >
                 {/* Row 1: Text Menu */}
-                <div className={`flex items-center gap-8 px-6 border-b border-white/10 overflow-x-auto no-scrollbar transition-opacity duration-300 ${isTopBarCollapsed ? 'h-full mt-0 border-transparent' : 'h-8 py-2 mt-4'}`}>
+                <div className={`flex items-center gap-8 px-6 border-b border-white/5 overflow-x-auto no-scrollbar transition-opacity duration-300 ${isTopBarCollapsed ? 'h-full mt-0 border-transparent' : 'h-8 py-2 mt-4'}`}>
                     <div className="flex items-center gap-6">
                         {menuBar.map((item, idx) => (
                             <button
@@ -929,7 +936,7 @@ const Dashboard = () => {
                                     if (item === 'System Admin') setShowSystemAdminModal(true);
                                     if (item === 'About') setShowSoftwareAboutModal(true);
                                 }}
-                                className="!text-[12px]  text-white/90 hover:text-white whitespace-nowrap transition-all hover:scale-105 active:scale-95 flex items-center gap-1 group"
+                                className="text-[12px] font-medium text-white/85 hover:text-white whitespace-nowrap transition-all hover:scale-[1.02] active:scale-95 flex items-center gap-1 relative"
                             >
                                 {item}
                                 <div className="w-0 h-[1.5px] bg-white absolute bottom-[-4px] left-0 group-hover:w-full transition-all duration-300" />
@@ -938,42 +945,41 @@ const Dashboard = () => {
                     </div>
 
                     <div className="flex items-center gap-3 ml-auto">
-                            <div className="flex items-center gap-2 h-[28px] bg-white/5 backdrop-blur-md px-3 rounded-[10px] border border-white/10 shadow-sm mb-1">
+                            <div className="flex items-center gap-2 h-[28px] bg-white/10 backdrop-blur-sm px-3 rounded-lg border border-white/10 mb-1">
                                 <div className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse shadow-[0_0_8px_rgba(74,222,128,0.6)]" />
-                                <span className="text-[10px] font-black uppercase tracking-widest text-white drop-shadow-sm">
+                                <span className="text-[10px] font-bold uppercase tracking-widest text-white">
                                     {user?.EmpName || user?.empName || user?.Emp_Name || user?.username || 'Admin'}
                                 </span>
                             </div>
 
-                            <div className="flex items-center gap-1.5 h-[28px] bg-white/5 backdrop-blur-md px-3 rounded-[10px] border border-white/10 shadow-sm mb-1">
+                            <div className="flex items-center gap-1.5 h-[28px] bg-white/10 backdrop-blur-sm px-3 rounded-lg border border-white/10 mb-1">
                                 <Building2 size={12} className="text-white/50" />
-                                <span className="text-[10px] font-medium text-white/70 tracking-tight">
+                                <span className="text-[10px] font-semibold text-white/80 tracking-tight">
                                     {selectedCompany?.CompanyName || selectedCompany?.companyName || selectedCompany?.name || 'Enterprise'}
                                 </span>
                             </div>
 
-                            <div className="flex items-center gap-1.5 h-[28px] bg-white/15 backdrop-blur-md px-3 rounded-[10px] border border-white/20 shadow-sm mb-1">
+                            <div className="flex items-center gap-1.5 h-[28px] bg-white/10 backdrop-blur-sm px-3 rounded-lg border border-white/10 mb-1">
                                 <Clock size={10} className="text-white/70" />
                                 <span className="text-[10px] font-mono font-bold text-white/90 tabular-nums">
                                     {currentTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true })}
                                 </span>
                             </div>
 
-                        <div className="w-[1px] h-4 bg-white/20 mx-1" />
+                        <div className="w-px h-4 bg-white/15 mx-1" />
                         <button
                             onClick={() => setShowSideBar(!showSideBar)}
-                            className={`p-2 rounded-lg transition-all flex items-center justify-center ${showSideBar ? 'bg-white/30 text-white shadow-[0_0_15px_rgba(255,255,255,0.2)]' : 'text-white/80 hover:bg-white/10 hover:text-white'}`}
+                            className={`p-2 rounded-lg transition-all flex items-center justify-center ${showSideBar ? 'bg-white/20 text-white' : 'text-white/70 hover:bg-white/8 hover:text-white'}`}
                         >
-                            <Menu size={18} />
+                            <Menu size={17} />
                         </button>
                     </div>
 
-                    {/* Expand Trigger when collapsed */}
                     {isTopBarCollapsed && (
-                        <div className="ml-4 pr-0 flex items-center">
+                        <div className="ml-3 flex items-center">
                             <ChevronRight
-                                size={16}
-                                className="text-white/50 cursor-pointer hover:text-white transition-all transform rotate-90"
+                                size={15}
+                                className="text-white/40 cursor-pointer hover:text-white transition-all transform rotate-90 hover:scale-110"
                                 onClick={() => {
                                     setIsTopBarCollapsed(false);
                                     setShowSideBar(false);
@@ -983,9 +989,9 @@ const Dashboard = () => {
                     )}
                 </div>
 
-                {/* Vertical Separator Gap - Dynamic Alert Bar (Fixed Persistence) */}
+                {/* Process/Alert Bar */}
                 {!isTopBarCollapsed && (
-                    <div className="h-[4px] w-full bg-slate-100 shadow-[inset_0_1px_2px_rgba(0,0,0,0.1)] my-1 overflow-hidden relative">
+                    <div className="h-[4px] w-full bg-white/10 shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)] my-1 overflow-hidden relative">
                         {pendingJobsCount > 0 && (
                             <div
                                 className="absolute inset-0 bg-gradient-to-r from-[#f05252] via-[#f05252] to-[#f05252] animate-[cardLoading_2s_ease-in-out_infinite]"
@@ -999,7 +1005,7 @@ const Dashboard = () => {
                 )}
 
                 {/* Row 2: Icon Ribbon */}
-                <div className={`flex items-center px-2 py-1 gap-1  overflow-x-auto no-scrollbar transition-all duration-500 ${isTopBarCollapsed ? 'opacity-0 -translate-y-10 scale-95 pointer-events-none' : 'opacity-100 translate-y-0 scale-100'}`}>
+                <div className={`flex items-center px-3 py-1.5 gap-1 overflow-x-auto no-scrollbar transition-all duration-500 ${isTopBarCollapsed ? 'opacity-0 -translate-y-10 scale-95 pointer-events-none' : 'opacity-100 translate-y-0 scale-100'}`}>
                     {ribbonIcons.map((iconId) => {
                         const iconData = {
                             logout: { icon: LogOut, label: 'LogOut', onClick: () => setShowLogoutConfirmModal(true), iconColor: 'text-red-500' },
@@ -1021,9 +1027,9 @@ const Dashboard = () => {
                                 if (isLocked) {
                                     setShowDashboardLockedModal(true);
                                 } else {
-                                    setShowBIDashboard(true);
+                                    window.open('/bi-dashboard', '_blank');
                                 }
-                            }, active: showBIDashboard, isHighlighted: true },
+                            }, active: false, isHighlighted: true },
                             ai_chat: { icon: Bot, label: 'AI Chat', onClick: handleAIClick, active: showAIChatbotModal },
                             department: { icon: Building2, label: 'Dept.', onClick: () => setShowDepartmentModal(true), active: showDepartmentModal },
                             calculator: { icon: Calculator, label: 'Calculator', onClick: () => window.open('ms-calculator:'), active: showCalculatorModal },
@@ -1044,38 +1050,20 @@ const Dashboard = () => {
                                         if (isLocked) {
                                             setShowDashboardLockedModal(true);
                                         } else {
-                                            setShowBIDashboard(true);
+                                            window.open('/bi-dashboard', '_blank');
                                         }
                                     }}
-                                    className="relative flex flex-col items-center justify-center min-w-[75px] h-[75px] m-0.5 rounded-xl cursor-pointer border-0 outline-none group transition-all duration-200"
-                                    style={{
-                                        background: showBIDashboard ? 'rgba(255,255,255,0.20)' : 'transparent',
-                                    }}
-                                    onMouseEnter={e => {
-                                        if (!showBIDashboard) e.currentTarget.style.background = 'rgba(255,255,255,0.12)';
-                                    }}
-                                    onMouseLeave={e => {
-                                        if (!showBIDashboard) e.currentTarget.style.background = 'transparent';
-                                    }}
+                                    className="relative flex flex-col items-center justify-center min-w-[72px] h-[72px] m-0.5 rounded-xl cursor-pointer border-0 outline-none group transition-all duration-200 hover:bg-white/8"
                                 >
                                     <PieChart
-                                        size={26}
+                                        size={24}
                                         strokeWidth={1.8}
-                                        className="text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.2)] group-hover:scale-110 transition-transform duration-300"
-                                        style={{
-                                            transform: showBIDashboard ? 'translateY(-1px) scale(1.08)' : undefined,
-                                        }}
+                                        className="text-white/90 group-hover:scale-110 group-hover:text-white transition-all duration-300"
                                     />
-                                    <span className="text-[11px] font-bold mt-2 tracking-wide leading-none text-center text-white opacity-90 group-hover:opacity-100 px-1">
+                                    <span className="text-[10px] font-semibold mt-1.5 tracking-wide leading-none text-center text-white/80 group-hover:text-white px-1">
                                         Dashboard
                                     </span>
 
-                                    {/* Active underline — same as RibbonButton */}
-                                    {showBIDashboard && (
-                                        <div className="absolute bottom-1 left-1/2 -translate-x-1/2 w-8 h-1 bg-white rounded-full shadow-[0_0_10px_rgba(255,255,255,0.8)]" />
-                                    )}
-
-                                    {/* Hover glow overlay — same as RibbonButton */}
                                     <div className="absolute inset-0 bg-white/0 group-hover:bg-white/5 rounded-xl transition-colors duration-300" />
                                 </button>
                             );
@@ -1107,8 +1095,8 @@ const Dashboard = () => {
                             <span className="text-[8px] font-bold uppercase tracking-wide mt-0.5 opacity-80">Menu</span>
                         </button> */}
                         <ChevronRight
-                            size={16}
-                            className="text-white/50 cursor-pointer hover:text-white transition-all transform -rotate-90"
+                            size={15}
+                            className="text-white/40 cursor-pointer hover:text-white transition-all transform -rotate-90 hover:scale-110"
                             onClick={() => {
                                 setIsTopBarCollapsed(true);
                             }}
@@ -1117,50 +1105,28 @@ const Dashboard = () => {
                 </div>
             </header>
 
-            {/* 3. Main Workspace Area - Professional Console */}
-            <main className="flex-1 relative overflow-y-auto bg-[#f8fafc]">
-                {/* Visual Watermark Background - Custom Mesh Gradient */}
-                <div
-                    className="fixed inset-0 z-0 bg-cover bg-center bg-no-repeat pointer-events-none opacity-[0.15]"
-                    style={{ backgroundImage: `url('/images/dashboard_bg_premium.png')` }}
-                />
+            {/* 3. Main Workspace Area - Clean Modern */}
+            <main className="flex-1 relative overflow-y-auto bg-gradient-to-br from-slate-50 via-white to-blue-50/30">
+                <div className="relative mt-6 z-10 p-10 max-w-7xl mx-auto flex flex-col gap-12">
 
 
 
-                {/* Technical Dot Grid Overlay */}
-                <div
-                    className="fixed inset-0 z-0 pointer-events-none opacity-[0.05]"
-                    style={{
-                        backgroundImage: `radial-gradient(${topBarColor} 1.5px, transparent 1.5px)`,
-                        backgroundSize: '36px 36px'
-                    }}
-                />
-
-                {/* Glassmorphism Frosted Overlay */}
-                <div className="fixed  inset-0 z-0 bg-white/20  backdrop-blur-[60px] pointer-events-none" />
-
-
-                <div className="relative mt-8 z-10 p-12 max-w-7xl mx-auto flex flex-col gap-20">
-
-
-
-                    {/* Top Right Action Buttons */}
-                    <div className="flex justify-end gap-4 -mb-12 animate-in fade-in slide-in-from-right-10 duration-700">
+                    <div className="flex justify-end gap-3">
                         <button
                             data-tour="rate-system"
                             onClick={() => setShowReviewModal(true)}
-                            className="flex items-center gap-2 px-4 h-11 bg-white/40 backdrop-blur-md border border-white/20 rounded-[10px] shadow-lg hover:bg-[#f97316] hover:text-white hover:border-[#ea580c] hover:shadow-xl hover:scale-105 transition-all duration-300 group text-gray-500"
+                            className="flex items-center gap-1.5 px-3 h-7 rounded-md text-[11px] font-medium text-slate-400 hover:text-[#f97316] hover:bg-orange-50 transition-all"
                         >
-                            <Star size={18} className="group-hover:text-white transition-colors" />
-                            <span className="text-sm font-semibold tracking-tight">Rate System</span>
+                            <Star size={13} />
+                            Rate
                         </button>
                         <button
                             data-tour="global-search"
                             onClick={() => setShowSearchModal(true)}
-                            className="flex items-center gap-3 px-5 h-11 bg-white/40 backdrop-blur-md border border-white/20 rounded-[10px] shadow-lg hover:bg-white/60 hover:shadow-xl hover:scale-105 transition-all duration-300 group"
+                            className="flex items-center gap-1.5 px-3 h-7 rounded-md text-[11px] font-medium text-slate-400 hover:text-[#0099ff] hover:bg-blue-50 transition-all"
                         >
-                            <Search size={18} className="text-gray-400 group-hover:text-[#0078d4] transition-colors" />
-                            <span className="text-gray-500 text-sm font-semibold tracking-tight">Search System</span>
+                            <Search size={13} />
+                            Search
                         </button>
                     </div>
 
@@ -1178,10 +1144,10 @@ const Dashboard = () => {
                                             item.onClick();
                                             setIsLoaderStopped(true);
                                         }}
-                                        className="w-full flex flex-col items-center justify-center p-6 bg-white border border-slate-200 rounded-[20px] shadow-sm hover:shadow-[0_20px_40px_-10px_rgba(0,120,212,0.2)] hover:border-[#0078d4]/50 hover:scale-[1.04] hover:-translate-y-2 active:scale-95 transition-all duration-500 ease-out relative overflow-hidden aspect-square"
+                                        className="w-full flex flex-col items-center justify-center p-6 bg-white border border-slate-200/70 rounded-2xl shadow-sm hover:shadow-[0_12px_32px_-8px_rgba(0,0,0,0.08)] hover:border-slate-300 hover:scale-[1.03] hover:-translate-y-1.5 active:scale-95 transition-all duration-400 ease-out relative overflow-hidden aspect-square"
                                     >
                                         {/* Focus Glow Effect */}
-                                        <div className="absolute inset-0 bg-[#0078d4]/[0.02] opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                                        <div className="absolute inset-0 bg-gradient-to-br from-blue-600/[0.03] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
                                         <div className={`relative z-10 transition-all duration-500 flex items-center justify-center`}>
                                             <div className={`${isAnimated ? 'w-24 h-24' : 'w-14 h-14'} flex items-center justify-center transition-transform duration-500 group-hover:scale-110`}>
@@ -1212,16 +1178,16 @@ const Dashboard = () => {
                                                     </>
                                                 ) : (
                                                     item.staticImg ? (
-                                                        <img src={item.staticImg} alt={item.label} className="w-16 h-16 object-contain group-hover:text-[#0078d4] transition-colors duration-500" />
+                                                        <img src={item.staticImg} alt={item.label} className="w-16 h-16 object-contain group-hover:text-[#0099ff] transition-colors duration-500" />
                                                     ) : (
-                                                        <Icon size={54} strokeWidth={1.5} className="text-slate-500 group-hover:text-[#0078d4] transition-colors duration-500" />
+                                                        <Icon size={54} strokeWidth={1.5} className="text-slate-500 group-hover:text-[#0099ff] transition-colors duration-500" />
                                                     )
                                                 )}
                                             </div>
                                         </div>
 
                                     </button>
-                                    <span className="text-[12px] font-medium text-slate-500 group-hover:text-[#0078d4] uppercase tracking-wider transition-colors duration-300 text-center leading-tight">
+                                    <span className="text-[12px] font-semibold text-slate-600 group-hover:text-[#0099ff] tracking-wide transition-colors duration-300 text-center leading-tight">
                                         {item.label}
                                     </span>
 
@@ -1233,46 +1199,41 @@ const Dashboard = () => {
                 </div>
             </main>
 
-            {/* Unified One-Line Professional Footer (Ticker + Company Info) */}
+            {/* Footer */}
             <footer
-                className="h-12 border-t border-white/10 flex items-center justify-between px-6 z-50 overflow-hidden relative shadow-[0_-4px_20px_rgba(0,0,0,0.1)]"
-                style={{ backgroundColor: topBarColor }}
+                className="h-10 flex items-center justify-between px-6 z-50 overflow-hidden relative bg-white/80 backdrop-blur-md border-t border-slate-200"
             >
-                {/* Left: Branding/License (Above Ticker) */}
-                <div
-                    className="flex items-center gap-2 relative z-20 pr-6"
-                    style={{ backgroundColor: topBarColor }}
-                >
-                    <span className="text-[#ef1022] text-[12px] font-black tracking-tight group-hover:text-red-400 transition-all cursor-default uppercase drop-shadow-sm">
-                        LICENSED
-                    </span>
+                <div className="flex items-center gap-2 text-[10px] font-semibold text-slate-400">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                    LICENSED
                 </div>
 
-                {/* Center: Animated Information Ticker (Middle Layer) */}
-                <div className="flex-1 overflow-hidden relative mx-4">
-                    {/* Fade Edges for Professional Look */}
-                    <div className="absolute inset-y-0 left-0 w-12 z-10" style={{ background: `linear-gradient(to right, ${topBarColor}, transparent)` }} />
-                    <div className="absolute inset-y-0 right-0 w-12 z-10" style={{ background: `linear-gradient(to left, ${topBarColor}, transparent)` }} />
-
-                    <div className="whitespace-nowrap animate-marquee flex items-center gap-12">
-                        {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-                            <span key={i} className="text-[9px] font-bold text-white/70 uppercase tracking-[0.25em] flex items-center gap-3">
-                                ONIMTA INFORMATION TECHNOLOGY (PVT) LTD
-                                <div className="h-1 w-1 bg-white/40 rounded-full" />
-                            </span>
-                        ))}
+                <div className="flex-1 overflow-hidden relative mx-6">
+                    <div className="absolute inset-y-0 left-0 w-12 z-10 pointer-events-none" style={{ background: 'linear-gradient(to right, rgba(255,255,255,0.95), transparent)' }} />
+                    <div className="absolute inset-y-0 right-0 w-12 z-10 pointer-events-none" style={{ background: 'linear-gradient(to left, rgba(255,255,255,0.95), transparent)' }} />
+                    <div className="flex ticker-scroll">
+                        <div className="flex items-center gap-16 whitespace-nowrap ticker-content">
+                            {[1, 2, 3, 4].map((i) => (
+                                <span key={i} className="text-[9px] font-semibold text-slate-400 uppercase tracking-[0.25em] flex items-center gap-3">
+                                    <span className="w-1 h-1 rounded-full bg-slate-300" />
+                                    ONIMTA INFORMATION TECHNOLOGY (PVT) LTD
+                                </span>
+                            ))}
+                        </div>
+                        <div className="flex items-center gap-16 whitespace-nowrap ticker-content" aria-hidden="true">
+                            {[1, 2, 3, 4].map((i) => (
+                                <span key={i} className="text-[9px] font-semibold text-slate-400 uppercase tracking-[0.25em] flex items-center gap-3">
+                                    <span className="w-1 h-1 rounded-full bg-slate-300" />
+                                    ONIMTA INFORMATION TECHNOLOGY (PVT) LTD
+                                </span>
+                            ))}
+                        </div>
                     </div>
                 </div>
 
-                {/* Right: Company Credits (Above Ticker) */}
-                <div
-                    className="flex items-center gap-2 group relative z-20 pl-6"
-                    style={{ backgroundColor: topBarColor }}
-                >
-                    <span className="text-[9px] font-medium text-white/60 uppercase tracking-tight">Powered by</span>
-                    <span className="text-[#ef1022] text-[12px] mt-[-1px] font-black tracking-tight group-hover:text-red-400 transition-all cursor-default uppercase drop-shadow-sm">
-                        ONIMTA
-                    </span>
+                <div className="flex items-center gap-1.5 text-[10px]">
+                    <span className="text-slate-400 font-medium">Powered by</span>
+                    <span className="text-[#ef1022] font-black tracking-tight">ONIMTA</span>
                 </div>
             </footer>
             {/* Floating AI Assistant with Dynamic Positioning (Status-Based) */}
@@ -1361,11 +1322,6 @@ const Dashboard = () => {
                     50% { transform: scaleY(0); opacity: 0.5; }
                     100% { transform: scaleY(1); opacity: 1; }
                 }
-                @keyframes marquee {
-                    0% { transform: translateX(0); }
-                    100% { transform: translateX(-50%); }
-                }
-
                 @keyframes ribbonGlow {
                     0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.5); border-color: rgba(16, 185, 129, 0.4); }
                     70% { transform: scale(1.04); box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); border-color: rgba(16, 185, 129, 0.8); }
@@ -1380,9 +1336,19 @@ const Dashboard = () => {
                     50% { width: 100%; opacity: 0.8; }
                     100% { width: 100%; opacity: 0; }
                 }
-                .animate-marquee {
-                    display: inline-flex;
-                    animation: marquee 40s linear infinite;
+                .ticker-scroll {
+                    display: flex;
+                    overflow: hidden;
+                }
+                .ticker-scroll:hover .ticker-content {
+                    animation-play-state: paused;
+                }
+                .ticker-content {
+                    animation: footerMarquee 50s linear infinite;
+                }
+                @keyframes footerMarquee {
+                    0% { transform: translateX(0); }
+                    100% { transform: translateX(-100%); }
                 }
                 .no-scrollbar::-webkit-scrollbar { display: none; }
                 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
@@ -1414,50 +1380,6 @@ const Dashboard = () => {
                 onAIClick={handleAIClick}
             />
 
-            <GetThingsDoneBoard
-                isOpen={showBIDashboard}
-                onClose={() => setShowBIDashboard(false)}
-                user={user}
-                selectedCompany={selectedCompany}
-                onAction={(actionId) => {
-                    setShowBIDashboard(false);
-                    const actions = {
-                        home: () => setShowHomeModal(true),
-                        header_search: () => setShowSearchModal(true),
-                        header_tasks: () => setShowReminderListModal(true),
-                        header_apps: () => setShowQuickLaunchModal(true),
-                        header_notifications: () => setShowReminderModal(true),
-                        header_settings: () => setShowSystemSettingsModal(true),
-                        header_help: () => setShowViewUtilityModal(true),
-                        header_profile: () => setShowChangePasswordModal(true),
-                        header_ai: () => setShowAIChatbotModal(true),
-                        enter_bill: () => setShowEnterBillModal(true),
-                        pay_bill: () => setShowPayBillModal(true),
-                        record_expense: () => setShowPettyCashModal(true),
-                        make_deposit: () => setShowMakeDepositModal(true),
-                        write_cheque: () => setShowWriteChequeModal(true),
-                        expenses_detail: () => setShowExpensesDashboardModal(true),
-                        journal: () => setShowJournalEntryModal(true),
-                        trial_balance: () => setShowTrialBalanceModal(true),
-                        bank_rec: () => setShowBankRecModal(true),
-                        opening_balance: () => setShowOpeningBalanceModal(true),
-                        invoice: () => setShowSalesInvoiceModal(true),
-                        sales_receipt: () => setShowSalesReceiptModal(true),
-                        receive_payment: () => setShowReceivePaymentModal(true),
-                        sales_order: () => setShowSalesOrderModal(true),
-                        customer: () => setShowCustomerModal(true),
-                        customer_advance: () => setShowCustomerAdvanceModal(true),
-                        customer_receipt: () => setShowCustomerReceiptModal(true),
-                        department: () => setShowDepartmentModal(true),
-                        estimate: () => setShowEstimateModal(true),
-                        purchase_order: () => setShowPurchaseOrderModal(true),
-                        grn: () => setShowGRNModal(true),
-                        items: () => handleOpenItemsServicesReport(),
-                        reports: () => setShowReportsModal(true),
-                    };
-                    actions[actionId]?.();
-                }}
-            />
         </div>
     );
 };
@@ -1469,10 +1391,10 @@ const CustomCard = ({ icon: Icon, label, subtitle, onClick, className, iconSize 
         className={`relative p-8 rounded-3xl border border-white/60 backdrop-blur-md flex flex-col justify-between items-start text-left transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.1)] active:scale-95 group overflow-hidden ${className}`}
     >
         {/* Decorative Background Element */}
-        <div className="absolute -right-8 -top-8 w-32 h-32 bg-[#0078d4]/5 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-700" />
+        <div className="absolute -right-8 -top-8 w-32 h-32 bg-[#0099ff]/5 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-700" />
 
         <div className="bg-white p-3 rounded-2xl shadow-sm group-hover:scale-110 group-hover:shadow-md transition-all duration-500">
-            <Icon size={iconSize} strokeWidth={1.5} className="text-[#0078d4]" />
+            <Icon size={iconSize} strokeWidth={1.5} className="text-[#0099ff]" />
         </div>
 
         <div>
@@ -1490,35 +1412,34 @@ const CustomCard = ({ icon: Icon, label, subtitle, onClick, className, iconSize 
     </button>
 );
 
-// Ribbon Button Component (Matches Legacy style)
+// Ribbon Button Component
 const RibbonButton = ({ icon: Icon, label, onClick, active, hasBadge, isHighlighted, gif, iconColor }) => (
     <button
         onClick={onClick}
-        className={`flex flex-col items-center justify-center min-w-[75px] h-[75px] m-0.5 rounded-xl relative transition-all duration-300 group
+        className={`flex flex-col items-center justify-center min-w-[72px] h-[72px] m-0.5 rounded-xl relative transition-all duration-300 group
             ${active
-                ? 'bg-white/20 text-white shadow-[0_4px_12px_rgba(0,0,0,0.1)] backdrop-blur-sm'
-                : 'text-white/80 hover:bg-white/10 hover:text-white hover:shadow-lg'}
-            ${isHighlighted ? 'bg-gradient-to-br from-emerald-500/20 via-green-600/30 to-emerald-500/10 text-white border border-emerald-400/40 shadow-[0_0_15px_rgba(16,185,129,0.3)] animate-ribbon-glow' : ''}
+                ? 'bg-white/15 text-white shadow-sm'
+                : 'text-white/80 hover:bg-white/8 hover:text-white'}
+            ${isHighlighted ? 'bg-gradient-to-br from-emerald-500/15 via-green-600/20 to-emerald-500/10 text-white border border-emerald-400/30 shadow-[0_0_12px_rgba(16,185,129,0.2)] animate-ribbon-glow' : ''}
         `}
     >
         <div className="relative z-10">
             {gif ? (
                 <img src={gif} alt={label} className="w-7 h-7 object-contain group-hover:scale-110 transition-transform" />
             ) : (
-                <Icon size={26} strokeWidth={1.8} className={`group-hover:scale-110 transition-all duration-300 ${iconColor || 'drop-shadow-[0_2px_4px_rgba(0,0,0,0.2)]'}`} />
+                <Icon size={24} strokeWidth={1.8} className={`group-hover:scale-110 transition-all duration-300 ${iconColor || 'text-white/90'}`} />
             )}
         </div>
 
-        <span className="text-[11px] font-bold mt-2 tracking-wide leading-none text-center relative z-10 px-1 opacity-90 group-hover:opacity-100">
+        <span className="text-[10px] font-semibold mt-1.5 tracking-wide leading-none text-center relative z-10 px-1 text-white/80 group-hover:text-white">
             {label.length > 9 ? <>{label.split(' ')[0]}<br />{label.split(' ')[1]}</> : label}
         </span>
 
-        {/* Premium Active Indicator */}
+        {/* Active Indicator */}
         {active && (
-            <div className="absolute bottom-1 left-1/2 -translate-x-1/2 w-8 h-1 bg-white rounded-full shadow-[0_0_10px_rgba(255,255,255,0.8)]" />
+            <div className="absolute bottom-1 left-1/2 -translate-x-1/2 w-6 h-0.5 bg-white rounded-full shadow-[0_0_8px_rgba(255,255,255,0.6)]" />
         )}
 
-        {/* Subtle Hover Glow Overlay */}
         <div className="absolute inset-0 bg-white/0 group-hover:bg-white/5 rounded-xl transition-colors duration-300" />
     </button>
 );

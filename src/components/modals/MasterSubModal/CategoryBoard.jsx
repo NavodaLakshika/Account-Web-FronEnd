@@ -1,50 +1,35 @@
 import React, { useState, useEffect } from 'react';
-import SimpleModal from '../../SimpleModal';
-import { Search, RotateCcw, Save, Trash2, Loader2, X, Layers } from 'lucide-react';
+import { RotateCcw, Save, Trash2, Loader2, AlertTriangle, Building2, FolderTree } from 'lucide-react';
 import { categoryService } from '../../../services/category.service';
 import { departmentService } from '../../../services/department.service';
 import { showSuccessToast, showErrorToast } from '../../../utils/toastUtils';
-
+import { MasterFormWrapper, MasterFieldRow, MasterInput, MasterLookupInput, MasterLookupModal } from '../../MasterFormComponents';
 
 const CategoryBoard = ({ isOpen, onClose }) => {
     const initialState = {
-        Code: '',
-        Cat_Name: '',
-        Dept_Code: '',
-        Dept_Name: '',
-        Company: '',
-        CurrentUser: ''
+        Code: '', Cat_Name: '', Dept_Code: '', Dept_Name: '', Company: '', CurrentUser: ''
     };
 
     const [formData, setFormData] = useState(initialState);
     const [loading, setLoading] = useState(false);
     const [isEditMode, setIsEditMode] = useState(false);
-    
-    // Lookups
     const [showDeptSearch, setShowDeptSearch] = useState(false);
     const [deptList, setDeptList] = useState([]);
     const [showCatSearch, setShowCatSearch] = useState(false);
     const [catList, setCatList] = useState([]);
-    const [searchQuery, setSearchQuery] = useState('');
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
     useEffect(() => {
         if (isOpen) {
             const user = JSON.parse(localStorage.getItem('user'));
             const companyData = localStorage.getItem('selectedCompany');
-            
             let companyCode = '';
             if (companyData) {
-                try {
-                    const parsed = JSON.parse(companyData);
-                    companyCode = parsed.companyCode || parsed.CompanyCode || parsed.code || parsed.Code || companyData;
-                } catch (e) {
-                    companyCode = companyData;
-                }
+                try { const p = JSON.parse(companyData); companyCode = p.companyCode || p.CompanyCode || p.code || p.Code || companyData; } catch (e) { companyCode = companyData; }
             }
-
             if (user) {
-                setFormData(prev => ({ 
-                    ...prev, 
+                setFormData(prev => ({
+                    ...prev,
                     CurrentUser: user.empName || user.EmpName || user.Emp_Name || user.emp_Name || user.username || '',
                     Company: companyCode
                 }));
@@ -58,11 +43,7 @@ const CategoryBoard = ({ isOpen, onClose }) => {
     };
 
     const handleClear = () => {
-        setFormData({
-            ...initialState,
-            Company: formData.Company,
-            CurrentUser: formData.CurrentUser
-        });
+        setFormData({ ...initialState, Company: formData.Company, CurrentUser: formData.CurrentUser });
         setIsEditMode(false);
     };
 
@@ -71,7 +52,6 @@ const CategoryBoard = ({ isOpen, onClose }) => {
             showErrorToast('Department and Category Name are required');
             return;
         }
-
         setLoading(true);
         try {
             const data = await categoryService.save(formData);
@@ -83,284 +63,135 @@ const CategoryBoard = ({ isOpen, onClose }) => {
                 showSuccessToast('Category updated');
             }
         } catch (err) {
-            const errorMsg = err.error || err.message || (typeof err === 'string' ? err : 'Failed to save');
-            showErrorToast(errorMsg, { duration: 5000 });
-            console.error('Save Error:', err);
+            showErrorToast(err.error || err.message || (typeof err === 'string' ? err : 'Failed to save'), { duration: 5000 });
         } finally {
             setLoading(false);
         }
     };
 
-    const handleDelete = async () => {
+    const handleDelete = () => {
         if (!isEditMode || !formData.Code) return;
-        if (!window.confirm('Delete this category?')) return;
+        setShowDeleteConfirm(true);
+    };
 
+    const confirmDelete = async () => {
         setLoading(true);
         try {
             await categoryService.delete(formData.Code, formData.Company);
             showSuccessToast('Category deleted');
             handleClear();
+            setShowDeleteConfirm(false);
         } catch (err) {
-            const errorMsg = err.error || err.message || (typeof err === 'string' ? err : 'Failed to delete');
-            showErrorToast(errorMsg);
+            showErrorToast(err.error || err.message || 'Failed to delete');
         } finally {
             setLoading(false);
         }
     };
 
     const openDeptSearch = async () => {
-        if (!formData.Company) {
-            showErrorToast('Company not identified');
-            return;
-        }
+        if (!formData.Company) { showErrorToast('Company not identified'); return; }
         setLoading(true);
         try {
             const data = await departmentService.getAll(formData.Company);
             setDeptList(data || []);
             setShowDeptSearch(true);
-        } catch (err) {
-            showErrorToast('Failed to load departments');
-        } finally {
-            setLoading(false);
-        }
+        } catch (err) { showErrorToast('Failed to load departments'); } finally { setLoading(false); }
     };
 
     const selectDept = (dept) => {
-        setFormData(prev => ({ 
-            ...prev, 
-            Dept_Code: dept.code, 
-            Dept_Name: dept.name, 
-            Code: '' 
-        }));
+        setFormData(prev => ({ ...prev, Dept_Code: dept.code, Dept_Name: dept.name, Code: '' }));
         setIsEditMode(false);
         setShowDeptSearch(false);
     };
 
     const openCatSearch = async () => {
-        if (!formData.Dept_Code) {
-            showErrorToast('Select a department first');
-            return;
-        }
+        if (!formData.Dept_Code) { showErrorToast('Select a department first'); return; }
         setLoading(true);
         try {
-            const data = await categoryService.searchCategories(formData.Dept_Code, formData.Company, searchQuery);
+            const data = await categoryService.searchCategories(formData.Dept_Code, formData.Company, '');
             setCatList(data || []);
             setShowCatSearch(true);
-        } catch (err) {
-            showErrorToast('Failed to load categories');
-        } finally {
-            setLoading(false);
-        }
+        } catch (err) { showErrorToast('Failed to load categories'); } finally { setLoading(false); }
     };
 
     const selectCat = (cat) => {
-        setFormData(prev => ({ 
-            ...prev, 
-            Code: cat.code, 
-            Cat_Name: cat.name 
-        }));
+        setFormData(prev => ({ ...prev, Code: cat.code, Cat_Name: cat.name }));
         setIsEditMode(true);
         setShowCatSearch(false);
     };
 
-    const footer = (
-        <div className="bg-slate-50 px-6  w-full flex justify-end gap-3 border-t border-gray-100 mt-4 rounded-b-xl">
-            <button 
-                onClick={handleSave} 
-                disabled={loading} 
-                className={`px-6 h-10 bg-[#50af60] text-white text-[13px] font-bold rounded-[5px] shadow-md shadow-green-200 hover:bg-[#24db4e] transition-all active:scale-95 flex items-center justify-center gap-2 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
-            >
-                {loading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />} 
-                {isEditMode ? 'Update' : 'Save'}
-            </button>
-            <button 
-                onClick={handleDelete} 
-                disabled={!isEditMode || loading} 
-                className={`px-6 h-10 bg-[#d13438] text-white text-[13px] font-bold rounded-[5px] shadow-md shadow-red-200 hover:bg-[#a4262c] transition-all active:scale-95 flex items-center justify-center gap-2 ${(!isEditMode || loading) ? 'opacity-50 cursor-not-allowed' : ''}`}
-            >
-                <Trash2 size={14} /> Delete
-            </button>
-            <button 
-                onClick={handleClear} 
-                className="px-6 h-10 bg-[#00adff] text-white text-[13px] font-bold rounded-[5px] hover:bg-[#0099e6] shadow-md shadow-blue-200 transition-all active:scale-95 border-none flex items-center justify-center gap-2"
-            >
-                <RotateCcw size={14} /> Clear
-            </button>
-        </div>
-    );
-
     return (
         <>
-            <SimpleModal isOpen={isOpen} onClose={onClose} title="Category Selection" maxWidth="max-w-xl" footer={footer}>
-                <div className="py-2 select-none font-['Tahoma'] space-y-4 text-[12.5px] mt-1">
-                    <div className="space-y-3">
-                        {/* Department ID Row */}
-                        <div className="flex items-center gap-6">
-                            <label className="w-32 font-bold text-gray-700">Department ID</label>
-                            <div className="flex-1 flex gap-3">
-                                <input 
-                                    type="text" 
-                                    name="Dept_Code" 
-                                    value={formData.Dept_Code} 
-                                    readOnly 
-                                    className="w-32 h-8 border border-gray-300 px-2 bg-white rounded-[5px] outline-none font-bold text-blue-600 shadow-sm text-center" 
-                                />
-                                <button 
-                                    onClick={openDeptSearch} 
-                                    className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95"
-                                >
-                                    <Search size={18} />
-                                </button>
-                                <input 
-                                    type="text" 
-                                    value={formData.Dept_Name} 
-                                    readOnly 
-                                    className="flex-1 h-8 font-mono border border-gray-300 px-3 bg-gray-50 rounded-[5px] outline-none shadow-sm cursor-default" 
-                                    placeholder="" 
-                                />
+            <MasterFormWrapper
+                isOpen={isOpen}
+                onClose={onClose}
+                title="Category Profile"
+                subtitle="Manage item categories & classification"
+                icon={FolderTree}
+                maxWidth="max-w-2xl"
+                isEditMode={isEditMode}
+                loading={loading}
+                onClear={handleClear}
+                onSave={handleSave}
+                onDelete={handleDelete}
+            >
+                <MasterFieldRow label="Department" colSpan="col-span-12">
+                    <MasterLookupInput value={formData.Dept_Name || formData.Dept_Code} onSearchClick={openDeptSearch} placeholder="Select department..." />
+                </MasterFieldRow>
+                <MasterFieldRow label="Category ID" colSpan="col-span-12">
+                    <MasterLookupInput value={formData.Code || ''} onSearchClick={openCatSearch} isIdField />
+                </MasterFieldRow>
+                <MasterFieldRow label="Category Name" colSpan="col-span-12">
+                    <MasterInput name="Cat_Name" value={formData.Cat_Name} onChange={handleInputChange} placeholder="Enter category name" />
+                </MasterFieldRow>
+            </MasterFormWrapper>
+
+            <MasterLookupModal
+                isOpen={showDeptSearch}
+                onClose={() => setShowDeptSearch(false)}
+                title="Department Search"
+                columns={[
+                    { label: 'CODE', key: 'code', isId: true, width: 'w-[100px]', render: (item) => <span className="font-mono text-[11px] font-bold text-[#0285fd]">{item.code}</span> },
+                    { label: 'DEPARTMENT NAME', key: 'name', render: (item) => <span className="font-bold text-slate-700 uppercase text-[11px]">{item.name}</span> },
+                ]}
+                items={deptList}
+                loading={loading}
+                onSelect={selectDept}
+                emptyMsg="No departments found"
+            />
+
+            <MasterLookupModal
+                isOpen={showCatSearch}
+                onClose={() => setShowCatSearch(false)}
+                title="Category Search"
+                columns={[
+                    { label: 'CODE', key: 'code', isId: true, width: 'w-[100px]', render: (item) => <span className="font-mono text-[11px] font-bold text-[#0285fd]">{item.code}</span> },
+                    { label: 'CATEGORY NAME', key: 'name', render: (item) => <span className="font-bold text-slate-700 uppercase text-[11px]">{item.name}</span> },
+                ]}
+                items={catList}
+                loading={loading}
+                onSelect={selectCat}
+                emptyMsg="No categories found"
+            />
+
+            {showDeleteConfirm && (
+                <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4">
+                    <div className="absolute inset-0 bg-slate-900/70 backdrop-blur-sm" onClick={() => !loading && setShowDeleteConfirm(false)} />
+                    <div className="relative w-full max-w-md bg-white rounded-2xl shadow-2xl border border-white/10 overflow-hidden animate-in zoom-in-95 duration-300">
+                        <div className="p-8 text-center">
+                            <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6 border-4 border-white shadow-lg"><AlertTriangle size={40} className="text-red-500" /></div>
+                            <h3 className="text-lg font-black text-slate-800 mb-2 uppercase tracking-wider">Confirm Deletion</h3>
+                            <p className="text-slate-500 text-[12px] font-medium leading-relaxed mb-8">Are you sure you want to delete category <span className="font-bold text-slate-800 uppercase">"{formData.Cat_Name || formData.Code}"</span>?<br />This action cannot be undone.</p>
+                            <div className="flex gap-3">
+                                <button onClick={() => setShowDeleteConfirm(false)} disabled={loading} className="flex-1 h-11 bg-slate-100 text-slate-600 text-[11px] font-black rounded-xl hover:bg-slate-200 transition-all uppercase tracking-widest disabled:opacity-50">Cancel</button>
+                                <button onClick={confirmDelete} disabled={loading} className="flex-1 h-11 bg-red-500 text-white text-[11px] font-black rounded-xl hover:bg-red-600 shadow-lg shadow-red-200 transition-all flex items-center justify-center gap-2 uppercase tracking-widest disabled:opacity-50">{loading ? <Loader2 size={16} className="animate-spin" /> : 'Delete Now'}</button>
                             </div>
                         </div>
-
-                        {/* Category ID Row */}
-                        <div className="flex items-center gap-6">
-                            <label className="w-32 font-bold text-gray-700">Category ID</label>
-                            <div className="flex-1 flex gap-3">
-                                <input 
-                                    type="text" 
-                                    name="Code" 
-                                    value={formData.Code || ''} 
-                                    readOnly 
-                                    className="w-32 h-8 border border-gray-300 px-2 bg-white rounded-[5px] outline-none font-bold text-blue-600 shadow-sm text-center" 
-                                />
-                                <button 
-                                    onClick={openCatSearch} 
-                                    className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95"
-                                >
-                                    <Search size={18} />
-                                </button>
-                            </div>
-                        </div>
-
-                        {/* Category Name Row */}
-                        <div className="flex items-center gap-6">
-                            <label className="w-32 font-bold text-gray-700">Category Name</label>
-                            <input 
-                                type="text" 
-                                name="Cat_Name" 
-                                value={formData.Cat_Name} 
-                                onChange={handleInputChange} 
-                                className="flex-1 h-8 font-mono border border-gray-300 px-3 bg-white rounded-[5px] outline-none focus:border-blue-400 shadow-sm transition-all focus:shadow-md" 
-                                placeholder="" 
-                            />
-                        </div>
+                        <div className="bg-slate-50 py-3 border-t border-slate-100"><span className="text-[9px] text-slate-400 font-black uppercase tracking-[0.2em] block text-center">Security Verification Required</span></div>
                     </div>
                 </div>
-            </SimpleModal>
-
-            {/* Department Search Modal */}
-            {showDeptSearch && (
-                <SearchModal 
-                    title="Search Departments" 
-                    list={deptList} 
-                    onSelect={selectDept} 
-                    onClose={() => setShowDeptSearch(false)}
-                    placeholder="Search by code or name..."
-                    columns={['code', 'name']}
-                />
-            )}
-
-            {/* Category Search Modal */}
-            {showCatSearch && (
-                <SearchModal 
-                    title="Search Categories" 
-                    list={catList} 
-                    onSelect={selectCat} 
-                    onClose={() => setShowCatSearch(false)}
-                    placeholder="Search by code or name..."
-                    columns={['code', 'name']}
-                />
             )}
         </>
-    );
-};
-
-const SearchModal = ({ title, list, onSelect, onClose, placeholder, columns = ['code', 'name'] }) => {
-    const [query, setQuery] = useState('');
-    return (
-        <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4 font-['Tahoma']">
-            <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={onClose} />
-            <div className="relative w-full max-w-2xl bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
-                {/* Header */}
-                <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-100 select-none relative overflow-hidden">
-                    {/* System Color Left Accent */}
-                    <div 
-                        className="absolute left-0 top-0 bottom-0 w-1.5 transition-colors duration-500" 
-                        style={{ backgroundColor: localStorage.getItem('topBarColor') || '#0285fd' }}
-                    />
-                    <div className="flex items-center gap-2">
-                        <Search size={16} className="text-[#0078d4]" />
-                        <span className="text-[15px] font-[700] text-slate-900 uppercase tracking-[3px] font-mono truncate">{title} Lookup</span>
-                    </div>
-                    <button
-                        onClick={onClose}
-                        className="w-9 h-8 flex items-center justify-center bg-red-50 hover:bg-red-100 text-red-600 rounded-[8px] transition-all active:scale-90 outline-none border-none group"
-                        title="Close"
-                    >
-                        <X size={18} strokeWidth={4} className="group-hover:scale-110 transition-transform" />
-                    </button>
-                </div>
-
-                {/* Search Input Area */}
-                <div className="p-3 bg-slate-50 border-b border-gray-100 flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                        <Search size={14} className="text-gray-400" />
-                        <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Search Facility</span>
-                    </div>
-                    <input 
-                        type="text" 
-                        placeholder={placeholder} 
-                        className="h-8 border border-gray-300 px-3 text-xs rounded-md w-60 focus:border-[#0285fd] outline-none shadow-sm transition-all" 
-                        value={query} 
-                        onChange={(e) => setQuery(e.target.value)} 
-                    />
-                </div>
-
-                {/* Results List */}
-                <div className="p-2">
-                    <div className=" px-3 py-1.5 flex text-[10px] font-bold text-gray-600 border-b border-gray-200 uppercase tracking-wider">
-                        <span className="w-24 text-center">Code</span>
-                        <span className="flex-1 px-3">Display Name</span>
-                    </div>
-                    <div className="max-h-[300px] overflow-y-auto custom-scrollbar">
-                        {list.filter(x => (x.name || '').toLowerCase().includes(query.toLowerCase()) || (x.code || '').toLowerCase().includes(query.toLowerCase())).map(x => (
-                            <button 
-                                key={x.code} 
-                                onClick={() => onSelect(x)}
-                                className="w-full flex items-center justify-between px-3 py-2 text-xs border-b border-gray-100 hover:bg-blue-50 transition-all text-left group"
-                            >
-                                <div className="flex items-center gap-2 flex-1">
-                                    <span className="w-24 text-center font-mono text-[11px] font-bold text-[#0078d4]">
-                                        {x.code}
-                                    </span>
-                                    <span className="flex-1 px-3 font-mono font-medium text-gray-700 uppercase">
-                                        {x.name}
-                                    </span>
-                                </div>
-                                <div className="bg-[#e49e1b] text-white text-[10px] px-5 py-1.5 rounded-md font-bold hover:bg-[#cb9b34] shadow-sm transition-all active:scale-95 uppercase">Select</div>
-                            </button>
-                        ))}
-                        {list.length === 0 && (
-                            <div className="p-8 text-center text-gray-400 italic text-sm">No results found.</div>
-                        )}
-                    </div>
-                </div>
-
-                {/* Footer */}
-                <div className="bg-gray-50 px-4 py-2 border-t border-gray-200 flex justify-between items-center text-[10px] text-gray-400">
-                    <span>{list.length} Result(s)</span>
-                </div>
-            </div>
-        </div>
     );
 };
 

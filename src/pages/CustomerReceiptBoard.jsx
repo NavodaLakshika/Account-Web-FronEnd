@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import SimpleModal from '../components/SimpleModal';
+import TransactionFormWrapper from '../components/TransactionFormWrapper';
 import CalendarModal from '../components/CalendarModal';
-import { Search, Calendar, CheckCircle, Trash2, RotateCcw, Save, X, Plus, Check } from 'lucide-react';
+import { Search, Calendar, CheckCircle, Trash2, RotateCcw, Save, X, Plus, Check, Receipt } from 'lucide-react';
 
 
 import { customerReceiptService } from '../services/customerReceipt.service';
@@ -265,23 +266,25 @@ const CustomerReceiptBoard = ({ isOpen, onClose }) => {
                     }
                 `}
             </style>
-            <SimpleModal
+            <TransactionFormWrapper
                 isOpen={isOpen}
                 onClose={onClose}
                 title="Customer Receipt"
-                maxWidth="max-w-[1050px]"
+                subtitle="Sales Receipts"
+                icon={Receipt}
+                maxWidth="max-w-6xl"
                 footer={
                     <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-gray-100 rounded-b-xl font-['Tahoma']">
                         <div className="flex gap-3">
                             <button
                                 onClick={handleDelete}
-                                className="px-6 h-10 bg-[#ff3b30] text-white text-[12px] font-black rounded-[5px] shadow-md shadow-red-100 hover:bg-[#e03127] transition-all active:scale-95 flex items-center gap-2 border-none"
+                                className="px-6 py-3 bg-[#ff3b30] hover:bg-[#e03127] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] shadow-md shadow-red-100 transition-all active:scale-95 flex items-center justify-center gap-2 border-none"
                             >
                                 <Trash2 size={14} /> DELETE DOC
                             </button>
                              <button
                                 onClick={handleClear}
-                                className="px-6 h-10 bg-[#00adff] text-white text-[12px] font-black rounded-[5px] hover:bg-[#0099e6] transition-all active:scale-95 flex items-center gap-2 border-none"
+                                className="px-6 py-3 bg-[#00adff] hover:bg-[#0099e6] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] transition-all active:scale-95 flex items-center justify-center gap-2 border-none"
                             >
                                 <RotateCcw size={14} /> CLEAR FORM
                             </button>
@@ -290,7 +293,7 @@ const CustomerReceiptBoard = ({ isOpen, onClose }) => {
                             <button
                                 onClick={handleApply}
                                 disabled={isSaving}
-                                className="px-6 h-10 bg-[#2bb744] text-white text-[12px] font-black rounded-[5px] shadow-md shadow-green-100 hover:bg-[#259b3a] transition-all active:scale-95 flex items-center gap-2 border-none disabled:opacity-50"
+                                className="px-6 py-3 bg-[#2bb744] hover:bg-[#259b3a] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] shadow-md shadow-green-100 transition-all active:scale-95 flex items-center justify-center gap-2 border-none disabled:opacity-50"
                             >
                                 {isSaving ? <RotateCcw size={14} className="animate-spin" /> : <CheckCircle size={14} />} SAVE & APPLY
                             </button>
@@ -298,16 +301,16 @@ const CustomerReceiptBoard = ({ isOpen, onClose }) => {
                     </div>
                 }
             >
-                <div className="space-y-4 overflow-y-auto no-scrollbar font-['Tahoma'] p-4 bg-[#f8fafd]">
+                <div className="space-y-4 overflow-y-auto no-scrollbar font-['Tahoma']">
                     {/* Top Inputs Section */}
-                    <div className="bg-white p-4 border border-gray-100 rounded-lg shadow-sm space-y-4">
+                    <div className="bg-white p-4 border border-slate-200 rounded-[5px] shadow-sm space-y-4">
                         <div className="grid grid-cols-12 gap-x-6 gap-y-3.5">
                             
                             {/* Document ID */}
                             <div className="col-span-4 flex items-center gap-2">
-                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Document ID</label>
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Document ID</label>
                                 <div className="flex-1 flex gap-1 h-8 min-w-0">
-                                    <input type="text" name="docNo" value={formData.docNo} onChange={handleInput} className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-blue-600 bg-gray-50 rounded-[5px] outline-none focus:border-[#0285fd] shadow-sm" />
+                                    <input type="text" name="docNo" value={formData.docNo} onChange={handleInput} className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-mono font-bold text-blue-600 bg-slate-50 rounded outline-none focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 shadow-sm" />
                                     <button className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
                                         <Search size={16} />
                                     </button>
@@ -316,13 +319,13 @@ const CustomerReceiptBoard = ({ isOpen, onClose }) => {
 
                             {/* Date */}
                             <div className="col-span-4 flex items-center gap-2">
-                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Date</label>
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Date</label>
                                 <div className="flex-1 flex gap-1 h-8 min-w-0">
                                     <input
                                         type="text"
                                         readOnly
                                         value={formData.date}
-                                        className="flex-1 min-w-0 h-8 border border-gray-300 rounded-[5px] px-3 text-[12px] outline-none bg-white text-gray-700 font-bold cursor-pointer shadow-sm"
+                                        className="flex-1 min-w-0 h-8 border border-slate-200 rounded px-3 text-[12px] font-mono outline-none bg-slate-50 text-gray-700 font-bold cursor-pointer shadow-sm"
                                         onClick={() => { setDatePickerField('date'); setShowDatePicker(true); }}
                                     />
                                     <button
@@ -336,19 +339,19 @@ const CustomerReceiptBoard = ({ isOpen, onClose }) => {
 
                             {/* Received Amount */}
                             <div className="col-span-4 flex items-center gap-2">
-                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Amount</label>
-                                <input type="text" name="amount" value={formData.amount} onChange={handleInput} className="flex-1 min-w-0 h-8 border border-gray-300 rounded-[5px] px-3 font-black text-[14px] text-[#0285fd] outline-none bg-white shadow-sm focus:border-[#0285fd]" />
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Amount</label>
+                                <input type="text" name="amount" value={formData.amount} onChange={handleInput} className="flex-1 min-w-0 h-8 border border-slate-200 rounded px-3 font-black text-[14px] text-[#0285fd] outline-none bg-slate-50 shadow-sm focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" />
                             </div>
 
                             {/* Customer */}
                             <div className="col-span-8 flex items-center gap-2">
-                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Received From</label>
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Received From</label>
                                 <div className="flex-1 flex gap-1 h-8 min-w-0">
                                     <input
                                         type="text"
                                         readOnly
                                         value={lookups.customers.find(c => (c.code || c.Code) === formData.customerId)?.name || lookups.customers.find(c => (c.code || c.Code) === formData.customerId)?.Cust_Name || lookups.customers.find(c => (c.code || c.Code) === formData.customerId)?.cust_Name || ''}
-                                        className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-red-600 bg-gray-50 rounded-[5px] outline-none shadow-sm cursor-pointer"
+                                        className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-mono font-bold text-red-600 bg-slate-50 rounded outline-none shadow-sm cursor-pointer"
                                         onClick={() => setShowCustomerSearch(true)}
                                         placeholder="Select Customer..."
                                     />
@@ -360,13 +363,13 @@ const CustomerReceiptBoard = ({ isOpen, onClose }) => {
 
                             {/* Payment Method */}
                             <div className="col-span-4 flex items-center gap-2">
-                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Pay Method</label>
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Pay Method</label>
                                 <div className="flex-1 flex gap-1 h-8 min-w-0">
                                     <input
                                         type="text"
                                         readOnly
                                         value={lookups.paymentMethods?.find(m => m.code === formData.payType)?.name || formData.payType || ''}
-                                        className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-gray-700 bg-white rounded-[5px] outline-none shadow-sm cursor-pointer"
+                                        className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-mono font-bold text-gray-700 bg-slate-50 rounded outline-none shadow-sm cursor-pointer"
                                         onClick={() => setShowPayMethodSearch(true)}
                                     />
                                     <button onClick={() => setShowPayMethodSearch(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
@@ -377,13 +380,13 @@ const CustomerReceiptBoard = ({ isOpen, onClose }) => {
 
                             {/* Bank and Branch */}
                             <div className="col-span-8 flex items-center gap-2">
-                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Bank / Branch</label>
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Bank / Branch</label>
                                 <div className="flex-1 flex gap-1 h-8 min-w-0">
                                     <input
                                         type="text"
                                         readOnly
                                         value={lookups.banks?.find(b => (b.bank_Code || b.Bank_Code) === formData.bankCode)?.bank_Name || lookups.banks?.find(b => (b.bank_Code || b.Bank_Code) === formData.bankCode)?.Bank_Name || ''}
-                                        className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-gray-700 bg-white rounded-[5px] outline-none shadow-sm cursor-pointer"
+                                        className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-mono font-bold text-gray-700 bg-slate-50 rounded outline-none shadow-sm cursor-pointer"
                                         onClick={() => setShowBankSearch(true)}
                                         placeholder="Select Bank"
                                     />
@@ -391,18 +394,18 @@ const CustomerReceiptBoard = ({ isOpen, onClose }) => {
                                         <Search size={16} />
                                     </button>
                                 </div>
-                                <input type="text" name="branchCode" value={formData.branchCode} onChange={handleInput} placeholder="Branch" className="w-32 h-8 border border-gray-300 rounded-[5px] px-3 font-mono text-[12px] outline-none bg-white text-gray-700 shadow-sm focus:border-[#0285fd]" />
+                                <input type="text" name="branchCode" value={formData.branchCode} onChange={handleInput} placeholder="Branch" className="w-32 h-8 border border-slate-200 rounded px-3 font-mono text-[12px] outline-none bg-slate-50 text-gray-700 shadow-sm focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" />
                             </div>
 
                             {/* Cost Center */}
                             <div className="col-span-4 flex items-center gap-2">
-                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Cost Center</label>
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Cost Center</label>
                                 <div className="flex-1 flex gap-1 h-8 min-w-0">
                                     <input
                                         type="text"
                                         readOnly
                                         value={lookups.costCenters?.find(c => (c.CostCenterCode || c.costCenterCode) === formData.costCenter)?.CostCenterName || lookups.costCenters?.find(c => (c.CostCenterCode || c.costCenterCode) === formData.costCenter)?.costCenterName || ''}
-                                        className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-gray-700 bg-white rounded-[5px] outline-none shadow-sm cursor-pointer"
+                                        className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-mono font-bold text-gray-700 bg-slate-50 rounded outline-none shadow-sm cursor-pointer"
                                         onClick={() => setShowCostCenterSearch(true)}
                                     />
                                     <button onClick={() => setShowCostCenterSearch(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
@@ -413,19 +416,19 @@ const CustomerReceiptBoard = ({ isOpen, onClose }) => {
 
                             {/* Cheque No */}
                             <div className="col-span-4 flex items-center gap-2">
-                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Cheque No</label>
-                                <input type="text" name="chequeNo" value={formData.chequeNo} onChange={handleInput} className="flex-1 min-w-0 h-8 border border-gray-300 rounded-[5px] px-3 font-mono text-[12px] outline-none bg-white text-gray-700 shadow-sm focus:border-[#0285fd]" />
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Cheque No</label>
+                                <input type="text" name="chequeNo" value={formData.chequeNo} onChange={handleInput} className="flex-1 min-w-0 h-8 border border-slate-200 rounded px-3 font-mono text-[12px] outline-none bg-slate-50 text-gray-700 shadow-sm focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" />
                             </div>
 
                             {/* Cheque Date */}
                             <div className="col-span-4 flex items-center gap-2">
-                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Cheque Date</label>
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Cheque Date</label>
                                 <div className="flex-1 flex gap-1 h-8 min-w-0">
                                     <input
                                         type="text"
                                         readOnly
                                         value={formData.chequeDate}
-                                        className="flex-1 min-w-0 h-8 border border-gray-300 rounded-[5px] px-3 text-[12px] outline-none bg-white text-gray-700 font-bold cursor-pointer shadow-sm"
+                                        className="flex-1 min-w-0 h-8 border border-slate-200 rounded px-3 text-[12px] font-mono outline-none bg-slate-50 text-gray-700 font-bold cursor-pointer shadow-sm"
                                         onClick={() => { setDatePickerField('chequeDate'); setShowDatePicker(true); }}
                                     />
                                     <button
@@ -439,51 +442,51 @@ const CustomerReceiptBoard = ({ isOpen, onClose }) => {
 
                             {/* Memo */}
                             <div className="col-span-4 flex items-center gap-2">
-                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Memo / Ref</label>
-                                <input type="text" name="memo" value={formData.memo} onChange={handleInput} className="flex-1 min-w-0 h-8 border border-gray-300 rounded-[5px] px-3 font-mono text-[12px] outline-none bg-white text-gray-700 shadow-sm focus:border-[#0285fd]" />
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Memo / Ref</label>
+                                <input type="text" name="memo" value={formData.memo} onChange={handleInput} className="flex-1 min-w-0 h-8 border border-slate-200 rounded px-3 font-mono text-[12px] outline-none bg-slate-50 text-gray-700 shadow-sm focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" />
                             </div>
                         </div>
                     </div>
 
                     {/* Invoice Grid Section */}
-                    <div className="border border-gray-100 rounded-lg bg-white shadow-sm flex flex-col min-h-[250px] overflow-hidden">
-                        <div className="flex bg-slate-50/80 border-b border-gray-100 text-[10px] font-black text-gray-400 uppercase tracking-widest items-center">
-                            <div className="w-12 py-2.5 px-3 border-r border-gray-100 text-center">Chk</div>
-                            <div className="w-24 py-2.5 px-3 border-r border-gray-100">Due Date</div>
-                            <div className="w-32 py-2.5 px-3 border-r border-gray-100">Doc No</div>
-                            <div className="flex-1 py-2.5 px-3 border-r border-gray-100">Ref No</div>
-                            <div className="w-28 py-2.5 px-3 border-r border-gray-100 text-right">Inv Amount</div>
-                            <div className="w-24 py-2.5 px-3 border-r border-gray-100 text-right">Discount</div>
-                            <div className="w-24 py-2.5 px-3 border-r border-gray-100 text-right">SetOff</div>
-                            <div className="w-28 py-2.5 px-3 border-r border-gray-100 text-right">Balance</div>
+                    <div className="border border-slate-200 rounded-[5px] bg-white shadow-sm flex flex-col min-h-[250px] overflow-hidden">
+                        <div className="flex bg-slate-50/80 border-b border-slate-200 text-[10px] font-black text-gray-400 uppercase tracking-widest items-center">
+                            <div className="w-12 py-2.5 px-3 border-r border-slate-200 text-center">Chk</div>
+                            <div className="w-24 py-2.5 px-3 border-r border-slate-200">Due Date</div>
+                            <div className="w-32 py-2.5 px-3 border-r border-slate-200">Doc No</div>
+                            <div className="flex-1 py-2.5 px-3 border-r border-slate-200">Ref No</div>
+                            <div className="w-28 py-2.5 px-3 border-r border-slate-200 text-right">Inv Amount</div>
+                            <div className="w-24 py-2.5 px-3 border-r border-slate-200 text-right">Discount</div>
+                            <div className="w-24 py-2.5 px-3 border-r border-slate-200 text-right">SetOff</div>
+                            <div className="w-28 py-2.5 px-3 border-r border-slate-200 text-right">Balance</div>
                             <div className="w-32 py-2.5 px-4 text-right">Payment</div>
                         </div>
 
-                        <div className="flex-1 bg-white overflow-y-auto max-h-[220px] divide-y divide-gray-50">
+                        <div className="flex-1 bg-white overflow-y-auto max-h-[220px] divide-y divide-slate-100">
                             {invoices.length === 0 ? (
                                 <div className="h-24 flex items-center justify-center text-gray-300 text-[10px] font-bold uppercase tracking-widest ">
                                     No outstanding invoices for this customer
                                 </div>
                             ) : invoices.map((inv, idx) => (
-                                <div key={idx} className={`flex border-b border-gray-100 text-[11px] font-bold text-slate-700 hover:bg-blue-50/30 items-center transition-colors group ${inv.selected ? 'bg-blue-50/10' : ''}`}>
-                                    <div className="w-12 py-2 px-3 border-r border-gray-100 text-center flex items-center justify-center">
+                                <div key={idx} className={`flex border-b border-slate-100 text-[11px] font-bold text-slate-700 hover:bg-blue-50/30 items-center transition-colors group ${inv.selected ? 'bg-blue-50/10' : ''}`}>
+                                    <div className="w-12 py-2 px-3 border-r border-slate-100 text-center flex items-center justify-center">
                                         <button onClick={() => handleInvoiceCheck(idx)} className={`w-5 h-5 rounded-[4px] border ${inv.selected ? 'bg-[#0285fd] border-[#0285fd] text-white' : 'bg-white border-gray-300 text-transparent'} flex items-center justify-center transition-all shadow-sm`}>
                                             <Check size={12} strokeWidth={4} />
                                         </button>
                                     </div>
-                                    <div className="w-24 py-2 px-3 border-r border-gray-100 font-mono text-[10px] text-gray-500">{inv.date_Due}</div>
-                                    <div className="w-32 py-2 px-3 border-r border-gray-100 font-mono">{inv.doc_No}</div>
-                                    <div className="flex-1 py-2 px-3 border-r border-gray-100 truncate italic text-gray-400">{inv.ref_No}</div>
-                                    <div className="w-28 py-2 px-3 border-r border-gray-100 text-right font-mono">{inv.inv_Amount.toLocaleString(undefined, {minimumFractionDigits:2})}</div>
-                                    <div className="w-24 py-1.5 px-2 border-r border-gray-100 text-right">
-                                        <input type="text" disabled={!inv.selected} value={inv.discount} onChange={(e) => handleInvoiceChange(idx, 'discount', e.target.value)} className="w-full h-6 border border-gray-200 rounded-[3px] text-right font-mono text-[11px] text-red-500 outline-none focus:border-[#0285fd] disabled:bg-gray-50" />
+                                    <div className="w-24 py-2 px-3 border-r border-slate-100 font-mono text-[10px] text-gray-500">{inv.date_Due}</div>
+                                    <div className="w-32 py-2 px-3 border-r border-slate-100 font-mono">{inv.doc_No}</div>
+                                    <div className="flex-1 py-2 px-3 border-r border-slate-100 truncate italic text-gray-400">{inv.ref_No}</div>
+                                    <div className="w-28 py-2 px-3 border-r border-slate-100 text-right font-mono">{inv.inv_Amount.toLocaleString(undefined, {minimumFractionDigits:2})}</div>
+                                    <div className="w-24 py-1.5 px-2 border-r border-slate-100 text-right">
+                                        <input type="text" disabled={!inv.selected} value={inv.discount} onChange={(e) => handleInvoiceChange(idx, 'discount', e.target.value)} className="w-full h-6 border border-slate-200 rounded-[3px] text-right font-mono text-[11px] text-red-500 outline-none focus:border-[#0285fd] disabled:bg-gray-50" />
                                     </div>
-                                    <div className="w-24 py-1.5 px-2 border-r border-gray-100 text-right">
-                                        <input type="text" disabled={!inv.selected} value={inv.setOff} onChange={(e) => handleInvoiceChange(idx, 'setOff', e.target.value)} className="w-full h-6 border border-gray-200 rounded-[3px] text-right font-mono text-[11px] text-orange-500 outline-none focus:border-[#0285fd] disabled:bg-gray-50" />
+                                    <div className="w-24 py-1.5 px-2 border-r border-slate-100 text-right">
+                                        <input type="text" disabled={!inv.selected} value={inv.setOff} onChange={(e) => handleInvoiceChange(idx, 'setOff', e.target.value)} className="w-full h-6 border border-slate-200 rounded-[3px] text-right font-mono text-[11px] text-orange-500 outline-none focus:border-[#0285fd] disabled:bg-gray-50" />
                                     </div>
-                                    <div className="w-28 py-2 px-3 border-r border-gray-100 text-right font-mono text-[#0285fd]">{inv.balance.toLocaleString(undefined, {minimumFractionDigits:2})}</div>
+                                    <div className="w-28 py-2 px-3 border-r border-slate-100 text-right font-mono text-[#0285fd]">{inv.balance.toLocaleString(undefined, {minimumFractionDigits:2})}</div>
                                     <div className="w-32 py-1.5 px-2 text-right">
-                                        <input type="text" disabled={!inv.selected} value={inv.payment} onChange={(e) => handleInvoiceChange(idx, 'payment', e.target.value)} className="w-full h-6 border border-gray-200 rounded-[3px] text-right font-mono font-black text-[12px] text-emerald-600 outline-none focus:border-[#0285fd] shadow-inner disabled:bg-gray-50" />
+                                        <input type="text" disabled={!inv.selected} value={inv.payment} onChange={(e) => handleInvoiceChange(idx, 'payment', e.target.value)} className="w-full h-6 border border-slate-200 rounded-[3px] text-right font-mono font-black text-[12px] text-emerald-600 outline-none focus:border-[#0285fd] shadow-inner disabled:bg-gray-50" />
                                     </div>
                                 </div>
                             ))}
@@ -496,7 +499,7 @@ const CustomerReceiptBoard = ({ isOpen, onClose }) => {
                         <div className="col-span-4 flex flex-col gap-2">
                             <div className="flex gap-2">
                                 <div className="flex flex-col gap-2 border border-[#0285fd] p-1.5 rounded-sm relative mt-2">
-                                    <span className="absolute -top-[10px] left-2 bg-[#f8fafd] text-[10px] px-1 font-bold text-[#0285fd]">Bill Reference</span>
+                                    <span className="absolute -top-[10px] left-2 bg-white text-[10px] px-1 font-mono font-bold text-[#0285fd]">Bill Reference</span>
                                     <button onClick={handleSelectAll} className="h-7 px-3 bg-white border border-[#0285fd] hover:bg-blue-50 text-[#0285fd] text-[11px] font-bold shadow-sm active:scale-95 transition-all">Select All Bill</button>
                                     <button className="h-7 px-3 bg-white border border-[#0285fd] hover:bg-blue-50 text-[#0285fd] text-[11px] font-bold shadow-sm active:scale-95 transition-all">Go To Bill</button>
                                 </div>
@@ -508,11 +511,11 @@ const CustomerReceiptBoard = ({ isOpen, onClose }) => {
                                     <button className="h-7 px-4 bg-white border border-gray-400 hover:bg-gray-50 text-gray-700 text-[11px] font-bold shadow-sm active:scale-95 transition-all mt-[36px]">Set off Over</button>
                                 </div>
                             </div>
-                            <textarea className="w-full flex-1 border border-gray-300 outline-none p-2 text-[12px] shadow-sm resize-none focus:border-[#0285fd] rounded-sm"></textarea>
+                            <textarea className="w-full flex-1 border border-slate-200 outline-none p-2 text-[12px] font-mono shadow-sm resize-none focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 rounded-sm bg-slate-50"></textarea>
                             <div className="flex items-center gap-2 mt-auto pb-1">
-                                <span className="text-[11px] font-bold text-gray-700">Over Debit Value</span>
-                                <input type="text" className="w-24 h-7 border border-gray-300 outline-none px-2 text-right text-[11px] shadow-inner focus:border-[#0285fd]" />
-                                <label className="flex items-center gap-1 text-[11px] font-bold text-gray-700 ml-2 cursor-pointer">
+                                <span className="text-[11px] font-mono font-bold text-gray-500 uppercase tracking-wider">Over Debit Value</span>
+                                <input type="text" className="w-24 h-7 border border-slate-200 outline-none px-2 text-right text-[11px] font-mono shadow-inner focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 bg-slate-50" />
+                                <label className="flex items-center gap-1 text-[11px] font-mono font-bold text-gray-500 ml-2 cursor-pointer">
                                     <input type="checkbox" className="w-3.5 h-3.5 cursor-pointer accent-[#0285fd]" />
                                     Print Debit Note
                                 </label>
@@ -523,50 +526,50 @@ const CustomerReceiptBoard = ({ isOpen, onClose }) => {
                         <div className="col-span-4 flex flex-col gap-4 pt-2">
                             <div className="bg-[#8aff8a] border border-green-500 p-3 flex items-center shadow-sm w-fit ml-4">
                                 <div className="border border-dotted border-gray-800 p-1.5 flex gap-2 items-center bg-white/20">
-                                    <span className="text-[12px] font-bold text-gray-800">Current Over Payment</span>
+                                    <span className="text-[12px] font-mono font-bold text-gray-800">Current Over Payment</span>
                                     <span className="text-[14px] font-black text-red-600">{advanceBalance.toLocaleString(undefined, {minimumFractionDigits:2})}</span>
                                 </div>
                             </div>
                             <div className="flex items-center gap-3 ml-4 mt-2">
-                                <span className="text-[11px] font-bold text-gray-700">Over Payment</span>
-                                <input type="text" value={overPayment.toLocaleString(undefined, {minimumFractionDigits:2})} readOnly className="w-24 h-7 border border-gray-300 outline-none px-2 text-right text-[12px] font-bold shadow-inner bg-gray-50" />
+                                <span className="text-[11px] font-mono font-bold text-gray-500 uppercase tracking-wider">Over Payment</span>
+                                <input type="text" value={overPayment.toLocaleString(undefined, {minimumFractionDigits:2})} readOnly className="w-24 h-7 border border-slate-200 outline-none px-2 text-right text-[12px] font-mono font-bold shadow-inner bg-slate-50" />
                             </div>
                         </div>
 
                         {/* Right Side: Totals */}
                         <div className="col-span-4 flex flex-col gap-1.5 pt-2 pr-2">
                             <div className="flex justify-between items-center">
-                                <span className="text-[11px] font-bold text-gray-700">Number Of Debit</span>
-                                <input type="text" readOnly className="w-32 h-7 border border-gray-300 outline-none px-2 text-right text-[12px] font-mono shadow-inner bg-white" />
+                                <span className="text-[11px] font-mono font-bold text-gray-500 uppercase tracking-wider">Number Of Debit</span>
+                                <input type="text" readOnly className="w-32 h-7 border border-slate-200 outline-none px-2 text-right text-[12px] font-mono shadow-inner bg-slate-50" />
                             </div>
                             <div className="flex justify-between items-center">
-                                <span className="text-[11px] font-bold text-gray-700">Total Debit Available</span>
-                                <input type="text" readOnly className="w-32 h-7 border border-gray-300 outline-none px-2 text-right text-[12px] font-mono shadow-inner bg-white" />
+                                <span className="text-[11px] font-mono font-bold text-gray-500 uppercase tracking-wider">Total Debit Available</span>
+                                <input type="text" readOnly className="w-32 h-7 border border-slate-200 outline-none px-2 text-right text-[12px] font-mono shadow-inner bg-slate-50" />
                             </div>
                             <div className="flex justify-between items-center mt-2">
-                                <span className="text-[11px] font-bold text-gray-700">Total Amount Due</span>
-                                <input type="text" value={invoices.reduce((a,b) => a + b.balance, 0).toLocaleString(undefined, {minimumFractionDigits:2})} readOnly className="w-32 h-7 border border-gray-300 outline-none px-2 text-right text-[12px] font-bold font-mono shadow-inner bg-white text-gray-800" />
+                                <span className="text-[11px] font-mono font-bold text-gray-500 uppercase tracking-wider">Total Amount Due</span>
+                                <input type="text" value={invoices.reduce((a,b) => a + b.balance, 0).toLocaleString(undefined, {minimumFractionDigits:2})} readOnly className="w-32 h-7 border border-slate-200 outline-none px-2 text-right text-[12px] font-bold font-mono shadow-inner bg-slate-50 text-gray-800" />
                             </div>
                             <div className="flex justify-between items-center">
-                                <span className="text-[11px] font-bold text-gray-700">Payment Received</span>
-                                <input type="text" value={parseFloat(formData.amount).toLocaleString(undefined, {minimumFractionDigits:2})} readOnly className="w-32 h-7 border border-gray-300 outline-none px-2 text-right text-[12px] font-bold font-mono shadow-inner bg-white text-[#0285fd]" />
+                                <span className="text-[11px] font-mono font-bold text-gray-500 uppercase tracking-wider">Payment Received</span>
+                                <input type="text" value={parseFloat(formData.amount).toLocaleString(undefined, {minimumFractionDigits:2})} readOnly className="w-32 h-7 border border-slate-200 outline-none px-2 text-right text-[12px] font-bold font-mono shadow-inner bg-slate-50 text-[#0285fd]" />
                             </div>
                             <div className="flex justify-between items-center">
-                                <span className="text-[11px] font-bold text-gray-700">Discount Applied</span>
-                                <input type="text" value={totalDiscount.toLocaleString(undefined, {minimumFractionDigits:2})} readOnly className="w-32 h-7 border border-gray-300 outline-none px-2 text-right text-[12px] font-bold font-mono shadow-inner bg-white text-red-500" />
+                                <span className="text-[11px] font-mono font-bold text-gray-500 uppercase tracking-wider">Discount Applied</span>
+                                <input type="text" value={totalDiscount.toLocaleString(undefined, {minimumFractionDigits:2})} readOnly className="w-32 h-7 border border-slate-200 outline-none px-2 text-right text-[12px] font-bold font-mono shadow-inner bg-slate-50 text-red-500" />
                             </div>
                             <div className="flex justify-between items-center">
-                                <span className="text-[11px] font-bold text-gray-700">Debit Applied</span>
-                                <input type="text" value={totalSetOff.toLocaleString(undefined, {minimumFractionDigits:2})} readOnly className="w-32 h-7 border border-gray-300 outline-none px-2 text-right text-[12px] font-bold font-mono shadow-inner bg-white text-emerald-600" />
+                                <span className="text-[11px] font-mono font-bold text-gray-500 uppercase tracking-wider">Debit Applied</span>
+                                <input type="text" value={totalSetOff.toLocaleString(undefined, {minimumFractionDigits:2})} readOnly className="w-32 h-7 border border-slate-200 outline-none px-2 text-right text-[12px] font-bold font-mono shadow-inner bg-slate-50 text-emerald-600" />
                             </div>
-                            <div className="flex justify-between items-center mt-1 pt-1 border-t border-gray-200">
-                                <span className="text-[12px] font-black text-gray-800">Ending Balance Rs.</span>
-                                <input type="text" value={(invoices.reduce((a,b) => a + b.balance, 0) - totalAllocated - totalDiscount - totalSetOff).toLocaleString(undefined, {minimumFractionDigits:2})} readOnly className="w-32 h-8 border-2 border-gray-400 outline-none px-2 text-right text-[14px] font-black font-mono shadow-inner bg-gray-50 text-black" />
+                            <div className="flex justify-between items-center mt-1 pt-1 border-t border-slate-200">
+                                <span className="text-[12px] font-mono font-black text-gray-500 uppercase tracking-wider">Ending Balance Rs.</span>
+                                <input type="text" value={(invoices.reduce((a,b) => a + b.balance, 0) - totalAllocated - totalDiscount - totalSetOff).toLocaleString(undefined, {minimumFractionDigits:2})} readOnly className="w-32 h-8 border-2 border-slate-300 outline-none px-2 text-right text-[14px] font-black font-mono shadow-inner bg-slate-50 text-black" />
                             </div>
                         </div>
                     </div>
                 </div>
-            </SimpleModal>
+            </TransactionFormWrapper>
 
             {/* Sub Modals */}
             <CalendarModal isOpen={showDatePicker} onClose={() => setShowDatePicker(false)} onDateSelect={(d) => { setFormData(prev => ({ ...prev, [datePickerField]: d })); setShowDatePicker(false); }} initialDate={formData[datePickerField]} />

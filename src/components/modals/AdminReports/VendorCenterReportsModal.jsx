@@ -1,68 +1,128 @@
-import React from 'react';
-import { X, UserSquare, Clock, FileText, ClipboardList, AlertCircle, List, Calendar, BarChart3 } from 'lucide-react';
+import React, { useState } from 'react';
+import { X, ChevronRight, UserSquare, Clock, FileText, ClipboardList, AlertCircle, List, Calendar, BarChart3, Search } from 'lucide-react';
+
+const accentColor = () => localStorage.getItem('topBarColor') || '#4f83ff';
+
+const menuGroups = [
+    {
+        title: 'Vendor Reports',
+        items: [
+            { icon: Clock, label: 'Creditor Aging Analyst', desc: 'View creditor aging analysis', action: 'aging' },
+            { icon: FileText, label: 'Creditor Statement', desc: 'View creditor statements', action: 'statement' },
+            { icon: BarChart3, label: 'Creditor Balance Report', desc: 'View creditor balance summary', action: 'balance' },
+            { icon: AlertCircle, label: 'Unpaid Bills Details', desc: 'View unpaid bills details', action: 'unpaid' },
+            { icon: List, label: 'Transaction List by Vendor', desc: 'View transactions by vendor', action: 'transactionList' },
+            { icon: Calendar, label: 'Creditor Statement (Given Date)', desc: 'View creditor statements for a date', action: 'statementDate' },
+            { icon: ClipboardList, label: 'Creditor Balance Report (Given Date)', desc: 'View creditor balance for a date', action: 'balanceDate' },
+        ]
+    }
+];
 
 const VendorCenterReportsModal = ({ isOpen, onClose }) => {
+    const [searchQuery, setSearchQuery] = useState('');
+
     if (!isOpen) return null;
 
-    const menuItems = [
-        { icon: Clock, label: 'Creditor Aging Analyst' },
-        { icon: FileText, label: 'Creditor Statement' },
-        { icon: BarChart3, label: 'Creditor Balance Report' },
-        { icon: AlertCircle, label: 'Unpaid Bills Details' },
-        { icon: List, label: 'Transaction List by Vendor' },
-        { icon: Calendar, label: 'Creditor Statement (Given Date)' },
-        { icon: ClipboardList, label: 'Creditor Balance Report (Given Date)' },
-    ];
+    const filteredGroups = (() => {
+        const q = searchQuery.toLowerCase();
+        if (!q) return menuGroups;
+        return menuGroups.map(group => ({
+            ...group,
+            items: group.items.filter(item =>
+                item.label.toLowerCase().includes(q) || item.desc.toLowerCase().includes(q)
+            )
+        })).filter(group => group.items.length > 0);
+    })();
+
+    const totalModules = menuGroups.reduce((sum, g) => sum + g.items.length, 0);
 
     return (
         <div className="fixed inset-0 z-[300] flex items-center justify-center p-4">
-            <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={onClose} />
-            
-            <div className="relative w-full max-w-sm bg-white border border-gray-100 rounded-xl shadow-2xl overflow-hidden flex flex-col animate-in slide-in-from-right-5 duration-300">
-                
-                <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-100 select-none relative overflow-hidden">
-                    <div 
-                        className="absolute left-0 top-0 bottom-0 w-1.5 transition-colors duration-500" 
-                        style={{ backgroundColor: localStorage.getItem('topBarColor') || '#0078d4' }}
-                    />
-                    <div className="flex items-center gap-2">
-                        <UserSquare size={14} className="text-[#0078d4]" />
-                        <span className="text-[15px] font-[700] text-slate-900 uppercase tracking-[3px] font-mono truncate">Vendor Center Reports</span>
+            <div className="absolute inset-0 bg-slate-900/70 backdrop-blur-sm" onClick={onClose} />
+
+            <div className="relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl overflow-hidden border border-white/10 animate-in zoom-in-95 duration-300">
+                <div className="absolute left-0 top-0 bottom-0 w-[4px]" style={{ backgroundColor: accentColor() }} />
+
+                <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-white">
+                    <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-xl bg-[#4f83ff]/10 flex items-center justify-center">
+                            <UserSquare size={16} className="text-[#4f83ff]" />
+                        </div>
+                        <div>
+                            <h2 className="text-[15px] font-black uppercase tracking-[0.25em] text-slate-900 leading-tight">
+                                Vendor Center Reports
+                            </h2>
+                            <p className="text-[10px] text-slate-400 font-medium tracking-wider">Creditor Reports &amp; Analytics</p>
+                        </div>
                     </div>
-                    <button 
-                        onClick={onClose} 
-                        className="w-9 h-8 flex items-center justify-center bg-red-50 hover:bg-red-100 text-red-600 rounded-[8px] transition-all active:scale-90 outline-none border-none group"
-                        title="Close"
-                    >
-                        <X size={18} strokeWidth={4} className="group-hover:scale-110 transition-transform" />
+                    <button onClick={onClose} className="w-9 h-9 rounded-xl bg-red-50 hover:bg-red-100 flex items-center justify-center transition-all active:scale-90">
+                        <X size={18} strokeWidth={3} className="text-red-600" />
                     </button>
                 </div>
 
-                <div className="p-2 bg-white flex-1 overflow-y-auto max-h-[75vh] no-scrollbar">
-                    {menuItems.map((item, idx) => {
-                        const Icon = item.icon;
-                        return (
-                            <button
-                                key={idx}
-                                onClick={() => {}}
-                                className="w-full flex items-center justify-between px-4 py-3 rounded-xl hover:bg-slate-50 group transition-all relative overflow-hidden text-left"
-                            >
-                                <div 
-                                    className="absolute left-0 top-0 bottom-0 w-1 opacity-0 group-hover:opacity-100 transition-all duration-300"
-                                    style={{ backgroundColor: localStorage.getItem('topBarColor') || '#0078d4' }}
-                                />
+                <div className="px-5 py-3 bg-slate-50/80 border-b border-slate-100">
+                    <div className="relative">
+                        <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                        <input
+                            type="text"
+                            placeholder="Search vendor reports..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="w-full h-9 pl-9 pr-3 text-[12px] border border-slate-200 rounded-lg bg-white outline-none focus:border-[#4f83ff] focus:ring-1 focus:ring-[#4f83ff]/20 transition-all placeholder:text-slate-300"
+                        />
+                    </div>
+                </div>
 
-                                <div className="flex items-center gap-3 relative z-10">
-                                    <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center group-hover:bg-white transition-colors shadow-sm group-hover:shadow-md">
-                                        <Icon size={16} className="text-slate-500 group-hover:text-[#0078d4] transition-colors" />
-                                    </div>
-                                    <span className="text-[14px] font-bold text-slate-700 group-hover:text-slate-900 transition-colors">
-                                        {item.label}
-                                    </span>
+                <div className="px-5 py-4 max-h-[65vh] overflow-y-auto custom-scrollbar">
+                    {filteredGroups.length === 0 ? (
+                        <div className="py-16 text-center">
+                            <Search size={32} className="mx-auto text-slate-200 mb-3" />
+                            <p className="text-[13px] text-slate-400 font-medium">No reports match your search</p>
+                            <button onClick={() => setSearchQuery('')} className="mt-2 text-[11px] text-[#4f83ff] font-bold hover:underline">Clear search</button>
+                        </div>
+                    ) : (
+                        filteredGroups.map((group, gi) => (
+                            <div key={gi} className="mb-5 last:mb-0">
+                                <div className="flex items-center gap-2.5 mb-2.5 px-1">
+                                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.25em]">{group.title}</span>
+                                    <div className="flex-1 h-px bg-slate-100" />
+                                    <span className="text-[9px] text-slate-300 font-medium">{group.items.length}</span>
                                 </div>
-                            </button>
-                        );
-                    })}
+                                <div className="grid grid-cols-1 gap-1">
+                                    {group.items.map((item, idx) => {
+                                        const Icon = item.icon;
+                                        return (
+                                            <button
+                                                key={idx}
+                                                onClick={() => {}}
+                                                className="group w-full flex items-center gap-3 px-4 py-2.5 rounded-xl hover:bg-slate-50 transition-all duration-200 border border-transparent hover:border-slate-100 hover:shadow-sm text-left"
+                                            >
+                                                <div className="w-9 h-9 rounded-lg bg-white border border-slate-100 flex items-center justify-center shadow-sm group-hover:border-[#4f83ff]/20 group-hover:bg-[#4f83ff]/5 transition-all shrink-0">
+                                                    <Icon size={16} strokeWidth={1.8} className="text-slate-500 group-hover:text-[#4f83ff] transition-colors" />
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-[13px] font-[700] tracking-tight text-slate-700">
+                                                            {item.label}
+                                                        </span>
+                                                    </div>
+                                                    <p className="text-[10.5px] text-slate-400 font-medium leading-tight mt-0.5">{item.desc}</p>
+                                                </div>
+                                                <ChevronRight size={14} className="text-slate-200 group-hover:text-slate-400 group-hover:translate-x-0.5 transition-all shrink-0" />
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        ))
+                    )}
+                </div>
+
+                <div className="px-5 py-2.5 bg-slate-50/80 border-t border-slate-100 flex items-center justify-between">
+                    <span className="text-[9px] text-slate-400 font-medium">
+                        {totalModules} Modules Available
+                    </span>
+                    <span className="text-[9px] text-slate-300">Vendor Reports</span>
                 </div>
             </div>
         </div>

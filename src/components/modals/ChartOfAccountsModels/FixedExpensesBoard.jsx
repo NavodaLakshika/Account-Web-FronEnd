@@ -134,55 +134,55 @@ const FixedExpensesBoard = ({ isOpen, onClose }) => {
                 title="Fixed Expenses Entry"
                 maxWidth="max-w-[850px]"
                 footer={
-                    <div className="bg-slate-50 px-6 py-3 w-full flex justify-end gap-3 border-t border-gray-100 mt-1 rounded-b-xl">
+                    <div className="bg-slate-50 px-6 py-4 w-full flex justify-end gap-4 border-t border-slate-200 mt-1 rounded-b-[5px]">
                         <button 
                             onClick={handleSave} 
                             disabled={loading} 
-                            className={`px-6 h-10 bg-[#50af60] text-white text-[13px] font-bold rounded-[5px] shadow-md shadow-green-200 hover:bg-[#24db4e] transition-all active:scale-95 flex items-center justify-center gap-2 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            className={`px-8 h-10 text-white font-mono font-bold text-[13px] uppercase tracking-widest rounded-[5px] transition-all active:scale-95 flex items-center justify-center gap-2 border-none disabled:opacity-50 shadow-md bg-[#2bb744] hover:bg-[#259b3a] shadow-green-100 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                         >
                             {loading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />} 
-                            Save Record
+                            SAVE
                         </button>
-                        <button onClick={handleClear} className="px-6 h-10 bg-[#00adff] text-white text-[13px] font-bold rounded-[5px] hover:bg-[#0099e6] shadow-md shadow-blue-200 transition-all active:scale-95 flex items-center justify-center gap-2 border-none">
-                            <RotateCcw size={14} /> Clear
+                        <button onClick={handleClear} className="px-8 h-10 bg-[#00adff] hover:bg-[#0099e6] text-white font-mono font-bold text-[13px] uppercase tracking-widest rounded-[5px] shadow-md shadow-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border-none disabled:opacity-50">
+                            <RotateCcw size={14} /> CLEAR
                         </button>
                     </div>
                 }
             >
                 <div className="select-none font-['Tahoma'] space-y-4 p-2">
                     {/* Main Form */}
-                    <div className="bg-white p-6 border border-gray-200 rounded-[5px] space-y-5 shadow-sm border-l-4 border-l-[#ff3b30]">
+                    <div className="bg-white p-6 border border-slate-200 rounded-[5px] space-y-5 shadow-sm border-l-4 border-l-[#ff3b30]">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-5">
                             {/* Account Selection */}
-                            <div className="space-y-2">
-                                <label className="text-[11px] font-bold text-gray-700 uppercase tracking-wider">Expense Account</label>
-                                <div className="flex gap-2">
+                            <div className="space-y-1.5">
+                                <label className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">Expense Account</label>
+                                <div className="flex gap-1">
                                     <div className="relative flex-1">
                                         <input 
                                             type="text" 
                                             value={formData.ExpenseAccount} 
                                             readOnly 
-                                            className="w-full h-9 border border-gray-300 px-3 text-[12.5px] bg-gray-50 rounded-[5px] outline-none font-bold text-red-600 shadow-sm"
+                                            className="w-full h-8 border border-slate-200 px-3 text-[12px] bg-slate-50 rounded outline-none font-bold text-red-500 shadow-sm cursor-not-allowed"
                                         />
                                         {formData.AccCode && (
-                                            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-bold text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded">
+                                            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-bold text-[#ff3b30] bg-red-50 border border-red-100 px-1.5 py-0.5 rounded shadow-sm">
                                                 {formData.AccCode}
                                             </span>
                                         )}
                                     </div>
                                     <button 
                                         onClick={() => setShowAccSearch(true)} 
-                                        className="w-10 h-9 bg-[#ff3b30] text-white flex items-center justify-center hover:bg-[#e03127] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0"
+                                        className="w-9 h-8 bg-[#ff3b30] text-white flex items-center justify-center hover:bg-[#e03127] rounded transition-all shadow-sm active:scale-95 shrink-0 border-none"
                                     >
-                                        <Search size={18} />
+                                        <Search size={14} />
                                     </button>
                                 </div>
                             </div>
 
                             {/* Vendor Name */}
-                            <div className="space-y-2">
-                                <label className="text-[11px] font-bold text-gray-700 uppercase tracking-wider flex items-center gap-2">
-                                    <User size={12} className="text-gray-400" /> Vendor Name
+                            <div className="space-y-1.5">
+                                <label className="text-[11px] font-bold text-gray-500 uppercase tracking-widest flex items-center gap-2">
+                                    Vendor Name
                                 </label>
                                 <input 
                                     name="Vendor"
@@ -190,58 +190,58 @@ const FixedExpensesBoard = ({ isOpen, onClose }) => {
                                     onChange={handleInputChange}
                                     type="text"
                                     placeholder=""
-                                    className="w-full h-9 border border-gray-300 px-3 text-[12.5px] focus:border-blue-500 outline-none rounded-[5px] font-medium shadow-sm uppercase"
+                                    className="w-full h-8 border border-slate-200 rounded px-3 text-[12px] font-bold outline-none shadow-sm transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 text-gray-700 bg-white"
                                 />
                             </div>
 
                             {/* Debit Date */}
-                            <div className="space-y-2">
-                                <label className="text-[11px] font-bold text-gray-700 uppercase tracking-wider flex items-center gap-2">
+                            <div className="space-y-1.5">
+                                <label className="text-[11px] font-bold text-gray-500 uppercase tracking-widest flex items-center gap-2">
                                     Debit Date
                                 </label>
-                                <div className="flex gap-2">
+                                <div className="flex gap-1">
                                     <input 
                                         name="DebitDate"
                                         value={formData.DebitDate}
                                         readOnly
                                         onClick={() => setShowCalendar(true)}
-                                        className="flex-1 h-9 border border-gray-300 px-3 text-[12.5px] bg-gray-50 rounded-[5px] outline-none font-bold text-gray-600 shadow-sm cursor-pointer"
+                                        className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] bg-slate-50 rounded outline-none font-bold text-gray-700 shadow-sm cursor-not-allowed"
                                     />
                                     <button 
                                         type="button"
                                         onClick={() => setShowCalendar(true)}
-                                        className="w-10 h-9 bg-[#0285fd] text-white flex items-center justify-center rounded-[5px] shadow-md shrink-0 hover:bg-[#0073ff] active:scale-95 transition-all"
+                                        className="w-9 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded transition-all shadow-sm active:scale-95 shrink-0 border-none"
                                     >
-                                        <Calendar size={18} />
+                                        <Calendar size={14} />
                                     </button>
                                 </div>
                             </div>
 
                             {/* Pay Type */}
-                            <div className="space-y-2">
-                                <label className="text-[11px] font-bold text-gray-700 uppercase tracking-wider flex items-center gap-2">
-                                    <DollarSign size={12} className="text-gray-400" /> Payment Type
+                            <div className="space-y-1.5">
+                                <label className="text-[11px] font-bold text-gray-500 uppercase tracking-widest flex items-center gap-2">
+                                    Payment Type
                                 </label>
-                                <div className="flex gap-2">
+                                <div className="flex gap-1">
                                     <input 
                                         type="text" 
                                         value={formData.PayType} 
                                         readOnly 
                                         placeholder=""
-                                        className="w-full h-9 border border-gray-300 px-3 text-[12.5px] bg-gray-50 rounded-[5px] outline-none font-bold text-gray-600 shadow-sm"
+                                        className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] bg-slate-50 rounded outline-none font-bold text-gray-700 shadow-sm cursor-not-allowed"
                                     />
                                     <button 
                                         onClick={() => setShowPayTypeSearch(true)} 
-                                        className="w-10 h-9 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0"
+                                        className="w-9 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded transition-all shadow-sm active:scale-95 shrink-0 border-none"
                                     >
-                                        <Search size={18} />
+                                        <Search size={14} />
                                     </button>
                                 </div>
                             </div>
 
                             {/* Amount */}
-                            <div className="space-y-2 md:col-span-2">
-                                <label className="text-[11px] font-bold text-gray-700 uppercase tracking-wider">Debit Amount</label>
+                            <div className="space-y-1.5 md:col-span-2">
+                                <label className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">Debit Amount</label>
                                 <div className="relative">
                                     <input 
                                         name="Amount"
@@ -249,49 +249,49 @@ const FixedExpensesBoard = ({ isOpen, onClose }) => {
                                         onChange={handleInputChange}
                                         type="number"
                                         placeholder="0.00"
-                                        className="w-full h-12 border border-gray-300 px-4 text-[20px] focus:border-blue-500 outline-none rounded-[5px] font-black text-right text-red-600 shadow-sm pr-12 bg-[#fef2f2]"
+                                        className="w-full h-10 border border-slate-200 px-4 text-[16px] focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 outline-none rounded font-black text-right text-red-500 shadow-sm pr-12 bg-white"
                                     />
-                                    <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-black text-gray-400 uppercase tracking-tighter">Rs</span>
+                                    <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-black text-gray-400 uppercase tracking-widest">Rs</span>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     {/* Data List */}
-                    <div className="border border-gray-200 rounded-[5px] overflow-hidden shadow-sm bg-white">
-                        <div className="bg-gray-50 px-4 py-3 border-b border-gray-200 flex justify-between items-center">
-                            <span className="text-[11px] font-bold text-[#0078d4] uppercase tracking-widest flex items-center gap-2">
+                    <div className="border border-slate-200 rounded-[5px] overflow-hidden shadow-sm bg-white">
+                        <div className="bg-slate-50 px-4 py-2.5 border-b border-slate-200 flex justify-between items-center">
+                            <span className="text-[11px] font-bold text-[#ff3b30] uppercase tracking-widest flex items-center gap-2">
                                 <PlusCircle size={14} /> Recent Fixed Expense Entries
                             </span>
-                            <span className="text-[10px] font-bold text-gray-400 bg-white px-2 py-0.5 border rounded-full">{expenseList.length} Entries Found</span>
+                            <span className="text-[10px] font-bold text-[#0285fd] bg-blue-50 px-2 py-0.5 border border-blue-100 rounded-[5px] shadow-sm">{expenseList.length} Entries Found</span>
                         </div>
                         <div className="max-h-[250px] overflow-y-auto custom-scrollbar">
                             <table className="w-full text-left border-collapse">
-                                <thead className="sticky top-0 bg-white z-10">
-                                    <tr className="bg-slate-100 border-b border-gray-200 shadow-sm">
-                                        <th className="px-4 py-2.5 text-[10px] font-bold text-gray-600 uppercase">Expense Source</th>
-                                        <th className="px-4 py-2.5 text-[10px] font-bold text-gray-600 uppercase">Vendor</th>
-                                        <th className="px-4 py-2.5 text-[10px] font-bold text-gray-600 uppercase text-center">Date</th>
-                                        <th className="px-4 py-2.5 text-[10px] font-bold text-gray-600 uppercase text-right">Amount</th>
+                                <thead className="sticky top-0 bg-white z-10 shadow-sm">
+                                    <tr className="bg-slate-50 border-b border-slate-200">
+                                        <th className="px-4 py-2 text-[10px] font-bold text-gray-500 uppercase tracking-widest">Expense Source</th>
+                                        <th className="px-4 py-2 text-[10px] font-bold text-gray-500 uppercase tracking-widest">Vendor</th>
+                                        <th className="px-4 py-2 text-[10px] font-bold text-gray-500 uppercase tracking-widest text-center">Date</th>
+                                        <th className="px-4 py-2 text-[10px] font-bold text-gray-500 uppercase tracking-widest text-right">Amount</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {expenseList.map((item, idx) => (
-                                        <tr key={idx} className="border-b border-gray-50 hover:bg-red-50 transition-colors group">
-                                            <td className="px-4 py-3">
-                                                <div className="text-[11px] font-bold text-[#ff3b30] font-mono mb-0.5">{item.accCode}</div>
-                                                <div className="text-[12px] font-medium text-gray-700 uppercase leading-tight">{item.expenseAccount}</div>
+                                        <tr key={idx} className="border-b border-slate-100 hover:bg-slate-50 transition-colors group">
+                                            <td className="px-4 py-2">
+                                                <div className="text-[10px] font-bold text-[#ff3b30] font-mono mb-0.5">{item.accCode}</div>
+                                                <div className="text-[11px] font-bold text-gray-700 uppercase leading-tight group-hover:text-[#ff3b30] transition-colors">{item.expenseAccount}</div>
                                             </td>
-                                            <td className="px-4 py-3 text-[12px] font-medium text-gray-600 uppercase">{item.vendor}</td>
-                                            <td className="px-4 py-3 text-[11px] font-bold text-gray-500 text-center">{item.debitDate}</td>
-                                            <td className="px-4 py-3 text-[13px] font-black text-red-600 text-right">
+                                            <td className="px-4 py-2 text-[11px] font-bold text-gray-600 uppercase">{item.vendor}</td>
+                                            <td className="px-4 py-2 text-[11px] font-bold text-gray-500 text-center">{item.debitDate}</td>
+                                            <td className="px-4 py-2 text-[12px] font-black text-red-500 text-right">
                                                 {parseFloat(item.amount).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                             </td>
                                         </tr>
                                     ))}
                                     {expenseList.length === 0 && (
                                         <tr>
-                                            <td colSpan="4" className="px-4 py-12 text-center text-gray-400 text-[12px]">
+                                            <td colSpan="4" className="px-4 py-12 text-center text-gray-400 text-[11px] font-bold uppercase tracking-widest italic">
                                                 No fixed expense records found for this company.
                                             </td>
                                         </tr>
@@ -314,32 +314,51 @@ const FixedExpensesBoard = ({ isOpen, onClose }) => {
                                 <Search size={16} className="text-[#ff3b30]" />
                                 <span className="text-[15px] font-[700] text-slate-900 uppercase tracking-[3px] font-mono truncate">Expense Accounts Lookup</span>
                             </div>
-                            <button onClick={() => setShowAccSearch(false)} className="w-9 h-8 flex items-center justify-center bg-[#ff3b30] hover:bg-[#e03127] text-white rounded-[8px] shadow-sm active:scale-90"><X size={18} strokeWidth={4} /></button>
+                            <button onClick={() => setShowAccSearch(false)} className="w-9 h-8 flex items-center justify-center bg-red-50 hover:bg-red-100 text-red-600 rounded-[8px] transition-all active:scale-90 outline-none border-none group">
+                                <X size={18} strokeWidth={4} className="group-hover:scale-110 transition-transform" />
+                            </button>
                         </div>
-                        <div className="p-3 bg-slate-50 border-b border-gray-100">
+                        <div className="p-3 bg-slate-50 border-b border-gray-100 flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                <Search size={14} className="text-gray-400" />
+                                <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Search Facility</span>
+                            </div>
                             <input 
                                 type="text" 
-                                placeholder="SEARCH BY NAME OR CODE..." 
-                                className="h-9 border border-gray-300 px-3 text-xs rounded-md w-full focus:border-[#ff3b30] outline-none shadow-sm uppercase" 
+                                placeholder="FIND BY NAME OR CODE..." 
+                                className="h-9 border border-slate-200 px-3 text-xs rounded-md w-72 focus:border-[#ff3b30] focus:ring-2 focus:ring-[#ff3b30]/20 outline-none shadow-sm transition-all uppercase" 
                                 value={searchTerm} 
                                 onChange={(e) => setSearchTerm(e.target.value)} 
                             />
                         </div>
-                        <div className="p-2">
-                            <div className="max-h-[400px] overflow-y-auto custom-scrollbar">
-                                {lookups.filter(a => 
-                                    (a.name || '').toLowerCase().includes(searchTerm.toLowerCase()) || 
-                                    (a.code || '').toLowerCase().includes(searchTerm.toLowerCase())
-                                ).map((acc, idx) => (
-                                    <button key={idx} onClick={() => handleAccountSelect(acc)} className="w-full flex items-center justify-between px-4 py-2.5 border-b border-gray-100 hover:bg-red-50 transition-all text-left group">
-                                        <div className="flex flex-col">
-                                            <span className="text-[10px] font-bold text-[#ff3b30] font-mono tracking-tighter">{acc.code}</span>
-                                            <span className="text-[12px] font-bold text-gray-700 uppercase leading-tight">{acc.name}</span>
-                                        </div>
-                                        <div className="bg-[#e49e1b] text-white text-[10px] px-4 py-1.5 rounded-md font-bold uppercase group-hover:scale-105 transition-transform">Select</div>
-                                    </button>
-                                ))}
-                            </div>
+                        <div className="p-0">
+                            <table className="w-full text-left border-collapse">
+                                <thead className="bg-slate-50 sticky top-0 text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-slate-200 z-10">
+                                    <tr>
+                                        <th className="px-5 py-3 w-32">Account Code</th>
+                                        <th className="px-5 py-3">Account Name</th>
+                                        <th className="px-5 py-3 text-right">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-slate-100 max-h-[400px] overflow-y-auto custom-scrollbar block" style={{ maxHeight: '400px' }}>
+                                    {lookups.filter(a => 
+                                        (a.name || '').toLowerCase().includes(searchTerm.toLowerCase()) || 
+                                        (a.code || '').toLowerCase().includes(searchTerm.toLowerCase())
+                                    ).map((acc, idx) => (
+                                        <tr 
+                                            key={idx} 
+                                            onClick={() => handleAccountSelect(acc)}
+                                            className="group hover:bg-slate-50 cursor-pointer transition-colors flex w-full table-fixed"
+                                        >
+                                            <td className="px-5 py-3 w-32 font-mono text-[12px] font-bold text-slate-500">{acc.code}</td>
+                                            <td className="px-5 py-3 flex-1 text-[12px] font-bold text-slate-700 uppercase group-hover:text-[#ff3b30] transition-colors">{acc.name}</td>
+                                            <td className="px-5 py-3 text-right">
+                                                <button className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded font-bold hover:bg-[#cb9b34] shadow-sm transition-all active:scale-95 uppercase tracking-widest border-none">Select</button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -349,40 +368,33 @@ const FixedExpensesBoard = ({ isOpen, onClose }) => {
             {showPayTypeSearch && (
                 <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4 font-['Tahoma']">
                     <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setShowPayTypeSearch(false)} />
-                    <div className="relative w-full max-w-md bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
+                    <div className="relative w-full max-w-sm bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
                         <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-100 select-none relative overflow-hidden">
                             <div className="absolute left-0 top-0 bottom-0 w-1.5 transition-colors duration-500" style={{ backgroundColor: localStorage.getItem('topBarColor') || '#0285fd' }} />
                             <div className="flex items-center gap-2">
-                                <DollarSign size={16} className="text-[#0078d4]" />
+                                <Search size={16} className="text-[#0078d4]" />
                                 <span className="text-[15px] font-[700] text-slate-900 uppercase tracking-[3px] font-mono truncate">Payment Type Lookup</span>
                             </div>
-                            <button onClick={() => setShowPayTypeSearch(false)} className="w-9 h-8 flex items-center justify-center bg-[#ff3b30] hover:bg-[#e03127] text-white rounded-[8px] shadow-sm active:scale-90"><X size={18} strokeWidth={4} /></button>
+                            <button onClick={() => setShowPayTypeSearch(false)} className="w-9 h-8 flex items-center justify-center bg-red-50 hover:bg-red-100 text-red-600 rounded-[8px] transition-all active:scale-90 outline-none border-none group">
+                                <X size={18} strokeWidth={4} className="group-hover:scale-110 transition-transform" />
+                            </button>
                         </div>
-                        <div className="p-3 bg-slate-50 border-b border-gray-100">
-                            <input 
-                                type="text" 
-                                placeholder="FILTER PAYMENT TYPES..." 
-                                className="h-9 border border-gray-300 px-3 text-xs rounded-md w-full focus:border-[#0285fd] outline-none shadow-sm uppercase" 
-                                value={paySearchTerm} 
-                                onChange={(e) => setPaySearchTerm(e.target.value)} 
-                            />
-                        </div>
-                        <div className="p-2">
-                            <div className="max-h-[300px] overflow-y-auto custom-scrollbar">
-                                {(payTypes.length > 0 ? payTypes : [
-                                    { code: 'CASH', name: 'CASH' },
-                                    { code: 'CHQ', name: 'CHEQUE' },
-                                    { code: 'CC', name: 'CREDIT CARD' },
-                                    { code: 'BT', name: 'BANK TRANSFER' }
-                                ]).filter(p => 
-                                    (p.name || '').toLowerCase().includes(paySearchTerm.toLowerCase())
-                                ).map((pay, idx) => (
-                                    <button key={idx} onClick={() => handlePayTypeSelect(pay)} className="w-full flex items-center justify-between px-4 py-3 border-b border-gray-100 hover:bg-blue-50 transition-all text-left group">
-                                        <span className="text-[12px] font-bold text-gray-700 uppercase leading-tight">{pay.name}</span>
-                                        <div className="bg-[#e49e1b] text-white text-[10px] px-4 py-1.5 rounded-md font-bold uppercase group-hover:scale-105 transition-transform">Select</div>
-                                    </button>
-                                ))}
-                            </div>
+                        <div className="p-4 space-y-2">
+                            {(payTypes.length > 0 ? payTypes : [
+                                { code: 'CASH', name: 'CASH' },
+                                { code: 'CHQ', name: 'CHEQUE' },
+                                { code: 'CC', name: 'CREDIT CARD' },
+                                { code: 'BT', name: 'BANK TRANSFER' }
+                            ]).map((pay, idx) => (
+                                <button 
+                                    key={idx} 
+                                    onClick={() => handlePayTypeSelect(pay)}
+                                    className="w-full px-4 py-3 text-[12px] font-bold text-gray-700 hover:bg-slate-50 border border-slate-200 rounded-lg transition-all text-left flex justify-between items-center group shadow-sm"
+                                >
+                                    <span className="uppercase tracking-widest">{pay.name}</span>
+                                    <PlusCircle size={16} className="text-gray-300 group-hover:text-[#0285fd] transition-colors" />
+                                </button>
+                            ))}
                         </div>
                     </div>
                 </div>

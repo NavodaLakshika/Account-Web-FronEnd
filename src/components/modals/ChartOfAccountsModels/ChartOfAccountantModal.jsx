@@ -59,7 +59,7 @@ const ChartOfAccountantModal = ({ isOpen, onClose, onCreateNewAccount, onOpenFix
                             <button
                                 key={idx}
                                 onClick={item.onClick}
-                                className="w-full flex items-center justify-between px-4 py-3 rounded-xl hover:bg-slate-50 group transition-all relative overflow-hidden text-left"
+                                className="w-full flex items-center justify-between px-4 py-3 rounded-lg hover:bg-slate-50 group transition-all relative overflow-hidden text-left border border-transparent hover:border-slate-200"
                             >
                                 {/* Hover Indicator Bar */}
                                 <div 
@@ -68,17 +68,17 @@ const ChartOfAccountantModal = ({ isOpen, onClose, onCreateNewAccount, onOpenFix
                                 />
 
                                 <div className="flex items-center gap-3 relative z-10">
-                                    <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center group-hover:bg-white transition-colors shadow-sm group-hover:shadow-md">
-                                        <Icon size={16} className="text-slate-500 group-hover:text-[#0078d4] transition-colors" />
+                                    <div className="w-8 h-8 rounded-md bg-slate-100 flex items-center justify-center group-hover:bg-white transition-colors shadow-sm group-hover:shadow-md">
+                                        <Icon size={14} className="text-slate-500 group-hover:text-[#0078d4] transition-colors" />
                                     </div>
-                                    <span className="text-[14px] font-bold text-slate-700 group-hover:text-slate-900 transition-colors">
+                                    <span className="text-[11px] uppercase tracking-widest font-bold text-slate-600 group-hover:text-[#0078d4] transition-colors">
                                         {item.label}
                                     </span>
                                 </div>
                                 
                                 <div className="flex items-center gap-3 relative z-10">
                                     {item.shortcut && (
-                                        <span className="text-[10px] font-bold text-slate-300 group-hover:text-slate-400 bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100">
+                                        <span className="text-[10px] font-bold text-slate-300 group-hover:text-slate-400 bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100 uppercase tracking-widest">
                                             {item.shortcut}
                                         </span>
                                     )}

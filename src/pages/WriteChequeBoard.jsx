@@ -332,21 +332,21 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
             title="Write Cheque Portfolio"
             maxWidth="max-w-[1150px]"
             footer={
-                <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-gray-100 rounded-b-xl">
+                <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-slate-200 rounded-b-xl">
                     <div className="flex gap-3">
-                         <button onClick={() => setShowVoidConfirm(true)} className="px-6 h-10 bg-[#ff3b30] text-white text-sm font-black rounded-[5px] shadow-md shadow-red-100 hover:bg-[#e03127] transition-all active:scale-95 flex items-center gap-2 border-none">
+                         <button onClick={() => setShowVoidConfirm(true)} className="px-6 h-10 bg-[#ff3b30] text-white text-[13px] font-mono font-bold uppercase tracking-widest rounded-[5px] shadow-md shadow-red-100 hover:bg-[#e03127] transition-all active:scale-95 flex items-center gap-2 border-none">
                             <Trash2 size={14} /> VOID 
                         </button>
-                        <button onClick={handleClear} className="px-6 h-10 bg-[#00adff] text-white text-sm font-black rounded-[5px] hover:bg-[#0099e6] transition-all active:scale-95 flex items-center gap-2 border-none">
+                        <button onClick={handleClear} className="px-6 h-10 bg-[#00adff] text-white text-[13px] font-mono font-bold uppercase tracking-widest rounded-[5px] hover:bg-[#0099e6] transition-all active:scale-95 flex items-center gap-2 border-none shadow-md shadow-blue-100">
                             <RotateCcw size={14} /> CLEAR 
                         </button>
                     </div>
                     <div className="flex gap-3">
-                        <button onClick={handleSaveDraft} disabled={loading} className="px-6 h-10 bg-white text-[#0285fd] text-sm font-black rounded-[5px] border-2 border-[#0285fd] hover:bg-blue-50 transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-50">
+                        <button onClick={handleSaveDraft} disabled={loading} className="px-6 h-10 bg-white text-[#0285fd] text-[13px] font-mono font-bold uppercase tracking-widest rounded-[5px] border-2 border-[#0285fd] hover:bg-blue-50 transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-50">
                             {loading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />} 
                              SAVE DRAFT
                         </button>
-                        <button onClick={handleCommit} disabled={loading} className="px-6 h-10 bg-[#2bb744] text-white text-sm font-black rounded-[5px] shadow-md shadow-green-100 hover:bg-[#259b3a] transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-50 border-none">
+                        <button onClick={handleCommit} disabled={loading} className="px-8 h-10 bg-[#2bb744] text-white text-[13px] font-mono font-bold uppercase tracking-widest rounded-[5px] shadow-md shadow-green-100 hover:bg-[#259b3a] transition-all active:scale-95 flex items-center justify-center gap-2 border-none disabled:opacity-50">
                             {loading ? <Loader2 size={14} className="animate-spin" /> : <CheckCircle size={14} />} 
                              APPLY
                         </button>
@@ -355,27 +355,27 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
             }
         >
             <div className="space-y-4 overflow-y-auto no-scrollbar font-['Tahoma'] select-none">
-                <div className="bg-white p-4 border border-gray-100 rounded-lg shadow-sm space-y-4">
-                    <div className="grid grid-cols-12 gap-x-6 gap-y-3.5">
+                <div className="bg-white p-4 border border-slate-200 rounded-[5px] shadow-sm space-y-4">
+                    <div className="grid grid-cols-12 gap-x-6 gap-y-4">
                         {/* Row 1: Doc ID & Date */}
                         <div className="col-span-6 flex items-center gap-2">
-                            <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Document ID</label>
-                            <div className="flex-1 h-8 border border-gray-300 px-3 text-[12px] font-bold text-blue-600 bg-gray-50 flex items-center rounded-[5px] shadow-sm">
+                            <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Document ID</label>
+                            <div className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-bold text-blue-600 bg-white flex items-center rounded transition-all focus-within:border-[#00D1FF] focus-within:ring-2 focus-within:ring-[#00D1FF]/20">
                                 {formData.docId}
                             </div>
                         </div>
 
                         <div className="col-span-6 flex items-center gap-2">
-                            <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Dispatch Date</label>
+                            <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Dispatch Date</label>
                             <div className="flex-1 flex gap-1 h-8 min-w-0">
                                 <input 
                                     type="text" 
                                     readOnly 
                                     value={formData.date} 
-                                    className="flex-1 px-3 text-[12px] border border-gray-300 rounded-[5px] outline-none text-slate-700 font-bold bg-white cursor-pointer shadow-sm"
+                                    className="flex-1 px-3 text-[12px] border border-slate-200 rounded outline-none text-gray-700 font-mono font-bold bg-white text-center cursor-pointer transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20"
                                     onClick={() => openCalendar('date')}
                                 />
-                                <button onClick={() => openCalendar('date')} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
+                                <button onClick={() => openCalendar('date')} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center rounded-[5px] transition-all shadow-md active:scale-95 shrink-0 hover:bg-[#0073ff]">
                                     <Calendar size={16} />
                                 </button>
                             </div>
@@ -383,15 +383,15 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
 
                         {/* Row 2: Settlement Bank */}
                         <div className="col-span-12 flex items-center gap-2">
-                            <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Settlement Bank</label>
-                            <div className="flex-1 flex gap-2 items-center h-8">
+                            <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Settlement Bank</label>
+                            <div className="flex-1 flex gap-1 items-center h-8">
                                 <div className="flex-1 relative flex items-center h-full">
                                     <Landmark size={14} className="absolute left-3 text-gray-400" />
                                     <input 
                                         type="text" 
                                         readOnly 
                                         value={lookups.banks.find(b => b.code === formData.bankAcc)?.name || ''} 
-                                        className="w-full h-full border border-gray-300 pl-9 pr-3 text-[12px] font-bold text-slate-800 bg-gray-50 outline-none rounded-[5px] shadow-sm truncate cursor-pointer"
+                                        className="w-full h-full border border-slate-200 pl-9 pr-3 text-[12px] font-bold text-slate-800 bg-white outline-none rounded truncate cursor-pointer transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20"
                                         onClick={() => setShowBankModal(true)}
                                     />
                                 </div>
@@ -399,7 +399,7 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
                                     <Search size={16} />
                                 </button>
                                 {formData.bankAcc && (
-                                    <div className="px-3 h-8 bg-blue-50 flex flex-col justify-center rounded-[5px] border border-blue-100 min-w-[120px]">
+                                    <div className="px-3 h-8 bg-blue-50 flex flex-col justify-center rounded border border-blue-100 min-w-[120px] ml-1">
                                         <span className="text-[8px] font-black text-blue-400 uppercase leading-none">Bank Balance</span>
                                         <span className="text-[12px] font-mono font-black text-blue-700">{formData.bankBalance.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                                     </div>
@@ -409,13 +409,13 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
 
                         {/* Row 3: Cost Center & Endorsement */}
                         <div className="col-span-6 flex items-center gap-2">
-                            <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Cost Center</label>
-                            <div className="flex-1 flex gap-2 items-center h-8">
+                            <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Cost Center</label>
+                            <div className="flex-1 flex gap-1 items-center h-8">
                                 <input 
                                     type="text" 
                                     readOnly 
                                     value={lookups.costCenters.find(cc => cc.code === formData.costCenter)?.name || ''} 
-                                    className="flex-1 h-full border border-gray-300 px-3 text-[12px] font-bold text-gray-600 bg-gray-50 outline-none rounded-[5px] shadow-sm truncate cursor-pointer"
+                                    className="flex-1 min-w-0 h-full border border-slate-200 px-3 text-[12px] font-bold text-gray-700 bg-white outline-none rounded truncate cursor-pointer transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20"
                                     onClick={() => { setCcSource('header'); setShowCCModal(true); }}
                                 />
                                 <button onClick={() => { setCcSource('header'); setShowCCModal(true); }} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
@@ -425,13 +425,13 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
                         </div>
 
                         <div className="col-span-6 flex items-center gap-2">
-                            <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Endorsement</label>
-                            <div className="flex-1 flex gap-2 items-center h-8">
+                            <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Endorsement</label>
+                            <div className="flex-1 flex gap-1 items-center h-8">
                                 <input 
                                     type="text" 
                                     readOnly 
                                     value={formData.endorsement} 
-                                    className="flex-1 h-full border border-gray-300 px-3 text-[12px] font-bold bg-white text-gray-700 outline-none rounded-[5px] shadow-sm cursor-pointer"
+                                    className="flex-1 min-w-0 h-full border border-slate-200 px-3 text-[12px] font-bold bg-white text-gray-700 outline-none rounded shadow-sm cursor-pointer transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20"
                                     onClick={() => setShowEndorsementModal(true)}
                                 />
                                 <button onClick={() => setShowEndorsementModal(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
@@ -442,15 +442,15 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
 
                         {/* Row 4: Pay to Order */}
                         <div className="col-span-12 flex items-center gap-2">
-                            <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Pay to order</label>
-                            <div className="flex-1 flex gap-2 h-8">
-                                <input type="text" className="w-24 h-full font-mono border border-gray-300 px-3 text-[12px] bg-gray-50 text-slate-600 font-bold rounded-[5px]" value={formData.payeeId} readOnly />
-                                <input type="text" className="flex-1 h-full font-bold border border-gray-300 px-3 text-[12px] text-slate-800 bg-white focus:border-[#0285fd] outline-none rounded-[5px] shadow-sm" value={formData.payeeName} onChange={(e) => setFormData({...formData, payeeName: e.target.value})} />
-                                <div className="flex h-full shadow-sm">
-                                    <button onClick={() => setShowPayeeModal(true)} title="Search Payees" className="w-10 h-full bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-l-[5px] transition-all active:scale-95 border-r border-white/20">
+                            <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Pay to order</label>
+                            <div className="flex-1 flex gap-1 h-8">
+                                <input type="text" className="w-24 h-full font-mono border border-slate-200 px-3 text-[12px] bg-slate-50 text-slate-600 font-bold rounded" value={formData.payeeId} readOnly />
+                                <input type="text" className="flex-1 h-full font-bold border border-slate-200 px-3 text-[12px] text-slate-800 bg-white transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 outline-none rounded" value={formData.payeeName} onChange={(e) => setFormData({...formData, payeeName: e.target.value})} />
+                                <div className="flex h-full shadow-sm ml-1 gap-1">
+                                    <button onClick={() => setShowPayeeModal(true)} title="Search Payees" className="w-10 h-full bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded transition-all active:scale-95">
                                         <Search size={14} />
                                     </button>
-                                    <button onClick={() => setShowVendorModal(true)} title="Search Vendors" className="w-10 h-full bg-[#2bb744] text-white flex items-center justify-center hover:bg-[#259b3a] rounded-r-[5px] transition-all active:scale-95 ml-1">
+                                    <button onClick={() => setShowVendorModal(true)} title="Search Vendors" className="w-10 h-full bg-[#2bb744] text-white flex items-center justify-center hover:bg-[#259b3a] rounded transition-all active:scale-95">
                                         <Plus size={14} />
                                     </button>
                                 </div>
@@ -459,23 +459,23 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
 
                         {/* Row 5: Postal Address */}
                         <div className="col-span-12 flex items-start gap-2">
-                            <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0 mt-1.5">Postal Address</label>
-                            <textarea className="flex-1 h-20 border border-gray-300 p-3 text-[12px] text-gray-600 resize-none focus:border-[#0285fd] outline-none rounded-[5px] shadow-sm bg-white font-mono" value={formData.address} onChange={(e) => setFormData({...formData, address: e.target.value})}></textarea>
+                            <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0 mt-1.5">Postal Address</label>
+                            <textarea className="flex-1 h-20 border border-slate-200 p-3 text-[12px] font-bold text-gray-700 resize-none transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 outline-none rounded-[5px] bg-white font-mono" value={formData.address} onChange={(e) => setFormData({...formData, address: e.target.value})}></textarea>
                         </div>
                     </div>
                 </div>
 
                 {/* 2. Cheque Specifics & Financial Summary */}
                 <div className="grid grid-cols-12 gap-x-6 items-stretch">
-                    <div className="col-span-7 bg-white border border-gray-100 p-4 rounded-lg shadow-sm space-y-4">
-                        <div className="flex items-center justify-between border-b border-gray-50 pb-2.5">
+                    <div className="col-span-7 bg-white border border-slate-200 p-4 rounded-[5px] shadow-sm space-y-4">
+                        <div className="flex items-center justify-between border-b border-slate-200 pb-2.5">
                              <div className="flex items-center gap-2.5">
                                 <div className="h-3.5 w-1 bg-blue-500 rounded-full"></div>
                                 <span className="text-[11px] font-black text-gray-500 uppercase tracking-widest">Bank Submission Details</span>
                              </div>
                              <label className="flex items-center gap-2.5 cursor-pointer group">
-                                <input type="checkbox" className="w-4 h-4 border-gray-300 rounded text-blue-600 focus:ring-blue-500 shadow-sm transition-all" checked={formData.isElectronic} onChange={(e) => setFormData({...formData, isElectronic: e.target.checked})} />
-                                <span className="text-[11px] font-bold text-gray-400 uppercase tracking-tight group-hover:text-blue-600">Electronic Pay</span>
+                                <input type="checkbox" className="w-4 h-4 border-slate-300 rounded text-[#00D1FF] focus:ring-[#00D1FF] transition-all" checked={formData.isElectronic} onChange={(e) => setFormData({...formData, isElectronic: e.target.checked})} />
+                                <span className="text-[11px] font-bold text-gray-400 uppercase tracking-tight group-hover:text-[#00D1FF]">Electronic Pay</span>
                             </label>
                         </div>
                         
@@ -484,8 +484,8 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
                             <div className="col-span-12 xl:col-span-6 flex items-center gap-2">
                                 <label className="text-[11px] font-black text-gray-400 uppercase w-20 shrink-0">Cheque No</label>
                                 <div className="flex-1 flex items-center gap-2 h-8 min-w-0">
-                                    <input type="checkbox" className="w-4 h-4 rounded-sm border-slate-300 text-blue-600 shrink-0" checked={formData.isChqNoManual} onChange={(e) => setFormData({...formData, isChqNoManual: e.target.checked})} />
-                                    <input type="text" className="flex-1 h-full border border-gray-300 px-3 text-[13px] font-bold text-gray-800 tracking-wider focus:border-[#0285fd] outline-none rounded-[5px] shadow-sm bg-white min-w-0" value={formData.chqNo} onChange={(e) => setFormData({...formData, chqNo: e.target.value})} />
+                                    <input type="checkbox" className="w-4 h-4 rounded border-slate-300 text-[#00D1FF] shrink-0 focus:ring-[#00D1FF]" checked={formData.isChqNoManual} onChange={(e) => setFormData({...formData, isChqNoManual: e.target.checked})} />
+                                    <input type="text" className="flex-1 min-w-0 h-full border border-slate-200 px-3 text-[13px] font-bold text-gray-800 tracking-wider transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 outline-none rounded bg-white" value={formData.chqNo} onChange={(e) => setFormData({...formData, chqNo: e.target.value})} />
                                 </div>
                             </div>
 
@@ -497,10 +497,10 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
                                         type="text" 
                                         readOnly 
                                         value={formData.chqDate} 
-                                        className="flex-1 px-3 text-[12px] border border-gray-300 rounded-[5px] outline-none text-slate-700 font-bold bg-white text-center shadow-sm cursor-pointer min-w-0" 
+                                        className="flex-1 min-w-0 px-3 text-[12px] border border-slate-200 rounded outline-none text-slate-700 font-bold bg-white text-center cursor-pointer transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" 
                                         onClick={() => openCalendar('chqDate')}
                                     />
-                                    <button onClick={() => openCalendar('chqDate')} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
+                                    <button onClick={() => openCalendar('chqDate')} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center rounded-[5px] transition-all shadow-md active:scale-95 shrink-0 hover:bg-[#0073ff]">
                                         <Calendar size={16} />
                                     </button>
                                 </div>
@@ -508,7 +508,7 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
                         </div>
                     </div>
 
-                    <div className="col-span-5 bg-blue-50/20 p-4 rounded-lg border border-dashed border-blue-200 flex flex-col justify-center relative overflow-hidden group">
+                    <div className="col-span-5 bg-blue-50/20 p-4 rounded-[5px] border border-dashed border-blue-200 flex flex-col justify-center relative overflow-hidden group">
                          <div className="absolute top-0 right-0 p-1 opacity-10 group-hover:opacity-20 transition-opacity">
                             <Receipt size={80} className="-rotate-12 text-blue-600" />
                          </div>
@@ -522,8 +522,8 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
                 </div>
 
                 {/* 3. Expenses/Items Portfolio Ledger Table */}
-                <div className="bg-white border border-gray-100 rounded-xl shadow-xl overflow-hidden flex flex-col min-h-[250px]">
-                    <div className="flex items-center justify-between bg-slate-50 px-4 py-2 border-b border-gray-100">
+                <div className="bg-white border border-slate-200 rounded-[5px] shadow-sm overflow-hidden flex flex-col min-h-[250px]">
+                    <div className="flex items-center justify-between bg-slate-50 px-4 py-2 border-b border-slate-200">
                         <div className="flex gap-1">
                             {[
                                 { id: 'Expenses', icon: Receipt },
@@ -532,7 +532,7 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
                                 <button
                                     key={tab.id}
                                     onClick={() => setSelectedTab(tab.id)}
-                                    className={`px-4 py-1.5 text-[11px] font-black uppercase tracking-widest transition-all rounded-md flex items-center gap-2 ${selectedTab === tab.id ? 'bg-white text-blue-600 shadow-sm border border-gray-100' : 'text-gray-400 hover:text-gray-600'}`}
+                                    className={`px-4 py-1.5 text-[11px] font-black uppercase tracking-widest transition-all rounded flex items-center gap-2 ${selectedTab === tab.id ? 'bg-white text-blue-600 shadow-sm border border-slate-200' : 'text-gray-400 hover:text-gray-600'}`}
                                 >
                                     <tab.icon size={12} />
                                     {tab.id}
@@ -549,7 +549,7 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
                         {selectedTab === 'Expenses' ? (
                             <table className="w-full text-left border-collapse">
                                 <thead>
-                                    <tr className="bg-gray-50/50 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">
+                                    <tr className="bg-slate-50 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-slate-200">
                                         <th className="px-4 py-3 w-12 text-center">#</th>
                                         <th className="px-4 py-3 w-[35%]">Ledger Selection</th>
                                         <th className="px-4 py-3 w-[25%]">Allocation CC</th>
@@ -557,45 +557,47 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
                                         <th className="px-4 py-3">Memo / Internal Transcript</th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-gray-50">
+                                <tbody className="divide-y divide-slate-100">
                                     {expenses.map((line, idx) => (
-                                        <tr key={idx} className="group hover:bg-blue-50/30 transition-colors">
+                                        <tr key={idx} className="group hover:bg-slate-50/50 transition-colors">
                                             <td className="px-4 py-2 text-center font-mono text-[11px] text-gray-300 font-bold group-hover:text-slate-400 transition-colors">{idx + 1}</td>
                                             <td className="px-2 py-1">
-                                                <div className="flex gap-1 items-center">
+                                                <div className="flex gap-1 items-center h-8">
                                                     <input 
                                                         type="text" 
                                                         readOnly 
                                                         value={lookups.accounts.find(a => a.code === line.accCode)?.name || ''} 
-                                                        className="flex-1 h-8 font-mono border border-gray-200 px-3 text-[11px] font-bold bg-white text-slate-700 rounded-[5px] outline-none shadow-sm truncate group-hover:border-slate-200 transition-all" 
+                                                        className="flex-1 min-w-0 h-full font-mono border border-transparent px-3 text-[11px] font-bold bg-transparent text-slate-700 rounded outline-none truncate transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 group-hover:border-slate-200 group-hover:bg-white cursor-pointer" 
+                                                        onClick={() => { setAccIndex(idx); setShowAccModal(true); }}
                                                     />
-                                                    <button onClick={() => { setAccIndex(idx); setShowAccModal(true); }} className="w-8 h-8 bg-white border border-gray-200 text-gray-400 flex items-center justify-center hover:text-blue-600 rounded-[5px] transition-all shadow-sm active:scale-90">
+                                                    <button onClick={() => { setAccIndex(idx); setShowAccModal(true); }} className="w-8 h-8 bg-white border border-slate-200 text-gray-400 flex items-center justify-center hover:text-[#00D1FF] hover:border-[#00D1FF] rounded transition-all active:scale-90 opacity-0 group-hover:opacity-100 shrink-0">
                                                         <Search size={14} />
                                                     </button>
                                                 </div>
                                             </td>
                                             <td className="px-2 py-1">
-                                                <div className="flex gap-1 items-center">
+                                                <div className="flex gap-1 items-center h-8">
                                                     <input 
                                                         type="text" 
                                                         readOnly 
                                                         value={lookups.costCenters.find(cc => cc.code === line.costCenter)?.name || ''} 
-                                                        className="flex-1 h-8 font-mono border border-gray-200 px-3 text-[11px] font-bold bg-white text-gray-600 rounded-[5px] outline-none shadow-sm truncate group-hover:border-blue-200 transition-all" 
+                                                        className="flex-1 min-w-0 h-full font-mono border border-transparent px-3 text-[11px] font-bold bg-transparent text-gray-600 rounded outline-none truncate transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 group-hover:border-slate-200 group-hover:bg-white cursor-pointer" 
+                                                        onClick={() => { setCcSource('line'); setCcIndex(idx); setShowCCModal(true); }}
                                                     />
-                                                    <button onClick={() => { setCcSource('line'); setCcIndex(idx); setShowCCModal(true); }} className="w-8 h-8 bg-white border border-gray-200 text-gray-400 flex items-center justify-center hover:text-blue-600 rounded-[5px] transition-all shadow-sm active:scale-90">
+                                                    <button onClick={() => { setCcSource('line'); setCcIndex(idx); setShowCCModal(true); }} className="w-8 h-8 bg-white border border-slate-200 text-gray-400 flex items-center justify-center hover:text-[#00D1FF] hover:border-[#00D1FF] rounded transition-all active:scale-90 opacity-0 group-hover:opacity-100 shrink-0">
                                                         <Search size={14} />
                                                     </button>
                                                 </div>
                                             </td>
                                             <td className="px-2 py-1">
-                                                <input type="text" className="w-full h-8 font-mono border border-gray-200 px-3 text-right text-[12px] font-black text-gray-800 bg-white rounded-[5px] outline-none shadow-sm group-hover:border-blue-200 transition-all" value={line.amount} onChange={(e) => {
+                                                <input type="text" className="w-full h-8 font-mono border border-transparent px-3 text-right text-[12px] font-black text-gray-800 bg-transparent rounded outline-none transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 group-hover:border-slate-200 group-hover:bg-white" value={line.amount} onChange={(e) => {
                                                     const newExp = [...expenses];
                                                     newExp[idx].amount = e.target.value;
                                                     setExpenses(newExp);
                                                 }} />
                                             </td>
                                             <td className="px-2 py-1">
-                                                <input type="text" className="w-full h-8 font-mono border border-transparent px-3 text-[11px] text-gray-500 bg-transparent rounded-[5px] outline-none group-hover:bg-white group-hover:border-gray-200 transition-all" value={line.memo} onChange={(e) => {
+                                                <input type="text" className="w-full h-8 font-mono border border-transparent px-3 text-[11px] text-gray-500 bg-transparent rounded outline-none transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 group-hover:border-slate-200 group-hover:bg-white" value={line.memo} onChange={(e) => {
                                                     const newExp = [...expenses];
                                                     newExp[idx].memo = e.target.value;
                                                     setExpenses(newExp);
@@ -604,8 +606,8 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
                                         </tr>
                                     ))}
                                     <tr className="bg-slate-50/30">
-                                        <td colSpan="5" className="p-0">
-                                            <button onClick={() => setExpenses([...expenses, { accCode: '', costCenter: '', amount: '0.00', memo: '' }])} className="w-full py-2.5 text-blue-600 font-black text-[10px] tracking-[0.2em] hover:bg-white transition-all flex items-center justify-center gap-2 group border-none bg-transparent">
+                                        <td colSpan="5" className="p-0 border-t border-slate-100">
+                                            <button onClick={() => setExpenses([...expenses, { accCode: '', costCenter: '', amount: '0.00', memo: '' }])} className="w-full py-3 text-blue-600 font-black text-[10px] tracking-[0.2em] hover:bg-slate-50 transition-all flex items-center justify-center gap-2 group border-none bg-transparent">
                                                 <Plus size={14} /> ATTACH EXPENSE LINE
                                             </button>
                                         </td>
@@ -615,7 +617,7 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
                         ) : (
                             <table className="w-full text-left border-collapse">
                                 <thead>
-                                    <tr className="bg-gray-50/50 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">
+                                    <tr className="bg-slate-50 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-slate-200">
                                         <th className="px-4 py-3 w-12 text-center">#</th>
                                         <th className="px-4 py-3 w-[40%]">Item Description</th>
                                         <th className="px-4 py-3 w-24 text-center">Qty</th>
@@ -624,32 +626,33 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
                                         <th className="px-4 py-3">Memo</th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-gray-50">
+                                <tbody className="divide-y divide-slate-100">
                                     {items.map((line, idx) => (
-                                        <tr key={idx} className="group hover:bg-blue-50/30 transition-colors">
+                                        <tr key={idx} className="group hover:bg-slate-50/50 transition-colors">
                                             <td className="px-4 py-2 text-center font-mono text-[11px] text-gray-300 font-bold group-hover:text-slate-400 transition-colors">{idx + 1}</td>
                                             <td className="px-2 py-1">
-                                                <div className="flex gap-1 items-center">
+                                                <div className="flex gap-1 items-center h-8">
                                                     <input 
                                                         type="text" 
                                                         readOnly 
                                                         value={lookups.products.find(p => p.code === line.itemCode)?.prod_Name || ''} 
-                                                        className="flex-1 h-8 font-mono border border-gray-200 px-3 text-[11px] font-bold bg-white text-slate-700 rounded-[5px] outline-none shadow-sm truncate group-hover:border-slate-200 transition-all" 
+                                                        className="flex-1 min-w-0 h-full font-mono border border-transparent px-3 text-[11px] font-bold bg-transparent text-slate-700 rounded outline-none truncate transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 group-hover:border-slate-200 group-hover:bg-white cursor-pointer" 
+                                                        onClick={() => { setItemIndex(idx); setShowItemModal(true); }}
                                                     />
-                                                    <button onClick={() => { setItemIndex(idx); setShowItemModal(true); }} className="w-8 h-8 bg-white border border-gray-200 text-gray-400 flex items-center justify-center hover:text-blue-600 rounded-[5px] transition-all shadow-sm active:scale-90">
+                                                    <button onClick={() => { setItemIndex(idx); setShowItemModal(true); }} className="w-8 h-8 bg-white border border-slate-200 text-gray-400 flex items-center justify-center hover:text-[#00D1FF] hover:border-[#00D1FF] rounded transition-all active:scale-90 opacity-0 group-hover:opacity-100 shrink-0">
                                                         <Search size={14} />
                                                     </button>
                                                 </div>
                                             </td>
                                             <td className="px-2 py-1">
-                                                <input type="number" className="w-full h-8 font-mono border border-gray-200 px-2 text-center text-[11px] font-bold bg-white rounded-[5px] outline-none" value={line.qty} onChange={(e) => {
+                                                <input type="number" className="w-full h-8 font-mono border border-transparent px-2 text-center text-[11px] font-bold bg-transparent rounded outline-none transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 group-hover:border-slate-200 group-hover:bg-white" value={line.qty} onChange={(e) => {
                                                     const newItems = [...items];
                                                     newItems[idx].qty = e.target.value;
                                                     setItems(newItems);
                                                 }} />
                                             </td>
                                             <td className="px-2 py-1">
-                                                <input type="text" className="w-full h-8 font-mono border border-gray-200 px-2 text-right text-[11px] font-bold bg-white rounded-[5px] outline-none" value={line.cost} onChange={(e) => {
+                                                <input type="text" className="w-full h-8 font-mono border border-transparent px-2 text-right text-[11px] font-bold bg-transparent rounded outline-none transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 group-hover:border-slate-200 group-hover:bg-white" value={line.cost} onChange={(e) => {
                                                     const newItems = [...items];
                                                     newItems[idx].cost = e.target.value;
                                                     setItems(newItems);
@@ -659,7 +662,7 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
                                                 {( (parseFloat(line.cost) || 0) * (parseInt(line.qty) || 0) ).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                             </td>
                                             <td className="px-2 py-1">
-                                                <input type="text" className="w-full h-8 font-mono border border-transparent px-3 text-[11px] text-gray-500 bg-transparent rounded-[5px] outline-none group-hover:bg-white group-hover:border-gray-200 transition-all" value={line.description} onChange={(e) => {
+                                                <input type="text" className="w-full h-8 font-mono border border-transparent px-3 text-[11px] text-gray-500 bg-transparent rounded outline-none transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 group-hover:border-slate-200 group-hover:bg-white" value={line.description} onChange={(e) => {
                                                     const newItems = [...items];
                                                     newItems[idx].description = e.target.value;
                                                     setItems(newItems);
@@ -668,8 +671,8 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
                                         </tr>
                                     ))}
                                     <tr className="bg-slate-50/30">
-                                        <td colSpan="6" className="p-0">
-                                            <button onClick={() => setItems([...items, { itemCode: '', description: '', qty: '1', cost: '0.00' }])} className="w-full py-2.5 text-blue-600 font-black text-[10px] tracking-[0.2em] hover:bg-white transition-all flex items-center justify-center gap-2 group border-none bg-transparent">
+                                        <td colSpan="6" className="p-0 border-t border-slate-100">
+                                            <button onClick={() => setItems([...items, { itemCode: '', description: '', qty: '1', cost: '0.00' }])} className="w-full py-3 text-blue-600 font-black text-[10px] tracking-[0.2em] hover:bg-slate-50 transition-all flex items-center justify-center gap-2 group border-none bg-transparent">
                                                 <Plus size={14} /> ATTACH ITEM LINE
                                             </button>
                                         </td>
@@ -681,7 +684,7 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
                 </div>
 
                 {/* 4. Global Validation Summary Footer */}
-                <div className="flex justify-between items-center bg-white p-3 border border-gray-100 rounded-lg shadow-sm">
+                <div className="flex justify-between items-center bg-white p-3 border border-slate-200 rounded-[5px] shadow-sm">
                     <div className="flex items-center gap-8">
                         <div className="flex items-center gap-3">
                              <div className="flex flex-col">
@@ -691,15 +694,15 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
                                  </div>
                              </div>
                         </div>
-                        <div className="h-8 w-[1px] bg-gray-100" />
+                        <div className="h-8 w-[1px] bg-slate-200" />
                         <div className="flex items-center gap-3">
                             <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-sm shadow-emerald-200"></div>
                             <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">Entry Validated</span>
                         </div>
                     </div>
                     <div className="flex items-center gap-4">
-                        <div className="h-6 w-[1px] bg-gray-100" />
-                        <button onClick={handleClear} className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-all active:scale-90 border-none bg-transparent">
+                        <div className="h-6 w-[1px] bg-slate-200" />
+                        <button onClick={handleClear} className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-all active:scale-90 border-none bg-transparent">
                             <RotateCcw size={16} />
                         </button>
                     </div>

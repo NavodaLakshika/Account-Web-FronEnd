@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import SimpleModal from '../components/SimpleModal';
-import { Search, Calendar, RefreshCw, X, Save, RotateCcw, Loader2, Landmark, Wallet, Layers, Users, CheckCircle } from 'lucide-react';
+import { Search, Calendar, RefreshCw, X, Save, RotateCcw, Loader2, Landmark, Wallet, Layers, Users, CheckCircle, Plus } from 'lucide-react';
 import { pettyCashService } from '../services/pettyCash.service';
 
 
@@ -331,23 +331,23 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                 title="Petty Cash Entry"
                 maxWidth="max-w-[1100px] "
                 footer={
-                    <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-gray-100 rounded-b-xl gap-3">
+                    <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-slate-200 rounded-b-[5px] gap-3">
                         <div className="flex gap-3">
-                            <button onClick={() => setShowCustomerMasterBoard(true)} className="px-6 h-10 bg-indigo-50/50 backdrop-blur-md border border-indigo-200 text-indigo-700 text-sm font-bold rounded-[5px] shadow-sm hover:bg-indigo-100/80 transition-all active:scale-95 flex items-center gap-2">
+                            <button onClick={() => setShowCustomerMasterBoard(true)} className="px-6 h-10 bg-indigo-50/50 backdrop-blur-md border border-indigo-200 text-indigo-700 text-[13px] font-mono font-bold tracking-widest uppercase rounded-[5px] shadow-sm hover:bg-indigo-100/80 transition-all active:scale-95 flex items-center gap-2">
                                 <Users size={14} /> NEW CUSTOMER
                             </button>
-                            <button onClick={() => setShowAccountBoard(true)} className="px-6 h-10 bg-teal-50/50 backdrop-blur-md border border-teal-200 text-teal-700 text-sm font-bold rounded-[5px] shadow-sm hover:bg-teal-100/80 transition-all active:scale-95 flex items-center gap-2">
+                            <button onClick={() => setShowAccountBoard(true)} className="px-6 h-10 bg-teal-50/50 backdrop-blur-md border border-teal-200 text-teal-700 text-[13px] font-mono font-bold tracking-widest uppercase rounded-[5px] shadow-sm hover:bg-teal-100/80 transition-all active:scale-95 flex items-center gap-2">
                                 <Layers size={14} /> NEW ACCOUNT
                             </button>
                         </div>
                         <div className="flex gap-3">
-                            <button onClick={handleClear} className="px-6 h-10 bg-[#00adff] text-white text-sm font-bold rounded-[5px] hover:bg-[#0099e6] transition-all active:scale-95 flex items-center gap-2 border-none">
+                            <button onClick={handleClear} className="px-6 h-10 bg-[#00adff] text-white text-[13px] font-mono font-bold tracking-widest uppercase rounded-[5px] hover:bg-[#0099e6] transition-all active:scale-95 flex items-center gap-2 border-none shadow-md shadow-blue-100">
                                 <RotateCcw size={14} /> CLEAR FORM
                             </button>
-                            <button onClick={handleSaveDraft} disabled={loading} className={`px-6 h-10 bg-white text-[#0285fd] text-sm font-black rounded-[5px] border-2 border-[#0285fd] hover:bg-blue-50 transition-all active:scale-95 flex items-center gap-2 ${loading ? 'opacity-50' : ''}`}>
+                            <button onClick={handleSaveDraft} disabled={loading} className={`px-6 h-10 bg-white text-[#0285fd] text-[13px] font-mono font-bold tracking-widest uppercase rounded-[5px] border-2 border-[#0285fd] hover:bg-blue-50 transition-all active:scale-95 flex items-center gap-2 ${loading ? 'opacity-50' : ''}`}>
                                 <Save size={14} /> SAVE DRAFT
                             </button>
-                            <button onClick={handleSave} disabled={loading} className={`px-6 h-10 bg-[#2bb744] text-white text-sm font-bold rounded-[5px] shadow-md shadow-green-100 hover:bg-[#259b3a] transition-all active:scale-95 flex items-center justify-center gap-2 border-none ${loading ? 'opacity-50' : ''}`}>
+                            <button onClick={handleSave} disabled={loading} className={`px-8 h-10 bg-[#2bb744] text-white text-[13px] font-mono font-bold tracking-widest uppercase rounded-[5px] shadow-md shadow-green-100 hover:bg-[#259b3a] transition-all active:scale-95 flex items-center justify-center gap-2 border-none ${loading ? 'opacity-50' : ''}`}>
                                 {loading ? <Loader2 size={14} className="animate-spin" /> : <CheckCircle size={14} />}
                                 APPLY
                             </button>
@@ -357,44 +357,44 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
             >
                 <div className="space-y-3 overflow-y-auto no-scrollbar font-['Tahoma']">
                     {/* 1. Header Information Section */}
-                    <div className="bg-white p-4 border border-gray-100 rounded-xl shadow-sm space-y-4">
+                    <div className="bg-white p-4 border border-slate-200 rounded-[5px] shadow-sm space-y-4">
                         <div className="grid grid-cols-12 gap-x-6 gap-y-4">
                             {/* Row 1: Document ID | Post Date | Exp. Timeline (Pay Date) */}
                             <div className="col-span-4 flex items-center gap-2">
-                                <label className="text-[12px] font-bold text-gray-700 w-24 shrink-0">Document ID</label>
-                                <div className="flex-1 flex gap-1 h-10 min-w-0">
-                                    <input type="text" name="docNo" value={formData.docNo} readOnly className="flex-1 min-w-0 h-10 border border-gray-300 px-3 text-[12px] font-bold text-blue-600 bg-gray-50 rounded-[5px] outline-none shadow-sm" />
-                                    <button onClick={handleSearchDocs} className="w-11 h-10 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0"><Search size={18} /></button>
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Document ID</label>
+                                <div className="flex-1 flex gap-1 h-8 min-w-0">
+                                    <input type="text" name="docNo" value={formData.docNo} readOnly className="flex-1 min-w-0 h-full border border-slate-200 px-3 text-[12px] font-bold text-blue-600 bg-white rounded outline-none shadow-sm transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" />
+                                    <button onClick={handleSearchDocs} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0"><Search size={16} /></button>
                                 </div>
                             </div>
                             <div className="col-span-4 flex items-center gap-2">
-                                <label className="text-[12px] font-bold text-gray-700 w-24 shrink-0 text-center">Post Date</label>
-                                <div className="flex-1 flex gap-1 h-10 min-w-0">
-                                    <input type="text" readOnly value={formatDate(formData.date)} onClick={() => setShowDateModal(true)} className="flex-1 min-w-0 h-10 border border-gray-300 rounded-[5px] px-3 text-[12px] outline-none bg-white text-gray-700 font-bold cursor-pointer shadow-sm" />
-                                    <button onClick={() => setShowDateModal(true)} className="w-11 h-10 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0"><Calendar size={18} /></button>
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0 text-center">Post Date</label>
+                                <div className="flex-1 flex gap-1 h-8 min-w-0">
+                                    <input type="text" readOnly value={formatDate(formData.date)} onClick={() => setShowDateModal(true)} className="flex-1 min-w-0 h-full border border-slate-200 rounded px-3 text-[12px] outline-none bg-white text-gray-700 font-bold cursor-pointer transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 shadow-sm" />
+                                    <button onClick={() => setShowDateModal(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0"><Calendar size={16} /></button>
                                 </div>
                             </div>
                             <div className="col-span-4 flex items-center gap-2">
-                                <label className="text-[12px] font-bold text-gray-700 w-24 shrink-0 text-center">Due Date</label>
-                                <div className="flex-1 flex gap-1 h-10 min-w-0">
-                                    <input type="text" readOnly value={formatDate(formData.dueDate)} onClick={() => setShowDueDateModal(true)} className="flex-1 min-w-0 h-10 border border-gray-300 rounded-[5px] px-3 text-[12px] outline-none bg-white text-gray-700 font-bold cursor-pointer shadow-sm" />
-                                    <button onClick={() => setShowDueDateModal(true)} className="w-11 h-10 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0"><Calendar size={18} /></button>
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0 text-center">Due Date</label>
+                                <div className="flex-1 flex gap-1 h-8 min-w-0">
+                                    <input type="text" readOnly value={formatDate(formData.dueDate)} onClick={() => setShowDueDateModal(true)} className="flex-1 min-w-0 h-full border border-slate-200 rounded px-3 text-[12px] outline-none bg-white text-gray-700 font-bold cursor-pointer transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 shadow-sm" />
+                                    <button onClick={() => setShowDueDateModal(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0"><Calendar size={16} /></button>
                                 </div>
                             </div>
 
                             {/* Row 2: Petty Account (8) | Cost Center (4) */}
                             <div className="col-span-8 flex items-center gap-2">
-                                <label className="text-[12px] font-bold text-gray-700 w-24 shrink-0">Petty A/C</label>
-                                <div className="flex-1 flex gap-1 h-10 min-w-0">
-                                    <input type="text" readOnly value={formData.account ? `${formData.account} - ${safePetty.find(a => a.code === formData.account)?.name || ''}` : ''} onClick={() => setShowAccModal(true)} className="flex-1 min-w-0 h-10 border border-gray-300 px-3 text-[12px] font-bold text-[#0285fd] bg-blue-50/20 rounded-[5px] outline-none shadow-sm cursor-pointer" />
-                                    <button onClick={() => setShowAccModal(true)} className="w-11 h-10 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0"><Search size={18} /></button>
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Petty A/C</label>
+                                <div className="flex-1 flex gap-1 h-8 min-w-0">
+                                    <input type="text" readOnly value={formData.account ? `${formData.account} - ${safePetty.find(a => a.code === formData.account)?.name || ''}` : ''} onClick={() => setShowAccModal(true)} className="flex-1 min-w-0 h-full border border-slate-200 px-3 text-[12px] font-bold text-gray-700 bg-white rounded outline-none shadow-sm cursor-pointer transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" />
+                                    <button onClick={() => setShowAccModal(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0"><Search size={16} /></button>
                                 </div>
                             </div>
                             <div className="col-span-4 flex items-center gap-2">
-                                <label className="text-[12px] font-bold text-gray-700 w-24 shrink-0 text-center">Cost Center</label>
-                                <div className="flex-1 flex gap-1 h-10 min-w-0">
-                                    <input type="text" readOnly value={safeCC.find(c => c.code === formData.costCenter)?.name || ''} onClick={() => { setCcSource('header'); setShowCCModal(true); }} className="flex-1 min-w-0 h-10 border border-gray-300 px-3 text-[12px] font-bold text-gray-700 bg-white rounded-[5px] outline-none shadow-sm cursor-pointer" />
-                                    <button onClick={() => { setCcSource('header'); setShowCCModal(true); }} className="w-11 h-10 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] shadow-md shrink-0"><Search size={18} /></button>
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0 text-center">Cost Center</label>
+                                <div className="flex-1 flex gap-1 h-8 min-w-0">
+                                    <input type="text" readOnly value={safeCC.find(c => c.code === formData.costCenter)?.name || ''} onClick={() => { setCcSource('header'); setShowCCModal(true); }} className="flex-1 min-w-0 h-full border border-slate-200 px-3 text-[12px] font-bold text-gray-700 bg-white rounded outline-none shadow-sm cursor-pointer transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" />
+                                    <button onClick={() => { setCcSource('header'); setShowCCModal(true); }} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] shadow-md shrink-0"><Search size={16} /></button>
                                 </div>
                             </div>
 
@@ -405,37 +405,37 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                                         type="checkbox"
                                         checked={formData.isVendor}
                                         onChange={(e) => setFormData({ ...formData, isVendor: e.target.checked, vendorId: '', payee: '' })}
-                                        className="w-4 h-4 text-[#0285fd] border-gray-300 rounded focus:ring-[#0285fd]"
+                                        className="w-4 h-4 text-[#00D1FF] border-slate-300 rounded focus:ring-[#00D1FF] transition-all"
                                     />
-                                    <span className="text-[11px] font-bold text-gray-600 uppercase tracking-tighter">Vendor A/C</span>
+                                    <span className="text-[11px] font-bold text-gray-500 uppercase tracking-tighter">Vendor A/C</span>
                                 </div>
-                                <div className="flex-1 flex gap-1 h-10 min-w-0">
+                                <div className="flex-1 flex gap-1 h-8 min-w-0">
                                     {formData.isVendor ? (
                                         <>
-                                            <input type="text" readOnly value={formData.vendorId || ''} placeholder="ID" className="w-24 h-10 border border-gray-300 px-3 text-[12px] font-mono font-bold text-[#0285fd] bg-gray-50 rounded-[5px] outline-none" />
-                                            <input type="text" readOnly value={formData.payee || ''} placeholder="Select Active Vendor..." className="flex-1 h-10 border border-gray-300 px-3 text-[12px] font-bold text-gray-700 bg-white rounded-[5px] outline-none shadow-sm cursor-pointer" onClick={() => setShowVendorModal(true)} />
-                                            <button onClick={() => setShowVendorModal(true)} className="w-11 h-10 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] shadow-md transition-all active:scale-95"><Search size={18} /></button>
+                                            <input type="text" readOnly value={formData.vendorId || ''} placeholder="ID" className="w-24 h-full border border-slate-200 px-3 text-[12px] font-mono font-bold text-gray-700 bg-slate-50 rounded outline-none" />
+                                            <input type="text" readOnly value={formData.payee || ''} placeholder="Select Active Vendor..." className="flex-1 h-full border border-slate-200 px-3 text-[12px] font-bold text-gray-700 bg-white rounded outline-none shadow-sm cursor-pointer transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" onClick={() => setShowVendorModal(true)} />
+                                            <button onClick={() => setShowVendorModal(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] shadow-md transition-all active:scale-95"><Search size={16} /></button>
                                         </>
                                     ) : (
-                                        <input type="text" value={formData.payee} onChange={(e) => setFormData({ ...formData, payee: e.target.value })} placeholder="" className="flex-1 h-10 border border-gray-300 px-3 text-[12px] font-bold text-gray-700 bg-white rounded-[5px] outline-none shadow-sm focus:border-[#0285fd] transition-all" />
+                                        <input type="text" value={formData.payee} onChange={(e) => setFormData({ ...formData, payee: e.target.value })} placeholder="" className="flex-1 h-full border border-slate-200 px-3 text-[12px] font-bold text-gray-700 bg-white rounded outline-none shadow-sm focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 transition-all" />
                                     )}
                                 </div>
                             </div>
                             <div className="col-span-4 flex items-center gap-2">
-                                <label className="text-[12px] font-bold text-gray-700 w-24 shrink-0 text-center">A/C Balance</label>
-                                <div className="flex-1 h-10 bg-blue-50/50 border border-blue-100 rounded-[5px] flex items-center justify-end px-4">
-                                    <span className="text-[15px] font-mono font-black text-[#0285fd]">{balance.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0 text-center">A/C Balance</label>
+                                <div className="flex-1 h-8 bg-blue-50/50 border border-blue-100 rounded flex items-center justify-end px-4">
+                                    <span className="text-[14px] font-mono font-black text-[#0285fd]">{balance.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                                 </div>
                             </div>
 
                             {/* Row 4: Memo (8) | Bill Amount (4) */}
                             <div className="col-span-8 flex items-center gap-2">
-                                <label className="text-[12px] font-bold text-gray-700 w-24 shrink-0">Memo/Rem.</label>
-                                <input type="text" value={formData.memo} onChange={(e) => setFormData({ ...formData, memo: e.target.value })} className="flex-1 h-10 border border-gray-300 rounded-[5px] px-3 text-[12px] font-bold text-gray-700 outline-none bg-white shadow-sm focus:border-[#0285fd] transition-all" placeholder="" />
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Memo/Rem.</label>
+                                <input type="text" value={formData.memo} onChange={(e) => setFormData({ ...formData, memo: e.target.value })} className="flex-1 h-8 border border-slate-200 rounded px-3 text-[12px] font-bold text-gray-700 outline-none bg-white shadow-sm focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 transition-all" placeholder="" />
                             </div>
                             <div className="col-span-4 flex items-center gap-2">
-                                <label className="text-[12px] font-bold text-gray-700 w-24 shrink-0 text-center">Bill Amount</label>
-                                <input type="number" value={formData.billAmount} onChange={(e) => setFormData({ ...formData, billAmount: e.target.value })} className="flex-1 h-10 border-2 border-[#0285fd] px-4 text-[16px] font-mono font-black text-right text-[#0285fd] outline-none bg-white rounded-[5px] shadow-md transition-all focus:ring-2 focus:ring-blue-100" />
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0 text-center">Bill Amount</label>
+                                <input type="number" value={formData.billAmount} onChange={(e) => setFormData({ ...formData, billAmount: e.target.value })} className="flex-1 h-8 border border-slate-200 px-4 text-[14px] font-mono font-black text-right text-gray-800 outline-none bg-white rounded shadow-sm transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" />
                             </div>
                         </div>
                     </div>
@@ -447,53 +447,53 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                                 <button
                                     key={tab}
                                     onClick={() => setSelectedTab(tab)}
-                                    className={`px-12 py-3 text-[11px] font-black border rounded-t-[8px] transition-all uppercase tracking-widest ${selectedTab === tab ? 'bg-[#0285fd] border-[#0285fd] text-white shadow-md z-10' : 'bg-gray-50 border-gray-100 text-slate-500 hover:bg-white hover:text-[#0285fd]'}`}
+                                    className={`px-12 py-3 text-[11px] font-black border-t border-x rounded-t-[5px] transition-all uppercase tracking-widest ${selectedTab === tab ? 'bg-white border-slate-200 text-blue-600 shadow-sm z-10 -mb-[1px]' : 'bg-slate-50 border-transparent text-gray-400 hover:bg-white hover:text-blue-500 border-b border-b-slate-200'}`}
                                 >
                                     {tab}
                                 </button>
                             ))}
                         </div>
 
-                        <div className="border border-gray-100 rounded-lg shadow-sm bg-white overflow-hidden">
+                        <div className="border border-slate-200 rounded-[5px] shadow-sm bg-white overflow-hidden">
                             {selectedTab === 'Expenses' ? (
                                 <table className="w-full text-left border-collapse">
-                                    <thead className="bg-slate-50/80 border-b border-gray-100 text-slate-500 text-[10px] font-black uppercase tracking-widest sticky top-0">
+                                    <thead className="bg-slate-50 border-b border-slate-200 text-gray-400 text-[10px] font-black uppercase tracking-widest sticky top-0">
                                         <tr>
-                                            <th className="px-4 py-2.5 border-r border-gray-100 w-12 text-center">#</th>
-                                            <th className="px-4 py-2.5 border-r border-gray-100">Expense Portfolio</th>
-                                            <th className="px-4 py-2.5 border-r border-gray-100 w-48">Cost Allocation</th>
-                                            <th className="px-4 py-2.5 border-r border-gray-100 w-32 text-right">Valuation</th>
-                                            <th className="px-4 py-2.5">Journal Memo</th>
+                                            <th className="px-4 py-3 w-12 text-center">#</th>
+                                            <th className="px-4 py-3">Expense Portfolio</th>
+                                            <th className="px-4 py-3 w-48">Cost Allocation</th>
+                                            <th className="px-4 py-3 w-32 text-right">Valuation</th>
+                                            <th className="px-4 py-3">Journal Memo</th>
                                         </tr>
                                     </thead>
-                                    <tbody className="divide-y divide-gray-50 min-h-[180px]">
+                                    <tbody className="divide-y divide-slate-100 min-h-[180px]">
                                         {expenseRows.map((row, idx) => (
-                                            <tr key={row.id} className="hover:bg-blue-50/30 transition-colors">
-                                                <td className="px-4 py-3 text-center text-[11px] font-bold text-slate-400">{idx + 1}</td>
-                                                <td className="px-1.5 py-2 border-r border-gray-50">
-                                                    <div className="flex gap-1 items-center">
-                                                        <input type="text" readOnly value={safeExp.find(e => e.code === row.accCode)?.name || ''} className="flex-1 h-10 px-3 text-[11px] font-bold outline-none bg-gray-50/50 border border-gray-200 rounded-[4px] text-slate-700" placeholder="Select Account..." />
-                                                        <button onClick={() => { setExpIndex(idx); setShowExpAccModal(true); }} className="w-9 h-10 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[4px] transition-all shadow-sm active:scale-90"><Search size={14} /></button>
+                                            <tr key={row.id} className="group hover:bg-slate-50/50 transition-colors">
+                                                <td className="px-4 py-3 text-center font-mono text-[11px] font-bold text-gray-300 group-hover:text-slate-400">{idx + 1}</td>
+                                                <td className="px-2 py-1">
+                                                    <div className="flex gap-1 items-center h-8">
+                                                        <input type="text" readOnly value={safeExp.find(e => e.code === row.accCode)?.name || ''} className="flex-1 h-full min-w-0 font-mono border border-transparent px-3 text-[11px] font-bold outline-none bg-transparent rounded text-slate-700 truncate cursor-pointer transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 group-hover:border-slate-200 group-hover:bg-white" placeholder="Select Account..." onClick={() => { setExpIndex(idx); setShowExpAccModal(true); }} />
+                                                        <button onClick={() => { setExpIndex(idx); setShowExpAccModal(true); }} className="w-8 h-8 bg-white border border-slate-200 text-gray-400 flex items-center justify-center hover:text-[#00D1FF] hover:border-[#00D1FF] rounded transition-all active:scale-90 opacity-0 group-hover:opacity-100 shrink-0"><Search size={14} /></button>
                                                     </div>
                                                 </td>
-                                                <td className="px-1.5 py-2 border-r border-gray-50">
-                                                    <div className="flex gap-1 items-center">
-                                                        <input type="text" readOnly value={safeCC.find(cc => cc.code === row.costCode)?.name || ''} className="flex-1 h-10 border border-gray-200 px-3 text-[11px] font-bold outline-none bg-white rounded-[4px] text-slate-600" placeholder="Alloc..." />
-                                                        <button onClick={() => { setCcSource('line'); setCcIndex(idx); setShowCCModal(true); }} className="w-9 h-10 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[4px] transition-all shadow-sm active:scale-90"><Search size={14} /></button>
+                                                <td className="px-2 py-1">
+                                                    <div className="flex gap-1 items-center h-8">
+                                                        <input type="text" readOnly value={safeCC.find(cc => cc.code === row.costCode)?.name || ''} className="flex-1 h-full min-w-0 font-mono border border-transparent px-3 text-[11px] font-bold outline-none bg-transparent rounded text-gray-600 truncate cursor-pointer transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 group-hover:border-slate-200 group-hover:bg-white" placeholder="Alloc..." onClick={() => { setCcSource('line'); setCcIndex(idx); setShowCCModal(true); }} />
+                                                        <button onClick={() => { setCcSource('line'); setCcIndex(idx); setShowCCModal(true); }} className="w-8 h-8 bg-white border border-slate-200 text-gray-400 flex items-center justify-center hover:text-[#00D1FF] hover:border-[#00D1FF] rounded transition-all active:scale-90 opacity-0 group-hover:opacity-100 shrink-0"><Search size={14} /></button>
                                                     </div>
                                                 </td>
-                                                <td className="px-1.5 py-2 border-r border-gray-50">
-                                                    <input type="number" value={row.amount} onChange={(e) => handleExpenseRowUpdate(row.id, 'amount', e.target.value)} className="w-full h-10 px-3 text-[12px] font-mono font-black text-right outline-none text-blue-600 bg-white border-transparent focus:border-blue-400 rounded-[4px]" />
+                                                <td className="px-2 py-1">
+                                                    <input type="number" value={row.amount} onChange={(e) => handleExpenseRowUpdate(row.id, 'amount', e.target.value)} className="w-full h-8 px-3 text-[12px] font-mono font-black text-right outline-none text-gray-800 bg-transparent border border-transparent transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 group-hover:border-slate-200 group-hover:bg-white rounded" />
                                                 </td>
-                                                <td className="px-1.5 py-2">
-                                                    <input type="text" value={row.memo} onChange={(e) => handleExpenseRowUpdate(row.id, 'memo', e.target.value)} className="w-full h-10 px-3 text-[11px] font-bold outline-none text-slate-600 bg-white border-transparent focus:border-blue-400 rounded-[4px]" placeholder="Optional description..." />
+                                                <td className="px-2 py-1">
+                                                    <input type="text" value={row.memo} onChange={(e) => handleExpenseRowUpdate(row.id, 'memo', e.target.value)} className="w-full h-8 px-3 text-[11px] font-bold outline-none text-gray-500 bg-transparent border border-transparent transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 group-hover:border-slate-200 group-hover:bg-white rounded" placeholder="Optional description..." />
                                                 </td>
                                             </tr>
                                         ))}
-                                        <tr className="h-12">
-                                            <td colSpan={5} className="bg-slate-50/30">
-                                                <button onClick={addExpenseRow} className="w-full h-full text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] hover:text-[#0285fd] transition-colors flex items-center justify-center gap-2">
-                                                    + APPEND NEW EXPENSE LINE
+                                        <tr className="bg-slate-50/30">
+                                            <td colSpan={5} className="p-0 border-t border-slate-100">
+                                                <button onClick={addExpenseRow} className="w-full py-3 text-blue-600 font-black text-[10px] tracking-[0.2em] hover:bg-slate-50 transition-all flex items-center justify-center gap-2 group border-none bg-transparent">
+                                                    <Plus size={14} /> ATTACH EXPENSE LINE
                                                 </button>
                                             </td>
                                         </tr>
@@ -501,44 +501,44 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                                 </table>
                             ) : (
                                 <table className="w-full text-left border-collapse">
-                                    <thead className="bg-slate-50/80 border-b border-gray-100 text-slate-500 text-[10px] font-black uppercase tracking-widest sticky top-0">
+                                    <thead className="bg-slate-50 border-b border-slate-200 text-gray-400 text-[10px] font-black uppercase tracking-widest sticky top-0">
                                         <tr>
-                                            <th className="px-4 py-2.5 border-r border-gray-100 w-12 text-center">#</th>
-                                            <th className="px-4 py-2.5 border-r border-gray-100">Inventory Product</th>
-                                            <th className="px-4 py-2.5 border-r border-gray-100 w-24 text-center">Qty</th>
-                                            <th className="px-4 py-2.5 border-r border-gray-100 w-32 text-right">Unit Cost</th>
-                                            <th className="px-4 py-2.5 border-r border-gray-100 w-32 text-right">Extension</th>
-                                            <th className="px-4 py-2.5">Distribution Memo</th>
+                                            <th className="px-4 py-3 w-12 text-center">#</th>
+                                            <th className="px-4 py-3">Inventory Product</th>
+                                            <th className="px-4 py-3 w-24 text-center">Qty</th>
+                                            <th className="px-4 py-3 w-32 text-right">Unit Cost</th>
+                                            <th className="px-4 py-3 w-32 text-right">Extension</th>
+                                            <th className="px-4 py-3">Distribution Memo</th>
                                         </tr>
                                     </thead>
-                                    <tbody className="divide-y divide-gray-50 min-h-[180px]">
+                                    <tbody className="divide-y divide-slate-100 min-h-[180px]">
                                         {itemRows.map((row, idx) => (
-                                            <tr key={row.id} className="hover:bg-blue-50/30 transition-colors">
-                                                <td className="px-4 py-3 text-center text-[11px] font-bold text-slate-400">{idx + 1}</td>
-                                                <td className="px-1.5 py-2 border-r border-gray-50">
-                                                    <div className="flex gap-1 items-center">
-                                                        <input type="text" readOnly value={lookups.products?.find(p => p.code === row.prodCode)?.name || ''} className="flex-1 h-10 px-3 text-[11px] font-bold outline-none bg-gray-50/50 border border-gray-200 rounded-[4px] text-slate-700" placeholder="Search Product..." />
-                                                        <button onClick={() => { setProdIndex(idx); setShowProdModal(true); }} className="w-9 h-10 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[4px] transition-all shadow-sm active:scale-90"><Search size={14} /></button>
+                                            <tr key={row.id} className="group hover:bg-slate-50/50 transition-colors">
+                                                <td className="px-4 py-3 text-center font-mono text-[11px] font-bold text-gray-300 group-hover:text-slate-400">{idx + 1}</td>
+                                                <td className="px-2 py-1">
+                                                    <div className="flex gap-1 items-center h-8">
+                                                        <input type="text" readOnly value={lookups.products?.find(p => p.code === row.prodCode)?.name || ''} className="flex-1 h-full min-w-0 font-mono border border-transparent px-3 text-[11px] font-bold outline-none bg-transparent rounded text-slate-700 truncate cursor-pointer transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 group-hover:border-slate-200 group-hover:bg-white" placeholder="Search Product..." onClick={() => { setProdIndex(idx); setShowProdModal(true); }} />
+                                                        <button onClick={() => { setProdIndex(idx); setShowProdModal(true); }} className="w-8 h-8 bg-white border border-slate-200 text-gray-400 flex items-center justify-center hover:text-[#00D1FF] hover:border-[#00D1FF] rounded transition-all active:scale-90 opacity-0 group-hover:opacity-100 shrink-0"><Search size={14} /></button>
                                                     </div>
                                                 </td>
-                                                <td className="px-1.5 py-2 border-r border-gray-50">
-                                                    <input type="number" value={row.qty} onChange={(e) => handleItemRowUpdate(row.id, 'qty', e.target.value)} className="w-full h-10 px-3 text-[11px] font-mono font-bold text-center outline-none text-slate-700 bg-white border-transparent focus:border-blue-400 rounded-[4px]" />
+                                                <td className="px-2 py-1">
+                                                    <input type="number" value={row.qty} onChange={(e) => handleItemRowUpdate(row.id, 'qty', e.target.value)} className="w-full h-8 px-3 text-[11px] font-mono font-bold text-center outline-none text-slate-700 bg-transparent border border-transparent transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 group-hover:border-slate-200 group-hover:bg-white rounded" />
                                                 </td>
-                                                <td className="px-1.5 py-2 border-r border-gray-50 text-right">
-                                                    <input type="number" value={row.cost} onChange={(e) => handleItemRowUpdate(row.id, 'cost', e.target.value)} className="w-full h-10 px-3 text-[11px] font-mono font-bold text-right outline-none text-slate-700 bg-white border-transparent focus:border-blue-400 rounded-[4px]" />
+                                                <td className="px-2 py-1">
+                                                    <input type="number" value={row.cost} onChange={(e) => handleItemRowUpdate(row.id, 'cost', e.target.value)} className="w-full h-8 px-3 text-[11px] font-mono font-bold text-right outline-none text-slate-700 bg-transparent border border-transparent transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 group-hover:border-slate-200 group-hover:bg-white rounded" />
                                                 </td>
-                                                <td className="px-4 py-3 border-r border-gray-50 text-right text-[12px] font-mono font-black text-blue-600">
+                                                <td className="px-4 py-3 text-right text-[12px] font-mono font-black text-gray-800">
                                                     {(Number(row.qty) * Number(row.cost)).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                                 </td>
-                                                <td className="px-1.5 py-2">
-                                                    <input type="text" value={row.memo} onChange={(e) => handleItemRowUpdate(row.id, 'memo', e.target.value)} className="w-full h-10 px-3 text-[11px] font-bold outline-none text-slate-600 bg-white border-transparent focus:border-blue-400 rounded-[4px]" placeholder="Notes..." />
+                                                <td className="px-2 py-1">
+                                                    <input type="text" value={row.memo} onChange={(e) => handleItemRowUpdate(row.id, 'memo', e.target.value)} className="w-full h-8 px-3 text-[11px] font-bold outline-none text-gray-500 bg-transparent border border-transparent transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 group-hover:border-slate-200 group-hover:bg-white rounded" placeholder="Notes..." />
                                                 </td>
                                             </tr>
                                         ))}
-                                        <tr className="h-12">
-                                            <td colSpan={6} className="bg-slate-50/30">
-                                                <button onClick={addItemRow} className="w-full h-full text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] hover:text-[#0285fd] transition-colors flex items-center justify-center gap-2">
-                                                    + APPEND NEW PRODUCT LINE
+                                        <tr className="bg-slate-50/30">
+                                            <td colSpan={6} className="p-0 border-t border-slate-100">
+                                                <button onClick={addItemRow} className="w-full py-3 text-blue-600 font-black text-[10px] tracking-[0.2em] hover:bg-slate-50 transition-all flex items-center justify-center gap-2 group border-none bg-transparent">
+                                                    <Plus size={14} /> ATTACH PRODUCT LINE
                                                 </button>
                                             </td>
                                         </tr>
@@ -548,32 +548,34 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                         </div>
                     </div>
 
-                    {/* 3. Bottom Actions & Totals Area */}
-                    <div className="flex items-center justify-end pt-2 border-t border-slate-100 mt-2">
-
-                        <div className="flex items-center gap-10">
+                    {/* 3. Global Validation Summary Footer */}
+                    <div className="flex justify-between items-center bg-white p-3 border border-slate-200 rounded-[5px] shadow-sm">
+                        <div className="flex items-center gap-8">
                             <label className="flex items-center gap-3 cursor-pointer group">
                                 <div className="relative flex items-center justify-center">
-                                    <input type="checkbox" className="w-5 h-5 rounded border-gray-300 text-[#0078d4] focus:ring-blue-500 shadow-sm transition-all" />
+                                    <input type="checkbox" className="w-4 h-4 rounded border-slate-300 text-[#00D1FF] focus:ring-[#00D1FF] transition-all" />
                                 </div>
-                                <span className="text-xs font-bold text-slate-600 uppercase tracking-tight group-hover:text-[#0078d4] transition-colors">Queue for Printing</span>
+                                <span className="text-[11px] font-bold text-gray-500 uppercase tracking-tighter group-hover:text-[#00D1FF] transition-colors">Queue for Printing</span>
                             </label>
-
-                            <div className="flex items-center gap-6 bg-slate-50/80 px-6 py-2.5 rounded-lg border border-gray-100 shadow-sm">
-                                <div className="flex flex-col items-end">
-                                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Balance Diff.</span>
-                                    <div className={`text-sm font-mono font-black tabular-nums tracking-tighter ${difference === 0 ? 'text-green-600' : 'text-red-600'}`}>
+                        </div>
+                        <div className="flex items-center gap-6">
+                            <div className="flex items-center gap-3">
+                                 <div className="flex flex-col items-end">
+                                    <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1">Balance Diff.</span>
+                                     <div className={`text-[14px] font-mono leading-none font-black tracking-tighter ${difference === 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
                                         {difference.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                                    </div>
-                                </div>
-                                <div className="h-8 w-[1px] bg-gray-200 mx-2" />
-                                <div className="flex flex-col items-end">
-                                    <span className="text-[10px] font-black text-[#0285fd] uppercase tracking-widest leading-none mb-1">Total Allocated</span>
-                                    <div className="text-xl font-mono font-black text-[#0285fd] tabular-nums tracking-tighter flex items-baseline gap-1">
-                                        <span className="text-[12px] font-bold opacity-50">LKR</span>
+                                     </div>
+                                 </div>
+                            </div>
+                            <div className="h-8 w-[1px] bg-slate-200" />
+                            <div className="flex items-center gap-3">
+                                 <div className="flex flex-col items-end">
+                                    <span className="text-[9px] font-black text-[#00D1FF] uppercase tracking-widest leading-none mb-1">Total Allocated</span>
+                                     <div className="text-[18px] font-mono leading-none font-black text-[#00D1FF] tracking-tighter flex items-baseline gap-1">
+                                        <span className="text-[11px] opacity-60">LKR</span>
                                         {totalAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                                    </div>
-                                </div>
+                                     </div>
+                                 </div>
                             </div>
                         </div>
                     </div>

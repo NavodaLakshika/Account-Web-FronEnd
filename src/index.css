@@ -144,3 +144,16 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   display: none;
   -webkit-appearance: none;
 }
+
+/* Clean card hover effect */
+.clean-card {
+  @apply bg-white border border-slate-200/70 rounded-2xl shadow-sm transition-all duration-400 ease-out;
+}
+.clean-card:hover {
+  @apply shadow-[0_12px_32px_-8px_rgba(0,0,0,0.08)] border-slate-300 -translate-y-1.5 scale-[1.03];
+}
+
+/* Transition duration 400 */
+.duration-400 {
+  transition-duration: 400ms;
+}

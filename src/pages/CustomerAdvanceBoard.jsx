@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import SimpleModal from '../components/SimpleModal';
+import TransactionFormWrapper from '../components/TransactionFormWrapper';
 import CalendarModal from '../components/CalendarModal';
-import { Search, Calendar, ChevronDown, Check, X, Save, RotateCcw, Loader2 } from 'lucide-react';
+import { Search, Calendar, ChevronDown, Check, X, Save, RotateCcw, Loader2, Banknote } from 'lucide-react';
 import { customerAdvanceService } from '../services/customerAdvance.service';
 
 import { getSessionData } from '../utils/session';
@@ -296,18 +297,20 @@ const CustomerAdvanceBoard = ({ isOpen, onClose }) => {
                     }
                 `}
             </style>
-            <SimpleModal
+            <TransactionFormWrapper
                 isOpen={isOpen}
                 onClose={onClose}
                 title="Customer Advance Receipt"
-                maxWidth="max-w-[900px]"
+                subtitle="Customer Advances"
+                icon={Banknote}
+                maxWidth="max-w-4xl"
                 footer={
                     <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-gray-100 rounded-b-xl">
                         <div>
                             <button 
                                 onClick={handleClear} 
                                 disabled={loading} 
-                                className="px-6 h-10 bg-[#00adff] text-white text-sm font-black rounded-[5px] hover:bg-[#0099e6] transition-all active:scale-95 flex items-center justify-center gap-2 border-none font-['Tahoma']"
+                                className="px-6 py-3 bg-[#00adff] hover:bg-[#0099e6] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] transition-all active:scale-95 flex items-center justify-center gap-2 border-none"
                             >
                                 <RotateCcw size={14} /> Clear Form
                             </button>
@@ -316,7 +319,7 @@ const CustomerAdvanceBoard = ({ isOpen, onClose }) => {
                             <button 
                                 onClick={handleSave} 
                                 disabled={loading} 
-                                className={`px-6 h-10 bg-[#2bb744] text-white text-sm font-black rounded-[5px] shadow-md shadow-green-100 hover:bg-[#259b3a] transition-all active:scale-95 flex items-center justify-center gap-2 border-none font-['Tahoma'] ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                className={`px-6 py-3 bg-[#2bb744] hover:bg-[#259b3a] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] shadow-md shadow-green-100 transition-all active:scale-95 flex items-center justify-center gap-2 border-none ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                             >
                                 {loading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />} 
                                 Save & Apply
@@ -327,29 +330,29 @@ const CustomerAdvanceBoard = ({ isOpen, onClose }) => {
             >
                 <div className="space-y-4 font-['Tahoma']">
                     {/* Main Entry Panel */}
-                    <div className="bg-white p-5 border border-gray-100 rounded-lg shadow-sm space-y-4">
+                    <div className="bg-white p-5 border border-slate-200 rounded-[5px] shadow-sm space-y-4">
                         <div className="grid grid-cols-12 gap-x-6 gap-y-3.5">
                             
                             {/* Receipt No / Doc ID */}
                             <div className="col-span-6 flex items-center gap-2">
-                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Doc ID</label>
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Doc ID</label>
                                 <input 
                                     type="text" 
                                     value={formData.receiptNo} 
                                     readOnly 
-                                    className="flex-1 h-8 border border-gray-300 px-3 text-[12px] font-bold text-slate-700 bg-white rounded-[5px] outline-none shadow-sm focus:border-[#0285fd]" 
+                                    className="flex-1 h-8 border border-slate-200 px-3 text-[12px] font-mono font-bold text-slate-700 bg-slate-50 rounded outline-none shadow-sm focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" 
                                 />
                             </div>
 
                             {/* Post Date */}
                             <div className="col-span-6 flex items-center gap-2">
-                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0 text-right pr-2">Rec. Date</label>
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0 text-right pr-2">Rec. Date</label>
                                 <div className="flex-1 flex gap-1 h-8 min-w-0">
                                     <input 
                                         type="text" 
                                         readOnly 
                                         value={formData.postDate ? formatDateToDMY(formData.postDate) : ''} 
-                                        className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-slate-700 bg-white rounded-[5px] outline-none shadow-sm cursor-pointer"
+                                        className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-mono font-bold text-slate-700 bg-slate-50 rounded outline-none shadow-sm cursor-pointer"
                                         onClick={() => setShowDatePicker(true)}
                                     />
                                     <button 
@@ -364,14 +367,14 @@ const CustomerAdvanceBoard = ({ isOpen, onClose }) => {
 
                             {/* Credit Account / Customer Selection */}
                             <div className="col-span-12 flex items-center gap-2">
-                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Customer *</label>
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Customer *</label>
                                 <div className="flex-1 flex gap-1 h-8 min-w-0">
                                     <input 
                                         type="text" 
                                         ref={inputRefs.creditAccCode}
                                         readOnly 
                                         value={formData.creditAccCode ? `${formData.creditAccCode} - ${formData.creditAccName}` : ''} 
-                                        className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-red-600 bg-white rounded-[5px] outline-none shadow-sm cursor-pointer"
+                                        className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-mono font-bold text-red-600 bg-slate-50 rounded outline-none shadow-sm cursor-pointer"
                                         onClick={() => setActiveModal('customer')}
                                         onKeyDown={(e) => handleKeyDown(e, 'creditAccCode')}
                                     />
@@ -386,14 +389,14 @@ const CustomerAdvanceBoard = ({ isOpen, onClose }) => {
 
                             {/* Debit Account Selection */}
                             <div className="col-span-12 flex items-center gap-2">
-                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Debit Acc *</label>
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Debit Acc *</label>
                                 <div className="flex-1 flex gap-1 h-8 min-w-0">
                                     <input 
                                         type="text" 
                                         ref={inputRefs.debitAccCode}
                                         readOnly 
                                         value={formData.debitAccCode ? `${formData.debitAccCode} - ${formData.debitAccName}` : ''} 
-                                        className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-slate-700 bg-white rounded-[5px] outline-none shadow-sm cursor-pointer"
+                                        className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-mono font-bold text-slate-700 bg-slate-50 rounded outline-none shadow-sm cursor-pointer"
                                         onClick={() => setActiveModal('debitAcc')}
                                         onKeyDown={(e) => handleKeyDown(e, 'debitAccCode')}
                                     />
@@ -408,14 +411,14 @@ const CustomerAdvanceBoard = ({ isOpen, onClose }) => {
 
                             {/* Pay Type Selection */}
                             <div className="col-span-4 flex items-center gap-2">
-                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Pay Type</label>
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Pay Type</label>
                                 <div className="flex-1 flex gap-1 h-8 min-w-0">
                                     <input 
                                         type="text" 
                                         ref={inputRefs.payType}
                                         readOnly 
                                         value={formData.payType} 
-                                        className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-slate-700 bg-white rounded-[5px] outline-none shadow-sm cursor-pointer"
+                                        className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-mono font-bold text-slate-700 bg-slate-50 rounded outline-none shadow-sm cursor-pointer"
                                         onClick={() => setActiveModal('payType')}
                                         onKeyDown={(e) => handleKeyDown(e, 'payType')}
                                     />
@@ -430,7 +433,7 @@ const CustomerAdvanceBoard = ({ isOpen, onClose }) => {
 
                             {/* Cheque Details (Only if PayType === 'CHEQUE') */}
                             <div className="col-span-4 flex items-center gap-2">
-                                <label className="text-[12.5px] font-bold text-gray-700 w-20 shrink-0 text-right pr-2">Chq No</label>
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-20 shrink-0 text-right pr-2">Chq No</label>
                                 <input 
                                     type="text" 
                                     ref={inputRefs.chequeNo}
@@ -439,19 +442,19 @@ const CustomerAdvanceBoard = ({ isOpen, onClose }) => {
                                     onChange={handleInputChange} 
                                     disabled={formData.payType !== 'CHEQUE'}
                                     onKeyDown={(e) => handleKeyDown(e, 'chequeNo')}
-                                    className="flex-1 h-8 border border-gray-300 px-3 text-[12px] rounded-[5px] outline-none bg-white shadow-sm focus:border-[#0285fd] disabled:bg-gray-100 disabled:text-gray-400" 
+                                    className="flex-1 h-8 border border-slate-200 px-3 text-[12px] font-mono rounded outline-none bg-slate-50 shadow-sm focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 disabled:bg-gray-100 disabled:text-gray-400" 
                                 />
                             </div>
 
                             <div className="col-span-4 flex items-center gap-2">
-                                <label className="text-[12.5px] font-bold text-gray-700 w-20 shrink-0 text-right pr-2">Chq Date</label>
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-20 shrink-0 text-right pr-2">Chq Date</label>
                                 <div className="flex-1 flex gap-1 h-8 min-w-0">
                                     <input 
                                         type="text" 
                                         readOnly 
                                         value={formData.chequeDate ? formatDateToDMY(formData.chequeDate) : ''} 
                                         disabled={formData.payType !== 'CHEQUE'}
-                                        className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-slate-700 bg-white rounded-[5px] outline-none shadow-sm cursor-pointer disabled:bg-gray-100 disabled:text-gray-400"
+                                        className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-mono font-bold text-slate-700 bg-slate-50 rounded outline-none shadow-sm cursor-pointer disabled:bg-gray-100 disabled:text-gray-400"
                                         onClick={() => formData.payType === 'CHEQUE' && setShowChqDatePicker(true)}
                                     />
                                     <button 
@@ -467,7 +470,7 @@ const CustomerAdvanceBoard = ({ isOpen, onClose }) => {
 
                             {/* Bank Selection (Cheque only) */}
                             <div className="col-span-6 flex items-center gap-2">
-                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Bank</label>
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Bank</label>
                                 <div className="flex-1 flex gap-1 h-8 min-w-0">
                                     <input 
                                         type="text" 
@@ -475,7 +478,7 @@ const CustomerAdvanceBoard = ({ isOpen, onClose }) => {
                                         readOnly 
                                         value={formData.bank || ''} 
                                         disabled={formData.payType !== 'CHEQUE'}
-                                        className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-slate-700 bg-white rounded-[5px] outline-none shadow-sm cursor-pointer disabled:bg-gray-100 disabled:text-gray-400"
+                                        className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-mono font-bold text-slate-700 bg-slate-50 rounded outline-none shadow-sm cursor-pointer disabled:bg-gray-100 disabled:text-gray-400"
                                         onClick={() => formData.payType === 'CHEQUE' && setActiveModal('bank')}
                                         onKeyDown={(e) => handleKeyDown(e, 'bank')}
                                     />
@@ -491,7 +494,7 @@ const CustomerAdvanceBoard = ({ isOpen, onClose }) => {
 
                             {/* Branch (Cheque only) */}
                             <div className="col-span-6 flex items-center gap-2">
-                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0 text-right pr-2">Branch</label>
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0 text-right pr-2">Branch</label>
                                 <input 
                                     type="text" 
                                     ref={inputRefs.branch}
@@ -500,13 +503,13 @@ const CustomerAdvanceBoard = ({ isOpen, onClose }) => {
                                     onChange={handleInputChange} 
                                     disabled={formData.payType !== 'CHEQUE'}
                                     onKeyDown={(e) => handleKeyDown(e, 'branch')}
-                                    className="flex-1 h-8 border border-gray-300 px-3 text-[12px] rounded-[5px] outline-none bg-white shadow-sm focus:border-[#0285fd] disabled:bg-gray-100 disabled:text-gray-400" 
+                                    className="flex-1 h-8 border border-slate-200 px-3 text-[12px] font-mono rounded outline-none bg-slate-50 shadow-sm focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 disabled:bg-gray-100 disabled:text-gray-400" 
                                 />
                             </div>
 
                             {/* Amount */}
                             <div className="col-span-12 flex items-center gap-2">
-                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Amount *</label>
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Amount *</label>
                                 <input 
                                     type="number" 
                                     ref={inputRefs.amount}
@@ -515,13 +518,13 @@ const CustomerAdvanceBoard = ({ isOpen, onClose }) => {
                                     value={formData.amount} 
                                     onChange={handleInputChange} 
                                     onKeyDown={(e) => handleKeyDown(e, 'amount')}
-                                    className="w-48 h-8 border border-gray-300 px-3 text-[14px] text-right font-black text-red-600 bg-white rounded-[5px] outline-none shadow-sm focus:border-[#0285fd]" 
+                                    className="w-48 h-8 border border-slate-200 px-3 text-[14px] text-right font-black text-red-600 bg-slate-50 rounded outline-none shadow-sm focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" 
                                 />
                             </div>
 
                             {/* Memo */}
                             <div className="col-span-12 flex items-start gap-2 pt-2">
-                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0 pt-1.5">Remarks / Memo</label>
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0 pt-1.5">Remarks / Memo</label>
                                 <input 
                                     type="text" 
                                     ref={inputRefs.memo}
@@ -529,14 +532,14 @@ const CustomerAdvanceBoard = ({ isOpen, onClose }) => {
                                     value={formData.memo} 
                                     onChange={handleInputChange} 
                                     onKeyDown={(e) => handleKeyDown(e, 'memo')}
-                                    className="flex-1 h-9 border border-gray-300 px-3 text-[12px] rounded-[5px] outline-none bg-white shadow-sm focus:border-[#0285fd]" 
+                                    className="flex-1 h-9 border border-slate-200 px-3 text-[12px] font-mono rounded outline-none bg-slate-50 shadow-sm focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" 
                                 />
                             </div>
 
                         </div>
                     </div>
                 </div>
-            </SimpleModal>
+            </TransactionFormWrapper>
 
             {/* Selection Lookups */}
             <SearchModal 

@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import SimpleModal from '../components/SimpleModal';
+import TransactionFormWrapper from '../components/TransactionFormWrapper';
 import CalendarModal from '../components/CalendarModal';
-import { Search, Calendar, X, Save, RotateCcw, Loader2 } from 'lucide-react';
+import { Search, Calendar, X, Save, RotateCcw, Loader2, FileText } from 'lucide-react';
 import { customerInvoiceService } from '../services/customerInvoice.service';
 
 import { getSessionData } from '../utils/session';
@@ -284,18 +285,20 @@ const CustomerInvoiceBoard = ({ isOpen, onClose }) => {
                 }
             `}</style>
 
-            <SimpleModal
+            <TransactionFormWrapper
                 isOpen={isOpen}
                 onClose={onClose}
                 title="Customer Invoice (Other Invoice)"
-                maxWidth="max-w-[850px]"
+                subtitle="Customer Invoices"
+                icon={FileText}
+                maxWidth="max-w-4xl"
                 footer={
                     <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-gray-100 rounded-b-xl">
                         {/* Left: Clear */}
                         <button
                             onClick={handleClear}
                             disabled={loading}
-                            className="px-6 h-10 bg-[#00adff] text-white text-sm font-black rounded-[5px] hover:bg-[#0099e6] transition-all active:scale-95 flex items-center gap-2 border-none"
+                            className="px-6 py-3 bg-[#00adff] hover:bg-[#0099e6] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] transition-all active:scale-95 flex items-center justify-center gap-2 border-none"
                         >
                             <RotateCcw size={14} /> Clear Form
                         </button>
@@ -305,7 +308,7 @@ const CustomerInvoiceBoard = ({ isOpen, onClose }) => {
                             ref={saveBtnRef}
                             onClick={handleSave}
                             disabled={loading}
-                            className={`px-6 h-10 bg-[#2bb744] text-white text-sm font-black rounded-[5px] shadow-md shadow-green-100 hover:bg-[#259b3a] transition-all active:scale-95 flex items-center gap-2 border-none ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            className={`px-6 py-3 bg-[#2bb744] hover:bg-[#259b3a] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] shadow-md shadow-green-100 transition-all active:scale-95 flex items-center justify-center gap-2 border-none ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                         >
                             {loading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
                             Save &amp; Apply
@@ -315,13 +318,13 @@ const CustomerInvoiceBoard = ({ isOpen, onClose }) => {
             >
                 {/* ── Form Body ─────────────────────────────────────────────── */}
                 <div className="space-y-4 font-['Tahoma']">
-                    <div className="bg-white p-5 border border-gray-100 rounded-lg shadow-sm space-y-4">
+                    <div className="bg-white p-5 border border-slate-200 rounded-[5px] shadow-sm space-y-4">
                         
                         {/* Row 1: Customer & Doc ID */}
                         <div className="flex items-center justify-between gap-6">
                             {/* Customer */}
                             <div className="flex-1 flex items-center gap-2">
-                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">
                                     Customer <span className="text-red-500">*</span>
                                 </label>
                                 <div className="flex-1 flex gap-1 h-8 min-w-0">
@@ -332,7 +335,7 @@ const CustomerInvoiceBoard = ({ isOpen, onClose }) => {
                                         value={formData.customerId ? `${formData.customerId} — ${formData.customerName}` : ''}
                                         onKeyDown={e => handleKeyDown(e, 'customerSearch')}
                                         onClick={() => setActiveModal('customer')}
-                                        className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-red-600 bg-gray-50 rounded-[5px] outline-none shadow-sm cursor-pointer"
+                                        className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-mono font-bold text-red-600 bg-slate-50 rounded outline-none shadow-sm cursor-pointer"
                                     />
                                     <button
                                         ref={customerSearchBtnRef}
@@ -346,12 +349,12 @@ const CustomerInvoiceBoard = ({ isOpen, onClose }) => {
 
                             {/* Doc ID */}
                             <div className="w-[260px] flex items-center gap-2">
-                                <label className="text-[12.5px] font-bold text-gray-700 w-16 shrink-0 text-right pr-2">Doc ID</label>
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-16 shrink-0 text-right pr-2">Doc ID</label>
                                 <input
                                     type="text"
                                     value={formData.docNo}
                                     readOnly
-                                    className="flex-1 h-8 border border-[#0285fd]/30 px-3 text-[12.5px] font-bold text-blue-600 bg-blue-50/20 rounded-[5px] outline-none shadow-inner"
+                                    className="flex-1 h-8 border border-slate-200 px-3 text-[12px] font-mono font-bold text-blue-600 bg-slate-50 rounded outline-none shadow-sm"
                                 />
                             </div>
                         </div>
@@ -360,7 +363,7 @@ const CustomerInvoiceBoard = ({ isOpen, onClose }) => {
                         <div className="flex items-center justify-between gap-6">
                             {/* Account */}
                             <div className="flex-1 flex items-center gap-2">
-                                <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">
                                     Account <span className="text-red-500">*</span>
                                 </label>
                                 <div className="flex-1 flex gap-1 h-8 min-w-0">
@@ -371,7 +374,7 @@ const CustomerInvoiceBoard = ({ isOpen, onClose }) => {
                                         value={formData.accountCode ? `${formData.accountCode} — ${formData.accountName}` : ''}
                                         onKeyDown={e => handleKeyDown(e, 'accountSearch')}
                                         onClick={() => setActiveModal('account')}
-                                        className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-slate-700 bg-gray-50 rounded-[5px] outline-none shadow-sm cursor-pointer"
+                                        className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-mono font-bold text-slate-700 bg-slate-50 rounded outline-none shadow-sm cursor-pointer"
                                     />
                                     <button
                                         ref={accountSearchBtnRef}
@@ -385,7 +388,7 @@ const CustomerInvoiceBoard = ({ isOpen, onClose }) => {
 
                             {/* Date */}
                             <div className="w-[260px] flex items-center gap-2">
-                                <label className="text-[12.5px] font-bold text-gray-700 w-16 shrink-0 text-right pr-2">Date</label>
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-16 shrink-0 text-right pr-2">Date</label>
                                 <div className="flex-grow flex gap-1 h-8 min-w-0">
                                     <input
                                         ref={dateInputRef}
@@ -394,7 +397,7 @@ const CustomerInvoiceBoard = ({ isOpen, onClose }) => {
                                         value={formData.postDate ? formatDateToDMY(formData.postDate) : ''}
                                         onKeyDown={e => handleKeyDown(e, 'save')}
                                         onClick={() => setShowDatePicker(true)}
-                                        className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-slate-700 bg-gray-50 rounded-[5px] outline-none shadow-sm cursor-pointer"
+                                        className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-mono font-bold text-slate-700 bg-slate-50 rounded outline-none shadow-sm cursor-pointer"
                                     />
                                     <button
                                         ref={dateBtnRef}
@@ -410,7 +413,7 @@ const CustomerInvoiceBoard = ({ isOpen, onClose }) => {
 
                         {/* Row 3: Description */}
                         <div className="flex items-center gap-2">
-                            <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">
+                            <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">
                                 Description <span className="text-red-500">*</span>
                             </label>
                             <input
@@ -420,15 +423,15 @@ const CustomerInvoiceBoard = ({ isOpen, onClose }) => {
                                 value={formData.description}
                                 onChange={handleInputChange}
                                 onKeyDown={e => handleKeyDown(e, 'amount')}
-                                className="flex-grow h-8 border border-gray-300 px-3 text-[12px] rounded-[5px] outline-none bg-white shadow-sm focus:border-[#0285fd]"
+                                className="flex-grow h-8 border border-slate-200 px-3 text-[12px] font-mono rounded outline-none bg-slate-50 shadow-sm focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20"
                             />
                         </div>
 
                         {/* Row 4: Gross Amount, Discount, Net Total */}
-                        <div className="pt-4 border-t border-gray-100 flex items-center justify-between gap-6">
+                        <div className="pt-4 border-t border-slate-200 flex items-center justify-between gap-6">
                             {/* Gross Amount */}
                             <div className="flex items-center gap-2">
-                                <label className="text-[12.5px] font-bold text-gray-700 shrink-0">
+                                <label className="text-[11px] font-bold text-gray-500 uppercase shrink-0">
                                     Gross Amount <span className="text-red-500">*</span>
                                 </label>
                                 <input
@@ -440,13 +443,13 @@ const CustomerInvoiceBoard = ({ isOpen, onClose }) => {
                                     onChange={handleInputChange}
                                     onBlur={handleAmountBlur}
                                     onKeyDown={e => handleKeyDown(e, 'discount')}
-                                    className="w-[140px] h-8 border border-gray-300 px-3 text-[14px] text-right font-black text-slate-800 bg-white rounded-[5px] outline-none focus:border-[#0285fd] shadow-sm font-mono"
+                                    className="w-[140px] h-8 border border-slate-200 px-3 text-[14px] text-right font-black text-slate-800 bg-slate-50 rounded outline-none focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 shadow-sm font-mono"
                                 />
                             </div>
 
                             {/* Discount */}
                             <div className="flex items-center gap-2">
-                                <label className="text-[12.5px] font-bold text-gray-700 shrink-0">Discount</label>
+                                <label className="text-[11px] font-bold text-gray-500 uppercase shrink-0">Discount</label>
                                 <input
                                     ref={discountRef}
                                     name="discount"
@@ -456,14 +459,14 @@ const CustomerInvoiceBoard = ({ isOpen, onClose }) => {
                                     onChange={handleInputChange}
                                     onBlur={handleAmountBlur}
                                     onKeyDown={e => handleKeyDown(e, 'account')}
-                                    className="w-[140px] h-8 border border-gray-300 px-3 text-[14px] text-right font-black text-[#b91c1c] bg-white rounded-[5px] outline-none focus:border-[#0285fd] shadow-sm font-mono"
+                                    className="w-[140px] h-8 border border-slate-200 px-3 text-[14px] text-right font-black text-[#b91c1c] bg-slate-50 rounded outline-none focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 shadow-sm font-mono"
                                 />
                             </div>
 
                             {/* Net Total Display */}
-                            <div className="flex items-center gap-3 pl-4 border-l border-gray-200 flex-1 justify-end">
-                                <label className="text-[12.5px] font-black text-slate-700 uppercase tracking-widest shrink-0">NET TOTAL</label>
-                                <div className="w-[160px] h-10 flex items-center justify-end px-4 text-[22px] font-black text-[#0285fd] bg-white border-b-2 border-[#0285fd] shadow-sm tabular-nums rounded-t-[5px]">
+                            <div className="flex items-center gap-3 pl-4 border-l border-slate-200 flex-1 justify-end">
+                                <label className="text-[10px] font-mono font-black text-gray-500 uppercase tracking-wider shrink-0">NET TOTAL</label>
+                                <div className="w-[160px] h-10 flex items-center justify-end px-4 text-[22px] font-black text-[#0285fd] bg-slate-50 border-b-2 border-[#0285fd] shadow-sm tabular-nums rounded-t-[5px]">
                                     {formData.netAmount || '0.00'}
                                 </div>
                             </div>
@@ -471,7 +474,7 @@ const CustomerInvoiceBoard = ({ isOpen, onClose }) => {
 
                     </div>
                 </div>
-            </SimpleModal>
+            </TransactionFormWrapper>
 
             {/* Lookups Search Modals */}
             <SearchModal

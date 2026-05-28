@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { X, Send, Bot, User, Trash2, Plus, ChevronLeft, ChevronRight, Paperclip, File, Image as ImageIcon, Mic, Maximize2, Minimize2 } from 'lucide-react';
+import { X, Send, Bot, User, Trash2, Plus, ChevronLeft, ChevronRight, Paperclip, File, Image as ImageIcon, Mic, Maximize2, Minimize2, Square } from 'lucide-react';
 import { DotLottiePlayer } from '@dotlottie/react-player';
 import { getUserName } from '../utils/session';
 
@@ -7,11 +7,11 @@ import { getUserName } from '../utils/session';
 // SVG stroke-dashoffset animation that perfectly traces the rounded-rect border.
 // AI bubbles → brand topBarColor with glow | User bubbles → Slate #94a3b8 (Simple & Charm)
 const DrawBorderBox = ({ children, color = '#0285fd', isUser = false, animKey }) => {
-    const [drawn, setDrawn]            = useState(false);
+    const [drawn, setDrawn] = useState(false);
     const [contentVisible, setContent] = useState(false);
-    const [size, setSize]              = useState({ w: 0, h: 0 });
-    const containerRef                 = useRef(null);
-    const rx = 12; 
+    const [size, setSize] = useState({ w: 0, h: 0 });
+    const containerRef = useRef(null);
+    const rx = 12;
 
     useEffect(() => {
         const obs = new ResizeObserver(entries => {
@@ -22,18 +22,18 @@ const DrawBorderBox = ({ children, color = '#0285fd', isUser = false, animKey })
             }
         });
         if (containerRef.current) obs.observe(containerRef.current);
-        
+
         // Animation sequence
         const t1 = setTimeout(() => setDrawn(true), 150);
         const t2 = setTimeout(() => setContent(true), 1200);
-        
+
         return () => { obs.disconnect(); clearTimeout(t1); clearTimeout(t2); };
     }, [animKey]);
 
     const { w, h } = size;
-    const perimeter  = 2 * (w - 2 * rx + h - 2 * rx) + 2 * Math.PI * rx;
+    const perimeter = 2 * (w - 2 * rx + h - 2 * rx) + 2 * Math.PI * rx;
     const strokeColor = isUser ? '#94a3b8' : color;
-    const sparkFill   = isUser ? '#cbd5e1' : '#e0f0ff';
+    const sparkFill = isUser ? '#cbd5e1' : '#e0f0ff';
 
     const svgPath = `M ${rx},1 L ${w - rx},1 Q ${w - 1},1 ${w - 1},${rx} L ${w - 1},${h - rx} Q ${w - 1},${h - 1} ${w - rx},${h - 1} L ${rx},${h - 1} Q 1,${h - 1} 1,${h - rx} L 1,${rx} Q 1,1 ${rx},1 Z`;
 
@@ -67,7 +67,7 @@ const DrawBorderBox = ({ children, color = '#0285fd', isUser = false, animKey })
 };
 // ─────────────────────────────────────────────────────────────────────────────
 
-const AIChatbotBoard = ({ isOpen, onClose }) => {
+const AIChatbotBoard = ({ isOpen, onClose, position = 'center' }) => {
     // Persistent History from localStorage
     const [history, setHistory] = useState(() => {
         const saved = localStorage.getItem('ai_chat_history');
@@ -81,11 +81,11 @@ const AIChatbotBoard = ({ isOpen, onClose }) => {
     ]);
     const [inputValue, setInputValue] = useState('');
     const [isTyping, setIsTyping] = useState(false);
-    const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+    const [sidebarCollapsed, setSidebarCollapsed] = useState(position === 'right');
     const [attachedFile, setAttachedFile] = useState(null);
     const [isRecording, setIsRecording] = useState(false);
     const [chatSize, setChatSize] = useState('standard'); // 'standard', 'wide', 'compact'
-
+    const abortControllerRef = useRef(null);
     const topBarColor = localStorage.getItem('topBarColor') || '#0285fd';
     const messagesEndRef = useRef(null);
     const fileInputRef = useRef(null);
@@ -98,7 +98,7 @@ const AIChatbotBoard = ({ isOpen, onClose }) => {
     // Live-sync active session to history
     useEffect(() => {
         if (activeHistoryId && messages.length > 1) {
-            setHistory(prev => prev.map(item => 
+            setHistory(prev => prev.map(item =>
                 item.id === activeHistoryId ? { ...item, msgs: [...messages] } : item
             ));
         }
@@ -108,34 +108,93 @@ const AIChatbotBoard = ({ isOpen, onClose }) => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [messages, isTyping]);
 
-    const handleSendMessage = (e) => {
+    const handleSendMessage = async (e) => {
         e.preventDefault();
         if (!inputValue.trim() && !attachedFile) return;
 
-        const newUserMessage = { 
-            id: Date.now(), 
-            text: inputValue, 
-            sender: 'user', 
+        const newUserMessage = {
+            id: Date.now(),
+            text: inputValue,
+            sender: 'user',
             timestamp: new Date(),
-            file: attachedFile 
+            file: attachedFile
         };
-        
+
         setMessages(prev => [...prev, newUserMessage]);
         setInputValue('');
         setAttachedFile(null);
         setIsTyping(true);
-        
-        setTimeout(() => {
-            const aiResponse = { id: Date.now() + 1, text: getMockResponse(inputValue), sender: 'ai', timestamp: new Date() };
+
+        try {
+            abortControllerRef.current = new AbortController();
+            const API_KEY = import.meta.env.VITE_GROQ_API_KEY;
+            // Prepare messages for API
+            const apiMessages = [
+                { role: "system", content: "You are a helpful, professional AI Assistant integrated into ONIMTA Information Technology's accounting dashboard. You assist Navoda and other users with accounting queries, balances, and system workflows." },
+                ...messages.map(m => ({
+                    role: m.sender === 'user' ? "user" : "assistant",
+                    content: m.text
+                })),
+                { role: "user", content: newUserMessage.text }
+            ];
+
+            const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${API_KEY}`
+                },
+                body: JSON.stringify({
+                    model: "llama-3.3-70b-versatile",
+                    messages: apiMessages,
+                    temperature: 0.7
+                }),
+                signal: abortControllerRef.current.signal
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error?.message || "Failed to fetch response from AI API");
+            }
+
+            const data = await response.json();
+            const aiText = data.choices && data.choices[0] && data.choices[0].message.content
+                ? data.choices[0].message.content
+                : "I couldn't process that response correctly.";
+
+            const aiResponse = { id: Date.now() + 1, text: aiText, sender: 'ai', timestamp: new Date() };
             setMessages(prev => [...prev, aiResponse]);
+        } catch (error) {
+            if (error.name === 'AbortError') {
+                console.log("Generation stopped by user");
+                return;
+            }
+            console.error("AI API Error:", error);
+            const errorResponse = {
+                id: Date.now() + 1,
+                text: `API Error: ${error.message}. If this is not an OpenAI key, you may need to specify the correct API endpoint (e.g. DeepSeek, Anthropic, or custom).`,
+                sender: 'ai',
+                timestamp: new Date()
+            };
+            setMessages(prev => [...prev, errorResponse]);
+        } finally {
             setIsTyping(false);
-        }, 1500);
+            abortControllerRef.current = null;
+        }
+    };
+
+    const handleStopGeneration = () => {
+        if (abortControllerRef.current) {
+            abortControllerRef.current.abort();
+            abortControllerRef.current = null;
+            setIsTyping(false);
+        }
     };
 
     const handleFileChange = (e) => {
         const file = e.target.files[0];
         if (!file) return;
-        
+
         const reader = new FileReader();
         reader.onloadend = () => {
             setAttachedFile({
@@ -162,7 +221,7 @@ const AIChatbotBoard = ({ isOpen, onClose }) => {
             const firstUserMsg = messages.find(m => m.sender === 'user')?.text || "New Conversation";
             const summary = firstUserMsg.length > 20 ? firstUserMsg.substring(0, 18) + '...' : firstUserMsg;
             const newId = Date.now();
-            setHistory(prev => [{ id: newId, title: summary, time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}), msgs: [...messages] }, ...prev.slice(0, 9)]);
+            setHistory(prev => [{ id: newId, title: summary, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), msgs: [...messages] }, ...prev.slice(0, 9)]);
         }
         setActiveHistoryId(null);
         setMessages([{ id: Date.now(), text: "System Online. I am your specialized AI Assistant. How can I assist with your accounts today?", sender: 'ai', timestamp: new Date() }]);
@@ -183,17 +242,186 @@ const AIChatbotBoard = ({ isOpen, onClose }) => {
         wide: 'md:max-w-[98%] md:h-[95vh] md:max-h-[95vh]'
     };
 
+    const isRight = position === 'right';
+    const isInlineRight = position === 'inline-right';
+
+    if (isInlineRight) {
+        return (
+            <div className={`relative overflow-hidden flex flex-col h-full bg-white shadow-2xl shrink-0 border-l border-gray-200 transition-all duration-500 ease-out
+                ${chatSize === 'wide' ? 'w-full md:w-[800px] lg:w-[900px]' : 'w-full md:w-[450px] lg:w-[500px]'}
+            `}>
+                <div className="absolute left-0 top-0 bottom-0 w-1.5 z-[120]" style={{ backgroundColor: topBarColor }} />
+
+                <div className="absolute top-4 right-4 z-[100] flex items-center gap-2">
+                    <button
+                        onClick={() => setChatSize(prev => prev === 'standard' ? 'wide' : 'standard')}
+                        className="w-9 h-8 flex items-center justify-center bg-white border border-gray-200 text-slate-400 hover:text-blue-500 hover:border-blue-200 rounded-[8px] shadow-sm transition-all active:scale-90"
+                        title={chatSize === 'standard' ? "Switch to Wide View" : "Switch to Standard View"}
+                    >
+                        {chatSize === 'wide' ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
+                    </button>
+                    <button onClick={onClose} className="w-9 h-8 flex items-center justify-center bg-red-50 hover:bg-red-100 text-red-600 rounded-[8px] transition-all active:scale-90 border-none group">
+                        <X size={18} strokeWidth={4} />
+                    </button>
+                </div>
+
+                <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'linear-gradient(rgba(0,0,0,1) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,1) 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
+
+                {/* Chat Area */}
+                <div className="flex-1 flex flex-col relative z-20 bg-transparent min-w-0">
+
+                    <div className="flex-1 overflow-y-auto p-4 md:p-10 space-y-8 custom-scrollbar">
+                        {(messages || []).map((msg) => (
+                            <div key={msg.id} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
+                                <div className={`flex gap-3 items-end max-w-[90%] md:max-w-[75%] ${msg.sender === 'user' ? 'flex-row-reverse' : ''}`}>
+
+                                    {/* Avatar with Animation */}
+                                    <div className="relative flex-shrink-0 flex items-center justify-center">
+                                        <span className="absolute inset-0 rounded-full" style={msg.sender === 'ai'
+                                            ? { animation: 'aiRing 2.4s ease-in-out infinite', border: `2px solid ${topBarColor}`, opacity: 0 }
+                                            : { animation: 'userRing 2.4s ease-in-out infinite', border: '2px solid #94a3b8', opacity: 0 }}
+                                        />
+                                        <div className="w-7 h-7 md:w-8 md:h-8 rounded-full border flex items-center justify-center shadow" style={msg.sender === 'ai'
+                                            ? { borderColor: `${topBarColor}50`, backgroundColor: `${topBarColor}12`, animation: 'iconBob 3s ease-in-out infinite' }
+                                            : { borderColor: '#cbd5e1', backgroundColor: '#f8fafc', animation: 'iconPop 3s ease-in-out infinite' }}>
+                                            {msg.sender === 'user' ? <User size={13} className="text-slate-500" /> : <Bot size={14} style={{ color: topBarColor }} />}
+                                        </div>
+                                    </div>
+
+                                    <DrawBorderBox color={topBarColor} isUser={msg.sender === 'user'} animKey={msg.id}>
+                                        <div className={`px-5 py-3.5 font-mono text-[11px] leading-relaxed rounded-xl relative break-words whitespace-pre-wrap ${msg.sender === 'user' ? 'bg-slate-50 text-slate-700' : 'bg-slate-50 text-slate-800'}`} style={msg.sender === 'ai' ? { borderLeft: `2px solid ${topBarColor}` } : { borderLeft: '2px solid #94a3b8' }}>
+                                            <svg className={`absolute ${msg.sender === 'user' ? '-right-4 text-slate-50' : '-left-4 text-slate-50'} bottom-0 w-6 h-8`} viewBox="0 0 24 32" fill="none" preserveAspectRatio="none">
+                                                <path d={msg.sender === 'user' ? "M0 0V32H24C12 32 6 20 0 0Z" : "M24 0V32H0C12 32 18 20 24 0Z"} fill="currentColor" />
+                                                <path d={msg.sender === 'user' ? "M0 0V32H24C12 32 6 20 0 0Z" : "M24 0V32H0C12 32 18 20 24 0Z"} stroke="#e2e8f0" strokeWidth="1" />
+                                            </svg>
+
+                                            {msg.file && (
+                                                <div className="mb-3">
+                                                    {msg.file.isImage ? (
+                                                        <img src={msg.file.url} alt="upload" className="max-w-full rounded-lg border border-gray-100 shadow-sm" />
+                                                    ) : (
+                                                        <div className="flex items-center gap-3 p-3 bg-white/50 border border-gray-100 rounded-lg">
+                                                            <div className="p-2 bg-blue-50 text-blue-500 rounded-lg">
+                                                                <File size={20} />
+                                                            </div>
+                                                            <div className="flex-1 min-w-0">
+                                                                <div className="text-[10px] font-bold text-slate-700 truncate">{msg.file.name}</div>
+                                                                <div className="text-[8px] text-slate-400">{msg.file.size}</div>
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            )}
+
+                                            {msg.text}
+                                        </div>
+                                    </DrawBorderBox>
+                                </div>
+                            </div>
+                        ))}
+
+                        {isTyping && (
+                            <div className="flex justify-start">
+                                <div className="flex gap-2.5 items-end">
+                                    <div className="relative flex-shrink-0 flex items-center justify-center">
+                                        <span className="absolute inset-0 rounded-full" style={{ animation: 'aiRing 2.4s ease-in-out infinite', border: `2px solid ${topBarColor}`, opacity: 0 }} />
+                                        <div className="w-7 h-7 md:w-8 md:h-8 rounded-full border flex items-center justify-center shadow" style={{ borderColor: `${topBarColor}50`, backgroundColor: `${topBarColor}12`, animation: 'iconBob 3s ease-in-out infinite' }}>
+                                            <Bot size={14} style={{ color: topBarColor }} />
+                                        </div>
+                                    </div>
+                                    <div className="px-2 py-1.5 bg-slate-50 border border-gray-100 rounded-xl flex items-center gap-1 shadow-sm" style={{ borderLeft: `2px solid ${topBarColor}` }}>
+                                        <span className="w-1 h-1 rounded-full animate-bounce" style={{ backgroundColor: topBarColor, animationDelay: '0ms' }} />
+                                        <span className="w-1 h-1 rounded-full animate-bounce" style={{ backgroundColor: topBarColor, animationDelay: '150ms' }} />
+                                        <span className="w-1 h-1 rounded-full animate-bounce" style={{ backgroundColor: topBarColor, animationDelay: '300ms' }} />
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                        <div ref={messagesEndRef} />
+                    </div>
+
+                    <div className="p-4 md:p-6 bg-slate-50 border-t border-gray-100">
+                        {attachedFile && (
+                            <div className="mb-4 flex items-center justify-between p-2.5 bg-white border border-blue-100 rounded-xl animate-in slide-in-from-bottom-2 fade-in">
+                                <div className="flex items-center gap-3 min-w-0">
+                                    <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center text-blue-500 overflow-hidden border border-blue-100">
+                                        {attachedFile.isImage ? <img src={attachedFile.url} className="w-full h-full object-cover" /> : <File size={18} />}
+                                    </div>
+                                    <div className="min-w-0">
+                                        <div className="text-[10px] font-bold text-slate-700 truncate">{attachedFile.name}</div>
+                                        <div className="text-[8px] text-slate-400">{attachedFile.size}</div>
+                                    </div>
+                                </div>
+                                <button onClick={() => setAttachedFile(null)} className="p-1.5 hover:bg-red-50 text-slate-300 hover:text-red-500 rounded-full transition-colors">
+                                    <X size={14} />
+                                </button>
+                            </div>
+                        )}
+
+                        <form onSubmit={handleSendMessage} className="flex gap-2 items-center relative">
+                            <input
+                                type="file"
+                                ref={fileInputRef}
+                                onChange={handleFileChange}
+                                className="hidden"
+                                accept="image/*,.pdf,.doc,.docx,.txt"
+                            />
+                            <button
+                                type="button"
+                                onClick={() => fileInputRef.current.click()}
+                                className="p-3.5 bg-white border border-gray-200 text-slate-400 hover:text-blue-500 hover:border-blue-100 rounded-2xl transition-all active:scale-95 shadow-sm"
+                            >
+                                <Paperclip size={18} />
+                            </button>
+
+                            <div className="flex-1 relative">
+                                <input
+                                    type="text"
+                                    value={inputValue}
+                                    onChange={(e) => setInputValue(e.target.value)}
+                                    placeholder={isRecording ? "Recording audio..." : "Write your message..."}
+                                    className={`w-full px-6 py-4 bg-white border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-300 transition-all font-mono text-[11px] shadow-inner placeholder:text-slate-300 ${isRecording ? 'text-red-500 animate-pulse' : ''}`}
+                                />
+                            </div>
+
+                            <button
+                                type="button"
+                                onClick={() => setIsRecording(!isRecording)}
+                                className={`p-4 rounded-2xl shadow-md border-none transition-all active:scale-95 ${isRecording ? 'bg-red-500 text-white animate-bounce' : 'bg-white border border-gray-100 text-slate-400 hover:text-blue-500'}`}
+                            >
+                                <Mic size={18} />
+                            </button>
+
+                            <button
+                                type="submit"
+                                disabled={!inputValue.trim() && !attachedFile}
+                                className="p-4 rounded-2xl text-white shadow-lg border-none disabled:bg-slate-200 disabled:shadow-none transition-all active:scale-95"
+                                style={inputValue.trim() || attachedFile ? { backgroundColor: topBarColor } : {}}
+                            >
+                                <Send size={18} />
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <>
-            <div className={`fixed inset-0 z-[1100] flex items-center justify-center p-0 md:p-4 transition-all duration-700 ${isOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'}`}>
-                <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md transition-all duration-700" onClick={onClose} />
+            <div className={`fixed inset-0 z-[10000] flex ${isRight ? 'justify-end p-0 pointer-events-none' : 'items-center justify-center p-0 md:p-4'} transition-all duration-700 ${isOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'}`}>
+                {!isRight && (
+                    <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md transition-all duration-700 pointer-events-auto" onClick={onClose} />
+                )}
 
-                <div className={`relative overflow-hidden flex transition-all duration-500 ease-out w-full ${sizeClasses[chatSize]} h-full md:h-[85vh] bg-white rounded-none md:rounded-2xl shadow-2xl`}>
-                    
+                <div className={`relative overflow-hidden flex transition-all duration-500 ease-out bg-white shadow-2xl 
+                    ${isRight ? `pointer-events-auto h-full rounded-none border-l border-gray-200 ${chatSize === 'wide' ? 'w-full md:w-[800px] lg:w-[900px]' : 'w-full md:w-[450px] lg:w-[500px]'}` : `w-full h-full md:h-[85vh] rounded-none md:rounded-2xl pointer-events-auto ${sizeClasses[chatSize]}`}
+                `}>
+
                     <div className="absolute left-0 top-0 bottom-0 w-1.5 z-[120]" style={{ backgroundColor: topBarColor }} />
 
                     <div className="absolute top-4 right-4 z-[100] flex items-center gap-2">
-                        <button 
+                        <button
                             onClick={() => {
                                 setChatSize(prev => prev === 'standard' ? 'wide' : 'standard');
                             }}
@@ -212,7 +440,7 @@ const AIChatbotBoard = ({ isOpen, onClose }) => {
                     {/* Sidebar */}
                     <div className={`hidden lg:flex flex-col border-r border-gray-100 relative z-10 bg-slate-50 transition-all duration-500 ${sidebarCollapsed ? 'w-[80px] p-4' : 'w-[300px] p-6'}`}>
                         <div className="flex items-center justify-between mb-2">
-                             {/* Sidebar controls removed as requested */}
+                            {/* Sidebar controls removed as requested */}
                         </div>
                         {/* Header */}
                         <div className={`mb-4 flex flex-col ${sidebarCollapsed ? 'hidden' : ''}`}>
@@ -232,7 +460,7 @@ const AIChatbotBoard = ({ isOpen, onClose }) => {
                             <div className="space-y-2">
                                 {history.map((item, idx) => (
                                     <div key={idx} className="group relative">
-                                        <button 
+                                        <button
                                             onClick={() => {
                                                 if (item.msgs) {
                                                     setMessages(item.msgs);
@@ -242,20 +470,20 @@ const AIChatbotBoard = ({ isOpen, onClose }) => {
                                             className={`w-full text-left p-2 bg-white border rounded-lg shadow-sm hover:shadow-md transition-all flex items-center gap-2 relative overflow-hidden ${activeHistoryId === item.id ? 'border-blue-300 ring-1 ring-blue-50' : 'border-gray-50 hover:border-blue-100'}`}
                                         >
                                             <div className="absolute left-0 top-0 bottom-0 w-[3px] opacity-40 group-hover:opacity-100 transition-opacity" style={{ backgroundColor: activeHistoryId === item.id ? topBarColor : topBarColor + '80' }} />
-                                            
+
                                             <div className="w-7 h-7 rounded bg-slate-50 flex items-center justify-center flex-shrink-0 group-hover:bg-blue-50 transition-colors border border-gray-100">
                                                 <Bot size={12} className="text-slate-400 group-hover:text-blue-500 transition-colors" />
                                             </div>
-                                            
+
                                             <div className="flex-1 min-w-0">
                                                 <div className="text-slate-700 text-[9px] font-black group-hover:text-blue-600 transition-colors truncate uppercase tracking-tight w-full">
                                                     {item.title || "New Conversation"}
                                                 </div>
-                                                
+
                                                 <div className="text-slate-400 text-[8px] truncate font-medium leading-none mt-1">
                                                     {item.msgs && item.msgs.length > 0 ? item.msgs[item.msgs.length - 1].text : "No messages yet"}
                                                 </div>
-                                                
+
                                                 <div className="mt-1.5 flex items-center gap-2">
                                                     <div className="text-blue-400 text-[6.5px] font-black uppercase tracking-[0.1em] flex items-center gap-1 opacity-60 group-hover:opacity-100 transition-opacity">
                                                         <div className="w-0.5 h-0.5 rounded-full bg-blue-400 animate-pulse" />
@@ -265,7 +493,7 @@ const AIChatbotBoard = ({ isOpen, onClose }) => {
                                                 </div>
                                             </div>
                                         </button>
-                                        <button 
+                                        <button
                                             onClick={(e) => {
                                                 e.stopPropagation();
                                                 setHistory(prev => prev.filter((_, i) => i !== idx));
@@ -281,7 +509,7 @@ const AIChatbotBoard = ({ isOpen, onClose }) => {
 
                         {/* Sidebar Controls */}
                         <div className="space-y-2.5 pt-6 border-t border-gray-200">
-                            <button 
+                            <button
                                 onClick={handleNewSession}
                                 className={`flex items-center justify-center gap-2.5 rounded-xl transition-all shadow-md active:scale-95 border-none text-white font-black uppercase tracking-widest ${sidebarCollapsed ? 'w-10 h-10' : 'w-full py-2.5'}`}
                                 style={{ backgroundColor: topBarColor, boxShadow: `0 4px 12px ${topBarColor}25` }}
@@ -289,8 +517,8 @@ const AIChatbotBoard = ({ isOpen, onClose }) => {
                                 <Plus size={16} strokeWidth={3} />
                                 {!sidebarCollapsed && <span className="text-[9.5px]">New Session</span>}
                             </button>
-                            
-                            <button 
+
+                            <button
                                 onClick={handleClearHistory}
                                 className={`flex items-center justify-center gap-2.5 rounded-xl border border-gray-100 bg-white hover:bg-gray-50 transition-all active:scale-95 text-slate-500 shadow-sm ${sidebarCollapsed ? 'w-10 h-10' : 'w-full py-2.5'}`}
                             >
@@ -310,15 +538,15 @@ const AIChatbotBoard = ({ isOpen, onClose }) => {
                             {(messages || []).map((msg) => (
                                 <div key={msg.id} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
                                     <div className={`flex gap-3 items-end max-w-[90%] md:max-w-[75%] ${msg.sender === 'user' ? 'flex-row-reverse' : ''}`}>
-                                        
+
                                         {/* Avatar with Animation */}
                                         <div className="relative flex-shrink-0 flex items-center justify-center">
-                                            <span className="absolute inset-0 rounded-full" style={msg.sender === 'ai' 
-                                                ? { animation: 'aiRing 2.4s ease-in-out infinite', border: `2px solid ${topBarColor}`, opacity: 0 } 
-                                                : { animation: 'userRing 2.4s ease-in-out infinite', border: '2px solid #94a3b8', opacity: 0 }} 
+                                            <span className="absolute inset-0 rounded-full" style={msg.sender === 'ai'
+                                                ? { animation: 'aiRing 2.4s ease-in-out infinite', border: `2px solid ${topBarColor}`, opacity: 0 }
+                                                : { animation: 'userRing 2.4s ease-in-out infinite', border: '2px solid #94a3b8', opacity: 0 }}
                                             />
-                                            <div className="w-7 h-7 md:w-8 md:h-8 rounded-full border flex items-center justify-center shadow" style={msg.sender === 'ai' 
-                                                ? { borderColor: `${topBarColor}50`, backgroundColor: `${topBarColor}12`, animation: 'iconBob 3s ease-in-out infinite' } 
+                                            <div className="w-7 h-7 md:w-8 md:h-8 rounded-full border flex items-center justify-center shadow" style={msg.sender === 'ai'
+                                                ? { borderColor: `${topBarColor}50`, backgroundColor: `${topBarColor}12`, animation: 'iconBob 3s ease-in-out infinite' }
                                                 : { borderColor: '#cbd5e1', backgroundColor: '#f8fafc', animation: 'iconPop 3s ease-in-out infinite' }}>
                                                 {msg.sender === 'user' ? <User size={13} className="text-slate-500" /> : <Bot size={14} style={{ color: topBarColor }} />}
                                             </div>
@@ -330,7 +558,7 @@ const AIChatbotBoard = ({ isOpen, onClose }) => {
                                                     <path d={msg.sender === 'user' ? "M0 0V32H24C12 32 6 20 0 0Z" : "M24 0V32H0C12 32 18 20 24 0Z"} fill="currentColor" />
                                                     <path d={msg.sender === 'user' ? "M0 0V32H24C12 32 6 20 0 0Z" : "M24 0V32H0C12 32 18 20 24 0Z"} stroke="#e2e8f0" strokeWidth="1" />
                                                 </svg>
-                                                
+
                                                 {msg.file && (
                                                     <div className="mb-3">
                                                         {msg.file.isImage ? (
@@ -348,7 +576,7 @@ const AIChatbotBoard = ({ isOpen, onClose }) => {
                                                         )}
                                                     </div>
                                                 )}
-                                                
+
                                                 {msg.text}
                                             </div>
                                         </DrawBorderBox>
@@ -395,24 +623,24 @@ const AIChatbotBoard = ({ isOpen, onClose }) => {
                             )}
 
                             <form onSubmit={handleSendMessage} className="flex gap-2 items-center relative">
-                                <input 
-                                    type="file" 
-                                    ref={fileInputRef} 
-                                    onChange={handleFileChange} 
-                                    className="hidden" 
+                                <input
+                                    type="file"
+                                    ref={fileInputRef}
+                                    onChange={handleFileChange}
+                                    className="hidden"
                                     accept="image/*,.pdf,.doc,.docx,.txt"
                                 />
-                                <button 
+                                <button
                                     type="button"
                                     onClick={() => fileInputRef.current.click()}
                                     className="p-3.5 bg-white border border-gray-200 text-slate-400 hover:text-blue-500 hover:border-blue-100 rounded-2xl transition-all active:scale-95 shadow-sm"
                                 >
                                     <Paperclip size={18} />
                                 </button>
-                                
+
                                 <div className="flex-1 relative">
-                                    <input 
-                                        type="text" 
+                                    <input
+                                        type="text"
                                         value={inputValue}
                                         onChange={(e) => setInputValue(e.target.value)}
                                         placeholder={isRecording ? "Recording audio..." : "Write your message..."}
@@ -420,22 +648,35 @@ const AIChatbotBoard = ({ isOpen, onClose }) => {
                                     />
                                 </div>
 
-                                <button 
-                                    type="button"
-                                    onClick={() => setIsRecording(!isRecording)}
-                                    className={`p-4 rounded-2xl shadow-md border-none transition-all active:scale-95 ${isRecording ? 'bg-red-500 text-white animate-bounce' : 'bg-white border border-gray-100 text-slate-400 hover:text-blue-500'}`}
-                                >
-                                    <Mic size={18} />
-                                </button>
+                                {isTyping ? (
+                                    <button
+                                        type="button"
+                                        onClick={handleStopGeneration}
+                                        className="p-4 rounded-2xl bg-red-50 text-red-500 hover:bg-red-500 hover:text-white shadow-md transition-all active:scale-95"
+                                        title="Stop Generation"
+                                    >
+                                        <Square size={18} fill="currentColor" />
+                                    </button>
+                                ) : (
+                                    <>
+                                        <button
+                                            type="button"
+                                            onClick={() => setIsRecording(!isRecording)}
+                                            className={`p-4 rounded-2xl shadow-md border-none transition-all active:scale-95 ${isRecording ? 'bg-red-500 text-white animate-bounce' : 'bg-white border border-gray-100 text-slate-400 hover:text-blue-500'}`}
+                                        >
+                                            <Mic size={18} />
+                                        </button>
 
-                                <button 
-                                    type="submit"
-                                    disabled={!inputValue.trim() && !attachedFile}
-                                    className="p-4 rounded-2xl text-white shadow-lg border-none disabled:bg-slate-200 disabled:shadow-none transition-all active:scale-95"
-                                    style={inputValue.trim() || attachedFile ? { backgroundColor: topBarColor } : {}}
-                                >
-                                    <Send size={18} />
-                                </button>
+                                        <button
+                                            type="submit"
+                                            disabled={!inputValue.trim() && !attachedFile}
+                                            className="p-4 rounded-2xl text-white shadow-lg border-none disabled:bg-slate-200 disabled:shadow-none transition-all active:scale-95"
+                                            style={inputValue.trim() || attachedFile ? { backgroundColor: topBarColor } : {}}
+                                        >
+                                            <Send size={18} />
+                                        </button>
+                                    </>
+                                )}
                             </form>
                         </div>
                     </div>
