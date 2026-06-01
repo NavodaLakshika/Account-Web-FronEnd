@@ -13,7 +13,7 @@ const ChequeBookEntryBoard = ({ isOpen, onClose }) => {
     const [lookups, setLookups] = useState({ accounts: [] });
     
     // Form States
-    const [formData, setFormData] = useState({
+    const getInitialFormData = () => ({
         accountCode: '',
         accountName: '',
         bookNo: '1',
@@ -24,12 +24,15 @@ const ChequeBookEntryBoard = ({ isOpen, onClose }) => {
         createUser: ''
     });
 
+    const [formData, setFormData] = useState(getInitialFormData());
+
     const [activeModal, setActiveModal] = useState(null); // 'account'
     const [searchTerm, setSearchTerm] = useState('');
     const [showDatePicker, setShowDatePicker] = useState(false);
 
     useEffect(() => {
         if (isOpen) {
+            setFormData(getInitialFormData());
             const { companyCode, userName } = getSessionData();
 
             setFormData(prev => ({

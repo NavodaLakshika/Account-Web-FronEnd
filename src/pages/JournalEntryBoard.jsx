@@ -98,7 +98,7 @@ const JournalEntryBoard = ({ isOpen, onClose, onComplete }) => {
     const [companyCode, setCompanyCode] = useState(null);
     const [currentUser, setCurrentUser] = useState('');
 
-    const [header, setHeader] = useState({
+    const getInitialHeader = () => ({
         docNo: 'JNL-AUTO',
         entryNo: '',
         date: new Date().toLocaleDateString('en-GB'),
@@ -109,6 +109,8 @@ const JournalEntryBoard = ({ isOpen, onClose, onComplete }) => {
         reconcileDate: '',
         reconcileDocNo: ''
     });
+
+    const [header, setHeader] = useState(getInitialHeader());
 
     const [currentLine, setCurrentLine] = useState({
         accId: '',
@@ -133,6 +135,7 @@ const JournalEntryBoard = ({ isOpen, onClose, onComplete }) => {
 
     useEffect(() => {
         if (isOpen) {
+            setHeader(getInitialHeader());
             const { companyCode: sessCompany, userName: sessUser } = getSessionData();
             setCompanyCode(sessCompany);
             setCurrentUser(sessUser);

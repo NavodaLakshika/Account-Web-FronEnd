@@ -14,7 +14,7 @@ const DirectBankTransactionBoard = ({ isOpen, onClose }) => {
     const [lookups, setLookups] = useState({ banks: [], accounts: [], costCenters: [] });
     
     // Form States
-    const [formData, setFormData] = useState({
+    const getInitialFormData = () => ({
         docNo: '',
         date: new Date().toISOString().split('T')[0],
         relevantDate: new Date().toISOString().split('T')[0],
@@ -31,6 +31,8 @@ const DirectBankTransactionBoard = ({ isOpen, onClose }) => {
         createUser: ''
     });
 
+    const [formData, setFormData] = useState(getInitialFormData());
+
     const [activeModal, setActiveModal] = useState(null); // 'bank', 'ap', 'costCenter'
     const [searchTerm, setSearchTerm] = useState('');
     const [showDatePicker, setShowDatePicker] = useState(false);
@@ -38,14 +40,13 @@ const DirectBankTransactionBoard = ({ isOpen, onClose }) => {
 
     useEffect(() => {
         if (isOpen) {
+            setFormData(getInitialFormData());
             const { companyCode, userName } = getSessionData();
-
             setFormData(prev => ({
                 ...prev,
                 company: companyCode,
                 createUser: userName
             }));
-            
             loadInitialData(companyCode);
         }
     }, [isOpen]);

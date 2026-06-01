@@ -35,7 +35,7 @@ const EnterBillBoard = ({ isOpen, onClose }) => {
     const [billSearchQuery, setBillSearchQuery] = useState('');
     const [billSearchResults, setBillSearchResults] = useState([]);
 
-    const [formData, setFormData] = useState({
+    const getInitialFormData = () => ({
         docNo: '',
         vendorId: '',
         accId: '',
@@ -50,6 +50,8 @@ const EnterBillBoard = ({ isOpen, onClose }) => {
         createUser: ''
     });
 
+    const [formData, setFormData] = useState(getInitialFormData());
+
     const [expenses, setExpenses] = useState([]);
 
     // Line entry state
@@ -62,16 +64,11 @@ const EnterBillBoard = ({ isOpen, onClose }) => {
 
     useEffect(() => {
         if (isOpen) {
-            fetchLookups();
+            setFormData(getInitialFormData());
 
             const { companyCode, userName } = getSessionData();
 
-            setFormData(prev => ({
-                ...prev,
-                company: companyCode,
-                createUser: userName
-            }));
-            
+            fetchLookups();
             generateDocNo(companyCode);
         }
     }, [isOpen]);
@@ -107,7 +104,7 @@ const EnterBillBoard = ({ isOpen, onClose }) => {
                 postDate: (data.header.post_Date || data.header.postDate || '').split('T')[0],
                 billDueDate: (data.header.bill_Due_Date || data.header.billDueDate || '').split('T')[0],
                 costCenter: data.header.costCenter || '',
-                company: data.header.company || ''
+                company: prev.company
             }));
             const bType = data.header.bill_Type !== undefined ? data.header.bill_Type : (data.header.billType !== undefined ? data.header.billType : 'Bill');
             setBillType(bType === true || bType === 'Bill' ? 'Bill' : 'Credit');
@@ -245,7 +242,7 @@ const EnterBillBoard = ({ isOpen, onClose }) => {
             <TransactionFormWrapper
                 isOpen={isOpen}
                 onClose={onClose}
-                title="Bill Management Facility"
+                title="Enter Bill"
                 subtitle="Bill Management"
                 icon={FileText}
                 maxWidth="max-w-[1200px]"

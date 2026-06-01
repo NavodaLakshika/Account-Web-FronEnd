@@ -97,7 +97,7 @@ const AdvancePayBoard = ({ isOpen, onClose }) => {
     const [chequeMessage, setChequeMessage] = useState('');
 
     // Form States
-    const [formData, setFormData] = useState({
+    const getInitialFormData = () => ({
         docNo: '',
         postDate: new Date().toISOString().split('T')[0],
         fromCostCenter: '',
@@ -115,8 +115,10 @@ const AdvancePayBoard = ({ isOpen, onClose }) => {
         chqDate: new Date().toISOString().split('T')[0],
         company: '',
         createUser: '',
-        payType: 'Cheque' // Default pay type matching WinForms dropdown
+        payType: 'Cheque'
     });
+
+    const [formData, setFormData] = useState(getInitialFormData());
 
     // Custom Search Modal States
     const [activeModal, setActiveModal] = useState(null); // 'vendor', 'account', 'fromCc', 'toCc'
@@ -126,6 +128,7 @@ const AdvancePayBoard = ({ isOpen, onClose }) => {
     // Toast Custom Layouts matching JournalEntryBoard & PurchaseOrderBoard
     useEffect(() => {
         if (isOpen) {
+            setFormData(getInitialFormData());
             const { companyCode, userName } = getSessionData();
 
             setFormData(prev => ({

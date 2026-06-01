@@ -3,15 +3,17 @@ import SimpleModal from '../components/SimpleModal';
 import CalendarModal from '../components/CalendarModal';
 import { Search, X, RotateCcw, Loader2, History, ShieldCheck, Key, FileSearch, CheckCircle2, AlertCircle } from 'lucide-react';
 import { reversalEntryService } from '../services/reversalEntry.service';
+import { getSessionData } from '../utils/session';
 import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
 
 
 const ReversalEntryBoard = ({ isOpen, onClose }) => {
+    const { companyCode, userName } = getSessionData();
     const [loading, setLoading] = useState(false);
     const [lookups, setLookups] = useState({ transactionTypes: [], users: [] });
     
     // Form States
-    const [formData, setFormData] = useState({
+    const getInitialFormData = () => ({
         transactionType: '',
         transactionTypeName: '',
         voucherNo: '',
@@ -20,9 +22,11 @@ const ReversalEntryBoard = ({ isOpen, onClose }) => {
         reason: '',
         authUsername: '',
         authPassword: '',
-        company: 'C001',
-        createUser: 'SYSTEM'
+        company: companyCode,
+        createUser: userName
     });
+
+    const [formData, setFormData] = useState(getInitialFormData());
 
     const [activeModal, setActiveModal] = useState(null); // 'type', 'user'
     const [searchTerm, setSearchTerm] = useState('');
@@ -31,32 +35,16 @@ const ReversalEntryBoard = ({ isOpen, onClose }) => {
 
     useEffect(() => {
         if (isOpen) {
+            setFormData(getInitialFormData());
+            const { companyCode: comp, userName: user } = getSessionData();
             loadInitialData();
-            
-            const companyData = localStorage.getItem('selectedCompany');
-            const user = JSON.parse(localStorage.getItem('user') || '{}');
-            let companyCode = 'C001';
-
-            if (companyData) {
-                try {
-                    const parsed = JSON.parse(companyData);
-                    companyCode = parsed.company_Code || parsed.companyCode || parsed.CompanyCode || companyData;
-                } catch (e) { companyCode = companyData; }
-            }
-
-            setFormData(prev => ({
-                ...prev,
-                company: companyCode,
-                createUser: user?.emp_Name || user?.empName || 'SYSTEM'
-            }));
         }
     }, [isOpen]);
 
     const loadInitialData = async () => {
         try {
             setLoading(true);
-            const companyCode = formData.company || 'C001';
-            const lookupRes = await reversalEntryService.getLookups(companyCode);
+            const lookupRes = await reversalEntryService.getLookups(formData.company);
             setLookups(lookupRes);
         } catch (error) {
             showErrorToast("Failed to load initial data");

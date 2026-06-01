@@ -15,7 +15,7 @@ const ReceivedPaymentBoard = ({ isOpen, onClose }) => {
     const [lookups, setLookups] = useState({ banks: [], accounts: [] });
     const [loading, setLoading] = useState(false);
 
-    const [formData, setFormData] = useState({
+    const getInitialFormData = () => ({
         receiptNo: '',
         receiptDate: new Date().toISOString().split('T')[0],
         payType: 'Cash',
@@ -32,6 +32,8 @@ const ReceivedPaymentBoard = ({ isOpen, onClose }) => {
         createUser: ''
     });
 
+    const [formData, setFormData] = useState(getInitialFormData());
+
     const [activeModal, setActiveModal] = useState(null); // 'bank', 'debit', 'credit', 'payType'
     const [showReceiptDateModal, setShowReceiptDateModal] = useState(false);
     const [showChequeDateModal, setShowChequeDateModal] = useState(false);
@@ -39,14 +41,8 @@ const ReceivedPaymentBoard = ({ isOpen, onClose }) => {
 
     useEffect(() => {
         if (isOpen) {
+            setFormData(getInitialFormData());
             const { companyCode, userName } = getSessionData();
-            
-            setFormData(prev => ({
-                ...prev,
-                company: companyCode,
-                createUser: userName
-            }));
-
             fetchLookups(companyCode);
             generateReceiptNo(companyCode);
         }

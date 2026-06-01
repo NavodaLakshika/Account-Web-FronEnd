@@ -24,7 +24,7 @@ const ItemMasterBoard = ({ isOpen, onClose }) => {
     const [searchResults, setSearchResults] = useState([]);
     const [productImage, setProductImage] = useState(null);
 
-    const initialFormData = {
+    const getInitialFormData = () => ({
         code: '',
         prodName: '',
         unit: '',
@@ -52,12 +52,13 @@ const ItemMasterBoard = ({ isOpen, onClose }) => {
         lastPurchQty: 0,
         discount: 0,
         companyCode: ''
-    };
+    });
 
-    const [formData, setFormData] = useState(initialFormData);
+    const [formData, setFormData] = useState(getInitialFormData());
 
     useEffect(() => {
         if (isOpen) {
+            setFormData(getInitialFormData());
             const { companyCode, userName: initUser } = getSessionData();
 
             setFormData(prev => ({ ...prev, companyCode, createUser: initUser, modifiedUser: initUser }));
@@ -163,7 +164,7 @@ const ItemMasterBoard = ({ isOpen, onClose }) => {
     };
 
     const handleClear = () => {
-        setFormData({ ...initialFormData, companyCode: formData.companyCode, createUser: formData.createUser });
+        setFormData({ ...getInitialFormData(), companyCode: formData.companyCode, createUser: formData.createUser });
         setProductImage(null);
     };
 

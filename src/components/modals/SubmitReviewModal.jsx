@@ -141,14 +141,52 @@ const SubmitReviewModal = ({ isOpen, onClose, currentUser }) => {
                                 <h3 className="text-base font-bold text-slate-700 mb-4">Write a Review</h3>
                                 <form onSubmit={handleSubmit} className="flex-1 flex flex-col gap-4">
                                     <div className="flex flex-col items-center gap-5 py-3">
-                                        <div className="flex flex-row items-center justify-center gap-1.5">
-                                            {[1, 2, 3, 4, 5].map((star) => (
-                                                <button key={star} type="button" onMouseEnter={() => setHoveredRating(star)} onMouseLeave={() => setHoveredRating(0)} onClick={() => setRating(star)} className="focus:outline-none transition-transform hover:scale-110 active:scale-95">
-                                                    <Star size={32} className={`${star <= (hoveredRating || rating) ? 'fill-yellow-400 text-yellow-400 drop-shadow-sm' : 'text-slate-200 fill-slate-50'} transition-all`} />
-                                                </button>
-                                            ))}
+                                        <div className="flex flex-row items-center justify-center gap-2">
+                                            {[1, 2, 3, 4, 5].map((star) => {
+                                                const isSelected = star <= rating;
+                                                const isHovered = hoveredRating > 0;
+                                                
+                                                let starClass = "";
+                                                if (isHovered) {
+                                                    if (star <= hoveredRating) {
+                                                        if (star <= rating) {
+                                                            starClass = "fill-yellow-400 text-yellow-400 drop-shadow-[0_0px_8px_rgba(250,204,21,0.5)] scale-110";
+                                                        } else {
+                                                            starClass = "fill-transparent text-yellow-400 drop-shadow-[0_0px_4px_rgba(250,204,21,0.3)] scale-105";
+                                                        }
+                                                    } else {
+                                                        if (star <= rating) {
+                                                            starClass = "fill-transparent text-yellow-400 opacity-60 scale-95";
+                                                        } else {
+                                                            starClass = "fill-transparent text-slate-300 scale-100";
+                                                        }
+                                                    }
+                                                } else {
+                                                    if (isSelected) {
+                                                        starClass = "fill-yellow-400 text-yellow-400 drop-shadow-[0_0px_8px_rgba(250,204,21,0.5)] scale-110";
+                                                    } else {
+                                                        starClass = "fill-transparent text-slate-300 scale-100";
+                                                    }
+                                                }
+
+                                                return (
+                                                    <button 
+                                                        key={star} 
+                                                        type="button" 
+                                                        onMouseEnter={() => setHoveredRating(star)} 
+                                                        onMouseLeave={() => setHoveredRating(0)} 
+                                                        onClick={() => setRating(star)} 
+                                                        className="focus:outline-none p-1 relative transition-transform active:scale-90 duration-150 group"
+                                                    >
+                                                        <Star 
+                                                            size={36} 
+                                                            className={`transition-all duration-300 ${starClass} stroke-[1.8px]`} 
+                                                        />
+                                                    </button>
+                                                );
+                                            })}
                                         </div>
-                                        <span className="text-sm font-semibold text-slate-500">{['', 'Poor', 'Fair', 'Good', 'Very Good', 'Excellent'][rating] || 'Select your rating'}</span>
+                                        <span className="text-sm font-semibold text-slate-500 mt-1">{['', 'Poor', 'Fair', 'Good', 'Very Good', 'Excellent'][rating] || 'Select your rating'}</span>
                                     </div>
                                     <div className="relative flex-1 flex flex-col">
                                         <textarea value={comment} onChange={(e) => setComment(e.target.value)} placeholder="Tell us what you like or what could be improved..." maxLength={MAX_CHARS} className="flex-1 w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:border-blue-400 focus:ring-2 focus:ring-blue-100 outline-none transition-all resize-none text-sm text-slate-700 placeholder:text-slate-400 min-h-[300px]" />

@@ -15,7 +15,7 @@ const PayBillBoard = ({ isOpen, onClose }) => {
         costCenters: [], vendors: [], cashAccounts: [], chqAccounts: [], creditAccounts: [], settlementAccounts: [] 
     });
 
-    const [formData, setFormData] = useState({
+    const getInitialFormData = () => ({
         payDoc: '',
         vendorId: '',
         company: '',
@@ -30,6 +30,8 @@ const PayBillBoard = ({ isOpen, onClose }) => {
         costCenter: '',
         payCostCenter: ''
     });
+
+    const [formData, setFormData] = useState(getInitialFormData());
 
     const [bills, setBills] = useState([]);
     const [advanceCredits, setAdvanceCredits] = useState({ count: 0, total: 0 });
@@ -55,16 +57,14 @@ const PayBillBoard = ({ isOpen, onClose }) => {
 
     useEffect(() => {
         if (isOpen) {
-            fetchLookups();
-            
+            setFormData(getInitialFormData());
             const { companyCode, userName } = getSessionData();
-            
             setFormData(prev => ({ 
                 ...prev, 
                 company: companyCode,
                 createUser: userName
             }));
-            
+            fetchLookups();
             generateDocNo(companyCode);
         }
     }, [isOpen]);

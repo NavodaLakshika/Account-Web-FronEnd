@@ -13,7 +13,7 @@ const SearchModal = ({ isOpen, onClose, title, items, onSelect }) => {
     const [q, setQ] = useState('');
     if (!isOpen) return null;
     const filtered = (items || []).filter(i => (i.name || '').toLowerCase().includes(q.toLowerCase()) || (i.code || '').toLowerCase().includes(q.toLowerCase()));
-    
+
     return (
         <SimpleModal
             isOpen={isOpen}
@@ -27,11 +27,11 @@ const SearchModal = ({ isOpen, onClose, title, items, onSelect }) => {
                     <span className="text-[12px] font-bold text-gray-500 uppercase tracking-widest">Search Facility</span>
                     <div className="relative flex-1">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
-                        <input 
-                            autoFocus 
-                            value={q} 
-                            onChange={e => setQ(e.target.value)} 
-                            placeholder="" 
+                        <input
+                            autoFocus
+                            value={q}
+                            onChange={e => setQ(e.target.value)}
+                            placeholder=""
                             className="w-full h-9 pl-10 pr-4 border border-gray-300 rounded-[5px] outline-none text-sm focus:border-[#0285fd] bg-white shadow-sm font-bold"
                         />
                     </div>
@@ -87,7 +87,7 @@ const CollectionToDepositBoard = ({ isOpen, onClose, onComplete }) => {
         docNo: '',
         costCenter: '',
         costCenterName: '',
-        dateFrom: new Date().toLocaleDateString('en-GB'), 
+        dateFrom: new Date().toLocaleDateString('en-GB'),
         dateTo: new Date().toLocaleDateString('en-GB'),
         paymentMode: '',
         customerReceipt: false,
@@ -136,7 +136,7 @@ const CollectionToDepositBoard = ({ isOpen, onClose, onComplete }) => {
             const activeComp = comp || companyCode;
             const docRes = await bankingService.generateDocNo('MDPO', activeComp);
             setFormData(prev => ({ ...prev, docNo: docRes.docNo }));
-        } catch (e) {}
+        } catch (e) { }
     };
 
     const handleFetchCollections = async () => {
@@ -217,30 +217,30 @@ const CollectionToDepositBoard = ({ isOpen, onClose, onComplete }) => {
                 maxWidth="max-w-[1150px]"
                 footer={
                     <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-slate-200 rounded-b-[5px]">
-                        <button 
-                            onClick={handleClear} 
+                        <button
+                            onClick={handleClear}
                             className="px-6 h-10 bg-[#00adff] text-white text-[13px] font-mono font-bold tracking-widest uppercase rounded-[5px] hover:bg-[#0099e6] transition-all flex items-center gap-2 border-none active:scale-95 shadow-md shadow-blue-100"
                         >
-                            <RotateCcw size={14} /> CLEAR 
+                            <RotateCcw size={14} /> CLEAR
                         </button>
                         <div className="flex gap-4">
-                            <button 
-                                onClick={handleSave} 
-                                disabled={loading || selectedIds.length === 0} 
+                            <button
+                                onClick={handleSave}
+                                disabled={loading || selectedIds.length === 0}
                                 className={`px-8 h-10 bg-[#2bb744] text-white text-[13px] font-mono font-bold tracking-widest uppercase rounded-[5px] shadow-md shadow-green-100 hover:bg-[#259b3a] transition-all flex items-center gap-2 active:scale-95 border-none ${loading || selectedIds.length === 0 ? 'opacity-50 grayscale cursor-not-allowed' : ''}`}
                             >
-                                {loading ? <Loader2 size={14} className="animate-spin" /> : <CheckCircle size={14} />} CONFIRM 
+                                {loading ? <Loader2 size={14} className="animate-spin" /> : <CheckCircle size={14} />} CONFIRM
                             </button>
                         </div>
                     </div>
                 }
             >
                 <div className="space-y-4 font-['Tahoma'] overflow-y-auto no-scrollbar">
-                    
+
                     {/* Header Controls Grid */}
                     <div className="bg-white p-4 border border-slate-200 rounded-[5px] shadow-sm space-y-4">
                         <div className="grid grid-cols-12 gap-x-6 gap-y-3.5">
-                            
+
                             {/* Column 1 */}
                             <div className="col-span-12 lg:col-span-4 flex items-center gap-2">
                                 <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Document ID</label>
@@ -252,12 +252,12 @@ const CollectionToDepositBoard = ({ isOpen, onClose, onComplete }) => {
                             <div className="col-span-12 lg:col-span-4 flex items-center gap-2">
                                 <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Date From</label>
                                 <div className="flex-1 flex gap-1 h-8 min-w-0">
-                                    <input 
-                                        type="text" 
-                                        readOnly 
-                                        value={formData.dateFrom} 
-                                        onClick={() => { setDatePickerField('dateFrom'); setShowDatePicker(true); }} 
-                                        className="flex-1 h-full border border-slate-200 rounded px-3 text-[12px] font-bold text-gray-700 outline-none transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 bg-white cursor-pointer shadow-sm" 
+                                    <input
+                                        type="text"
+                                        readOnly
+                                        value={formData.dateFrom}
+                                        onClick={() => { setDatePickerField('dateFrom'); setShowDatePicker(true); }}
+                                        className="flex-1 h-full border border-slate-200 rounded px-3 text-[12px] font-bold text-gray-700 outline-none transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 bg-white cursor-pointer shadow-sm"
                                     />
                                     <button onClick={() => { setDatePickerField('dateFrom'); setShowDatePicker(true); }} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center rounded-[5px] shadow-md hover:bg-blue-600 transition-all active:scale-95 shrink-0">
                                         <Calendar size={16} />
@@ -268,12 +268,12 @@ const CollectionToDepositBoard = ({ isOpen, onClose, onComplete }) => {
                             <div className="col-span-12 lg:col-span-4 flex items-center gap-2">
                                 <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Date To</label>
                                 <div className="flex-1 flex gap-1 h-8 min-w-0">
-                                    <input 
-                                        type="text" 
-                                        readOnly 
-                                        value={formData.dateTo} 
-                                        onClick={() => { setDatePickerField('dateTo'); setShowDatePicker(true); }} 
-                                        className="flex-1 h-full border border-slate-200 rounded px-3 text-[12px] font-bold text-gray-700 outline-none transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 bg-white cursor-pointer shadow-sm" 
+                                    <input
+                                        type="text"
+                                        readOnly
+                                        value={formData.dateTo}
+                                        onClick={() => { setDatePickerField('dateTo'); setShowDatePicker(true); }}
+                                        className="flex-1 h-full border border-slate-200 rounded px-3 text-[12px] font-bold text-gray-700 outline-none transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 bg-white cursor-pointer shadow-sm"
                                     />
                                     <button onClick={() => { setDatePickerField('dateTo'); setShowDatePicker(true); }} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center rounded-[5px] shadow-md hover:bg-blue-600 transition-all active:scale-95 shrink-0">
                                         <Calendar size={16} />
@@ -285,12 +285,12 @@ const CollectionToDepositBoard = ({ isOpen, onClose, onComplete }) => {
                             <div className="col-span-12 lg:col-span-8 flex items-center gap-2">
                                 <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Cost Center</label>
                                 <div className="flex-1 flex gap-1 h-8 min-w-0">
-                                    <input 
-                                        type="text" 
-                                        readOnly 
-                                        value={formData.costCenterName || ''} 
-                                        onClick={() => setActiveModal('costCenter')} 
-                                        className="flex-1 h-full border border-slate-200 rounded px-3 text-[12px] font-bold text-gray-700 outline-none transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 bg-white cursor-pointer shadow-sm" 
+                                    <input
+                                        type="text"
+                                        readOnly
+                                        value={formData.costCenterName || ''}
+                                        onClick={() => setActiveModal('costCenter')}
+                                        className="flex-1 h-full border border-slate-200 rounded px-3 text-[12px] font-bold text-gray-700 outline-none transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 bg-white cursor-pointer shadow-sm"
                                     />
                                     <button onClick={() => setActiveModal('costCenter')} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center rounded-[5px] shadow-md hover:bg-blue-600 transition-all active:scale-95 shrink-0">
                                         <Search size={16} />
@@ -301,12 +301,12 @@ const CollectionToDepositBoard = ({ isOpen, onClose, onComplete }) => {
                             <div className="col-span-12 lg:col-span-4 flex items-center gap-2">
                                 <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Pay Type</label>
                                 <div className="flex-1 flex gap-1 h-8 min-w-0">
-                                    <input 
-                                        type="text" 
-                                        readOnly 
-                                        value={formData.paymentMode || ''} 
-                                        onClick={() => setActiveModal('paymentMode')} 
-                                        className="flex-1 h-full border border-slate-200 rounded px-3 text-[12px] font-bold text-gray-700 outline-none transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 bg-white cursor-pointer shadow-sm" 
+                                    <input
+                                        type="text"
+                                        readOnly
+                                        value={formData.paymentMode || ''}
+                                        onClick={() => setActiveModal('paymentMode')}
+                                        className="flex-1 h-full border border-slate-200 rounded px-3 text-[12px] font-bold text-gray-700 outline-none transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 bg-white cursor-pointer shadow-sm"
                                     />
                                     <button onClick={() => setActiveModal('paymentMode')} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center rounded-[5px] shadow-md hover:bg-blue-600 transition-all active:scale-95 shrink-0">
                                         <Search size={16} />
@@ -317,7 +317,7 @@ const CollectionToDepositBoard = ({ isOpen, onClose, onComplete }) => {
                             {/* Row 3 */}
                             <div className="col-span-12 lg:col-span-8 flex items-center gap-2">
                                 <div className="w-24 shrink-0 flex items-center gap-2">
-                                    <input type="checkbox" id="chkCustomer" checked={formData.customerReceipt} onChange={e => setFormData({...formData, customerReceipt: e.target.checked})} className="w-4 h-4 rounded border-slate-300 text-[#00D1FF] focus:ring-[#00D1FF] transition-all cursor-pointer" />
+                                    <input type="checkbox" id="chkCustomer" checked={formData.customerReceipt} onChange={e => setFormData({ ...formData, customerReceipt: e.target.checked })} className="w-4 h-4 rounded border-slate-300 text-[#00D1FF] focus:ring-[#00D1FF] transition-all cursor-pointer" />
                                     <label htmlFor="chkCustomer" className="text-[11px] font-bold text-gray-500 uppercase cursor-pointer">Customer</label>
                                 </div>
                                 <div className={`flex-1 flex gap-1 h-8 min-w-0 ${!formData.customerReceipt ? 'opacity-30 grayscale pointer-events-none' : ''}`}>
@@ -341,7 +341,7 @@ const CollectionToDepositBoard = ({ isOpen, onClose, onComplete }) => {
                             {/* Actions & Checkbox Bar */}
                             <div className="col-span-12 flex items-center justify-between pt-2 border-t border-slate-100">
                                 <div className="flex items-center gap-4">
-                                    <div 
+                                    <div
                                         onClick={toggleSelectAll}
                                         className="flex items-center gap-2 bg-white px-4 py-1.5 rounded-[5px] border border-blue-200 cursor-pointer hover:bg-blue-50 transition-all shadow-sm group"
                                     >
@@ -354,9 +354,9 @@ const CollectionToDepositBoard = ({ isOpen, onClose, onComplete }) => {
                                         * Use filters above to narrow down the collection queue
                                     </div>
                                 </div>
-                                <button 
-                                    onClick={handleFetchCollections} 
-                                    disabled={loading} 
+                                <button
+                                    onClick={handleFetchCollections}
+                                    disabled={loading}
                                     className="h-8 px-8 bg-[#0285fd] text-white text-[11px] font-black uppercase tracking-widest rounded-[5px] shadow-md shadow-blue-100 hover:bg-blue-600 transition-all flex items-center gap-2 active:scale-95 border-none"
                                 >
                                     {loading ? <Loader2 size={14} className="animate-spin" /> : <Filter size={14} />} Load Records
@@ -383,9 +383,9 @@ const CollectionToDepositBoard = ({ isOpen, onClose, onComplete }) => {
                                     <div className="text-[11px] font-bold uppercase tracking-widest">Pending collection queue is empty</div>
                                 </div>
                             ) : collections.map((c) => (
-                                <div 
-                                    key={c.documentNo} 
-                                    onClick={() => toggleSelect(c.documentNo)} 
+                                <div
+                                    key={c.documentNo}
+                                    onClick={() => toggleSelect(c.documentNo)}
                                     className={`flex text-[11px] font-bold hover:bg-slate-50 transition-colors cursor-pointer group ${selectedIds.includes(c.documentNo) ? 'bg-blue-50/30' : 'text-slate-700'}`}
                                 >
                                     <div className="w-14 py-2 px-3 flex items-center justify-center">
@@ -431,21 +431,21 @@ const CollectionToDepositBoard = ({ isOpen, onClose, onComplete }) => {
             </SimpleModal>
 
             {/* Redesigned SearchModal */}
-            <SearchModal 
-                isOpen={activeModal !== null} 
-                onClose={() => setActiveModal(null)} 
+            <SearchModal
+                isOpen={activeModal !== null}
+                onClose={() => setActiveModal(null)}
                 title={
-                    activeModal === 'costCenter' ? 'Cost Center Registry Lookup' : 
-                    activeModal === 'paymentMode' ? 'Payment Method Directory' : 
-                    activeModal === 'customer' ? 'Client / Customer Master' : 
-                    'Departmental Unit Directory'
+                    activeModal === 'costCenter' ? 'Cost Center Registry Lookup' :
+                        activeModal === 'paymentMode' ? 'Payment Method Directory' :
+                            activeModal === 'customer' ? 'Client / Customer Master' :
+                                'Departmental Unit Directory'
                 }
                 items={activeModal === 'costCenter' ? lookups.costCenters : activeModal === 'paymentMode' ? lookups.paymentModes : activeModal === 'customer' ? lookups.customers : lookups.departments}
                 onSelect={(item) => {
-                    if (activeModal === 'costCenter') setFormData({...formData, costCenter: item.code, costCenterName: item.name});
-                    if (activeModal === 'paymentMode') setFormData({...formData, paymentMode: item.name});
-                    if (activeModal === 'customer') setFormData({...formData, customerId: item.code, customerName: item.name});
-                    if (activeModal === 'dept') setFormData({...formData, department: item.code, departmentName: item.name});
+                    if (activeModal === 'costCenter') setFormData({ ...formData, costCenter: item.code, costCenterName: item.name });
+                    if (activeModal === 'paymentMode') setFormData({ ...formData, paymentMode: item.name });
+                    if (activeModal === 'customer') setFormData({ ...formData, customerId: item.code, customerName: item.name });
+                    if (activeModal === 'dept') setFormData({ ...formData, department: item.code, departmentName: item.name });
                 }}
             />
 

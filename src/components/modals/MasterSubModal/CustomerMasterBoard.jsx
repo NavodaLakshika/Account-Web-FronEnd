@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import SimpleModal from '../../../components/SimpleModal';
-import { Search, Save, RotateCcw, Trash2, CheckCircle } from 'lucide-react';
+import { Search, Save, RotateCcw, Trash2, CheckCircle, AlertTriangle, Loader2 } from 'lucide-react';
 import { customerService } from '../../../services/customer.service';
 import { authService } from '../../../services/auth.service';
 import { showSuccessToast, showErrorToast } from '../../../utils/toastUtils';
@@ -15,6 +15,7 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
     const [formData, setFormData] = useState(initialState);
     const [loading, setLoading] = useState(false);
     const [isEditMode, setIsEditMode] = useState(false);
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
     // Lookups
     const [showSearchModal, setShowSearchModal] = useState(false);
@@ -72,31 +73,53 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
         if (!formData.Name) return showErrorToast('Customer Name is required');
         if (!formData.Type_Code) return showErrorToast('Customer Type is required');
         
+        const payload = {
+            Code: formData.Code || 'AUTO',
+            Cust_Name: formData.Name,
+            Address1: formData.Address1,
+            Address2: formData.Address2,
+            Phone: formData.Phone_No,
+            Email: formData.Email,
+            Web: formData.Web,
+            Credit_Period: formData.Credit_Period?.toString(),
+            Credit_Limit: Number(formData.Credit_Limit) || 0,
+            VAT_Number: formData.Vat_Reg_No,
+            Type: formData.Type_Code,
+            Area_Code: formData.Area,
+            Locked: formData.Inactive,
+            CurrentUser: formData.CurrentUser
+        };
+
         setLoading(true);
         try {
-            const data = await customerService.save(formData);
-            if (data.message === 'inserted') {
+            if (isEditMode && formData.Code) {
+                await customerService.update(formData.Code, payload);
+                showSuccessToast('Customer updated successfully');
+            } else {
+                const data = await customerService.create(payload);
                 showSuccessToast('Customer created successfully');
                 setFormData(prev => ({ ...prev, Code: data.code }));
                 setIsEditMode(true);
-            } else if (data.message === 'updated') {
-                showSuccessToast('Customer updated successfully');
             }
         } catch (error) {
-            showErrorToast(error.error || error.message || 'Failed to save');
+            showErrorToast(error.error || error.message || (typeof error === 'string' ? error : 'Failed to save'));
         } finally {
             setLoading(false);
         }
     };
 
-    const handleDelete = async () => {
+    const handleDelete = () => {
         if (!isEditMode || !formData.Code) return;
-        if (!window.confirm(`Are you sure you want to delete customer "${formData.Name}"?`)) return;
+        setShowDeleteConfirm(true);
+    };
+
+    const confirmDelete = async () => {
         setLoading(true);
         try {
             await customerService.delete(formData.Code, formData.Company);
             showSuccessToast('Customer deleted');
             handleClear();
+            setShowDeleteConfirm(false);
         } catch (error) {
             showErrorToast(error.error || error.message || 'Deletion failed');
         } finally {
@@ -115,7 +138,7 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
 
     const openTypeSearch = async () => {
         try {
-            const data = await customerService.getCustomerTypes(formData.Company);
+            const data = await customerService.getTypes(formData.Company);
             setTypeList(data);
             setShowTypeModal(true);
         } catch (error) { showErrorToast('Failed to load types'); }
@@ -129,28 +152,33 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
         } catch (error) { showErrorToast('Failed to load areas'); }
     };
 
-    const loadCustomer = (item) => {
-        setFormData({ 
-            Code: item.code || item.Code, 
-            Name: item.name || item.Name, 
-            Type_Code: item.type_Code || item.Type_Code, 
-            Type_Name: item.type_Name || item.Type_Name || '', 
-            Address1: item.address1 || item.Address1 || '', 
-            Address2: item.address2 || item.Address2 || '', 
-            Email: item.email || item.Email || '', 
-            Web: item.web || item.Web || '', 
-            Phone_No: item.phone_No || item.Phone_No || '', 
-            Area: item.area || item.Area || '', 
-            AreaName: item.areaName || item.AreaName || '',
-            Credit_Limit: item.credit_Limit || item.Credit_Limit || 0, 
-            Credit_Period: item.credit_Period || item.Credit_Period || 0, 
-            Vat_Reg_No: item.vat_Reg_No || item.Vat_Reg_No || '', 
-            Inactive: item.inactive || item.Inactive, 
-            CurrentUser: formData.CurrentUser, 
-            Company: formData.Company 
-        });
-        setIsEditMode(true);
-        setShowSearchModal(false);
+    const loadCustomer = async (item) => {
+        try {
+            const fullItem = await customerService.getByCode(item.code || item.Code);
+            setFormData({ 
+                Code: fullItem.code || fullItem.Code || '', 
+                Name: fullItem.cust_Name || fullItem.Cust_Name || '', 
+                Type_Code: fullItem.type || fullItem.Type || '', 
+                Type_Name: fullItem.type_Name || fullItem.Type_Name || '', 
+                Address1: fullItem.address1 || fullItem.Address1 || '', 
+                Address2: fullItem.address2 || fullItem.Address2 || '', 
+                Email: fullItem.email || fullItem.Email || '', 
+                Web: fullItem.web || fullItem.Web || '', 
+                Phone_No: fullItem.phone || fullItem.Phone || '', 
+                Area: fullItem.area_Code || fullItem.Area_Code || '', 
+                AreaName: fullItem.areaName || fullItem.AreaName || '',
+                Credit_Limit: fullItem.credit_Limit || fullItem.Credit_Limit || 0, 
+                Credit_Period: fullItem.credit_Period || fullItem.Credit_Period || 0, 
+                Vat_Reg_No: fullItem.vat_Number || fullItem.Vat_Number || '', 
+                Inactive: fullItem.locked === 1 || fullItem.Locked === 1 || false, 
+                CurrentUser: formData.CurrentUser, 
+                Company: formData.Company 
+            });
+            setIsEditMode(true);
+            setShowSearchModal(false);
+        } catch (error) {
+            showErrorToast('Failed to load customer details');
+        }
     };
 
     const inputClass = "flex-1 min-w-0 h-8 border border-slate-200 rounded px-3 text-[12px] font-bold text-gray-700 bg-slate-50 outline-none transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20";
@@ -345,11 +373,11 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
                                 </thead>
                                 <tbody className="divide-y divide-slate-100 bg-white">
                                     {customerList
-                                        .filter(c => ((c.name || c.Name) || '').toLowerCase().includes(custSearch.toLowerCase()) || ((c.code || c.Code) || '').toLowerCase().includes(custSearch.toLowerCase()))
+                                        .filter(c => ((c.cust_Name || c.Cust_Name || c.name || c.Name) || '').toLowerCase().includes(custSearch.toLowerCase()) || ((c.code || c.Code) || '').toLowerCase().includes(custSearch.toLowerCase()))
                                         .map((c, i) => (
                                         <tr key={i} className="group hover:bg-blue-50/50 cursor-pointer transition-colors" onClick={() => loadCustomer(c)}>
                                             <td className="px-5 py-3 font-mono text-[12px] text-gray-700">{c.code || c.Code}</td>
-                                            <td className="px-5 py-3 text-[12px] font-bold text-gray-700 group-hover:text-blue-600">{c.name || c.Name}</td>
+                                            <td className="px-5 py-3 text-[12px] font-bold text-gray-700 group-hover:text-blue-600">{c.cust_Name || c.Cust_Name || c.name || c.Name}</td>
                                         </tr>
                                     ))}
                                     {customerList.length === 0 && (
@@ -457,6 +485,23 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
                     </div>
                 </div>
             </SimpleModal>
+            {showDeleteConfirm && (
+                <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4">
+                    <div className="absolute inset-0 bg-slate-900/70 backdrop-blur-sm" onClick={() => !loading && setShowDeleteConfirm(false)} />
+                    <div className="relative w-full max-w-md bg-white rounded-2xl shadow-2xl border border-white/10 overflow-hidden animate-in zoom-in-95 duration-300">
+                        <div className="p-8 text-center">
+                            <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6 border-4 border-white shadow-lg"><AlertTriangle size={40} className="text-red-500" /></div>
+                            <h3 className="text-lg font-black text-slate-800 mb-2 uppercase tracking-wider">Confirm Deletion</h3>
+                            <p className="text-slate-500 text-[12px] font-medium leading-relaxed mb-8">Are you sure you want to delete <span className="font-bold text-slate-800 uppercase">"{formData.Name || formData.Code}"</span>?<br />This action is permanent and cannot be undone.</p>
+                            <div className="flex gap-3">
+                                <button onClick={() => setShowDeleteConfirm(false)} disabled={loading} className="flex-1 h-11 bg-slate-100 text-slate-600 text-[11px] font-black rounded-xl hover:bg-slate-200 transition-all uppercase tracking-widest disabled:opacity-50">Cancel</button>
+                                <button onClick={confirmDelete} disabled={loading} className="flex-1 h-11 bg-red-500 text-white text-[11px] font-black rounded-xl hover:bg-red-600 shadow-lg shadow-red-200 transition-all flex items-center justify-center gap-2 uppercase tracking-widest disabled:opacity-50">{loading ? <Loader2 size={16} className="animate-spin" /> : 'Delete Now'}</button>
+                            </div>
+                        </div>
+                        <div className="bg-slate-50 py-3 border-t border-slate-100"><span className="text-[9px] text-slate-400 font-black uppercase tracking-[0.2em] block text-center">Security Verification Required</span></div>
+                    </div>
+                </div>
+            )}
         </>
     );
 };

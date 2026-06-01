@@ -13,13 +13,15 @@ const NotPresentedChequesBoard = ({ isOpen, onClose }) => {
     const [lookups, setLookups] = useState({ banks: [] });
     
     // Header States
-    const [header, setHeader] = useState({
+    const getInitialHeader = () => ({
         bankCode: '',
         bankName: '',
         docNo: '',
         company: '',
         createUser: ''
     });
+
+    const [header, setHeader] = useState(getInitialHeader());
 
     // Line Entry States
     const [entry, setEntry] = useState({
@@ -40,6 +42,7 @@ const NotPresentedChequesBoard = ({ isOpen, onClose }) => {
 
     useEffect(() => {
         if (isOpen) {
+            setHeader(getInitialHeader());
             const { companyCode, userName } = getSessionData();
 
             setHeader(prev => ({

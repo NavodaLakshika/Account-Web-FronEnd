@@ -14,7 +14,7 @@ const MainCashBoard = ({ isOpen, onClose }) => {
     const [activeTab, setActiveTab] = useState('Expenses'); // 'Expenses', 'Cost Center'
     
     // Form States
-    const [formData, setFormData] = useState({
+    const getInitialFormData = () => ({
         docNo: '',
         date: new Date().toISOString().split('T')[0],
         accountId: '',
@@ -32,6 +32,8 @@ const MainCashBoard = ({ isOpen, onClose }) => {
         createUser: ''
     });
 
+    const [formData, setFormData] = useState(getInitialFormData());
+
     const [rows, setRows] = useState([{ id: Date.now(), expAccCode: '', expAccName: '', ccCode: '', amount: 0, memo: '' }]);
 
     const [activeModal, setActiveModal] = useState(null); // 'account', 'cc', 'payee', 'row_acc', 'row_cc'
@@ -42,14 +44,13 @@ const MainCashBoard = ({ isOpen, onClose }) => {
 
     useEffect(() => {
         if (isOpen) {
+            setFormData(getInitialFormData());
             const { companyCode, userName } = getSessionData();
-
             setFormData(prev => ({
                 ...prev,
                 company: companyCode,
                 createUser: userName
             }));
-            
             loadInitialData(companyCode);
         }
     }, [isOpen]);

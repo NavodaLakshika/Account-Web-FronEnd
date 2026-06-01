@@ -15,7 +15,7 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
     const [company, setCompany] = useState('');
     
     // Custom Toast Handlers
-    const initialFormState = {
+    const getInitialForm = () => ({
         docNo: '',
         company: company,
         date: new Date().toISOString().split('T')[0],
@@ -35,9 +35,9 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
         adjType: 'Add',
         adjValue: 0,
         netAmount: 0
-    };
+    });
 
-    const [formData, setFormData] = useState(initialFormState);
+    const [formData, setFormData] = useState(getInitialForm());
     const [rows, setRows] = useState([{ id: Date.now(), prodCode: '', prodName: '', unit: '', cost: 0, selling: 0, qty: 0, discPer: 0, discount: 0, amount: 0 }]);
     const [lookups, setLookups] = useState({ customers: [], salesAssistants: [], products: [], jobs: [], paymentTypes: [] });
     const [showSearchModal, setShowSearchModal] = useState(false);
@@ -61,6 +61,7 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
     // 1. Initial Load
     useEffect(() => {
         if (isOpen) {
+            setFormData(getInitialForm());
             const { companyCode } = getSessionData();
             setCompany(companyCode);
             setFormData(prev => ({ ...prev, company: companyCode }));
@@ -238,7 +239,7 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
     };
 
     const handleClear = () => {
-        setFormData(initialFormState);
+        setFormData(getInitialForm());
         setRows([{ id: Date.now(), prodCode: '', prodName: '', unit: '', cost: 0, selling: 0, qty: 0, discPer: 0, discount: 0, amount: 0 }]);
         initComponent();
     };

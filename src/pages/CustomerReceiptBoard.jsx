@@ -7,10 +7,12 @@ import { Search, Calendar, CheckCircle, Trash2, RotateCcw, Save, X, Plus, Check,
 
 import { customerReceiptService } from '../services/customerReceipt.service';
 import { salesOrderService } from '../services/salesOrder.service'; // For customer lookup initially
+import { getSessionData } from '../utils/session';
 import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
 
 
 const CustomerReceiptBoard = ({ isOpen, onClose }) => {
+    const { companyCode, userName } = getSessionData();
     const [lookups, setLookups] = useState({ 
         customers: [], 
         paymentMethods: [], 
@@ -18,7 +20,7 @@ const CustomerReceiptBoard = ({ isOpen, onClose }) => {
         costCenters: [] 
     });
 
-    const [formData, setFormData] = useState({
+    const getInitialFormData = () => ({
         docNo: '',
         date: new Date().toISOString().split('T')[0],
         customerId: '',
@@ -31,9 +33,11 @@ const CustomerReceiptBoard = ({ isOpen, onClose }) => {
         chequeDate: new Date().toISOString().split('T')[0],
         memo: '',
         reference: '',
-        company: 'C001',
-        createUser: 'SYSTEM'
+        company: companyCode,
+        createUser: userName
     });
+
+    const [formData, setFormData] = useState(getInitialFormData());
 
     const [invoices, setInvoices] = useState([]);
     const [advanceBalance, setAdvanceBalance] = useState(0);
@@ -59,22 +63,10 @@ const CustomerReceiptBoard = ({ isOpen, onClose }) => {
 
     useEffect(() => {
         if (isOpen) {
-            const companyData = localStorage.getItem('selectedCompany');
-            const user = JSON.parse(localStorage.getItem('user') || '{}');
-            let companyCode = 'C001';
-            if (companyData) {
-                try {
-                    const parsed = JSON.parse(companyData);
-                    companyCode = parsed.company_Code || parsed.companyCode || parsed.CompanyCode || companyData;
-                } catch (e) { companyCode = companyData; }
-            }
-
-            const initCompany = companyCode;
-            const initUser = user?.emp_Name || user?.empName || 'SYSTEM';
-
-            setFormData(prev => ({ ...prev, company: initCompany, createUser: initUser }));
-            fetchLookups(initCompany);
-            generateDocNo(initCompany);
+            setFormData(getInitialFormData());
+            const { companyCode: comp, userName: user } = getSessionData();
+            fetchLookups(comp);
+            generateDocNo(comp);
         }
     }, [isOpen]);
 

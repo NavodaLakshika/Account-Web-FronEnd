@@ -8,7 +8,7 @@ import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
 
 
 const VendorBoard = ({ isOpen, onClose }) => {
-    const initialState = {
+    const getInitialFormData = () => ({
         Code: '',
         Supplier_Name: '',
         Destibution_Name: '',
@@ -29,9 +29,9 @@ const VendorBoard = ({ isOpen, onClose }) => {
         Locked: false,
         Company: '',
         CurrentUser: ''
-    };
+    });
 
-    const [formData, setFormData] = useState(initialState);
+    const [formData, setFormData] = useState(getInitialFormData());
     const [banks, setBanks] = useState([]);
     const [vendorTypes, setVendorTypes] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -42,13 +42,14 @@ const VendorBoard = ({ isOpen, onClose }) => {
 
     useEffect(() => {
         if (isOpen) {
-            fetchLookups();
+            setFormData(getInitialFormData());
             const { companyCode, userName } = getSessionData();
             setFormData(prev => ({ 
                 ...prev, 
                 CurrentUser: userName,
                 Company: companyCode
             }));
+            fetchLookups();
         }
     }, [isOpen]);
 
@@ -75,7 +76,7 @@ const VendorBoard = ({ isOpen, onClose }) => {
 
     const handleClear = () => {
         setFormData({
-            ...initialState,
+            ...getInitialFormData(),
             CurrentUser: formData.CurrentUser,
             Company: formData.Company
         });

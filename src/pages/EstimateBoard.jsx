@@ -16,15 +16,18 @@ import CalendarModal from '../components/CalendarModal';
 
 
 import { quotationService } from '../services/quotation.service';
+import { getSessionData } from '../utils/session';
 import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
 
 
 const EstimateBoard = ({ isOpen, onClose }) => {
+    const { companyCode, userName } = getSessionData();
     const [lookups, setLookups] = useState({ customers: [], products: [], terms: [] });
-    const [formData, setFormData] = useState({
+
+    const getInitialFormData = () => ({
         docNo: '',
-        company: 'C001',
-        createUser: 'SYSTEM',
+        company: companyCode,
+        createUser: userName,
         postDate: new Date().toISOString().split('T')[0],
         expectedDate: new Date().toISOString().split('T')[0],
         customerId: '',
@@ -34,6 +37,8 @@ const EstimateBoard = ({ isOpen, onClose }) => {
         taxPer: '',
         nbtAmnt: 0
     });
+
+    const [formData, setFormData] = useState(getInitialFormData());
 
     const [items, setItems] = useState([]);
     const [entry, setEntry] = useState({
@@ -57,27 +62,9 @@ const EstimateBoard = ({ isOpen, onClose }) => {
 
     useEffect(() => {
         if (isOpen) {
-            console.log('EstimateBoard Opening - Initializing Data...');
-            const companyData = localStorage.getItem('selectedCompany');
-            const user = JSON.parse(localStorage.getItem('user') || '{}');
-            let companyCode = 'C001';
-
-            if (companyData) {
-                try {
-                    // Try to parse if it's a JSON string
-                    const parsed = JSON.parse(companyData);
-                    companyCode = parsed.company_Code || parsed.companyCode || parsed.CompanyCode || companyData;
-                } catch (e) {
-                    // It's a plain string
-                    companyCode = companyData;
-                }
-            }
-
-            console.log('Target Company Code:', companyCode);
-            const initUser = user?.emp_Name || user?.empName || 'SYSTEM';
-            setFormData(prev => ({ ...prev, company: companyCode, createUser: initUser }));
-
-            fetchInitialData(companyCode);
+            setFormData(getInitialFormData());
+            const { companyCode: comp, userName: user } = getSessionData();
+            fetchInitialData(comp);
         }
     }, [isOpen]);
 

@@ -10,7 +10,7 @@ import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
 
 const AccountBoard = ({ isOpen, onClose, selectedType, initialData }) => {
     const [loading, setLoading] = useState(false);
-    const [formData, setFormData] = useState({
+    const getInitialFormData = () => ({
         accountType: selectedType || 'Assets',
         subAccountOfCode: '',
         subAccountOfName: '',
@@ -24,6 +24,8 @@ const AccountBoard = ({ isOpen, onClose, selectedType, initialData }) => {
         inactiveAcc: false,
         editSubAccount: false
     });
+
+    const [formData, setFormData] = useState(getInitialFormData());
     const [companyCode, setCompanyCode] = useState('');
 
     const [parentAccounts, setParentAccounts] = useState([]);
@@ -36,6 +38,7 @@ const AccountBoard = ({ isOpen, onClose, selectedType, initialData }) => {
 
     useEffect(() => {
         if (isOpen) {
+            setFormData(getInitialFormData());
             const { companyCode: comp, userName: user } = getSessionData();
             setCompanyCode(comp);
             setFormData(prev => ({ ...prev, user }));

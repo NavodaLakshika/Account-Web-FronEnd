@@ -72,5 +72,23 @@ export const writeChequeService = {
     } catch (error) {
       throw error.response?.data || 'Failed to apply transaction';
     }
+  },
+
+  async searchSaved(company = getCompanyCode()) {
+    try {
+      const response = await api.get(`/search?company=${encodeURIComponent(company)}`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || 'Failed to search saved documents';
+    }
+  },
+
+  async loadSaved(docNo, company = getCompanyCode()) {
+    try {
+      const response = await api.get(`/${encodeURIComponent(docNo)}?company=${encodeURIComponent(company)}`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || 'Failed to load document';
+    }
   }
 };

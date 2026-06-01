@@ -11,7 +11,7 @@ import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
 
 const SalesReceiptBoard = ({ isOpen, onClose }) => {
     // --- State ---
-    const [formData, setFormData] = useState({
+    const getInitialFormData = () => ({
         docNo: '',
         date: new Date().toISOString().split('T')[0],
         customerId: '',
@@ -22,6 +22,8 @@ const SalesReceiptBoard = ({ isOpen, onClose }) => {
         company: 'COM001',
         createUser: 'Admin'
     });
+
+    const [formData, setFormData] = useState(getInitialFormData());
 
     const [rows, setRows] = useState([]);
     const [entry, setEntry] = useState({ prodCode: '', prodName: '', qty: '', sellingPrice: '', amount: '0.00' });
@@ -49,6 +51,7 @@ const SalesReceiptBoard = ({ isOpen, onClose }) => {
     // --- Initialization ---
     useEffect(() => {
         if (isOpen) {
+            setFormData(getInitialFormData());
             loadInitialData();
         }
     }, [isOpen]);

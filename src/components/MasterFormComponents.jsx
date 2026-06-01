@@ -76,7 +76,7 @@ export const MasterFormWrapper = ({
 };
 
 export const MasterFieldRow = ({ label, labelWidth = "w-[120px]", colSpan = "col-span-12", children }) => (
-    <div className={`${colSpan} flex items-center gap-2`}>
+    <div className={`${colSpan} flex items-center gap-2 min-w-0`}>
         <label className={`text-[11px] font-bold text-gray-500 uppercase tracking-widest ${labelWidth} shrink-0`}>
             {label}
         </label>

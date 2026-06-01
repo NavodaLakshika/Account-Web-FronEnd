@@ -12,7 +12,7 @@ const OpeningBalanceBoard = ({ isOpen, onClose }) => {
     const [loading, setLoading] = useState(false);
     const [lookups, setLookups] = useState({ apAccounts: [], arAccounts: [], glAccounts: [], costCenters: [], vendors: [], customers: [] });
     
-    const [formData, setFormData] = useState({
+    const getInitialFormData = () => ({
         docNo: '',
         date: new Date().toISOString().split('T')[0],
         accountCode: '',
@@ -31,19 +31,20 @@ const OpeningBalanceBoard = ({ isOpen, onClose }) => {
         createUser: ''
     });
 
+    const [formData, setFormData] = useState(getInitialFormData());
+
     const [activeModal, setActiveModal] = useState(null); // 'account', 'cc', 'entity'
     const [searchTerm, setSearchTerm] = useState('');
 
     useEffect(() => {
         if (isOpen) {
+            setFormData(getInitialFormData());
             const { companyCode, userName } = getSessionData();
-            
             setFormData(prev => ({
                 ...prev,
                 company: companyCode,
                 createUser: userName
             }));
-
             loadInitialData(companyCode);
         }
     }, [isOpen, activeTab]);

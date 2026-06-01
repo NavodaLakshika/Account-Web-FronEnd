@@ -16,7 +16,7 @@ import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
 const SalesInvoiceBoard = ({ isOpen, onClose }) => {
     const [lookups, setLookups] = useState({ customers: [], products: [], paymentMethods: [], salesAssistants: [], salesOrders: [], taxAccounts: [] });
 
-    const [formData, setFormData] = useState({
+    const getInitialFormData = () => ({
         docNo: '',
         company: '',
         createUser: '',
@@ -34,6 +34,8 @@ const SalesInvoiceBoard = ({ isOpen, onClose }) => {
         discountPer: '0',
         taxAccount: ''
     });
+
+    const [formData, setFormData] = useState(getInitialFormData());
 
     const [products, setProducts] = useState([]);
     const [invoices, setInvoices] = useState([]); 
@@ -73,6 +75,7 @@ const SalesInvoiceBoard = ({ isOpen, onClose }) => {
 
     useEffect(() => {
         if (isOpen) {
+            setFormData(getInitialFormData());
             const { companyCode: initCompany, userName: initUser } = getSessionData();
 
             setFormData(prev => ({ ...prev, company: initCompany, createUser: initUser }));

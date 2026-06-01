@@ -24,7 +24,7 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
         ]
     });
 
-    const [formData, setFormData] = useState({
+    const getInitialFormData = () => ({
         docNo: '',
         date: new Date().toISOString().split('T')[0],
         customerId: '',
@@ -41,6 +41,8 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
         createUser: '',
         accountType: 'Medical Members'
     });
+
+    const [formData, setFormData] = useState(getInitialFormData());
 
     const [invoices, setInvoices] = useState([]);
     const [orders, setOrders] = useState([]); // Historical documents
@@ -70,6 +72,7 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
 
     useEffect(() => {
         if (isOpen) {
+            setFormData(getInitialFormData());
             const { companyCode: initCompany, userName: initUser } = getSessionData();
 
             setFormData(prev => ({ ...prev, company: initCompany, createUser: initUser }));

@@ -24,14 +24,17 @@ const ReminderBoard = ({ isOpen, onClose, onViewAll, taskToEdit }) => {
     const [showConfirm, setShowConfirm] = useState(false);
     const [showDatePicker, setShowDatePicker] = useState(false);
 
-    const [formData, setFormData] = useState({
+    const getInitialFormData = () => ({
         task: '',
         date: new Date().toISOString().split('T')[0],
         time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })
     });
 
+    const [formData, setFormData] = useState(getInitialFormData());
+
     useEffect(() => {
         if (isOpen) {
+            setFormData(getInitialFormData());
             if (taskToEdit) {
                 const dateParts = (taskToEdit.date || taskToEdit.Date || '').split('/');
                 let formattedInputDate = '';
@@ -43,12 +46,6 @@ const ReminderBoard = ({ isOpen, onClose, onViewAll, taskToEdit }) => {
                     task: taskToEdit.task || taskToEdit.Task || '',
                     date: formattedInputDate || new Date().toISOString().split('T')[0],
                     time: taskToEdit.time || taskToEdit.Time || '10:30 AM'
-                });
-            } else {
-                setFormData({
-                    task: '',
-                    date: new Date().toISOString().split('T')[0],
-                    time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })
                 });
             }
         }

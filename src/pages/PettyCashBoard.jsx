@@ -56,12 +56,14 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
     const [activeTab, setActiveTab] = useState('expenses');
 
     // Header form
-    const [form, setForm] = useState({
+    const getInitialForm = () => ({
         docNo:'', isVendor:false, vendorId:'', vendorName:'', payee:'',
         location:'', memo:'', date:today(), vouchNo:'', dueDate:today(),
         refNo:'', billAmount:'0.00', pettyAccCode:'', pettyAccName:'',
         costCenterFrom:'', balance:'0.00',
     });
+
+    const [form, setForm] = useState(getInitialForm());
 
     // Expense line form
     const [line, setLine] = useState({ accCode:'', accName:'', amount:'0.00', memo:'', costCode:'', costName:'', idNo:'0' });
@@ -82,6 +84,7 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
 
     useEffect(() => {
         if (isOpen) { 
+            setForm(getInitialForm());
             const { companyCode } = getSessionData();
             loadLookups(companyCode); 
             generateDoc(companyCode); 

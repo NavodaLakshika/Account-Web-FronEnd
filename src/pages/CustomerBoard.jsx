@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import SimpleModal from '../components/SimpleModal';
 import { Search, RotateCcw, Save, Trash2, Loader2, X } from 'lucide-react';
+import ConfirmModal from '../components/modals/ConfirmModal';
 import { customerService } from '../services/customer.service';
 
 import { getSessionData } from '../utils/session';
@@ -8,7 +9,7 @@ import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
 
 
 const CustomerBoard = ({ isOpen, onClose }) => {
-    const initialState = {
+    const getInitialFormData = () => ({
         Code: '',
         Cust_Name: '',
         Address1: '',
@@ -30,9 +31,9 @@ const CustomerBoard = ({ isOpen, onClose }) => {
         Route_Code: '',
         Locked: false,
         CurrentUser: ''
-    };
+    });
 
-    const [formData, setFormData] = useState(initialState);
+    const [formData, setFormData] = useState(getInitialFormData());
     const [areas, setAreas] = useState([]);
     const [routes, setRoutes] = useState([]);
     const [banks, setBanks] = useState([]);
@@ -42,9 +43,12 @@ const CustomerBoard = ({ isOpen, onClose }) => {
     const [showSearchModal, setShowSearchModal] = useState(false);
     const [customersList, setCustomersList] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
 
     useEffect(() => {
         if (isOpen) {
+            setFormData(getInitialFormData());
             fetchLookups();
             const { userName } = getSessionData();
             setFormData(prev => ({ ...prev, CurrentUser: userName }));
@@ -78,7 +82,7 @@ const CustomerBoard = ({ isOpen, onClose }) => {
 
     const handleClear = () => {
         setFormData({
-            ...initialState,
+            ...getInitialFormData(),
             CurrentUser: formData.CurrentUser
         });
         setIsEditMode(false);
@@ -122,20 +126,22 @@ const CustomerBoard = ({ isOpen, onClose }) => {
         }
     };
 
-    const handleDelete = async () => {
+    const handleDelete = () => {
         if (!isEditMode || !formData.Code) return;
+        setShowDeleteConfirm(true);
+    };
 
-        if (!window.confirm('Are you sure you want to delete this customer?')) return;
-
-        setLoading(true);
+    const confirmDelete = async () => {
+        setIsDeleting(true);
         try {
             await customerService.delete(formData.Code);
             showSuccessToast('Customer deleted');
+            setShowDeleteConfirm(false);
             handleClear();
         } catch (error) {
             showErrorToast(error);
         } finally {
-            setLoading(false);
+            setIsDeleting(false);
         }
     };
 
@@ -478,6 +484,17 @@ const CustomerBoard = ({ isOpen, onClose }) => {
                     </div>
                 </div>
             )}
+
+            <ConfirmModal
+                isOpen={showDeleteConfirm}
+                onClose={() => setShowDeleteConfirm(false)}
+                onConfirm={confirmDelete}
+                title="Delete Customer"
+                message={`Are you sure you want to delete this customer (${formData.Cust_Name})? This action cannot be undone.`}
+                loading={isDeleting}
+                confirmText="Delete"
+                variant="danger"
+            />
         </>
     );
 };

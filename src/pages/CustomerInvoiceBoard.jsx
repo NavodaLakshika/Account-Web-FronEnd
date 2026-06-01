@@ -109,7 +109,7 @@ const CustomerInvoiceBoard = ({ isOpen, onClose }) => {
     const discountRef = useRef(null);
     const saveBtnRef = useRef(null);
 
-    const [formData, setFormData] = useState({
+    const getInitialFormData = () => ({
         docNo: '',
         postDate: new Date().toISOString().split('T')[0],
         customerId: '',
@@ -124,6 +124,8 @@ const CustomerInvoiceBoard = ({ isOpen, onClose }) => {
         createUser: ''
     });
 
+    const [formData, setFormData] = useState(getInitialFormData());
+
     const [activeModal, setActiveModal] = useState(null); // 'customer' | 'account'
     const [showDatePicker, setShowDatePicker] = useState(false);
 
@@ -131,6 +133,7 @@ const CustomerInvoiceBoard = ({ isOpen, onClose }) => {
     // ── Lifecycle ─────────────────────────────────────────────────────────────
     useEffect(() => {
         if (isOpen) {
+            setFormData(getInitialFormData());
             const { companyCode, userName } = getSessionData();
             setFormData(prev => ({ ...prev, company: companyCode, createUser: userName }));
             fetchLookups(companyCode);

@@ -13,7 +13,7 @@ const CustomerChequeReturnBoard = ({ isOpen, onClose }) => {
     const [lookups, setLookups] = useState({ customers: [], banks: [] });
     
     // Form States
-    const [formData, setFormData] = useState({
+    const getInitialFormData = () => ({
         docNo: '',
         returnDate: new Date().toISOString().split('T')[0],
         customerCode: '',
@@ -30,12 +30,15 @@ const CustomerChequeReturnBoard = ({ isOpen, onClose }) => {
         createUser: ''
     });
 
+    const [formData, setFormData] = useState(getInitialFormData());
+
     const [activeModal, setActiveModal] = useState(null); // 'customer', 'bank'
     const [searchTerm, setSearchTerm] = useState('');
     const [showDatePicker, setShowDatePicker] = useState(false);
 
     useEffect(() => {
         if (isOpen) {
+            setFormData(getInitialFormData());
             const { companyCode, userName } = getSessionData();
 
             setFormData(prev => ({

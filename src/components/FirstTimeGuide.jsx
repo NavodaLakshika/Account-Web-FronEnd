@@ -180,14 +180,8 @@ const FirstTimeGuide = ({ isOpen, onClose, user }) => {
                         50% { transform: translate(-10px, -10px); }
                     }
                 `}</style>
-                <svg width="72" height="72" viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg" className="animate-[diagonalBounce_1.2s_infinite] drop-shadow-[0_10px_20px_rgba(0,0,0,0.4)]">
-                    {/* Action Lines */}
-                    <path d="M14 26 L22 30" stroke="#00acee" strokeWidth="4" strokeLinecap="round" className="animate-[pulse_1s_infinite_100ms]" />
-                    <path d="M12 14 L20 18" stroke="#00acee" strokeWidth="4" strokeLinecap="round" className="animate-[pulse_1s_infinite_200ms]" />
-                    <path d="M22 6 L26 14" stroke="#00acee" strokeWidth="4" strokeLinecap="round" className="animate-[pulse_1s_infinite_300ms]" />
-                    
-                    {/* Hand Pointer rotated to point top-left */}
-                    <path d="M30 18 C30 16.9 30.9 16 32 16 C33.1 16 34 16.9 34 18 L34 32 L36.6 29.4 C37.4 28.6 38.6 28.6 39.4 29.4 C40.2 30.2 40.2 31.4 39.4 32.2 L32.6 39 C31.8 39.8 30.8 40.2 29.8 40.2 C28.8 40.2 27.8 39.8 27 39 L20.4 32.4 C19.6 31.6 19.6 30.4 20.4 29.6 C21.2 28.8 22.4 28.8 23.2 29.6 L26 32.4 L26 22 C26 20.9 26.9 20 28 20 C29.1 20 30 20.9 30 22 L30 18 Z" fill="white" stroke="#1e293b" strokeWidth="2.5" strokeLinejoin="round" transform="rotate(-45 32 32) scale(1.3) translate(4, 4)" />
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="white" stroke="#1e293b" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="animate-[diagonalBounce_1.2s_infinite] drop-shadow-[0_10px_20px_rgba(0,0,0,0.4)]">
+                    <path d="M4 4l7.07 17 2.51-7.39L21 11.07z" />
                 </svg>
             </div>
 

@@ -36,6 +36,7 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
     const [showItemModal, setShowItemModal] = useState(false);
     const [showPayeeModal, setShowPayeeModal] = useState(false);
     const [showVendorModal, setShowVendorModal] = useState(false);
+    const [showSearchModal, setShowSearchModal] = useState(false);
     const [showCalendar, setShowCalendar] = useState(false);
     const [calendarField, setCalendarField] = useState(null);
     const [ccSource, setCcSource] = useState('header'); // header or line
@@ -45,12 +46,16 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
     const [showVoidConfirm, setShowVoidConfirm] = useState(false);
 
     // Search States
+    const [savedDocs, setSavedDocs] = useState([]);
+    const [docSearchQuery, setDocSearchQuery] = useState('');
+
+    // Search States
     const [bankSearch, setBankSearch] = useState('');
     const [ccSearch, setCcSearch] = useState('');
     const [accSearch, setAccSearch] = useState('');
     const [itemSearch, setItemSearch] = useState('');
 
-    const [formData, setFormData] = useState({
+    const getInitialFormData = () => ({
         docId: '',
         date: new Date().toLocaleDateString('en-GB'), // DD/MM/YYYY
         bankAcc: '',
@@ -67,13 +72,15 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
         bankBalance: 0
     });
 
+    const [formData, setFormData] = useState(getInitialFormData());
+
     const [expenses, setExpenses] = useState([]);
     const [items, setItems] = useState([]);
     
     const [lookups, setLookups] = useState({
         banks: [],
         costCenters: [],
-        endorsements: ['A/C PAYEE ONLY', 'NOT NEGOTIABLE', 'CASH PAYABLE', 'NONE'],
+        endorsements: [],
         accounts: [],
         products: [],
         customers: [],
@@ -82,6 +89,7 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
 
     useEffect(() => {
         if (isOpen) {
+            setFormData(getInitialFormData());
             initData();
         }
     }, [isOpen]);
@@ -96,6 +104,7 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
                 ...prev,
                 banks: data.bankAccounts || [],
                 costCenters: data.costCenters || [],
+                endorsements: data.endorsements || [],
                 accounts: data.accounts || [],
                 products: data.products || [],
                 customers: data.customers || [],
@@ -150,7 +159,7 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
                     IdNo: '0',
                     Type: 'WCH',
                     CostCode: exp.costCenter || formData.costCenter,
-                    CostName: lookups.costCenters.find(cc => cc.code === (exp.costCenter || formData.costCenter))?.name || ''
+                    CostName: lookups.costCenters.find(cc => cc.costCenterCode === (exp.costCenter || formData.costCenter))?.costCenterName || ''
                 });
             }
 
@@ -234,7 +243,7 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
                     IdNo: '0',
                     Type: 'WCH',
                     CostCode: exp.costCenter || formData.costCenter,
-                    CostName: lookups.costCenters.find(cc => cc.code === (exp.costCenter || formData.costCenter))?.name || ''
+                    CostName: lookups.costCenters.find(cc => cc.costCenterCode === (exp.costCenter || formData.costCenter))?.costCenterName || ''
                 });
             }
 
@@ -293,9 +302,68 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
             address: '',
             chqNo: '',
             totalAmount: 0,
-            bankBalance: 0
+            bankBalance: 0,
+            endorsement: 'A/C PAYEE ONLY'
         }));
         initData();
+    };
+
+    const handleOpenSearch = async () => {
+        setLoading(true);
+        try {
+            const { companyCode } = getSessionData();
+            const docs = await writeChequeService.searchSaved(companyCode);
+            setSavedDocs(docs || []);
+            setShowSearchModal(true);
+        } catch (error) {
+            showErrorToast(error.toString());
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleLoadDoc = async (docNo) => {
+        setLoading(true);
+        try {
+            const { companyCode } = getSessionData();
+            const { header, expenses: loadedExpenses, items: loadedItems } = await writeChequeService.loadSaved(docNo, companyCode);
+            
+            setFormData(prev => ({
+                ...prev,
+                docId: header.docNo,
+                date: header.date,
+                bankAcc: header.bankCode,
+                payeeName: header.payee,
+                payeeId: header.payeeId,
+                address: header.address,
+                chqNo: header.chequeNo,
+                totalAmount: header.totalAmount
+            }));
+
+            // Map loaded expenses to the UI structure
+            setExpenses((loadedExpenses || []).map(exp => ({
+                accCode: exp.accCode,
+                accName: exp.accName,
+                amount: exp.amount,
+                memo: exp.memo,
+                costCenter: exp.costCenter
+            })));
+
+            // Map loaded items to the UI structure
+            setItems((loadedItems || []).map(item => ({
+                itemCode: item.itemCode,
+                description: item.description,
+                qty: item.qty,
+                cost: item.cost
+            })));
+
+            setShowSearchModal(false);
+            showSuccessToast(`Loaded Document ${docNo}`);
+        } catch (error) {
+            showErrorToast(error.toString());
+        } finally {
+            setLoading(false);
+        }
     };
 
     const calculateTotal = () => {
@@ -339,6 +407,9 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
                         </button>
                         <button onClick={handleClear} className="px-6 h-10 bg-[#00adff] text-white text-[13px] font-mono font-bold uppercase tracking-widest rounded-[5px] hover:bg-[#0099e6] transition-all active:scale-95 flex items-center gap-2 border-none shadow-md shadow-blue-100">
                             <RotateCcw size={14} /> CLEAR 
+                        </button>
+                        <button onClick={handleOpenSearch} className="px-6 h-10 bg-[#8b5cf6] text-white text-[13px] font-mono font-bold uppercase tracking-widest rounded-[5px] shadow-md shadow-purple-100 hover:bg-[#7c3aed] transition-all active:scale-95 flex items-center gap-2 border-none">
+                            <Search size={14} /> SEARCH 
                         </button>
                     </div>
                     <div className="flex gap-3">
@@ -414,7 +485,7 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
                                 <input 
                                     type="text" 
                                     readOnly 
-                                    value={lookups.costCenters.find(cc => cc.code === formData.costCenter)?.name || ''} 
+                                    value={lookups.costCenters.find(cc => cc.costCenterCode === formData.costCenter)?.costCenterName || ''} 
                                     className="flex-1 min-w-0 h-full border border-slate-200 px-3 text-[12px] font-bold text-gray-700 bg-white outline-none rounded truncate cursor-pointer transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20"
                                     onClick={() => { setCcSource('header'); setShowCCModal(true); }}
                                 />
@@ -580,7 +651,7 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
                                                     <input 
                                                         type="text" 
                                                         readOnly 
-                                                        value={lookups.costCenters.find(cc => cc.code === line.costCenter)?.name || ''} 
+                                                        value={lookups.costCenters.find(cc => cc.costCenterCode === line.costCenter)?.costCenterName || ''} 
                                                         className="flex-1 min-w-0 h-full font-mono border border-transparent px-3 text-[11px] font-bold bg-transparent text-gray-600 rounded outline-none truncate transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 group-hover:border-slate-200 group-hover:bg-white cursor-pointer" 
                                                         onClick={() => { setCcSource('line'); setCcIndex(idx); setShowCCModal(true); }}
                                                     />
@@ -999,6 +1070,64 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
                                     </td>
                                 </tr>
                             ))}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </SimpleModal>
+
+        <SimpleModal
+            isOpen={showSearchModal}
+            onClose={() => setShowSearchModal(false)}
+            title="Search Saved Cheques"
+            maxWidth="max-w-4xl"
+        >
+            <div className="space-y-4 font-['Tahoma']">
+                <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+                    <input 
+                        type="text" 
+                        placeholder="Search by Document Number or Payee..."
+                        value={docSearchQuery}
+                        onChange={(e) => setDocSearchQuery(e.target.value)}
+                        className="w-full pl-9 pr-4 py-2 border-2 border-gray-100 rounded-lg focus:border-blue-500 focus:outline-none transition-all text-[13px] bg-gray-50/50"
+                    />
+                </div>
+                <div className="max-h-[400px] overflow-y-auto custom-scrollbar">
+                    <table className="w-full text-left">
+                        <thead className="sticky top-0 bg-white text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">
+                            <tr>
+                                <th className="px-4 py-3">Doc No</th>
+                                <th className="px-4 py-3">Date</th>
+                                <th className="px-4 py-3">Payee</th>
+                                <th className="px-4 py-3">Bank Code</th>
+                                <th className="px-4 py-3 text-right">Amount</th>
+                                <th className="px-4 py-3 text-right">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-50">
+                            {savedDocs.filter(d => 
+                                (d.docNo?.toLowerCase() || '').includes(docSearchQuery.toLowerCase()) || 
+                                (d.payee?.toLowerCase() || '').includes(docSearchQuery.toLowerCase())
+                            ).map((d, idx) => (
+                                <tr key={idx} className="group hover:bg-blue-50/50 cursor-pointer" onClick={() => handleLoadDoc(d.docNo)}>
+                                    <td className="px-4 py-3 font-mono text-[12px] font-bold text-[#0285fd]">{d.docNo}</td>
+                                    <td className="px-4 py-3 text-[12px] text-gray-500">{new Date(d.date).toLocaleDateString('en-GB')}</td>
+                                    <td className="px-4 py-3 font-bold text-[13px] text-gray-700">{d.payee}</td>
+                                    <td className="px-4 py-3 text-[12px] text-gray-500">{d.bankCode}</td>
+                                    <td className="px-4 py-3 text-right font-mono font-bold text-[13px]">
+                                        {d.amount?.toLocaleString('en-US', {minimumFractionDigits:2})}
+                                    </td>
+                                    <td className="px-4 py-3 text-right">
+                                        <button className="bg-[#2bb744] text-white text-[10px] px-4 py-1.5 rounded-[5px] font-black hover:bg-[#259b3a] shadow-md transition-all border-none">LOAD</button>
+                                    </td>
+                                </tr>
+                            ))}
+                            {savedDocs.length === 0 && (
+                                <tr>
+                                    <td colSpan="6" className="text-center py-8 text-gray-400 text-sm">No saved documents found</td>
+                                </tr>
+                            )}
                         </tbody>
                     </table>
                 </div>

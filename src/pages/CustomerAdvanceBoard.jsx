@@ -94,10 +94,10 @@ const CustomerAdvanceBoard = ({ isOpen, onClose }) => {
     const [loading, setLoading] = useState(false);
 
     // Form States
-    const [formData, setFormData] = useState({
+    const getInitialFormData = () => ({
         receiptNo: '',
         postDate: new Date().toISOString().split('T')[0],
-        payType: 'CASH', // Default PayType matching legacy C# code
+        payType: 'CASH',
         chequeNo: '',
         chequeDate: new Date().toISOString().split('T')[0],
         bank: '',
@@ -111,6 +111,8 @@ const CustomerAdvanceBoard = ({ isOpen, onClose }) => {
         company: '',
         createUser: ''
     });
+
+    const [formData, setFormData] = useState(getInitialFormData());
 
     // Custom Search Modal States
     const [activeModal, setActiveModal] = useState(null); // 'customer', 'debitAcc', 'bank', 'payType'
@@ -162,6 +164,7 @@ const CustomerAdvanceBoard = ({ isOpen, onClose }) => {
     // Toast Custom Layouts
     useEffect(() => {
         if (isOpen) {
+            setFormData(getInitialFormData());
             const { companyCode, userName } = getSessionData();
 
             setFormData(prev => ({

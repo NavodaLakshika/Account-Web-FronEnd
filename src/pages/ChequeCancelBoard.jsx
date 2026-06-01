@@ -13,8 +13,8 @@ const ChequeCancelBoard = ({ isOpen, onClose }) => {
     const [lookups, setLookups] = useState({ docTypes: [], accounts: [] });
     
     // Form States
-    const [formData, setFormData] = useState({
-        mode: 'Cheque Cancel', // 'Cheque Cancel' or 'Cheque Return'
+    const getInitialFormData = () => ({
+        mode: 'Cheque Cancel',
         docType: '',
         docNo: '',
         voucherNo: '',
@@ -32,12 +32,15 @@ const ChequeCancelBoard = ({ isOpen, onClose }) => {
         createUser: ''
     });
 
+    const [formData, setFormData] = useState(getInitialFormData());
+
     const [activeModal, setActiveModal] = useState(null); // 'account', 'docType'
     const [searchTerm, setSearchTerm] = useState('');
     const [showDatePicker, setShowDatePicker] = useState(false);
 
     useEffect(() => {
         if (isOpen) {
+            setFormData(getInitialFormData());
             const { companyCode, userName } = getSessionData();
 
             setFormData(prev => ({

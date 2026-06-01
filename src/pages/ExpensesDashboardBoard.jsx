@@ -6,6 +6,7 @@ import {
   ArrowUpRight, TrendingUp, DollarSign, Users, PieChart, AlertCircle
 } from 'lucide-react';
 import { expensesService } from '../services/expenses.service';
+import { supplierService } from '../services/supplier.service';
 import { getSessionData } from '../utils/session';
 import { showErrorToast } from '../utils/toastUtils';
 
@@ -34,14 +35,38 @@ const ExpensesDashboardBoard = ({
   const [txTypeFilter, setTxTypeFilter] = useState('all');
   const [txStatusFilter, setTxStatusFilter] = useState('all');
   const [vendorSearch, setVendorSearch] = useState('');
+  const [suppliersMap, setSuppliersMap] = useState({});
+
+  const [companyName, setCompanyName] = useState('Expense Workspace');
 
   const { companyCode } = getSessionData();
+
+  useEffect(() => {
+    try {
+      const companyRaw = localStorage.getItem('selectedCompany');
+      if (companyRaw) {
+        const parsed = JSON.parse(companyRaw);
+        setCompanyName(parsed.CompanyName || parsed.companyName || parsed.Company_Name || 'Expense Workspace');
+      }
+    } catch (e) {}
+  }, []);
 
   const fetchDashboardData = async () => {
     if (!companyCode) return;
     setLoading(true);
     try {
-      const res = await expensesService.getDashboardData(companyCode, dateRange);
+      const [res, suppliers] = await Promise.all([
+        expensesService.getDashboardData(companyCode, dateRange),
+        supplierService.getAll().catch(() => [])
+      ]);
+
+      const sMap = {};
+      if (Array.isArray(suppliers)) {
+        suppliers.forEach(s => {
+          sMap[s.SupplierCode || s.supplierCode] = s.SupplierName || s.supplierName || s.Name || s.name;
+        });
+      }
+      setSuppliersMap(sMap);
 
       // Workaround for backend duplicate category issue (returning both Name and GL Code)
       if (res.categoryBreakdown && Array.isArray(res.categoryBreakdown)) {
@@ -154,7 +179,7 @@ const ExpensesDashboardBoard = ({
           <div className="flex items-center gap-3">
             <div>
               <h2 className="text-lg font-bold text-slate-900 leading-none">Dashboard</h2>
-              <span className="text-xs text-slate-400 font-medium">QuickBooks Online Style Expense Workspace</span>
+              <span className="text-xs text-blue-600 font-bold uppercase tracking-wider">{companyName}</span>
             </div>
           </div>
 
@@ -465,7 +490,7 @@ const ExpensesDashboardBoard = ({
                               </span>
                             </td>
                             <td className="py-3 px-6 font-mono text-blue-600">{tx.docNo}</td>
-                            <td className="py-3 px-6 truncate max-w-[200px] uppercase font-mono">{tx.payee || '---'}</td>
+                            <td className="py-3 px-6 truncate max-w-[200px] uppercase font-mono">{suppliersMap[tx.payee] || tx.payee || '---'}</td>
                             <td className="py-3 px-6 text-slate-500 italic max-w-[200px] truncate">{tx.category || '---'}</td>
                             <td className="py-3 px-6 text-right font-mono font-black text-slate-900">
                               {tx.total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}

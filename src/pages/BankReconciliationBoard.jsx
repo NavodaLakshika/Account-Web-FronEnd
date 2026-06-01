@@ -50,7 +50,7 @@ const BankReconciliationBoard = ({ isOpen, onClose }) => {
     const [companyCode, setCompanyCode] = useState('');
     const [currentUser, setCurrentUser] = useState('');
 
-    const [header, setHeader] = useState({
+    const getInitialHeader = () => ({
         docNo: 'BRC-AUTO',
         bankId: '',
         bankName: '',
@@ -61,11 +61,14 @@ const BankReconciliationBoard = ({ isOpen, onClose }) => {
         endingBalance: 0
     });
 
+    const [header, setHeader] = useState(getInitialHeader());
+
     const [transactions, setTransactions] = useState({ debits: [], credits: [] });
     const [activeModal, setActiveModal] = useState(null); // 'bank', 'dateFrom', 'dateTo', 'statementDate'
 
     useEffect(() => {
         if (isOpen) {
+            setHeader(getInitialHeader());
             const { companyCode: comp, userName } = getSessionData();
             setCompanyCode(comp);
             setCurrentUser(userName);
@@ -287,7 +290,7 @@ const BankReconciliationBoard = ({ isOpen, onClose }) => {
                     <div className="bg-white p-4 border border-slate-200 rounded-[5px] shadow-sm grid grid-cols-12 gap-6">
                         <div className="col-span-12 lg:col-span-3">
                             <label className="text-[11px] font-bold text-gray-500 uppercase tracking-widest mb-1.5 block">Recon Reference</label>
-                            <div className="h-8 px-3 bg-slate-50 border border-slate-200 rounded flex items-center justify-between font-mono font-bold text-blue-600">
+                            <div className=" text-[11px] h-8 px-3 bg-slate-50 border border-slate-200 rounded flex items-center justify-between font-mono font-bold text-blue-600">
                                 <span>{header.docNo}</span>
                                 <span className="text-[9px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded uppercase tracking-tighter">{currentUser}</span>
                             </div>

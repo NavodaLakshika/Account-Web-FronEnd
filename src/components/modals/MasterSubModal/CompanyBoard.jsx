@@ -114,10 +114,10 @@ const CompanyBoard = ({ isOpen, onClose }) => {
                 onSave={handleSave}
                 onDelete={handleDelete}
             >
-                <MasterFieldRow label="Company ID" colSpan="col-span-4">
+                <MasterFieldRow label="Company ID" colSpan="col-span-6">
                     <MasterLookupInput value={formData.Code} onSearchClick={handleSearch} isIdField />
                 </MasterFieldRow>
-                <MasterFieldRow label="Company Name" colSpan="col-span-8">
+                <MasterFieldRow label="Company Name" colSpan="col-span-6">
                     <MasterInput name="Comp_Name" value={formData.Comp_Name} onChange={handleInputChange} maxLength={50} placeholder="" />
                 </MasterFieldRow>
 
@@ -137,10 +137,10 @@ const CompanyBoard = ({ isOpen, onClose }) => {
                     <MasterInput name="Address2" value={formData.Address2} onChange={handleInputChange} placeholder="" />
                 </MasterFieldRow>
 
-                <MasterFieldRow label="Country" colSpan="col-span-4">
+                <MasterFieldRow label="Country" colSpan="col-span-6">
                     <MasterLookupInput value={formData.Country} onSearchClick={handleCountrySearch} placeholder="" />
                 </MasterFieldRow>
-                <MasterFieldRow label="Phone No" colSpan="col-span-8">
+                <MasterFieldRow label="Phone No" colSpan="col-span-6">
                     <MasterInput name="Phone" value={formData.Phone} onChange={handleInputChange} placeholder="" />
                 </MasterFieldRow>
 

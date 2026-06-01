@@ -20,15 +20,18 @@ const BulkGRNBoard = ({ isOpen, onClose }) => {
     const excelInputRef = useRef(null);
 
     // Initial setup
-    const [formDataTemplate, setFormDataTemplate] = useState({
+    const getInitialFormDataTemplate = () => ({
         grnDate: new Date().toISOString().split('T')[0],
         expectedDate: new Date().toISOString().split('T')[0],
         company: '',
         createUser: ''
     });
 
+    const [formDataTemplate, setFormDataTemplate] = useState(getInitialFormDataTemplate());
+
     useEffect(() => {
         if (isOpen) {
+            setFormDataTemplate(getInitialFormDataTemplate());
             const { companyCode: initCompany, userName: initUser } = getSessionData();
             setFormDataTemplate(prev => ({ ...prev, company: initCompany, createUser: initUser }));
             fetchLookups(initCompany);

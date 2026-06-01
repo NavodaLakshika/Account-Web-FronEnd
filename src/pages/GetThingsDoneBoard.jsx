@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 import {
   X,
   ChevronDown,
+  ChevronLeft,
   Plus,
   Loader2,
   ChevronRight,
@@ -36,10 +37,26 @@ import {
   Users,
   Play,
   PlayCircle,
+  Layers,
+  FileText,
+  CreditCard,
+  Wallet,
+  FileEdit,
+  FilePlus,
+  ArrowDownCircle,
+  RefreshCw,
+  Box,
+  Book,
+  PenTool,
+  Megaphone,
+  Truck,
 } from 'lucide-react';
 import { expensesService } from '../services/expenses.service';
 import { biDashboardService } from '../services/biDashboard.service';
+import { supplierService } from '../services/supplier.service';
 import { getSessionData } from '../utils/session';
+
+
 
 const TABS = [
   { id: 'accounting', label: 'Accounting', icon: BookOpen, iconBg: '#2ca01c' },
@@ -66,20 +83,34 @@ const DISPLAY_CREATE_ACTIONS = [
 const TAB_EXTRA_ACTIONS = {
   accounting: [
     { id: 'trial_balance', label: 'View trial balance' },
+    { id: 'journal', label: 'Create journal entry' },
     { id: 'bank_rec', label: 'Bank reconciliation' },
+    { id: 'account_balance', label: 'Acc.Balance' },
   ],
   expenses: [
-    { id: 'pay_bill', label: 'Pay bills' },
+    { id: 'vendor', label: 'Vendor' },
+    { id: 'enter_bill', label: 'Enter bill' },
+    { id: 'pay_bills', label: 'Pay bills' },
     { id: 'write_cheque', label: 'Write cheque' },
-    { id: 'expenses_detail', label: 'View expense details' },
+    { id: 'cheque_register', label: 'Cheque Register' },
+    { id: 'petty_cash', label: 'Petty cash' },
+    { id: 'purchase_order', label: 'Purchase order' },
+    { id: 'grn', label: 'GRN' },
+    { id: 'bulk_grn', label: 'Bulk GRN' },
   ],
   sales: [
+    { id: 'customer', label: 'Customer' },
+    { id: 'invoice', label: 'Create invoice' },
     { id: 'sales_receipt', label: 'Create sales receipt' },
     { id: 'receive_payment', label: 'Receive payment' },
+    { id: 'make_deposit', label: 'Collection Deposit' },
     { id: 'sales_order', label: 'Sales order' },
+    { id: 'estimate', label: 'Create estimate' },
+    { id: 'refunds_credit', label: 'Refunds and Credit' },
   ],
   customers: [
-    { id: 'customer', label: 'Add customer' },
+    { id: 'customer', label: 'Customer' },
+    { id: 'add_customer', label: 'Add customer' },
     { id: 'customer_advance', label: 'Customer advance' },
     { id: 'customer_receipt', label: 'Customer receipt' },
   ],
@@ -88,15 +119,71 @@ const TAB_EXTRA_ACTIONS = {
   inventory: [
     { id: 'purchase_order', label: 'Purchase order' },
     { id: 'grn', label: 'GRN' },
+    { id: 'bulk_grn', label: 'Bulk GRN' },
     { id: 'items', label: 'Items & services' },
   ],
   tax: [{ id: 'reports', label: 'Tax reports' }],
+  marketing: [
+    { id: 'marketing', label: 'Marketing Tool' },
+  ],
 };
 
 const PLACEHOLDER_BANKS = [
-  { name: 'Elite Client Account' },
-  { name: 'M.E.S.A. Money Credit Card(Mobile Electro...' },
-  { name: 'First Choice Community Credit Union (Niles,...' },
+  { name: 'BOC' },
+  { name: 'Bank of Ceylon' },
+  { name: 'Peoples Bank' },
+  { name: 'Commercial Bank of Ceylon' },
+  { name: 'Hatton National Bank' },
+  { name: 'Sampath Bank' },
+  { name: 'Seylan Bank' },
+  { name: 'Nations Trust Bank' },
+  { name: 'National Development Bank' },
+  { name: 'DFCC Bank' },
+  { name: 'Pan Asia Bank' },
+  { name: 'Union Bank of Colombo' },
+  { name: 'Amana Bank' },
+  { name: 'Cargills Bank' },
+  { name: 'Sanasa Development Bank' },
+  { name: 'HDFC Bank Sri Lanka' },
+  { name: 'Standard Chartered Bank' },
+  { name: 'Hongkong and Shanghai Bank' },
+  { name: 'Citibank Sri Lanka' },
+  { name: 'Habib Bank Limited' },
+  { name: 'Indian Bank' },
+  { name: 'Indian Overseas Bank' },
+  { name: 'State Bank of India' },
+  { name: 'ICICI Bank' },
+  { name: 'Axis Bank' },
+  { name: 'MCB Bank' },
+  { name: 'Public Bank Berhad' },
+  { name: 'Bank of China' },
+  { name: 'Commercial Credit & Finance' },
+  { name: 'Lanka Orix Leasing Company' },
+  { name: 'Central Finance Company' },
+  { name: 'Mercantile Investments' },
+  { name: 'LB Finance' },
+  { name: 'Senkadagala Finance' },
+  { name: 'Citizens Development Business' },
+  { name: 'Vallibel Finance' },
+  { name: 'Siyapatha Finance' },
+  { name: 'HNB Finance' },
+  { name: 'People\'s Leasing & Finance' },
+  { name: 'Merchant Bank of Sri Lanka' },
+  { name: 'Ideal Finance' },
+  { name: 'Bimputh Finance' },
+  { name: 'Abans Finance' },
+  { name: 'AMW Capital Leasing' },
+  { name: 'Orient Finance' },
+  { name: 'Softlogic Finance' },
+  { name: 'Trade Finance & Investments' },
+  { name: 'Lanka Credit and Business' },
+  { name: 'Prime Finance' },
+  { name: 'Richard Pieris Finance' },
+  { name: 'Asia Asset Finance' },
+  { name: 'Nation Lanka Finance' },
+  { name: 'Arpico Finance Company' },
+  { name: 'Dialog Finance' },
+  { name: 'LMF Finance' }
 ];
 
 const formatLkr = (n) =>
@@ -165,11 +252,9 @@ const CREATE_ACTIONS_DB = {
     { id: 'create_estimate', label: 'Create estimate' },
     { id: 'record_payment', label: 'Record payment' },
     { id: 'create_sales_receipt', label: 'Create sales receipt' },
+    { id: 'create_sales_order', label: 'Create sales order' },
     { id: 'add_customer', label: 'Add customer' },
     { id: 'create_recurring_invoice', label: 'Create recurring invoice' },
-    { id: 'recurring_sales_receipt', label: 'Recurring sales receipt' },
-    { id: 'create_statement', label: 'Create statement' },
-    { id: 'create_sales_order', label: 'Create sales order' },
   ],
   'Suppliers': [
     { id: 'record_expense', label: 'Record expense' },
@@ -177,11 +262,15 @@ const CREATE_ACTIONS_DB = {
     { id: 'pay_bills', label: 'Pay bills' },
     { id: 'add_supplier', label: 'Add supplier' },
     { id: 'create_purchase_order', label: 'Create purchase order' },
+    { id: 'grn', label: 'Create GRN' },
+    { id: 'bulk_grn', label: 'Create Bulk GRN' },
+    { id: 'petty_cash', label: 'Petty Cash' },
   ],
-  'Other': [
+  'Banking & Other': [
     { id: 'add_bank_deposit', label: 'Add bank deposit' },
     { id: 'create_journal_entry', label: 'Create journal entry' },
-    { id: 'transfer_funds', label: 'Transfer funds' },
+    { id: 'write_cheque', label: 'Write cheque' },
+    { id: 'bank_rec', label: 'Bank reconciliation' },
   ]
 };
 
@@ -597,19 +686,60 @@ const HeaderIconBtn = ({ children, label, onClick }) => (
   </button>
 );
 
+const SmartSuggestionsHelpModal = ({ isOpen, onClose }) => {
+  if (!isOpen) return null;
+  return (
+    <div className="fixed inset-0 z-[10005] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+      <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden">
+        <div className="flex justify-between items-center p-5 border-b border-[#eceef1]">
+          <h2 className="text-[18px] font-bold text-[#393a3d]">Why am I seeing these suggestions?</h2>
+          <button onClick={onClose} className="p-1.5 text-[#6b6c72] hover:bg-slate-100 rounded-full transition-colors">
+            <X size={20} />
+          </button>
+        </div>
+        <div className="p-6">
+          <p className="text-[14px] text-[#393a3d] leading-relaxed mb-4">
+            We use smart algorithms to recommend widgets and features that are highly relevant to your business profile and recent activity.
+          </p>
+          <div className="space-y-4">
+            <div className="flex items-start gap-3">
+              <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center shrink-0">
+                <Sparkles size={16} className="text-blue-600" />
+              </div>
+              <div>
+                <h4 className="text-[13px] font-bold text-[#393a3d]">Personalized for you</h4>
+                <p className="text-[12px] text-[#6b6c72] mt-0.5">Suggestions adapt as you use the system, matching features to your workflow.</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3">
+              <div className="w-8 h-8 rounded-full bg-emerald-50 flex items-center justify-center shrink-0">
+                <Shapes size={16} className="text-emerald-600" />
+              </div>
+              <div>
+                <h4 className="text-[13px] font-bold text-[#393a3d]">Industry standards</h4>
+                <p className="text-[12px] text-[#6b6c72] mt-0.5">We recommend widgets commonly used by similar businesses to help you stay ahead.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="bg-[#f4f5f8] p-4 flex justify-end">
+          <button onClick={onClose} className="px-5 py-2 rounded-lg bg-[#2ca01c] hover:bg-[#207a15] text-white text-[13px] font-bold transition-colors shadow-sm">
+            Got it
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, isInline = false }) => {
   const [activeTab, setActiveTab] = useState('expenses');
+  const [activeGroup, setActiveGroup] = useState('Purchases');
   const [isCustomising, setIsCustomising] = useState(false);
   const [isAddWidgetsOpen, setIsAddWidgetsOpen] = useState(false);
   const [bankPage, setBankPage] = useState(0);
   const [selectedWidgets, setSelectedWidgets] = useState(() => {
-    const saved = localStorage.getItem('onimta_gtd_widgets');
-    if (saved) {
-      try {
-        return JSON.parse(saved);
-      } catch (e) {}
-    }
-    return {
+    const defaultWidgets = {
       'app_carousel': true,
       'business_feed': true,
       'create_actions': true,
@@ -632,10 +762,19 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
       'referrals': true,
       'video_tutorials': true,
     };
+    const saved = localStorage.getItem('onimta_gtd_widgets');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        return { ...defaultWidgets, ...parsed };
+      } catch (e) {}
+    }
+    return defaultWidgets;
   });
   const [isPrivacyMode, setIsPrivacyMode] = useState(false);
   const [isShowAllActionsOpen, setIsShowAllActionsOpen] = useState(false);
   const [videoOpen, setVideoOpen] = useState(null);
+  const [isSmartSuggestionsHelpOpen, setIsSmartSuggestionsHelpOpen] = useState(false);
   const [widgetToHide, setWidgetToHide] = useState(null);
   const [favActions, setFavActions] = useState(() => {
     const saved = localStorage.getItem('onimta_gtd_fav_actions');
@@ -663,6 +802,7 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
     recentTransactions: [],
   });
   const [biData, setBiData] = useState(null);
+  const [suppliersMap, setSuppliersMap] = useState({});
   const tabScrollRef = useRef(null);
 
   // Persist preferences to localStorage when they change
@@ -692,6 +832,11 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
     return 'Good evening';
   }, []);
 
+  const unselectedWidgets = useMemo(() => {
+    const all = WIDGET_OPTIONS.flatMap(g => g.items);
+    return all.filter(w => !selectedWidgets[w.id]).slice(0, 2);
+  }, [selectedWidgets]);
+
   useEffect(() => {
     if (!isOpen || !companyCode) return;
 
@@ -699,7 +844,17 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
     const load = async () => {
       setLoading(true);
       try {
-        const data = await biDashboardService.getSummary(companyCode);
+        const [data, suppliers] = await Promise.all([
+          biDashboardService.getSummary(companyCode),
+          supplierService.getAll().catch(() => [])
+        ]);
+
+        const sMap = {};
+        if (Array.isArray(suppliers)) {
+          suppliers.forEach(s => {
+            sMap[s.SupplierCode || s.supplierCode] = s.SupplierName || s.supplierName || s.Name || s.name;
+          });
+        }
 
         // Build expenseData from biData for backward compat
         const expenseRes = {
@@ -712,6 +867,7 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
 
         if (!cancelled) {
           setBiData(data);
+          setSuppliersMap(sMap);
           setExpenseData(expenseRes);
           setTotalIncome(data.totalIncome || 0);
         }
@@ -785,6 +941,7 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
   return (
     <div className={`${isInline ? 'relative w-full h-full' : 'fixed inset-0 z-[9999]'} flex flex-col font-['Plus_Jakarta_Sans'] text-slate-700 bg-[#f8fafc] overflow-hidden animate-in fade-in duration-300`}>
       {/* QBO-style top header */}
+      {!isInline && (
         <header className="shrink-0 bg-white/95 border-b border-slate-200/60 px-4 sm:px-5 lg:px-7 py-3">
           <div className="flex items-center gap-2 lg:gap-4 min-h-[44px]">
             {/* Left: brand + company */}
@@ -857,6 +1014,9 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
             </div>
           </div>
         </header>
+      )}
+
+
 
         {/* Body (no duplicate slim chrome) */}
         <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden">
@@ -884,6 +1044,14 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
                   </>
                 ) : (
                   <>
+                    <button
+                      type="button"
+                      className="flex items-center gap-1.5 hover:text-blue-600 transition-colors mr-2"
+                      onClick={onClose}
+                    >
+                      <ChevronLeft size={15} className="text-slate-400" />
+                      <span className="hidden sm:inline">Back to Dashboard</span>
+                    </button>
                     <button
                       type="button"
                       className="flex items-center gap-1.5 hover:text-blue-600 transition-colors"
@@ -922,91 +1090,13 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
                   </>
                 )}
               </div>
-              <h1 className="text-center text-[22px] sm:text-[26px] lg:text-[30px] font-extralight text-slate-800 tracking-tight px-8 sm:px-0">
-                {greeting}, <span className="font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-slate-900 via-slate-850 to-slate-900">{userName}!</span>
-              </h1>
-              <p className="text-center text-slate-500 text-[12px] mt-0.5 font-medium">Here's what's happening with your business today.</p>
             </div>
 
-            {/* Dark category pills + scroll */}
-            <EditWrapper isEditing={isCustomising} className="mb-3.5 py-1 px-1">
-              <div className="flex items-center justify-center gap-1 sm:gap-2 w-full">
-                <div
-                  ref={tabScrollRef}
-                  className="flex items-center gap-2.5 overflow-x-auto no-scrollbar py-1 max-w-full min-w-0"
-                >
-                  {TABS.map((tab) => {
-                    const isActive = activeTab === tab.id;
-                    const Icon = tab.icon;
-                    return (
-                      <button
-                        key={tab.id}
-                        type="button"
-                        onClick={() => setActiveTab(tab.id)}
-                        className={`shrink-0 flex items-center gap-3 pl-1.5 pr-5 h-11 rounded-full text-left transition-all border duration-200 ${
-                          isActive
-                            ? 'bg-slate-900 border-slate-900 text-white shadow-md shadow-slate-900/10'
-                            : 'bg-white border-slate-200/80 hover:border-slate-350 hover:bg-slate-50 text-slate-700'
-                        }`}
-                      >
-                        <span
-                          className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-colors"
-                          style={{
-                            backgroundColor: isActive ? 'rgba(255,255,255,0.15)' : `${tab.iconBg}18`,
-                            color: isActive ? '#ffffff' : tab.iconBg,
-                          }}
-                        >
-                          <Icon size={15} strokeWidth={2.5} />
-                        </span>
-                        <span className={`text-[13.5px] font-semibold whitespace-nowrap ${isActive ? 'text-white' : 'text-slate-700'}`}>
-                          {tab.label}
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
+            {/* Grouped Homeboard actions pills with Tabs */}
+            <EditWrapper isEditing={isCustomising} className="mb-6 py-2 px-1">
+              <div className="flex flex-col gap-6 max-w-6xl mx-auto px-4 mt-2">
               </div>
             </EditWrapper>
-
-            {/* Create actions */}
-            {selectedWidgets.create_actions && (
-              <EditWrapper isEditing={isCustomising} className="mb-4 py-2 px-1">
-                <div className="flex flex-col items-center justify-center gap-3 bg-slate-50 border border-slate-200/50 p-4 rounded-2xl max-w-4xl mx-auto shadow-sm">
-                  <span className="text-[11px] font-bold text-slate-500 uppercase tracking-widest text-center">Create Actions</span>
-                  <div className="flex flex-wrap items-center justify-center gap-2">
-                    {DISPLAY_CREATE_ACTIONS.map((a) => (
-                      <button
-                        key={a.id}
-                        type="button"
-                        onClick={() => runAction(a.id)}
-                        className="px-4 py-1 h-9 rounded-full text-[13px] font-semibold text-slate-700 bg-white border border-slate-200/80 hover:border-slate-450 hover:text-slate-950 hover:shadow-[0_2px_8px_rgba(0,0,0,0.04)] active:scale-97 transition-all whitespace-nowrap"
-                      >
-                        {a.label}
-                      </button>
-                    ))}
-                    {topActions.map((a) => (
-                      <button
-                        key={a.id}
-                        type="button"
-                        onClick={() => runAction(a.id)}
-                        className="px-4 py-1 h-9 rounded-full text-[13px] font-semibold text-slate-700 bg-white border border-slate-200/80 hover:border-slate-450 hover:text-slate-950 hover:shadow-[0_2px_8px_rgba(0,0,0,0.04)] active:scale-97 transition-all whitespace-nowrap"
-                      >
-                        {a.label}
-                      </button>
-                    ))}
-                    {activeTab === 'accounting' && (
-                      <button
-                        type="button"
-                        onClick={() => setIsShowAllActionsOpen(true)}
-                        className="text-[13px] font-bold text-blue-650 hover:text-blue-800 transition-colors ml-2 mr-3"
-                      >
-                        Show all
-                      </button>
-                    )}
-                  </div>
-                </div>
-              </EditWrapper>
-            )}
 
             <div className="border-b border-slate-200 pb-1.5 mb-3 flex items-center justify-between">
               <h2 className="text-[11px] font-extrabold uppercase tracking-widest text-slate-400">
@@ -1066,7 +1156,7 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
                     title="Profit & Loss"
                     subtitle="See what you make & spend across all your accounts"
                     footerButtonLabel="Bring in transactions automatically"
-                    onFooterButton={bringInTransactions}
+                    onFooterButton={() => runAction('profit_loss_detail')}
                     onHide={() => setWidgetToHide('profit_and_loss')}
                   >
                   <div className="flex flex-col justify-center h-full gap-4.5 py-1 mt-1">
@@ -1114,7 +1204,7 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
                     title="Expenses"
                     subtitle="See where your money is going"
                     footerButtonLabel="Bring in transactions automatically"
-                    onFooterButton={bringInTransactions}
+                    onFooterButton={() => runAction('expenses_detail')}
                     onHide={() => setWidgetToHide('expenses')}
                   >
                   <div className="flex flex-col sm:flex-row items-center justify-center gap-6 min-h-[120px] mt-2">
@@ -1207,36 +1297,39 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
                     {/* Divider */}
                     <div className="w-full h-px bg-[#eceef1] mt-2" />
                 <div className="text-center flex-1 flex flex-col items-center mt-5">
-                  <p className="text-[11px] font-bold text-[#393a3d] mb-3 flex items-center justify-center gap-1.5">
-                    <Sparkles size={12} className="text-[#6b6c72]" /> Smart suggestions
-                  </p>
-                  <div className="flex flex-wrap gap-2 justify-center mb-3">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setActiveTab('sales');
-                        runAction('invoice');
-                      }}
-                      className="px-4 py-1.5 rounded-full border border-[#d4d7dc] bg-white text-[11px] font-bold text-[#393a3d] hover:bg-[#f4f5f8]"
-                    >
-                      Sales
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => runAction('receive_payment')}
-                      className="px-4 py-1.5 rounded-full border border-[#d4d7dc] bg-white text-[11px] font-bold text-[#393a3d] hover:bg-[#f4f5f8]"
-                    >
-                      Accounts receivable
-                    </button>
-                  </div>
-                  <button
-                    type="button"
-                    className="text-[10px] text-[#6b6c72] hover:underline inline-flex items-center justify-center gap-1"
-                  >
-                    <HelpCircle size={12} />
-                    Why am I seeing these suggestions?
-                  </button>
-                                </div>
+                  {unselectedWidgets.length > 0 ? (
+                    <>
+                      <p className="text-[11px] font-bold text-[#393a3d] mb-3 flex items-center justify-center gap-1.5">
+                        <Sparkles size={12} className="text-[#6b6c72]" /> Smart suggestions
+                      </p>
+                      <div className="flex flex-wrap gap-2 justify-center mb-3">
+                        {unselectedWidgets.map(w => (
+                          <button
+                            key={w.id}
+                            type="button"
+                            onClick={() => setSelectedWidgets(prev => ({ ...prev, [w.id]: true }))}
+                            className="px-4 py-1.5 rounded-full border border-[#d4d7dc] bg-white text-[11px] font-bold text-[#393a3d] hover:bg-[#f4f5f8]"
+                          >
+                            {w.label}
+                          </button>
+                        ))}
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setIsSmartSuggestionsHelpOpen(true)}
+                        className="text-[10px] text-[#6b6c72] hover:underline inline-flex items-center justify-center gap-1 mt-1"
+                      >
+                        <HelpCircle size={12} />
+                        Why am I seeing these suggestions?
+                      </button>
+                    </>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center h-full gap-2 opacity-60 mt-4">
+                      <Sparkles size={16} className="text-[#0078d4]" />
+                      <span className="text-[11px] font-bold text-[#393a3d]">Your dashboard is fully loaded!</span>
+                    </div>
+                  )}
+                </div>
               </div>
               </EditWrapper>
               )}
@@ -1270,7 +1363,7 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
                                 <Landmark size={13} className="text-slate-500" />
                               </div>
                               <span className="text-[11px] font-bold text-slate-700 truncate leading-tight">{b.bankName || b.name || b.bankCode}</span>
-                              <button type="button" className="ml-auto w-6 h-6 rounded-lg hover:bg-blue-50 text-blue-655 flex items-center justify-center shrink-0 transition-colors" aria-label="Add">
+                              <button type="button" onClick={() => runAction('bank_rec')} className="ml-auto w-6 h-6 rounded-lg hover:bg-blue-50 text-blue-655 flex items-center justify-center shrink-0 transition-colors" aria-label="Add">
                                 <Plus size={14} strokeWidth={2.5} />
                               </button>
                             </div>
@@ -1380,8 +1473,8 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
               key={i}
               className="flex justify-between text-[11px]"
             >
-              <span className="font-semibold text-[#393a3d] truncate max-w-[65%]">
-                {tx.payee || tx.type}
+              <span className="font-semibold text-[#393a3d] truncate max-w-[65%] uppercase">
+                {suppliersMap[tx.payee] || tx.payee || tx.type}
               </span>
 
               <span className="font-mono font-bold text-[#111827]">
@@ -1404,13 +1497,14 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
       <WidgetShell 
         title="Inventory Reports" 
         footerButtonLabel="View all reports"
+        onFooterButton={() => runAction('reports')}
         onHide={() => setWidgetToHide('inventory_reports')}
       >
         <div className="space-y-2 mt-2">
           {['Inventory valuation summary', 'Inventory valuation detail', 'Stock take worksheet', 'Products and services list', 'Sales by products - Summary', 'Open sales order by item', 'Open sales order by customer'].map(r => (
             <div key={r} className="flex justify-between items-center border-b border-[#eceef1] pb-1.5 last:border-0">
               <span className="text-[12px] text-[#393a3d] truncate pr-2">{r}</span>
-              <button className="text-[#0078d4] text-[12px] font-bold hover:underline shrink-0">View</button>
+              <button onClick={() => runAction('reports')} className="text-[#0078d4] text-[12px] font-bold hover:underline shrink-0">View</button>
             </div>
           ))}
         </div>
@@ -1428,6 +1522,7 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
         title="Low on Stock" 
         subtitle="Never miss a sale with items that are running low" 
         footerButtonLabel="Start tracking inventory"
+        onFooterButton={() => runAction('items')}
         onHide={() => setWidgetToHide('low_on_stock')}
       >
         <table className="w-full text-left text-[11px] mt-4">
@@ -1513,7 +1608,7 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
       className="xl:col-span-3"
       onRemove={() => setSelectedWidgets(prev => ({...prev, customers_funnel: false}))}
     >
-      <WidgetShell title="Customers Funnel">
+      <WidgetShell title="Customers Funnel" onHide={() => setWidgetToHide('customers_funnel')}>
         <div className="absolute top-5 right-5 text-[11px] font-semibold text-slate-400">As of today</div>
         <div className="flex items-center justify-between gap-1 overflow-x-auto py-2 h-full mt-4 pb-4 no-scrollbar">
           {[
@@ -1549,7 +1644,7 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
       grabbers={['left', 'right']}
       onRemove={() => setSelectedWidgets(prev => ({...prev, sales: false}))}
     >
-      <WidgetShell title="Sales">
+      <WidgetShell title="Sales" onHide={() => setWidgetToHide('sales')}>
         <div className="absolute top-4 right-6 text-[11px] text-[#6b6c72] flex items-center gap-1 cursor-pointer hover:text-[#393a3d]">
           This year to date <ChevronDown size={12} />
         </div>
@@ -1584,7 +1679,7 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
       grabbers={['left', 'right']}
       onRemove={() => setSelectedWidgets(prev => ({...prev, accounts_payable: false}))}
     >
-      <WidgetShell title="Accounts Payable">
+      <WidgetShell title="Accounts Payable" onHide={() => setWidgetToHide('accounts_payable')}>
         <div className="absolute top-4 right-4 text-[11px] text-[#6b6c72]">As of today</div>
         <div className="mt-4 text-[11px] text-[#6b6c72]">Total</div>
         <div className="text-[20px] font-bold text-[#393a3d] mb-4">{formatLkr(biData?.accountsPayable?.total || 0)}</div>
@@ -1610,7 +1705,7 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
       grabbers={['left', 'right']}
       onRemove={() => setSelectedWidgets(prev => ({...prev, accounts_receivable: false}))}
     >
-      <WidgetShell title="Accounts Receivable">
+      <WidgetShell title="Accounts Receivable" onHide={() => setWidgetToHide('accounts_receivable')}>
         <div className="absolute top-4 right-4 text-[11px] text-[#6b6c72]">As of today</div>
         <div className="mt-4 text-[11px] text-[#6b6c72]">Total</div>
         <div className="text-[20px] font-bold text-[#393a3d] mb-4">{formatLkr(biData?.accountsReceivable?.total || 0)}</div>
@@ -1636,7 +1731,13 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
       grabbers={['left', 'right']}
       onRemove={() => setSelectedWidgets(prev => ({...prev, sales_orders: false}))}
     >
-      <WidgetShell title="Sales Orders" subtitle="Take charge of your finances with open sales orders" footerButtonLabel="Get started with sales orders">
+      <WidgetShell 
+        title="Sales Orders" 
+        subtitle="Take charge of your finances with open sales orders" 
+        footerButtonLabel="Get started with sales orders"
+        onFooterButton={() => runAction('sales_order')}
+        onHide={() => setWidgetToHide('sales_orders')}
+      >
         <table className="w-full text-left text-[11px] mt-4">
           <thead>
             <tr className="border-b border-[#eceef1] text-[#6b6c72]">
@@ -1673,7 +1774,13 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
       grabbers={['left', 'right']}
       onRemove={() => setSelectedWidgets(prev => ({...prev, work_requests: false}))}
     >
-      <WidgetShell title="Work Requests" subtitle="Drive repeat business using the post-invoice survey" footerButtonLabel="Manage survey settings">
+      <WidgetShell 
+        title="Work Requests" 
+        subtitle="Drive repeat business using the post-invoice survey" 
+        footerButtonLabel="Manage survey settings"
+        onFooterButton={() => runAction('survey_settings')}
+        onHide={() => setWidgetToHide('work_requests')}
+      >
         <div className="flex-1 flex items-center justify-center py-6">
           <div className="border border-[#eceef1] rounded-lg shadow-sm p-3 flex gap-3 max-w-[160px] bg-white z-10 relative">
             <div className="w-6 h-6 rounded-full bg-[#d4d7dc] shrink-0" />
@@ -1693,7 +1800,7 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
       grabbers={['left', 'right']}
       onRemove={() => setSelectedWidgets(prev => ({...prev, reviews: false}))}
     >
-      <WidgetShell title="Reviews">
+      <WidgetShell title="Reviews" onHide={() => setWidgetToHide('reviews')}>
         {biData?.reviews?.reviewCount > 0 ? (
           <div className="mt-4 space-y-4">
             <div className="flex items-center gap-3">
@@ -1735,7 +1842,12 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
       grabbers={['left', 'right']}
       onRemove={() => setSelectedWidgets(prev => ({...prev, overdue_invoices: false}))}
     >
-      <WidgetShell title="Overdue Invoices">
+      <WidgetShell 
+        title="Overdue Invoices" 
+        footerButtonLabel="Create an invoice for your next job!"
+        onFooterButton={() => runAction('invoice')}
+        onHide={() => setWidgetToHide('overdue_invoices')}
+      >
         <div className="mt-4 text-[14px] font-bold text-[#393a3d] leading-snug pr-4">
           You have {formatLkr(biData?.overdueInvoiceTotal || 0)} in invoices that are overdue.
         </div>
@@ -1752,7 +1864,13 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
       grabbers={['left', 'right']}
       onRemove={() => setSelectedWidgets(prev => ({...prev, referrals: false}))}
     >
-      <WidgetShell title="Referrals" subtitle="Generate referrals using the post-invoice survey" footerButtonLabel="Manage survey settings">
+      <WidgetShell 
+        title="Referrals" 
+        subtitle="Generate referrals using the post-invoice survey" 
+        footerButtonLabel="Manage survey settings"
+        onFooterButton={() => runAction('survey_settings')}
+        onHide={() => setWidgetToHide('referrals')}
+      >
         <div className="flex-1 flex items-center justify-center py-6">
           <div className="border border-[#eceef1] rounded-lg shadow-sm p-3 flex flex-col gap-3 max-w-[160px] bg-white z-10 relative">
             <div className="text-[10px] text-[#393a3d] font-bold text-center">You've received a new referral</div>
@@ -1776,7 +1894,11 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
       className="xl:col-span-1"
       onRemove={() => setSelectedWidgets(prev => ({...prev, video_tutorials: false}))}
     >
-      <WidgetShell title="Video tutorials" subtitle="Watch and learn how to use your dashboard">
+      <WidgetShell 
+        title="Video tutorials" 
+        subtitle="Watch and learn how to use your dashboard"
+        onHide={() => setWidgetToHide('video_tutorials')}
+      >
         <div className="grid grid-cols-2 gap-5 mt-4 h-full pb-4">
           <div className="flex flex-col gap-2.5">
             <div 
@@ -1828,6 +1950,11 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
         isOpen={!!videoOpen} 
         initialVideoId={videoOpen} 
         onClose={() => setVideoOpen(null)} 
+      />
+
+      <SmartSuggestionsHelpModal
+        isOpen={isSmartSuggestionsHelpOpen}
+        onClose={() => setIsSmartSuggestionsHelpOpen(false)}
       />
 
       {/* Hide Widget Confirmation Modal */}

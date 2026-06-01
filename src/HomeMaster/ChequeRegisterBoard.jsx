@@ -15,7 +15,7 @@ const ChequeRegisterBoard = ({ isOpen, onClose }) => {
     const [accountSearchQuery, setAccountSearchQuery] = useState('');
     const [calendar, setCalendar] = useState({ isOpen: false, target: '' });
     
-    const [formData, setFormData] = useState({
+    const getInitialFormData = () => ({
         accCode: '',
         accName: '',
         bookNo: '',
@@ -26,8 +26,11 @@ const ChequeRegisterBoard = ({ isOpen, onClose }) => {
         createUser: localStorage.getItem('userName') || 'SYSTEM'
     });
 
+    const [formData, setFormData] = useState(getInitialFormData());
+
     useEffect(() => {
         if (isOpen) {
+            setFormData(getInitialFormData());
             const companyData = localStorage.getItem('selectedCompany');
             const userData = localStorage.getItem('user');
             let companyCode = 'COM001';

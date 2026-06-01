@@ -47,7 +47,7 @@ const GRNBoard = ({ isOpen, onClose }) => {
     const [orders, setOrders] = useState([]);
     const excelInputRef = useRef(null);
 
-    const [formData, setFormData] = useState({
+    const getInitialFormData = () => ({
         docNo: '',
         grnDate: new Date().toISOString().split('T')[0],
         expectedDate: new Date().toISOString().split('T')[0],
@@ -67,6 +67,8 @@ const GRNBoard = ({ isOpen, onClose }) => {
         adjType: '',
         adjAmt: '0.00'
     });
+
+    const [formData, setFormData] = useState(getInitialFormData());
 
     const [products, setProducts] = useState([]);
     const [entry, setEntry] = useState({
@@ -91,6 +93,7 @@ const GRNBoard = ({ isOpen, onClose }) => {
 
     useEffect(() => {
         if (isOpen) {
+            setFormData(getInitialFormData());
             const { companyCode: initCompany, userName: initUser } = getSessionData();
 
             setFormData(prev => ({ ...prev, company: initCompany, createUser: initUser }));

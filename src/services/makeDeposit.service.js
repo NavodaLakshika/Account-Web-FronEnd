@@ -1,6 +1,24 @@
 import { bankingService } from './banking.service';
 
+let _tempDocNo = null;
+
+const getTempDocNo = async (company) => {
+    if (!_tempDocNo) {
+        const result = await bankingService.generateDocNo('MDP', company);
+        _tempDocNo = result.docNo;
+    }
+    return _tempDocNo;
+};
+
 export const makeDepositService = {
+    getLookups: async (companyCode) => {
+        return await bankingService.getCollectionLookups(companyCode);
+    },
+
+    generateDocNo: async (companyCode) => {
+        return await bankingService.generateDocNo('MDP', companyCode);
+    },
+
     getUndepositedFunds: async (company, costCenter, payMode, dateFrom, dateTo) => {
         return await bankingService.getCollections({
             company,
@@ -12,24 +30,24 @@ export const makeDepositService = {
     },
 
     saveDraft: async (data) => {
-        // Map to the banking service deposit which saves to temp table
+        const docNo = await getTempDocNo(data.company);
         return await bankingService.saveDeposit({
             Company: data.company,
             CostCenter: data.costCenter,
             PaymentMode: data.payMode,
-            DocNo: 'TEMP_DEP', // Needs real doc no if implemented fully
-            Items: data.selectedDocNos.map(doc => ({ DocumentNo: doc, Balance: 0 }))
+            DocNo: docNo,
+            Items: data.selectedDocNos.map(doc => ({ DocumentNo: doc, Balance: data.totalAmount }))
         });
     },
 
     applyDeposit: async (data) => {
-        // Map to saveDeposit for now as placeholder for apply
+        const docNo = await getTempDocNo(data.company);
         return await bankingService.saveDeposit({
             Company: data.company,
             CostCenter: data.costCenter,
             PaymentMode: data.payMode,
-            DocNo: 'TEMP_DEP',
-            Items: data.selectedDocNos.map(doc => ({ DocumentNo: doc, Balance: 0 }))
+            DocNo: docNo,
+            Items: data.selectedDocNos.map(doc => ({ DocumentNo: doc, Balance: data.totalAmount }))
         });
     }
 };

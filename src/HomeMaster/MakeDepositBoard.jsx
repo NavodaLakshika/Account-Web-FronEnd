@@ -2,17 +2,19 @@ import React, { useState, useEffect, useMemo } from 'react';
 import SimpleModal from '../components/SimpleModal';
 import { Search, Calendar, CheckCircle, RotateCcw, X, Plus, Save } from 'lucide-react';
 import { makeDepositService } from '../services/makeDeposit.service';
-
+import { getSessionData } from '../utils/session';
 import CalendarModal from '../components/CalendarModal';
 import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
 
 
 const MakeDepositBoard = ({ isOpen, onClose }) => {
+    const { companyCode, userName } = getSessionData();
+
     const [formData, setFormData] = useState({
-        docNo: 'SYSTEM GENERATED',
-        company: 'C001',
-        createUser: 'SYSTEM',
-        costCenter: 'CC001',
+        docNo: '',
+        company: companyCode,
+        createUser: userName,
+        costCenter: '',
         dateFrom: new Date(new Date().setMonth(new Date().getMonth() - 1)).toISOString().split('T')[0],
         dateTo: new Date().toISOString().split('T')[0],
         payMode: 'All Payment Types',
@@ -27,19 +29,8 @@ const MakeDepositBoard = ({ isOpen, onClose }) => {
 
     useEffect(() => {
         if (isOpen) {
-            const companyData = localStorage.getItem('selectedCompany');
-            const user = JSON.parse(localStorage.getItem('user') || '{}');
-            let companyCode = 'C001';
-            if (companyData) {
-                try {
-                    const parsed = JSON.parse(companyData);
-                    companyCode = parsed.company_Code || parsed.companyCode || parsed.CompanyCode || companyData;
-                } catch (e) { companyCode = companyData; }
-            }
-
-            const initUser = user?.emp_Name || user?.empName || 'SYSTEM';
-
-            setFormData(prev => ({ ...prev, company: companyCode, createUser: initUser }));
+            const { companyCode: comp, userName: user } = getSessionData();
+            setFormData(prev => ({ ...prev, company: comp, createUser: user }));
         }
     }, [isOpen]);
 
@@ -95,7 +86,7 @@ const MakeDepositBoard = ({ isOpen, onClose }) => {
         setSelectedDocNos(new Set());
         setFormData(prev => ({
             ...prev,
-            costCenter: 'CC001',
+            costCenter: '',
             department: '',
             payMode: 'All Payment Types',
             dateFrom: new Date(new Date().setMonth(new Date().getMonth() - 1)).toISOString().split('T')[0],
@@ -119,7 +110,7 @@ const MakeDepositBoard = ({ isOpen, onClose }) => {
             });
             showSuccessToast('Funds applied for deposit successfully!');
             handleClear();
-            onClose(); // Optional: close or keep open to process more
+            onClose();
         } catch (error) {
             showErrorToast(error.message || 'Failed to apply deposit');
         }
@@ -193,7 +184,7 @@ const MakeDepositBoard = ({ isOpen, onClose }) => {
             <div className="space-y-4 overflow-y-auto no-scrollbar font-['Tahoma']">
                 <div className="bg-white p-4 border border-gray-100 rounded-lg shadow-sm space-y-4">
                     <div className="grid grid-cols-12 gap-x-6 gap-y-3.5">
-                        
+
                         <div className="col-span-4 flex items-center gap-2">
                             <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Cost Center</label>
                             <input type="text" name="costCenter" value={formData.costCenter} onChange={handleInput} className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-gray-700 bg-white rounded-[5px] outline-none focus:border-[#0285fd] shadow-sm" />
@@ -240,7 +231,6 @@ const MakeDepositBoard = ({ isOpen, onClose }) => {
                         <div className="col-span-4 flex items-center gap-2">
                             <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Pay Mode</label>
                             <select name="payMode" value={formData.payMode} onChange={handleInput} className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-gray-700 bg-white rounded-[5px] outline-none focus:border-[#0285fd] shadow-sm">
-                                <option value="All Payment Types">All Payment Types</option>
                                 <option value="Cash">Cash</option>
                                 <option value="Cheque">Cheque</option>
                                 <option value="Direct Deposit">Direct Deposit</option>
@@ -263,7 +253,6 @@ const MakeDepositBoard = ({ isOpen, onClose }) => {
                 </div>
 
                 <div className="border border-gray-100 rounded-lg bg-white shadow-sm flex flex-col min-h-[350px] overflow-hidden">
-                    {/* Table header */}
                     <div className="flex bg-slate-50/80 border-b border-gray-100 text-[10px] font-black text-gray-400 uppercase tracking-widest items-center">
                         <div className="w-12 py-2.5 px-3 border-r border-gray-100 text-center flex justify-center">
                             <input type="checkbox" checked={funds.length > 0 && selectedDocNos.size === funds.length} onChange={toggleAll} className="w-3.5 h-3.5 rounded border-gray-300 text-blue-600 focus:ring-blue-600" />

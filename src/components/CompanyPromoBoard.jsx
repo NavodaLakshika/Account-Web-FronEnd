@@ -98,18 +98,17 @@ const CompanyPromoBoard = ({ isOpen, onClose }) => {
         if (!isOpen || entering || exiting) return;
 
         const interval = setInterval(() => {
-            setCountdown(prev => {
-                if (prev <= 1) {
-                    clearInterval(interval);
-                    handleClose();
-                    return 0;
-                }
-                return prev - 1;
-            });
+            setCountdown(prev => prev - 1);
         }, 1000);
 
         return () => clearInterval(interval);
-    }, [isOpen, entering, exiting, handleClose]);
+    }, [isOpen, entering, exiting]);
+
+    useEffect(() => {
+        if (countdown <= 0 && isOpen && !exiting) {
+            handleClose();
+        }
+    }, [countdown, isOpen, exiting, handleClose]);
 
     if (!isOpen || ads.length === 0) return null;
 

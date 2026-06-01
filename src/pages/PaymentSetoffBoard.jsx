@@ -2,25 +2,28 @@ import React, { useState, useEffect } from 'react';
 import SimpleModal from '../components/SimpleModal';
 import { Search, X, RotateCcw, Loader2, ArrowRightLeft, UserCircle, Briefcase, FileCheck, CheckCircle2, History, AlertTriangle } from 'lucide-react';
 import { paymentSetoffService } from '../services/paymentSetoff.service';
-
+import { getSessionData } from '../utils/session';
 import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
 
 
 const PaymentSetoffBoard = ({ isOpen, onClose }) => {
+    const { companyCode, userName } = getSessionData();
     const [loading, setLoading] = useState(false);
     const [lookups, setLookups] = useState({ suppliers: [] });
     
     // Form States
-    const [formData, setFormData] = useState({
+    const getInitialFormData = () => ({
         docNo: '',
         date: new Date().toISOString().split('T')[0],
         supplierId: '',
         supplierName: '',
         totalOutstanding: 0,
         totalReturns: 0,
-        company: 'C001',
-        createUser: 'SYSTEM'
+        company: companyCode,
+        createUser: userName
     });
+
+    const [formData, setFormData] = useState(getInitialFormData());
 
     const [pendingPayments, setPendingPayments] = useState([]);
     const [returns, setReturns] = useState([]);
@@ -31,33 +34,17 @@ const PaymentSetoffBoard = ({ isOpen, onClose }) => {
 
     useEffect(() => {
         if (isOpen) {
+            setFormData(getInitialFormData());
+            const { companyCode: comp, userName: user } = getSessionData();
             loadInitialData();
-            
-            const companyData = localStorage.getItem('selectedCompany');
-            const user = JSON.parse(localStorage.getItem('user') || '{}');
-            let companyCode = 'C001';
-
-            if (companyData) {
-                try {
-                    const parsed = JSON.parse(companyData);
-                    companyCode = parsed.company_Code || parsed.companyCode || parsed.CompanyCode || companyData;
-                } catch (e) { companyCode = companyData; }
-            }
-
-            setFormData(prev => ({
-                ...prev,
-                company: companyCode,
-                createUser: user?.emp_Name || user?.empName || 'SYSTEM'
-            }));
         }
     }, [isOpen]);
 
     const loadInitialData = async () => {
         try {
             setLoading(true);
-            const companyCode = formData.company || 'C001';
             const [lookupRes, docRes] = await Promise.all([
-                paymentSetoffService.getLookups(companyCode),
+                paymentSetoffService.getLookups(formData.company),
                 paymentSetoffService.generateDocNo(companyCode)
             ]);
             setLookups(lookupRes);

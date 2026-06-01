@@ -14,7 +14,7 @@ const FundsTransferBoard = ({ isOpen, onClose }) => {
     const [lookups, setLookups] = useState({ banks: [], costCenters: [] });
     
     // Form States
-    const [formData, setFormData] = useState({
+    const getInitialFormData = () => ({
         docNo: '',
         date: new Date().toISOString().split('T')[0],
         fromAccount: '',
@@ -34,20 +34,21 @@ const FundsTransferBoard = ({ isOpen, onClose }) => {
         createUser: ''
     });
 
+    const [formData, setFormData] = useState(getInitialFormData());
+
     const [activeModal, setActiveModal] = useState(null); // 'fromAcc', 'toAcc', 'fromCC', 'toCC'
     const [searchTerm, setSearchTerm] = useState('');
     const [showDatePicker, setShowDatePicker] = useState(false);
 
     useEffect(() => {
         if (isOpen) {
+            setFormData(getInitialFormData());
             const { companyCode, userName } = getSessionData();
-
             setFormData(prev => ({
                 ...prev,
                 company: companyCode,
                 createUser: userName
             }));
-            
             loadInitialData(companyCode);
         }
     }, [isOpen]);

@@ -34,7 +34,7 @@ const TrialBalanceBoard = ({ isOpen, onClose, companyCodeProp, companyNameProp }
     };
 
     const [loading, setLoading] = useState(false);
-    const [formData, setFormData] = useState({
+    const getInitialFormData = () => ({
         dateFrom: formatDate(new Date()), // DD/MM/YYYY
         dateTo: formatDate(new Date()),   // DD/MM/YYYY
         costCenterCode: 'all',
@@ -42,6 +42,8 @@ const TrialBalanceBoard = ({ isOpen, onClose, companyCodeProp, companyNameProp }
         isYearEnd: false,
         allAccounts: false
     });
+
+    const [formData, setFormData] = useState(getInitialFormData());
 
     const [lookups, setLookups] = useState({ costCenters: [], dateRanges: [] });
     const [reportResults, setReportResults] = useState([]);
@@ -55,6 +57,7 @@ const TrialBalanceBoard = ({ isOpen, onClose, companyCodeProp, companyNameProp }
 
     useEffect(() => {
         if (isOpen) {
+            setFormData(getInitialFormData());
             loadLookups();
         }
     }, [isOpen]);

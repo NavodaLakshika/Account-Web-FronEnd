@@ -15,7 +15,7 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
     const [loading, setLoading] = useState(false);
     const [company, setCompany] = useState('');
 
-    const initialFormState = {
+    const getInitialFormData = () => ({
         docNo: '',
         company: company,
         account: '',
@@ -31,9 +31,9 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
         billAmount: 0,
         costCenter: '',
         items: []
-    };
+    });
 
-    const [formData, setFormData] = useState(initialFormState);
+    const [formData, setFormData] = useState(getInitialFormData());
     const [lookups, setLookups] = useState({
         pettyAccounts: [],
         expenseAccounts: [],
@@ -153,7 +153,7 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
             const data = await pettyCashService.getDraft(docNo, company);
             // Map backend data to frontend state
             setFormData({
-                ...initialFormState,
+                ...getInitialFormData(),
                 ...data.header,
                 date: toISODate(data.header.date),
                 dueDate: toISODate(data.header.dueDate),
@@ -187,6 +187,7 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
 
     useEffect(() => {
         if (isOpen) {
+            setFormData(getInitialFormData());
             const { companyCode } = getSessionData();
             setCompany(companyCode);
             setFormData(prev => ({ ...prev, company: companyCode }));
@@ -304,7 +305,7 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
     };
 
     const handleClear = () => {
-        setFormData(initialFormState);
+        setFormData(getInitialFormData());
         setExpenseRows([{ id: Date.now(), accCode: '', costCode: '', amount: 0, memo: '' }]);
         setItemRows([{ id: Date.now(), prodCode: '', qty: 1, cost: 0, memo: '' }]);
         setAccSearch('');

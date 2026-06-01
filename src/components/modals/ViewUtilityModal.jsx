@@ -106,19 +106,17 @@ const ViewUtilityModal = ({ isOpen, onClose, onToggleSideBar, onOpenCalculator, 
                 <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={onClose} />
 
                 <div className="relative w-full max-w-sm bg-white border border-gray-100 rounded-xl shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
-                    <div className="bg-white px-5 py-3.5 flex items-center justify-between border-b border-gray-100 select-none relative overflow-hidden">
-                        <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#0285fd]" />
-
+                    <div className="bg-[#1e3a5f] px-5 py-3.5 flex items-center justify-between select-none relative overflow-hidden">
                         <div className="flex items-center gap-2.5 pl-2">
-                            <div className="w-7 h-7 rounded-lg bg-slate-100 flex items-center justify-center">
-                                <Layout size={13} className="text-[#0285fd]" />
+                            <div className="w-7 h-7 rounded-lg bg-white/15 flex items-center justify-center">
+                                <Layout size={13} className="text-white" />
                             </div>
                             <div className="flex flex-col">
-                                <span className="text-[13px] font-[700] text-slate-900 uppercase tracking-[2px] font-mono leading-none">View and Utility Hub</span>
-                                <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">System Tools &amp; Utilities</span>
+                                <span className="text-[13px] font-[700] text-white uppercase tracking-[2px] font-mono leading-none">View and Utility Hub</span>
+                                <span className="text-[8px] font-bold text-white/60 uppercase tracking-widest mt-0.5">System Tools &amp; Utilities</span>
                             </div>
                         </div>
-                        <button onClick={onClose} className="w-8 h-7 flex items-center justify-center bg-red-50 hover:bg-red-100 text-red-600 rounded-[8px] transition-all active:scale-90 outline-none border-none group">
+                        <button onClick={onClose} className="w-8 h-7 flex items-center justify-center bg-white/10 hover:bg-white/20 text-white/80 rounded-[8px] transition-all active:scale-90 outline-none border-none group">
                             <X size={16} strokeWidth={4} className="group-hover:scale-110 transition-transform" />
                         </button>
                     </div>

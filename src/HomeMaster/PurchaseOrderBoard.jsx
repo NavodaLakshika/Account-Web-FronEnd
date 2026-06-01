@@ -15,7 +15,7 @@ import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
 const PurchaseOrderBoard = ({ isOpen, onClose }) => {
     const [lookups, setLookups] = useState({ suppliers: [], products: [], paymentMethods: [] });
 
-    const [formData, setFormData] = useState({
+    const getInitialFormData = () => ({
         docNo: '',
         company: '',
         createUser: '',
@@ -29,6 +29,8 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
         taxPer: '0',
         nbtAmnt: 0
     });
+
+    const [formData, setFormData] = useState(getInitialFormData());
 
     const [products, setProducts] = useState([]);
     const [orders, setOrders] = useState([]); // List of existing POs for picker
@@ -75,6 +77,7 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
 
     useEffect(() => {
         if (isOpen) {
+            setFormData(getInitialFormData());
             const { companyCode: initCompany, userName: initUser } = getSessionData();
 
             setFormData(prev => ({ ...prev, company: initCompany, createUser: initUser }));
