@@ -19,11 +19,11 @@ const SearchModal = ({ isOpen, onClose, title, items, onSelect, searchKey = 'nam
     if (!isOpen) return null;
     const filtered = items.filter(i => (i.name||'').toLowerCase().includes(q.toLowerCase()) || (i.code||'').toLowerCase().includes(q.toLowerCase()));
     return (
-        <div className="fixed inset-0 z-[2100] flex items-center justify-center bg-black/40 backdrop-blur-sm" onClick={onClose}>
-            <div className="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden" onClick={e=>e.stopPropagation()}>
+        <div className="fixed inset-0 z-[2100] flex items-center justify-center bg-slate-900/30 backdrop-blur-sm" onClick={onClose}>
+ <div className="bg-white rounded-sm shadow-2xl w-full max-w-md overflow-hidden" onClick={e=>e.stopPropagation()}>
                 <div className="bg-[#0285fd] px-5 py-3 flex items-center justify-between">
                     <span className="text-white font-mono font-bold text-xs tracking-widest uppercase">{title}</span>
-                    <button onClick={onClose} className="text-white hover:bg-white/20 p-1 rounded"><X size={16}/></button>
+                    <button onClick={onClose} className="text-white hover:bg-white/20 p-1 rounded"><X size={28}/></button>
                 </div>
                 <div className="p-3 border-b">
                     <input autoFocus value={q} onChange={e=>setQ(e.target.value)} placeholder="Search..." className="w-full border border-gray-200 rounded-md px-3 py-1.5 text-sm outline-none focus:border-blue-400"/>

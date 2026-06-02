@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import {
+  Check,
   X,
   ChevronDown,
   ChevronLeft,
@@ -315,7 +316,7 @@ const ShowAllActionsPanel = ({ isOpen, onClose, favActions, onSave }) => {
         <div className="h-14 flex items-center justify-center border-b border-[#eceef1] relative shrink-0">
           <h2 className="text-[15px] font-bold text-[#393a3d]">Create actions</h2>
           <button onClick={onClose} className="absolute right-4 p-2 text-[#6b6c72] hover:bg-[#f4f5f8] rounded-full transition-colors">
-            <X size={18} />
+            <X size={28} />
           </button>
         </div>
         <div className="flex-1 overflow-y-auto p-6 min-h-0">
@@ -330,7 +331,7 @@ const ShowAllActionsPanel = ({ isOpen, onClose, favActions, onSave }) => {
             />
             {search && (
               <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#8d9096]">
-                <X size={14} />
+                <X size={28} />
               </button>
             )}
           </div>
@@ -443,6 +444,13 @@ const TUTORIAL_VIDEOS = [
     url: 'https://www.youtube.com/embed/S2pE8-VbF-I',
     thumbnail: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&q=80',
     duration: '8:05'
+  },
+  {
+    id: 'customise_layout',
+    title: 'How to customise your layout',
+    url: 'https://www.youtube.com/embed/S2pE8-VbF-I',
+    thumbnail: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=400&q=80',
+    duration: '2:15'
   }
 ];
 
@@ -465,7 +473,7 @@ const VideoTutorialsModal = ({ isOpen, initialVideoId, onClose }) => {
         onClick={onClose} 
         className="absolute top-4 right-4 sm:top-6 sm:right-6 text-white/70 hover:text-white transition-colors z-20 bg-black/40 hover:bg-black/80 rounded-full p-2"
       >
-        <X size={24} />
+        <X size={28} />
       </button>
 
       <div className="relative w-full max-w-5xl bg-[#111827] rounded-xl shadow-2xl overflow-hidden ring-1 ring-white/10 flex flex-col md:flex-row h-[85vh] max-h-[700px]">
@@ -550,7 +558,7 @@ const AddWidgetsPanel = ({ isOpen, onClose, initialSelected, onSave }) => {
         <div className="h-14 flex items-center justify-center border-b border-[#eceef1] relative shrink-0">
           <h2 className="text-[15px] font-bold text-[#393a3d]">Add widgets</h2>
           <button onClick={onClose} className="absolute right-4 p-2 text-[#6b6c72] hover:bg-[#f4f5f8] rounded-full transition-colors">
-            <X size={18} />
+            <X size={28} />
           </button>
         </div>
         <div className="flex-1 overflow-y-auto p-6 min-h-0">
@@ -616,7 +624,7 @@ const EditWrapper = ({ children, isEditing, grabbers = [], className = '', onRem
           className="absolute -top-3 -right-3 w-6 h-6 bg-white border border-slate-200 rounded-full flex items-center justify-center text-rose-500 shadow-md hover:bg-rose-550 hover:text-white hover:border-rose-550 transition-colors z-30 opacity-0 group-hover:opacity-100"
           title="Delete widget"
         >
-          <X size={14} strokeWidth={2.5} />
+          <X size={28} strokeWidth={1.5} />
         </button>
       )}
 
@@ -640,7 +648,7 @@ const EditWrapper = ({ children, isEditing, grabbers = [], className = '', onRem
 
 /** QBO-style widget: white card + optional full-width footer button */
 const WidgetShell = ({ title, subtitle, children, footerButtonLabel, onFooterButton, onHide }) => (
-  <div className="group relative bg-white border border-slate-200/60 rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.02),0_1px_3px_rgba(0,0,0,0.01)] flex flex-col min-h-[200px] h-full hover:shadow-[0_12px_24px_-8px_rgba(0,0,0,0.06)] hover:border-slate-350/80 transition-all duration-300 ease-out">
+ <div className="group relative bg-white rounded-sm shadow-[0_2px_12px_rgba(0,0,0,0.02),0_1px_3px_rgba(0,0,0,0.01)] flex flex-col min-h-[200px] h-full hover:shadow-[0_12px_24px_-8px_rgba(0,0,0,0.06)] hover:border-slate-350/80 transition-all duration-300 ease-out">
     <div className="p-4 sm:p-4.5 flex-1 flex flex-col min-h-0 relative">
       <div className="flex justify-between items-start gap-2 mb-1">
         <span className="text-[9.5px] font-extrabold uppercase tracking-widest text-slate-400">
@@ -689,12 +697,12 @@ const HeaderIconBtn = ({ children, label, onClick }) => (
 const SmartSuggestionsHelpModal = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
   return (
-    <div className="fixed inset-0 z-[10005] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-      <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden">
+    <div className="fixed inset-0 z-[10005] flex items-center justify-center bg-slate-900/30 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+ <div className="bg-white rounded-sm w-full max-w-md shadow-2xl overflow-hidden">
         <div className="flex justify-between items-center p-5 border-b border-[#eceef1]">
           <h2 className="text-[18px] font-bold text-[#393a3d]">Why am I seeing these suggestions?</h2>
           <button onClick={onClose} className="p-1.5 text-[#6b6c72] hover:bg-slate-100 rounded-full transition-colors">
-            <X size={20} />
+            <X size={28} />
           </button>
         </div>
         <div className="p-6">
@@ -775,6 +783,7 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
   const [isShowAllActionsOpen, setIsShowAllActionsOpen] = useState(false);
   const [videoOpen, setVideoOpen] = useState(null);
   const [isSmartSuggestionsHelpOpen, setIsSmartSuggestionsHelpOpen] = useState(false);
+  const [feedbackState, setFeedbackState] = useState(null);
   const [widgetToHide, setWidgetToHide] = useState(null);
   const [favActions, setFavActions] = useState(() => {
     const saved = localStorage.getItem('onimta_gtd_fav_actions');
@@ -1022,11 +1031,14 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
         <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden">
           <div className="w-full max-w-[min(2050px,100%)] mx-auto px-2.5 sm:px-5 lg:px-7 pb-4">
             {/* Greeting + utilities */}
-            <div className="relative pt-3 sm:pt-4.5 pb-2.5">
-              <div className="absolute right-0 top-3 sm:top-4.5 flex items-center gap-3 sm:gap-4 text-[12px] sm:text-[13px] font-bold text-slate-605">
+            <div className="relative py-3 sm:py-4.5 w-full">
+              <div className="flex justify-end items-center gap-3 sm:gap-4 text-[12px] sm:text-[13px] font-bold text-slate-605 w-full">
                 {isCustomising ? (
                   <>
-                    <button className="text-blue-650 hover:underline transition-colors hidden sm:block">
+                    <button 
+                      onClick={() => setVideoOpen('customise_layout')} 
+                      className="text-blue-650 hover:underline transition-colors hidden sm:block"
+                    >
                       Learn how to customise your layout
                     </button>
                     <button 
@@ -1046,7 +1058,7 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
                   <>
                     <button
                       type="button"
-                      className="flex items-center gap-1.5 hover:text-blue-600 transition-colors mr-2"
+                      className="flex items-center gap-1.5 hover:text-blue-600 transition-colors mr-2 mt-6"
                       onClick={onClose}
                     >
                       <ChevronLeft size={15} className="text-slate-400" />
@@ -1054,7 +1066,7 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
                     </button>
                     <button
                       type="button"
-                      className="flex items-center gap-1.5 hover:text-blue-600 transition-colors"
+                      className="flex items-center gap-1.5 hover:text-blue-600 transition-colors mt-6"
                       onClick={() => setVideoOpen('get_started')}
                     >
                       <PlayCircle size={15} className="text-slate-400" />
@@ -1062,13 +1074,13 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
                     </button>
                     <button
                       type="button"
-                      className="flex items-center gap-1.5 hover:text-blue-600 transition-colors"
+                      className="flex items-center gap-1.5 hover:text-blue-600 transition-colors mt-6"
                       onClick={() => setIsCustomising(true)}
                     >
-                      <SlidersHorizontal size={15} className="text-slate-400" />
+                      <SlidersHorizontal size={15} className="text-slate-400 " />
                       <span className="hidden sm:inline">Customise</span>
                     </button>
-                    <div className="relative group flex items-center">
+                    <div className="relative group flex items-center mt-6">
                       <button 
                         type="button" 
                         onClick={() => setIsPrivacyMode(!isPrivacyMode)}
@@ -1092,11 +1104,6 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
               </div>
             </div>
 
-            {/* Grouped Homeboard actions pills with Tabs */}
-            <EditWrapper isEditing={isCustomising} className="mb-6 py-2 px-1">
-              <div className="flex flex-col gap-6 max-w-6xl mx-auto px-4 mt-2">
-              </div>
-            </EditWrapper>
 
             <div className="border-b border-slate-200 pb-1.5 mb-3 flex items-center justify-between">
               <h2 className="text-[11px] font-extrabold uppercase tracking-widest text-slate-400">
@@ -1105,16 +1112,33 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
             </div>
 
             {isCustomising && (
-              <div className="bg-[#eceef1] rounded-md py-3 px-4 mb-4 flex flex-col sm:flex-row items-center justify-center gap-3">
-                <span className="text-[12px] font-bold text-[#393a3d]">Are these customisation options useful?</span>
-                <div className="flex gap-1.5">
-                  <button className="w-8 h-8 rounded-full border border-[#d4d7dc] bg-white flex items-center justify-center hover:bg-[#f4f5f8] text-[#393a3d] transition-colors">
-                    <ThumbsUp size={14} />
-                  </button>
-                  <button className="w-8 h-8 rounded-full border border-[#d4d7dc] bg-white flex items-center justify-center hover:bg-[#f4f5f8] text-[#393a3d] transition-colors">
-                    <ThumbsDown size={14} />
-                  </button>
-                </div>
+              <div className="bg-[#eceef1] rounded-md py-3 px-4 mb-4 flex flex-col sm:flex-row items-center justify-center gap-3 min-h-[56px] transition-all">
+                {feedbackState ? (
+                  <div className="flex items-center gap-2 text-[#2ca01c]">
+                    <Check size={16} strokeWidth={3} />
+                    <span className="text-[12px] font-bold">Thanks for your feedback!</span>
+                  </div>
+                ) : (
+                  <>
+                    <span className="text-[12px] font-bold text-[#393a3d]">Are these customisation options useful?</span>
+                    <div className="flex gap-1.5">
+                      <button 
+                        onClick={() => setFeedbackState('up')} 
+                        className="w-8 h-8 rounded-full border border-[#d4d7dc] bg-white flex items-center justify-center hover:bg-green-50 hover:text-[#2ca01c] hover:border-[#2ca01c] text-[#393a3d] transition-all duration-200"
+                        title="Yes, they are useful"
+                      >
+                        <ThumbsUp size={14} />
+                      </button>
+                      <button 
+                        onClick={() => setFeedbackState('down')} 
+                        className="w-8 h-8 rounded-full border border-[#d4d7dc] bg-white flex items-center justify-center hover:bg-red-50 hover:text-red-600 hover:border-red-600 text-[#393a3d] transition-all duration-200"
+                        title="No, they need improvement"
+                      >
+                        <ThumbsDown size={14} />
+                      </button>
+                    </div>
+                  </>
+                )}
               </div>
             )}
 
@@ -1270,6 +1294,27 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
                       </>
                     )}
                   </div>
+                  {/* Transactions */}
+                  {expenseData.recentTransactions?.length > 0 && (
+                    <div className="mt-4 pt-3 border-t border-[#eceef1] space-y-2">
+                      {expenseData.recentTransactions
+                        .slice(0, 4)
+                        .map((tx, i) => (
+                          <div
+                            key={i}
+                            className="flex justify-between text-[11px]"
+                          >
+                            <span className="font-semibold text-[#393a3d] truncate max-w-[65%] uppercase">
+                              {suppliersMap[tx.payee] || tx.payee || tx.type}
+                            </span>
+
+                            <span className="font-mono font-bold text-[#111827]">
+                              {formatLkr(tx.total)}
+                            </span>
+                          </div>
+                        ))}
+                    </div>
+                  )}
                 </WidgetShell>
                 </EditWrapper>
               )}
@@ -1409,14 +1454,8 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
 <WidgetShell
   title="Cash flow"
   subtitle="Track how your money is doing"
-  footerButtonLabel={
-    activeTab === 'expenses'
-      ? 'View expense transactions'
-      : 'Link your bank to see cash flow'
-  }
-  onFooterButton={() =>
-    runAction(activeTab === 'expenses' ? 'expenses_detail' : 'bank_rec')
-  }
+  footerButtonLabel="Link your bank to see cash flow"
+  onFooterButton={() => runAction('bank_rec')}
   onHide={() => setWidgetToHide('cash_flow')}
 >
   <div className="flex gap-3 h-[190px] pt-4 mt-2">
@@ -1462,28 +1501,7 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
     </div>
   </div>
 
-  {/* Transactions */}
-  {activeTab === 'expenses' &&
-    expenseData.recentTransactions?.length > 0 && (
-      <div className="mt-4 pt-3 border-t border-[#eceef1] space-y-2">
-        {expenseData.recentTransactions
-          .slice(0, 4)
-          .map((tx, i) => (
-            <div
-              key={i}
-              className="flex justify-between text-[11px]"
-            >
-              <span className="font-semibold text-[#393a3d] truncate max-w-[65%] uppercase">
-                {suppliersMap[tx.payee] || tx.payee || tx.type}
-              </span>
 
-              <span className="font-mono font-bold text-[#111827]">
-                {formatLkr(tx.total)}
-              </span>
-            </div>
-          ))}
-      </div>
-    )}
 </WidgetShell>
 </EditWrapper>
 )}
@@ -1620,7 +1638,7 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
             { label: 'Reviews', val: String(biData?.customerFunnel?.reviewCount || '0'), color: '#022c22' },
           ].map((f, i, arr) => (
             <React.Fragment key={i}>
-              <div className="border border-slate-100 rounded-2xl flex flex-col min-w-[115px] flex-1 shrink-0 h-[105px] overflow-hidden bg-slate-50/40 hover:bg-white hover:border-slate-200 hover:shadow-md transition-all duration-305 relative shadow-[0_1px_3px_rgba(0,0,0,0.01)]">
+ <div className=" rounded-sm flex flex-col min-w-[115px] flex-1 shrink-0 h-[105px] overflow-hidden bg-slate-50/40 hover:bg-white hover:border-slate-200 hover:shadow-md transition-all duration-305 relative shadow-[0_1px_3px_rgba(0,0,0,0.01)]">
                 <div className="h-1.5 w-full shrink-0" style={{ backgroundColor: f.color }} />
                 <div className="p-4 flex-1 flex flex-col justify-between">
                   <span className="text-[12px] font-bold text-slate-500 leading-tight">{f.label}</span>
@@ -1782,7 +1800,7 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
         onHide={() => setWidgetToHide('work_requests')}
       >
         <div className="flex-1 flex items-center justify-center py-6">
-          <div className="border border-[#eceef1] rounded-lg shadow-sm p-3 flex gap-3 max-w-[160px] bg-white z-10 relative">
+ <div className="border border-[#eceef1] rounded-sm shadow-sm p-3 flex gap-3 max-w-[160px] bg-white z-10 relative">
             <div className="w-6 h-6 rounded-full bg-[#d4d7dc] shrink-0" />
             <div className="flex-1 space-y-1.5 pt-0.5">
               <div className="h-2.5 w-10 bg-[#eceef1] rounded-sm" />
@@ -1872,7 +1890,7 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
         onHide={() => setWidgetToHide('referrals')}
       >
         <div className="flex-1 flex items-center justify-center py-6">
-          <div className="border border-[#eceef1] rounded-lg shadow-sm p-3 flex flex-col gap-3 max-w-[160px] bg-white z-10 relative">
+ <div className="border border-[#eceef1] rounded-sm shadow-sm p-3 flex flex-col gap-3 max-w-[160px] bg-white z-10 relative">
             <div className="text-[10px] text-[#393a3d] font-bold text-center">You've received a new referral</div>
             <div className="flex items-center gap-3 justify-center">
               <div className="w-6 h-6 rounded-full bg-[#d4d7dc] shrink-0" />
@@ -1906,7 +1924,7 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
               onClick={() => setVideoOpen('get_started')}
             >
               <img src="https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=400&q=80" alt="Thumbnail 1" className="absolute inset-0 w-full h-full object-cover opacity-75 group-hover:opacity-95 group-hover:scale-103 transition-all duration-350" />
-              <div className="w-11 h-11 rounded-full bg-white shadow-xl flex items-center justify-center z-10 text-emerald-600 group-hover:scale-110 transition-transform duration-200">
+ <div className="w-11 h-11 rounded-sm bg-white shadow-xl flex items-center justify-center z-10 text-emerald-600 group-hover:scale-110 transition-transform duration-200">
                 <Play size={18} fill="currentColor" className="ml-0.5" />
               </div>
             </div>
@@ -1918,7 +1936,7 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
               onClick={() => setVideoOpen('track_expenses')}
             >
               <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&q=80" alt="Thumbnail 2" className="absolute inset-0 w-full h-full object-cover opacity-75 group-hover:opacity-95 group-hover:scale-103 transition-all duration-350" />
-              <div className="w-11 h-11 rounded-full bg-white shadow-xl flex items-center justify-center z-10 text-emerald-600 group-hover:scale-110 transition-transform duration-200">
+ <div className="w-11 h-11 rounded-sm bg-white shadow-xl flex items-center justify-center z-10 text-emerald-600 group-hover:scale-110 transition-transform duration-200">
                 <Play size={18} fill="currentColor" className="ml-0.5" />
               </div>
             </div>
@@ -1959,14 +1977,14 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
 
       {/* Hide Widget Confirmation Modal */}
       {widgetToHide && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-2xl w-full max-w-sm shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/30 backdrop-blur-sm p-4">
+ <div className="bg-white rounded-sm w-full max-w-sm shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
             <div className="flex justify-end p-3 pb-0">
               <button 
                 onClick={() => setWidgetToHide(null)}
                 className="text-[#6b6c72] hover:bg-slate-100 p-1.5 rounded-full transition-colors"
               >
-                <X size={18} />
+                <X size={28} />
               </button>
             </div>
             <div className="px-6 pb-6 text-center">

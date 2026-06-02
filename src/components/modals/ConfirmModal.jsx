@@ -18,18 +18,18 @@ const ConfirmModal = ({
     return (
         <div className="fixed inset-0 z-[1200] flex items-center justify-center p-4 font-['Plus_Jakarta_Sans'] ">
             <div 
-                className="absolute inset-0 bg-slate-900/60 backdrop-blur-md transition-opacity" 
+                className="absolute inset-0 bg-slate-900/30 backdrop-blur-sm transition-opacity" 
                 onClick={() => !loading && onClose()} 
             />
             
-            <div className="relative w-full max-w-md bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden animate-in zoom-in-95 duration-200">
+ <div className="relative w-full max-w-md bg-white rounded-sm shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
                 {/* <button
                     onClick={onClose}
                     disabled={loading}
                     className="absolute top-4 right-4 w-9 h-8 flex items-center justify-center bg-red-50 hover:bg-red-100 text-red-600 rounded-[8px] transition-all active:scale-90 outline-none border-none group"
                     title="Close"
                 >
-                    <X size={18} strokeWidth={4} className="group-hover:scale-110 transition-transform" />
+                    <X size={28} strokeWidth={1.5} className="group-hover:scale-110 transition-transform" />
                 </button> */}
 
                 <div className="p-8 text-center">

@@ -357,7 +357,7 @@ const ReportTemplate = ({
             <div className={`fixed left-0 top-0 bottom-0 w-[260px] bg-white shadow-2xl z-[120] border-r border-gray-100 flex flex-col transition-transform duration-300 ease-in-out ${showFontModal ? 'translate-x-0' : '-translate-x-full'}`}>
                 <div className="h-14 border-b border-gray-50 flex items-center justify-between px-5 bg-slate-50 shrink-0">
                     <span className="text-[10px] font-black text-slate-900 uppercase tracking-widest flex items-center gap-2"><TypeIcon size={12} className="text-blue-600" /> Typography Hub</span>
-                    <button onClick={() => setShowFontModal(false)} className="text-gray-400 hover:text-red-500 transition-colors"><X size={16} /></button>
+                    <button onClick={() => setShowFontModal(false)} className="text-gray-400 hover:text-red-500 transition-colors"><X size={28} /></button>
                 </div>
                 <div className="p-3 border-b border-gray-50 bg-white">
                     <div className="relative">
@@ -379,7 +379,7 @@ const ReportTemplate = ({
             <div className={`fixed left-0 top-0 bottom-0 w-[260px] bg-white shadow-2xl z-[130] border-r border-gray-100 flex flex-col transition-transform duration-300 ease-in-out ${showColorModal ? 'translate-x-0' : '-translate-x-full'}`}>
                 <div className="h-14 border-b border-gray-50 flex items-center justify-between px-5 bg-slate-50 shrink-0">
                     <span className="text-[10px] font-black text-slate-900 uppercase tracking-widest flex items-center gap-2"><Palette size={14} className="text-pink-500" /> Color Matrix</span>
-                    <button onClick={() => setShowColorModal(false)} className="text-gray-400 hover:text-red-500 transition-colors"><X size={16} /></button>
+                    <button onClick={() => setShowColorModal(false)} className="text-gray-400 hover:text-red-500 transition-colors"><X size={28} /></button>
                 </div>
                 <div className="p-3 border-b border-gray-50 bg-white">
                     <div className="relative">
@@ -412,7 +412,7 @@ const ReportTemplate = ({
             <div className={`fixed left-0 top-0 bottom-0 w-[260px] bg-white shadow-2xl z-[140] border-r border-gray-100 flex flex-col transition-transform duration-300 ease-in-out ${showVisibilityModal ? 'translate-x-0' : '-translate-x-full'}`}>
                 <div className="h-14 border-b border-gray-50 flex items-center justify-between px-5 bg-slate-50 shrink-0">
                     <span className="text-[10px] font-black text-slate-900 uppercase tracking-widest flex items-center gap-2"><LayoutTemplate size={14} className="text-emerald-500" /> Visibility Hub</span>
-                    <button onClick={() => setShowVisibilityModal(false)} className="text-gray-400 hover:text-red-500 transition-colors"><X size={16} /></button>
+                    <button onClick={() => setShowVisibilityModal(false)} className="text-gray-400 hover:text-red-500 transition-colors"><X size={28} /></button>
                 </div>
                 <div className="p-4 flex-1 space-y-6 overflow-y-auto no-scrollbar">
                     <div className="space-y-4">
@@ -444,7 +444,7 @@ const ReportTemplate = ({
             <div className={`fixed left-0 top-0 bottom-0 w-[240px] bg-white shadow-2xl z-[150] border-r border-gray-100 flex flex-col transition-transform duration-300 ease-in-out ${showCustomSizeModal ? 'translate-x-0' : '-translate-x-full'}`}>
                 <div className="h-14 border-b border-gray-50 flex items-center justify-between px-5 bg-slate-50 shrink-0">
                     <span className="text-[10px] font-black text-slate-900 uppercase tracking-widest flex items-center gap-2"><Ruler size={14} className="text-blue-500" /> Dimensions</span>
-                    <button onClick={() => setShowCustomSizeModal(false)} className="text-gray-400 hover:text-red-500 transition-colors"><X size={16} /></button>
+                    <button onClick={() => setShowCustomSizeModal(false)} className="text-gray-400 hover:text-red-500 transition-colors"><X size={28} /></button>
                 </div>
                 <div className="p-5 flex-1 space-y-6 overflow-y-auto no-scrollbar">
                     <div className="space-y-4">
@@ -503,10 +503,10 @@ const ReportTemplate = ({
                     </button>
 
                     {showSettings && (
-                        <div className="absolute top-10 right-0 w-[300px] bg-white border border-gray-200 shadow-xl rounded-[5px] p-4 z-[110] animate-in zoom-in-95 duration-150 font-sans text-slate-800 overflow-y-auto max-h-[85vh] no-scrollbar">
+ <div className="absolute top-10 right-0 w-[300px] bg-white shadow-xl rounded-[5px] p-4 z-[110] animate-in zoom-in-95 duration-150 font-sans text-slate-800 overflow-y-auto max-h-[85vh] no-scrollbar">
                             <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-200 sticky top-0 bg-white z-10">
                                 <h3 className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">Report Settings</h3>
-                                <button onClick={() => setShowSettings(false)} className="text-gray-400 hover:text-red-500 transition-colors"><X size={14} /></button>
+                                <button onClick={() => setShowSettings(false)} className="text-gray-400 hover:text-red-500 transition-colors"><X size={28} /></button>
                             </div>
                             <div className="flex gap-2 mb-4">
                                 <button onClick={handleSaveSettings} className="flex-1 h-9 rounded-[5px] bg-[#0285fd] text-white text-[11px] font-bold flex items-center justify-center gap-2 hover:bg-[#0073ff] transition-all shadow-md active:scale-95"><Save size={12}/> SAVE STYLE</button>
@@ -524,7 +524,7 @@ const ReportTemplate = ({
                                                 {hiddenCells.includes(activeCell.rowIndex === 'special' ? activeCell.columnKey : `${activeCell.rowIndex}_${activeCell.columnKey}`) ? <Eye size={14}/> : <EyeOff size={14}/>}
                                                 {hiddenCells.includes(activeCell.rowIndex === 'special' ? activeCell.columnKey : `${activeCell.rowIndex}_${activeCell.columnKey}`) ? 'RESTORE' : 'HIDE'}
                                             </button>
-                                            <button onClick={() => setActiveCell(null)} className="h-8 px-3 rounded-[5px] border border-slate-200 bg-white text-gray-500 hover:bg-slate-50 transition-all active:scale-95"><X size={14}/></button>
+                                            <button onClick={() => setActiveCell(null)} className="h-8 px-3 rounded-[5px] border border-slate-200 bg-white text-gray-500 hover:bg-slate-50 transition-all active:scale-95"><X size={28}/></button>
                                         </div>
                                         <div className="p-4 border border-slate-200 rounded-[5px] bg-white space-y-4">
                                             <label className="text-[11px] font-bold text-gray-500 uppercase block border-b border-slate-100 pb-2 mb-2">Cell Borders</label>

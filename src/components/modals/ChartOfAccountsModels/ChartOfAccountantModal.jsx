@@ -21,10 +21,10 @@ const ChartOfAccountantModal = ({ isOpen, onClose, onCreateNewAccount, onOpenFix
             {/* Modal Container Logic */}
             <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
                 {/* Backdrop */}
-                <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={onClose} />
+                <div className="absolute inset-0 bg-slate-900/30 backdrop-blur-sm" onClick={onClose} />
                 
                 {/* Modal Container */}
-                <div className="relative w-full max-w-sm bg-white border border-gray-100 rounded-xl shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
+ <div className="relative w-full max-w-sm bg-white rounded-sm shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
                     
                     {/* Header */}
                     <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-100 select-none relative overflow-hidden">
@@ -43,7 +43,7 @@ const ChartOfAccountantModal = ({ isOpen, onClose, onCreateNewAccount, onOpenFix
                             className="w-9 h-8 flex items-center justify-center bg-red-50 hover:bg-red-100 text-red-600 rounded-[8px] transition-all active:scale-90 outline-none border-none group"
                             title="Close"
                         >
-                            <X size={18} strokeWidth={4} className="group-hover:scale-110 transition-transform" />
+                            <X size={28} strokeWidth={1.5} className="group-hover:scale-110 transition-transform" />
                         </button>
                     </div>
 
@@ -68,7 +68,7 @@ const ChartOfAccountantModal = ({ isOpen, onClose, onCreateNewAccount, onOpenFix
                                 />
 
                                 <div className="flex items-center gap-3 relative z-10">
-                                    <div className="w-8 h-8 rounded-md bg-slate-100 flex items-center justify-center group-hover:bg-white transition-colors shadow-sm group-hover:shadow-md">
+ <div className="w-8 h-8 rounded-sm bg-slate-100 flex items-center justify-center group-hover:bg-white transition-colors shadow-sm group-hover:shadow-md">
                                         <Icon size={14} className="text-slate-500 group-hover:text-[#0078d4] transition-colors" />
                                     </div>
                                     <span className="text-[11px] uppercase tracking-widest font-bold text-slate-600 group-hover:text-[#0078d4] transition-colors">

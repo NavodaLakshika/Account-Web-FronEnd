@@ -6,13 +6,13 @@ const TransactionFormWrapper = ({ isOpen, onClose, title, subtitle, icon: Icon, 
 
   return (
     <div className="fixed inset-0 z-[300] flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-md" onClick={onClose} />
+      <div className="absolute inset-0 bg-slate-900/30 backdrop-blur-sm" onClick={onClose} />
 
-      <div className={`relative w-full ${maxWidth} bg-white rounded-[5px] shadow-2xl border border-slate-200 overflow-hidden animate-in slide-in-from-bottom-10 fade-in duration-400 flex flex-col max-h-[95vh]`}>
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 bg-white shrink-0">
+ <div className={`relative w-full ${maxWidth} bg-white rounded-none shadow-2xl overflow-hidden animate-in slide-in-from-bottom-10 fade-in duration-400 flex flex-col max-h-[95vh]`}>
+        <div className="flex items-center justify-between px-6 py-4 bg-white shrink-0">
           <div className="flex items-center gap-3">
             {Icon && (
-              <div className="w-8 h-8 rounded-[5px] bg-slate-100 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-none bg-slate-100 flex items-center justify-center">
                 <Icon size={15} className="text-slate-500" />
               </div>
             )}
@@ -21,8 +21,8 @@ const TransactionFormWrapper = ({ isOpen, onClose, title, subtitle, icon: Icon, 
               {subtitle && <p className="text-[11px] font-bold text-gray-500 uppercase">{subtitle}</p>}
             </div>
           </div>
-          <button onClick={onClose} className="w-8 h-8 bg-white/10 hover:bg-slate-100 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-600 transition-all border-none shrink-0">
-            <X size={15} strokeWidth={2} />
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-800 transition-colors border-none shrink-0 bg-transparent">
+            <X size={28} strokeWidth={1.5} />
           </button>
         </div>
 

@@ -138,7 +138,7 @@ const ChangePasswordBoard = ({ isOpen, onClose }) => {
                 <div className="space-y-4 py-4 font-['Plus_Jakarta_Sans']">
                     {/* User Profile Header */}
                     <div className="flex flex-col items-center bg-blue-50/50 p-6 rounded-2xl border border-blue-100 mb-2">
-                        <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-md mb-3 border-2 border-blue-200">
+ <div className="w-16 h-16 bg-white rounded-sm flex items-center justify-center shadow-md mb-3 border-2 border-blue-200">
                              <User size={32} className="text-blue-600" />
                         </div>
                         <h4 className="text-lg font-black text-slate-800 uppercase tracking-tight">
@@ -256,7 +256,7 @@ const ChangePasswordBoard = ({ isOpen, onClose }) => {
                     </div>
 
                     {/* Table matching PurchaseOrderBoard style */}
-                    <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm bg-white">
+ <div className=" rounded-sm overflow-hidden shadow-sm bg-white">
                         <table className="w-full text-left">
                             <thead className="bg-[#f8fafd] text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 sticky top-0 z-10">
                                 <tr>
@@ -310,8 +310,8 @@ const ChangePasswordBoard = ({ isOpen, onClose }) => {
             {/* Save Confirmation */}
             {showSaveConfirm && (
                 <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4 font-['Plus_Jakarta_Sans']">
-                    <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setShowSaveConfirm(false)} />
-                    <div className="relative w-full max-w-xs bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden animate-in zoom-in-95 duration-200">
+                    <div className="absolute inset-0 bg-slate-900/30 backdrop-blur-sm" onClick={() => setShowSaveConfirm(false)} />
+ <div className="relative w-full max-w-xs bg-white rounded-sm shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
                         <div className="p-6 text-center">
                             <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-white shadow-sm">
                                 <CheckCircle2 size={32} className="text-[#0078d4]" />

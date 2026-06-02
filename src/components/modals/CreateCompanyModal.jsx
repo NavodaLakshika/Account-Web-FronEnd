@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Building2, Loader2, CheckCircle2, Globe, Briefcase, MapPin, Phone, Mail, Save, RefreshCw, ArrowLeft } from 'lucide-react';
+import { Building2, Loader2, CheckCircle2, Save, ArrowLeft } from 'lucide-react';
 import { authService } from '../../services/auth.service';
 import { showSuccessToast, showErrorToast } from '../../utils/toastUtils';
 import TransactionFormWrapper from '../TransactionFormWrapper';
@@ -58,63 +58,61 @@ const CreateCompanyModal = ({ isOpen, onClose, onCreated, user }) => {
             isOpen={isOpen}
             onClose={onClose}
             title={done ? 'Company Created' : 'New Company'}
-            subtitle="Register a new company"
+            subtitle="Register a new company workspace"
             icon={Building2}
-            maxWidth="max-w-lg"
+            maxWidth="max-w-2xl"
             footer={
                 !done && (
                     <div className="flex items-center justify-end gap-3 w-full">
-                        <button type="button" onClick={onClose} className="px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-500 font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] transition-all active:scale-95 flex items-center justify-center gap-2 border-none">
-                            <ArrowLeft size={14} /> CANCEL
+                        <button type="button" onClick={onClose} className="px-6 py-3 bg-white border border-slate-300 hover:border-slate-400 hover:bg-slate-50 text-slate-700 font-bold text-sm rounded-md transition-all flex items-center justify-center gap-2">
+                            <ArrowLeft size={16} /> Cancel
                         </button>
-                        <button type="submit" form="companyForm" disabled={loading} className="px-6 py-3 bg-[#2bb744] hover:bg-[#259b3a] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] transition-all active:scale-95 flex items-center justify-center gap-2 border-none shadow-md shadow-green-100">
-                            {loading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />} CREATE COMPANY
+                        <button type="submit" form="companyForm" disabled={loading} className="px-6 py-3 bg-[#00acee] hover:bg-[#0092cc] text-white font-bold text-sm rounded-md transition-all active:scale-[0.98] flex items-center justify-center gap-2 shadow-sm">
+                            {loading ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />} Create Company
                         </button>
                     </div>
                 )
             }
         >
             {done ? (
-                <div className="flex flex-col items-center gap-5 text-center py-8">
-                    <div className="w-20 h-20 rounded-full bg-cyan-50 border-2 border-[#00D1FF]/40 flex items-center justify-center">
-                        <CheckCircle2 size={40} className="text-[#00D1FF]" />
+                <div className="flex flex-col items-center gap-5 text-center py-12">
+                    <div className="w-24 h-24 rounded-full bg-blue-50 flex items-center justify-center animate-in zoom-in duration-300">
+                        <CheckCircle2 size={48} className="text-[#00acee]" />
                     </div>
                     <div>
-                        <h3 className="text-slate-800 text-xl font-mono font-bold uppercase tracking-tight mb-1">{form.CompanyName}</h3>
-                        <p className="text-gray-400 text-xs font-mono">Company registered successfully. You can now select it.</p>
+                        <h3 className="text-slate-800 text-2xl font-bold tracking-tight mb-2">{form.CompanyName}</h3>
+                        <p className="text-slate-500 text-sm">Company registered successfully. You can now enter this workspace.</p>
                     </div>
-                    <button onClick={onCreated} className="px-8 py-3 bg-[#2bb744] hover:bg-[#259b3a] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] transition-all active:scale-95 shadow-md shadow-green-100">
-                        SELECT COMPANY
+                    <button onClick={onCreated} className="px-8 py-3 mt-4 bg-[#00acee] hover:bg-[#0092cc] text-white font-bold text-sm rounded-md transition-all active:scale-[0.98] shadow-sm">
+                        Select Company
                     </button>
                 </div>
             ) : (
-                <form id="companyForm" onSubmit={handleSubmit} className="space-y-4 font-['Tahoma',_sans-serif] text-slate-700">
-                    <div className="bg-white p-4 border border-slate-200 rounded-[5px] shadow-sm space-y-4">
-                        <div className="grid grid-cols-12 gap-x-4 gap-y-3.5">
-                            <div className="col-span-12 flex items-center gap-2">
-                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Company Name</label>
-                                <input type="text" name="CompanyName" value={form.CompanyName} onChange={handleChange} required placeholder="Enter company name" className="flex-1 min-w-0 h-8 border border-slate-200 rounded px-3 font-mono text-sm outline-none bg-slate-50 text-gray-700 transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" />
-                            </div>
-                            <div className="col-span-6 flex items-center gap-2">
-                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Country</label>
-                                <input type="text" name="Country" value={form.Country} onChange={handleChange} placeholder="Select country" className="flex-1 min-w-0 h-8 border border-slate-200 rounded px-3 font-mono text-sm outline-none bg-slate-50 text-gray-700 transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" />
-                            </div>
-                            <div className="col-span-6 flex items-center gap-2">
-                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Industry</label>
-                                <input type="text" name="Industry" value={form.Industry} onChange={handleChange} placeholder="Select industry" className="flex-1 min-w-0 h-8 border border-slate-200 rounded px-3 font-mono text-sm outline-none bg-slate-50 text-gray-700 transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" />
-                            </div>
-                            <div className="col-span-12 flex items-center gap-2">
-                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Address</label>
-                                <input type="text" name="Address" value={form.Address} onChange={handleChange} placeholder="Street address" className="flex-1 min-w-0 h-8 border border-slate-200 rounded px-3 font-mono text-sm outline-none bg-slate-50 text-gray-700 transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" />
-                            </div>
-                            <div className="col-span-6 flex items-center gap-2">
-                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Phone</label>
-                                <input type="tel" name="Phone" value={form.Phone} onChange={handleChange} placeholder="Phone number" className="flex-1 min-w-0 h-8 border border-slate-200 rounded px-3 font-mono text-sm outline-none bg-slate-50 text-gray-700 transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" />
-                            </div>
-                            <div className="col-span-6 flex items-center gap-2">
-                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Email</label>
-                                <input type="email" name="Email" value={form.Email} onChange={handleChange} placeholder="company@example.com" className="flex-1 min-w-0 h-8 border border-slate-200 rounded px-3 font-mono text-sm outline-none bg-slate-50 text-gray-700 transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" />
-                            </div>
+                <form id="companyForm" onSubmit={handleSubmit} className="space-y-6 text-slate-700 p-2">
+                    <div className="grid grid-cols-2 gap-6">
+                        <div className="col-span-2">
+                            <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-2">Company Name</label>
+                            <input type="text" name="CompanyName" value={form.CompanyName} onChange={handleChange} required className="w-full px-4 py-3 bg-white border border-slate-300 rounded-md font-bold text-slate-800 text-sm outline-none transition-all focus:border-[#00acee] focus:ring-4 focus:ring-[#00acee]/20 hover:border-[#00acee]" />
+                        </div>
+                        <div className="col-span-1">
+                            <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-2">Country</label>
+                            <input type="text" name="Country" value={form.Country} onChange={handleChange} className="w-full px-4 py-3 bg-white border border-slate-300 rounded-md font-bold text-slate-800 text-sm outline-none transition-all focus:border-[#00acee] focus:ring-4 focus:ring-[#00acee]/20 hover:border-[#00acee]" />
+                        </div>
+                        <div className="col-span-1">
+                            <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-2">Industry</label>
+                            <input type="text" name="Industry" value={form.Industry} onChange={handleChange} className="w-full px-4 py-3 bg-white border border-slate-300 rounded-md font-bold text-slate-800 text-sm outline-none transition-all focus:border-[#00acee] focus:ring-4 focus:ring-[#00acee]/20 hover:border-[#00acee]" />
+                        </div>
+                        <div className="col-span-2">
+                            <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-2">Address</label>
+                            <input type="text" name="Address" value={form.Address} onChange={handleChange} className="w-full px-4 py-3 bg-white border border-slate-300 rounded-md font-bold text-slate-800 text-sm outline-none transition-all focus:border-[#00acee] focus:ring-4 focus:ring-[#00acee]/20 hover:border-[#00acee]" />
+                        </div>
+                        <div className="col-span-1">
+                            <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-2">Phone</label>
+                            <input type="tel" name="Phone" value={form.Phone} onChange={handleChange} className="w-full px-4 py-3 bg-white border border-slate-300 rounded-md font-bold text-slate-800 text-sm outline-none transition-all focus:border-[#00acee] focus:ring-4 focus:ring-[#00acee]/20 hover:border-[#00acee]" />
+                        </div>
+                        <div className="col-span-1">
+                            <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-2">Email</label>
+                            <input type="email" name="Email" value={form.Email} onChange={handleChange} className="w-full px-4 py-3 bg-white border border-slate-300 rounded-md font-bold text-slate-800 text-sm outline-none transition-all focus:border-[#00acee] focus:ring-4 focus:ring-[#00acee]/20 hover:border-[#00acee]" />
                         </div>
                     </div>
                 </form>

@@ -143,9 +143,9 @@ const CustomizeIconBarBoard = ({ isOpen, onClose, onSave }) => {
 
     return (
         <div className="fixed inset-0 z-[300] flex items-center justify-center p-4">
-            <div className="absolute inset-0 bg-slate-900/70 backdrop-blur-sm" onClick={onClose} />
+            <div className="absolute inset-0 bg-slate-900/30 backdrop-blur-sm" onClick={onClose} />
 
-            <div className="relative w-full max-w-3xl bg-white rounded-2xl shadow-2xl overflow-hidden border border-white/10 animate-in zoom-in-95 duration-300 flex flex-col max-h-[90vh]">
+ <div className="relative w-full max-w-3xl bg-white rounded-sm shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 flex flex-col max-h-[90vh]">
                 <div className="absolute left-0 top-0 bottom-0 w-[4px]" style={{ backgroundColor: accent }} />
 
                 <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-white">
@@ -159,7 +159,7 @@ const CustomizeIconBarBoard = ({ isOpen, onClose, onSave }) => {
                         </div>
                     </div>
                     <button onClick={onClose} className="w-9 h-9 rounded-xl bg-red-50 hover:bg-red-100 flex items-center justify-center transition-all active:scale-90">
-                        <X size={18} strokeWidth={3} className="text-red-600" />
+                        <X size={28} strokeWidth={1.5} className="text-red-600" />
                     </button>
                 </div>
 
@@ -175,7 +175,7 @@ const CustomizeIconBarBoard = ({ isOpen, onClose, onSave }) => {
                         <div className="flex items-stretch gap-4">
                             <div className="flex-1 space-y-2 min-w-0">
                                 <span className="text-[12px] font-bold text-slate-500 uppercase tracking-widest ml-1">All Icons</span>
-                                <div className="border border-slate-200 rounded-[5px] shadow-sm bg-white h-[400px] overflow-y-auto no-scrollbar">
+ <div className=" rounded-[5px] shadow-sm bg-white h-[400px] overflow-y-auto no-scrollbar">
                                     {availableIcons.length === 0 ? (
                                         <p className="text-center py-10 text-slate-300 text-[12px] font-bold uppercase tracking-widest">No icons available</p>
                                     ) : (
@@ -213,7 +213,7 @@ const CustomizeIconBarBoard = ({ isOpen, onClose, onSave }) => {
 
                             <div className="flex-1 space-y-2 min-w-0">
                                 <span className="text-[12px] font-bold text-slate-500 uppercase tracking-widest ml-1">Current Icon</span>
-                                <div className="border border-slate-200 rounded-[5px] shadow-sm bg-white h-[400px] overflow-y-auto no-scrollbar">
+ <div className=" rounded-[5px] shadow-sm bg-white h-[400px] overflow-y-auto no-scrollbar">
                                     {currentIcons.length === 0 ? (
                                         <p className="text-center py-10 text-slate-300 text-[12px] font-bold uppercase tracking-widest">No icons selected</p>
                                     ) : (

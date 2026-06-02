@@ -64,8 +64,8 @@ export const SearchModal = ({ title, list, onSelect, onClose, placeholder = "Sea
 
     return (
         <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4 font-['Tahoma']">
-            <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={onClose} />
-            <div className="relative w-full max-w-2xl bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
+            <div className="absolute inset-0 bg-slate-900/30 backdrop-blur-sm" onClick={onClose} />
+ <div className="relative w-full max-w-2xl bg-white shadow-2xl rounded-sm overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
                 <div className="bg-white px-6 py-3.5 flex items-center justify-between border-b border-gray-100 select-none relative overflow-hidden">
                     <div className="absolute left-0 top-0 bottom-0 w-1 transition-colors duration-500" style={{ backgroundColor: accentColor() }} />
                     <div className="flex items-center gap-2.5">
@@ -75,7 +75,7 @@ export const SearchModal = ({ title, list, onSelect, onClose, placeholder = "Sea
                         <span className="text-[14px] font-[700] text-slate-900 uppercase tracking-[2px] truncate">{title} Lookup</span>
                     </div>
                     <button onClick={onClose} className="w-8 h-7 flex items-center justify-center bg-red-50 hover:bg-red-100 text-red-600 rounded-[6px] transition-all active:scale-90 outline-none border-none group" title="Close">
-                        <X size={16} strokeWidth={3} className="group-hover:scale-110 transition-transform" />
+                        <X size={28} strokeWidth={1.5} className="group-hover:scale-110 transition-transform" />
                     </button>
                 </div>
 

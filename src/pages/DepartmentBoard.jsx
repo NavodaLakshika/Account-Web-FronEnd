@@ -20,9 +20,6 @@ const DepartmentBoard = ({ isOpen, onClose }) => {
                     <button className="px-6 h-10 bg-[#d13438] text-white text-sm font-bold rounded-md shadow-md shadow-red-200 hover:bg-[#a4262c] transition-all active:scale-95 flex items-center gap-2">
                         <Trash2 size={14} /> Delete
                     </button>
-                    <button onClick={onClose} className="px-6 h-10 bg-slate-100 text-slate-600 text-sm font-bold rounded-md hover:bg-slate-200 transition-all active:scale-95">
-                        <X size={14} /> Exit
-                    </button>
                 </>
             }
         >

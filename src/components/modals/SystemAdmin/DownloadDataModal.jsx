@@ -88,7 +88,7 @@ const DownloadDataModal = ({ isOpen, onClose }) => {
                             {/* Date From */}
                             <div className="flex items-center gap-3">
                                 <label className="font-bold text-gray-700 whitespace-nowrap">Date From</label>
-                                <div className="flex items-center border border-gray-300 bg-white rounded-[5px] overflow-hidden shadow-sm focus-within:border-blue-400 transition-all">
+ <div className="flex items-center bg-white rounded-[5px] overflow-hidden shadow-sm focus-within:border-blue-400 transition-all">
                                     <input 
                                         type="text" 
                                         value={dateFrom} 
@@ -107,7 +107,7 @@ const DownloadDataModal = ({ isOpen, onClose }) => {
                             {/* Date To */}
                             <div className="flex items-center gap-3">
                                 <label className="font-bold text-gray-700 whitespace-nowrap">Date To</label>
-                                <div className="flex items-center border border-gray-300 bg-white rounded-[5px] overflow-hidden shadow-sm focus-within:border-blue-400 transition-all">
+ <div className="flex items-center bg-white rounded-[5px] overflow-hidden shadow-sm focus-within:border-blue-400 transition-all">
                                     <input 
                                         type="text" 
                                         value={dateTo} 
@@ -166,7 +166,7 @@ const DownloadDataModal = ({ isOpen, onClose }) => {
                     </div>
 
                     {/* Inventory Table Container */}
-                    <div className="border border-gray-300 rounded-[5px] overflow-hidden flex flex-col min-h-[400px] bg-white shadow-inner relative">
+ <div className=" rounded-[5px] overflow-hidden flex flex-col min-h-[400px] bg-white shadow-inner relative">
                         <div className="absolute inset-0 pointer-events-none opacity-[0.05]" 
                              style={{ backgroundImage: 'linear-gradient(#000 1px, transparent 1px)', backgroundSize: '100% 28px' }} 
                         />
@@ -236,8 +236,8 @@ const SearchModal = ({ title, list, onSelect, onClose, placeholder }) => {
     const [query, setQuery] = useState('');
     return (
         <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4 font-['Tahoma']">
-            <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={onClose} />
-            <div className="relative w-full max-w-lg bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
+            <div className="absolute inset-0 bg-slate-900/30 backdrop-blur-sm" onClick={onClose} />
+ <div className="relative w-full max-w-lg bg-white shadow-2xl rounded-sm overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
                 {/* Header */}
                 <div className="bg-[#0078d4] px-4 py-2 flex items-center justify-between text-white">
                     <div className="flex items-center gap-2">
@@ -248,7 +248,7 @@ const SearchModal = ({ title, list, onSelect, onClose, placeholder }) => {
                         onClick={onClose}
                         className="w-9 h-8 flex items-center justify-center bg-red-50 hover:bg-red-100 text-red-600 rounded-[8px] transition-all active:scale-90 outline-none border-none group"
                     >
-                        <X size={18} strokeWidth={4} className="group-hover:scale-110 transition-transform" />
+                        <X size={28} strokeWidth={1.5} className="group-hover:scale-110 transition-transform" />
                     </button>
                 </div>
 

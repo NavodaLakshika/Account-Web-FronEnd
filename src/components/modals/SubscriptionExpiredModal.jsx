@@ -55,8 +55,8 @@ const SubscriptionExpiredModal = ({ isOpen, userStatus }) => {
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md overflow-y-auto">
-            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-5xl my-8 overflow-hidden animate-in fade-in zoom-in duration-300">
+        <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4 bg-slate-900/30 backdrop-blur-sm overflow-y-auto">
+ <div className="bg-white rounded-sm shadow-2xl w-full max-w-5xl my-8 overflow-hidden animate-in fade-in zoom-in duration-300">
                 <div className="bg-white p-8 text-center border-b border-slate-100 relative">
                     <button 
                         onClick={handleLogout}
@@ -89,7 +89,7 @@ const SubscriptionExpiredModal = ({ isOpen, userStatus }) => {
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                             {plans.filter(p => p.isActive).map((plan, index) => (
-                                <div key={plan.id} className="bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col relative overflow-hidden group">
+ <div key={plan.id} className="bg-white rounded-sm shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col relative overflow-hidden group">
                                     {index === 1 && (
                                         <div className="bg-blue-500 text-white text-[11px] font-black uppercase tracking-wider py-1 text-center w-full absolute top-0 left-0">
                                             Most Popular

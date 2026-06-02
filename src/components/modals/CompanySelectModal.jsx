@@ -2,49 +2,24 @@ import React, { useState, useEffect } from 'react';
 import { 
     Building2, 
     Loader2, 
-    X, 
-    ChevronRight,
     CheckCircle2,
-    Database,
-    Building,
-    User,
-    MessageCircle,
-    Mail,
-    Globe,
-    ArrowLeft
+    ArrowLeft,
+    PlusCircle
 } from 'lucide-react';
 import { authService } from '../../services/auth.service';
-import toast from 'react-hot-toast';
-import { showErrorToast, showSuccessToast, showPendingToast } from '../../utils/toastUtils';
-import { DotLottiePlayer } from '@dotlottie/react-player';
+import { showErrorToast, showPendingToast } from '../../utils/toastUtils';
 import ContactSupportModal from './ContactSupportModal';
 import CreateCompanyModal from './CreateCompanyModal';
 
 const SUCCESS_SOUND_URL = '/Music/mrstokes302-success-videogame-sfx-423626.mp3';
-
-
 
 const CompanySelectModal = ({ isOpen, onClose, onSelect, user }) => {
     const [loading, setLoading] = useState(false);
     const [fetching, setFetching] = useState(true);
     const [companies, setCompanies] = useState([]);
     const [selectedCompanyId, setSelectedCompanyId] = useState(null);
-    const [displayedText, setDisplayedText] = useState('');
-    const fullText = "Select Your Company";
-
-    useEffect(() => {
-        if (isOpen) {
-            let i = 0;
-            const timer = setInterval(() => {
-                i++;
-                setDisplayedText(fullText.slice(0, i));
-                if (i >= fullText.length) clearInterval(timer);
-            }, 80); // 80ms per letter
-            return () => clearInterval(timer);
-        } else {
-            setDisplayedText('');
-        }
-    }, [isOpen]);
+    const [showSupport, setShowSupport] = useState(false);
+    const [showCreateCompany, setShowCreateCompany] = useState(false);
 
     const userName = user ? (user.EmpName || user.empName || user.Emp_Name || 'User') : 'Guest';
 
@@ -68,7 +43,6 @@ const CompanySelectModal = ({ isOpen, onClose, onSelect, user }) => {
             }
         } catch (err) {
             console.error("Error fetching companies:", err);
-            // Ignore the expected 404 error when user has no companies yet
             if (err?.message !== "No companies assigned to this employee." && err?.message !== "Employee not found.") {
                 showErrorToast("Failed to load companies");
             }
@@ -76,8 +50,6 @@ const CompanySelectModal = ({ isOpen, onClose, onSelect, user }) => {
             setFetching(false);
         }
     };
-
-
 
     const handleOpen = async () => {
         const selected = companies.find(c => c.id === selectedCompanyId);
@@ -90,7 +62,6 @@ const CompanySelectModal = ({ isOpen, onClose, onSelect, user }) => {
             await authService.openCompany(userName, selected.id);
             showPendingToast(`Connecting to ${selected.name}...`, "Initializing workspace");
             
-            // Play success sound
             const audio = new Audio(SUCCESS_SOUND_URL);
             audio.volume = 0.5;
             audio.play().catch(e => console.error("Audio play failed:", e));
@@ -103,104 +74,106 @@ const CompanySelectModal = ({ isOpen, onClose, onSelect, user }) => {
         }
     };
 
-
-    const [showSupport, setShowSupport] = useState(false);
-    const [isFlipped, setIsFlipped] = useState(false);
-    const [showCreateCompany, setShowCreateCompany] = useState(false);
-
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center p-4">
-            {/* Cinematic Backdrop */}
-            <div className="absolute inset-0 bg-black/60 backdrop-blur-md" />
+        <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center p-4 font-['Arial']">
+            {/* Clean, frosted glass overlay */}
+            <div className="absolute inset-0 bg-slate-800/40 backdrop-blur-sm" />
             
-            <div className="relative w-full max-w-[420px] flex flex-col items-center animate-in slide-in-from-bottom-20 fade-in duration-500">
+            <div className="relative w-full max-w-md bg-white rounded-none shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
                 
-                {/* External Heading (Matching Image Style) */}
-                <h3 className="text-white font-mono font-bold tracking-[0.15em] text-[32px] uppercase mb-8 drop-shadow-lg select-none min-h-[48px]">
-                    {displayedText}
-                    <span className="animate-[pulse_1s_ease-in-out_infinite] opacity-70 font-light ml-1">_</span>
-                </h3>
+                {/* Header */}
+                <div className="px-8 pt-8 pb-6 text-center border-b border-slate-100">
+                    <div className="w-12 h-12 bg-blue-50 rounded-none flex items-center justify-center mx-auto mb-4">
+                        <Building2 size={24} className="text-[#00acee]" />
+                    </div>
+                    <h2 className="text-2xl font-bold text-slate-800 tracking-tight font-tahoma mb-1">
+                        Select Your Company
+                    </h2>
+                    <p className="text-slate-500 text-sm">
+                        Choose a workspace to continue
+                    </p>
+                </div>
 
-                {/* Main Content Area (Separated Div) */}
-                <div className="w-full bg-white rounded-[5px] shadow-2xl px-10 pt-12 pb-10 relative mb-4">
-                    <div className="space-y-6 max-h-[350px] overflow-y-auto pr-2 custom-scrollbar">
+                {/* Main Content Area */}
+                <div className="px-8 py-6 bg-slate-50/50">
+                    <div className="space-y-3 max-h-[280px] overflow-y-auto custom-scrollbar pr-2">
                         {fetching ? (
-                            <div className="py-16 flex flex-col items-center justify-center gap-4">
-                                <Loader2 size={32} className="text-[#00D1FF] animate-spin" />
-                                <p className="text-[10px] text-gray-400 uppercase tracking-widest font-bold font-mono">Identifying Entities...</p>
+                            <div className="py-12 flex flex-col items-center justify-center gap-3">
+                                <Loader2 size={24} className="text-[#00acee] animate-spin" />
+                                <p className="text-xs text-slate-400 font-bold uppercase tracking-widest">Loading...</p>
                             </div>
                         ) : companies.length === 0 ? (
                             <div className="py-10 flex flex-col items-center gap-4 text-center">
-                                <Building2 size={36} className="text-gray-200" strokeWidth={1} />
-                                <p className="text-gray-400 text-xs font-mono uppercase tracking-widest">No companies assigned</p>
+                                <Building2 size={32} className="text-slate-300" />
+                                <p className="text-slate-500 text-sm font-bold">No companies assigned</p>
                                 <button onClick={() => setShowCreateCompany(true)}
-                                    className="mt-2 px-6 py-3 bg-[#00D1FF] hover:bg-[#00acee] text-white font-mono font-bold text-xs uppercase tracking-widest rounded-[5px] transition-all active:scale-[0.98]">
-                                    + Create New Company
+                                    className="mt-2 px-6 py-2.5 bg-white border border-[#00acee] text-[#00acee] hover:bg-blue-50 font-bold text-sm rounded-none transition-all flex items-center gap-2">
+                                    <PlusCircle size={16} />
+                                    Create New Company
                                 </button>
                             </div>
                         ) : (
                             companies.map((company) => {
                                 const isSelected = selectedCompanyId === company.id;
                                 return (
-                                    <div 
+                                    <button 
                                         key={company.id}
                                         onClick={() => setSelectedCompanyId(company.id)}
-                                        className="group cursor-pointer relative"
+                                        className={`w-full text-left p-4 rounded-none border transition-all flex items-center justify-between ${
+                                            isSelected 
+                                                ? 'bg-blue-50 border-[#00acee] shadow-sm' 
+                                                : 'bg-white border-slate-200 hover:border-slate-300 hover:shadow-sm'
+                                        }`}
                                     >
-                                        <div className={`flex items-center gap-5 transition-all duration-300 pb-5 mb-1 ${isSelected ? 'opacity-100' : 'opacity-40 hover:opacity-70'}`}>
-                                            <div className={`${isSelected ? 'text-[#00D1FF]' : 'text-gray-400'}`}>
-                                                <Building2 size={24} strokeWidth={1.5} />
+                                        <div className="flex items-center gap-4">
+                                            <div className={`p-2 rounded-none ${isSelected ? 'bg-white text-[#00acee]' : 'bg-slate-100 text-slate-500'}`}>
+                                                <Building2 size={20} />
                                             </div>
-                                            <div className="flex-grow text-left">
-                                                <p className={`font-bold text-sm uppercase tracking-tight truncate ${isSelected ? 'text-gray-800' : 'text-gray-500'}`}>
+                                            <div>
+                                                <p className={`font-bold text-sm ${isSelected ? 'text-slate-800' : 'text-slate-600'}`}>
                                                     {company.name}
                                                 </p>
-                                                <p className={`text-[9px] uppercase tracking-[0.2em] font-bold mt-0.5 font-mono ${isSelected ? 'text-[#00D1FF]' : 'text-gray-300'}`}>
+                                                <p className={`text-[10px] uppercase tracking-wider font-bold mt-0.5 ${isSelected ? 'text-[#00acee]' : 'text-slate-400'}`}>
                                                     ID: {company.id}
                                                 </p>
                                             </div>
-                                            {isSelected && <CheckCircle2 size={16} className="text-[#00D1FF]" />}
                                         </div>
-                                        {/* Minimalist Separator Line */}
-                                        <div className={`h-[1px] w-full transition-all duration-500 ${isSelected ? 'bg-gradient-to-r from-[#00D1FF] to-transparent shadow-[0_1px_2px_rgba(0,209,255,0.3)]' : 'bg-gray-100'}`} />
-                                    </div>
+                                        {isSelected && <CheckCircle2 size={20} className="text-[#00acee]" />}
+                                    </button>
                                 );
                             })
                         )}
                     </div>
                 </div>
 
-                {/* Cyan Dual Action Bar (Separated into Two Divs with Gap) */}
-                <div className="w-full flex gap-4 h-[75px]">
-                    <button 
-                        onClick={onClose}
-                        className="flex-1 bg-[#00D1FF] flex items-center justify-center text-white font-bold text-sm tracking-widest hover:bg-[#00acee] transition-colors uppercase rounded-[5px] shadow-2xl"
-                    >
-                        Back
-                    </button>
-                    <button 
-                        disabled={loading || !selectedCompanyId}
-                        onClick={handleOpen}
-                        className="flex-1 bg-[#00D1FF] flex items-center justify-center text-white font-bold text-sm tracking-widest hover:bg-[#00acee] transition-colors uppercase rounded-[5px] shadow-2xl active:scale-[0.98] disabled:opacity-50"
-                    >
-                        {loading ? <Loader2 className="animate-spin" /> : 'Enter Site'}
-                    </button>
-                </div>
+                {/* Footer Actions */}
+                <div className="px-8 py-6 border-t border-slate-100 bg-white">
+                    <div className="flex items-center gap-3 mb-4">
+                        <button 
+                            onClick={onClose}
+                            className="flex-1 py-3 px-4 bg-white border border-slate-300 hover:border-slate-400 hover:bg-slate-50 text-slate-700 font-bold text-sm rounded-none transition-all flex items-center justify-center gap-2"
+                        >
+                            <ArrowLeft size={16} /> Back
+                        </button>
+                        <button 
+                            disabled={loading || !selectedCompanyId}
+                            onClick={handleOpen}
+                            className="flex-1 py-3 px-4 bg-[#00acee] hover:bg-[#0092cc] text-white font-bold text-sm rounded-none transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2 shadow-sm"
+                        >
+                            {loading ? <Loader2 size={16} className="animate-spin" /> : 'Enter Site'}
+                        </button>
+                    </div>
 
-                {/* Bottom actions */}
-                <div className="flex flex-col items-center gap-3 mt-6">
-                    <button onClick={() => setShowCreateCompany(true)}
-                        className="text-[#00D1FF]/70 hover:text-[#00D1FF] font-mono font-bold text-[10px] uppercase tracking-widest transition-all">
-                        + Create New Company
-                    </button>
-                    <button 
-                        onClick={() => setShowSupport(true)}
-                        className="text-white/30 hover:text-white/80 transition-all font-bold text-[10px] uppercase tracking-[0.3em] flex items-center gap-2"
-                    >
-                        <span className="text-[#00D1FF] underline decoration-2 underline-offset-4">Contact Support</span>
-                    </button>
+                    <div className="flex items-center justify-between text-[11px] font-bold text-slate-500">
+                        <button onClick={() => setShowCreateCompany(true)} className="hover:text-[#00acee] transition-colors">
+                            + Create Company
+                        </button>
+                        <button onClick={() => setShowSupport(true)} className="hover:text-[#00acee] transition-colors underline underline-offset-2">
+                            Contact Support
+                        </button>
+                    </div>
                 </div>
             </div>
 

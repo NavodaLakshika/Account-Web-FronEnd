@@ -143,7 +143,7 @@ const OpeningBalanceBoard = ({ isOpen, onClose }) => {
                              <RotateCcw size={14} /> CLEAR
                         </button>
                         <button onClick={onClose} className="px-8 h-10 bg-white border-2 border-red-100 text-red-500 font-mono font-bold text-[13px] uppercase tracking-widest rounded-[5px] hover:bg-red-50 transition-all active:scale-95 flex items-center justify-center gap-2">
-                             <X size={14} strokeWidth={3} /> EXIT
+                             <X size={28} strokeWidth={1.5} /> EXIT
                         </button>
                     </div>
                 }
@@ -168,7 +168,7 @@ const OpeningBalanceBoard = ({ isOpen, onClose }) => {
                 </div>
 
                 <div className="space-y-4">
-                    <div className="bg-white p-6 border border-slate-200 rounded-[5px] shadow-sm space-y-6">
+ <div className="bg-white p-6 rounded-[5px] shadow-sm space-y-6">
                         
                         <div className="grid grid-cols-12 gap-x-12 gap-y-4">
                             {/* Row 1 */}
@@ -284,8 +284,8 @@ const OpeningBalanceBoard = ({ isOpen, onClose }) => {
             {/* Selection Modals */}
             {activeModal && (
                 <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setActiveModal(null)} />
-                    <div className="relative w-full max-w-2xl bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col max-h-[85vh]">
+                    <div className="absolute inset-0 bg-slate-900/30 backdrop-blur-sm" onClick={() => setActiveModal(null)} />
+ <div className="relative w-full max-w-2xl bg-white shadow-2xl rounded-sm overflow-hidden flex flex-col max-h-[85vh]">
                         <div className="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-50">
                             <h3 className="text-lg font-bold text-slate-800 tracking-tight">
                                 {activeModal === 'account' ? 'Search Accounts' : activeModal === 'cc' ? 'Search Cost Centers' : `Search ${activeTab}s`}
@@ -304,7 +304,7 @@ const OpeningBalanceBoard = ({ isOpen, onClose }) => {
                                     className="w-8 h-8 flex items-center justify-center bg-red-50 hover:bg-red-100 text-red-600 rounded-[5px] transition-all active:scale-90 outline-none border-none group"
                                     title="Close"
                                 >
-                                    <X size={18} strokeWidth={4} className="group-hover:scale-110 transition-transform" />
+                                    <X size={28} strokeWidth={1.5} className="group-hover:scale-110 transition-transform" />
                                 </button>
                             </div>
                         </div>

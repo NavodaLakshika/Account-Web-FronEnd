@@ -117,7 +117,7 @@ const SearchBoard = ({ isOpen, onClose }) => {
                 </div>
 
                 {/* Search Filters */}
-                <div className="bg-white border border-gray-200 p-8 rounded-xl shadow-sm relative overflow-hidden">
+ <div className="bg-white p-8 rounded-sm shadow-sm relative overflow-hidden">
                     <div className="absolute top-0 left-0 w-1.5 h-full bg-[#0078d4]" />
                     <div className="grid grid-cols-12 gap-10">
                         {/* Transaction Params */}
@@ -233,13 +233,13 @@ const SearchBoard = ({ isOpen, onClose }) => {
                 </div>
 
                 {/* Results Table */}
-                <div className="border border-gray-200 rounded-2xl shadow-lg bg-white overflow-hidden">
+ <div className=" rounded-sm shadow-lg bg-white overflow-hidden">
                     <div className="bg-[#f8fafd] px-8 py-4 border-b border-gray-200 flex justify-between items-center">
                         <div className="flex items-center gap-3">
                             <LayoutGrid size={18} className="text-[#0078d4]" />
                             <span className="text-[11px] font-black text-slate-600 uppercase tracking-[0.2em]">Retrieved Transaction Records</span>
                         </div>
-                        <div className="bg-white px-4 py-1.5 rounded-full border border-gray-200 shadow-sm flex items-center gap-4 text-[11px] font-black">
+ <div className="bg-white px-4 py-1.5 rounded-sm shadow-sm flex items-center gap-4 text-[11px] font-black">
                             <div className="flex items-center gap-2">
                                 <span className="text-slate-400 uppercase tracking-tighter">Total Hits</span>
                                 <span className="text-[#0078d4] tabular-nums">1,245</span>
@@ -330,7 +330,7 @@ const FormRow = ({ label, children }) => (
 const SearchModal = ({ title, query, setQuery, onClose, data, columns, onSelect }) => (
     <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4">
         <div className="absolute inset-0 bg-slate-500/30 backdrop-blur-[2px]" onClick={onClose} />
-        <div className="relative w-full max-w-2xl bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col max-h-[85vh] font-['Tahoma']">
+ <div className="relative w-full max-w-2xl bg-white shadow-2xl rounded-sm overflow-hidden flex flex-col max-h-[85vh] font-['Tahoma']">
             <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-slate-50/50">
                 <h3 className="text-base font-black text-slate-800 tracking-tight uppercase tracking-[0.05em]">{title}</h3>
                 <div className="flex gap-4">
@@ -338,7 +338,7 @@ const SearchModal = ({ title, query, setQuery, onClose, data, columns, onSelect 
                         <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                         <input type="text" placeholder="Search..." className="h-9 border border-gray-200 pl-9 pr-3 text-sm rounded-lg w-64 focus:border-blue-500 outline-none shadow-sm transition-all" value={query} onChange={(e) => setQuery(e.target.value)} autoFocus />
                     </div>
-                    <button onClick={onClose} className="w-8 h-8 flex items-center justify-center hover:bg-white text-slate-400 hover:text-red-500 transition-all rounded-full border border-transparent hover:border-gray-200"><X size={20} /></button>
+                    <button onClick={onClose} className="w-8 h-8 flex items-center justify-center hover:bg-white text-slate-400 hover:text-red-500 transition-all rounded-full border border-transparent hover:border-gray-200"><X size={28} /></button>
                 </div>
             </div>
             <div className="overflow-y-auto p-2">

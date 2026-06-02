@@ -136,7 +136,7 @@ const SubscriptionAdminBoard = () => {
             </div>
           </div>
 
-      <div className="flex-1 bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
+ <div className="flex-1 bg-white rounded-sm shadow-sm overflow-hidden flex flex-col">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
@@ -221,7 +221,7 @@ const SubscriptionAdminBoard = () => {
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {plans.map((plan) => (
-                        <div key={plan.id} className="bg-white rounded-2xl border border-slate-200 border-t-4 border-t-[#f97316] shadow-sm p-6 flex flex-col relative transition-shadow hover:shadow-md">
+ <div key={plan.id} className="bg-white rounded-sm border-t-4 border-t-[#f97316] shadow-sm p-6 flex flex-col relative transition-shadow hover:shadow-md">
                             {!plan.isActive && (
                                 <div className="absolute top-4 right-4 bg-red-100 text-red-600 text-[10px] font-bold px-2 py-1 rounded-md uppercase">
                                     Inactive
@@ -277,7 +277,7 @@ const SubscriptionAdminBoard = () => {
       {/* Manage User Modal */}
       {selectedUser && (
         <div className="fixed inset-0 z-[200] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4 font-sans">
-          <div className="bg-white rounded-[16px] shadow-2xl w-full max-w-[420px] overflow-hidden animate-in fade-in zoom-in-95 duration-200 flex flex-col">
+ <div className="bg-white rounded-[16px] shadow-2xl w-full max-w-[420px] overflow-hidden animate-in fade-in zoom-in-95 duration-200 flex flex-col">
             <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
               <h3 className="text-[17px] font-bold text-slate-800">Manage Subscription</h3>
               <button onClick={() => setSelectedUser(null)} className="text-slate-400 hover:text-slate-600 transition-colors text-xl leading-none font-light">×</button>

@@ -8,9 +8,9 @@ const SendFileBoard = ({ isOpen, onClose }) => {
 
     return (
         <div className="fixed inset-0 z-[300] flex items-center justify-center p-4">
-            <div className="absolute inset-0 bg-slate-900/70 backdrop-blur-sm" onClick={onClose} />
+            <div className="absolute inset-0 bg-slate-900/30 backdrop-blur-sm" onClick={onClose} />
 
-            <div className="relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl overflow-hidden border border-white/10 animate-in zoom-in-95 duration-300 flex flex-col max-h-[90vh]">
+ <div className="relative w-full max-w-2xl bg-white rounded-sm shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 flex flex-col max-h-[90vh]">
                 <div className="absolute left-0 top-0 bottom-0 w-[4px]" style={{ backgroundColor: accent }} />
 
                 <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-white">
@@ -24,7 +24,7 @@ const SendFileBoard = ({ isOpen, onClose }) => {
                         </div>
                     </div>
                     <button onClick={onClose} className="w-9 h-9 rounded-xl bg-red-50 hover:bg-red-100 flex items-center justify-center transition-all active:scale-90">
-                        <X size={18} strokeWidth={3} className="text-red-600" />
+                        <X size={28} strokeWidth={1.5} className="text-red-600" />
                     </button>
                 </div>
 

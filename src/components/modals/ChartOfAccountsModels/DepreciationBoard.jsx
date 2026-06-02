@@ -159,7 +159,7 @@ const DepreciationBoard = ({ isOpen, onClose }) => {
                     </div>
 
                     {/* Input Section */}
-                    <div className="bg-white p-4 border border-slate-200 rounded-[5px] space-y-4 shadow-sm border-l-4 border-l-[#0078d4]">
+ <div className="bg-white p-4 rounded-[5px] space-y-4 shadow-sm border-l-4 border-l-[#0078d4]">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="space-y-1.5">
                                 <label className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">Asset Account</label>
@@ -206,7 +206,7 @@ const DepreciationBoard = ({ isOpen, onClose }) => {
                     </div>
 
                     {/* Table Section */}
-                    <div className="border border-slate-200 rounded-[5px] overflow-hidden shadow-sm bg-white">
+ <div className=" rounded-[5px] overflow-hidden shadow-sm bg-white">
                         <div className="bg-slate-50 px-4 py-2.5 border-b border-slate-200 flex justify-between items-center">
                             <span className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">Registered Depreciation Rates</span>
                             <span className="text-[10px] font-bold text-[#0285fd] bg-blue-50 px-2 py-0.5 border border-blue-100 rounded-[5px] shadow-sm">{rateList.length} Records</span>
@@ -249,8 +249,8 @@ const DepreciationBoard = ({ isOpen, onClose }) => {
             {/* Account Search Modal */}
             {showAccountSearch && (
                 <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4 font-['Tahoma']">
-                    <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setShowAccountSearch(false)} />
-                    <div className="relative w-full max-w-2xl bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
+                    <div className="absolute inset-0 bg-slate-900/30 backdrop-blur-sm" onClick={() => setShowAccountSearch(false)} />
+ <div className="relative w-full max-w-2xl bg-white shadow-2xl rounded-sm overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
                         {/* Header */}
                         <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-100 select-none relative overflow-hidden">
                             <div className="absolute left-0 top-0 bottom-0 w-1.5 transition-colors duration-500" style={{ backgroundColor: localStorage.getItem('topBarColor') || '#0285fd' }} />
@@ -259,7 +259,7 @@ const DepreciationBoard = ({ isOpen, onClose }) => {
                                 <span className="text-[15px] font-[700] text-slate-900 uppercase tracking-[3px] font-mono truncate">Asset Accounts Lookup</span>
                             </div>
                             <button onClick={() => setShowAccountSearch(false)} className="w-9 h-8 flex items-center justify-center bg-red-50 hover:bg-red-100 text-red-600 rounded-[8px] transition-all active:scale-90 outline-none border-none group">
-                                <X size={18} strokeWidth={4} className="group-hover:scale-110 transition-transform" />
+                                <X size={28} strokeWidth={1.5} className="group-hover:scale-110 transition-transform" />
                             </button>
                         </div>
                         <div className="p-3 bg-slate-50 border-b border-gray-100 flex items-center justify-between">

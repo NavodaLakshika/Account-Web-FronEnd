@@ -205,7 +205,7 @@ const FirstTimeGuide = ({ isOpen, onClose, user }) => {
                     <div className="flex items-center justify-between mt-6 pt-4 border-t border-white/10 relative z-10">
                         <div className="flex items-center gap-1.5">
                             {steps.map((_, idx) => (
-                                <div key={idx} className={`h-1.5 rounded-full transition-all duration-300 ${idx === currentStep ? 'bg-gradient-to-r from-[#00acee] to-blue-500 w-5 shadow-[0_0_8px_rgba(0,172,238,0.6)]' : idx < currentStep ? 'bg-white/40 w-1.5' : 'bg-white/10 w-1.5'}`} />
+ <div key={idx} className={`h-1.5 rounded-sm transition-all duration-300 ${idx === currentStep ? 'bg-gradient-to-r from-[#00acee] to-blue-500 w-5 shadow-[0_0_8px_rgba(0,172,238,0.6)]' : idx < currentStep ? 'bg-white/40 w-1.5' : 'bg-white/10 w-1.5'}`} />
                             ))}
                         </div>
                         <div className="flex items-center gap-2">

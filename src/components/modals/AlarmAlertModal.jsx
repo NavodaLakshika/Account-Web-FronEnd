@@ -23,7 +23,7 @@ const AlarmAlertModal = ({ isOpen, onClose, task, onComplete }) => {
             />
             
             {/* Modal Container (Compact small size) */}
-            <div className="relative w-full max-w-[340px] bg-white rounded-[10px] shadow-[0_20px_40px_-10px_rgba(0,0,0,0.3)] overflow-hidden animate-in zoom-in-95 duration-300">
+ <div className="relative w-full max-w-[340px] bg-white rounded-[10px] shadow-[0_20px_40px_-10px_rgba(0,0,0,0.3)] overflow-hidden animate-in zoom-in-95 duration-300">
                 
                 {/* Header Section (Flat Red - Compact) */}
                 <div className="bg-[#f05252] h-[150px] flex items-center justify-center relative overflow-hidden">

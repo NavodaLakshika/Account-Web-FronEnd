@@ -262,7 +262,7 @@ const SystemSettingsBoard = ({ isOpen = true, onClose, isInline = false }) => {
                     onClick={() => handleToggle(item.id, item.label)}
                     className={`relative w-10 h-5 rounded-full transition-all duration-500 focus:outline-none shadow-inner border-2 shrink-0 ${isLocked ? 'bg-red-500 border-red-600' : 'bg-slate-200 border-slate-300 hover:border-blue-300'}`}
                 >
-                    <div className={`absolute top-[1px] left-[1px] bg-white w-3.5 h-3.5 rounded-full transition-all duration-500 shadow-md flex items-center justify-center ${isLocked ? 'translate-x-[18px] scale-110' : 'translate-x-0'}`}>
+ <div className={`absolute top-[1px] left-[1px] bg-white w-3.5 h-3.5 rounded-sm transition-all duration-500 shadow-md flex items-center justify-center ${isLocked ? 'translate-x-[18px] scale-110' : 'translate-x-0'}`}>
                         <div className={`w-1.5 h-1.5 rounded-full ${isLocked ? 'bg-red-500' : 'bg-slate-300'}`} />
                     </div>
                 </button>
@@ -293,7 +293,7 @@ const SystemSettingsBoard = ({ isOpen = true, onClose, isInline = false }) => {
                 </div>
                 <div className="flex flex-col gap-4 px-2">
                     {chunks.map((chunk, idx) => (
-                        <div key={idx} className="border-2 border-slate-100 rounded-xl p-4 bg-white shadow-[0_2px_10px_rgba(0,0,0,0.02)] hover:border-blue-100 hover:shadow-md transition-all duration-300">
+ <div key={idx} className="border-2 border-slate-100 rounded-sm p-4 bg-white shadow-[0_2px_10px_rgba(0,0,0,0.02)] hover:border-blue-100 hover:shadow-md transition-all duration-300">
                             <div className="grid grid-cols-4 gap-x-4 gap-y-3">
                                 {chunk.map(renderItem)}
                             </div>
@@ -373,7 +373,7 @@ const SystemSettingsBoard = ({ isOpen = true, onClose, isInline = false }) => {
                 `}
             </style>
         {isInline ? (
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 flex flex-col animate-in fade-in zoom-in-95 duration-200 h-full max-h-[82vh]">
+ <div className="bg-white rounded-sm shadow-sm flex flex-col animate-in fade-in zoom-in-95 duration-200 h-full max-h-[82vh]">
                 {content}
             </div>
         ) : (
@@ -391,11 +391,11 @@ const SystemSettingsBoard = ({ isOpen = true, onClose, isInline = false }) => {
         {/* Target Selection Sub-Modal */}
         {showTargetModal && (
             <div className="fixed inset-0 z-[200] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4 font-sans">
-                <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-visible animate-in fade-in zoom-in-95 duration-200 flex flex-col">
+ <div className="bg-white rounded-sm shadow-2xl w-full max-w-md overflow-visible animate-in fade-in zoom-in-95 duration-200 flex flex-col">
                     <div className="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50 rounded-t-2xl">
                         <h3 className="text-sm font-bold tracking-wide uppercase text-slate-900">Select Target Scope</h3>
                         <button onClick={() => setShowTargetModal(false)} className="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-200 transition-colors">
-                            <X size={16} />
+                            <X size={28} />
                         </button>
                     </div>
                     <div className="p-6 flex flex-col gap-5 h-full max-h-[70vh] overflow-visible">
@@ -423,7 +423,7 @@ const SystemSettingsBoard = ({ isOpen = true, onClose, isInline = false }) => {
                                 </button>
                                 
                                 {empSearchTriggered && (
-                                    <div className="absolute top-[100%] mt-2 left-0 w-full z-50 bg-white border border-slate-200 rounded-xl shadow-2xl max-h-[250px] overflow-y-auto flex flex-col">
+ <div className="absolute top-[100%] mt-2 left-0 w-full z-50 bg-white rounded-sm shadow-2xl max-h-[250px] overflow-y-auto flex flex-col">
                                         <div 
                                             onClick={() => {
                                                 setSelectedEmployee('');
@@ -497,7 +497,7 @@ const SystemSettingsBoard = ({ isOpen = true, onClose, isInline = false }) => {
                                 </button>
 
                                 {compSearchTriggered && (
-                                    <div className="absolute top-[100%] mt-2 left-0 w-full z-50 bg-white border border-slate-200 rounded-xl shadow-2xl max-h-[250px] overflow-y-auto flex flex-col">
+ <div className="absolute top-[100%] mt-2 left-0 w-full z-50 bg-white rounded-sm shadow-2xl max-h-[250px] overflow-y-auto flex flex-col">
                                         <div 
                                             onClick={() => {
                                                 setSelectedCompany('');

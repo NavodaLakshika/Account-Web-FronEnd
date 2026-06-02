@@ -80,7 +80,7 @@ const SoftwareAboutModal = ({ isOpen, onClose }) => {
                         onClick={onClose}
                         className="absolute top-4 right-6 text-slate-300 hover:text-slate-500 transition-colors p-2 rounded-full hover:bg-slate-50"
                     >
-                        <X size={18} />
+                        <X size={28} />
                     </button>
                 </div>
 

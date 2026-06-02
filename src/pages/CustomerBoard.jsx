@@ -220,7 +220,7 @@ const CustomerBoard = ({ isOpen, onClose }) => {
                 {isEditMode ? 'Update' : 'Save'}
             </button>
             <button onClick={onClose} className="px-6 h-10 bg-slate-100 text-slate-600 text-sm font-bold rounded-md hover:bg-slate-200 transition-all active:scale-95 flex items-center gap-2 border-none">
-                <X size={14} /> Exit
+                <X size={28} /> Exit
             </button>
         </>
     );
@@ -424,8 +424,8 @@ const CustomerBoard = ({ isOpen, onClose }) => {
             {/* Simple Search Modal */}
             {showSearchModal && (
                 <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setShowSearchModal(false)} />
-                    <div className="relative w-full max-w-2xl bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col max-h-[80vh]">
+                    <div className="absolute inset-0 bg-slate-900/30 backdrop-blur-sm" onClick={() => setShowSearchModal(false)} />
+ <div className="relative w-full max-w-2xl bg-white shadow-2xl rounded-sm overflow-hidden flex flex-col max-h-[80vh]">
                         <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50 font-['Plus_Jakarta_Sans']">
                             <h3 className="text-lg font-bold text-slate-800 tracking-tight">Search Customers</h3>
                             <div className="flex gap-4">
@@ -442,7 +442,7 @@ const CustomerBoard = ({ isOpen, onClose }) => {
                                     className="w-9 h-8 flex items-center justify-center bg-red-50 hover:bg-red-100 text-red-600 rounded-[8px] transition-all active:scale-90 outline-none border-none group"
                                     title="Close"
                                 >
-                                    <X size={18} strokeWidth={4} className="group-hover:scale-110 transition-transform" />
+                                    <X size={28} strokeWidth={1.5} className="group-hover:scale-110 transition-transform" />
                                 </button>
                             </div>
                         </div>

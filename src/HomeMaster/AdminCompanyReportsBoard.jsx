@@ -457,7 +457,7 @@ const AdminCompanyReportsBoard = ({ hierarchy, allEmployees }) => {
     return (
         <div className="flex flex-col gap-6 animate-in fade-in zoom-in-95 duration-200">
             {/* Header */}
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+ <div className="bg-white rounded-sm shadow-sm p-6">
                 <div className="flex items-center gap-3 mb-6">
                     <div className="w-10 h-10 rounded-xl bg-[#00acee]/10 flex items-center justify-center">
                         <FileText className="w-5 h-5 text-[#00acee]" />
@@ -469,7 +469,7 @@ const AdminCompanyReportsBoard = ({ hierarchy, allEmployees }) => {
                 </div>
 
                 <div className="bg-slate-50 rounded-xl p-4 border border-slate-200/60">
-                    <div className="bg-white p-4 rounded-xl border border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
+ <div className="bg-white p-4 rounded-sm flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
                         <div className="flex flex-col w-full sm:w-auto">
                             <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Selection Target</span>
                             <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
@@ -580,11 +580,11 @@ const AdminCompanyReportsBoard = ({ hierarchy, allEmployees }) => {
             {/* Employee Selection Modal */}
             {showEmpModal && (
                 <div className="fixed inset-0 z-[200] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4">
-                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-visible animate-in fade-in zoom-in-95 duration-200 flex flex-col">
+ <div className="bg-white rounded-sm shadow-2xl w-full max-w-md overflow-visible animate-in fade-in zoom-in-95 duration-200 flex flex-col">
                         <div className="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50 rounded-t-2xl">
                             <h3 className="text-sm font-bold tracking-wide uppercase text-slate-900">Select Employee</h3>
                             <button onClick={() => setShowEmpModal(false)} className="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-200 transition-colors">
-                                <X size={16} />
+                                <X size={28} />
                             </button>
                         </div>
                         <div className="p-6 flex flex-col gap-5 max-h-[70vh] overflow-visible">
@@ -608,7 +608,7 @@ const AdminCompanyReportsBoard = ({ hierarchy, allEmployees }) => {
                                         Load
                                     </button>
                                     {empSearchTriggered && (
-                                        <div className="absolute top-[100%] mt-2 left-0 w-full z-50 bg-white border border-slate-200 rounded-xl shadow-2xl max-h-[250px] overflow-y-auto">
+ <div className="absolute top-[100%] mt-2 left-0 w-full z-50 bg-white rounded-sm shadow-2xl max-h-[250px] overflow-y-auto">
                                             <div
                                                 onClick={() => { setSelectedEmployee(''); setSelectedCompany(''); setShowEmpModal(false); setEmpSearch(''); setEmpSearchTriggered(false); }}
                                                 className="p-3 border-b border-slate-100 text-sm cursor-pointer transition-all bg-[#00acee]/5 text-[#00acee] font-bold hover:bg-[#00acee]/10"
@@ -652,11 +652,11 @@ const AdminCompanyReportsBoard = ({ hierarchy, allEmployees }) => {
             {/* Company Selection Modal */}
             {showCompModal && (
                 <div className="fixed inset-0 z-[200] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4">
-                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-visible animate-in fade-in zoom-in-95 duration-200 flex flex-col">
+ <div className="bg-white rounded-sm shadow-2xl w-full max-w-md overflow-visible animate-in fade-in zoom-in-95 duration-200 flex flex-col">
                         <div className="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50 rounded-t-2xl">
                             <h3 className="text-sm font-bold tracking-wide uppercase text-slate-900">Select Company</h3>
                             <button onClick={() => setShowCompModal(false)} className="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-200 transition-colors">
-                                <X size={16} />
+                                <X size={28} />
                             </button>
                         </div>
                         <div className="p-6 flex flex-col gap-5 max-h-[70vh] overflow-visible">
@@ -680,7 +680,7 @@ const AdminCompanyReportsBoard = ({ hierarchy, allEmployees }) => {
                                         Load
                                     </button>
                                     {compSearchTriggered && (
-                                        <div className="absolute top-[100%] mt-2 left-0 w-full z-50 bg-white border border-slate-200 rounded-xl shadow-2xl max-h-[250px] overflow-y-auto">
+ <div className="absolute top-[100%] mt-2 left-0 w-full z-50 bg-white rounded-sm shadow-2xl max-h-[250px] overflow-y-auto">
                                             <div
                                                 onClick={() => { setSelectedCompany(''); setShowCompModal(false); setCompSearch(''); setCompSearchTriggered(false); }}
                                                 className="p-3 border-b border-slate-100 text-sm cursor-pointer transition-all bg-[#00acee]/5 text-[#00acee] font-bold hover:bg-[#00acee]/10"
@@ -725,7 +725,7 @@ const AdminCompanyReportsBoard = ({ hierarchy, allEmployees }) => {
                 <div className="fixed inset-0 z-[1000] bg-white overflow-hidden animate-in fade-in duration-200">
                     <div className="absolute top-4 right-4 z-50">
                         <button onClick={handleCloseReport} className="w-10 h-10 flex items-center justify-center bg-red-50 hover:bg-red-100 text-red-600 rounded-xl transition-all active:scale-90">
-                            <X className="w-5 h-5" />
+                            <X size={28} strokeWidth={1.5} className="w-5 h-5" />
                         </button>
                     </div>
                     <ItemsServicesReportPage companyCodeProp={selectedCompany} companyNameProp={selectedCompanyName} />
@@ -737,7 +737,7 @@ const AdminCompanyReportsBoard = ({ hierarchy, allEmployees }) => {
                 <div className="fixed inset-0 z-[1000] bg-white overflow-hidden animate-in fade-in duration-200">
                     <div className="absolute top-4 right-4 z-50">
                         <button onClick={handleCloseReport} className="w-10 h-10 flex items-center justify-center bg-red-50 hover:bg-red-100 text-red-600 rounded-xl transition-all active:scale-90">
-                            <X className="w-5 h-5" />
+                            <X size={28} strokeWidth={1.5} className="w-5 h-5" />
                         </button>
                     </div>
                     <SystemAnalyticsReportPage companyCodeProp={selectedCompany} companyNameProp={selectedCompanyName} />

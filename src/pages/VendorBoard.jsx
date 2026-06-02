@@ -211,7 +211,7 @@ const VendorBoard = ({ isOpen, onClose }) => {
                 onClick={onClose} 
                 className="px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-500 font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] transition-all active:scale-95 flex items-center justify-center gap-2 border-none"
             >
-                <X size={14} /> EXIT
+                <X size={28} /> EXIT
             </button>
         </div>
     );
@@ -369,8 +369,8 @@ const VendorBoard = ({ isOpen, onClose }) => {
             {/* Search Modal */}
             {showSearchModal && (
                 <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-black/60 backdrop-blur-md" onClick={() => setShowSearchModal(false)} />
-                    <div className="relative w-full max-w-2xl bg-white shadow-2xl rounded-[5px] border border-slate-200 overflow-hidden flex flex-col max-h-[80vh]">
+                    <div className="absolute inset-0 bg-slate-900/30 backdrop-blur-sm" onClick={() => setShowSearchModal(false)} />
+ <div className="relative w-full max-w-2xl bg-white shadow-2xl rounded-[5px] overflow-hidden flex flex-col max-h-[80vh]">
                         <div className="px-6 py-3.5 border-b border-slate-200 flex justify-between items-center bg-white">
                             <h3 className="text-[15px] font-mono font-bold text-slate-800 uppercase tracking-widest">Search Suppliers</h3>
                             <div className="flex gap-2 items-center">
@@ -386,7 +386,7 @@ const VendorBoard = ({ isOpen, onClose }) => {
                                     className="w-8 h-8 bg-white/10 hover:bg-slate-100 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-600 transition-all border-none"
                                     title="Close"
                                 >
-                                    <X size={15} strokeWidth={2} />
+                                    <X size={28} strokeWidth={1.5} />
                                 </button>
                             </div>
                         </div>

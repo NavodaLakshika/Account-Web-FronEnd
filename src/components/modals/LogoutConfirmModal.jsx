@@ -8,12 +8,12 @@ const LogoutConfirmModal = ({ isOpen, onClose, onConfirm, loading = false }) => 
         <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4 font-['Plus_Jakarta_Sans']">
             {/* Backdrop with blur */}
             <div 
-                className="absolute inset-0 bg-slate-900/60 backdrop-blur-md transition-opacity" 
+                className="absolute inset-0 bg-slate-900/30 backdrop-blur-sm transition-opacity" 
                 onClick={() => !loading && onClose()} 
             />
             
             {/* Modal Container - Matching Delete Confirmation Style */}
-            <div className="relative w-full max-w-md bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden animate-in zoom-in-95 duration-200">
+ <div className="relative w-full max-w-md bg-white rounded-sm shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
                 
                 {/* Close button (optional, but keep for consistency with other modals) */}
                 {/* <button 
@@ -21,7 +21,7 @@ const LogoutConfirmModal = ({ isOpen, onClose, onConfirm, loading = false }) => 
                     disabled={loading}
                     className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 transition-colors"
                 >
-                    <X size={20} />
+                    <X size={28} />
                 </button> */}
 
                 <div className="p-8 text-center">

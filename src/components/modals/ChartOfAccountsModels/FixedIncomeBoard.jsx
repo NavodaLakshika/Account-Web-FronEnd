@@ -151,7 +151,7 @@ const FixedIncomeBoard = ({ isOpen, onClose }) => {
             >
                 <div className="select-none font-['Tahoma'] space-y-4 p-2">
                     {/* Main Form */}
-                    <div className="bg-white p-6 border border-slate-200 rounded-[5px] space-y-5 shadow-sm border-l-4 border-l-[#0078d4]">
+ <div className="bg-white p-6 rounded-[5px] space-y-5 shadow-sm border-l-4 border-l-[#0078d4]">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-5">
                             {/* Account Selection */}
                             <div className="space-y-1.5">
@@ -258,7 +258,7 @@ const FixedIncomeBoard = ({ isOpen, onClose }) => {
                     </div>
 
                     {/* Data List */}
-                    <div className="border border-slate-200 rounded-[5px] overflow-hidden shadow-sm bg-white">
+ <div className=" rounded-[5px] overflow-hidden shadow-sm bg-white">
                         <div className="bg-slate-50 px-4 py-2.5 border-b border-slate-200 flex justify-between items-center">
                             <span className="text-[11px] font-bold text-[#0285fd] uppercase tracking-widest flex items-center gap-2">
                                 <PlusCircle size={14} /> Recent Fixed Income Entries
@@ -306,8 +306,8 @@ const FixedIncomeBoard = ({ isOpen, onClose }) => {
             {/* Account Search Modal */}
             {showAccSearch && (
                 <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4 font-['Tahoma']">
-                    <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setShowAccSearch(false)} />
-                    <div className="relative w-full max-w-2xl bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
+                    <div className="absolute inset-0 bg-slate-900/30 backdrop-blur-sm" onClick={() => setShowAccSearch(false)} />
+ <div className="relative w-full max-w-2xl bg-white shadow-2xl rounded-sm overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
                         <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-100 select-none relative overflow-hidden">
                             <div className="absolute left-0 top-0 bottom-0 w-1.5 transition-colors duration-500" style={{ backgroundColor: localStorage.getItem('topBarColor') || '#0285fd' }} />
                             <div className="flex items-center gap-2">
@@ -315,7 +315,7 @@ const FixedIncomeBoard = ({ isOpen, onClose }) => {
                                 <span className="text-[15px] font-[700] text-slate-900 uppercase tracking-[3px] font-mono truncate">Income Accounts Lookup</span>
                             </div>
                             <button onClick={() => setShowAccSearch(false)} className="w-9 h-8 flex items-center justify-center bg-red-50 hover:bg-red-100 text-red-600 rounded-[8px] transition-all active:scale-90 outline-none border-none group">
-                                <X size={18} strokeWidth={4} className="group-hover:scale-110 transition-transform" />
+                                <X size={28} strokeWidth={1.5} className="group-hover:scale-110 transition-transform" />
                             </button>
                         </div>
                         <div className="p-3 bg-slate-50 border-b border-gray-100 flex items-center justify-between">
@@ -367,8 +367,8 @@ const FixedIncomeBoard = ({ isOpen, onClose }) => {
             {/* Payment Type Search Modal */}
             {showPayTypeSearch && (
                 <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4 font-['Tahoma']">
-                    <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setShowPayTypeSearch(false)} />
-                    <div className="relative w-full max-w-sm bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
+                    <div className="absolute inset-0 bg-slate-900/30 backdrop-blur-sm" onClick={() => setShowPayTypeSearch(false)} />
+ <div className="relative w-full max-w-sm bg-white shadow-2xl rounded-sm overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
                         <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-100 select-none relative overflow-hidden">
                             <div className="absolute left-0 top-0 bottom-0 w-1.5 transition-colors duration-500" style={{ backgroundColor: localStorage.getItem('topBarColor') || '#0285fd' }} />
                             <div className="flex items-center gap-2">
@@ -376,7 +376,7 @@ const FixedIncomeBoard = ({ isOpen, onClose }) => {
                                 <span className="text-[15px] font-[700] text-slate-900 uppercase tracking-[3px] font-mono truncate">Payment Type Lookup</span>
                             </div>
                             <button onClick={() => setShowPayTypeSearch(false)} className="w-9 h-8 flex items-center justify-center bg-red-50 hover:bg-red-100 text-red-600 rounded-[8px] transition-all active:scale-90 outline-none border-none group">
-                                <X size={18} strokeWidth={4} className="group-hover:scale-110 transition-transform" />
+                                <X size={28} strokeWidth={1.5} className="group-hover:scale-110 transition-transform" />
                             </button>
                         </div>
                         <div className="p-4 space-y-2">

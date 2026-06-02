@@ -163,7 +163,7 @@ const PromoAdminBoard = ({ isOpen, onClose, inlineView }) => {
                                 onClick={onClose}
                                 className="p-2 hover:bg-slate-100 rounded-full text-slate-500 transition-colors"
                             >
-                                <X className="w-6 h-6" />
+                                <X size={28} strokeWidth={1.5} className="w-6 h-6" />
                             </button>
                         )}
                     </div>
@@ -172,7 +172,7 @@ const PromoAdminBoard = ({ isOpen, onClose, inlineView }) => {
                 <div className={inlineView ? "flex-1 overflow-y-auto" : "p-6 overflow-y-auto flex-1"}>
                     {isEditing ? (
                         /* Edit/Create Form */
-                        <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden p-6 max-w-2xl mx-auto">
+ <div className="bg-white dark:bg-slate-800 rounded-sm shadow-sm dark:border-slate-700 overflow-hidden p-6 max-w-2xl mx-auto">
                             <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-6">{currentAd ? 'Edit Advertisement' : 'Create New Advertisement'}</h3>
                             <form onSubmit={handleSubmit} className="space-y-5">
                                 <div>
@@ -270,7 +270,7 @@ const PromoAdminBoard = ({ isOpen, onClose, inlineView }) => {
                         </div>
                     ) : (
                         /* List View */
-                        <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
+ <div className="bg-white dark:bg-slate-800 rounded-sm shadow-sm dark:border-slate-700 overflow-hidden">
                             <div className="overflow-x-auto">
                                 <table className="w-full text-left border-collapse">
                                     <thead>
@@ -365,7 +365,7 @@ const PromoAdminBoard = ({ isOpen, onClose, inlineView }) => {
     if (inlineView) return Content;
 
     return (
-        <div className="fixed inset-0 z-[2050] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm overflow-y-auto">
+        <div className="fixed inset-0 z-[2050] flex items-center justify-center p-4 bg-slate-900/30 backdrop-blur-sm overflow-y-auto">
             {Content}
         </div>
     );

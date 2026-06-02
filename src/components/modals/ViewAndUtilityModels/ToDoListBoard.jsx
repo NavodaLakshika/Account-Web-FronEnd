@@ -43,9 +43,9 @@ const ToDoListBoard = ({ isOpen, onClose }) => {
 
     return (
         <div className="fixed inset-0 z-[300] flex items-center justify-center p-4">
-            <div className="absolute inset-0 bg-slate-900/70 backdrop-blur-sm" onClick={onClose} />
+            <div className="absolute inset-0 bg-slate-900/30 backdrop-blur-sm" onClick={onClose} />
 
-            <div className="relative w-full max-w-xl bg-white rounded-2xl shadow-2xl overflow-hidden border border-white/10 animate-in zoom-in-95 duration-300 flex flex-col max-h-[90vh]">
+ <div className="relative w-full max-w-xl bg-white rounded-sm shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 flex flex-col max-h-[90vh]">
                 <div className="absolute left-0 top-0 bottom-0 w-[4px]" style={{ backgroundColor: accent }} />
 
                 <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-white">
@@ -59,7 +59,7 @@ const ToDoListBoard = ({ isOpen, onClose }) => {
                         </div>
                     </div>
                     <button onClick={onClose} className="w-9 h-9 rounded-xl bg-red-50 hover:bg-red-100 flex items-center justify-center transition-all active:scale-90">
-                        <X size={18} strokeWidth={3} className="text-red-600" />
+                        <X size={28} strokeWidth={1.5} className="text-red-600" />
                     </button>
                 </div>
 
@@ -76,7 +76,7 @@ const ToDoListBoard = ({ isOpen, onClose }) => {
                                     <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-1.5">{today}</p>
                                 </div>
                             </div>
-                            <div className="flex items-center gap-3 px-4 py-2 bg-white rounded-lg shadow-sm border border-slate-100">
+ <div className="flex items-center gap-3 px-4 py-2 bg-white rounded-sm shadow-sm ">
                                 <Clock size={14} className="text-[#4f83ff]" />
                                 <span className="text-[14px] font-black text-slate-700 font-mono tracking-wider">{currentTime}</span>
                             </div>
@@ -99,7 +99,7 @@ const ToDoListBoard = ({ isOpen, onClose }) => {
                             </button>
                         </div>
 
-                        <div className="border border-slate-100 rounded-xl overflow-hidden shadow-sm bg-white">
+ <div className=" rounded-sm overflow-hidden shadow-sm bg-white">
                             <div className="max-h-[320px] overflow-y-auto no-scrollbar divide-y divide-slate-50">
                                 {tasks.length === 0 ? (
                                     <div className="py-16 text-center">

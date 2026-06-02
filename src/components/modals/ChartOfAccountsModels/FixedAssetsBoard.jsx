@@ -286,7 +286,7 @@ const FixedAssetsBoard = ({ isOpen, onClose }) => {
                     {/* Middle Grid */}
                     <div className="grid grid-cols-2 gap-4">
                         {/* Purchase Information */}
-                        <div className="border border-slate-200 rounded-[5px] p-4 relative pt-6 bg-white shadow-sm">
+ <div className=" rounded-[5px] p-4 relative pt-6 bg-white shadow-sm">
                             <span className="absolute -top-3 left-3 bg-white px-2 py-0.5 border border-slate-200 rounded text-[10px] font-bold text-[#0285fd] uppercase tracking-widest shadow-sm">Purchase Information</span>
                             <div className="space-y-4">
                                 <div>
@@ -337,7 +337,7 @@ const FixedAssetsBoard = ({ isOpen, onClose }) => {
                         </div>
 
                         {/* Sales Information */}
-                        <div className="border border-slate-200 rounded-[5px] p-4 relative pt-6 bg-white shadow-sm">
+ <div className=" rounded-[5px] p-4 relative pt-6 bg-white shadow-sm">
                             <span className="absolute -top-3 left-3 bg-white px-2 py-0.5 border border-slate-200 rounded text-[10px] font-bold text-red-500 uppercase tracking-widest shadow-sm">Sales Information</span>
                             <div className="space-y-4">
                                 <div>
@@ -384,7 +384,7 @@ const FixedAssetsBoard = ({ isOpen, onClose }) => {
                     </div>
 
                     {/* Asset Detailed Information */}
-                    <div className="border border-slate-200 rounded-[5px] p-4 relative pt-6 bg-white shadow-sm">
+ <div className=" rounded-[5px] p-4 relative pt-6 bg-white shadow-sm">
                         <span className="absolute -top-3 left-3 bg-white px-3 py-0.5 border border-slate-200 rounded text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
                              Detailed Info
                         </span>
@@ -431,8 +431,8 @@ const FixedAssetsBoard = ({ isOpen, onClose }) => {
 
             {showSearchModal && (
                 <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4 font-['Tahoma']">
-                    <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setShowSearchModal(false)} />
-                    <div className="relative w-full max-w-3xl bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
+                    <div className="absolute inset-0 bg-slate-900/30 backdrop-blur-sm" onClick={() => setShowSearchModal(false)} />
+ <div className="relative w-full max-w-3xl bg-white shadow-2xl rounded-sm overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
                         {/* Header */}
                         <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-100 select-none relative overflow-hidden">
                             {/* System Color Left Accent */}
@@ -449,7 +449,7 @@ const FixedAssetsBoard = ({ isOpen, onClose }) => {
                                 className="w-9 h-8 flex items-center justify-center bg-red-50 hover:bg-red-100 text-red-600 rounded-[8px] transition-all active:scale-90 outline-none border-none group"
                                 title="Close"
                             >
-                                <X size={18} strokeWidth={4} className="group-hover:scale-110 transition-transform" />
+                                <X size={28} strokeWidth={1.5} className="group-hover:scale-110 transition-transform" />
                             </button>
                         </div>
 
@@ -511,8 +511,8 @@ const FixedAssetsBoard = ({ isOpen, onClose }) => {
             {/* Account Search Modal */}
             {showAccountSearch && (
                 <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4 font-['Tahoma']">
-                    <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setShowAccountSearch(false)} />
-                    <div className="relative w-full max-w-2xl bg-white shadow-2xl rounded-xl border border-gray-100 overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
+                    <div className="absolute inset-0 bg-slate-900/30 backdrop-blur-sm" onClick={() => setShowAccountSearch(false)} />
+ <div className="relative w-full max-w-2xl bg-white shadow-2xl rounded-sm overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
                         {/* Header */}
                         <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-100 select-none relative overflow-hidden">
                             {/* System Color Left Accent */}
@@ -529,7 +529,7 @@ const FixedAssetsBoard = ({ isOpen, onClose }) => {
                                 className="w-9 h-8 flex items-center justify-center bg-red-50 hover:bg-red-100 text-red-600 rounded-[8px] transition-all active:scale-90 outline-none border-none group"
                                 title="Close"
                             >
-                                <X size={18} strokeWidth={4} className="group-hover:scale-110 transition-transform" />
+                                <X size={28} strokeWidth={1.5} className="group-hover:scale-110 transition-transform" />
                             </button>
                         </div>
 

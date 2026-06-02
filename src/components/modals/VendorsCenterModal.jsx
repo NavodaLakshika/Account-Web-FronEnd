@@ -43,9 +43,9 @@ const VendorsCenterModal = ({ isOpen, onClose, onOpenEnterBill, onOpenPayBill, o
 
     return (
         <div className="fixed inset-0 z-[300] flex items-center justify-center p-4">
-            <div className="absolute inset-0 bg-slate-900/70 backdrop-blur-sm" onClick={onClose} />
+            <div className="absolute inset-0 bg-slate-900/30 backdrop-blur-sm" onClick={onClose} />
 
-            <div className="relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl overflow-hidden border border-white/10 animate-in zoom-in-95 duration-300">
+ <div className="relative w-full max-w-2xl bg-white rounded-sm shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
                 <div className="absolute left-0 top-0 bottom-0 w-[4px]" style={{ backgroundColor: accent }} />
 
                 <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-white">
@@ -61,7 +61,7 @@ const VendorsCenterModal = ({ isOpen, onClose, onOpenEnterBill, onOpenPayBill, o
                         </div>
                     </div>
                     <button onClick={onClose} className="w-9 h-9 rounded-xl bg-red-50 hover:bg-red-100 flex items-center justify-center transition-all active:scale-90">
-                        <X size={18} strokeWidth={3} className="text-red-600" />
+                        <X size={28} strokeWidth={1.5} className="text-red-600" />
                     </button>
                 </div>
 
@@ -102,7 +102,7 @@ const VendorsCenterModal = ({ isOpen, onClose, onOpenEnterBill, onOpenPayBill, o
                                                 onClick={() => handleAction(item.action)}
                                                 className="group w-full flex items-center gap-3 px-4 py-2.5 rounded-xl hover:bg-slate-50 transition-all duration-200 border border-transparent hover:border-slate-100 hover:shadow-sm text-left"
                                             >
-                                                <div className="w-9 h-9 rounded-lg bg-white border border-slate-100 flex items-center justify-center shadow-sm group-hover:border-[${accent}]/20 group-hover:bg-[${accent}]/5 transition-all shrink-0">
+ <div className="w-9 h-9 rounded-sm bg-white flex items-center justify-center shadow-sm group-hover:border-[${accent}]/20 group-hover:bg-[${accent}]/5 transition-all shrink-0">
                                                     <Icon size={16} strokeWidth={1.8} className="text-slate-500 group-hover:text-[${accent}] transition-colors" />
                                                 </div>
                                                 <div className="flex-1 min-w-0">

@@ -86,7 +86,7 @@ const AIChatbotBoard = ({ isOpen, onClose, position = 'center' }) => {
     const [isRecording, setIsRecording] = useState(false);
     const [chatSize, setChatSize] = useState('standard'); // 'standard', 'wide', 'compact'
     const abortControllerRef = useRef(null);
-    const topBarColor = localStorage.getItem('topBarColor') || '#0285fd';
+    const topBarColor = '#0078d4'; // System blue color
     const messagesEndRef = useRef(null);
     const fileInputRef = useRef(null);
 
@@ -261,7 +261,7 @@ const AIChatbotBoard = ({ isOpen, onClose, position = 'center' }) => {
                         {chatSize === 'wide' ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
                     </button>
                     <button onClick={onClose} className="w-9 h-8 flex items-center justify-center bg-red-50 hover:bg-red-100 text-red-600 rounded-[8px] transition-all active:scale-90 border-none group">
-                        <X size={18} strokeWidth={4} />
+                        <X size={28} strokeWidth={1.5} />
                     </button>
                 </div>
 
@@ -353,7 +353,7 @@ const AIChatbotBoard = ({ isOpen, onClose, position = 'center' }) => {
                                     </div>
                                 </div>
                                 <button onClick={() => setAttachedFile(null)} className="p-1.5 hover:bg-red-50 text-slate-300 hover:text-red-500 rounded-full transition-colors">
-                                    <X size={14} />
+                                    <X size={28} />
                                 </button>
                             </div>
                         )}
@@ -411,7 +411,7 @@ const AIChatbotBoard = ({ isOpen, onClose, position = 'center' }) => {
         <>
             <div className={`fixed inset-0 z-[10000] flex ${isRight ? 'justify-end p-0 pointer-events-none' : 'items-center justify-center p-0 md:p-4'} transition-all duration-700 ${isOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'}`}>
                 {!isRight && (
-                    <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md transition-all duration-700 pointer-events-auto" onClick={onClose} />
+                    <div className="absolute inset-0 bg-slate-900/30 backdrop-blur-sm transition-all duration-700 pointer-events-auto" onClick={onClose} />
                 )}
 
                 <div className={`relative overflow-hidden flex transition-all duration-500 ease-out bg-white shadow-2xl 
@@ -431,7 +431,7 @@ const AIChatbotBoard = ({ isOpen, onClose, position = 'center' }) => {
                             {chatSize === 'wide' ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
                         </button>
                         <button onClick={onClose} className="w-9 h-8 flex items-center justify-center bg-red-50 hover:bg-red-100 text-red-600 rounded-[8px] transition-all active:scale-90 border-none group">
-                            <X size={18} strokeWidth={4} />
+                            <X size={28} strokeWidth={1.5} />
                         </button>
                     </div>
 
@@ -500,7 +500,7 @@ const AIChatbotBoard = ({ isOpen, onClose, position = 'center' }) => {
                                             }}
                                             className="absolute right-1 top-1 opacity-0 group-hover:opacity-100 p-1 text-slate-300 hover:text-red-500 transition-all z-20"
                                         >
-                                            <X size={10} strokeWidth={3} />
+                                            <X size={28} strokeWidth={1.5} />
                                         </button>
                                     </div>
                                 ))}
@@ -617,7 +617,7 @@ const AIChatbotBoard = ({ isOpen, onClose, position = 'center' }) => {
                                         </div>
                                     </div>
                                     <button onClick={() => setAttachedFile(null)} className="p-1.5 hover:bg-red-50 text-slate-300 hover:text-red-500 rounded-full transition-colors">
-                                        <X size={14} />
+                                        <X size={28} />
                                     </button>
                                 </div>
                             )}

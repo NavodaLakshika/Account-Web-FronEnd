@@ -672,7 +672,7 @@ const SuperAdminDashboard = () => {
             {/* Mobile sidebar overlay */}
             {sidebarOpen && (
                 <div className="fixed inset-0 z-50 md:hidden">
-                    <div className="absolute inset-0 bg-slate-900/50 dark:bg-slate-900/80" onClick={() => setSidebarOpen(false)} />
+                    <div className="absolute inset-0 bg-slate-900/30 backdrop-blur-sm dark:bg-slate-900/80" onClick={() => setSidebarOpen(false)} />
                     <aside className="absolute left-0 top-0 h-full w-64 bg-white dark:bg-slate-800 shadow-2xl animate-in slide-in-from-left duration-200">
                         <div className="h-20 flex items-center px-8 border-b border-slate-100 dark:border-slate-700">
                             <div className="flex items-center gap-3">
@@ -781,7 +781,7 @@ const SuperAdminDashboard = () => {
                                 </button>
 
                                 {showResets && (
-                                    <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+ <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-slate-800 rounded-sm shadow-xl dark:border-slate-700 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200">
                                         <div className="p-4 border-b border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 flex items-center justify-between">
                                             <h3 className="font-bold text-slate-900 dark:text-white">Password Recovery Alerts</h3>
                                             <span className="bg-red-100 dark:bg-red-500/20 text-red-600 dark:text-red-400 text-xs font-bold px-2 py-1 rounded-full">{pendingResets.length}</span>
@@ -845,7 +845,7 @@ const SuperAdminDashboard = () => {
                         <>
                             {/* Metric Cards */}
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                                <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 flex items-center justify-between hover:shadow-md transition-shadow">
+ <div className="bg-white dark:bg-slate-800 p-6 rounded-sm shadow-sm dark:border-slate-700 flex items-center justify-between hover:shadow-md transition-shadow">
                                     <div>
                                         <p className="text-xs font-bold tracking-widest uppercase text-slate-500 dark:text-slate-400 mb-1">Total Employees</p>
                                         <h3 className="text-4xl font-bold text-slate-900 dark:text-white">{hierarchy.length}</h3>
@@ -854,7 +854,7 @@ const SuperAdminDashboard = () => {
                                         <Users className="w-7 h-7 text-[#00acee]" />
                                     </div>
                                 </div>
-                                <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 flex items-center justify-between hover:shadow-md transition-shadow">
+ <div className="bg-white dark:bg-slate-800 p-6 rounded-sm shadow-sm dark:border-slate-700 flex items-center justify-between hover:shadow-md transition-shadow">
                                     <div>
                                         <p className="text-xs font-bold tracking-widest uppercase text-slate-500 dark:text-slate-400 mb-1">Total Companies</p>
                                         <h3 className="text-4xl font-bold text-slate-900 dark:text-white">{totalCompanies}</h3>
@@ -863,7 +863,7 @@ const SuperAdminDashboard = () => {
                                         <Building2 className="w-7 h-7 text-emerald-500" />
                                     </div>
                                 </div>
-                                <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 flex items-center justify-between hover:shadow-md transition-shadow">
+ <div className="bg-white dark:bg-slate-800 p-6 rounded-sm shadow-sm dark:border-slate-700 flex items-center justify-between hover:shadow-md transition-shadow">
                                     <div>
                                         <p className="text-xs font-bold tracking-widest uppercase text-slate-500 dark:text-slate-400 mb-1">Total Entities</p>
                                         <h3 className="text-4xl font-bold text-slate-900 dark:text-white">{hierarchy.length + totalCompanies}</h3>
@@ -875,7 +875,7 @@ const SuperAdminDashboard = () => {
                             </div>
 
                             {/* Main Table Card */}
-                            <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
+ <div className="bg-white dark:bg-slate-800 rounded-sm shadow-sm dark:border-slate-700 overflow-hidden">
                                 <div className="p-6 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between">
                                     <h2 className="text-xl font-bold text-slate-900 dark:text-white">System Overview</h2>
                                     <button className="p-2 bg-slate-50 dark:bg-slate-700 rounded-full text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
@@ -960,7 +960,7 @@ const SuperAdminDashboard = () => {
                                                                             <p className="text-sm text-slate-500 dark:text-slate-400 italic py-2">No companies assigned.</p>
                                                                         ) : (
                                                                             emp.companies.map((comp, idx) => (
-                                                                                <div key={comp.companyCode} onClick={() => openTransactionsModal(comp)} className="group relative flex items-center justify-between p-3 rounded-xl hover:bg-white dark:hover:bg-slate-800 hover:shadow-[0_2px_10px_rgba(0,0,0,0.04)] border border-transparent hover:border-slate-200 dark:hover:border-slate-700 transition-all cursor-pointer">
+ <div key={comp.companyCode} onClick={() => openTransactionsModal(comp)} className="group relative flex items-center justify-between p-3 rounded-sm hover:bg-white dark:hover:bg-slate-800 hover:shadow-[0_2px_10px_rgba(0,0,0,0.04)] hover:border-slate-200 dark:hover:border-slate-700 transition-all cursor-pointer">
                                                                                     {/* Tree branch line */}
                                                                                     <div className="absolute top-1/2 -left-6 w-4 h-[2px] bg-slate-200 dark:bg-slate-700 -translate-y-1/2"></div>
                                                                                     
@@ -1006,7 +1006,7 @@ const SuperAdminDashboard = () => {
 
                     {/* COMPANIES VIEW */}
                     {activeMenu === 'Companies' && (
-                        <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+ <div className="bg-white dark:bg-slate-800 rounded-sm shadow-sm dark:border-slate-700 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
                             <div className="p-6 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between">
                                 <h2 className="text-xl font-bold text-slate-900 dark:text-white">All Registered Companies</h2>
                                 <span className="bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-bold px-3 py-1 rounded-full">{allCompanies.length} Companies</span>
@@ -1047,7 +1047,7 @@ const SuperAdminDashboard = () => {
 
                     {/* EMPLOYEES VIEW */}
                     {activeMenu === 'Employees' && (
-                        <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+ <div className="bg-white dark:bg-slate-800 rounded-sm shadow-sm dark:border-slate-700 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
                             <div className="p-6 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between">
                                 <h2 className="text-xl font-bold text-slate-900 dark:text-white">All Employees</h2>
                                 <span className="bg-[#00acee]/10 text-[#00acee] text-xs font-bold px-3 py-1 rounded-full">{allEmployees.length} Employees</span>
@@ -1104,7 +1104,7 @@ const SuperAdminDashboard = () => {
                     )}                    {/* DATABASE VIEW */}
                     {activeMenu === 'Database' && (
                         <div className="flex flex-col gap-6 animate-in fade-in zoom-in-95 duration-200 h-full pb-10">
-                            <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0">
+ <div className="bg-white dark:bg-slate-800 rounded-sm shadow-sm dark:border-slate-700 p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0">
                                 <div>
                                     <h2 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
                                         <Database className="text-[#00acee]" size={20} />
@@ -1125,7 +1125,7 @@ const SuperAdminDashboard = () => {
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 shrink-0">
-                                <div className="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col justify-between">
+ <div className="bg-white dark:bg-slate-800 p-5 rounded-sm dark:border-slate-700 shadow-sm flex flex-col justify-between">
                                     <div className="flex items-center justify-between mb-4">
                                         <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-500/10 flex items-center justify-center text-blue-500">
                                             <Database size={18} />
@@ -1137,7 +1137,7 @@ const SuperAdminDashboard = () => {
                                         <p className="text-2xl font-bold text-slate-900 dark:text-white">N/A</p>
                                     </div>
                                 </div>
-                                <div className="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col justify-between">
+ <div className="bg-white dark:bg-slate-800 p-5 rounded-sm dark:border-slate-700 shadow-sm flex flex-col justify-between">
                                     <div className="flex items-center justify-between mb-4">
                                         <div className="w-10 h-10 rounded-xl bg-purple-50 dark:bg-purple-500/10 flex items-center justify-center text-purple-500">
                                             <Users size={18} />
@@ -1150,7 +1150,7 @@ const SuperAdminDashboard = () => {
                                         </p>
                                     </div>
                                 </div>
-                                <div className="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col justify-between">
+ <div className="bg-white dark:bg-slate-800 p-5 rounded-sm dark:border-slate-700 shadow-sm flex flex-col justify-between">
                                     <div className="flex items-center justify-between mb-4">
                                         <div className="w-10 h-10 rounded-xl bg-orange-50 dark:bg-orange-500/10 flex items-center justify-center text-orange-500">
                                             <Activity size={18} />
@@ -1161,7 +1161,7 @@ const SuperAdminDashboard = () => {
                                         <p className="text-2xl font-bold text-slate-900 dark:text-white">{allEmployees.length || 0}</p>
                                     </div>
                                 </div>
-                                <div className="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col justify-between">
+ <div className="bg-white dark:bg-slate-800 p-5 rounded-sm dark:border-slate-700 shadow-sm flex flex-col justify-between">
                                     <div className="flex items-center justify-between mb-4">
                                         <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center text-emerald-500">
                                             <CheckCircle size={18} />
@@ -1179,7 +1179,7 @@ const SuperAdminDashboard = () => {
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 shrink-0">
-                                <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm p-6">
+ <div className="bg-white dark:bg-slate-800 rounded-sm dark:border-slate-700 shadow-sm p-6">
                                     <h3 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-widest mb-4">Maintenance Operations</h3>
                                     <div className="flex flex-col gap-3">
                                         <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-700/50 rounded-xl border border-slate-100 dark:border-slate-700">
@@ -1199,7 +1199,7 @@ const SuperAdminDashboard = () => {
                                     </div>
                                 </div>
 
-                                <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm p-6">
+ <div className="bg-white dark:bg-slate-800 rounded-sm dark:border-slate-700 shadow-sm p-6">
                                     <h3 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-widest mb-4">Recent Backups</h3>
                                     <div className="flex flex-col gap-0 border border-slate-100 dark:border-slate-700 rounded-xl overflow-hidden">
                                         {(backups.length > 0 ? backups.slice().reverse().slice(0, 5) : []).map((b, i) => {
@@ -1208,7 +1208,7 @@ const SuperAdminDashboard = () => {
                                                 <div key={i} className="flex items-center justify-between p-3 border-b border-slate-100 dark:border-slate-700 last:border-0 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
                                                     <div className="flex items-center gap-3">
                                                         <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${isFailed ? 'bg-red-50 dark:bg-red-500/10 text-red-500' : 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-500'}`}>
-                                                            {isFailed ? <X size={14} /> : <CheckCircle size={14} />}
+                                                            {isFailed ? <X size={28} /> : <CheckCircle size={28} />}
                                                         </div>
                                                         <div>
                                                             <p className="text-xs font-bold text-slate-800 dark:text-slate-200" title={b.backupPath}>
@@ -1229,7 +1229,7 @@ const SuperAdminDashboard = () => {
 
                     {/* ROLE FEATURES VIEW */}
                     {activeMenu === 'Role Features' && (
-                        <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-6 flex flex-col gap-6 animate-in fade-in zoom-in-95 duration-200">
+ <div className="bg-white dark:bg-slate-800 rounded-sm shadow-sm dark:border-slate-700 p-6 flex flex-col gap-6 animate-in fade-in zoom-in-95 duration-200">
                             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-100 dark:border-slate-700">
                                 <div>
                                     <h2 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
@@ -1265,7 +1265,7 @@ const SuperAdminDashboard = () => {
                             </div>
 
                             <div className="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-4 border border-slate-200/60 dark:border-slate-700/60 flex flex-col gap-4">
-                                <div className="bg-white dark:bg-slate-700 p-4 rounded-xl border border-slate-200 dark:border-slate-600 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
+ <div className="bg-white dark:bg-slate-700 p-4 rounded-sm dark:border-slate-600 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
                                     <div className="flex flex-col w-full sm:w-auto">
                                         <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1">Configuration Target</span>
                                         <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
@@ -1429,7 +1429,7 @@ const SuperAdminDashboard = () => {
 
                     {/* APP LIST VIEW */}
                     {activeMenu === 'App List' && (
-                        <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col animate-in fade-in zoom-in-95 duration-200">
+ <div className="bg-white dark:bg-slate-800 p-6 rounded-sm shadow-sm dark:border-slate-700 flex flex-col animate-in fade-in zoom-in-95 duration-200">
                             <div className="flex items-center justify-between mb-6">
                                 <div>
                                     <h2 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
@@ -1528,8 +1528,8 @@ const SuperAdminDashboard = () => {
 
             {/* Edit Role Modal */}
             {editingEmp && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4">
-                    <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200 font-sans">
+                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/30 backdrop-blur-sm backdrop-blur-sm p-4">
+ <div className="bg-white dark:bg-slate-800 rounded-sm shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200 font-sans">
                         {/* Header */}
                         <div className="p-6 border-b border-slate-100 dark:border-slate-700">
                             <div className="flex items-center justify-between">
@@ -1538,7 +1538,7 @@ const SuperAdminDashboard = () => {
                                     Manage Employee Role
                                 </h2>
                                 <button onClick={() => setEditingEmp(null)} className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-all">
-                                    <X className="w-5 h-5" />
+                                    <X size={28} strokeWidth={1.5} className="w-5 h-5" />
                                 </button>
                             </div>
                             <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Editing <span className="font-bold text-slate-700 dark:text-slate-300">{editingEmp.empName || editingEmp.emp_Name}</span> ({editingEmp.empCode || editingEmp.emp_Code})</p>
@@ -1623,8 +1623,8 @@ const SuperAdminDashboard = () => {
 
             {/* Employee Details View Modal */}
             {selectedEmployeeView && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4">
-                    <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden animate-in fade-in zoom-in duration-200 flex flex-col font-sans">
+                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/30 backdrop-blur-sm backdrop-blur-sm p-4">
+ <div className="bg-white dark:bg-slate-800 rounded-sm shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden animate-in fade-in zoom-in duration-200 flex flex-col font-sans">
                         <div className="p-6 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between bg-slate-50/50 dark:bg-slate-800/50 shrink-0">
                             <div className="flex items-center gap-4">
                                 <div className="w-12 h-12 rounded-xl bg-purple-50 dark:bg-purple-500/10 flex items-center justify-center">
@@ -1636,7 +1636,7 @@ const SuperAdminDashboard = () => {
                                 </div>
                             </div>
                             <button onClick={() => setSelectedEmployeeView(null)} className="p-2 text-slate-400 dark:text-slate-500 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full transition-all">
-                                <X className="w-5 h-5" />
+                                <X size={28} strokeWidth={1.5} className="w-5 h-5" />
                             </button>
                         </div>
                         <div className="p-6 overflow-y-auto bg-slate-50/30 dark:bg-slate-800/20">
@@ -1645,7 +1645,7 @@ const SuperAdminDashboard = () => {
                                     ...selectedEmployeeView,
                                     'PASSWORD': selectedEmployeeView.pass_Word || selectedEmployeeView.password || selectedEmployeeView.Pass_Word || '•••••••• (Encrypted by Backend)'
                                 }).map(([key, value]) => (
-                                    <div key={key} className="bg-white dark:bg-slate-700 p-4 rounded-xl border border-slate-200 dark:border-slate-600 shadow-sm flex flex-col justify-center">
+ <div key={key} className="bg-white dark:bg-slate-700 p-4 rounded-sm dark:border-slate-600 shadow-sm flex flex-col justify-center">
                                         <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-1">{key.replace(/_/g, ' ')}</h3>
                                         <p className="text-sm font-bold text-slate-800 dark:text-slate-200 break-all">{value !== null && value !== undefined && value !== '' ? String(value) : <span className="text-slate-300 dark:text-slate-500 font-normal italic">Empty</span>}</p>
                                     </div>
@@ -1722,8 +1722,8 @@ const SuperAdminDashboard = () => {
 
             {/* Target Selection Sub-Modal for Role Features */}
             {showPermTargetModal && (
-                <div className="fixed inset-0 z-[200] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4 font-sans">
-                    <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-md overflow-visible animate-in fade-in zoom-in-95 duration-200 flex flex-col">
+                <div className="fixed inset-0 z-[200] flex items-center justify-center bg-slate-900/30 backdrop-blur-sm backdrop-blur-sm p-4 font-sans">
+ <div className="bg-white dark:bg-slate-800 rounded-sm shadow-2xl w-full max-w-md overflow-visible animate-in fade-in zoom-in-95 duration-200 flex flex-col">
                         <div className="p-5 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between bg-slate-50 dark:bg-slate-700/50 rounded-t-2xl">
                             <h3 className="text-sm font-bold tracking-wide uppercase text-slate-900 dark:text-white">Select Target Scope</h3>
                             <button onClick={() => setShowPermTargetModal(false)} className="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
@@ -1755,7 +1755,7 @@ const SuperAdminDashboard = () => {
                                     </button>
 
                                     {permEmpSearchTriggered && (
-                                        <div className="absolute top-[100%] mt-2 left-0 w-full z-50 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl shadow-2xl max-h-[250px] overflow-y-auto flex flex-col">
+ <div className="absolute top-[100%] mt-2 left-0 w-full z-50 bg-white dark:bg-slate-700 dark:border-slate-600 rounded-sm shadow-2xl max-h-[250px] overflow-y-auto flex flex-col">
                                             <div
                                                 onClick={() => {
                                                     setSelectedPermEmployee('');
@@ -1829,7 +1829,7 @@ const SuperAdminDashboard = () => {
                                     </button>
 
                                     {permCompSearchTriggered && (
-                                        <div className="absolute top-[100%] mt-2 left-0 w-full z-50 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl shadow-2xl max-h-[250px] overflow-y-auto flex flex-col">
+ <div className="absolute top-[100%] mt-2 left-0 w-full z-50 bg-white dark:bg-slate-700 dark:border-slate-600 rounded-sm shadow-2xl max-h-[250px] overflow-y-auto flex flex-col">
                                             <div
                                                 onClick={() => {
                                                     setSelectedPermCompany('');

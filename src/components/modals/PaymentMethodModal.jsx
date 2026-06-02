@@ -25,8 +25,8 @@ const PaymentMethodModal = ({ isOpen, onClose, selectedPlan }) => {
     ];
 
     return (
-        <div className="fixed inset-0 z-[2050] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md overflow-y-auto">
-            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden animate-in fade-in zoom-in duration-300">
+        <div className="fixed inset-0 z-[2050] flex items-center justify-center p-4 bg-slate-900/30 backdrop-blur-sm overflow-y-auto">
+ <div className="bg-white rounded-sm shadow-2xl w-full max-w-2xl overflow-hidden animate-in fade-in zoom-in duration-300">
                 {/* Header */}
                 <div className="p-6 border-b border-slate-100 flex items-center justify-between">
                     <button 
@@ -74,7 +74,7 @@ const PaymentMethodModal = ({ isOpen, onClose, selectedPlan }) => {
 
                     {/* Right: Summary */}
                     <div className="w-full md:w-64 flex flex-col">
-                        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex-1">
+ <div className="bg-white p-5 rounded-sm shadow-sm flex-1">
                             <h4 className="font-bold text-slate-800 mb-4 uppercase text-xs tracking-wider border-b border-slate-100 pb-2">Order Summary</h4>
                             <div className="space-y-3 mb-6">
                                 <div className="flex justify-between items-center text-sm">

@@ -101,7 +101,7 @@ const CompanyOverviewBoard = ({ company, onClose, onTransactionDeleted }) => {
                     { title: 'Avg. Transaction', value: `Rs ${avgValue.toLocaleString(undefined, {minimumFractionDigits: 2})}`, icon: TrendingUp, color: 'text-orange-500', bg: 'bg-orange-500/10' },
                     { title: 'Active Users', value: 'N/A', icon: Users, color: 'text-purple-500', bg: 'bg-purple-500/10' },
                 ].map((stat, i) => (
-                    <div key={i} className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 hover:border-slate-200 transition-all group">
+ <div key={i} className="bg-white p-5 rounded-sm shadow-sm hover:border-slate-200 transition-all group">
                         <div className="flex items-center justify-between mb-4">
                             <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${stat.bg} ${stat.color} group-hover:scale-110 transition-transform`}>
                                 <stat.icon size={20} />
@@ -117,7 +117,7 @@ const CompanyOverviewBoard = ({ company, onClose, onTransactionDeleted }) => {
             </div>
 
             {/* Company Details */}
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+ <div className="bg-white rounded-sm shadow-sm p-6">
                 <h3 className="text-sm font-bold tracking-widest uppercase text-slate-400 mb-6">Company Profile</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div className="space-y-4">
@@ -166,7 +166,7 @@ const CompanyOverviewBoard = ({ company, onClose, onTransactionDeleted }) => {
             </div>
 
             {/* Full Company Details */}
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 mt-6">
+ <div className="bg-white rounded-sm shadow-sm p-6 mt-6">
                 <h3 className="text-sm font-bold tracking-widest uppercase text-slate-400 mb-6">Additional Details</h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                     {Object.entries(company).map(([key, value]) => {
@@ -190,7 +190,7 @@ const CompanyOverviewBoard = ({ company, onClose, onTransactionDeleted }) => {
 
     const renderSalesDashboard = () => (
         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+ <div className="bg-white p-6 rounded-sm shadow-sm ">
                 <div className="flex items-center justify-between mb-8">
                     <div>
                         <h3 className="text-lg font-bold text-slate-900">Revenue Overview</h3>
@@ -230,7 +230,7 @@ const CompanyOverviewBoard = ({ company, onClose, onTransactionDeleted }) => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+ <div className="bg-white p-6 rounded-sm shadow-sm ">
                     <h3 className="text-sm font-bold tracking-widest uppercase text-slate-400 mb-6">Recent Activity</h3>
                     <div className="space-y-4">
                         {transactions.slice(0, 5).map((tx, i) => (
@@ -253,7 +253,7 @@ const CompanyOverviewBoard = ({ company, onClose, onTransactionDeleted }) => {
                     </div>
                 </div>
 
-                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col items-center justify-center text-center">
+ <div className="bg-white p-6 rounded-sm shadow-sm flex flex-col items-center justify-center text-center">
                     <div className="w-20 h-20 bg-orange-50 rounded-full flex items-center justify-center text-orange-400 mb-4">
                         <BarChart3 size={32} />
                     </div>
@@ -268,7 +268,7 @@ const CompanyOverviewBoard = ({ company, onClose, onTransactionDeleted }) => {
     );
 
     const renderTransactions = () => (
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden flex flex-col h-full animate-in fade-in slide-in-from-bottom-4 duration-500">
+ <div className="bg-white rounded-sm shadow-sm overflow-hidden flex flex-col h-full animate-in fade-in slide-in-from-bottom-4 duration-500">
             <div className="p-6 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-50/50">
                 <div className="relative flex-1 max-w-md">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
@@ -385,7 +385,7 @@ const CompanyOverviewBoard = ({ company, onClose, onTransactionDeleted }) => {
                         onClick={onClose}
                         className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 hover:bg-slate-100 hover:text-slate-900 transition-all active:scale-95"
                     >
-                        <X size={20} />
+                        <X size={28} />
                     </button>
                 </div>
 
@@ -428,14 +428,14 @@ const CompanyOverviewBoard = ({ company, onClose, onTransactionDeleted }) => {
             {/* Transaction Details Modal */}
             {selectedTx && (
                 <div className="fixed inset-0 z-[300] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4">
-                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-200">
+ <div className="bg-white rounded-sm shadow-2xl w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-200">
                         <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
                             <div>
                                 <h3 className="text-lg font-bold text-slate-900">Transaction Details</h3>
                                 <p className="text-xs font-mono text-slate-500 mt-0.5">{selectedTx.docNo}</p>
                             </div>
                             <button onClick={() => setSelectedTx(null)} className="p-2 text-slate-400 hover:text-slate-900 hover:bg-slate-200 rounded-full transition-all">
-                                <X size={20} />
+                                <X size={28} />
                             </button>
                         </div>
                         <div className="p-6 space-y-6">

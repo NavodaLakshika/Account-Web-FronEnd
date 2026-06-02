@@ -48,7 +48,7 @@ const AdminVerificationModal = ({
 
     return (
         <div className="fixed inset-0 z-[200] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4 font-sans">
-            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-visible animate-in fade-in zoom-in-95 duration-200 flex flex-col">
+ <div className="bg-white rounded-sm shadow-2xl w-full max-w-md overflow-visible animate-in fade-in zoom-in-95 duration-200 flex flex-col">
                 
                 {/* Header */}
                 <div className="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50 rounded-t-2xl">
@@ -63,7 +63,7 @@ const AdminVerificationModal = ({
                         className="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-200 transition-colors"
                         disabled={loading}
                     >
-                        <X size={16} />
+                        <X size={28} />
                     </button>
                 </div>
                 

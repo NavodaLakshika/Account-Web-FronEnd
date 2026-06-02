@@ -29,9 +29,9 @@ const OfficeDocumentModal = ({ isOpen, onClose }) => {
 
     return (
         <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4">
-            <div className="absolute inset-0 bg-slate-900/70 backdrop-blur-sm" onClick={onClose} />
+            <div className="absolute inset-0 bg-slate-900/30 backdrop-blur-sm" onClick={onClose} />
 
-            <div className="relative w-full max-w-[280px] bg-white rounded-2xl shadow-2xl overflow-hidden border border-white/10 animate-in zoom-in-95 duration-300 flex flex-col max-h-[90vh]">
+ <div className="relative w-full max-w-[280px] bg-white rounded-sm shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 flex flex-col max-h-[90vh]">
                 <div className="absolute left-0 top-0 bottom-0 w-[4px]" style={{ backgroundColor: accent }} />
 
                 <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-white">
@@ -45,7 +45,7 @@ const OfficeDocumentModal = ({ isOpen, onClose }) => {
                         </div>
                     </div>
                     <button onClick={onClose} className="w-9 h-9 rounded-xl bg-red-50 hover:bg-red-100 flex items-center justify-center transition-all active:scale-90">
-                        <X size={18} strokeWidth={3} className="text-red-600" />
+                        <X size={28} strokeWidth={1.5} className="text-red-600" />
                     </button>
                 </div>
 
@@ -58,7 +58,7 @@ const OfficeDocumentModal = ({ isOpen, onClose }) => {
                                 onClick={item.onClick}
                                 className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-50 transition-all text-left group border border-transparent hover:border-slate-100 hover:shadow-sm"
                             >
-                                <div className="w-9 h-9 rounded-lg bg-white border border-slate-100 flex items-center justify-center shadow-sm group-hover:border-[#4f83ff]/20 group-hover:bg-[#4f83ff]/5 transition-all shrink-0">
+ <div className="w-9 h-9 rounded-sm bg-white flex items-center justify-center shadow-sm group-hover:border-[#4f83ff]/20 group-hover:bg-[#4f83ff]/5 transition-all shrink-0">
                                     <Icon size={16} className={`${item.color} group-hover:text-[#4f83ff] transition-colors`} />
                                 </div>
                                 <span className="text-[11px] font-[700] tracking-widest text-slate-700 uppercase">

@@ -91,19 +91,21 @@ const SubmitReviewModal = ({ isOpen, onClose, currentUser }) => {
     };
 
     return (
-        <div className="fixed inset-0 z-[2050] flex items-center justify-center p-6 bg-slate-900/50">
-            <div className="animate-in fade-in slide-in-from-top-8 duration-500 w-full max-w-5xl ">
-                <div className="bg-slate-50/95 backdrop-blur-sm rounded-3xl shadow-2xl border border-slate-200/60 p-6 relative">
-                    {/* Close */}
-                    <button onClick={onClose} className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-xl bg-white border border-slate-200 text-slate-400 hover:text-slate-600 hover:border-slate-300 shadow-sm transition-all z-10">
-                        <X size={15} />
+        <div className="fixed inset-0 z-[2050] flex items-center justify-center p-6 bg-slate-900/30 backdrop-blur-sm font-sans">
+            <div className="relative w-full max-w-[1000px] bg-white shadow-2xl flex flex-col rounded-sm overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                {/* Header with Close */}
+                <div className="flex justify-end p-4">
+                    <button onClick={onClose} className="text-gray-400 hover:text-gray-800 transition-colors">
+                        <X size={28} strokeWidth={1.5} />
                     </button>
+                </div>
 
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 min-h-[420px]">
+                <div className="px-8 md:px-12 pb-12 overflow-y-auto flex-1">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 min-h-[420px]">
                         {/* LEFT */}
                         <div className="flex flex-col gap-5">
                             {/* Overall Rating Card */}
-                            <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6 flex flex-col justify-center items-center flex-1">
+ <div className="bg-white rounded-sm shadow-sm p-6 flex flex-col justify-center items-center flex-1">
                                 <div className="flex items-center justify-center gap-6">
                                     <div className="text-6xl font-bold text-slate-800 tracking-tight">{stats.average || "0.0"}</div>
                                     <div className="flex flex-col items-start">
@@ -118,7 +120,7 @@ const SubmitReviewModal = ({ isOpen, onClose, currentUser }) => {
                             </div>
 
                             {/* Rating Breakdown */}
-                            <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6 flex-1 flex flex-col justify-center">
+ <div className="bg-white rounded-sm shadow-sm p-6 flex-1 flex flex-col justify-center">
                                 <h3 className="text-sm font-bold text-slate-700 mb-5">Rating Breakdown</h3>
                                 <div className="space-y-3">
                                     {stats.distribution.map((row) => (
@@ -137,7 +139,7 @@ const SubmitReviewModal = ({ isOpen, onClose, currentUser }) => {
 
                         {/* RIGHT — Submit Review Form */}
                         <div className="flex flex-col">
-                            <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6 flex-1 flex flex-col">
+ <div className="bg-white rounded-sm shadow-sm p-6 flex-1 flex flex-col">
                                 <h3 className="text-base font-bold text-slate-700 mb-4">Write a Review</h3>
                                 <form onSubmit={handleSubmit} className="flex-1 flex flex-col gap-4">
                                     <div className="flex flex-col items-center gap-5 py-3">

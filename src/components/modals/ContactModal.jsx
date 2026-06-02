@@ -84,7 +84,7 @@ const ContactModal = ({ isOpen, onClose }) => {
                         ].map((item, idx) => (
                             <div key={idx} className="flex items-center group">
                                 {/* Row Container */}
-                                <div className="flex-1 bg-gray-50/50 rounded-[4px] h-8 flex items-center overflow-hidden border border-gray-100 shadow-sm group-hover:bg-white transition-all">
+ <div className="flex-1 bg-gray-50/50 rounded-[4px] h-8 flex items-center overflow-hidden shadow-sm group-hover:bg-white transition-all">
                                     {/* Color Block */}
                                     <div className={`${item.color} w-32 h-full flex items-center justify-between px-4 shrink-0`}>
                                         <span className="text-white text-[9px] font-bold uppercase tracking-wider">{item.title}</span>

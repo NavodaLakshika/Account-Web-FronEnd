@@ -19,12 +19,12 @@ const ContactSupportModal = ({ isOpen, onClose }) => {
                     <div className={`relative w-full h-full transition-all duration-700 [transform-style:preserve-3d] ${isFlipped ? '[transform:rotateY(180deg)]' : ''}`}>
 
                         {/* FRONT SIDE (Direct Contact) */}
-                        <div className="absolute inset-0 w-full h-full bg-white rounded-[5px] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] border border-gray-100 p-7 [backface-visibility:hidden] flex flex-col justify-center overflow-y-auto custom-scrollbar">
+ <div className="absolute inset-0 w-full h-full bg-white rounded-[5px] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] p-7 [backface-visibility:hidden] flex flex-col justify-center overflow-y-auto custom-scrollbar">
                             <button
                                 onClick={onClose}
                                 className="absolute top-4 right-4 p-2 text-gray-300 hover:text-[#00acee] transition-colors"
                             >
-                                <X size={18} />
+                                <X size={28} />
                             </button>
 
                             <div>
@@ -68,7 +68,7 @@ const ContactSupportModal = ({ isOpen, onClose }) => {
                         </div>
 
                         {/* BACK SIDE (Folded-Tab Style) */}
-                        <div className="absolute inset-0 w-full h-full bg-white rounded-[5px] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] [backface-visibility:hidden] [transform:rotateY(180deg)] flex flex-col overflow-hidden border border-gray-100">
+ <div className="absolute inset-0 w-full h-full bg-white rounded-[5px] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] [backface-visibility:hidden] [transform:rotateY(180deg)] flex flex-col overflow-hidden ">
 
                             {/* Top Content (White Branding Area) */}
                             <div className="flex-grow flex flex-col items-center justify-center relative px-8">
@@ -76,7 +76,7 @@ const ContactSupportModal = ({ isOpen, onClose }) => {
                                     onClick={onClose}
                                     className="absolute top-4 right-4 p-2 text-gray-200 hover:text-[#00acee] transition-colors z-20"
                                 >
-                                    <X size={18} />
+                                    <X size={28} />
                                 </button>
 
                                 <div className="flex flex-col items-center">

@@ -3,11 +3,11 @@ import { toast } from 'react-hot-toast';
 import { Check, X, AlertCircle, Clock } from 'lucide-react';
 
 const toastBaseStyle = `
-    max-w-[420px] w-full
+    max-w-[320px] w-full
     bg-[#1a1b26]
     border border-slate-800
     shadow-[0_10px_40px_rgb(0,0,0,0.5)]
-    rounded-xl
+    rounded-none
     overflow-hidden
     pointer-events-auto
     flex
@@ -49,7 +49,7 @@ const ToastLayout = ({
         <div className={`absolute inset-y-0 left-0 w-32 bg-gradient-to-r ${gradientFrom} to-transparent opacity-20 pointer-events-none`} />
 
         {/* Main Content Area */}
-        <div className="flex flex-row w-full flex-1 items-center p-4 gap-4 relative z-10">
+        <div className="flex flex-row w-full flex-1 items-center p-3 gap-3 relative z-10">
             
             {/* Icon */}
             <div className="flex-shrink-0">
@@ -58,11 +58,11 @@ const ToastLayout = ({
             
             {/* Content Area */}
             <div className="flex-1 min-w-0">
-                <h3 className={`text-[15px] font-semibold ${titleColor} leading-tight`}>
+                <h3 className={`text-[13px] font-semibold ${titleColor} leading-tight`}>
                     {title}
                 </h3>
                 {subtitle && (
-                    <p className="text-[13px] text-slate-300 mt-1 opacity-90 leading-snug truncate">
+                    <p className="text-[11px] text-slate-300 mt-0.5 opacity-90 leading-snug truncate">
                         {subtitle}
                     </p>
                 )}
@@ -109,8 +109,8 @@ export const showSuccessToast = (message, subMessageOrOptions) => {
                 title={displayTitle}
                 subtitle={displaySubtitle}
                 icon={
-                    <div className="w-8 h-8 rounded-full bg-[#22c55e] flex items-center justify-center shadow-lg shadow-green-500/20">
-                        <Check size={18} strokeWidth={4} className="text-[#064e3b]" />
+                    <div className="w-7 h-7 rounded-none bg-[#22c55e] flex items-center justify-center shadow-lg shadow-green-500/20">
+                        <Check size={15} strokeWidth={4} className="text-[#064e3b]" />
                     </div>
                 }
                 gradientFrom="from-[#22c55e]"
@@ -141,8 +141,8 @@ export const showErrorToast = (message, subMessageOrOptions) => {
                 title={displayTitle}
                 subtitle={displaySubtitle}
                 icon={
-                    <div className="w-8 h-8 rounded-full bg-[#ef4444] flex items-center justify-center shadow-lg shadow-red-500/20">
-                        <X size={18} strokeWidth={4} className="text-[#450a0a]" />
+                    <div className="w-7 h-7 rounded-none bg-[#ef4444] flex items-center justify-center shadow-lg shadow-red-500/20">
+                        <X size={15} strokeWidth={4} className="text-[#450a0a]" />
                     </div>
                 }
                 gradientFrom="from-[#ef4444]"
@@ -173,8 +173,8 @@ export const showInfoToast = (message, subMessageOrOptions) => {
                 title={displayTitle}
                 subtitle={displaySubtitle}
                 icon={
-                    <div className="w-8 h-8 rounded-full bg-[#3b82f6] flex items-center justify-center shadow-lg shadow-blue-500/20">
-                        <AlertCircle size={18} strokeWidth={3} className="text-[#1e3a8a]" />
+                    <div className="w-7 h-7 rounded-none bg-[#3b82f6] flex items-center justify-center shadow-lg shadow-blue-500/20">
+                        <AlertCircle size={15} strokeWidth={3} className="text-[#1e3a8a]" />
                     </div>
                 }
                 gradientFrom="from-[#3b82f6]"
@@ -205,8 +205,8 @@ export const showPendingToast = (message, subMessageOrOptions) => {
                 title={displayTitle}
                 subtitle={displaySubtitle}
                 icon={
-                    <div className="w-8 h-8 rounded-full bg-[#00D1FF] flex items-center justify-center shadow-lg shadow-cyan-500/20">
-                        <Clock size={18} strokeWidth={3} className="text-[#083344]" />
+                    <div className="w-7 h-7 rounded-none bg-[#00D1FF] flex items-center justify-center shadow-lg shadow-cyan-500/20">
+                        <Clock size={15} strokeWidth={3} className="text-[#083344]" />
                     </div>
                 }
                 gradientFrom="from-[#00D1FF]"

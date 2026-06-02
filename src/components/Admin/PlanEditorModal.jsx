@@ -63,7 +63,7 @@ const PlanEditorModal = ({ isOpen, onClose, editingPlan, onSaveSuccess }) => {
 
     return (
         <div className="fixed inset-0 z-[3000] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
-            <div className="bg-white rounded-[16px] shadow-2xl w-full max-w-[420px] overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+ <div className="bg-white rounded-[16px] shadow-2xl w-full max-w-[420px] overflow-hidden animate-in fade-in zoom-in-95 duration-200">
                 <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
                     <h3 className="text-[17px] font-bold text-slate-800">
                         {editingPlan ? 'Edit Pricing Plan' : 'Create Pricing Plan'}

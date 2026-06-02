@@ -26,7 +26,7 @@ const AlertModal = ({
                     glow: 'from-[#ef4444]',
                     iconBg: 'bg-[#ef4444]',
                     iconColor: 'text-[#450a0a]',
-                    icon: <X size={32} strokeWidth={3} />,
+                    icon: <X size={28} strokeWidth={1.5} />,
                     titleColor: 'text-[#f87171]',
                     buttonBg: 'bg-[#ef4444] hover:bg-[#dc2626] text-[#450a0a]',
                 };

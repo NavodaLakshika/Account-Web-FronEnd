@@ -155,8 +155,8 @@ const CompanyUsersModal = ({ isOpen, onClose }) => {
 
     return (
         <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 font-['Tahoma']">
-            <div className="absolute inset-0 bg-black/60 backdrop-blur-md" onClick={onClose} />
-            <div className="relative w-full max-w-[900px] bg-white shadow-2xl border border-slate-200 rounded-[5px] overflow-hidden flex flex-col animate-in slide-in-from-bottom-10 fade-in duration-400">
+            <div className="absolute inset-0 bg-slate-900/30 backdrop-blur-sm" onClick={onClose} />
+ <div className="relative w-full max-w-[900px] bg-white shadow-2xl rounded-[5px] overflow-hidden flex flex-col animate-in slide-in-from-bottom-10 fade-in duration-400">
                 
                 {/* Custom Header similar to original but refined */}
                 <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-slate-200 select-none">
@@ -171,7 +171,7 @@ const CompanyUsersModal = ({ isOpen, onClose }) => {
                         className="w-8 h-8 flex items-center justify-center bg-red-50 hover:bg-red-100 text-red-500 rounded-[5px] transition-all outline-none border-none group"
                         title="Close"
                     >
-                        <X size={16} className="group-hover:scale-110 transition-transform" />
+                        <X size={28} className="group-hover:scale-110 transition-transform" />
                     </button>
                 </div>
 
@@ -197,7 +197,7 @@ const CompanyUsersModal = ({ isOpen, onClose }) => {
                                         onClick={() => setShowAddForm(false)}
                                         className="text-[10px] font-bold text-red-500 hover:text-red-600 uppercase tracking-widest transition-all flex items-center gap-1 border border-red-100 hover:bg-red-50 px-3 py-1 rounded"
                                     >
-                                        <X size={12} /> CANCEL
+                                        <X size={28} /> CANCEL
                                     </button>
                                 </div>
 
@@ -308,11 +308,11 @@ const CompanyUsersModal = ({ isOpen, onClose }) => {
             {/* Role Search Modal styled to match */}
             {showRoleModal && (
                 <div className="fixed inset-0 z-[1010] flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowRoleModal(false)} />
-                    <div className="relative w-full max-w-[500px] bg-white shadow-2xl border border-slate-200 rounded-[5px] overflow-hidden flex flex-col animate-in zoom-in-95">
+                    <div className="absolute inset-0 bg-slate-900/30 backdrop-blur-sm" onClick={() => setShowRoleModal(false)} />
+ <div className="relative w-full max-w-[500px] bg-white shadow-2xl rounded-[5px] overflow-hidden flex flex-col animate-in zoom-in-95">
                         <div className="bg-[#f8fafd] px-4 py-3 flex justify-between items-center border-b border-slate-200">
                             <span className="text-[12px] font-black text-slate-600 uppercase tracking-widest">Select User Role</span>
-                            <button onClick={() => setShowRoleModal(false)} className="text-slate-400 hover:text-red-500"><X size={16}/></button>
+                            <button onClick={() => setShowRoleModal(false)} className="text-slate-400 hover:text-red-500"><X size={28}/></button>
                         </div>
                         <div className="p-4">
                             <div className="relative mb-4">

@@ -6,9 +6,9 @@ const SimpleModal = ({ isOpen, onClose, title, children, footer, maxWidth = "max
 
     return (
         <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 font-['Tahoma']">
-            <div className="absolute inset-0 bg-black/60 backdrop-blur-md" onClick={onClose} />
+            <div className="absolute inset-0 bg-slate-900/30 backdrop-blur-sm" onClick={onClose} />
 
-            <div className={`relative w-full ${maxWidth} bg-white shadow-2xl border border-slate-200 rounded-[5px] overflow-hidden flex flex-col animate-in slide-in-from-bottom-10 fade-in duration-400`} style={{ zoom }}>
+ <div className={`relative w-full ${maxWidth} bg-white shadow-2xl rounded-[5px] overflow-hidden flex flex-col animate-in slide-in-from-bottom-10 fade-in duration-400`} style={{ zoom }}>
                 <div className="bg-white px-6 py-3.5 flex items-center justify-between border-b border-slate-200 select-none relative shrink-0">
                     <span className="text-[15px] font-mono font-bold text-slate-800 uppercase tracking-widest truncate">
                         {title}
@@ -16,7 +16,7 @@ const SimpleModal = ({ isOpen, onClose, title, children, footer, maxWidth = "max
 
                     {showHeaderClose && (
                         <button onClick={onClose} className="w-8 h-8 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-600 transition-all shrink-0 border-none" title="Close">
-                            <X size={15} strokeWidth={2} />
+                            <X size={28} strokeWidth={1.5} />
                         </button>
                     )}
                 </div>

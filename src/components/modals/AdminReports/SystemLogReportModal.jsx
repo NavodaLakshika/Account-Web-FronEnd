@@ -69,7 +69,7 @@ const SystemLogReportModal = ({ isOpen, onClose }) => {
                             onClick={() => setShowReport(false)} 
                             className="w-10 h-10 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center shadow-lg transition-all active:scale-95"
                         >
-                            <X size={20} />
+                            <X size={28} />
                         </button>
                     </div>
                     <ReportTemplate

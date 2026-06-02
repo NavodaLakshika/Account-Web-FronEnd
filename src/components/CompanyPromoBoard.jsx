@@ -125,18 +125,18 @@ const CompanyPromoBoard = ({ isOpen, onClose }) => {
     return (
         <div className="fixed inset-0 z-[2060] flex items-center justify-center p-4">
             <div 
-                className={`absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity duration-400 ${entering ? 'opacity-0' : 'opacity-100'}`}
+                className={`absolute inset-0 bg-slate-900/30 backdrop-blur-sm transition-opacity duration-400 ${entering ? 'opacity-0' : 'opacity-100'}`}
                 onClick={handleClose}
             />
             <div 
-                className={`relative w-full max-w-[420px] bg-white rounded-2xl shadow-2xl overflow-hidden transition-all duration-400 ${
+                className={`relative w-full max-w-[420px] bg-white rounded-none shadow-2xl overflow-hidden transition-all duration-400 ${
                     entering || exiting ? 'opacity-0 scale-95 translate-y-4' : 'opacity-100 scale-100 translate-y-0'
                 }`}
             >
                 {/* Progress bar at top */}
                 <div className="h-1 bg-slate-100 w-full">
                     <div 
-                        className="h-full transition-all duration-1000 ease-linear rounded-full"
+                        className="h-full transition-all duration-1000 ease-linear rounded-none"
                         style={{ 
                             width: `${progress}%`, 
                             backgroundColor: accentColor,
@@ -148,9 +148,9 @@ const CompanyPromoBoard = ({ isOpen, onClose }) => {
                 {/* Close button */}
                 <button
                     onClick={handleClose}
-                    className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-full bg-white/80 hover:bg-white text-slate-400 hover:text-slate-700 shadow-sm border border-slate-200 transition-all z-10 cursor-pointer"
+                    className="absolute top-3 right-3 text-gray-400 hover:text-gray-800 transition-colors z-10"
                 >
-                    <X size={15} />
+                    <X size={28} strokeWidth={1.5} />
                 </button>
 
                 {/* Ad content */}
@@ -158,7 +158,7 @@ const CompanyPromoBoard = ({ isOpen, onClose }) => {
                     <div className="flex flex-col items-center text-center gap-4">
                         {/* Icon */}
                         <div 
-                            className="w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg"
+                            className="w-16 h-16 rounded-none flex items-center justify-center shadow-lg"
                             style={{ backgroundColor: `${accentColor}15` }}
                         >
                             <Icon size={28} style={{ color: accentColor }} />
@@ -181,7 +181,7 @@ const CompanyPromoBoard = ({ isOpen, onClose }) => {
                             href="https://www.onimtait.com"
                             target="_blank"
                             rel="noreferrer"
-                            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-[13px] font-bold text-white transition-all active:scale-95 shadow-md hover:shadow-lg"
+                            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-none text-[13px] font-bold text-white transition-all active:scale-95 shadow-md hover:shadow-lg"
                             style={{ backgroundColor: accentColor }}
                         >
                             <ExternalLink size={15} />

@@ -71,7 +71,7 @@ const ReportsModal = ({ isOpen, onClose }) => {
             <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
                 <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={onClose} />
 
-                <div className="relative w-full max-w-sm bg-white border border-gray-100 rounded-xl shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
+ <div className="relative w-full max-w-sm bg-white rounded-sm shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
                     <div className="bg-white px-5 py-3.5 flex items-center justify-between border-b border-gray-100 select-none relative overflow-hidden">
                         <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#0285fd]" />
 
@@ -85,7 +85,7 @@ const ReportsModal = ({ isOpen, onClose }) => {
                             </div>
                         </div>
                         <button onClick={onClose} className="w-8 h-7 flex items-center justify-center bg-red-50 hover:bg-red-100 text-red-600 rounded-[8px] transition-all active:scale-90 outline-none border-none group">
-                            <X size={16} strokeWidth={4} className="group-hover:scale-110 transition-transform" />
+                            <X size={28} strokeWidth={1.5} className="group-hover:scale-110 transition-transform" />
                         </button>
                     </div>
 
@@ -131,7 +131,7 @@ const ReportsModal = ({ isOpen, onClose }) => {
                                                 <div className="absolute left-0 top-0 bottom-0 w-1 opacity-0 group-hover:opacity-100 transition-all duration-300 bg-[#0285fd]" />
 
                                                 <div className="flex items-center gap-3 relative z-10 w-full">
-                                                    <div className="w-7 h-7 rounded-lg bg-slate-100 flex items-center justify-center transition-colors shadow-sm group-hover:bg-white">
+ <div className="w-7 h-7 rounded-sm bg-slate-100 flex items-center justify-center transition-colors shadow-sm group-hover:bg-white">
                                                         <Icon size={14} className="text-slate-500 group-hover:text-[#0285fd] transition-colors" />
                                                     </div>
                                                     <div className="flex flex-col">
