@@ -22,19 +22,18 @@ const LegalTextModal = ({ isOpen, onClose, title, content, type }) => {
             />
 
             {/* Modal Container */}
-            <div className="relative w-[90%] max-w-2xl bg-white rounded-xl shadow-2xl flex flex-col max-h-[85vh] animate-in zoom-in-95 duration-200">
+            <div className="relative w-[90%] max-w-2xl bg-white rounded- shadow-2xl flex flex-col max-h-[85vh] animate-in zoom-in-95 duration-200">
                 
                 {/* Header */}
                 <div className="flex items-center justify-between p-6 border-b border-gray-100">
                     <div className="flex items-center gap-3">
-                        {getIcon()}
                         <h2 className="text-2xl font-bold text-slate-800 tracking-tight">{title}</h2>
                     </div>
                     <button
                         onClick={onClose}
-                        className="text-gray-400 hover:text-red-500 hover:bg-red-50 p-2 rounded-full transition-all"
+                        className="text-gray-400 p-2 rounded-full transition-all"
                     >
-                        <X size={20} />
+                        <X size={28} />
                     </button>
                 </div>
 
