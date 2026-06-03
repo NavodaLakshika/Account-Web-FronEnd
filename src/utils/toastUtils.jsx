@@ -7,7 +7,7 @@ const toastBaseStyle = `
     bg-[#1a1b26]
     border border-slate-800
     shadow-[0_10px_40px_rgb(0,0,0,0.5)]
-    rounded-none
+    rounded-xl
     overflow-hidden
     pointer-events-auto
     flex
@@ -109,7 +109,7 @@ export const showSuccessToast = (message, subMessageOrOptions) => {
                 title={displayTitle}
                 subtitle={displaySubtitle}
                 icon={
-                    <div className="w-7 h-7 rounded-none bg-[#22c55e] flex items-center justify-center shadow-lg shadow-green-500/20">
+                    <div className="w-7 h-7 rounded-md bg-[#22c55e] flex items-center justify-center shadow-lg shadow-green-500/20">
                         <Check size={15} strokeWidth={4} className="text-[#064e3b]" />
                     </div>
                 }
@@ -141,7 +141,7 @@ export const showErrorToast = (message, subMessageOrOptions) => {
                 title={displayTitle}
                 subtitle={displaySubtitle}
                 icon={
-                    <div className="w-7 h-7 rounded-none bg-[#ef4444] flex items-center justify-center shadow-lg shadow-red-500/20">
+                    <div className="w-7 h-7 rounded-md bg-[#ef4444] flex items-center justify-center shadow-lg shadow-red-500/20">
                         <X size={15} strokeWidth={4} className="text-[#450a0a]" />
                     </div>
                 }
@@ -173,7 +173,7 @@ export const showInfoToast = (message, subMessageOrOptions) => {
                 title={displayTitle}
                 subtitle={displaySubtitle}
                 icon={
-                    <div className="w-7 h-7 rounded-none bg-[#3b82f6] flex items-center justify-center shadow-lg shadow-blue-500/20">
+                    <div className="w-7 h-7 rounded-md bg-[#3b82f6] flex items-center justify-center shadow-lg shadow-blue-500/20">
                         <AlertCircle size={15} strokeWidth={3} className="text-[#1e3a8a]" />
                     </div>
                 }
@@ -205,7 +205,7 @@ export const showPendingToast = (message, subMessageOrOptions) => {
                 title={displayTitle}
                 subtitle={displaySubtitle}
                 icon={
-                    <div className="w-7 h-7 rounded-none bg-[#00D1FF] flex items-center justify-center shadow-lg shadow-cyan-500/20">
+                    <div className="w-7 h-7 rounded-md bg-[#00D1FF] flex items-center justify-center shadow-lg shadow-cyan-500/20">
                         <Clock size={15} strokeWidth={3} className="text-[#083344]" />
                     </div>
                 }

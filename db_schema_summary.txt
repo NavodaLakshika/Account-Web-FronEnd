@@ -1,0 +1,7 @@
+Table: ACC_TransactionSave_Header
+Columns: Account, Adjst, AdjType, Balance, Bill_Type, Comment, Company_Id, CostCenter, Create_Date, Create_User, Doc_No, Expected_Date, Iid, Inv_Amount, Inv_No, Location, Memo, NBT, NbtAmnt, Net_Amount, Pay_Type, Payee, PO_No, Post_Date, PurDiscount, Reference, Remarks, Tax, TaxPer, TaxPerAmt, Total, Vendor_Id
+
+Table: ACC_Transaction_Header
+Columns: Account, Adjst, AdjType, Bill_Type, Comment, Company_Id, CostCenter, Create_Date, Create_User, Doc_No, Expected_Date, Iid, Inv_Amount, Inv_No, Location, NBT, NbtAmnt, Net_Amount, Pay_Type, Payee, PO_No, Post_Date, PurDiscount, Reference, Remarks, Tax, TaxPer, TaxPerAmt, Total, Vendor_Id
+
+

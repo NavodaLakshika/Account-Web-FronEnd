@@ -114,7 +114,7 @@ const SystemAnalyticsBoard = ({ allEmployees = [], allCompanies = [], hierarchy 
                 </div>
                 <div className="flex items-center gap-3">
                     <button
-                        onClick={() => window.open('/report/system-analytics', '_blank')}
+                        onClick={() => navigate('/report/system-analytics')}
                         className="px-4 py-2.5 bg-white border border-slate-200 hover:border-emerald-500 hover:text-emerald-500 text-slate-600 text-xs font-bold uppercase tracking-wider rounded-xl shadow-sm transition-all flex items-center gap-2"
                     >
                         <Download size={14} />

@@ -21,6 +21,21 @@ const RegisterPage = () => {
         Emp_Name: '', Email: '', Phone_Number: '', Pass_Word: '', Conpass_Word: ''
     });
     const [passwordFocused, setPasswordFocused] = useState(false);
+    const [displayedRegisterText, setDisplayedRegisterText] = useState('');
+
+    useEffect(() => {
+        if (step === 1) {
+            let i = 0;
+            const text = 'REGISTER';
+            setDisplayedRegisterText('');
+            const timer = setInterval(() => {
+                i++;
+                setDisplayedRegisterText(text.slice(0, i));
+                if (i >= text.length) clearInterval(timer);
+            }, 80);
+            return () => clearInterval(timer);
+        }
+    }, [step]);
 
     const password = formData.Pass_Word || '';
     const criteria = {
@@ -108,78 +123,87 @@ const RegisterPage = () => {
                     {/* STEP 1 */}
                     {step === 1 && (
                         <div className="animate-in fade-in slide-in-from-right-4 duration-500">
-                            <h2 className="text-slate-800 text-3xl font-tahoma font-bold mb-6 tracking-tight">
-                                REGISTER<span className="animate-[pulse_1s_ease-in-out_infinite] opacity-70 font-light ml-1">_</span>
+                            <h2 className="text-slate-800 text-3xl font-tahoma font-bold mb-6 tracking-tight min-h-[36px]">
+                                {displayedRegisterText}<span className="animate-[pulse_1s_ease-in-out_infinite] opacity-70 font-light ml-1">_</span>
                             </h2>
                             <form onSubmit={handleSendOtp} className="space-y-4">
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="space-y-1">
-                                        <input type="text" name="Emp_Name" value={formData.Emp_Name} onChange={handleChange}
-                                            placeholder="Full Name" required
-                                            className="w-full px-4 py-3 bg-white font-mono text-slate-800 placeholder-slate-400 font-bold outline-none border border-slate-300 hover:border-[#00acee] focus:border-[#00acee] focus:ring-4 focus:ring-[#00acee]/30 transition-all" />
-                                    </div>
-                                    <div className="space-y-1">
-                                        <input type="tel" name="Phone_Number" value={formData.Phone_Number} onChange={handleChange}
-                                            placeholder="Phone Number" required
-                                            className="w-full px-4 py-3 bg-white font-mono text-slate-800 placeholder-slate-400 font-bold outline-none border border-slate-300 hover:border-[#00acee] focus:border-[#00acee] focus:ring-4 focus:ring-[#00acee]/30 transition-all" />
-                                    </div>
+                                <div className="space-y-1">
+                                    <label htmlFor="Emp_Name" className="block text-sm font-sans font-medium text-slate-700 ml-1">
+                                        Full Name
+                                    </label>
+                                    <input type="text" id="Emp_Name" name="Emp_Name" value={formData.Emp_Name} onChange={handleChange}
+                                        required
+                                        className="w-full px-4 py-3 bg-white font-mono text-slate-800 font-bold outline-none border border-slate-300 hover:border-[#00acee] focus:border-[#00acee] focus:ring-4 focus:ring-[#00acee]/30 transition-all" />
                                 </div>
                                 <div className="space-y-1">
-                                    <input type="email" name="Email" value={formData.Email} onChange={handleChange}
-                                        placeholder="Email Address" required
-                                        className="w-full px-4 py-3 bg-white font-mono text-slate-800 placeholder-slate-400 font-bold outline-none border border-slate-300 hover:border-[#00acee] focus:border-[#00acee] focus:ring-4 focus:ring-[#00acee]/30 transition-all" />
+                                    <label htmlFor="Phone_Number" className="block text-sm font-sans font-medium text-slate-700 ml-1">
+                                        Phone Number
+                                    </label>
+                                    <input type="tel" id="Phone_Number" name="Phone_Number" value={formData.Phone_Number} onChange={handleChange}
+                                        required
+                                        className="w-full px-4 py-3 bg-white font-mono text-slate-800 font-bold outline-none border border-slate-300 hover:border-[#00acee] focus:border-[#00acee] focus:ring-4 focus:ring-[#00acee]/30 transition-all" />
                                 </div>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="space-y-1 relative">
-                                        <input type="password" name="Pass_Word" value={formData.Pass_Word} onChange={handleChange}
-                                            onFocus={() => setPasswordFocused(true)}
-                                            onBlur={() => setPasswordFocused(false)}
-                                            placeholder="Password" required
-                                            className="w-full px-4 py-3 bg-white font-mono text-slate-800 placeholder-slate-400 font-bold outline-none border border-slate-300 hover:border-[#00acee] focus:border-[#00acee] focus:ring-4 focus:ring-[#00acee]/30 transition-all" />
-                                        
-                                        {(passwordFocused || password.length > 0) && (
-                                            <div className="absolute top-full left-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-slate-100 p-5 z-50 animate-in fade-in slide-in-from-top-2">
-                                                {/* Strength Bar */}
-                                                <div className="mb-4">
-                                                    <div className="flex justify-between items-center mb-1.5">
-                                                        <span className="text-[11px] font-bold text-slate-600 uppercase tracking-wider">Password Strength</span>
-                                                        <span className={`text-[11px] font-bold uppercase tracking-wider ${strengthText === 'Weak' ? 'text-red-500' : strengthText === 'Good' ? 'text-yellow-600' : strengthText === 'Strong' ? 'text-green-600' : 'text-slate-400'}`}>{strengthText}</span>
-                                                    </div>
-                                                    <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden flex gap-1">
-                                                        <div className={`h-full flex-1 rounded-full transition-all duration-300 ${strengthCount >= 1 ? strengthColor : 'bg-transparent'}`} />
-                                                        <div className={`h-full flex-1 rounded-full transition-all duration-300 ${strengthCount >= 2 ? strengthColor : 'bg-transparent'}`} />
-                                                        <div className={`h-full flex-1 rounded-full transition-all duration-300 ${strengthCount >= 3 ? strengthColor : 'bg-transparent'}`} />
-                                                        <div className={`h-full flex-1 rounded-full transition-all duration-300 ${strengthCount >= 4 ? strengthColor : 'bg-transparent'}`} />
-                                                    </div>
+                                <div className="space-y-1">
+                                    <label htmlFor="Email" className="block text-sm font-sans font-medium text-slate-700 ml-1">
+                                        Email Address
+                                    </label>
+                                    <input type="email" id="Email" name="Email" value={formData.Email} onChange={handleChange}
+                                        required
+                                        className="w-full px-4 py-3 bg-white font-mono text-slate-800 font-bold outline-none border border-slate-300 hover:border-[#00acee] focus:border-[#00acee] focus:ring-4 focus:ring-[#00acee]/30 transition-all" />
+                                </div>
+                                <div className="space-y-1">
+                                    <label htmlFor="Pass_Word" className="block text-sm font-sans font-medium text-slate-700 ml-1">
+                                        Password
+                                    </label>
+                                    <input type="password" id="Pass_Word" name="Pass_Word" value={formData.Pass_Word} onChange={handleChange}
+                                        onFocus={() => setPasswordFocused(true)}
+                                        onBlur={() => setPasswordFocused(false)}
+                                        required
+                                        className="w-full px-4 py-3 bg-white font-mono text-slate-800 font-bold outline-none border border-slate-300 hover:border-[#00acee] focus:border-[#00acee] focus:ring-4 focus:ring-[#00acee]/30 transition-all" />
+                                    
+                                        <div className="mt-2 w-full bg-slate-50/50 rounded-xl border border-slate-200 p-4 animate-in fade-in">
+                                            {/* Strength Bar */}
+                                            <div className="mb-4">
+                                                <div className="flex justify-between items-center mb-1.5">
+                                                    <span className="text-[11px] font-bold text-slate-600 uppercase tracking-wider">Password Strength</span>
+                                                    <span className={`text-[11px] font-bold uppercase tracking-wider ${strengthText === 'Weak' ? 'text-red-500' : strengthText === 'Good' ? 'text-yellow-600' : strengthText === 'Strong' ? 'text-green-600' : 'text-slate-400'}`}>{strengthText}</span>
                                                 </div>
-
-                                                <p className="text-[12px] font-bold text-slate-700 mb-3">Your password must contain:</p>
-                                                <ul className="space-y-2">
-                                                    <li className={`text-[12px] font-semibold flex items-center gap-3 transition-colors ${criteria.length ? 'text-green-600' : 'text-slate-400'}`}>
-                                                        <span className="text-sm font-bold w-3 text-center">{criteria.length ? '✓' : '−'}</span>
-                                                        8 or more characters
-                                                    </li>
-                                                    <li className={`text-[12px] font-semibold flex items-center gap-3 transition-colors ${criteria.number ? 'text-green-600' : 'text-slate-400'}`}>
-                                                        <span className="text-sm font-bold w-3 text-center">{criteria.number ? '✓' : '−'}</span>
-                                                        Numbers
-                                                    </li>
-                                                    <li className={`text-[12px] font-semibold flex items-center gap-3 transition-colors ${criteria.letter ? 'text-green-600' : 'text-slate-400'}`}>
-                                                        <span className="text-sm font-bold w-3 text-center">{criteria.letter ? '✓' : '−'}</span>
-                                                        Letters
-                                                    </li>
-                                                    <li className={`text-[12px] font-semibold flex items-center gap-3 transition-colors ${criteria.special ? 'text-green-600' : 'text-slate-400'}`}>
-                                                        <span className="text-sm font-bold w-3 text-center">{criteria.special ? '✓' : '−'}</span>
-                                                        Special characters
-                                                    </li>
-                                                </ul>
+                                                <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden flex gap-1">
+                                                    <div className={`h-full flex-1 rounded-full transition-all duration-300 ${strengthCount >= 1 ? strengthColor : 'bg-transparent'}`} />
+                                                    <div className={`h-full flex-1 rounded-full transition-all duration-300 ${strengthCount >= 2 ? strengthColor : 'bg-transparent'}`} />
+                                                    <div className={`h-full flex-1 rounded-full transition-all duration-300 ${strengthCount >= 3 ? strengthColor : 'bg-transparent'}`} />
+                                                    <div className={`h-full flex-1 rounded-full transition-all duration-300 ${strengthCount >= 4 ? strengthColor : 'bg-transparent'}`} />
+                                                </div>
                                             </div>
-                                        )}
-                                    </div>
-                                    <div className="space-y-1">
-                                        <input type="password" name="Conpass_Word" value={formData.Conpass_Word} onChange={handleChange}
-                                            placeholder="Confirm Password" required
-                                            className="w-full px-4 py-3 bg-white font-mono text-slate-800 placeholder-slate-400 font-bold outline-none border border-slate-300 hover:border-[#00acee] focus:border-[#00acee] focus:ring-4 focus:ring-[#00acee]/30 transition-all" />
-                                    </div>
+
+                                            <p className="text-[12px] font-bold text-slate-700 mb-3">Your password must contain:</p>
+                                            <ul className="space-y-2">
+                                                <li className={`text-[12px] font-semibold flex items-center gap-3 transition-colors ${criteria.length ? 'text-green-600' : 'text-slate-400'}`}>
+                                                    <span className="text-sm font-bold w-3 text-center">{criteria.length ? '✓' : '−'}</span>
+                                                    8 or more characters
+                                                </li>
+                                                <li className={`text-[12px] font-semibold flex items-center gap-3 transition-colors ${criteria.number ? 'text-green-600' : 'text-slate-400'}`}>
+                                                    <span className="text-sm font-bold w-3 text-center">{criteria.number ? '✓' : '−'}</span>
+                                                    Numbers
+                                                </li>
+                                                <li className={`text-[12px] font-semibold flex items-center gap-3 transition-colors ${criteria.letter ? 'text-green-600' : 'text-slate-400'}`}>
+                                                    <span className="text-sm font-bold w-3 text-center">{criteria.letter ? '✓' : '−'}</span>
+                                                    Letters
+                                                </li>
+                                                <li className={`text-[12px] font-semibold flex items-center gap-3 transition-colors ${criteria.special ? 'text-green-600' : 'text-slate-400'}`}>
+                                                    <span className="text-sm font-bold w-3 text-center">{criteria.special ? '✓' : '−'}</span>
+                                                    Special characters
+                                                </li>
+                                            </ul>
+                                        </div>
+                                </div>
+                                <div className="space-y-1">
+                                    <label htmlFor="Conpass_Word" className="block text-sm font-sans font-medium text-slate-700 ml-1">
+                                        Confirm Password
+                                    </label>
+                                    <input type="password" id="Conpass_Word" name="Conpass_Word" value={formData.Conpass_Word} onChange={handleChange}
+                                        required
+                                        className="w-full px-4 py-3 bg-white font-mono text-slate-800 font-bold outline-none border border-slate-300 hover:border-[#00acee] focus:border-[#00acee] focus:ring-4 focus:ring-[#00acee]/30 transition-all" />
                                 </div>
                                 <div className="flex items-start gap-3 py-2">
                                     <ShieldCheck size={16} className="text-[#00acee] mt-0.5 shrink-0" />

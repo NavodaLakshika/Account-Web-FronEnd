@@ -1,656 +1,579 @@
-import React, { useEffect, useState, useRef } from 'react';
-import SimpleModal from './SimpleModal';
-import {
-    Printer,
-    ChevronLeft,
-    ChevronRight,
-    ChevronsLeft,
-    ChevronsRight,
-    RefreshCw,
-    Search,
-    Download,
-    Monitor,
-    Smartphone,
-    Settings2,
-    Palette,
-    Type,
-    Maximize,
-    Ruler,
-    Bold,
-    Italic,
-    Underline,
-    Check,
-    X,
-    Type as TypeIcon,
-    MousePointer2,
-    Globe,
-    Baseline,
+import React, { useState, useEffect } from 'react';
+import { Settings2, Printer, Mail, Download, MoreVertical, 
+    ChevronLeft, 
+    BookOpen, 
+    MessageSquare, 
+    RefreshCw, 
+    ChevronDown,
+    Info,
     FileText,
-    Eye,
-    EyeOff,
-    Columns,
-    Layout,
-    Building2,
-    PenTool,
-    Hash,
-    Maximize2,
-    MoveHorizontal,
-    MoveVertical,
-    Save,
-    RotateCcw,
-    Settings,
-    LayoutGrid,
-    ListFilter,
-    PanelLeftClose,
-    Droplets,
-    LayoutTemplate
+    Sparkles, X
 } from 'lucide-react';
+import ReportPrintModal from './modals/AdminReports/ReportPrintModal';
+import ReportEmailModal from './modals/AdminReports/ReportEmailModal';
+import CalendarModal from './CalendarModal';
+import CalendarPopover from './CalendarPopover';
+import ReportCustomizeModal from './modals/AdminReports/ReportCustomizeModal';
 
-const ReportTemplate = ({
-    title,
-    subtitle,
+const allReportsList = [
+    "Profit and Loss Detail",
+    "Profit and Loss year-to-date comparison",
+    "Quarterly Profit and Loss Summary",
+    "Statement of Changes in Equity",
+    "Custom Summary Report",
+    "Project Profitability Summary",
+    "Customer Balance Summary",
+    "Customer Balance Detail",
+    "Open Invoices",
+    "Accounts receivable ageing detail",
+    "Collections Report",
+    "Invoice List",
+    "Statement List",
+    "Terms List",
+    "Unbilled time",
+    "Unbilled charges",
+    "Sales by Customer Summary",
+    "Sales by Customer Detail",
+    "Sales by Product/Service Summary",
+    "Sales by Product/Service Detail",
+    "Product/Service List",
+    "Income by Customer Summary",
+    "Customer Contact List",
+    "Payment Method List",
+    "Transaction List by Customer",
+    "Time Activities by Customer Detail",
+    "Estimates by Customer",
+    "Deposit Detail",
+    "Bill Approval Status",
+    "Product/Item Profitability by Customer",
+    "Invoice Approval Status",
+    "Transaction List by Tag Group",
+    "Invoices and Received Payments",
+    "Supplier Phone List",
+    "Bills and Applied Payments",
+    "Customer Phone List",
+    "Purchases by Product/Service Detail",
+    "Time Summary by Pay Type",
+    "Timesheet Detail by Employee",
+    "Tax Liability Report",
+    "Adjusted Trial Balance",
+    "Invalid Journal Transactions",
+    "Profit and Loss By Tag Group",
+    "Sales by Customer Type Detail",
+    "Purchase List",
+    "General Ledger List",
+    "Purchases by Supplier Detail",
+    "Audit Log",
+    "Expenses by Supplier Summary",
+    "Transaction List by Supplier",
+    "Supplier Contact List",
+    "Cheque Detail",
+    "Accounts payable ageing summary",
+    "Supplier Balance Detail",
+    "Bill Payment List",
+    "Accounts payable ageing detail",
+    "Unpaid Bills",
+    "Supplier Balance Summary",
+    "Account List",
+    "Reconciliation Reports",
+    "Trial Balance",
+    "Journal",
+    "Profit and Loss",
+    "Profit and Loss Comparison",
+    "Balance Sheet",
+    "Balance Sheet Comparison",
+    "Transaction Detail by Account",
+    "General Ledger",
+    "Transaction List with Splits",
+    "Statement of Cash Flows",
+    "Transaction List by Date",
+    "Recent Transactions",
+    "Recurring Template List",
+    "Time Activities by Employee Detail",
+    "Recent/Edited Time Activities",
+    "Employee Contact List",
+    "Inventory Valuation Summary",
+    "Inventory Valuation Detail",
+    "Stock Take Worksheet",
+    "Open Purchase Order Detail",
+    "Open Purchase Order List",
+    "Accounts receivable ageing summary",
+    "Balance Sheet Detail",
+    "Balance Sheet Summary",
+    "Business Snapshot",
+    "Profit and Loss as % of total income",
+    "Profit and Loss by Customer",
+    "Profit and Loss by Month"
+];
+
+
+const OtherReportsDropdown = ({ onSelect }) => {
+    const [isOpen, setIsOpen] = useState(false);
+    const [search, setSearch] = useState('');
+    
+    const filtered = allReportsList.filter(r => r.toLowerCase().includes(search.toLowerCase()));
+
+    return (
+        <div className="relative ml-8">
+            <div className="flex items-center border border-gray-300 rounded-sm overflow-hidden bg-white h-[32px] w-[300px]">
+                <input 
+                    type="text" 
+                    className="flex-1 h-full px-3 text-[13px] text-gray-700 placeholder-gray-400 outline-none"
+                    placeholder="Type report name here"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    onFocus={() => setIsOpen(true)}
+                    onBlur={() => setTimeout(() => setIsOpen(false), 200)} 
+                />
+                <div className="w-[32px] h-full flex items-center justify-center border-l border-gray-300 bg-gray-50 text-gray-500 cursor-pointer" onClick={() => setIsOpen(!isOpen)}>
+                    <ChevronDown size={14} />
+                </div>
+            </div>
+            {isOpen && (
+                <div className="absolute top-full left-0 mt-1 w-full max-h-[300px] overflow-y-auto bg-white border border-gray-300 shadow-lg z-[600] rounded-sm py-1">
+                    {filtered.length === 0 && <div className="px-4 py-2 text-[13px] text-gray-500">No reports found</div>}
+                    {filtered.map(report => (
+                        <div 
+                            key={report} 
+                            className="px-4 py-2 text-[13px] text-gray-700 hover:bg-gray-100 cursor-pointer transition-colors"
+                            onClick={() => {
+                                onSelect(report);
+                                setIsOpen(false);
+                                setSearch('');
+                            }}
+                        >
+                            {report}
+                        </div>
+                    ))}
+                </div>
+            )}
+        </div>
+    );
+};
+
+const ReportTemplate = ({ 
+    title = "A/R Ageing Summary Report", 
+    subtitle = "As of June 3, 2026", 
+    companyName = "ONIMTA IT SOLUTIONS",
     data = [],
-    columns,
-    companyName = "Onimta Information Technology",
-    companyAddress = "Lake Road,Maharagama,Sri Lanka",
-    isStandalone = true
+    columns = [],
+    onClose,
+    onSwitchReport
 }) => {
-    // --- Initial Defaults ---
-    const DEFAULTS = {
-        fontFamily: "'Tahoma', sans-serif",
-        fontSize: 13,
-        fontColor: '#334155',
-        isBold: false,
-        isItalic: false,
-        isUnderline: false,
-        rowSpacing: 8,
-        colSpacing: 16,
-        isLandscape: true,
-        reportSize: 'A4',
-        workspaceTheme: 'classic',
-        pagePadding: '10mm',
-        signatureStyle: 'dotted',
-        customWidth: 210,
-        customHeight: 297,
-        zoomLevel: 80,
-        tableBorderStyle: 'none',
-        tableBorderColor: '#e2e8f0'
-    };
-
-    // --- State Management ---
-    const [zoomLevel, setZoomLevel] = useState(DEFAULTS.zoomLevel);
-    const [tableBorderStyle, setTableBorderStyle] = useState(DEFAULTS.tableBorderStyle);
-    const [tableBorderColor, setTableBorderColor] = useState(DEFAULTS.tableBorderColor);
-    const [currentPage, setCurrentPage] = useState(1);
-    const [searchTerm, setSearchTerm] = useState('');
-    const [showSettings, setShowSettings] = useState(false);
-    const [showFontModal, setShowFontModal] = useState(false);
-    const [showColorModal, setShowColorModal] = useState(false);
-    const [showCustomSizeModal, setShowCustomSizeModal] = useState(false);
-    const [showVisibilityModal, setShowVisibilityModal] = useState(false);
-    const [fontSearch, setFontSearch] = useState('');
-    const [colorSearch, setColorSearch] = useState('');
-    const [colVisibilitySearch, setColVisibilitySearch] = useState('');
+    const [reportPeriod, setReportPeriod] = useState('Today');
+    const [asOfDate, setAsOfDate] = useState('06/03/2026');
+    const [showNoteArea, setShowNoteArea] = useState(false);
+    const [reportNote, setReportNote] = useState('');
+    const [showPrintModal, setShowPrintModal] = useState(false);
+    const [showEmailModal, setShowEmailModal] = useState(false);
+    const [showCustomizeModal, setShowCustomizeModal] = useState(false);
+    const [showCalendarModal, setShowCalendarModal] = useState(false);
+    const [dismissAlert, setDismissAlert] = useState(false);
     
-    // Core Layout States
-    const [isLandscape, setIsLandscape] = useState(DEFAULTS.isLandscape);
-    const [reportSize, setReportSize] = useState(DEFAULTS.reportSize);
-    const [workspaceTheme, setWorkspaceTheme] = useState(DEFAULTS.workspaceTheme);
-    const [rowSpacing, setRowSpacing] = useState(DEFAULTS.rowSpacing);
-    const [colSpacing, setColSpacing] = useState(DEFAULTS.colSpacing);
+    // AI State
+    const [showAIBox, setShowAIBox] = useState(false);
+    const [aiQuestion, setAiQuestion] = useState('');
+    const [aiResponse, setAiResponse] = useState('');
+    const [isAiLoading, setIsAiLoading] = useState(false);
+
     
-    // Core Style States
-    const [fontFamily, setFontFamily] = useState(DEFAULTS.fontFamily);
-    const [fontSize, setFontSize] = useState(DEFAULTS.fontSize);
-    const [fontColor, setFontColor] = useState(DEFAULTS.fontColor);
-    const [isBold, setIsBold] = useState(DEFAULTS.isBold);
-    const [isItalic, setIsItalic] = useState(DEFAULTS.isItalic);
-    const [isUnderline, setIsUnderline] = useState(DEFAULTS.isUnderline);
-    const [pagePadding, setPagePadding] = useState(DEFAULTS.pagePadding);
-    const [signatureStyle, setSignatureStyle] = useState(DEFAULTS.signatureStyle);
+    const [apiData, setApiData] = useState(null);
+    const [apiLoading, setApiLoading] = useState(false);
+    const [apiError, setApiError] = useState(null);
 
-    // Custom Size States
-    const [customWidth, setCustomWidth] = useState(DEFAULTS.customWidth);
-    const [customHeight, setCustomHeight] = useState(DEFAULTS.customHeight);
-
-    // Interaction Matrix States
-    const [activeCell, setActiveCell] = useState(null); 
-    const [cellStyles, setCellStyles] = useState({}); 
-    const [editedCells, setEditedCells] = useState({}); 
-    const [hiddenColumns, setHiddenColumns] = useState([]); 
-    const [hiddenCells, setHiddenCells] = useState([]); 
-    const [styleMode, setStyleMode] = useState('global'); 
-
-    // Visibility Parts
-    const [showCompanyInfo, setShowCompanyInfo] = useState(true);
-    const [showReportTitle, setShowReportTitle] = useState(true);
-    const [showSignatures, setShowSignatures] = useState(true);
-    const [showPageNumbers, setShowPageNumbers] = useState(true);
-    const [showTimestamp, setShowTimestamp] = useState(true);
-
-    // --- Persistence Engine ---
-    useEffect(() => {
-        const saved = localStorage.getItem(`report_settings_${title}`);
-        if (saved) {
+    const fetchReportData = async () => {
+        const endpoint = title.replace(/[^a-zA-Z0-9 ]/g, "").split(' ').map(w=>w.toLowerCase()).filter(Boolean).join('-');
+        
+        if (endpoint) {
+            setApiLoading(true);
             try {
-                const config = JSON.parse(saved);
-                setIsLandscape(config.isLandscape ?? DEFAULTS.isLandscape);
-                setReportSize(config.reportSize ?? DEFAULTS.reportSize);
-                setWorkspaceTheme(config.workspaceTheme ?? DEFAULTS.workspaceTheme);
-                setRowSpacing(config.rowSpacing ?? DEFAULTS.rowSpacing);
-                setColSpacing(config.colSpacing ?? DEFAULTS.colSpacing);
-                setFontFamily(config.fontFamily ?? DEFAULTS.fontFamily);
-                setFontSize(config.fontSize ?? DEFAULTS.fontSize);
-                setFontColor(config.fontColor ?? DEFAULTS.fontColor);
-                setIsBold(config.isBold ?? DEFAULTS.isBold);
-                setIsItalic(config.isItalic ?? DEFAULTS.isItalic);
-                setIsUnderline(config.isUnderline ?? DEFAULTS.isUnderline);
-                setSignatureStyle(config.signatureStyle ?? DEFAULTS.signatureStyle);
-                setCustomWidth(config.customWidth ?? DEFAULTS.customWidth);
-                setCustomHeight(config.customHeight ?? DEFAULTS.customHeight);
-                setZoomLevel(config.zoomLevel ?? DEFAULTS.zoomLevel);
-                setTableBorderStyle(config.tableBorderStyle ?? DEFAULTS.tableBorderStyle);
-                setTableBorderColor(config.tableBorderColor ?? DEFAULTS.tableBorderColor);
-                if (config.cellStyles) setCellStyles(config.cellStyles);
-                if (config.hiddenColumns) setHiddenColumns(config.hiddenColumns);
-            } catch (e) { console.error("Persistence Load Failure", e); }
-        }
-        document.title = `${title} - ${companyName}`;
-    }, [title, companyName]);
-
-    const handleSaveSettings = () => {
-        const config = {
-            isLandscape, reportSize, workspaceTheme, rowSpacing, colSpacing,
-            fontFamily, fontSize, fontColor, isBold, isItalic, isUnderline,
-            cellStyles, hiddenColumns, signatureStyle, customWidth, customHeight, zoomLevel,
-            tableBorderStyle, tableBorderColor
-        };
-        localStorage.setItem(`report_settings_${title}`, JSON.stringify(config));
-        setShowSettings(false);
-    };
-
-    const handleResetDefaults = () => {
-        setIsLandscape(DEFAULTS.isLandscape);
-        setReportSize(DEFAULTS.reportSize);
-        setWorkspaceTheme(DEFAULTS.workspaceTheme);
-        setRowSpacing(DEFAULTS.rowSpacing);
-        setColSpacing(DEFAULTS.colSpacing);
-        setFontFamily(DEFAULTS.fontFamily);
-        setFontSize(DEFAULTS.fontSize);
-        setFontColor(DEFAULTS.fontColor);
-        setIsBold(DEFAULTS.isBold);
-        setIsItalic(DEFAULTS.isItalic);
-        setIsUnderline(DEFAULTS.isUnderline);
-        setSignatureStyle(DEFAULTS.signatureStyle);
-        setCustomWidth(DEFAULTS.customWidth);
-        setCustomHeight(DEFAULTS.customHeight);
-        setZoomLevel(DEFAULTS.zoomLevel);
-        setTableBorderStyle(DEFAULTS.tableBorderStyle);
-        setTableBorderColor(DEFAULTS.tableBorderColor);
-        setCellStyles({});
-        setHiddenColumns([]);
-        setHiddenCells([]);
-        setEditedCells({});
-    };
-
-    // --- Pagination Handlers ---
-    const pageSize = isLandscape ? 20 : 30;
-    const filteredData = data.filter(item => Object.values(item).some(val => String(val).toLowerCase().includes(searchTerm.toLowerCase())));
-    const totalPages = Math.ceil(filteredData.length / pageSize);
-    const startIndex = (currentPage - 1) * pageSize;
-    const currentData = filteredData.slice(startIndex, startIndex + pageSize);
-    const visibleColumns = columns.filter(col => !hiddenColumns.includes(col.key));
-
-    const handleFirstPage = () => setCurrentPage(1);
-    const handleLastPage = () => setCurrentPage(totalPages || 1);
-    const handlePrevPage = () => setCurrentPage(prev => Math.max(1, prev - 1));
-    const handleNextPage = () => setCurrentPage(prev => Math.min(totalPages || 1, prev + 1));
-
-    const getPageDimensions = () => {
-        if (reportSize === 'Custom') {
-            return { w: `${customWidth}mm`, h: `${customHeight}mm` };
-        }
-        const sizes = { 'A4': { p: 210, l: 297 }, 'A3': { p: 297, l: 420 }, 'Legal': { p: 216, l: 356 } };
-        const current = sizes[reportSize] || sizes['A4'];
-        const w = isLandscape ? current.l : current.p;
-        const h = isLandscape ? current.p : current.l;
-        return { w: `${w}mm`, h: `${h}mm` };
-    };
-
-    const dims = getPageDimensions();
-
-    const fontOptions = [
-        "Tahoma", "Inter", "Roboto", "Plus Jakarta Sans", "Open Sans", "Lato", "Montserrat", "Poppins", "Raleway", "Ubuntu", 
-        "Merriweather", "Playfair Display", "Lora", "PT Sans", "PT Serif", "Nunito", "Quicksand", "Oswald", "Work Sans", "Dosis",
-        "Arimo", "Bitter", "Cabin", "Crimson Text", "Domine", "Eczar", "Fira Sans", "Heebo", "Inconsolata", "Josefin Sans",
-        "Karla", "Libre Baskerville", "Manrope", "Nanum Gothic", "Overpass", "Public Sans", "Rubik", "Space Grotesk", "Titillium Web", "Varela Round",
-        "Abel", "Alegreya", "Anton", "Asap", "Assistant", "Barlow", "Bebas Neue", "Cairo", "Chivo", "Comfortaa",
-        "DM Sans", "Exo 2", "Fjalla One", "Gelasio", "Hind", "IBM Plex Sans", "Jost", "Kanit", "Lexend", "Mako",
-        "Noticia Text", "Orbitron", "Padauk", "Questrial", "Rokkitt", "Signika", "Teko", "Urbanist", "Vollkorn", "Xanh Mono",
-        "Yantramanav", "Zilla Slab", "Avenir", "Helvetica", "Arial", "Verdana", "Trebuchet MS", "Georgia", "Times New Roman", "Courier New",
-        "Segoe UI", "Calibri", "Candara", "Geneva", "Optima", "Palatino", "Garamond", "Bookman", "Avant Garde", "Century Gothic",
-        "Impact", "Copperplate", "Didot", "Monaco", "Lucida Console", "Consolas", "Fixedsys", "System-ui", "Baskerville", "Bodoni"
-    ].sort();
-
-    const curatedColors = [
-        { name: "Slate Dark", hex: "#0f172a" }, { name: "Slate Primary", hex: "#334155" }, { name: "Slate Light", hex: "#64748b" },
-        { name: "Ink Black", hex: "#000000" }, { name: "Charcoal", hex: "#2d3436" }, { name: "Steel", hex: "#4a4a4a" },
-        { name: "Deep Royal", hex: "#1e3a8a" }, { name: "Financial Blue", hex: "#0284c7" }, { name: "Sky Corporate", hex: "#0ea5e9" },
-        { name: "Forest Green", hex: "#14532d" }, { name: "Success Emerald", hex: "#059669" }, { name: "Vibrant Green", hex: "#10b981" },
-        { name: "Ruby Red", hex: "#991b1b" }, { name: "Critical Error", hex: "#dc2626" }, { name: "Bright Red", hex: "#ef4444" },
-        { name: "Deep Purple", hex: "#581c87" }, { name: "Royal Violet", hex: "#7c3aed" }, { name: "Light Lavender", hex: "#a78bfa" },
-        { name: "Burnt Orange", hex: "#9a3412" }, { name: "Warning Gold", hex: "#d97706" }, { name: "Sunset", hex: "#f97316" },
-        { name: "Deep Maroon", hex: "#7f1d1d" }, { name: "Earth Brown", hex: "#451a03" }, { name: "Sand", hex: "#78350f" },
-        { name: "Navy Blue", hex: "#172554" }, { name: "Pacific Blue", hex: "#0369a1" }, { name: "Arctic Blue", hex: "#0ea5e9" },
-        { name: "Teal Dark", hex: "#134e4a" }, { name: "Teal Primary", hex: "#0d9488" }, { name: "Teal Mint", hex: "#2dd4bf" },
-        { name: "Rose Dark", hex: "#881337" }, { name: "Rose Primary", hex: "#e11d48" }, { name: "Rose Soft", hex: "#fb7185" },
-        { name: "Midnight Indigo", hex: "#312e81" }, { name: "Classic Indigo", hex: "#4f46e5" }, { name: "Soft Indigo", hex: "#818cf8" }
-    ];
-
-    const filteredFonts = fontOptions.filter(f => f.toLowerCase().includes(fontSearch.toLowerCase()));
-    const filteredColors = curatedColors.filter(c => c.name.toLowerCase().includes(colorSearch.toLowerCase()) || c.hex.toLowerCase().includes(colorSearch.toLowerCase()));
-
-    const getActiveStyle = (type) => {
-        if (styleMode === 'global') {
-            switch(type) {
-                case 'bold': return isBold;
-                case 'italic': return isItalic;
-                case 'underline': return isUnderline;
-                case 'size': return fontSize;
-                case 'color': return fontColor;
-                case 'family': return fontFamily;
-                default: return null;
+                const companyRaw = localStorage.getItem('selectedCompany');
+                const company = companyRaw ? JSON.parse(companyRaw) : null;
+                const companyId = company?.companyCode || company?.CompanyCode || company?.Company_Code || company?.Code || company?.Company_Id || company?.companyId || company?.code || company?.id || '';
+                
+                const apiUrl = import.meta.env.VITE_API_URL;
+                const response = await fetch(`${apiUrl}/api/report/${endpoint}?companyId=${companyId}`);
+                if (response.ok) {
+                    const json = await response.json();
+                    setApiData(json);
+                    setApiError(null);
+                } else {
+                    const errText = await response.text();
+                    setApiError(`API returned ${response.status}: ${errText}`);
+                }
+            } catch (error) {
+                console.error("Failed to fetch report data", error);
+                setApiError(`Fetch failed: ${error.message}. Is the API URL correct? ${import.meta.env.VITE_API_URL}`);
+            } finally {
+                setApiLoading(false);
             }
-        } else if (activeCell) {
-            const key = activeCell.rowIndex === 'special' ? activeCell.columnKey : `${activeCell.rowIndex}_${activeCell.columnKey}`;
-            const style = cellStyles[key] || {};
-            switch(type) {
-                case 'bold': return style.bold ?? (activeCell.rowIndex === 'special' ? (activeCell.columnKey.startsWith('header_') || activeCell.columnKey === 'report_title' ? true : false) : isBold);
-                case 'italic': return style.italic ?? (activeCell.rowIndex === 'special' ? false : isItalic);
-                case 'underline': return style.underline ?? (activeCell.rowIndex === 'special' ? false : isUnderline);
-                case 'size': return style.size ?? (activeCell.rowIndex === 'special' ? (activeCell.columnKey === 'company_name' ? 36 : (activeCell.columnKey === 'report_title' ? 14 : (activeCell.columnKey.startsWith('header_') ? 11 : 13))) : fontSize);
-                case 'color': return style.color ?? (activeCell.rowIndex === 'special' ? (activeCell.columnKey === 'company_name' ? fontColor : (activeCell.columnKey === 'report_title' ? '#ffffff' : (activeCell.columnKey.startsWith('header_') ? fontColor : '#64748b'))) : fontColor);
-                case 'family': return style.family ?? fontFamily;
-                case 'borderTop': return style.borderTop || false;
-                case 'borderBottom': return style.borderBottom || false;
-                case 'borderLeft': return style.borderLeft || false;
-                case 'borderRight': return style.borderRight || false;
-                case 'borderSize': return style.borderSize || 1;
-                case 'borderColor': return style.borderColor || fontColor;
-                default: return null;
-            }
-        }
-        return null;
-    };
-
-    const updateStyle = (type, value) => {
-        if (styleMode === 'global') {
-            switch(type) {
-                case 'bold': setIsBold(value); break;
-                case 'italic': setIsItalic(value); break;
-                case 'underline': setIsUnderline(value); break;
-                case 'size': setFontSize(value); break;
-                case 'color': setFontColor(value); break;
-                case 'family': setFontFamily(value); break;
-            }
-        } else if (activeCell) {
-            const key = activeCell.rowIndex === 'special' ? activeCell.columnKey : `${activeCell.rowIndex}_${activeCell.columnKey}`;
-            setCellStyles(prev => ({ ...prev, [key]: { ...(prev[key] || {}), [type]: value } }));
+        } else {
+            setApiData(null);
+            setApiError("Invalid endpoint");
         }
     };
 
-    const handleCellBlur = (key, e) => {
-        setEditedCells(prev => ({ ...prev, [key]: e.target.innerText }));
-    };
+    useEffect(() => {
+        fetchReportData();
+    }, [title]);
 
-    const toggleColumn = (key) => {
-        setHiddenColumns(prev => prev.includes(key) ? prev.filter(k => k !== key) : [...prev, key]);
-    };
+    // Use API data if available, otherwise fallback to props
+    const displayData = apiData || data;
+    
+    // Automatically generate columns if apiData is present and columns prop is empty
+    const displayColumns = (apiData && apiData.length > 0 && columns.length === 0) 
+        ? Object.keys(apiData[0]).map(key => ({ header: key, accessor: key }))
+        : columns;
 
-    const toggleCellVisibility = () => {
-        if (!activeCell) return;
-        const key = activeCell.rowIndex === 'special' ? activeCell.columnKey : `${activeCell.rowIndex}_${activeCell.columnKey}`;
-        setHiddenCells(prev => prev.includes(key) ? prev.filter(k => k !== key) : [...prev, key]);
+    const defaultCustomizations = {
+        divideBy1000: false,
+        hideCurrency: false,
+        roundWholeNumber: false,
+        negativeNumbers: '-100',
+        negativeRed: false,
+        showEmptyAs: 'blank',
+        showLogo: false,
+        showReportPeriod: true,
+        showCompanyName: true,
+        headerAlignment: 'Center',
+        headerLayout: 'companyFirst',
+        showDatePrepared: true,
+        showTimePrepared: true,
+        showReportBasis: true,
+        footerAlignment: 'Center'
     };
+    const [customizations, setCustomizations] = useState(defaultCustomizations);
 
-    const getSpecialStyle = (key, defaultStyle = {}) => {
-        const style = cellStyles[key] || {};
-        return {
-            ...defaultStyle,
-            color: style.color || defaultStyle.color,
-            fontSize: style.size ? `${style.size}px` : defaultStyle.fontSize,
-            fontWeight: style.bold !== undefined ? (style.bold ? 'bold' : 'normal') : defaultStyle.fontWeight,
-            fontStyle: style.italic !== undefined ? (style.italic ? 'italic' : 'normal') : defaultStyle.fontStyle,
-            textDecoration: style.underline !== undefined ? (style.underline ? 'underline' : 'none') : defaultStyle.textDecoration,
-            fontFamily: style.family || defaultStyle.fontFamily,
-            borderTop: style.borderTop ? `${style.borderSize || 1}px solid ${style.borderColor || fontColor}` : defaultStyle.borderTop,
-            borderBottom: style.borderBottom ? `${style.borderSize || 1}px solid ${style.borderColor || fontColor}` : defaultStyle.borderBottom,
-            borderLeft: style.borderLeft ? `${style.borderSize || 1}px solid ${style.borderColor || fontColor}` : defaultStyle.borderLeft,
-            borderRight: style.borderRight ? `${style.borderSize || 1}px solid ${style.borderColor || fontColor}` : defaultStyle.borderRight
-        };
+    const askAI = async () => {
+        if (!aiQuestion.trim()) return;
+        setIsAiLoading(true);
+        setAiResponse("Analyzing report data...");
+        
+        try {
+            const API_KEY = import.meta.env.VITE_GROQ_API_KEY;
+            const apiMessages = [
+                { role: "system", content: "You are a helpful, professional AI Assistant integrated into ONIMTA Information Technology's accounting dashboard. You are specifically analyzing a report called '" + title + "'. Provide concise, helpful financial insights based on user questions." },
+                { role: "user", content: aiQuestion }
+            ];
+
+            const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${API_KEY}`
+                },
+                body: JSON.stringify({
+                    model: "llama-3.3-70b-versatile",
+                    messages: apiMessages,
+                    temperature: 0.7
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error("Failed to fetch response");
+            }
+
+            const data = await response.json();
+            const aiText = data.choices && data.choices[0] && data.choices[0].message.content
+                ? data.choices[0].message.content
+                : "I couldn't process that response correctly.";
+            
+            setAiResponse(aiText);
+            setAiQuestion('');
+        } catch (error) {
+            console.error("AI API Error:", error);
+            setAiResponse("I'm sorry, I am currently unable to connect to the AI service. Please try again later.");
+        } finally {
+            setIsAiLoading(false);
+        }
     };
 
     return (
-        <div className={`fixed inset-0 flex flex-col select-text overflow-hidden transition-colors duration-500 ${workspaceTheme === 'classic' ? 'bg-[#808080]' : 'bg-slate-100'}`} style={{ fontFamily }}>
-            <style>
-                {`
-                    ::selection { background: ${fontColor} !important; color: white !important; }
-                    @media print {
-                        @page { size: ${dims.w} ${dims.h}; margin: 0; }
-                        body { background: white !important; margin: 0; padding: 0; }
-                        .no-print { display: none !important; }
-                        .print-area { box-shadow: none !important; border: none !important; margin: 0 !important; width: ${dims.w} !important; min-height: ${dims.h} !important; padding: 8mm !important; transform: none !important; }
-                        .cell-selected { border-color: transparent !important; background: transparent !important; outline: none !important; }
-                        .cell-hidden { display: none !important; }
-                    }
-                    .report-workspace { flex: 1; overflow: auto; padding: 40px; display: flex; flex-direction: column; align-items: center; }
-                    .print-area { zoom: ${zoomLevel / 100}; width: ${dims.w}; min-height: ${dims.h}; background: white; padding: ${pagePadding}; box-shadow: ${workspaceTheme === 'classic' ? '10px 10px 5px rgba(0,0,0,0.4)' : '0 20px 50px rgba(0,0,0,0.1)'}; position: relative; box-sizing: border-box; transition: all 0.3s ease; flex-shrink: 0; margin-bottom: 40px; }
-                    .dynamic-report-text { color: ${fontColor}; font-size: ${fontSize}px; font-weight: ${isBold ? 'bold' : 'normal'}; font-style: ${isItalic ? 'italic' : 'normal'}; text-decoration: ${isUnderline ? 'underline' : 'none'}; font-family: ${fontFamily}; }
-                    .cell-selected { outline: 2px solid #3b82f6 !important; outline-offset: 4px; background: rgba(59, 130, 246, 0.05); }
-                    .cell-hidden { opacity: 0.1; background: repeating-linear-gradient(45deg, #f1f5f9, #f1f5f9 10px, #ffffff 10px, #ffffff 20px); }
-                    .editable-cell:focus { background: white !important; outline: 2px solid #3b82f6 !important; box-shadow: 0 0 10px rgba(59, 130, 246, 0.1); z-index: 20; }
-                    .no-scrollbar::-webkit-scrollbar { display: none; }
-                `}
-            </style>
+        <div className="fixed inset-0 z-[500] bg-[#f4f5f8] overflow-y-auto font-sans flex flex-col">
+            {/* Top Navigation Bar */}
+            <div className="flex items-center justify-between px-6 py-3 bg-white border-b border-gray-200 shrink-0">
+                <button 
+                    onClick={onClose}
+                    className="flex items-center gap-2 text-green-700 font-bold text-[13px] hover:underline"
+                >
+                    <ChevronLeft size={16} />
+                    Back to dashboard
+                </button>
 
-            {/* Typography Hub Drawer */}
-            <div className={`fixed left-0 top-0 bottom-0 w-[260px] bg-white shadow-2xl z-[120] border-r border-gray-100 flex flex-col transition-transform duration-300 ease-in-out ${showFontModal ? 'translate-x-0' : '-translate-x-full'}`}>
-                <div className="h-14 border-b border-gray-50 flex items-center justify-between px-5 bg-slate-50 shrink-0">
-                    <span className="text-[10px] font-black text-slate-900 uppercase tracking-widest flex items-center gap-2"><TypeIcon size={12} className="text-blue-600" /> Typography Hub</span>
-                    <button onClick={() => setShowFontModal(false)} className="text-gray-400 hover:text-red-500 transition-colors"><X size={28} /></button>
-                </div>
-                <div className="p-3 border-b border-gray-50 bg-white">
-                    <div className="relative">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={12} />
-                        <input type="text" placeholder="Filter fonts..." value={fontSearch} onChange={(e) => setFontSearch(e.target.value)} className="w-full h-8 pl-8 pr-3 bg-gray-50 border border-gray-100 rounded-lg text-[10px] font-medium outline-none focus:border-blue-300 focus:bg-white transition-all shadow-sm" />
-                    </div>
-                </div>
-                <div className="flex-1 overflow-y-auto no-scrollbar p-2 space-y-1">
-                    {filteredFonts.map((f, i) => (
-                        <button key={i} onClick={() => { updateStyle('family', `'${f}', sans-serif`); setShowFontModal(false); }} className={`w-full h-10 px-3 rounded-lg flex items-center justify-between transition-all group relative ${getActiveStyle('family')?.includes(f) ? 'bg-blue-600 text-white shadow-md' : 'hover:bg-blue-50 text-slate-600'}`}>
-                            <span className="text-[12px] font-medium truncate" style={{ fontFamily: `'${f}', sans-serif` }}>{f}</span>
-                            {getActiveStyle('family')?.includes(f) && <Check size={10} className="text-white" />}
-                        </button>
-                    ))}
+                {onSwitchReport && <OtherReportsDropdown onSelect={onSwitchReport} />}
+
+                <div className="flex items-center gap-6">
+                    <button className="flex items-center gap-1.5 text-red-600 font-bold text-[13px] hover:underline">
+                        <BookOpen size={14} />
+                        Learn more
+                    </button>
+                    <button className="flex items-center gap-1.5 text-[#0077c5] font-bold text-[13px] hover:underline">
+                        <MessageSquare size={14} />
+                        Give feedback
+                    </button>
                 </div>
             </div>
 
-            {/* Color Matrix Drawer */}
-            <div className={`fixed left-0 top-0 bottom-0 w-[260px] bg-white shadow-2xl z-[130] border-r border-gray-100 flex flex-col transition-transform duration-300 ease-in-out ${showColorModal ? 'translate-x-0' : '-translate-x-full'}`}>
-                <div className="h-14 border-b border-gray-50 flex items-center justify-between px-5 bg-slate-50 shrink-0">
-                    <span className="text-[10px] font-black text-slate-900 uppercase tracking-widest flex items-center gap-2"><Palette size={14} className="text-pink-500" /> Color Matrix</span>
-                    <button onClick={() => setShowColorModal(false)} className="text-gray-400 hover:text-red-500 transition-colors"><X size={28} /></button>
-                </div>
-                <div className="p-3 border-b border-gray-50 bg-white">
-                    <div className="relative">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={12} />
-                        <input type="text" placeholder="Search colors..." value={colorSearch} onChange={(e) => setColorSearch(e.target.value)} className="w-full h-8 pl-8 pr-3 bg-gray-50 border border-gray-100 rounded-lg text-[10px] font-medium outline-none focus:border-blue-300 focus:bg-white transition-all shadow-sm" />
-                    </div>
-                </div>
-                <div className="flex-1 overflow-y-auto no-scrollbar p-2 grid grid-cols-1 gap-1.5">
-                    {filteredColors.map((c, i) => (
-                        <button key={i} onClick={() => { updateStyle('color', c.hex); setShowColorModal(false); }} className={`w-full h-10 px-2.5 rounded-xl flex items-center gap-3 transition-all border ${getActiveStyle('color') === c.hex ? 'border-slate-900 bg-slate-50 shadow-sm' : 'border-slate-50 hover:bg-slate-50 hover:border-slate-200'}`}>
-                            <div className="w-5 h-5 rounded-lg shadow-inner shrink-0 border border-black/5" style={{ backgroundColor: c.hex }} />
-                            <div className="flex flex-col items-start truncate">
-                                <span className="text-[9px] font-black text-slate-900 uppercase tracking-tight truncate w-full">{c.name}</span>
-                                <span className="text-[8px] font-mono font-bold text-slate-400">{c.hex.toUpperCase()}</span>
-                            </div>
-                            {getActiveStyle('color') === c.hex && <Check size={10} className="ml-auto text-slate-900" />}
-                        </button>
-                    ))}
-                    <div className="pt-3 pb-2 text-center border-t border-slate-50 mt-1">
-                        <label className="text-[8px] font-black text-slate-300 uppercase tracking-widest block mb-2">Custom Hex</label>
-                        <div className="flex gap-2 items-center bg-slate-50 p-1.5 rounded-lg border border-slate-100">
-                             <input type="color" value={getActiveStyle('color')} onChange={(e) => updateStyle('color', e.target.value)} className="w-7 h-7 rounded-lg cursor-pointer border-none p-0 overflow-hidden shrink-0" />
-                             <input type="text" value={getActiveStyle('color')} onChange={(e) => updateStyle('color', e.target.value)} className="w-full bg-transparent border-none text-[10px] font-black font-mono text-slate-900 outline-none uppercase" />
+            {/* Filters Bar */}
+            <div className="flex items-end justify-between px-6 py-4 bg-white border-b border-gray-200 shrink-0">
+                <div className="flex items-center gap-4">
+                    <div className="flex flex-col gap-1.5">
+                        <label className="text-[12px] text-gray-600 font-medium">Report period</label>
+                        <div className="relative">
+                            <select 
+                                value={reportPeriod}
+                                onChange={(e) => setReportPeriod(e.target.value)}
+                                className="appearance-none w-[160px] h-9 px-3 border border-gray-300 rounded-[3px] text-[13px] font-medium text-gray-800 outline-none focus:border-[#0077c5] bg-white cursor-pointer"
+                            >
+                                <option>Today</option>
+                                <option>This Week</option>
+                                <option>This Month</option>
+                                <option>This Year</option>
+                            </select>
+                            <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" />
                         </div>
                     </div>
+                    
+                    <div className="flex flex-col gap-1.5 w-[140px] relative">
+                        <label className="text-[11px] font-medium text-gray-600">as of</label>
+                        <button 
+                            onClick={() => setShowCalendarModal(!showCalendarModal)}
+                            className="calendar-toggle-btn w-[140px] h-9 px-3 border border-gray-300 rounded-[3px] text-[13px] font-medium text-gray-800 outline-none focus:border-[#0077c5] bg-white cursor-pointer flex items-center justify-start text-left"
+                            >
+                                {asOfDate}
+                            </button>
+                            <CalendarPopover 
+                                isOpen={showCalendarModal} 
+                                onClose={() => setShowCalendarModal(false)}
+                                onDateSelect={(dateStr) => {
+                                    const [yyyy, mm, dd] = dateStr.split('-');
+                                    setAsOfDate(`${dd}/${mm}/${yyyy}`);
+                                }}
+                                initialDate={asOfDate.split('/').reverse().join('-')}
+                            />
+                        </div>
+                </div>
+
+                <div className="flex items-center gap-3">
+                    <button onClick={() => setShowCustomizeModal(true)} className="h-9 px-4 border border-gray-300 rounded-[3px] bg-white hover:bg-gray-50 flex items-center gap-1.5 text-[13px] font-bold text-[#393a3d] transition-colors">
+                        <Settings2 size={14} />
+                        Customise
+                    </button>
+                    <button className="h-9 px-4 rounded-[3px] bg-[#0077c5] hover:bg-[#005ca6] text-white text-[13px] font-bold transition-colors">
+                        Save As
+                    </button>
                 </div>
             </div>
 
-            {/* Visibility Hub Drawer (NEW) */}
-            <div className={`fixed left-0 top-0 bottom-0 w-[260px] bg-white shadow-2xl z-[140] border-r border-gray-100 flex flex-col transition-transform duration-300 ease-in-out ${showVisibilityModal ? 'translate-x-0' : '-translate-x-full'}`}>
-                <div className="h-14 border-b border-gray-50 flex items-center justify-between px-5 bg-slate-50 shrink-0">
-                    <span className="text-[10px] font-black text-slate-900 uppercase tracking-widest flex items-center gap-2"><LayoutTemplate size={14} className="text-emerald-500" /> Visibility Hub</span>
-                    <button onClick={() => setShowVisibilityModal(false)} className="text-gray-400 hover:text-red-500 transition-colors"><X size={28} /></button>
-                </div>
-                <div className="p-4 flex-1 space-y-6 overflow-y-auto no-scrollbar">
-                    <div className="space-y-4">
-                        <div className="flex items-center justify-between"><div className="flex items-center gap-2"><Columns size={12} className="text-emerald-500" /><span className="text-[9px] font-black text-slate-900 uppercase tracking-widest">Columns</span></div><div className="flex gap-1"><button onClick={() => setHiddenColumns([])} className="text-[8px] font-black text-blue-600 hover:underline transition-all">ALL</button><button onClick={() => setHiddenColumns(columns.map(c => c.key))} className="text-[8px] font-black text-red-400 hover:underline transition-all">NONE</button></div></div>
-                        <div className="relative"><Search className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-300" size={10} /><input type="text" placeholder="Filter columns..." value={colVisibilitySearch} onChange={(e) => setColVisibilitySearch(e.target.value)} className="w-full h-8 pl-8 pr-2 bg-slate-50 border border-slate-100 rounded-lg text-[10px] outline-none focus:border-emerald-200 transition-all"/></div>
-                        <div className="grid grid-cols-1 gap-1.5">
-                            {columns.filter(c => c.header.toLowerCase().includes(colVisibilitySearch.toLowerCase())).map((col) => (
-                                <button key={col.key} onClick={() => toggleColumn(col.key)} className={`flex items-center justify-between px-3 h-9 rounded-xl border transition-all ${hiddenColumns.includes(col.key) ? 'bg-red-50/30 border-red-100/50 text-red-300 grayscale italic' : 'bg-white border-slate-100 text-slate-700 shadow-sm hover:border-emerald-200'}`}>
-                                    <span className="text-[10px] font-bold truncate pr-2">{col.header}</span>
-                                    {hiddenColumns.includes(col.key) ? <EyeOff size={12} /> : <Check size={12} className="text-emerald-500" />}
+            {/* Main Report Container */}
+            <div className="flex-1 p-6 md:p-10 flex justify-center">
+                <div className="w-full max-w-[1000px] bg-white border border-gray-200 shadow-sm flex flex-col h-max min-h-[500px]">
+                    
+                    {/* Inner Toolbar */}
+                    <div className="flex items-center justify-between p-4 border-b border-gray-100">
+                        <button className="flex items-center gap-1 text-[13px] text-gray-600 font-medium hover:text-gray-900">
+                            Compact <ChevronDown size={14} />
+                        </button>
+                        
+                        <div className="flex items-center gap-3">
+                            <button className="p-1.5 hover:bg-gray-100 rounded text-gray-600" title="Refresh" onClick={fetchReportData}>
+                                <RefreshCw size={16} />
+                            </button>
+                            <button className="p-1.5 hover:bg-gray-100 rounded text-gray-600" title="Email" onClick={() => setShowEmailModal(true)}>
+                                <Mail size={16} />
+                            </button>
+                            <button className="p-1.5 hover:bg-gray-100 rounded text-gray-600" title="Print" onClick={() => setShowPrintModal(true)}>
+                                <Printer size={16} />
+                            </button>
+                            <button className="p-1.5 hover:bg-gray-100 rounded text-gray-600" title="Export">
+                                <FileText size={16} />
+                            </button>
+                            <button className="p-1.5 hover:bg-gray-100 rounded text-gray-600">
+                                <MoreVertical size={16} />
+                            </button>
+                            <button 
+                                onClick={() => setShowAIBox(!showAIBox)}
+                                className="ml-2 h-7 px-3 border border-[#0077c5] text-[#0077c5] hover:bg-blue-50 text-[12px] font-bold rounded-[14px] flex items-center gap-1.5 transition-colors"
+                            >
+                                Ask a question <span className="bg-[#0077c5] text-white text-[9px] px-1.5 py-0.5 rounded-[3px]">BETA</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* AI Box */}
+                    {showAIBox && (
+                        <div className="bg-[#f0f8ff] border-b border-[#b3d4f5] p-4 flex flex-col gap-3">
+                            <div className="flex items-center gap-2 text-[#0077c5] font-bold text-[13px]">
+                                <Sparkles size={16} /> Onimta Assistant
+                            </div>
+                            <div className="flex gap-2">
+                                <input 
+                                    type="text" 
+                                    placeholder="Ask something about this report..." 
+                                    value={aiQuestion}
+                                    onChange={(e) => setAiQuestion(e.target.value)}
+                                    onKeyDown={(e) => e.key === 'Enter' && askAI()}
+                                    className="flex-1 h-9 px-3 border border-gray-300 rounded-[3px] text-[13px] outline-none focus:border-[#0077c5]"
+                                />
+                                <button onClick={askAI} disabled={isAiLoading} className={`h-9 px-4 text-white text-[13px] font-bold rounded-[3px] transition-colors ${isAiLoading ? 'bg-blue-300 cursor-not-allowed' : 'bg-[#0077c5] hover:bg-[#005a9c]'}`}>
+                                    {isAiLoading ? 'Thinking...' : 'Ask'}
                                 </button>
-                            ))}
-                        </div>
-                    </div>
-                    <div className="h-[1px] bg-slate-50" />
-                    <div className="space-y-4">
-                        <div className="flex items-center gap-2"><Layout size={12} className="text-emerald-500" /><span className="text-[9px] font-black text-slate-900 uppercase tracking-widest">Part Visibility</span></div>
-                        <div className="grid grid-cols-2 gap-2">
-                            <button onClick={() => setShowCompanyInfo(!showCompanyInfo)} className={`flex items-center gap-2 px-2.5 h-9 rounded-xl border transition-all text-[9px] font-bold ${showCompanyInfo ? 'bg-emerald-50 border-emerald-100 text-emerald-600' : 'bg-slate-50 border-slate-100 text-slate-300'}`}><Building2 size={12}/> Info</button>
-                            <button onClick={() => setShowReportTitle(!showReportTitle)} className={`flex items-center gap-2 px-2.5 h-9 rounded-xl border transition-all text-[9px] font-bold ${showReportTitle ? 'bg-emerald-50 border-emerald-100 text-emerald-600' : 'bg-slate-50 border-slate-100 text-slate-300'}`}><FileText size={12}/> Title</button>
-                            <button onClick={() => setShowSignatures(!showSignatures)} className={`flex items-center gap-2 px-2.5 h-9 rounded-xl border transition-all text-[9px] font-bold ${showSignatures ? 'bg-emerald-50 border-emerald-100 text-emerald-600' : 'bg-slate-50 border-slate-100 text-slate-300'}`}><PenTool size={12}/> Sign</button>
-                            <button onClick={() => setShowPageNumbers(!showPageNumbers)} className={`flex items-center gap-2 px-2.5 h-9 rounded-xl border transition-all text-[9px] font-bold ${showPageNumbers ? 'bg-emerald-50 border-emerald-100 text-emerald-600' : 'bg-slate-50 border-slate-100 text-slate-300'}`}><Hash size={12}/> Pages</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {/* Dimension Hub Drawer */}
-            <div className={`fixed left-0 top-0 bottom-0 w-[240px] bg-white shadow-2xl z-[150] border-r border-gray-100 flex flex-col transition-transform duration-300 ease-in-out ${showCustomSizeModal ? 'translate-x-0' : '-translate-x-full'}`}>
-                <div className="h-14 border-b border-gray-50 flex items-center justify-between px-5 bg-slate-50 shrink-0">
-                    <span className="text-[10px] font-black text-slate-900 uppercase tracking-widest flex items-center gap-2"><Ruler size={14} className="text-blue-500" /> Dimensions</span>
-                    <button onClick={() => setShowCustomSizeModal(false)} className="text-gray-400 hover:text-red-500 transition-colors"><X size={28} /></button>
-                </div>
-                <div className="p-5 flex-1 space-y-6 overflow-y-auto no-scrollbar">
-                    <div className="space-y-4">
-                        <div className="space-y-1.5">
-                            <label className="text-[9px] font-black text-slate-400 uppercase tracking-wider flex items-center gap-1.5"><MoveHorizontal size={10} className="text-blue-500"/> Width (mm)</label>
-                            <input type="number" value={customWidth} onChange={(e) => setCustomWidth(parseInt(e.target.value) || 0)} className="w-full h-9 px-3 bg-slate-50 border-2 border-slate-100 rounded-lg text-sm font-bold text-slate-800 focus:border-blue-500 focus:bg-white outline-none transition-all shadow-inner"/>
-                        </div>
-                        <div className="space-y-1.5">
-                            <label className="text-[9px] font-black text-slate-400 uppercase tracking-wider flex items-center gap-1.5"><MoveVertical size={10} className="text-blue-500"/> Height (mm)</label>
-                            <input type="number" value={customHeight} onChange={(e) => setCustomHeight(parseInt(e.target.value) || 0)} className="w-full h-9 px-3 bg-slate-50 border-2 border-slate-100 rounded-lg text-sm font-bold text-slate-800 focus:border-blue-500 focus:bg-white outline-none transition-all shadow-inner"/>
-                        </div>
-                    </div>
-                    <div className="p-3 bg-blue-50 rounded-xl border border-blue-100/50 flex flex-col gap-2">
-                        <div className="flex items-center gap-1.5 text-blue-600 font-black text-[9px] uppercase tracking-wider"><Monitor size={10}/> Live Active</div>
-                        <p className="text-[10px] font-medium text-blue-700/70 leading-tight">Dimensions are applied instantly to the document.</p>
-                    </div>
-                    <div className="pt-2"><button onClick={() => setShowCustomSizeModal(false)} className="w-full h-11 bg-slate-900 text-white rounded-lg text-[10px] font-black uppercase tracking-[0.2em] hover:bg-black active:scale-95 transition-all shadow-lg flex items-center justify-center gap-2"><Check size={14}/> APPLY</button></div>
-                </div>
-            </div>
-
-            {/* Top Toolbar */}
-            <div className="h-10 bg-white border-b border-slate-200 flex items-center px-3 gap-2 no-print shrink-0 shadow-sm z-[100] font-sans text-slate-800">
-                <div className="flex items-center gap-1 border-r border-slate-200 pr-3">
-                    <button onClick={() => window.print()} className="w-7 h-7 flex items-center justify-center hover:bg-slate-100 rounded-lg text-slate-600 hover:text-blue-600" title="Print"><Printer size={14} /></button>
-                    <button onClick={() => window.location.reload()} className="w-7 h-7 flex items-center justify-center hover:bg-slate-100 rounded-lg text-slate-600 hover:text-emerald-600" title="Refresh"><RefreshCw size={14} /></button>
-                    <button onClick={() => { setIsLandscape(!isLandscape); setCurrentPage(1); }} className={`w-7 h-7 flex items-center justify-center rounded-lg transition-all ${isLandscape ? 'bg-blue-50 text-blue-600' : 'hover:bg-slate-100 text-slate-600'}`} title="Orientation">
-                        {isLandscape ? <Monitor size={14} /> : <Smartphone size={14} />}
-                    </button>
-                </div>
-
-                <div className="flex items-center gap-1.5 border-r border-slate-200 px-3">
-                    <button onClick={() => setZoomLevel(prev => Math.max(20, prev - 10))} className="w-6 h-6 flex items-center justify-center hover:bg-slate-100 rounded text-slate-600 font-bold" title="Zoom Out">-</button>
-                    <span className="text-[10px] font-bold text-slate-600 w-10 text-center" title="Zoom Level">{zoomLevel}%</span>
-                    <button onClick={() => setZoomLevel(prev => Math.min(200, prev + 10))} className="w-6 h-6 flex items-center justify-center hover:bg-slate-100 rounded text-slate-600 font-bold" title="Zoom In">+</button>
-                </div>
-
-                <div className="flex items-center gap-1 border-r border-slate-200 px-3">
-                    <button onClick={handleFirstPage} disabled={currentPage === 1} className="w-7 h-7 flex items-center justify-center hover:bg-slate-100 rounded-lg disabled:opacity-20 text-slate-600"><ChevronsLeft size={14} /></button>
-                    <button onClick={handlePrevPage} disabled={currentPage === 1} className="w-7 h-7 flex items-center justify-center hover:bg-slate-100 rounded-lg disabled:opacity-20 text-slate-600"><ChevronLeft size={14} /></button>
-                    <div className="flex items-center gap-1.5 mx-2">
-                        <input type="text" value={currentPage} className="w-10 h-6 bg-slate-50 border border-slate-200 rounded text-center text-xs font-bold text-slate-700 outline-none" readOnly />
-                        <span className="text-xs font-bold text-slate-400">/ {totalPages || 1}</span>
-                    </div>
-                    <button onClick={handleNextPage} disabled={currentPage === totalPages} className="w-7 h-7 flex items-center justify-center hover:bg-slate-100 rounded-lg disabled:opacity-20 text-slate-600"><ChevronRight size={14} /></button>
-                    <button onClick={handleLastPage} disabled={currentPage === totalPages} className="w-7 h-7 flex items-center justify-center hover:bg-slate-100 rounded-lg disabled:opacity-20 text-slate-600"><ChevronsRight size={14} /></button>
-                </div>
-
-                <div className="flex-1 max-w-sm relative">
-                    <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
-                    <input type="text" placeholder="Search report content..." value={searchTerm} onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }} className="w-full h-7 pl-8 pr-3 bg-slate-50 border border-slate-200 rounded text-xs outline-none focus:border-blue-500 transition-all shadow-sm" />
-                </div>
-
-                <div className="ml-auto flex items-center gap-3 relative">
-                    <button onClick={() => setShowSettings(!showSettings)} className={`w-7 h-7 flex items-center justify-center rounded-lg transition-all ${showSettings ? 'bg-slate-100 text-blue-600 shadow-inner' : 'hover:bg-slate-100 text-slate-400'}`}>
-                        <Settings2 size={16} className={showSettings ? 'rotate-90 duration-300' : 'duration-300'} />
-                    </button>
-
-                    {showSettings && (
- <div className="absolute top-10 right-0 w-[300px] bg-white shadow-xl rounded-[5px] p-4 z-[110] animate-in zoom-in-95 duration-150 font-sans text-slate-800 overflow-y-auto max-h-[85vh] no-scrollbar">
-                            <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-200 sticky top-0 bg-white z-10">
-                                <h3 className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">Report Settings</h3>
-                                <button onClick={() => setShowSettings(false)} className="text-gray-400 hover:text-red-500 transition-colors"><X size={28} /></button>
                             </div>
-                            <div className="flex gap-2 mb-4">
-                                <button onClick={handleSaveSettings} className="flex-1 h-9 rounded-[5px] bg-[#0285fd] text-white text-[11px] font-bold flex items-center justify-center gap-2 hover:bg-[#0073ff] transition-all shadow-md active:scale-95"><Save size={12}/> SAVE STYLE</button>
-                                <button onClick={handleResetDefaults} className="flex-1 h-9 rounded-[5px] bg-white text-[#0285fd] border-2 border-[#0285fd] text-[11px] font-bold flex items-center justify-center gap-2 hover:bg-blue-50 transition-all active:scale-95"><RotateCcw size={12}/> RESET ALL</button>
-                            </div>
-                            <div className="flex gap-1 bg-slate-50 p-1 border border-slate-200 rounded-[5px] mb-4">
-                                <button onClick={() => setStyleMode('global')} className={`flex-1 h-8 rounded text-[11px] font-bold transition-all ${styleMode === 'global' ? 'bg-white text-[#0285fd] shadow-sm border border-slate-200' : 'text-gray-500 hover:text-gray-700'}`}>GLOBAL</button>
-                                <button onClick={() => { if(activeCell) setStyleMode('selection'); }} className={`flex-1 h-8 rounded text-[11px] font-bold transition-all ${!activeCell ? 'opacity-30 cursor-not-allowed' : ''} ${styleMode === 'selection' ? 'bg-white text-[#0285fd] shadow-sm border border-slate-200' : 'text-gray-500 hover:text-gray-700'}`}>SELECTED CELL</button>
-                            </div>
-                            <div className="space-y-4">
-                                {styleMode === 'selection' && activeCell && (
-                                    <div className="animate-in slide-in-from-top-1 space-y-4">
-                                        <div className="flex gap-2">
-                                            <button onClick={toggleCellVisibility} className={`flex-1 h-8 rounded-[5px] border text-[11px] font-bold flex items-center justify-center gap-2 transition-all active:scale-95 ${hiddenCells.includes(activeCell.rowIndex === 'special' ? activeCell.columnKey : `${activeCell.rowIndex}_${activeCell.columnKey}`) ? 'bg-[#ff3b30] text-white border-[#ff3b30] hover:bg-[#e03127]' : 'bg-white text-gray-600 border-slate-200 hover:bg-slate-50'}`}>
-                                                {hiddenCells.includes(activeCell.rowIndex === 'special' ? activeCell.columnKey : `${activeCell.rowIndex}_${activeCell.columnKey}`) ? <Eye size={14}/> : <EyeOff size={14}/>}
-                                                {hiddenCells.includes(activeCell.rowIndex === 'special' ? activeCell.columnKey : `${activeCell.rowIndex}_${activeCell.columnKey}`) ? 'RESTORE' : 'HIDE'}
-                                            </button>
-                                            <button onClick={() => setActiveCell(null)} className="h-8 px-3 rounded-[5px] border border-slate-200 bg-white text-gray-500 hover:bg-slate-50 transition-all active:scale-95"><X size={28}/></button>
-                                        </div>
-                                        <div className="p-4 border border-slate-200 rounded-[5px] bg-white space-y-4">
-                                            <label className="text-[11px] font-bold text-gray-500 uppercase block border-b border-slate-100 pb-2 mb-2">Cell Borders</label>
-                                            
-                                            <div className="flex items-center justify-between">
-                                                <span className="text-[11px] font-bold text-gray-500 uppercase">Size</span>
-                                                <div className="flex items-center gap-2"><input type="number" min="1" max="10" value={getActiveStyle('borderSize') || 1} onChange={(e) => updateStyle('borderSize', parseInt(e.target.value) || 1)} className="w-14 h-8 bg-slate-50 border border-slate-200 rounded-[5px] text-[12px] font-bold text-gray-700 outline-none focus:border-[#00D1FF] text-center px-1"/><span className="text-[11px] font-bold text-gray-400">px</span></div>
-                                            </div>
-                                            
-                                            <div className="flex items-center justify-between">
-                                                <span className="text-[11px] font-bold text-gray-500 uppercase">Color</span>
-                                                <div className="w-14 h-8 bg-slate-50 border border-slate-200 rounded-[5px] flex items-center justify-center">
-                                                     <input type="color" value={getActiveStyle('borderColor') || fontColor} onChange={(e) => updateStyle('borderColor', e.target.value)} className="w-6 h-6 rounded cursor-pointer border-none p-0 overflow-hidden" />
-                                                </div>
-                                            </div>
-                                            
-                                            <div className="grid grid-cols-4 gap-2">
-                                                <button onClick={() => updateStyle('borderTop', !getActiveStyle('borderTop'))} className={`h-8 rounded-[5px] border text-[11px] font-bold transition-all active:scale-95 ${getActiveStyle('borderTop') ? 'bg-[#0285fd] text-white border-[#0285fd]' : 'bg-slate-50 text-gray-500 border-slate-200 hover:bg-slate-100'}`}>TOP</button>
-                                                <button onClick={() => updateStyle('borderBottom', !getActiveStyle('borderBottom'))} className={`h-8 rounded-[5px] border text-[11px] font-bold transition-all active:scale-95 ${getActiveStyle('borderBottom') ? 'bg-[#0285fd] text-white border-[#0285fd]' : 'bg-slate-50 text-gray-500 border-slate-200 hover:bg-slate-100'}`}>BTM</button>
-                                                <button onClick={() => updateStyle('borderLeft', !getActiveStyle('borderLeft'))} className={`h-8 rounded-[5px] border text-[11px] font-bold transition-all active:scale-95 ${getActiveStyle('borderLeft') ? 'bg-[#0285fd] text-white border-[#0285fd]' : 'bg-slate-50 text-gray-500 border-slate-200 hover:bg-slate-100'}`}>LFT</button>
-                                                <button onClick={() => updateStyle('borderRight', !getActiveStyle('borderRight'))} className={`h-8 rounded-[5px] border text-[11px] font-bold transition-all active:scale-95 ${getActiveStyle('borderRight') ? 'bg-[#0285fd] text-white border-[#0285fd]' : 'bg-slate-50 text-gray-500 border-slate-200 hover:bg-slate-100'}`}>RGT</button>
-                                            </div>
-                                            
-                                            <div className="grid grid-cols-2 gap-2">
-                                                <button onClick={() => { updateStyle('borderTop', true); updateStyle('borderBottom', true); updateStyle('borderLeft', true); updateStyle('borderRight', true); }} className="h-8 rounded-[5px] border border-slate-200 bg-slate-50 text-gray-600 hover:bg-slate-100 text-[11px] font-bold transition-all active:scale-95">ALL (BOX)</button>
-                                                <button onClick={() => { updateStyle('borderTop', false); updateStyle('borderBottom', false); updateStyle('borderLeft', false); updateStyle('borderRight', false); }} className="h-8 rounded-[5px] border border-slate-200 bg-slate-50 hover:bg-[#ff3b30] hover:text-white hover:border-[#ff3b30] text-gray-600 text-[11px] font-bold transition-all active:scale-95">NONE</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                )}
-                                <div className="space-y-4">
-                                    <div className="flex items-center justify-between"><label className="text-[11px] font-bold text-gray-500 uppercase">Typography</label><button onClick={() => { setShowFontModal(true); setShowColorModal(false); setShowCustomSizeModal(false); setShowVisibilityModal(false); }} className="w-32 h-8 text-[11px] font-bold bg-slate-50 text-gray-700 rounded-[5px] border border-slate-200 hover:bg-slate-100 transition-all truncate px-2">{getActiveStyle('family')?.replace(/'/g, '').split(',')[0] || "Default"}</button></div>
-                                    <div className="flex items-center justify-between"><label className="text-[11px] font-bold text-gray-500 uppercase">Font Style</label><div className="flex gap-2"><button onClick={() => updateStyle('bold', !getActiveStyle('bold'))} className={`w-8 h-8 rounded-[5px] flex items-center justify-center border transition-all active:scale-95 ${getActiveStyle('bold') ? 'bg-[#0285fd] text-white border-[#0285fd]' : 'bg-slate-50 text-gray-500 border-slate-200'}`}><Bold size={12} /></button><button onClick={() => updateStyle('italic', !getActiveStyle('italic'))} className={`w-8 h-8 rounded-[5px] flex items-center justify-center border transition-all active:scale-95 ${getActiveStyle('italic') ? 'bg-[#0285fd] text-white border-[#0285fd]' : 'bg-slate-50 text-gray-500 border-slate-200'}`}><Italic size={12} /></button><button onClick={() => updateStyle('underline', !getActiveStyle('underline'))} className={`w-8 h-8 rounded-[5px] flex items-center justify-center border transition-all active:scale-95 ${getActiveStyle('underline') ? 'bg-[#0285fd] text-white border-[#0285fd]' : 'bg-slate-50 text-gray-500 border-slate-200'}`}><Underline size={12} /></button></div></div>
-                                    <div className="flex items-center justify-between"><div className="flex items-center gap-2"><label className="text-[11px] font-bold text-gray-500 uppercase">Size</label><input type="number" value={getActiveStyle('size')} onChange={(e) => updateStyle('size', parseInt(e.target.value) || 8)} className="w-12 h-8 bg-slate-50 border border-slate-200 rounded-[5px] text-[12px] font-bold text-gray-700 outline-none focus:border-[#00D1FF] text-center"/><span className="text-[11px] font-bold text-gray-400">px</span></div><input type="range" min="8" max="150" value={getActiveStyle('size')} onChange={(e) => updateStyle('size', parseInt(e.target.value))} className="w-20 accent-[#0285fd] h-1" /></div>
-                                    <div className="flex items-center justify-between"><label className="text-[11px] font-bold text-gray-500 uppercase">Color</label><button onClick={() => { setShowColorModal(true); setShowFontModal(false); setShowCustomSizeModal(false); setShowVisibilityModal(false); }} className="w-32 h-8 flex items-center gap-2 px-3 bg-slate-50 border border-slate-200 rounded-[5px] hover:bg-slate-100 transition-all"><div className="w-4 h-4 rounded-full shrink-0 border border-black/10" style={{ backgroundColor: getActiveStyle('color') }} /><span className="text-[11px] font-mono font-bold text-gray-600 truncate">{getActiveStyle('color')?.toUpperCase()}</span></button></div>
+                            {aiResponse && (
+                                <div className="bg-white p-3 rounded-[3px] border border-[#b3d4f5] text-[13px] text-gray-700 leading-relaxed shadow-sm">
+                                    <strong className="text-[#0077c5] block mb-1">AI:</strong> {aiResponse}
                                 </div>
-                                <div className="h-[1px] bg-slate-100 my-4" />
-                                <div className="space-y-4">
-                                    <label className="text-[11px] font-bold text-gray-500 uppercase block">Layout Spacing</label>
-                                    <div className="p-4 border border-slate-200 bg-white rounded-[5px] space-y-4">
-                                        <div className="space-y-2">
-                                            <div className="flex items-center justify-between">
-                                                <span className="text-[11px] font-bold text-gray-500 uppercase">Line Space</span>
-                                                <div className="flex items-center gap-2"><input type="number" value={rowSpacing} onChange={(e) => setRowSpacing(parseInt(e.target.value) || 0)} className="w-12 h-8 bg-slate-50 border border-slate-200 rounded-[5px] text-[12px] font-bold text-gray-700 text-center outline-none focus:border-[#00D1FF]"/><span className="text-[11px] font-bold text-gray-400">px</span></div>
-                                            </div>
-                                            <input type="range" min="2" max="50" value={rowSpacing} onChange={(e) => setRowSpacing(parseInt(e.target.value))} className="w-full h-1 accent-[#0285fd] bg-slate-200 rounded cursor-pointer" />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <div className="flex items-center justify-between">
-                                                <span className="text-[11px] font-bold text-gray-500 uppercase">Col Space</span>
-                                                <div className="flex items-center gap-2"><input type="number" value={colSpacing} onChange={(e) => setColSpacing(parseInt(e.target.value) || 0)} className="w-12 h-8 bg-slate-50 border border-slate-200 rounded-[5px] text-[12px] font-bold text-gray-700 text-center outline-none focus:border-[#00D1FF]"/><span className="text-[11px] font-bold text-gray-400">px</span></div>
-                                            </div>
-                                            <input type="range" min="4" max="80" value={colSpacing} onChange={(e) => setColSpacing(parseInt(e.target.value))} className="w-full h-1 accent-[#0285fd] bg-slate-200 rounded cursor-pointer" />
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="h-[1px] bg-slate-100 my-4" />
-                                <div className="space-y-4">
-                                    <label className="text-[11px] font-bold text-gray-500 uppercase block">Grid Lines</label>
-                                    <div className="p-4 border border-slate-200 bg-white rounded-[5px] space-y-4">
-                                        <div className="flex items-center justify-between">
-                                            <span className="text-[11px] font-bold text-gray-500 uppercase">Line Style</span>
-                                            <div className="flex gap-1">
-                                                {['none', 'solid', 'dotted', 'double'].map(style => (
-                                                    <button key={style} onClick={() => setTableBorderStyle(style)} className={`px-2 h-8 text-[10px] font-bold rounded-[5px] border transition-all uppercase active:scale-95 ${tableBorderStyle === style ? 'bg-[#0285fd] text-white border-[#0285fd]' : 'bg-slate-50 text-gray-500 border-slate-200 hover:bg-slate-100'}`}>{style === 'none' ? 'Hide' : style}</button>
-                                                ))}
-                                            </div>
-                                        </div>
-                                        <div className="flex items-center justify-between">
-                                            <span className="text-[11px] font-bold text-gray-500 uppercase">Line Color</span>
-                                            <div className="w-14 h-8 bg-slate-50 border border-slate-200 rounded-[5px] flex items-center justify-center">
-                                                 <input type="color" value={tableBorderColor} onChange={(e) => setTableBorderColor(e.target.value)} className="w-6 h-6 rounded cursor-pointer border-none p-0 overflow-hidden" />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="h-[1px] bg-slate-100 my-4" />
-                                <div className="space-y-2">
-                                    <button onClick={() => { setShowVisibilityModal(true); setShowSettings(false); setShowFontModal(false); setShowColorModal(false); setShowCustomSizeModal(false); }} className="w-full h-10 bg-slate-800 text-white rounded-[5px] text-[11px] font-bold uppercase tracking-widest hover:bg-slate-900 transition-all flex items-center justify-center gap-2 shadow-md active:scale-95">
-                                        <LayoutTemplate size={14} /> Visibility Hub
-                                    </button>
-                                </div>
-                                <div className="h-[1px] bg-slate-100 my-4" />
-                                <div className="space-y-4">
-                                    <div className="flex items-center justify-between"><label className="text-[11px] font-bold text-gray-500 uppercase">Page Size</label><div className="flex gap-2">{['A4', 'A3', 'Custom'].map(s => ( <button key={s} onClick={() => { setReportSize(s); if(s === 'Custom') { setShowCustomSizeModal(true); setShowFontModal(false); setShowColorModal(false); setShowVisibilityModal(false); } }} className={`px-3 h-8 text-[11px] font-bold rounded-[5px] border transition-all active:scale-95 ${reportSize === s ? 'bg-[#0285fd] text-white border-[#0285fd]' : 'bg-slate-50 text-gray-500 border-slate-200 hover:bg-slate-100'}`}>{s}</button> ))}</div></div>
-                                    <div className="flex items-center justify-between"><label className="text-[11px] font-bold text-gray-500 uppercase">Signature</label><div className="flex gap-2">{['dotted', 'solid'].map(style => ( <button key={style} onClick={() => setSignatureStyle(style)} className={`px-3 h-8 text-[11px] font-bold rounded-[5px] border transition-all uppercase active:scale-95 ${signatureStyle === style ? 'bg-[#0285fd] text-white border-[#0285fd]' : 'bg-slate-50 text-gray-500 border-slate-200 hover:bg-slate-100'}`}>{style}</button> ))}</div></div>
-                                </div>
-                                <div className="pt-4"><button onClick={() => setWorkspaceTheme(workspaceTheme === 'classic' ? 'modern' : 'classic')} className="w-full h-8 text-[11px] font-bold bg-slate-50 text-gray-500 rounded-[5px] hover:bg-slate-100 transition-all border border-slate-200 active:scale-95">SWITCH THEME</button></div>
-                            </div>
+                            )}
                         </div>
                     )}
+
+                    {/* Report Header Text */}
+                    <div className={`py-10 flex flex-col gap-1 px-8 ${
+                        customizations.headerAlignment === 'Left' ? 'text-left items-start' : 
+                        customizations.headerAlignment === 'Right' ? 'text-right items-end' : 'text-center items-center'
+                    }`}>
+                        {customizations.showLogo && (
+                            <img src="/onimta_logo-modified.png" alt="Company Logo" className="h-12 w-auto object-contain mb-2" />
+                        )}
+                        {customizations.headerLayout === 'companyFirst' ? (
+                            <>
+                                {customizations.showCompanyName && <h1 className="text-[18px] font-bold text-gray-900 uppercase tracking-wide">{companyName}</h1>}
+                                <h2 className="text-[14px] text-gray-700 font-medium">{title}</h2>
+                            </>
+                        ) : (
+                            <>
+                                <h2 className="text-[18px] font-bold text-gray-900 tracking-wide">{title}</h2>
+                                {customizations.showCompanyName && <h1 className="text-[14px] text-gray-700 font-medium uppercase">{companyName}</h1>}
+                            </>
+                        )}
+                        {customizations.showReportPeriod && <h3 className="text-[13px] text-gray-500">{subtitle}</h3>}
+                    </div>
+
+                    {/* Report Data / Empty State */}
+                    <div className="px-8 pb-10 flex-1 flex flex-col gap-4">
+                        {apiError && (
+                            <div className="border border-red-300 bg-red-50 p-4 rounded-[3px] text-red-800 text-sm">
+                                <strong>API Error:</strong> {apiError}
+                            </div>
+                        )}
+                        {displayData.length === 0 && !dismissAlert && !apiError && !apiLoading && (
+                            <div className="border border-[#b3d4f5] bg-[#eef6fc] p-4 rounded-[3px] flex items-start justify-between gap-3 shadow-sm transition-all">
+                                <div className="flex gap-3">
+                                    <Info size={18} className="text-[#0077c5] shrink-0 mt-0.5 fill-blue-100" />
+                                    <p className="text-[13px] text-gray-800">
+                                        <strong className="font-bold">Your selection doesn't have any info.</strong> Change your selection or start a new search.
+                                    </p>
+                                </div>
+                                <button onClick={() => setDismissAlert(true)} className="text-gray-500 hover:text-gray-800 transition-colors p-1">
+                                    <X size={16} />
+                                </button>
+                            </div>
+                        )}
+
+                        <div className="w-full overflow-x-auto border border-gray-200 bg-white">
+                            <table className="w-full text-left border-collapse">
+                                <thead>
+                                    <tr className="border-b-2 border-gray-300">
+                                        {displayColumns.map((col, i) => (
+                                            <th key={i} className="p-2 text-[12px] font-bold text-gray-800" style={{ textAlign: col.align || 'left' }}>{col.header}</th>
+                                        ))}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                            {apiLoading ? <tr><td colSpan="100%" className="text-center py-4">Loading data from database...</td></tr> : displayData.map((row, i) => (
+                                        <tr key={i} className="border-b border-gray-200 hover:bg-gray-50">
+                                            {displayColumns.map((col, j) => (
+                                                <td key={j} className="p-2 text-[12px] text-gray-700" style={{ textAlign: col.align || 'left' }}>
+                                                    {col.format ? col.format(row[col.accessor || col.key]) : row[col.accessor || col.key]}
+                                                </td>
+                                            ))}
+                                        </tr>
+                                    ))}
+                                    {displayData.length === 0 && (
+                                        <tr>
+                                            <td colSpan={displayColumns.length || 1} className="p-8 text-center text-gray-400 text-sm italic">
+                                                No data available for this report.
+                                            </td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    {/* Note Area */}
+                    {showNoteArea && (
+                        <div className="px-8 pb-4">
+                            <textarea
+                                value={reportNote}
+                                onChange={(e) => setReportNote(e.target.value)}
+                                placeholder="Enter your note here..."
+                                className="w-full h-[80px] p-3 border border-gray-300 rounded-[3px] text-[13px] text-gray-800 outline-none focus:border-[#0077c5] resize-none"
+                            />
+                        </div>
+                    )}
+
+                    {/* Footer */}
+                                        {/* Footer */}
+                    <div className={`px-8 py-6 flex flex-col text-[12px] text-gray-500 border-t border-gray-100 mt-auto ${
+                        customizations.footerAlignment === 'Left' ? 'items-start text-left' : 
+                        customizations.footerAlignment === 'Right' ? 'items-end text-right' : 'items-center text-center'
+                    }`}>
+                        <div className="w-full flex items-center justify-between mb-4">
+                            <button onClick={() => setShowNoteArea(!showNoteArea)} className="flex items-center gap-1.5 text-[#0077c5] font-bold hover:underline">
+                                <FileText size={14} /> {showNoteArea ? 'Hide note' : 'Add note'}
+                            </button>
+                        </div>
+                        
+                        <div className="flex gap-2 font-medium">
+                            {customizations.showDatePrepared && <span>{new Date().toLocaleString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>}
+                            {customizations.showDatePrepared && customizations.showTimePrepared && <span>at</span>}
+                            {customizations.showTimePrepared && <span>{new Date().toLocaleString('en-US', { hour: '2-digit', minute: '2-digit' })}</span>}
+                        </div>
+                        {customizations.showReportBasis && (
+                            <div className="mt-1 opacity-75">
+                                Accrual Basis
+                            </div>
+                        )}
+                    </div>
+
                 </div>
             </div>
 
-            {/* Report Workspace */}
-            <div className="report-workspace no-scrollbar relative z-10" onClick={(e) => { if(e.target === e.currentTarget) setActiveCell(null); }}>
-                <div className="print-area animate-in fade-in zoom-in-95 duration-300">
-                    <div className={`absolute top-8 right-8 text-right no-print-timestamp ${!showTimestamp ? 'hidden' : ''}`}> <span className="text-[11px] font-medium text-gray-500 tracking-tight">{new Date().toLocaleDateString()} {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}</span> </div>
-                    <div className={`pb-6 mb-10 transition-all ${!showCompanyInfo && !showReportTitle ? 'hidden' : ''}`}>
-                        {showCompanyInfo && ( <div className="animate-in  slide-in-from-top-2 duration-300 relative group"><h1 contentEditable={!hiddenCells.includes('company_name')} suppressContentEditableWarning={true} onClick={() => { setActiveCell({ rowIndex: 'special', columnKey: 'company_name' }); setStyleMode('selection'); }} onBlur={(e) => handleCellBlur('company_name', e)} className={`cursor-text transition-all outline-none leading-none ${activeCell?.columnKey === 'company_name' ? 'cell-selected' : ''} ${hiddenCells.includes('company_name') ? 'cell-hidden' : ''}`} style={getSpecialStyle('company_name', { color: fontColor, fontSize: '36px', fontWeight: '900', letterSpacing: '-0.05em' })}>{hiddenCells.includes('company_name') ? '' : (editedCells['company_name'] || companyName)}</h1><p contentEditable={!hiddenCells.includes('company_address')} suppressContentEditableWarning={true} onClick={() => { setActiveCell({ rowIndex: 'special', columnKey: 'company_address' }); setStyleMode('selection'); }} onBlur={(e) => handleCellBlur('company_address', e)} className={`mt-2 cursor-text transition-all outline-none uppercase tracking-[0.2em] ${activeCell?.columnKey === 'company_address' ? 'cell-selected' : ''} ${hiddenCells.includes('company_address') ? 'cell-hidden' : ''}`} style={getSpecialStyle('company_address', { color: '#64748b', fontSize: '13px', fontWeight: '700' })}>{hiddenCells.includes('company_address') ? '' : (editedCells['company_address'] || companyAddress)}</p></div> )}
-                        {showReportTitle && ( <div onClick={() => { setActiveCell({ rowIndex: 'special', columnKey: 'report_title' }); setStyleMode('selection'); }} className={`mt-6 inline-block px-5 py-2 shadow-sm animate-in slide-in-from-top-1 duration-300 cursor-text transition-all ${activeCell?.columnKey === 'report_title' ? 'cell-selected' : ''} ${hiddenCells.includes('report_title') ? 'opacity-0 pointer-events-none' : ''}`} style={{ backgroundColor: getSpecialStyle('report_title', { color: '#ffffff' }).backgroundColor || fontColor }}><span contentEditable={!hiddenCells.includes('report_title')} suppressContentEditableWarning={true} onBlur={(e) => handleCellBlur('report_title', e)} className="text-[14px] font-black uppercase tracking-[0.3em] outline-none" style={getSpecialStyle('report_title', { color: '#ffffff', fontSize: '14px' })}>{hiddenCells.includes('report_title') ? '' : (editedCells['report_title'] || title)}</span></div> )}
-                    </div>
-                    <div className="min-h-[400px] mt-[-40px]">
-                        <table className="w-full border-collapse"> 
-                            <thead><tr className="border-y-2 border-slate-900 bg-slate-50/50" style={{ borderColor: fontColor }}>{visibleColumns.map((col, idx) => { const headerKey = `header_${col.key}`; const isSelected = activeCell?.rowIndex === 'special' && activeCell?.columnKey === headerKey; return ( <th key={idx} contentEditable={true} suppressContentEditableWarning={true} onClick={() => { setActiveCell({ rowIndex: 'special', columnKey: headerKey }); setStyleMode('selection'); }} onBlur={(e) => handleCellBlur(headerKey, e)} className={`py-3 px-4 text-[11px] font-black uppercase tracking-widest cursor-text transition-all outline-none ${isSelected ? 'cell-selected' : ''} ${col.align === 'right' ? 'text-right' : 'text-left'}`} style={{ ...getSpecialStyle(headerKey, { color: fontColor, fontSize: '11px', fontWeight: '900' }), paddingTop: `${rowSpacing}px`, paddingBottom: `${rowSpacing}px`, paddingLeft: `${colSpacing/2}px`, paddingRight: `${colSpacing/2}px` }}>{editedCells[headerKey] || col.header}</th> ); })}</tr></thead>
-                            <tbody>
-                                {currentData && currentData.length > 0 ? currentData.map((row, rowIdx) => (
-                                    <tr key={rowIdx} className="hover:bg-slate-50/50 transition-colors">{visibleColumns.map((col, colIdx) => { const cellKey = `${startIndex + rowIdx}_${col.key}`; const style = cellStyles[cellKey] || {}; const isSelected = activeCell?.rowIndex === (startIndex + rowIdx) && activeCell?.columnKey === col.key; const isHidden = hiddenCells.includes(cellKey); const originalVal = col.format ? col.format(row[col.key], row) : row[col.key]; const currentVal = editedCells[cellKey] !== undefined ? editedCells[cellKey] : originalVal; return ( <td key={colIdx} contentEditable={!isHidden} suppressContentEditableWarning={true} onFocus={() => { setActiveCell({ rowIndex: startIndex + rowIdx, columnKey: col.key }); setStyleMode('selection'); }} onBlur={(e) => handleCellBlur(cellKey, e)} className={`transition-all cursor-text dynamic-report-text editable-cell ${isSelected ? 'cell-selected' : ''} ${isHidden ? 'cell-hidden' : ''} ${col.align === 'right' ? 'text-right' : 'text-left'}`} style={{ color: isHidden ? 'transparent' : (style.color || undefined), fontSize: style.size ? `${style.size}px` : undefined, fontWeight: style.bold !== undefined ? (style.bold ? 'bold' : 'normal') : undefined, fontStyle: style.italic !== undefined ? (style.italic ? 'italic' : 'normal') : undefined, textDecoration: style.underline !== undefined ? (style.underline ? 'underline' : 'none') : undefined, fontFamily: style.family || undefined, paddingTop: `${rowSpacing}px`, paddingBottom: `${rowSpacing}px`, paddingLeft: `${colSpacing/2}px`, paddingRight: `${colSpacing/2}px`, borderBottomWidth: tableBorderStyle !== 'none' ? (tableBorderStyle === 'double' ? '3px' : '1px') : '0', borderBottomStyle: tableBorderStyle !== 'none' ? tableBorderStyle : 'solid', borderBottomColor: tableBorderColor }}>{isHidden ? '' : currentVal}</td> ); })}</tr>
-                                )) : ( <tr><td colSpan={visibleColumns.length} className="py-32 text-center text-slate-300 text-[14px] font-black uppercase tracking-[0.5em]">Void Dataset</td></tr> )}
-                            </tbody>
-                        </table>
-                    </div>
-                    <div className={`mt-16 pt-10 border-t border-slate-100 flex justify-between items-end ${!showSignatures && !showPageNumbers ? 'hidden' : ''}`}>
-                        <div className={`${!showSignatures ? 'opacity-0 pointer-events-none' : ''}`}><div className={`w-64 mb-1 ${signatureStyle === 'solid' ? 'h-[1.5px]' : 'border-b-[2px] border-dotted'}`} style={{ backgroundColor: signatureStyle === 'solid' ? fontColor : 'transparent', borderColor: fontColor }}></div><p className="text-[9px] font-bold text-slate-300 uppercase mt-2 italic">Validation required</p></div>
-                        <div className={`text-right ${!showPageNumbers ? 'opacity-0' : ''}`}> <span className="text-[11px] font-medium text-gray-400 tracking-tight">Page {currentPage} / {totalPages || 1}</span> </div>
-                    </div>
-                </div>
-            </div>
+            <ReportEmailModal 
+                isOpen={showEmailModal} 
+                onClose={() => setShowEmailModal(false)} 
+                title={title}
+                companyName={companyName}
+                userName="nawoda lakshika"
+            />
 
-            <div className="h-8 bg-white border-t border-slate-200 flex items-center px-6 no-print shrink-0 gap-10 shadow-sm z-50 text-[10px] font-black text-slate-400 uppercase tracking-widest font-sans">
-                <div>Format: <span className="text-slate-700">{reportSize}</span></div>
-                <div className="flex items-center gap-4"><div className="flex items-center gap-1.5 text-blue-600"><FileText size={10}/> INTERACTIVE</div><div className="flex items-center gap-1.5 text-slate-600"><Columns size={10}/> {visibleColumns.length} COLS</div><div className="flex items-center gap-1.5 text-slate-400 uppercase tracking-tighter"><Maximize2 size={10}/> {rowSpacing}x{colSpacing} GAP</div></div>
-                <div className="ml-auto">Engine v4.3</div>
-            </div>
+            <ReportPrintModal 
+                isOpen={showPrintModal} 
+                onClose={() => setShowPrintModal(false)} 
+                companyName={companyName}
+                title={title}
+                subtitle={subtitle}
+                data={displayData}
+                columns={displayColumns}
+            />
+            <ReportCustomizeModal
+                isOpen={showCustomizeModal}
+                onClose={() => setShowCustomizeModal(false)}
+                customizations={customizations}
+                onApply={setCustomizations}
+            />
+            
         </div>
     );
 };
 
 export default ReportTemplate;
+
+
+
+
+
+
+
+

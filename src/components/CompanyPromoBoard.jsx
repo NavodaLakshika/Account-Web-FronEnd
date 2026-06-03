@@ -3,42 +3,42 @@ import { Database, Layout, Cpu, Globe, X, ChevronRight, ExternalLink, Clock } fr
 import { adService } from '../services/ad.service';
 
 const defaultAds = [
-    {
-        title: 'Merit Plus Finance',
-        desc: 'Cloud-native accounting platform with real-time multi-company reporting.',
-        icon: Database,
-        accent: '#3b82f6',
-        bg: 'bg-blue-50',
-        border: 'border-blue-200',
-        iconBg: 'bg-blue-500'
-    },
-    {
-        title: 'Web Solutions',
-        desc: 'High-performance ERP for textile manufacturing and restaurant chains.',
-        icon: Layout,
-        accent: '#059669',
-        bg: 'bg-emerald-50',
-        border: 'border-emerald-200',
-        iconBg: 'bg-emerald-500'
-    },
-    {
-        title: 'AI Platform',
-        desc: 'Predictive analytics and intelligent automation for data-driven growth.',
-        icon: Cpu,
-        accent: '#7c3aed',
-        bg: 'bg-purple-50',
-        border: 'border-purple-200',
-        iconBg: 'bg-purple-500'
-    },
-    {
-        title: 'ONIMTA Technology',
-        desc: 'Enterprise software solutions — EST. 2013, Lake Road, Maharagama.',
-        icon: Globe,
-        accent: '#78716c',
-        bg: 'bg-stone-50',
-        border: 'border-stone-200',
-        iconBg: 'bg-stone-500'
-    }
+    // {
+    //     title: 'Merit Plus Finance',
+    //     desc: 'Cloud-native accounting platform with real-time multi-company reporting.',
+    //     icon: Database,
+    //     accent: '#3b82f6',
+    //     bg: 'bg-blue-50',
+    //     border: 'border-blue-200',
+    //     iconBg: 'bg-blue-500'
+    // },
+    // {
+    //     title: 'Web Solutions',
+    //     desc: 'High-performance ERP for textile manufacturing and restaurant chains.',
+    //     icon: Layout,
+    //     accent: '#059669',
+    //     bg: 'bg-emerald-50',
+    //     border: 'border-emerald-200',
+    //     iconBg: 'bg-emerald-500'
+    // },
+    // {
+    //     title: 'AI Platform',
+    //     desc: 'Predictive analytics and intelligent automation for data-driven growth.',
+    //     icon: Cpu,
+    //     accent: '#7c3aed',
+    //     bg: 'bg-purple-50',
+    //     border: 'border-purple-200',
+    //     iconBg: 'bg-purple-500'
+    // },
+    // {
+    //     title: 'ONIMTA Technology',
+    //     desc: 'Enterprise software solutions — EST. 2013, Lake Road, Maharagama.',
+    //     icon: Globe,
+    //     accent: '#78716c',
+    //     bg: 'bg-stone-50',
+    //     border: 'border-stone-200',
+    //     iconBg: 'bg-stone-500'
+    // }
 ];
 
 const AVAILABLE_ICONS = { Database, Layout, Cpu, Globe };

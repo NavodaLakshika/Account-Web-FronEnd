@@ -38,6 +38,7 @@ const AuthPage = () => {
         return saved ? JSON.parse(saved) : null;
     });
     const [showAccountSelector, setShowAccountSelector] = useState(() => !!localStorage.getItem('onimta_saved_account'));
+    const [rememberMe, setRememberMe] = useState(false);
     const [displayedSignInText, setDisplayedSignInText] = useState('');
 
     const translations = {
@@ -95,13 +96,18 @@ const AuthPage = () => {
             const user = authService.getCurrentUser();
             setCurrentUser(user);
 
-            // Save to localStorage for Account Selector
-            const accountToSave = {
-                empName: loginData.empName,
-                lastAccessed: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
-            };
-            localStorage.setItem('onimta_saved_account', JSON.stringify(accountToSave));
-            setSavedAccount(accountToSave);
+            // Save to localStorage for Account Selector if Remember Me is checked
+            if (rememberMe) {
+                const accountToSave = {
+                    empName: loginData.empName,
+                    lastAccessed: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+                };
+                localStorage.setItem('onimta_saved_account', JSON.stringify(accountToSave));
+                setSavedAccount(accountToSave);
+            } else {
+                localStorage.removeItem('onimta_saved_account');
+                setSavedAccount(null);
+            }
 
             showSuccessToast(result.message || 'Verification Successful');
 
@@ -252,40 +258,65 @@ const AuthPage = () => {
                             </h2>
                             <form onSubmit={handleLogin} className="space-y-4">
                                 <div className="space-y-1">
+                                    <label htmlFor="empName" className="block text-sm font-sans font-medium text-slate-700 ml-1">
+                                        {t.username}
+                                    </label>
                                     <input
                                         type="text"
+                                        id="empName"
                                         name="empName"
                                         value={loginData.empName}
                                         onChange={handleLoginChange}
-                                        placeholder={t.username}
-                                        className="w-full px-4 py-3 bg-white font-mono text-slate-800 placeholder-slate-400 font-bold outline-none border border-slate-300 hover:border-[#00acee] focus:border-[#00acee] focus:ring-4 focus:ring-[#00acee]/30 transition-all"
+                                        className="w-full px-4 py-3 bg-white font-mono text-slate-800 font-bold outline-none border border-slate-300 hover:border-[#00acee] focus:border-[#00acee] focus:ring-4 focus:ring-[#00acee]/30 transition-all"
                                         required
                                     />
                                 </div>
                                 <div className="space-y-1">
+                                    <label htmlFor="password" className="block text-sm font-sans font-medium text-slate-700 ml-1">
+                                        {t.password}
+                                    </label>
                                     <input
                                         type="password"
+                                        id="password"
                                         name="password"
                                         value={loginData.password}
                                         onChange={handleLoginChange}
-                                        placeholder={t.password}
-                                        className="w-full px-4 py-3 bg-white font-mono text-slate-800 placeholder-slate-400 font-bold outline-none border border-slate-300 hover:border-[#00acee] focus:border-[#00acee] focus:ring-4 focus:ring-[#00acee]/30 transition-all"
+                                        className="w-full px-4 py-3 bg-white font-mono text-slate-800 font-bold outline-none border border-slate-300 hover:border-[#00acee] focus:border-[#00acee] focus:ring-4 focus:ring-[#00acee]/30 transition-all"
                                         required
                                     />
                                 </div>
-                                <div className="flex flex-col gap-6 pt-4">
+                                <div className="flex items-center justify-between mt-2 mb-4 px-1">
+                                    <label className="flex items-center gap-2 cursor-pointer group">
+                                        <div className="relative flex items-center">
+                                            <input
+                                                type="checkbox"
+                                                id="rememberMe"
+                                                checked={rememberMe}
+                                                onChange={(e) => setRememberMe(e.target.checked)}
+                                                className="peer appearance-none w-5 h-5 border-2 border-slate-300 rounded bg-white hover:border-[#00acee] checked:bg-[#00acee] checked:border-[#00acee] focus:outline-none focus:ring-4 focus:ring-[#00acee]/30 transition-all cursor-pointer"
+                                            />
+                                            <svg className="absolute w-3.5 h-3.5 text-white left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 peer-checked:opacity-100 pointer-events-none transition-opacity" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                                <polyline points="20 6 9 17 4 12"></polyline>
+                                            </svg>
+                                        </div>
+                                        <span className="text-sm font-mono font-bold text-slate-500 group-hover:text-[#00acee] transition-colors select-none">
+                                            {t.remember}
+                                        </span>
+                                    </label>
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowForgot(true)}
+                                        className="text-[#00acee] font-mono text-sm font-bold hover:text-[#0092cc] hover:underline transition-all bg-transparent border-none cursor-pointer"
+                                    >
+                                        {t.forgot}
+                                    </button>
+                                </div>
+                                <div className="flex flex-col gap-6 pt-2">
                                     <button
                                         disabled={loading}
                                         className="w-full py-4 bg-[#00acee] hover:bg-[#0092cc] text-white font-mono font-bold tracking-[0.2em] transition-all active:scale-[0.98] disabled:opacity-70 uppercase shadow-lg shadow-black/10"
                                     >
                                         {loading ? <Loader2 className="animate-spin mx-auto text-white" /> : t.login}
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => setShowForgot(true)}
-                                        className="text-slate-500 font-mono text-sm hover:text-slate-800 transition-all text-center bg-transparent border-none cursor-pointer"
-                                    >
-                                        {t.forgot}
                                     </button>
                                     <div className="flex items-center gap-3">
                                         <div className="flex-1 h-[1px] bg-slate-300" />
@@ -321,34 +352,43 @@ const AuthPage = () => {
                             >
                                 {recoveryStep === 1 ? (
                                     <div className="space-y-1">
+                                        <label htmlFor="forgotEmail" className="block text-sm font-sans font-medium text-slate-700 ml-1">
+                                            Username / Email
+                                        </label>
                                         <input
                                             type="text"
+                                            id="forgotEmail"
                                             value={forgotEmail}
                                             onChange={(e) => setForgotEmail(e.target.value)}
-                                            placeholder="Username / Email"
-                                            className="w-full px-4 py-3 bg-white font-mono text-slate-800 placeholder-slate-400 font-bold outline-none border border-slate-300 hover:border-[#00acee] focus:border-[#00acee] focus:ring-4 focus:ring-[#00acee]/30 transition-all"
+                                            className="w-full px-4 py-3 bg-white font-mono text-slate-800 font-bold outline-none border border-slate-300 hover:border-[#00acee] focus:border-[#00acee] focus:ring-4 focus:ring-[#00acee]/30 transition-all"
                                             required
                                         />
                                     </div>
                                 ) : (
                                     <>
                                         <div className="space-y-1">
+                                            <label htmlFor="resetToken" className="block text-sm font-sans font-medium text-slate-700 ml-1">
+                                                Recovery Token
+                                            </label>
                                             <input
                                                 type="text"
+                                                id="resetToken"
                                                 value={resetToken}
                                                 onChange={(e) => setResetToken(e.target.value)}
-                                                placeholder="Recovery Token"
-                                                className="w-full px-4 py-3 bg-white font-mono text-slate-800 placeholder-slate-400 font-bold outline-none border border-slate-300 hover:border-[#00acee] focus:border-[#00acee] focus:ring-4 focus:ring-[#00acee]/30 transition-all"
+                                                className="w-full px-4 py-3 bg-white font-mono text-slate-800 font-bold outline-none border border-slate-300 hover:border-[#00acee] focus:border-[#00acee] focus:ring-4 focus:ring-[#00acee]/30 transition-all"
                                                 required
                                             />
                                         </div>
                                         <div className="space-y-1">
+                                            <label htmlFor="newPassword" className="block text-sm font-sans font-medium text-slate-700 ml-1">
+                                                New Password
+                                            </label>
                                             <input
                                                 type="password"
+                                                id="newPassword"
                                                 value={newPassword}
                                                 onChange={(e) => setNewPassword(e.target.value)}
-                                                placeholder="New Password"
-                                                className="w-full px-4 py-3 bg-white font-mono text-slate-800 placeholder-slate-400 font-bold outline-none border border-slate-300 hover:border-[#00acee] focus:border-[#00acee] focus:ring-4 focus:ring-[#00acee]/30 transition-all"
+                                                className="w-full px-4 py-3 bg-white font-mono text-slate-800 font-bold outline-none border border-slate-300 hover:border-[#00acee] focus:border-[#00acee] focus:ring-4 focus:ring-[#00acee]/30 transition-all"
                                                 required
                                             />
                                         </div>

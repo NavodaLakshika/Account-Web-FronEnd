@@ -29,7 +29,7 @@ import BankReconciliationBoard from './BankReconciliationBoard';
 import ExpensesDashboardBoard from './ExpensesDashboardBoard';
 import ProfitLossDashboardBoard from './ProfitLossDashboardBoard';
 import SurveySettingsModal from '../components/modals/SurveySettingsModal';
-import ReportsModal from '../components/modals/AdminReports/ReportsModal';
+import ReportTemplate from '../components/ReportTemplate';
 import ViewUtilityModal from '../components/modals/ViewUtilityModal';
 
 const BIDashboardPage = () => {
@@ -62,7 +62,7 @@ const BIDashboardPage = () => {
     const [showExpensesDashboardModal, setShowExpensesDashboardModal] = useState(false);
     const [showProfitLossDashboardModal, setShowProfitLossDashboardModal] = useState(false);
     const [showSurveySettingsModal, setShowSurveySettingsModal] = useState(false);
-    const [showReportsModal, setShowReportsModal] = useState(false);
+    const [selectedReport, setSelectedReport] = useState(null);
     const [showViewUtilityModal, setShowViewUtilityModal] = useState(false);
 
     useEffect(() => {
@@ -116,7 +116,7 @@ const BIDashboardPage = () => {
         'expenses_detail': setShowExpensesDashboardModal,
         'profit_loss_detail': setShowProfitLossDashboardModal,
         'survey_settings': setShowSurveySettingsModal,
-        'reports': setShowReportsModal,
+        'reports': () => setSelectedReport('System Analytics Report'),
         'items': setShowViewUtilityModal
     };
 
@@ -204,10 +204,13 @@ const BIDashboardPage = () => {
             />
             <ProfitLossDashboardBoard isOpen={showProfitLossDashboardModal} onClose={() => setShowProfitLossDashboardModal(false)} />
             <SurveySettingsModal isOpen={showSurveySettingsModal} onClose={() => setShowSurveySettingsModal(false)} />
-            <ReportsModal isOpen={showReportsModal} onClose={() => setShowReportsModal(false)} />
+            {selectedReport && <ReportTemplate title={selectedReport} subtitle={`As of ${new Date().toLocaleDateString()}`} onClose={() => setSelectedReport(null)} onSwitchReport={setSelectedReport} />}
             <ViewUtilityModal isOpen={showViewUtilityModal} onClose={() => setShowViewUtilityModal(false)} />
         </div>
     );
 };
 
 export default BIDashboardPage;
+
+
+

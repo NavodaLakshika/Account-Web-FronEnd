@@ -67,7 +67,7 @@ const menuGroups = [
     }
 ];
 
-const ReportsModal = ({ isOpen, onClose, onSelectReport }) => {
+const ReportsCenterModal = ({ isOpen, onClose, onSelectReport }) => {
     const [searchQuery, setSearchQuery] = useState('');
 
     if (!isOpen) return null;
@@ -172,4 +172,4 @@ const ReportsModal = ({ isOpen, onClose, onSelectReport }) => {
     );
 };
 
-export default ReportsModal;
+export default ReportsCenterModal;

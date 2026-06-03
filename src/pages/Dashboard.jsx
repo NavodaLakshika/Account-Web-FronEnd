@@ -81,7 +81,7 @@ import SystemSettingsBoard from '../HomeMaster/SystemSettingsBoard';
 import MasterFileModal from '../components/modals/MasterFileModal';
 import ViewUtilityModal from '../components/modals/ViewUtilityModal';
 import TransactionModal from '../components/modals/TransactionModal';
-import ReportsModal from '../components/modals/AdminReports/ReportsModal';
+
 import SystemAdminModal from '../components/modals/SystemAdmin/SystemAdminModal';
 import SideBar from '../components/SideBar';
 import ChangePasswordBoard from '../components/modals/ChangePasswordBoard';
@@ -165,14 +165,9 @@ import PeriodLockModal from '../components/modals/SystemAdmin/PeriodLockModal';
 import JournalEntryEditorModal from '../components/modals/SystemAdmin/JournalEntryEditorModal';
 import TransactionEditorModal from '../components/modals/SystemAdmin/TransactionEditorModal';
 import CompanyUsersModal from '../components/modals/SystemAdmin/CompanyUsersModal';
+import ReportsCenterModal from '../components/modals/AdminReports/ReportsCenterModal';
 
 // Reports Modals
-import AdminReportsModal from '../components/modals/AdminReports/AdminReportsModal';
-import AccountingReportsModal from '../components/modals/AdminReports/AccountingReportsModal';
-import BankingReportsModal from '../components/modals/AdminReports/BankingReportsModal';
-import FinanceManagementModal from '../components/modals/AdminReports/FinanceManagementModal';
-import VendorCenterReportsModal from '../components/modals/AdminReports/VendorCenterReportsModal';
-import CustomerCenterReportsModal from '../components/modals/AdminReports/CustomerCenterReportsModal';
 
 const Dashboard = () => {
 
@@ -219,14 +214,10 @@ const Dashboard = () => {
     const [showJournalEntryEditorModal, setShowJournalEntryEditorModal] = useState(false);
     const [showTransactionEditorModal, setShowTransactionEditorModal] = useState(false);
     const [showCompanyUsersModal, setShowCompanyUsersModal] = useState(false);
+    const [showReportsCenterModal, setShowReportsCenterModal] = useState(false);
+    const [navReportSearch, setNavReportSearch] = useState('');
 
     // Reports States
-    const [showAdminReportsModal, setShowAdminReportsModal] = useState(false);
-    const [showAccountingReportsModal, setShowAccountingReportsModal] = useState(false);
-    const [showBankingReportsModal, setShowBankingReportsModal] = useState(false);
-    const [showFinanceManagementModal, setShowFinanceManagementModal] = useState(false);
-    const [showVendorCenterReportsModal, setShowVendorCenterReportsModal] = useState(false);
-    const [showCustomerCenterReportsModal, setShowCustomerCenterReportsModal] = useState(false);
 
 
     const [showNewAccountModal, setShowNewAccountModal] = useState(false);
@@ -276,7 +267,7 @@ const Dashboard = () => {
     const [showMasterFileModal, setShowMasterFileModal] = useState(false);
     const [showViewUtilityModal, setShowViewUtilityModal] = useState(false);
     const [showTransactionModal, setShowTransactionModal] = useState(false);
-    const [showReportsModal, setShowReportsModal] = useState(false);
+    const [selectedReport, setSelectedReport] = useState(null);
     const [showSystemAdminModal, setShowSystemAdminModal] = useState(false);
     const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
     const [showSystemSettingsModal, setShowSystemSettingsModal] = useState(false);
@@ -321,6 +312,7 @@ const Dashboard = () => {
     const [showDashboardLockedModal, setShowDashboardLockedModal] = useState(false);
 
     const [showAIChatbotModal, setShowAIChatbotModal] = useState(false);
+    const [showAIText, setShowAIText] = useState(false);
     const [showItemsServicesReport, setShowItemsServicesReport] = useState(false);
     const [itemsServicesData, setItemsServicesData] = useState([]);
     const [isReportLoading, setIsReportLoading] = useState(false);
@@ -361,7 +353,7 @@ const Dashboard = () => {
             body: 'Your trial balance gives you a quick snapshot of all account balances. It\'s a great way to spot any errors or discrepancies before they become problems.',
             action: 'View Trial Balance',
             onAction: () => setShowTrialBalanceModal(true),
-            image: '/trial_balance.png',
+            image: '/trial_balance.jpg',
             color: '#4f46e5',
         },
         {
@@ -898,7 +890,7 @@ const Dashboard = () => {
             items: [
                 { icon: BookOpen, label: 'Journal Entry', onClick: () => setShowJournalEntryModal(true), color: '#6366f1' },
                 { icon: PieChart, label: 'Acc.Balance', onClick: () => setShowAccountBalanceModal(true), color: '#10b981' },
-                { icon: BarChart2, label: 'Reports', onClick: () => setShowTrialBalanceModal(true), color: '#4f46e5' },
+                { icon: BarChart2, label: 'Reports', onClick: () => setShowReportsCenterModal(true), color: '#4f46e5' },
                 { icon: Megaphone, label: 'Marketing Tool', onClick: () => setShowMarketingToolModal(true), color: '#ec4899' },
             ]
         }
@@ -1013,89 +1005,139 @@ const Dashboard = () => {
                 ]
             }
         ],
-        'Reports': [
+                'Reports': [
             {
-                group: 'Financial Statements',
+                group: 'Business Overview',
                 items: [
-                    { label: 'Profit & Loss Account', onClick: () => setShowFinanceManagementModal(true) },
-                    { label: 'General Ledger', onClick: () => setShowFinanceManagementModal(true) },
-                    { label: 'Trial Balance', onClick: () => setShowFinanceManagementModal(true) },
-                    { label: 'Balance Sheet', onClick: () => setShowFinanceManagementModal(true) },
+                    { label: 'Profit and Loss', onClick: () => setSelectedReport('Profit and Loss') },
+                    { label: 'Balance Sheet', onClick: () => setSelectedReport('Balance Sheet') },
+                    { label: 'Trial Balance', onClick: () => setSelectedReport('Trial Balance') },
+                    { label: 'Statement of Cash Flows', onClick: () => setSelectedReport('Statement of Cash Flows') },
+                    { label: 'Statement of Changes in Equity', onClick: () => setSelectedReport('Statement of Changes in Equity') },
+                    { label: 'Business Snapshot', onClick: () => setSelectedReport('Business Snapshot') },
+                    { label: 'Profit and Loss Comparison', onClick: () => setSelectedReport('Profit and Loss Comparison') },
+                    { label: 'Balance Sheet Comparison', onClick: () => setSelectedReport('Balance Sheet Comparison') },
+                    { label: 'Custom Summary Report', onClick: () => setSelectedReport('Custom Summary Report') },
+                    { label: 'Profit and Loss as % of total income', onClick: () => setSelectedReport('Profit and Loss as % of total income') },
+                    { label: 'Profit and Loss by Month', onClick: () => setSelectedReport('Profit and Loss by Month') },
+                    { label: 'Profit and Loss Detail', onClick: () => setSelectedReport('Profit and Loss Detail') },
+                    { label: 'Profit and Loss year-to-date comparison', onClick: () => setSelectedReport('Profit and Loss year-to-date comparison') },
+                    { label: 'Quarterly Profit and Loss Summary', onClick: () => setSelectedReport('Quarterly Profit and Loss Summary') },
                 ]
             },
             {
-                group: 'Accounting Reports',
+                group: 'Sales and Customers',
                 items: [
-                    { label: 'Accounting Details', onClick: () => setShowAccountingReportsModal(true) },
-                    { label: 'Accounting Report', onClick: () => setShowAccountingReportsModal(true) },
-                    { label: 'Journal Entry Reports', onClick: () => setShowAccountingReportsModal(true) },
-                    { label: 'Double Entry Details Report', onClick: () => setShowAccountingReportsModal(true) },
+                    { label: 'Sales by Customer Summary', onClick: () => setSelectedReport('Sales by Customer Summary') },
+                    { label: 'Sales by Customer Detail', onClick: () => setSelectedReport('Sales by Customer Detail') },
+                    { label: 'Sales by Product/Service Summary', onClick: () => setSelectedReport('Sales by Product/Service Summary') },
+                    { label: 'Sales by Product/Service Detail', onClick: () => setSelectedReport('Sales by Product/Service Detail') },
+                    { label: 'Income by Customer Summary', onClick: () => setSelectedReport('Income by Customer Summary') },
+                    { label: 'Customer Contact List', onClick: () => setSelectedReport('Customer Contact List') },
+                    { label: 'Transaction List by Customer', onClick: () => setSelectedReport('Transaction List by Customer') },
+                    { label: 'Time Activities by Customer Detail', onClick: () => setSelectedReport('Time Activities by Customer Detail') },
+                    { label: 'Estimates by Customer', onClick: () => setSelectedReport('Estimates by Customer') },
+                    { label: 'Customer Phone List', onClick: () => setSelectedReport('Customer Phone List') },
+                    { label: 'Sales by Customer Type Detail', onClick: () => setSelectedReport('Sales by Customer Type Detail') },
+                    { label: 'Project Profitability Summary', onClick: () => setSelectedReport('Project Profitability Summary') },
+                    { label: 'Product/Item Profitability by Customer', onClick: () => setSelectedReport('Product/Item Profitability by Customer') },
                 ]
             },
             {
-                group: 'Bank Statements',
+                group: 'Who Owes You',
                 items: [
-                    { label: 'Banking', onClick: () => setShowBankingReportsModal(true) },
-                    { label: 'Bank Statement', onClick: () => setShowBankingReportsModal(true) },
+                    { label: 'Customer Balance Summary', onClick: () => setSelectedReport('Customer Balance Summary') },
+                    { label: 'Customer Balance Detail', onClick: () => setSelectedReport('Customer Balance Detail') },
+                    { label: 'Open Invoices', onClick: () => setSelectedReport('Open Invoices') },
+                    { label: 'Accounts receivable ageing summary', onClick: () => setSelectedReport('Accounts receivable ageing summary') },
+                    { label: 'Accounts receivable ageing detail', onClick: () => setSelectedReport('Accounts receivable ageing detail') },
+                    { label: 'Collections Report', onClick: () => setSelectedReport('Collections Report') },
+                    { label: 'Invoice List', onClick: () => setSelectedReport('Invoice List') },
+                    { label: 'Statement List', onClick: () => setSelectedReport('Statement List') },
+                    { label: 'Invoices and Received Payments', onClick: () => setSelectedReport('Invoices and Received Payments') },
                 ]
             },
             {
-                group: 'Reconciliation',
+                group: 'Expenses and Vendors',
                 items: [
-                    { label: 'Bank Reconciliation Statement', onClick: () => setShowBankingReportsModal(true) },
-                    { label: 'Reconciliation Summary', onClick: () => setShowBankingReportsModal(true) },
-                    { label: 'Reconciliation Detail Summary', onClick: () => setShowBankingReportsModal(true) },
+                    { label: 'Purchase List', onClick: () => setSelectedReport('Purchase List') },
+                    { label: 'Purchases by Product/Service Detail', onClick: () => setSelectedReport('Purchases by Product/Service Detail') },
+                    { label: 'Purchases by Supplier Detail', onClick: () => setSelectedReport('Purchases by Supplier Detail') },
+                    { label: 'Expenses by Supplier Summary', onClick: () => setSelectedReport('Expenses by Supplier Summary') },
+                    { label: 'Transaction List by Supplier', onClick: () => setSelectedReport('Transaction List by Supplier') },
+                    { label: 'Supplier Contact List', onClick: () => setSelectedReport('Supplier Contact List') },
+                    { label: 'Cheque Detail', onClick: () => setSelectedReport('Cheque Detail') },
+                    { label: 'Bill Payment List', onClick: () => setSelectedReport('Bill Payment List') },
+                    { label: 'Open Purchase Order Detail', onClick: () => setSelectedReport('Open Purchase Order Detail') },
+                    { label: 'Open Purchase Order List', onClick: () => setSelectedReport('Open Purchase Order List') },
+                    { label: 'Bills and Applied Payments', onClick: () => setSelectedReport('Bills and Applied Payments') },
+                    { label: 'Supplier Phone List', onClick: () => setSelectedReport('Supplier Phone List') },
+                    { label: 'Bill Approval Status', onClick: () => setSelectedReport('Bill Approval Status') },
+                    { label: 'Invoice Approval Status', onClick: () => setSelectedReport('Invoice Approval Status') },
                 ]
             },
             {
-                group: 'Cheque Books',
+                group: 'What You Owe',
                 items: [
-                    { label: 'Entered Cheque Books Report', onClick: () => setShowBankingReportsModal(true) },
-                    { label: 'Cheque Diary', onClick: () => setShowBankingReportsModal(true) },
+                    { label: 'Supplier Balance Summary', onClick: () => setSelectedReport('Supplier Balance Summary') },
+                    { label: 'Supplier Balance Detail', onClick: () => setSelectedReport('Supplier Balance Detail') },
+                    { label: 'Unpaid Bills', onClick: () => setSelectedReport('Unpaid Bills') },
+                    { label: 'Accounts payable ageing summary', onClick: () => setSelectedReport('Accounts payable ageing summary') },
+                    { label: 'Accounts payable ageing detail', onClick: () => setSelectedReport('Accounts payable ageing detail') },
                 ]
             },
             {
-                group: 'Customer Reports',
+                group: 'Accountant Reports',
                 items: [
-                    { label: 'Debtor Aging Analyst', onClick: () => setShowCustomerCenterReportsModal(true) },
-                    { label: 'Debtors Statement', onClick: () => setShowCustomerCenterReportsModal(true) },
-                    { label: 'Debtors Balance Summary', onClick: () => setShowCustomerCenterReportsModal(true) },
-                    { label: 'Invoice Details', onClick: () => setShowCustomerCenterReportsModal(true) },
+                    { label: 'Journal', onClick: () => setSelectedReport('Journal') },
+                    { label: 'General Ledger', onClick: () => setSelectedReport('General Ledger') },
+                    { label: 'General Ledger List', onClick: () => setSelectedReport('General Ledger List') },
+                    { label: 'Transaction Detail by Account', onClick: () => setSelectedReport('Transaction Detail by Account') },
+                    { label: 'Transaction List with Splits', onClick: () => setSelectedReport('Transaction List with Splits') },
+                    { label: 'Transaction List by Date', onClick: () => setSelectedReport('Transaction List by Date') },
+                    { label: 'Recent Transactions', onClick: () => setSelectedReport('Recent Transactions') },
+                    { label: 'Invalid Journal Transactions', onClick: () => setSelectedReport('Invalid Journal Transactions') },
+                    { label: 'Account List', onClick: () => setSelectedReport('Account List') },
+                    { label: 'Reconciliation Reports', onClick: () => setSelectedReport('Reconciliation Reports') },
+                    { label: 'Adjusted Trial Balance', onClick: () => setSelectedReport('Adjusted Trial Balance') },
+                    { label: 'Profit and Loss By Tag Group', onClick: () => setSelectedReport('Profit and Loss By Tag Group') },
+                    { label: 'Transaction List by Tag Group', onClick: () => setSelectedReport('Transaction List by Tag Group') },
                 ]
             },
             {
-                group: 'Vendor Reports',
+                group: 'Inventory & Products',
                 items: [
-                    { label: 'Creditor Aging Analyst', onClick: () => setShowVendorCenterReportsModal(true) },
-                    { label: 'Creditor Statement', onClick: () => setShowVendorCenterReportsModal(true) },
-                    { label: 'Creditor Balance Report', onClick: () => setShowVendorCenterReportsModal(true) },
-                    { label: 'Unpaid Bills Details', onClick: () => setShowVendorCenterReportsModal(true) },
-                    { label: 'Transaction List by Vendor', onClick: () => setShowVendorCenterReportsModal(true) },
-                    { label: 'Creditor Statement (Given Date)', onClick: () => setShowVendorCenterReportsModal(true) },
-                    { label: 'Creditor Balance Report (Given Date)', onClick: () => setShowVendorCenterReportsModal(true) },
+                    { label: 'Inventory Valuation Summary', onClick: () => setSelectedReport('Inventory Valuation Summary') },
+                    { label: 'Inventory Valuation Detail', onClick: () => setSelectedReport('Inventory Valuation Detail') },
+                    { label: 'Stock Take Worksheet', onClick: () => setSelectedReport('Stock Take Worksheet') },
+                    { label: 'Product/Service List', onClick: () => setSelectedReport('Product/Service List') },
                 ]
             },
             {
-                group: 'Inventory Reports',
+                group: 'Employees & Time',
                 items: [
-                    { label: 'Stock Report', onClick: () => setShowAdminReportsModal(true) },
+                    { label: 'Unbilled time', onClick: () => setSelectedReport('Unbilled time') },
+                    { label: 'Unbilled charges', onClick: () => setSelectedReport('Unbilled charges') },
+                    { label: 'Time Summary by Pay Type', onClick: () => setSelectedReport('Time Summary by Pay Type') },
+                    { label: 'Timesheet Detail by Employee', onClick: () => setSelectedReport('Timesheet Detail by Employee') },
+                    { label: 'Time Activities by Employee Detail', onClick: () => setSelectedReport('Time Activities by Employee Detail') },
+                    { label: 'Employee Contact List', onClick: () => setSelectedReport('Employee Contact List') },
+                    { label: 'Recent/Edited Time Activities', onClick: () => setSelectedReport('Recent/Edited Time Activities') },
                 ]
             },
             {
-                group: 'Audit Reports',
+                group: 'Taxes & Other Lists',
                 items: [
-                    { label: 'System Log Report', onClick: () => setShowAdminReportsModal(true) },
-                    { label: 'Transaction Log Report', onClick: () => setShowAdminReportsModal(true) },
-                ]
-            },
-            {
-                group: 'Exception Reports',
-                items: [
-                    { label: 'Cancelled Transaction Report', onClick: () => setShowAdminReportsModal(true) },
+                    { label: 'Tax Liability Report', onClick: () => setSelectedReport('Tax Liability Report') },
+                    { label: 'Terms List', onClick: () => setSelectedReport('Terms List') },
+                    { label: 'Payment Method List', onClick: () => setSelectedReport('Payment Method List') },
+                    { label: 'Deposit Detail', onClick: () => setSelectedReport('Deposit Detail') },
+                    { label: 'Recurring Template List', onClick: () => setSelectedReport('Recurring Template List') },
+                    { label: 'Audit Log', onClick: () => setSelectedReport('Audit Log') },
                 ]
             }
         ],
-        'System Admin': [
+          'System Admin': [
             { label: 'Data Backup', onClick: () => setShowDatabaseBackupModal(true) },
             { label: 'Stock Balance Update', onClick: () => setShowStockBalanceUpdateModal(true) },
             { label: 'Inventory Download', onClick: () => setShowInventoryDownloadModal(true) },
@@ -1141,7 +1183,7 @@ const Dashboard = () => {
                 { label: 'Data Backup', onClick: () => setShowDatabaseBackupModal(true) },
                 { label: 'System Update', onClick: () => setShowSystemUpdateModal(true) },
                 { label: 'Reconcile', onClick: () => setShowBankRecModal(true) },
-                { label: 'Audit Log', onClick: () => setShowAdminReportsModal(true) },
+                { label: 'Audit Log', onClick: () => setSelectedReport('Audit Log') },
             ]
         },
         {
@@ -1345,7 +1387,7 @@ const Dashboard = () => {
                     setShowTransactionModal(false);
                 }}
             />
-            <ReportsModal isOpen={showReportsModal} onClose={() => setShowReportsModal(false)} />
+            {selectedReport && <ReportTemplate companyName={selectedCompany?.CompanyName || selectedCompany?.companyName || 'ONIMTA IT SOLUTIONS'} title={selectedReport} subtitle={`As of ${new Date().toLocaleDateString()}`} onClose={() => setSelectedReport(null)} onSwitchReport={setSelectedReport} />}
             <SubmitReviewModal isOpen={showReviewModal} onClose={() => setShowReviewModal(false)} currentUser={user} />
             <FirstTimeGuide isOpen={showFirstTimeGuide} onClose={() => setShowFirstTimeGuide(false)} onOpenMasterFile={() => setShowMasterFileModal(true)} onCloseMasterFile={() => setShowMasterFileModal(false)} user={user} />
             <CompanyPromoBoard isOpen={showPromoModal} onClose={() => setShowPromoModal(false)} />
@@ -1414,14 +1456,9 @@ const Dashboard = () => {
             <JournalEntryEditorModal isOpen={showJournalEntryEditorModal} onClose={() => setShowJournalEntryEditorModal(false)} />
             <TransactionEditorModal isOpen={showTransactionEditorModal} onClose={() => setShowTransactionEditorModal(false)} />
             <CompanyUsersModal isOpen={showCompanyUsersModal} onClose={() => setShowCompanyUsersModal(false)} />
+            <ReportsCenterModal isOpen={showReportsCenterModal} onClose={() => setShowReportsCenterModal(false)} onSelectReport={setSelectedReport} />
 
             {/* Reports Modals */}
-            <AdminReportsModal isOpen={showAdminReportsModal} onClose={() => setShowAdminReportsModal(false)} />
-            <AccountingReportsModal isOpen={showAccountingReportsModal} onClose={() => setShowAccountingReportsModal(false)} />
-            <BankingReportsModal isOpen={showBankingReportsModal} onClose={() => setShowBankingReportsModal(false)} />
-            <FinanceManagementModal isOpen={showFinanceManagementModal} onClose={() => setShowFinanceManagementModal(false)} />
-            <VendorCenterReportsModal isOpen={showVendorCenterReportsModal} onClose={() => setShowVendorCenterReportsModal(false)} />
-            <CustomerCenterReportsModal isOpen={showCustomerCenterReportsModal} onClose={() => setShowCustomerCenterReportsModal(false)} />
 
             <CardCommissionBoard isOpen={showCardCommissionBoard} onClose={() => setShowCardCommissionBoard(false)} />
             <UserProfileBoard isOpen={showUserProfileBoard} onClose={() => setShowUserProfileBoard(false)} />
@@ -1601,7 +1638,17 @@ const Dashboard = () => {
                                     >
                                         {item}
                                     </button>
-                                    {activeMenu === item && items.length > 0 && (
+                                    {activeMenu === item && items.length > 0 && (() => {
+                                        const isReports = item === 'Reports';
+                                        const filteredItems = isReports && navReportSearch.trim()
+                                            ? items.map(g => ({
+                                                ...g,
+                                                items: g.items.filter(sub =>
+                                                    sub.label.toLowerCase().includes(navReportSearch.toLowerCase())
+                                                )
+                                              })).filter(g => g.items.length > 0)
+                                            : items;
+                                        return (
                                         <div
                                             className="fixed sm:absolute top-[56px] sm:top-full left-2 sm:left-1/2 right-2 sm:right-auto sm:-translate-x-1/2 mt-0 sm:mt-3 bg-white shadow-[0_8px_30px_rgb(0,0,0,0.12)] rounded-none py-4 sm:py-6 px-4 sm:px-8 z-[200] border border-gray-100 w-auto sm:w-max max-h-[85vh] sm:max-h-none overflow-y-auto"
                                             onMouseEnter={() => clearTimeout(menuTimeoutRef.current)}
@@ -1609,10 +1656,31 @@ const Dashboard = () => {
                                                 menuTimeoutRef.current = setTimeout(() => setActiveMenu(null), 200);
                                             }}
                                         >
+                                            {isReports && (
+                                                <div className="mb-4 flex items-center gap-2 px-2 py-1.5 bg-gray-50 border border-gray-200 rounded-lg">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><circle cx="11" cy="11" r="8"/><path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35"/></svg>
+                                                    <input
+                                                        type="text"
+                                                        placeholder="Search reports..."
+                                                        value={navReportSearch}
+                                                        onChange={e => setNavReportSearch(e.target.value)}
+                                                        onMouseEnter={() => clearTimeout(menuTimeoutRef.current)}
+                                                        autoFocus
+                                                        className="flex-1 text-[13px] font-medium text-gray-800 bg-transparent outline-none placeholder:text-gray-400 min-w-[220px]"
+                                                    />
+                                                    {navReportSearch && (
+                                                        <button onClick={() => setNavReportSearch('')} className="text-gray-400 hover:text-gray-600 text-[10px] font-bold uppercase tracking-wide">✕</button>
+                                                    )}
+                                                </div>
+                                            )}
                                             <div className="max-h-[75vh] overflow-y-auto overflow-x-hidden no-scrollbar">
-                                                {items[0]?.group ? (
-                                                    <div className={`columns-1 sm:columns-2 ${items.length >= 3 ? 'lg:columns-3' : ''} ${items.length >= 4 ? 'xl:columns-4' : ''} gap-6 sm:gap-12`}>
-                                                        {items.map((menuItem, i) => (
+                                                {filteredItems.length === 0 ? (
+                                                    <div className="py-8 text-center text-[13px] text-gray-400 min-w-[220px]">
+                                                        No reports match <span className="font-bold text-gray-600">"{navReportSearch}"</span>
+                                                    </div>
+                                                ) : filteredItems[0]?.group ? (
+                                                    <div className={`columns-1 sm:columns-2 ${filteredItems.length >= 3 ? 'lg:columns-3' : ''} ${filteredItems.length >= 4 ? 'xl:columns-4' : ''} gap-6 sm:gap-12`}>
+                                                        {filteredItems.map((menuItem, i) => (
                                                             <div key={i} className="flex flex-col min-w-[140px] sm:min-w-[160px] break-inside-avoid mb-6 sm:mb-8">
                                                                 <h3 className="text-[11px] font-sans font-bold text-gray-500 uppercase tracking-widest mb-3 sm:mb-4">{menuItem.group}</h3>
                                                                 <div className="flex flex-col gap-2 sm:gap-3">
@@ -1622,6 +1690,7 @@ const Dashboard = () => {
                                                                             onClick={() => {
                                                                                 subItem.onClick();
                                                                                 setActiveMenu(null);
+                                                                                setNavReportSearch('');
                                                                             }}
                                                                             className="w-full text-left text-[13px] font-sans font-medium text-gray-600 hover:text-[#0078d4] hover:bg-[#f4f5f8] px-2 py-1.5 -mx-2 rounded-md transition-all block"
                                                                         >
@@ -1634,7 +1703,7 @@ const Dashboard = () => {
                                                     </div>
                                                 ) : (
                                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 sm:gap-x-12 gap-y-2 sm:gap-y-3 min-w-0 sm:min-w-[320px]">
-                                                        {items.map((menuItem, i) => (
+                                                        {filteredItems.map((menuItem, i) => (
                                                             <button
                                                                 key={i}
                                                                 onClick={() => {
@@ -1650,7 +1719,8 @@ const Dashboard = () => {
                                                 )}
                                             </div>
                                         </div>
-                                    )}
+                                        );
+                                    })()}
                                 </div>
                             );
                         })}
@@ -1701,27 +1771,41 @@ const Dashboard = () => {
                         <div className="relative mx-1">
                             <div
                                 onClick={() => setShowProfileDropdown(!showProfileDropdown)}
-                                className="w-[28px] h-[28px] rounded-full bg-[#4096ff] text-white flex items-center justify-center font-bold text-[11px] shadow-sm cursor-pointer hover:shadow-md hover:scale-105 transition-all"
+                                className="w-[28px] h-[28px] rounded-full bg-[#4096ff] text-white flex items-center justify-center font-bold text-[14px] shadow-sm cursor-pointer hover:shadow-md hover:scale-105 transition-all"
                                 title={user?.EmpName || user?.empName || user?.Emp_Name || user?.username || 'User'}
                             >
                                 {(user?.EmpName || user?.empName || user?.Emp_Name || user?.username || 'User').charAt(0).toUpperCase()}
                             </div>
-
                             {showProfileDropdown && (
                                 <div
-                                    className="absolute top-full right-0 mt-3 bg-white shadow-[0_8px_30px_rgb(0,0,0,0.12)] rounded-xl py-2 w-40 z-[200] border border-gray-100"
+                                    className="absolute top-full right-0 mt-3 bg-white shadow-[0_8px_30px_rgb(0,0,0,0.18)] py-6 w-[280px] z-[200] border border-gray-200 flex flex-col items-center"
                                     onMouseLeave={() => setShowProfileDropdown(false)}
                                 >
-                                    <button
-                                        onClick={() => {
-                                            setShowProfileDropdown(false);
-                                            setShowLogoutConfirmModal(true);
-                                        }}
-                                        className="w-full flex items-center gap-3 px-4 py-2 text-left text-[13px] text-red-600 hover:bg-red-50 transition-colors"
-                                    >
-                                        <LogOut size={16} />
-                                        <span className="font-semibold">Log Out</span>
+                                    <div className="w-[60px] h-[60px] rounded-full bg-[#4096ff] text-white flex items-center justify-center font-bold text-[28px] mb-3 shadow-sm">
+                                        {(user?.EmpName || user?.empName || user?.Emp_Name || user?.username || 'User').charAt(0).toUpperCase()}
+                                    </div>
+                                    <div className="text-[16px] font-bold text-[#393a3d] text-center px-4 w-full truncate">
+                                        {user?.EmpName || user?.empName || user?.Emp_Name || user?.username || 'User'}
+                                    </div>
+                                    <div className="text-[13px] text-gray-500 text-center px-4 mb-5 w-full truncate">
+                                        {selectedCompany?.name || selectedCompany?.companyName || 'ONIMTA Information Technology'}
+                                    </div>
+                                    
+                                    <button className="text-[13px] text-[#0077c5] hover:text-[#005ca6] font-medium hover:underline mb-5 transition-colors">
+                                        Manage your Account
                                     </button>
+
+                                    <div className="w-full px-6">
+                                        <button
+                                            onClick={() => {
+                                                setShowProfileDropdown(false);
+                                                setShowLogoutConfirmModal(true);
+                                            }}
+                                            className="w-full h-10 bg-[#e2e6eb] hover:bg-[#d1d5db] text-[#393a3d] font-bold text-[14px] transition-colors rounded-none"
+                                        >
+                                            Sign out
+                                        </button>
+                                    </div>
                                 </div>
                             )}
                         </div>
@@ -1816,20 +1900,14 @@ const Dashboard = () => {
 
                                     {showQuickActions && (
                                         <div
-                                            className="absolute top-full left-0 mt-1.5 w-[600px] max-h-[72vh] overflow-y-auto no-scrollbar bg-white border border-slate-100 shadow-[0_16px_48px_rgba(0,0,0,0.14)] rounded-2xl py-3 z-[200]"
+                                            className="absolute top-full left-0 mt-1.5 w-[700px] max-h-[72vh] overflow-y-auto no-scrollbar bg-white border border-slate-100 shadow-[0_16px_48px_rgba(0,0,0,0.14)]  py-3 z-[200]"
                                             onMouseEnter={() => clearTimeout(menuTimeoutRef.current)}
                                             onMouseLeave={() => { menuTimeoutRef.current = setTimeout(() => setShowQuickActions(false), 200); }}
                                         >
-                                            <div className="px-4 pb-2 flex items-center justify-between">
-                                                <span className="text-[9.5px] font-black uppercase tracking-[0.2em] text-slate-400">Quick Actions</span>
-                                                <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
-                                            </div>
                                             <div className="h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent mx-3 mb-2" />
                                             <div className="grid grid-cols-3 gap-1 px-2">
                                                 {ribbonIcons.map((iconId) => {
                                                 const iconData = {
-                                                    logout: { icon: LogOut, label: 'Logout', onClick: () => setShowLogoutConfirmModal(true), iconColor: '#dc2626', bg: '#fef2f2' },
-                                                    home: { icon: PieChart, label: 'Dashboard', onClick: () => navigate('/bi-dashboard'), iconColor: '#1e3a5f', bg: '#f1f5f9' },
                                                     new_account: { icon: UserPlus, label: 'New Account', onClick: () => setShowNewAccountModal(true), active: showNewAccountModal, iconColor: '#2563eb', bg: '#eff6ff' },
                                                     customer: { icon: Users, label: 'Customers', onClick: () => setShowCustomerModal(true), active: showCustomerModal, iconColor: '#059669', bg: '#f0fdf4' },
                                                     vendor: { icon: Truck, label: 'Vendors', onClick: () => setShowVendorModal(true), active: showVendorModal, iconColor: '#d97706', bg: '#fffbeb' },
@@ -2064,7 +2142,7 @@ const Dashboard = () => {
                                     case 'invoice': setShowSalesInvoiceModal(true); break;
                                     case 'reports':
                                     case 'profit_loss_detail':
-                                    case 'expenses_detail': setShowReportsModal(true); break;
+                                    case 'expenses_detail': setSelectedReport('Expenses Detail'); break;
                                     case 'header_settings': setShowSystemAdminModal(true); break;
                                     case 'header_profile': setShowLogoutConfirmModal(true); break;
                                     case 'header_ai': handleAIClick(); break;
@@ -2231,35 +2309,23 @@ const Dashboard = () => {
                         </div>
 
                         <div
-                            className="bg-white border-t-[0.5px] border-[#0078d4] shadow-[0_-12px_50px_rgba(0,0,0,0.14)] px-10 py-8 flex items-center gap-10"
+                            className="bg-white border-t-[0.5px] border-[#0078d4] shadow-[0_-12px_50px_rgba(0,0,0,0.14)] px-10 py-6 flex items-center gap-8"
                         >
-                            {/* Conditional Illustration Image (Left for Even Indexes) */}
-                            {currentTipIndex % 2 === 0 && (
-                                <div className="hidden md:flex w-44 h-32 shrink-0 items-center justify-center relative">
-                                    <img
-                                        src={tip.image}
-                                        alt={tip.title}
-                                        className="w-[180%] h-[180%] max-w-none object-contain drop-shadow-md"
-                                    />
-                                </div>
-                            )}
-
-                            {/* Text */}
-                            <div className="flex-1 min-w-0">
-                                <p className="text-[18px] font-bold text-slate-800 mb-2 leading-snug">{tip.title}</p>
-                                <p className="text-[13.5px] text-slate-500 leading-relaxed">{tip.body}</p>
+                            {/* Consistent Illustration Image (Left) */}
+                            <div className="hidden md:flex w-24 h-24 shrink-0 items-center justify-center bg-[#f0f8ff] rounded-full p-4 border border-[#e0f0ff] shadow-sm relative overflow-visible">
+                                <img
+                                    src={tip.image}
+                                    alt={tip.title}
+                                    className="w-[120%] h-[120%] object-contain drop-shadow-2xl saturate-[1.15] contrast-105 transition-all"
+                                    style={{ imageRendering: 'high-quality' }}
+                                />
                             </div>
 
-                            {/* Conditional Illustration Image (Right for Odd Indexes) */}
-                            {currentTipIndex % 2 !== 0 && (
-                                <div className="hidden md:flex w-44 h-32 shrink-0 items-center justify-center relative ml-4">
-                                    <img
-                                        src={tip.image}
-                                        alt={tip.title}
-                                        className="w-[180%] h-[180%] max-w-none object-contain drop-shadow-md"
-                                    />
-                                </div>
-                            )}
+                            {/* Text */}
+                            <div className="flex-1 min-w-0 flex flex-col justify-center">
+                                <p className="text-[19px] font-bold text-slate-800 mb-1.5 leading-snug tracking-tight">{tip.title}</p>
+                                <p className="text-[14px] text-slate-500 leading-relaxed max-w-4xl">{tip.body}</p>
+                            </div>
 
                             {/* Action Button */}
                             <button
@@ -2453,3 +2519,8 @@ const AITypingText = () => {
 };
 
 export default Dashboard;
+
+
+
+
+

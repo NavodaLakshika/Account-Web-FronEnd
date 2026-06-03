@@ -102,7 +102,7 @@ const CalendarModal = ({ isOpen, onClose, onDateSelect, onDateChange, initialDat
             </style>
             
             <div 
-                className="relative w-full max-w-[360px] bg-white rounded-[15px] shadow-2xl overflow-hidden calendar-animate font-['Tahoma',_sans-serif]"
+                className="relative w-full max-w-[360px] bg-white shadow-2xl overflow-hidden calendar-animate font-['Tahoma',_sans-serif]"
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* Blue Header */}
@@ -115,7 +115,7 @@ const CalendarModal = ({ isOpen, onClose, onDateSelect, onDateChange, initialDat
                     </div>
                     
                     <div className="flex justify-between items-end">
-                        <div className="bg-white/10 px-3 py-1 rounded-[6px] border border-white/20">
+                        <div className="bg-white/10 px-3 py-1 border border-white/20">
                             <span className="text-[16px]  font-mono font-bold tracking-widest">{currentYear}</span>
                         </div>
                         <span className="text-[11px] font-mono text-white/60 tracking-[0.2em]">ACCOUNTING REGISTER</span>
@@ -138,7 +138,7 @@ const CalendarModal = ({ isOpen, onClose, onDateSelect, onDateChange, initialDat
                                 {day ? (
                                     <button
                                         onClick={() => handleDateClick(day)}
-                                        className={`w-9 h-9 flex items-center justify-center rounded-[5px] text-[14px] font-mono font-bold transition-all relative group
+                                        className={`w-9 h-9 flex items-center justify-center  text-[14px] font-mono font-bold transition-all relative group
                                             ${idx % 7 === 0 ? 'text-[#f04e3e]' : 'text-[#0388cc]'}
                                             ${isToday(day) ? 'bg-blue-50 text-[#0388cc] border border-[#0388cc]/30 shadow-sm' : 'hover:bg-slate-100'}
                                             active:scale-90
@@ -159,7 +159,7 @@ const CalendarModal = ({ isOpen, onClose, onDateSelect, onDateChange, initialDat
                         </div>
                         <button 
                             onClick={() => handleDateClick(null, new Date())}
-                            className="text-[11px] font-black text-white bg-[#0388cc] hover:bg-[#0276a1] transition-colors uppercase tracking-widest px-4 py-1.5 rounded-[5px] shadow-md active:scale-95"
+                            className="text-[11px] font-black text-white bg-[#0388cc] hover:bg-[#0276a1] transition-colors uppercase tracking-widest px-4 py-1.5 shadow-md active:scale-95"
                         >
                             Today
                         </button>   
