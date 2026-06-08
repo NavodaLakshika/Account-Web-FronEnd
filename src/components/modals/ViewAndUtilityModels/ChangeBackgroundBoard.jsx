@@ -3,16 +3,17 @@ import { Pipette, Check, Sparkles, Zap, RefreshCw, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { DotLottiePlayer } from '@dotlottie/react-player';
 
-const accent = localStorage.getItem('topBarColor') || '#0388cc';
+const accent = localStorage.getItem('topBarColor') || '#0ea5e9';
 
 const ChangeBackgroundBoard = ({ isOpen, onClose, currentTopBarColor, onColorSelect }) => {
-    const [selectedColor, setSelectedColor] = useState(currentTopBarColor || '#0078d4');
+    const defaultColor = '#0ea5e9';
+    const [selectedColor, setSelectedColor] = useState(currentTopBarColor || defaultColor);
     const canvasRef = useRef(null);
     const [isDragging, setIsDragging] = useState(false);
 
     useEffect(() => {
         if (isOpen) {
-            setSelectedColor(currentTopBarColor);
+            setSelectedColor(currentTopBarColor || defaultColor);
             drawColorWheel();
         }
     }, [isOpen, currentTopBarColor]);
@@ -32,6 +33,8 @@ const ChangeBackgroundBoard = ({ isOpen, onClose, currentTopBarColor, onColorSel
         const width = canvas.width;
         const height = canvas.height;
         const radius = width / 2;
+
+        ctx.clearRect(0, 0, width, height);
 
         for (let y = 0; y < height; y++) {
             for (let x = 0; x < width; x++) {
@@ -69,11 +72,12 @@ const ChangeBackgroundBoard = ({ isOpen, onClose, currentTopBarColor, onColorSel
     };
 
     const handleApply = () => {
-        onColorSelect(selectedColor);
+        const colorToApply = selectedColor || defaultColor;
+        onColorSelect(colorToApply);
 
         toast.custom((t) => (
             <div className={`${t.visible ? 'animate-in slide-in-from-right-10 fade-in duration-500' : 'animate-out slide-out-to-right-10 fade-out duration-300'}
-                max-w-[320px] w-full bg-white/90 backdrop-blur-3xl border border-white/20 shadow-2xl rounded-[5px] flex flex-col pointer-events-auto overflow-hidden`}>
+                max-w-[320px] w-full bg-white/90 backdrop-blur-3xl border border-white/20 shadow-2xl rounded-sm flex flex-col pointer-events-auto overflow-hidden`}>
                 <div className="px-4 py-2 flex items-center gap-3">
                     <div className="w-12 h-12 shrink-0">
                         <DotLottiePlayer
@@ -83,14 +87,14 @@ const ChangeBackgroundBoard = ({ isOpen, onClose, currentTopBarColor, onColorSel
                         />
                     </div>
                     <div className="flex-grow text-left">
-                        <h3 className="text-slate-800 text-[12px] font-bold tracking-wider uppercase font-tahoma truncate">Theme Updated</h3>
+                        <h3 className="text-slate-800 text-[12px] font-bold tracking-wider uppercase font-mono truncate">Theme Updated</h3>
                         <div className="flex items-center gap-1.5 mt-0.5">
                             <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.3)]" />
-                            <span className="text-emerald-600 text-[8px] font-mono font-bold tracking-widest uppercase">Applied Successfully</span>
+                            <span className="text-emerald-600 text-[10px] font-medium">Applied Successfully</span>
                         </div>
                     </div>
-                    <button onClick={() => toast.dismiss(t.id)} className="text-slate-300 hover:text-slate-500 transition-colors">
-                        <X size={28} />
+                    <button onClick={() => toast.dismiss(t.id)} className="text-slate-400 hover:text-slate-600 transition-colors">
+                        <X size={20} />
                     </button>
                 </div>
                 <div className="h-[2px] w-full bg-emerald-50">
@@ -108,105 +112,95 @@ const ChangeBackgroundBoard = ({ isOpen, onClose, currentTopBarColor, onColorSel
         onClose();
     };
 
+    const safeSelectedColor = selectedColor || defaultColor;
+
     return (
-        <div className="fixed inset-0 z-[300] flex items-center justify-center p-4">
-            <div className="absolute inset-0 bg-slate-900/30 backdrop-blur-sm" onClick={onClose} />
+        <div className="fixed inset-0 z-[600] flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={onClose} />
 
- <div className="relative w-full max-w-[420px] bg-white rounded-sm shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 flex flex-col max-h-[90vh]">
-                <div className="absolute left-0 top-0 bottom-0 w-[4px]" style={{ backgroundColor: accent }} />
+            <div className="relative w-full max-w-[420px] bg-white rounded-sm shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col max-h-[90vh]">
 
-                <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-white">
-                    <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-xl bg-[#4f83ff]/10 flex items-center justify-center">
-                            <Sparkles size={16} className="text-[#4f83ff]" />
-                        </div>
-                        <div>
-                            <h2 className="text-[15px] font-black uppercase tracking-[0.25em] text-slate-900 leading-tight">Theme Configuration</h2>
-                            <p className="text-[10px] text-slate-400 font-medium tracking-wider">Color Customization</p>
-                        </div>
-                    </div>
-                    <button onClick={onClose} className="w-9 h-9 rounded-xl bg-red-50 hover:bg-red-100 flex items-center justify-center transition-all active:scale-90">
-                        <X size={28} strokeWidth={1.5} className="text-red-600" />
-                    </button>
-                </div>
 
-                <div className="flex-1 overflow-y-auto custom-scrollbar p-6">
-                    <div className="space-y-8 select-none py-4">
+                <div className="flex-1 overflow-y-auto custom-scrollbar p-6 bg-slate-50/50">
+                    <div className="space-y-6 select-none">
+                        
+                        {/* Color Picker Canvas */}
                         <div className="flex flex-col items-center">
-                            <div className="relative p-2 bg-slate-50 rounded-full border border-slate-100 shadow-inner">
+                            <div className="relative p-2 bg-white rounded-full border border-slate-200 shadow-sm">
                                 <canvas
                                     ref={canvasRef}
                                     width={220}
                                     height={220}
-                                    className="rounded-full shadow-lg cursor-crosshair active:scale-[0.98] transition-transform"
+                                    className="rounded-full shadow-inner cursor-crosshair active:scale-[0.98] transition-transform"
                                     onMouseDown={(e) => { setIsDragging(true); handleCanvasInteraction(e); }}
                                     onMouseMove={(e) => { if (isDragging) handleCanvasInteraction(e); }}
                                     onMouseUp={() => setIsDragging(false)}
                                     onMouseLeave={() => setIsDragging(false)}
                                 />
                                 <div
-                                    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 rounded-full border-4 border-white shadow-xl pointer-events-none"
-                                    style={{ backgroundColor: selectedColor }}
+                                    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 rounded-full border-[3px] border-white shadow-md pointer-events-none transition-colors duration-200"
+                                    style={{ backgroundColor: safeSelectedColor }}
                                 />
                             </div>
-                            <p className="mt-4 text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Click or Drag to Select Color</p>
+                            <p className="mt-4 text-xs font-medium text-slate-500">Click or Drag to select a color</p>
                         </div>
 
-                        <div className="space-y-4 px-6">
+                        {/* Selected Color Info */}
+                        <div className="bg-white p-4 rounded-lg border border-slate-200 shadow-sm space-y-4">
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-xl shadow-md border-2 border-white ring-1 ring-slate-100 transition-colors duration-500" style={{ backgroundColor: selectedColor }} />
+                                    <div className="w-12 h-12 rounded-lg shadow-inner border border-slate-200 transition-colors duration-200" style={{ backgroundColor: safeSelectedColor }} />
                                     <div>
-                                        <h4 className="text-[12px] font-black text-slate-700 uppercase tracking-tight">Active Pigment</h4>
-                                        <p className="text-[11px] font-mono font-bold text-slate-400">{selectedColor.toUpperCase()}</p>
+                                        <h4 className="text-sm font-semibold text-slate-800">Active Color</h4>
+                                        <p className="text-xs font-mono text-slate-500 mt-0.5">{safeSelectedColor.toUpperCase()}</p>
                                     </div>
                                 </div>
 
-                                <div className="flex items-center gap-2">
-                                    <div className="relative">
-                                        <input
-                                            type="text"
-                                            value={selectedColor.toUpperCase()}
-                                            onChange={(e) => {
-                                                setSelectedColor(e.target.value);
-                                            }}
-                                            className="w-28 h-8 px-3 border border-slate-200 rounded text-[12px] font-bold text-slate-700 bg-white outline-none focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 transition-all shadow-sm placeholder:text-slate-300 tabular-nums"
-                                            placeholder="#000000"
-                                        />
-                                        <div className="absolute -top-2.5 left-2 bg-white px-1.5 text-[9px] font-black text-slate-400 tracking-widest uppercase">Hex Code</div>
-                                    </div>
-                                    <button
-                                        onClick={() => {
-                                            setSelectedColor(currentTopBarColor);
-                                        }}
-                                        className="w-9 h-9 bg-slate-50 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-all flex items-center justify-center group"
-                                        title="Reset to Current"
-                                    >
-                                        <RefreshCw size={16} className="group-active:rotate-180 transition-transform duration-500" />
-                                    </button>
-                                </div>
+                                <button
+                                    onClick={() => setSelectedColor(currentTopBarColor || defaultColor)}
+                                    className="w-9 h-9 bg-slate-50 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-all flex items-center justify-center border border-slate-200 shadow-sm"
+                                    title="Reset to Current"
+                                >
+                                    <RefreshCw size={16} />
+                                </button>
                             </div>
 
-                            <div className="bg-blue-50/50 p-4 rounded-xl flex items-start gap-3 border border-blue-100/30">
-                                <p className="text-[11px] font-bold text-blue-600/70 leading-relaxed uppercase tracking-tighter">
-                                    Select a professional tone. <span className="text-blue-400 font-medium">Applied colors will update the dashboard ribbon immediately upon clicking 'Apply Theme'.</span>
-                                </p>
+                            <div className="pt-2 border-t border-slate-100">
+                                <label className="text-xs font-medium text-slate-600 block mb-1.5">Hex Code</label>
+                                <input
+                                    type="text"
+                                    value={safeSelectedColor.toUpperCase()}
+                                    onChange={(e) => setSelectedColor(e.target.value)}
+                                    className="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 transition-all font-mono"
+                                    placeholder="#0EA5E9"
+                                />
                             </div>
+                        </div>
+
+                        <div className="bg-blue-50 p-3.5 rounded-lg border border-blue-100 flex items-start gap-2.5">
+                            <Sparkles size={16} className="text-blue-500 shrink-0 mt-0.5" />
+                            <p className="text-xs text-blue-700 leading-relaxed">
+                                The top ribbon color of the dashboard will instantly update to your selection.
+                            </p>
                         </div>
                     </div>
                 </div>
 
-                <div className="bg-slate-50 border-t border-slate-200 flex items-center justify-between shrink-0 px-6 py-4 rounded-b-[5px]">
-                    <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Theme Settings</span>
+                {/* Footer matching standard web style */}
+                <div className="bg-white border-t border-slate-200 flex items-center justify-end gap-3 px-6 py-4 rounded-b-sm">
+                    <button
+                        onClick={onClose}
+                        className="px-5 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-300 hover:bg-slate-50 rounded-sm transition-colors"
+                    >
+                        Cancel
+                    </button>
                     <button
                         onClick={handleApply}
-                        className="px-8 h-10 text-white font-mono font-bold text-[13px] uppercase tracking-widest rounded-[5px] shadow-md transition-all active:scale-95 flex items-center gap-2 border-none"
-                        style={{
-                            backgroundColor: selectedColor,
-                            boxShadow: `0 8px 20px -6px ${selectedColor}66`
-                        }}
+                        className="px-6 py-2 text-sm font-medium text-white rounded-sm shadow-sm transition-all flex items-center gap-2 border-none hover:opacity-90 active:scale-95"
+                        style={{ backgroundColor: safeSelectedColor }}
                     >
-                        <Check size={14} strokeWidth={3} /> APPLY THEME
+                        <Check size={16} strokeWidth={2.5} />
+                        Apply Theme
                     </button>
                 </div>
             </div>

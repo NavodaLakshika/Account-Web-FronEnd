@@ -1,15 +1,13 @@
 import React, { useState } from 'react';
 import {
     X, Search, Layout, Bell, Send, Mail, FileText,
-    Calculator, Printer, File, Briefcase, Sidebar, Image, Notebook,
-    ListChecks
+    Calculator, Printer, File, Briefcase, Sidebar, Image, Notebook
 } from 'lucide-react';
 import LetterEnvelopesModal from './LetterEnvelopesModal';
 import OfficeDocumentModal from './OfficeDocumentModal';
 import ToDoListBoard from './ViewAndUtilityModels/ToDoListBoard';
 import SendFileBoard from './ViewAndUtilityModels/SendFileBoard';
 import FindBoard from './ViewAndUtilityModels/FindBoard';
-import DocumentSearchModal from './ViewAndUtilityModels/DocumentSearchModal';
 import CustomizeIconBarBoard from './ViewAndUtilityModels/CustomizeIconBarBoard';
 import ChangeBackgroundBoard from './ViewAndUtilityModels/ChangeBackgroundBoard';
 
@@ -42,16 +40,9 @@ const menuGroups = [
         title: 'Search & Print',
         items: [
             { icon: Search, label: 'Find', desc: 'Simple document search tool', board: 'find' },
-            { icon: ListChecks, label: 'Search', desc: 'Advanced document search utility', board: 'search' },
             { icon: Printer, label: 'Printer Setup', desc: 'Configure print settings', board: 'printer' },
         ]
     },
-    {
-        title: 'Correspondence',
-        items: [
-            { icon: Briefcase, label: 'Prepare Letter with Envelopes', desc: 'Create letters with envelopes', board: 'letterEnvelopes' },
-        ]
-    }
 ];
 
 const ViewUtilityModal = ({ isOpen, onClose, onToggleSideBar, onOpenCalculator, onOpenNotepad, onOpenPrinter, currentTopBarColor, onColorSelect }) => {
@@ -61,7 +52,6 @@ const ViewUtilityModal = ({ isOpen, onClose, onToggleSideBar, onOpenCalculator, 
     const [showOfficeDocumentModal, setShowOfficeDocumentModal] = useState(false);
     const [showToDoListBoard, setShowToDoListBoard] = useState(false);
     const [showSendFileBoard, setShowSendFileBoard] = useState(false);
-    const [showDocumentSearchModal, setShowDocumentSearchModal] = useState(false);
     const [showFindBoard, setShowFindBoard] = useState(false);
     const [showCalculatorBoard, setShowCalculatorBoard] = useState(false);
     const [showCustomizeIconBarBoard, setShowCustomizeIconBarBoard] = useState(false);
@@ -92,7 +82,6 @@ const ViewUtilityModal = ({ isOpen, onClose, onToggleSideBar, onOpenCalculator, 
             case 'notepad': onOpenNotepad(); onClose(); break;
             case 'calculator': onOpenCalculator(); onClose(); break;
             case 'find': setShowFindBoard(true); break;
-            case 'search': setShowDocumentSearchModal(true); break;
             case 'printer': onOpenPrinter(); onClose(); break;
             case 'letterEnvelopes': setShowLetterEnvelopesModal(true); break;
         }
@@ -217,12 +206,6 @@ const ViewUtilityModal = ({ isOpen, onClose, onToggleSideBar, onOpenCalculator, 
                 <FindBoard
                     isOpen={showFindBoard}
                     onClose={() => setShowFindBoard(false)}
-                />
-            )}
-            {showDocumentSearchModal && (
-                <DocumentSearchModal
-                    isOpen={showDocumentSearchModal}
-                    onClose={() => setShowDocumentSearchModal(false)}
                 />
             )}
             {showCustomizeIconBarBoard && (

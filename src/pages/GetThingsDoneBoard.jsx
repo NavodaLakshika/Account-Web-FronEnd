@@ -51,11 +51,14 @@ import {
   PenTool,
   Megaphone,
   Truck,
+  Bot,
 } from 'lucide-react';
 import { expensesService } from '../services/expenses.service';
 import { biDashboardService } from '../services/biDashboard.service';
 import { supplierService } from '../services/supplier.service';
 import { getSessionData } from '../utils/session';
+import { DotLottiePlayer } from '@dotlottie/react-player';
+import '@dotlottie/react-player/dist/index.css';
 
 
 
@@ -467,7 +470,7 @@ const VideoTutorialsModal = ({ isOpen, initialVideoId, onClose }) => {
   const activeVideo = TUTORIAL_VIDEOS.find(v => v.id === activeId) || TUTORIAL_VIDEOS[0];
 
   return (
-    <div className="fixed inset-0 z-[10005] flex items-center justify-center bg-black/90 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-[10005] flex items-center justify-center bg-black/90 backdrop-blur-sm p-4 animate-in fade-in duration-200 ">
       <button
         onClick={onClose}
         className="absolute top-4 right-4 sm:top-6 sm:right-6 text-white/70 hover:text-white transition-colors z-20 bg-black/40 hover:bg-black/80 rounded-full p-2"
@@ -670,9 +673,12 @@ const WidgetShell = ({ title, subtitle, children, footerButtonLabel, onFooterBut
         <button
           type="button"
           onClick={onFooterButton}
-          className="w-full h-8 rounded-xl border border-slate-100 bg-slate-50/50 text-[11px] font-bold text-slate-650 hover:bg-slate-100 hover:text-slate-805 hover:border-slate-200 transition-all"
+          className="relative w-full h-8 rounded-xl border border-slate-200 bg-slate-50/50 text-[11px] font-bold text-slate-650 overflow-hidden transition-all duration-300 hover:border-blue-300 hover:bg-blue-50/50 hover:text-blue-600 hover:shadow-[0_4px_12px_rgba(59,130,246,0.15)] hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] group"
         >
-          {footerButtonLabel}
+          <span className="relative z-10 flex items-center justify-center">
+            <span className="transition-transform duration-300 group-hover:-translate-x-1">{footerButtonLabel}</span>
+            <span className="absolute right-1/2 translate-x-[110%] opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-[120%] transition-all duration-300 text-blue-500">→</span>
+          </span>
         </button>
       </div>
     )}
@@ -924,7 +930,28 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
   if (!isOpen) return null;
 
   const totalSpend = expenseData.totalExpenses || 0;
-  const categories = expenseData.categoryBreakdown || [];
+
+  const rawCategories = expenseData.categoryBreakdown || [];
+  const derivedCategories = (expenseData.recentTransactions || []).reduce((acc, tx) => {
+    const name = tx.payee || tx.type || 'Other';
+    const val = Number(tx.total || 0);
+    if (val <= 0) return acc;
+    const existing = acc.find(c => c.name === name);
+    if (existing) {
+      existing.amount += val;
+    } else {
+      acc.push({ name, amount: val });
+    }
+    return acc;
+  }, []).sort((a, b) => b.amount - a.amount);
+  const derivedTotal = derivedCategories.reduce((s, c) => s + c.amount, 0);
+
+  const categories = rawCategories.length > 0
+    ? rawCategories
+    : derivedCategories.map(c => ({
+      name: c.name,
+      percentage: derivedTotal > 0 ? (c.amount / derivedTotal) * 100 : 0
+    }));
 
   // Compute monthly expense totals from real transactions for Cash Flow
   const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -1009,6 +1036,14 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
 
             {/* Right: utilities + close */}
             <div className="flex items-center gap-0.5 sm:gap-1 shrink-0">
+              <button
+                type="button"
+                onClick={() => runAction('header_subscribe')}
+                className="hidden sm:flex items-center justify-center h-7 px-3.5 rounded-full bg-[#0078d4] text-white text-[11px] font-bold hover:bg-[#005a9e] shadow-sm hover:shadow-[0_2px_8px_rgba(0,120,212,0.3)] transition-all mr-1 group overflow-hidden relative"
+              >
+                <span className="relative z-10">Subscribe now</span>
+                <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
+              </button>
               <HeaderIconBtn label="Tasks" onClick={() => runAction('header_tasks')}>
                 <ClipboardList size={18} strokeWidth={2} className="text-slate-650" />
               </HeaderIconBtn>
@@ -1043,8 +1078,15 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
       <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden">
         <div className="w-full max-w-[min(2050px,100%)] mx-auto px-2.5 sm:px-5 lg:px-7 pb-4">
           {/* Greeting + utilities */}
-          <div className="relative py-3 sm:py-4.5 w-full">
-            <div className="flex justify-end items-center gap-3 sm:gap-4 text-[12px] sm:text-[13px] font-bold text-slate-605 w-full">
+          <div className="border-b border-slate-200 pb-2 mb-4 mt-4 flex flex-wrap items-center justify-between gap-y-3 w-full">
+            <div className="flex items-center gap-4 flex-wrap">
+              <h2 className="text-[16px] sm:text-[18px] font-extrabold uppercase tracking-widest text-slate-400">
+                {displayedCompanyText || 'BUSINESS AT A GLANCE'}
+                <span className="animate-[pulse_1s_ease-in-out_infinite] opacity-70 font-light ml-1">_</span>
+              </h2>
+            </div>
+
+            <div className="flex justify-end items-center gap-5 sm:gap-8 text-[12px] sm:text-[13px] font-bold text-slate-605">
               {isCustomising ? (
                 <>
                   <button
@@ -1070,15 +1112,15 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
                 <>
                   <button
                     type="button"
-                    className="flex items-center gap-1.5 hover:text-blue-600 transition-colors mr-2 mt-6"
+                    className="flex items-center gap-1.5 hover:text-blue-600 transition-colors mr-2"
                     onClick={onClose}
                   >
-                    <ChevronLeft size={15} className="text-slate-400" />
-                    <span className="hidden sm:inline">Back to Dashboard</span>
+                    <ChevronLeft size={15} className="text-red-500" />
+                    <span className="hidden sm:inline text-red-500">Back to Dashboard</span>
                   </button>
                   <button
                     type="button"
-                    className="flex items-center gap-1.5 hover:text-blue-600 transition-colors mt-6"
+                    className="flex items-center gap-1.5 hover:text-blue-600 transition-colors"
                     onClick={() => setVideoOpen('get_started')}
                   >
                     <PlayCircle size={15} className="text-slate-400" />
@@ -1086,13 +1128,13 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
                   </button>
                   <button
                     type="button"
-                    className="flex items-center gap-1.5 hover:text-blue-600 transition-colors mt-6"
+                    className="flex items-center gap-1.5 hover:text-blue-600 transition-colors"
                     onClick={() => setIsCustomising(true)}
                   >
                     <SlidersHorizontal size={15} className="text-slate-400 " />
                     <span className="hidden sm:inline">Customise</span>
                   </button>
-                  <div className="relative group flex items-center mt-6">
+                  <div className="relative group flex items-center">
                     <button
                       type="button"
                       onClick={() => setIsPrivacyMode(!isPrivacyMode)}
@@ -1100,6 +1142,34 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
                     >
                       {isPrivacyMode ? <EyeOff size={15} className="text-slate-400" /> : <Eye size={15} className="text-slate-400" />}
                       <span className="hidden sm:inline">Privacy</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => onAction && onAction('header_ai')}
+                      className="relative flex items-center justify-center group cursor-pointer transition-transform hover:scale-[1.02] ml-8"
+                      title="AI Assistant"
+                    >
+                      {/* Animated Gradient Border */}
+                      <div className="rounded-full p-[2px] bg-gradient-to-tr from-[#3b82f6] via-[#8b5cf6] to-[#06b6d4] bg-[length:200%_200%] animate-[gradient_3s_ease_infinite] shadow-[0_0_10px_rgba(59,130,246,0.2)] group-hover:shadow-[0_0_15px_rgba(59,130,246,0.4)] transition-shadow">
+                        <div className="h-[32px] px-3.5 bg-white rounded-full flex items-center overflow-hidden relative">
+                          {/* Inner glowing pulse */}
+                          <div className="absolute inset-0 bg-blue-50/50 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+
+                          {/* Custom AI Asterisk animated */}
+                          <div className="relative flex items-center justify-center w-[18px] h-[18px] group-hover:rotate-180 transition-transform duration-1000 ease-[cubic-bezier(0.34,1.56,0.64,1)] shrink-0">
+                            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[3px] h-full bg-gradient-to-b from-[#3b82f6] to-[#1e1b4b] rounded-full"></div>
+                            <div className="absolute top-1/2 left-0 -translate-y-1/2 w-full h-[3px] bg-gradient-to-r from-[#60a5fa] to-[#4338ca] rounded-full"></div>
+                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-[3px] bg-gradient-to-r from-[#93c5fd] to-[#312e81] rounded-full rotate-45"></div>
+                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-[3px] bg-gradient-to-r from-[#bfdbfe] to-[#3730a3] rounded-full -rotate-45"></div>
+                          </div>
+
+                          {/* Animated Shimmering Text */}
+                          <div className="ml-2.5 whitespace-nowrap text-[13.5px] font-medium tracking-tight w-[130px] flex items-center h-full">
+                            <AITypingText />
+                          </div>
+                        </div>
+                      </div>
                     </button>
 
                     {isPrivacyMode && (
@@ -1114,14 +1184,6 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
                 </>
               )}
             </div>
-          </div>
-
-
-          <div className="border-b border-slate-200 pb-1.5 mb-3 flex flex-wrap items-center justify-between gap-y-3 mt-4">
-            <h2 className="text-[16px] sm:text-[18px] font-extrabold uppercase tracking-widest text-slate-400 min-h-[22px]">
-              {displayedCompanyText || 'BUSINESS AT A GLANCE'}
-              <span className="animate-[pulse_1s_ease-in-out_infinite] opacity-70 font-light ml-1">_</span>
-            </h2>
           </div>
 
           {isCustomising && (
@@ -1156,9 +1218,20 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
           )}
 
           {loading && (
-            <div className="flex items-center justify-center gap-2 py-4 text-[#6b6c72] mb-2">
-              <Loader2 size={18} className="animate-spin text-[#0078d4]" />
-              <span className="text-[13px] font-semibold">Loading your data…</span>
+            // <div className="fixed inset-0 z-[10010] flex items-center justify-center bg-slate-900/10 backdrop-blur-sm">
+            //   <div className="bg-white px-8 py-5 rounded-2xl shadow-2xl border border-slate-100 flex flex-col items-center gap-3">
+            //     <Loader2 size={32} className="animate-spin text-[#0078d4]" />
+            //     <span className="text-[14px] font-extrabold text-slate-800 tracking-tight">Loading your data...</span>
+            //   </div>
+            // </div>
+            <div className="fixed inset-0 z-[10010] flex items-center justify-center bg-slate-900/10 backdrop-blur-sm">
+              <div className="w-40 h-40">
+                <DotLottiePlayer
+                  src="/lottiefile/DashboardLoader.lottie"
+                  autoplay
+                  loop
+                />
+              </div>
             </div>
           )}
 
@@ -1198,8 +1271,8 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
                     >
                       <div className="flex flex-col justify-center h-full gap-4.5 py-1 mt-1">
                         {[
-                          { label: 'Income', val: totalIncome, gradient: 'from-green-500 to-emerald-600' },
-                          { label: 'Expenses', val: totalSpend, gradient: 'from-sky-500 to-cyan-550' },
+                          { label: 'Income', val: totalIncome, gradient: 'bg-gradient-to-r from-[#10b981] to-[#34d399] shadow-sm' },
+                          { label: 'Expenses', val: totalSpend, gradient: 'bg-gradient-to-r from-[#60a5fa] to-[#38bdf8] shadow-sm' },
                         ].map((bar, idx) => {
                           const max = Math.max(totalIncome, totalSpend, 1);
                           const hasData = bar.val > 0;
@@ -1211,10 +1284,10 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
                               </div>
                               <div className="flex items-center gap-3">
                                 <div className="text-[12px] font-semibold text-slate-500 w-[60px] shrink-0">{bar.label}</div>
-                                <div className="flex-1 bg-slate-100 h-3 rounded-full overflow-hidden">
+                                <div className="flex-1 bg-slate-100 h-3  overflow-hidden">
                                   {hasData ? (
                                     <div
-                                      className={`h-full transition-all duration-1000 ease-out rounded-full bg-gradient-to-r ${bar.gradient}`}
+                                      className={`h-full transition-all duration-1000 ease-out  ${bar.gradient}`}
                                       style={{ width: `${wPct}%` }}
                                     />
                                   ) : (
@@ -1270,7 +1343,7 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
                                   .slice(0, 5)
                                   .reduce(
                                     (acc, cat, i) => {
-                                      const colors = ['#3478c1', '#39a29e', '#68358e', '#b4190c', '#e86016'];
+                                      const colors = ['#60a5fa', '#a78bfa', '#10b981', '#f59e0b', '#ec4899'];
                                       const start = acc.offset;
                                       const pct = Math.min(100, Math.max(0, Number(cat.percentage) || 0));
                                       acc.offset += pct;
@@ -1294,7 +1367,7 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
                                     <span
                                       className="w-2.5 h-2.5 rounded-full shrink-0"
                                       style={{
-                                        backgroundColor: ['#3478c1', '#39a29e', '#68358e', '#b4190c', '#e86016'][i % 5],
+                                        backgroundColor: ['#60a5fa', '#a78bfa', '#10b981', '#f59e0b', '#ec4899'][i % 5],
                                       }}
                                     />
                                     <span className="truncate flex-1 text-slate-650 font-bold text-[12px]">
@@ -1340,53 +1413,22 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
                     className="h-full"
                     onRemove={() => setSelectedWidgets(prev => ({ ...prev, add_widgets: false }))}
                   >
-                    <div className="bg-white border border-dashed border-[#babec5] rounded-lg min-h-[240px] flex flex-col h-full overflow-hidden">
-                      {/* Top: Add widgets */}
-                      <div className="flex flex-col items-center justify-center pt-6 pb-5 px-5 mt-2">
-                        <span className="text-[14px] font-bold text-[#393a3d] mb-3">Add widgets</span>
-                        <button
-                          type="button"
-                          onClick={() => setIsAddWidgetsOpen(true)}
-                          className="w-9 h-9 rounded-full border border-[#d4d7dc] bg-white flex items-center justify-center text-[#6b6c72] hover:border-[#0078d4] hover:text-[#0078d4] transition-all shadow-sm"
-                        >
-                          <Plus size={18} strokeWidth={1.8} />
-                        </button>
+                    <div 
+                      className="bg-[#f8fafc] rounded-lg min-h-[240px] flex flex-col items-center justify-center h-full overflow-hidden cursor-pointer hover:bg-blue-50/50 transition-colors"
+                      onClick={() => setIsAddWidgetsOpen(true)}
+                      style={{
+                        backgroundImage: `url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' rx='8' ry='8' stroke='%230078d4' stroke-width='1.5' stroke-dasharray='6%2c 10' stroke-dashoffset='0' stroke-linecap='square'/%3e%3c/svg%3e")`,
+                      }}
+                    >
+                      <span className="text-[15px] font-bold text-[#0078d4] mb-6">View Widgets</span>
+                      
+                      <div className="w-14 h-14 rounded-full border border-dashed border-[#0078d4]/40 bg-[#0078d4]/5 flex items-center justify-center mb-6 relative">
+                        <LayoutGrid size={22} className="text-[#0078d4]" strokeWidth={1.8} />
                       </div>
-                      {/* Divider */}
-                      <div className="w-full h-px bg-[#eceef1] mt-2" />
-                      <div className="text-center flex-1 flex flex-col items-center mt-5">
-                        {unselectedWidgets.length > 0 ? (
-                          <>
-                            <p className="text-[11px] font-bold text-[#393a3d] mb-3 flex items-center justify-center gap-1.5">
-                              <Sparkles size={12} className="text-[#6b6c72]" /> Smart suggestions
-                            </p>
-                            <div className="flex flex-wrap gap-2 justify-center mb-3">
-                              {unselectedWidgets.map(w => (
-                                <button
-                                  key={w.id}
-                                  type="button"
-                                  onClick={() => setSelectedWidgets(prev => ({ ...prev, [w.id]: true }))}
-                                  className="px-4 py-1.5 rounded-full border border-[#d4d7dc] bg-white text-[11px] font-bold text-[#393a3d] hover:bg-[#f4f5f8]"
-                                >
-                                  {w.label}
-                                </button>
-                              ))}
-                            </div>
-                            <button
-                              type="button"
-                              onClick={() => setIsSmartSuggestionsHelpOpen(true)}
-                              className="text-[10px] text-[#6b6c72] hover:underline inline-flex items-center justify-center gap-1 mt-1"
-                            >
-                              <HelpCircle size={12} />
-                              Why am I seeing these suggestions?
-                            </button>
-                          </>
-                        ) : (
-                          <div className="flex flex-col items-center justify-center h-full gap-2 opacity-60 mt-4">
-                            <Sparkles size={16} className="text-[#0078d4]" />
-                            <span className="text-[11px] font-bold text-[#393a3d]">Your dashboard is fully loaded!</span>
-                          </div>
-                        )}
+
+                      <div className="flex items-center gap-2 text-[#4096ff] hover:text-[#0078d4] transition-colors">
+                        <Eye size={15} strokeWidth={2.5} />
+                        <span className="text-[13px] font-bold">Browse dashboards</span>
                       </div>
                     </div>
                   </EditWrapper>
@@ -1497,8 +1539,8 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
                           <div className="absolute top-0 bottom-[22px] left-0 right-0 flex justify-between px-1">
                             {monthlyData.map((d) => (
                               <div key={d.m} className="flex gap-[2px] items-end flex-1 justify-center relative group cursor-pointer hover:bg-slate-100 rounded-t-lg transition-all duration-200" title={`${d.m}: LKR ${formatShortK(monthlyExpenses[MONTHS.indexOf(d.m)])}`}>
-                                <div className={`w-[11px] rounded-full transition-all duration-500 ${d.hasData ? 'bg-gradient-to-t from-emerald-600 to-green-450' : 'bg-slate-200'}`} style={{ height: `${d.h1}%` }} />
-                                <div className={`w-[11px] rounded-full transition-all duration-500 ${d.hasData ? 'bg-gradient-to-t from-blue-655 to-cyan-455' : 'bg-slate-300'}`} style={{ height: `${d.h2}%` }} />
+                                <div className={`w-[11px] rounded-t-sm transition-all duration-500 ${d.hasData ? 'bg-gradient-to-t from-[#10b981] to-[#34d399] shadow-[0_2px_4px_rgba(16,185,129,0.3)]' : 'bg-slate-200'}`} style={{ height: `${d.h1}%` }} />
+                                <div className={`w-[11px] rounded-t-sm transition-all duration-500 ${d.hasData ? 'bg-gradient-to-t from-[#60a5fa] to-[#38bdf8] shadow-[0_2px_4px_rgba(96,165,250,0.3)]' : 'bg-slate-300'}`} style={{ height: `${d.h2}%` }} />
                               </div>
                             ))}
                           </div>
@@ -1532,10 +1574,10 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
                       onHide={() => setWidgetToHide('inventory_reports')}
                     >
                       <div className="space-y-2 mt-2">
-                        {['Inventory valuation summary', 'Inventory valuation detail', 'Stock take worksheet', 'Products and services list', 'Sales by products - Summary', 'Open sales order by item', 'Open sales order by customer'].map(r => (
+                        {['Inventory Valuation Detail', 'Inventory Valuation Summary', 'Open Purchase Order Detail', 'Open Purchase Order List', 'Stock Take Worksheet'].map(r => (
                           <div key={r} className="flex justify-between items-center border-b border-[#eceef1] pb-1.5 last:border-0">
                             <span className="text-[12px] text-[#393a3d] truncate pr-2">{r}</span>
-                            <button onClick={() => runAction('reports')} className="text-[#0078d4] text-[12px] font-bold hover:underline shrink-0">View</button>
+                            <button onClick={() => runAction(`open_report:${r}`)} className="text-[#0078d4] text-[12px] font-bold hover:underline shrink-0">View</button>
                           </div>
                         ))}
                       </div>
@@ -2030,6 +2072,43 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
         </div>
       )}
     </div>
+  );
+};
+
+const AITypingText = () => {
+  const [text, setText] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [loopNum, setLoopNum] = useState(0);
+  const [typingSpeed, setTypingSpeed] = useState(100);
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const messages = ['Or, ask me anything', 'Generate a report', 'Search transactions', 'Analyze my expenses'];
+
+  useEffect(() => {
+    let timer = setTimeout(() => {
+      const i = loopNum % messages.length;
+      const fullText = messages[i];
+
+      setText(isDeleting ? fullText.substring(0, text.length - 1) : fullText.substring(0, text.length + 1));
+
+      setTypingSpeed(isDeleting ? 30 : 100);
+
+      if (!isDeleting && text === fullText) {
+        setTimeout(() => setIsDeleting(true), 2000);
+      } else if (isDeleting && text === '') {
+        setIsDeleting(false);
+        setLoopNum(loopNum + 1);
+      }
+    }, typingSpeed);
+
+    return () => clearTimeout(timer);
+  }, [text, isDeleting, loopNum, typingSpeed, messages]);
+
+  return (
+    <span className="inline-block bg-clip-text text-transparent bg-gradient-to-r from-slate-600 via-blue-500 to-slate-600 bg-[length:200%_auto] animate-[gradient_3s_linear_infinite]">
+      {text}
+      <span className="animate-pulse text-blue-500 border-r-2 border-blue-500 ml-[1px]"></span>
+    </span>
   );
 };
 

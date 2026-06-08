@@ -101,12 +101,12 @@ const CompanyOverviewBoard = ({ company, onClose, onTransactionDeleted }) => {
                     { title: 'Avg. Transaction', value: `Rs ${avgValue.toLocaleString(undefined, {minimumFractionDigits: 2})}`, icon: TrendingUp, color: 'text-orange-500', bg: 'bg-orange-500/10' },
                     { title: 'Active Users', value: 'N/A', icon: Users, color: 'text-purple-500', bg: 'bg-purple-500/10' },
                 ].map((stat, i) => (
- <div key={i} className="bg-white p-5 rounded-sm shadow-sm hover:border-slate-200 transition-all group">
+ <div key={i} className="bg-white p-5  shadow-sm hover:border-slate-200 rounded-[12px] transition-all group">
                         <div className="flex items-center justify-between mb-4">
-                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${stat.bg} ${stat.color} group-hover:scale-110 transition-transform`}>
+                            <div className={`w-10 h-10  flex items-center justify-center ${stat.bg} ${stat.color} group-hover:scale-110 transition-transform`}>
                                 <stat.icon size={20} />
                             </div>
-                            <span className="text-xs font-bold text-emerald-500 bg-emerald-50 px-2 py-1 rounded-full flex items-center gap-1">
+                            <span className="text-xs font-bold text-emerald-500 bg-emerald-50 px-2 py-1  flex items-center gap-1">
                                 <ArrowUpRight size={12} /> +12%
                             </span>
                         </div>
@@ -117,12 +117,12 @@ const CompanyOverviewBoard = ({ company, onClose, onTransactionDeleted }) => {
             </div>
 
             {/* Company Details */}
- <div className="bg-white rounded-sm shadow-sm p-6">
+ <div className="bg-white  shadow-sm p-6">
                 <h3 className="text-sm font-bold tracking-widest uppercase text-slate-400 mb-6">Company Profile</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div className="space-y-4">
                         <div className="flex items-start gap-4">
-                            <div className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center shrink-0">
+                            <div className="w-10 h-10  bg-slate-50 flex items-center justify-center shrink-0">
                                 <Building2 className="w-5 h-5 text-slate-400" />
                             </div>
                             <div>
@@ -131,7 +131,7 @@ const CompanyOverviewBoard = ({ company, onClose, onTransactionDeleted }) => {
                             </div>
                         </div>
                         <div className="flex items-start gap-4">
-                            <div className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center shrink-0">
+                            <div className="w-10 h-10  bg-slate-50 flex items-center justify-center shrink-0">
                                 <Mail className="w-5 h-5 text-slate-400" />
                             </div>
                             <div>
@@ -142,7 +142,7 @@ const CompanyOverviewBoard = ({ company, onClose, onTransactionDeleted }) => {
                     </div>
                     <div className="space-y-4">
                         <div className="flex items-start gap-4">
-                            <div className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center shrink-0">
+                            <div className="w-10 h-10  bg-slate-50 flex items-center justify-center shrink-0">
                                 <Phone className="w-5 h-5 text-slate-400" />
                             </div>
                             <div>
@@ -151,7 +151,7 @@ const CompanyOverviewBoard = ({ company, onClose, onTransactionDeleted }) => {
                             </div>
                         </div>
                         <div className="flex items-start gap-4">
-                            <div className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center shrink-0">
+                            <div className="w-10 h-10  bg-slate-50 flex items-center justify-center shrink-0">
                                 <MapPin className="w-5 h-5 text-slate-400" />
                             </div>
                             <div>
@@ -166,7 +166,7 @@ const CompanyOverviewBoard = ({ company, onClose, onTransactionDeleted }) => {
             </div>
 
             {/* Full Company Details */}
- <div className="bg-white rounded-sm shadow-sm p-6 mt-6">
+ <div className="bg-white  shadow-sm p-6 mt-6">
                 <h3 className="text-sm font-bold tracking-widest uppercase text-slate-400 mb-6">Additional Details</h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                     {Object.entries(company).map(([key, value]) => {
@@ -175,7 +175,7 @@ const CompanyOverviewBoard = ({ company, onClose, onTransactionDeleted }) => {
                         if (typeof value === 'object' || typeof value === 'function') return null;
                         
                         return (
-                            <div key={key} className="bg-slate-50 p-4 rounded-xl border border-slate-100 flex flex-col justify-center">
+                            <div key={key} className="bg-slate-50 p-4  border border-slate-100 flex flex-col justify-center">
                                 <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">{key.replace(/_/g, ' ')}</h4>
                                 <p className="text-sm font-bold text-slate-800 break-words">
                                     {value !== null && value !== undefined && value !== '' ? String(value) : <span className="text-slate-300 font-normal italic">Empty</span>}
@@ -190,15 +190,15 @@ const CompanyOverviewBoard = ({ company, onClose, onTransactionDeleted }) => {
 
     const renderSalesDashboard = () => (
         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
- <div className="bg-white p-6 rounded-sm shadow-sm ">
+ <div className="bg-white p-6  shadow-sm ">
                 <div className="flex items-center justify-between mb-8">
                     <div>
                         <h3 className="text-lg font-bold text-slate-900">Revenue Overview</h3>
                         <p className="text-sm text-slate-500">Weekly transaction performance</p>
                     </div>
-                    <div className="flex items-center gap-2 bg-slate-50 p-1 rounded-lg">
+                    <div className="flex items-center gap-2 bg-slate-50 p-1 ">
                         {['Week', 'Month', 'Year'].map(t => (
-                            <button key={t} className={`px-4 py-1.5 text-xs font-bold rounded-md transition-colors ${t === 'Week' ? 'bg-white text-[#00acee] shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}>
+                            <button key={t} className={`px-4 py-1.5 text-xs font-bold rounded-md transition-colors ${t === 'Week' ? 'bg-white text-[#0078d4] shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}>
                                 {t}
                             </button>
                         ))}
@@ -230,13 +230,13 @@ const CompanyOverviewBoard = ({ company, onClose, onTransactionDeleted }) => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
- <div className="bg-white p-6 rounded-sm shadow-sm ">
+ <div className="bg-white p-6  shadow-sm ">
                     <h3 className="text-sm font-bold tracking-widest uppercase text-slate-400 mb-6">Recent Activity</h3>
                     <div className="space-y-4">
                         {transactions.slice(0, 5).map((tx, i) => (
-                            <div key={i} className="flex items-center justify-between p-3 hover:bg-slate-50 rounded-xl transition-colors">
+                            <div key={i} className="flex items-center justify-between p-3 hover:bg-slate-50  transition-colors">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-500">
+                                    <div className="w-10 h-10  bg-blue-50 flex items-center justify-center text-blue-500">
                                         <Wallet size={16} />
                                     </div>
                                     <div>
@@ -253,13 +253,13 @@ const CompanyOverviewBoard = ({ company, onClose, onTransactionDeleted }) => {
                     </div>
                 </div>
 
- <div className="bg-white p-6 rounded-sm shadow-sm flex flex-col items-center justify-center text-center">
-                    <div className="w-20 h-20 bg-orange-50 rounded-full flex items-center justify-center text-orange-400 mb-4">
+ <div className="bg-white p-6  shadow-sm flex flex-col items-center justify-center text-center">
+                    <div className="w-20 h-20 bg-orange-50  flex items-center justify-center text-orange-400 mb-4">
                         <BarChart3 size={32} />
                     </div>
                     <h3 className="text-lg font-bold text-slate-900 mb-2">Advanced Analytics</h3>
                     <p className="text-sm text-slate-500 max-w-sm mb-6">Detailed sales breakdowns, product performance, and forecasting tools are available in the Pro version.</p>
-                    <button className="px-6 py-2.5 bg-[#00acee] hover:bg-[#009adb] text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-md transition-all active:scale-95">
+                    <button className="px-6 py-2.5 bg-[#0078d4] hover:bg-[#005a9e] text-white text-xs font-bold uppercase tracking-wider  shadow-md rounded-[12px] transition-all active:scale-95">
                         Upgrade Features
                     </button>
                 </div>
@@ -268,7 +268,7 @@ const CompanyOverviewBoard = ({ company, onClose, onTransactionDeleted }) => {
     );
 
     const renderTransactions = () => (
- <div className="bg-white rounded-sm shadow-sm overflow-hidden flex flex-col h-full animate-in fade-in slide-in-from-bottom-4 duration-500">
+ <div className="bg-white  shadow-sm overflow-hidden flex flex-col h-full animate-in fade-in slide-in-from-bottom-4 duration-500">
             <div className="p-6 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-50/50">
                 <div className="relative flex-1 max-w-md">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
@@ -277,11 +277,11 @@ const CompanyOverviewBoard = ({ company, onClose, onTransactionDeleted }) => {
                         placeholder="Search Doc No or Account..." 
                         value={searchTx}
                         onChange={e => setSearchTx(e.target.value)}
-                        className="w-full pl-9 pr-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#00acee]/20 focus:border-[#00acee] transition-all bg-white font-medium"
+                        className="w-full pl-9 pr-4 py-2.5 border border-slate-200  text-sm focus:outline-none focus:ring-2 focus:ring-[#0078d4]/20 focus:border-[#0078d4] rounded-[12px] transition-all bg-white font-medium"
                     />
                 </div>
                 <div className="flex items-center gap-3">
-                    <div className="flex items-center gap-2 bg-white border border-slate-200 rounded-xl px-3 py-1.5">
+                    <div className="flex items-center gap-2 bg-white border border-slate-200  px-3 py-1.5">
                         <Filter className="w-4 h-4 text-slate-400" />
                         <select 
                             value={filterType}
@@ -300,11 +300,11 @@ const CompanyOverviewBoard = ({ company, onClose, onTransactionDeleted }) => {
             <div className="flex-1 overflow-auto">
                 {loadingTx ? (
                     <div className="flex justify-center items-center h-64">
-                        <Loader2 className="w-8 h-8 text-[#00acee] animate-spin" />
+                        <Loader2 className="w-8 h-8 text-[#0078d4] animate-spin" />
                     </div>
                 ) : filteredTransactions.length === 0 ? (
                     <div className="flex flex-col items-center justify-center h-64 text-center px-4">
-                        <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4">
+                        <div className="w-16 h-16 bg-slate-50  flex items-center justify-center mb-4">
                             <Database className="w-8 h-8 text-slate-300" />
                         </div>
                         <p className="text-slate-900 font-bold text-lg mb-1">No Transactions Found</p>
@@ -342,14 +342,14 @@ const CompanyOverviewBoard = ({ company, onClose, onTransactionDeleted }) => {
                                         <div className="flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                             <button 
                                                 onClick={() => setSelectedTx(tx)}
-                                                className="p-2 text-slate-400 hover:text-[#00acee] hover:bg-[#00acee]/10 rounded-lg transition-all"
+                                                className="p-2 text-slate-400 hover:text-[#0078d4] hover:bg-[#0078d4]/10  rounded-[12px] transition-all"
                                                 title="View Details"
                                             >
                                                 <Eye className="w-4 h-4" />
                                             </button>
                                             <button 
                                                 onClick={() => handleDeleteTransaction(tx.docNo)}
-                                                className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
+                                                className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50  rounded-[12px] transition-all"
                                                 title="Delete"
                                             >
                                                 <Trash2 className="w-4 h-4" />
@@ -368,22 +368,22 @@ const CompanyOverviewBoard = ({ company, onClose, onTransactionDeleted }) => {
 
     return (
         <div className="fixed inset-0 z-[200] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4 font-sans">
-            <div className="bg-slate-50 rounded-2xl shadow-2xl w-[95vw] h-[95vh] flex flex-col overflow-hidden animate-in fade-in zoom-in duration-200">
+            <div className="bg-slate-50 shadow-[0_8px_30px_rgb(0,0,0,0.12)] w-[95vw] h-[95vh] flex flex-col overflow-hidden animate-in fade-in zoom-in duration-200">
                 
                 {/* Modal Header */}
                 <div className="bg-white px-6 py-4 border-b border-slate-100 flex items-center justify-between shrink-0">
                     <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-xl bg-[#00acee]/10 flex items-center justify-center">
-                            <Building2 className="w-6 h-6 text-[#00acee]" />
+                        <div className="w-12 h-12 bg-[#0078d4]/10 flex items-center justify-center">
+                            <Building2 className="w-6 h-6 text-[#0078d4]" />
                         </div>
                         <div>
-                            <h2 className="text-xl font-bold text-slate-900">{company.companyName || company.company_Name || company.comp_Name}</h2>
-                            <p className="text-sm text-slate-500 mt-0.5">Company Overview (ID: {company.companyCode || company.code})</p>
+                            <h2 className="text-[15px] font-bold text-slate-800">{company.companyName || company.company_Name || company.comp_Name}</h2>
+                            <p className="text-[11px] text-slate-500 font-medium mt-0.5">Company Overview (ID: {company.companyCode || company.code})</p>
                         </div>
                     </div>
                     <button 
                         onClick={onClose}
-                        className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 hover:bg-slate-100 hover:text-slate-900 transition-all active:scale-95"
+                        className="w-10 h-10 bg-slate-50 flex items-center justify-center text-slate-400 hover:bg-slate-100 hover:text-slate-900 rounded-[12px] transition-all active:scale-95"
                     >
                         <X size={28} />
                     </button>
@@ -397,9 +397,28 @@ const CompanyOverviewBoard = ({ company, onClose, onTransactionDeleted }) => {
                             <button
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id)}
-                                className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all font-bold text-sm whitespace-nowrap ${
+                                className={`flex items-center gap-2 px-4 py-2 rounded-[12px] transition-all font-bold text-sm whitespace-nowrap ${
                                     active 
-                                        ? 'bg-[#00acee] text-white shadow-md shadow-[#00acee]/20' 
+                                        ? 'bg-[#0078d4] text-white shadow-md shadow-[#0078d4]/20' 
+                                        : 'bg-slate-50 text-slate-500 hover:bg-slate-100 hover:text-slate-900'
+                                }`}
+                            >
+                                <tab.icon size={16} className={active ? 'text-white' : 'text-slate-400'} />
+                                {tab.label}
+                            </button>
+                        );
+                    })}
+                </div>
+                <div className="bg-white border-b border-slate-200 px-6 py-3 flex items-center gap-2 overflow-x-auto shrink-0 scrollbar-hide">
+                    {tabs.map(tab => {
+                        const active = activeTab === tab.id;
+                        return (
+                            <button
+                                key={tab.id}
+                                onClick={() => setActiveTab(tab.id)}
+                                className={`flex items-center gap-2 px-4 py-2  rounded-[12px] transition-all font-bold text-sm whitespace-nowrap ${
+                                    active 
+                                        ? 'bg-[#0078d4] text-white shadow-md shadow-[#0078d4]/20' 
                                         : 'bg-slate-50 text-slate-500 hover:bg-slate-100 hover:text-slate-900'
                                 }`}
                             >
@@ -428,33 +447,33 @@ const CompanyOverviewBoard = ({ company, onClose, onTransactionDeleted }) => {
             {/* Transaction Details Modal */}
             {selectedTx && (
                 <div className="fixed inset-0 z-[300] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4">
- <div className="bg-white rounded-sm shadow-2xl w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-200">
+                    <div className="bg-white shadow-[0_8px_30px_rgb(0,0,0,0.12)] w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-200">
                         <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
                             <div>
-                                <h3 className="text-lg font-bold text-slate-900">Transaction Details</h3>
-                                <p className="text-xs font-mono text-slate-500 mt-0.5">{selectedTx.docNo}</p>
+                                <h3 className="text-[15px] font-bold text-slate-800">Transaction Details</h3>
+                                <p className="text-[11px] font-mono text-slate-500 font-medium mt-0.5">{selectedTx.docNo}</p>
                             </div>
-                            <button onClick={() => setSelectedTx(null)} className="p-2 text-slate-400 hover:text-slate-900 hover:bg-slate-200 rounded-full transition-all">
+                            <button onClick={() => setSelectedTx(null)} className="p-2 text-slate-400 hover:text-slate-900 hover:bg-slate-200 rounded-[12px] transition-all">
                                 <X size={28} />
                             </button>
                         </div>
                         <div className="p-6 space-y-6">
                             <div className="grid grid-cols-2 gap-4">
-                                <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
+                                <div className="p-4 bg-slate-50 border border-slate-100">
                                     <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1">Amount</p>
                                     <p className="text-xl font-black text-emerald-500">Rs {(selectedTx.amount || 0).toFixed(2)}</p>
                                 </div>
-                                <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
+                                <div className="p-4 bg-slate-50 border border-slate-100">
                                     <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1">Date</p>
                                     <p className="text-sm font-bold text-slate-900 mt-1">{selectedTx.postDate || 'N/A'}</p>
                                 </div>
-                                <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
+                                <div className="p-4 bg-slate-50 border border-slate-100">
                                     <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1">Account</p>
                                     <p className="text-sm font-bold text-slate-900 mt-1">{selectedTx.account || 'System'}</p>
                                 </div>
-                                <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
+                                <div className="p-4 bg-slate-50 border border-slate-100">
                                     <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1">Payment Type</p>
-                                    <span className="inline-block mt-1 px-2.5 py-1 text-xs font-bold uppercase tracking-wider rounded-md bg-blue-100 text-blue-700">
+                                    <span className="inline-block mt-1 px-2.5 py-1 text-xs font-bold uppercase tracking-wider bg-blue-100 text-blue-700">
                                         {selectedTx.payType || 'N/A'}
                                     </span>
                                 </div>
@@ -463,13 +482,13 @@ const CompanyOverviewBoard = ({ company, onClose, onTransactionDeleted }) => {
                         <div className="p-6 border-t border-slate-100 bg-slate-50/50 flex justify-between">
                             <button 
                                 onClick={() => handleDeleteTransaction(selectedTx.docNo)}
-                                className="px-5 py-2.5 text-xs font-bold text-red-500 hover:bg-red-50 hover:border-red-200 border border-transparent rounded-xl transition-all flex items-center gap-2"
+                                className="px-5 py-2.5 text-xs font-bold text-red-500 hover:bg-red-50 hover:border-red-200 border border-transparent rounded-[12px] transition-all flex items-center gap-2"
                             >
                                 <Trash2 size={16} /> Delete Record
                             </button>
                             <button 
                                 onClick={() => setSelectedTx(null)}
-                                className="px-6 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-md transition-all active:scale-95"
+                                className="px-6 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold uppercase tracking-wider rounded-[12px] shadow-md transition-all active:scale-95"
                             >
                                 Close Details
                             </button>

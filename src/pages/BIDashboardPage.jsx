@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import GetThingsDoneBoard from './GetThingsDoneBoard';
 import AIChatbotBoard from './AIChatbotBoard';
 import { authService } from '../services/auth.service';
+import { X } from 'lucide-react';
 
 // Import all modals
 import EnterBillBoard from './EnterBillBoard';
@@ -31,6 +32,8 @@ import ProfitLossDashboardBoard from './ProfitLossDashboardBoard';
 import SurveySettingsModal from '../components/modals/SurveySettingsModal';
 import ReportTemplate from '../components/ReportTemplate';
 import ViewUtilityModal from '../components/modals/ViewUtilityModal';
+import ReportsCenterModal from '../components/modals/AdminReports/ReportsCenterModal';
+import SubscriptionModal from '../components/modals/SubscriptionModal';
 
 const BIDashboardPage = () => {
     const [user, setUser] = useState(null);
@@ -63,7 +66,10 @@ const BIDashboardPage = () => {
     const [showProfitLossDashboardModal, setShowProfitLossDashboardModal] = useState(false);
     const [showSurveySettingsModal, setShowSurveySettingsModal] = useState(false);
     const [selectedReport, setSelectedReport] = useState(null);
+    const [showReportsCenterModal, setShowReportsCenterModal] = useState(false);
     const [showViewUtilityModal, setShowViewUtilityModal] = useState(false);
+    const [showSubscriptionBanner, setShowSubscriptionBanner] = useState(true);
+    const [showPricingPlansModal, setShowPricingPlansModal] = useState(false);
 
     useEffect(() => {
         const currentUser = authService.getCurrentUser();
@@ -80,15 +86,12 @@ const BIDashboardPage = () => {
         }
     }, []);
 
+    const navigate = useNavigate();
+
     if (!user) return null;
 
     const handleClose = () => {
-        if (window.history.length > 1) {
-            window.close();
-            window.location.href = '/dashboard';
-        } else {
-            window.location.href = '/dashboard';
-        }
+        navigate('/dashboard');
     };
 
     const actionToStateSetter = {
@@ -116,15 +119,28 @@ const BIDashboardPage = () => {
         'expenses_detail': setShowExpensesDashboardModal,
         'profit_loss_detail': setShowProfitLossDashboardModal,
         'survey_settings': setShowSurveySettingsModal,
-        'reports': () => setSelectedReport('System Analytics Report'),
-        'items': setShowViewUtilityModal
+        'reports': () => setShowReportsCenterModal(true),
+        'items': setShowViewUtilityModal,
+        'header_subscribe': setShowPricingPlansModal
     };
 
     return (
-        <div className="h-screen w-screen overflow-hidden flex flex-row relative bg-[#f8fafc]">
-            {/* Animated Background */}
-            <div className="absolute inset-0 flex items-center opacity-[0.03] pointer-events-none z-0 overflow-hidden select-none">
-                <style>{`
+        <div className="h-screen w-screen overflow-hidden flex flex-col bg-[#f8fafc]">
+            {/* Subscription Banner */}
+            {showSubscriptionBanner && (
+                <div className="bg-[#0078d4] text-white text-[13px] h-9 flex-shrink-0 flex justify-center items-center gap-2 relative z-50 transition-all animate-in slide-in-from-top duration-300">
+                    <span>Save 50% for 3 months.</span>
+                    <button onClick={() => setShowPricingPlansModal(true)} className="underline font-bold hover:text-white/80 transition-colors">Subscribe now</button>
+                    <button onClick={() => setShowSubscriptionBanner(false)} className="absolute right-4 text-white/70 hover:text-white transition-colors">
+                        <X size={20} strokeWidth={1.5} />
+                    </button>
+                </div>
+            )}
+
+            <div className="flex-1 w-full overflow-hidden flex flex-row relative">
+                {/* Animated Background */}
+                <div className="absolute inset-0 flex items-center opacity-[0.03] pointer-events-none z-0 overflow-hidden select-none">
+                    <style>{`
                   @keyframes slideRightText {
                     0% { transform: translateX(-50%); }
                     100% { transform: translateX(0%); }
@@ -155,11 +171,17 @@ const BIDashboardPage = () => {
                             return;
                         }
                         
+                        if (actionId.startsWith('open_report:')) {
+                            const reportName = actionId.split(':')[1];
+                            setSelectedReport(reportName);
+                            return;
+                        }
+                        
                         const setter = actionToStateSetter[actionId] || actionToStateSetter[actionId.replace('create_', '')];
                         if (setter) {
                             setter(true);
                         } else {
-                            window.location.href = '/dashboard';
+                            navigate('/dashboard');
                         }
                     }}
                 />
@@ -170,6 +192,7 @@ const BIDashboardPage = () => {
                 onClose={() => setShowAIChatbotModal(false)} 
                 position="inline-right" 
             />
+            </div>
 
             {/* Render all Modals */}
             <EnterBillBoard isOpen={showEnterBillModal} onClose={() => setShowEnterBillModal(false)} />
@@ -204,8 +227,16 @@ const BIDashboardPage = () => {
             />
             <ProfitLossDashboardBoard isOpen={showProfitLossDashboardModal} onClose={() => setShowProfitLossDashboardModal(false)} />
             <SurveySettingsModal isOpen={showSurveySettingsModal} onClose={() => setShowSurveySettingsModal(false)} />
-            {selectedReport && <ReportTemplate title={selectedReport} subtitle={`As of ${new Date().toLocaleDateString()}`} onClose={() => setSelectedReport(null)} onSwitchReport={setSelectedReport} />}
+            <ReportsCenterModal 
+                isOpen={showReportsCenterModal} 
+                onClose={() => setShowReportsCenterModal(false)} 
+                onSelectReport={setSelectedReport} 
+                empCode={user?.EmpCode || user?.empCode || user?.emp_Code || user?.id_No || user?.Id_No || user?.IdNo}
+                companyCode={selectedCompany?.Company_Id || selectedCompany?.CompanyId || selectedCompany?.companyId || 'COM001'}
+            />
+            {selectedReport && <ReportTemplate companyName={selectedCompany?.CompanyName || selectedCompany?.companyName || 'ONIMTA IT SOLUTIONS'} title={selectedReport} subtitle={`As of ${new Date().toLocaleDateString()}`} onClose={() => setSelectedReport(null)} onSwitchReport={setSelectedReport} />}
             <ViewUtilityModal isOpen={showViewUtilityModal} onClose={() => setShowViewUtilityModal(false)} />
+            <SubscriptionModal isOpen={showPricingPlansModal} onClose={() => setShowPricingPlansModal(false)} />
         </div>
     );
 };

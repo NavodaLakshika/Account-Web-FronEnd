@@ -75,7 +75,7 @@ const ProfitLossDashboardBoard = ({
       isOpen={isOpen}
       onClose={onClose}
       title="Profit & Loss Intelligence Center"
-      maxWidth="max-w-[1080px]"
+      maxWidth="max-w-[1180px]"
     >
       <div className="flex flex-col gap-6 select-none font-['Plus_Jakarta_Sans'] text-slate-800">
         
@@ -110,7 +110,7 @@ const ProfitLossDashboardBoard = ({
             <div className="flex items-center gap-2 mb-2">
               <span className="text-white/90 text-[10px] font-black uppercase tracking-[0.2em]">Net Profit (Loss)</span>
             </div>
-            <div className="text-3xl font-black tracking-tight font-mono">
+            <div className="text-3xl font-black tracking-tight font-['Tahoma']">
               {loading ? (
                 <div className="h-9 w-32 bg-white/20 rounded animate-pulse" />
               ) : (
@@ -124,7 +124,7 @@ const ProfitLossDashboardBoard = ({
             <div className="flex items-center gap-2 mb-2">
               <span className="text-blue-500 text-[10px] font-black uppercase tracking-[0.2em]">Total Income</span>
             </div>
-            <div className="text-3xl font-black tracking-tight font-mono">
+            <div className="text-3xl font-black tracking-tight font-['Tahoma']">
               {loading ? (
                 <div className="h-9 w-32 bg-slate-100 rounded animate-pulse" />
               ) : (
@@ -138,7 +138,7 @@ const ProfitLossDashboardBoard = ({
             <div className="flex items-center gap-2 mb-2">
               <span className="text-amber-500 text-[10px] font-black uppercase tracking-[0.2em]">Total Expenses</span>
             </div>
-            <div className="text-3xl font-black tracking-tight font-mono">
+            <div className="text-3xl font-black tracking-tight font-['Tahoma']">
               {loading ? (
                 <div className="h-9 w-32 bg-slate-100 rounded animate-pulse" />
               ) : (

@@ -95,8 +95,16 @@ const EmployeeMessageDropdown = ({ allEmployees = [], onClose }) => {
         const phone = getPhone(emp);
         if (phone) {
             // keep numbers and plus sign
-            const cleanPhone = phone.replace(/[^0-9+]/g, '');
-            window.open(`http://wa.me/${cleanPhone}`, '_blank');
+            let cleanPhone = phone.replace(/[^0-9+]/g, '');
+            if (cleanPhone.startsWith('0')) {
+                cleanPhone = '94' + cleanPhone.substring(1);
+            } else if (cleanPhone.startsWith('+')) {
+                cleanPhone = cleanPhone.substring(1);
+            } else if (cleanPhone.length === 9) {
+                cleanPhone = '94' + cleanPhone;
+            }
+
+            window.open(`https://wa.me/${cleanPhone}`, '_blank');
         }
     };
 

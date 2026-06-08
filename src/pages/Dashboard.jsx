@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { DotLottiePlayer } from '@dotlottie/react-player';
+import '@dotlottie/react-player/dist/index.css';
 
 import {
     LogOut,
@@ -74,7 +75,6 @@ import ChequeRegisterBoard from '../HomeMaster/ChequeRegisterBoard';
 
 import MarketingToolBoard from '../HomeMaster/MarketingToolBoard';
 import AccountBalanceBoard from '../HomeMaster/AccountBalanceBoard';
-import ReminderBoard from '../HomeMaster/ReminderBoard';
 import ReminderListBoard from '../HomeMaster/ReminderListBoard';
 import SalesInvoiceBoard from '../HomeMaster/SalesInvoiceBoard';
 import SystemSettingsBoard from '../HomeMaster/SystemSettingsBoard';
@@ -125,7 +125,8 @@ import SubscriptionExpiredModal from '../components/modals/SubscriptionExpiredMo
 import SubmitReviewModal from '../components/modals/SubmitReviewModal';
 import FirstTimeGuide from '../components/FirstTimeGuide';
 import CompanyPromoBoard from '../components/CompanyPromoBoard';
-import { showSuccessToast } from '../utils/toastUtils';
+import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
+import api from '../services/api';
 import SubscriptionAdminBoard from '../components/Admin/SubscriptionAdminBoard';
 import { biDashboardService } from '../services/biDashboard.service';
 import GetThingsDoneBoard from './GetThingsDoneBoard';
@@ -149,7 +150,6 @@ import OfficeDocumentModal from '../components/modals/OfficeDocumentModal';
 import ToDoListBoard from '../components/modals/ViewAndUtilityModels/ToDoListBoard';
 import SendFileBoard from '../components/modals/ViewAndUtilityModels/SendFileBoard';
 import FindBoard from '../components/modals/ViewAndUtilityModels/FindBoard';
-import DocumentSearchModal from '../components/modals/ViewAndUtilityModels/DocumentSearchModal';
 import CustomizeIconBarBoard from '../components/modals/ViewAndUtilityModels/CustomizeIconBarBoard';
 import ChangeBackgroundBoard from '../components/modals/ViewAndUtilityModels/ChangeBackgroundBoard';
 
@@ -198,7 +198,6 @@ const Dashboard = () => {
     const [showToDoListBoard, setShowToDoListBoard] = useState(false);
     const [showSendFileBoard, setShowSendFileBoard] = useState(false);
     const [showFindBoard, setShowFindBoard] = useState(false);
-    const [showDocSearchModal, setShowDocSearchModal] = useState(false);
     const [showCustomizeIconBarBoard, setShowCustomizeIconBarBoard] = useState(false);
     const [showChangeBackgroundBoard, setShowChangeBackgroundBoard] = useState(false);
 
@@ -216,6 +215,32 @@ const Dashboard = () => {
     const [showCompanyUsersModal, setShowCompanyUsersModal] = useState(false);
     const [showReportsCenterModal, setShowReportsCenterModal] = useState(false);
     const [navReportSearch, setNavReportSearch] = useState('');
+    
+    const getCompanyFavKey = () => `favorite_reports_${selectedCompany?.Company_Id || selectedCompany?.companyId || 'default'}`;
+    
+    const [favoriteReports, setFavoriteReports] = useState([]);
+
+    useEffect(() => {
+        try {
+            const saved = localStorage.getItem(getCompanyFavKey());
+            setFavoriteReports(saved ? JSON.parse(saved) : []);
+        } catch { setFavoriteReports([]); }
+    }, [selectedCompany]);
+
+    useEffect(() => {
+        if (selectedCompany) {
+            localStorage.setItem(getCompanyFavKey(), JSON.stringify(favoriteReports));
+        }
+    }, [favoriteReports, selectedCompany]);
+    
+    const toggleFavoriteReport = (e, reportLabel) => {
+        e.stopPropagation();
+        setFavoriteReports(prev => 
+            prev.includes(reportLabel) 
+                ? prev.filter(r => r !== reportLabel)
+                : [...prev, reportLabel]
+        );
+    };
 
     // Reports States
 
@@ -267,7 +292,21 @@ const Dashboard = () => {
     const [showMasterFileModal, setShowMasterFileModal] = useState(false);
     const [showViewUtilityModal, setShowViewUtilityModal] = useState(false);
     const [showTransactionModal, setShowTransactionModal] = useState(false);
-    const [selectedReport, setSelectedReport] = useState(null);
+    const [selectedReport, _setSelectedReport] = useState(null);
+    const [hiddenReports, setHiddenReports] = useState([]);
+
+    const setSelectedReport = (reportName) => {
+        if (!reportName) {
+            _setSelectedReport(null);
+            return;
+        }
+        const itemId = reportName.toLowerCase().replace(/ /g, '-').replace(/\//g, '-');
+        if (hiddenReports.includes(itemId) || hiddenReports.includes(reportName)) {
+            return;
+        }
+        _setSelectedReport(reportName);
+    };
+
     const [showSystemAdminModal, setShowSystemAdminModal] = useState(false);
     const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
     const [showSystemSettingsModal, setShowSystemSettingsModal] = useState(false);
@@ -315,6 +354,63 @@ const Dashboard = () => {
     const [showAIText, setShowAIText] = useState(false);
     const [showItemsServicesReport, setShowItemsServicesReport] = useState(false);
     const [itemsServicesData, setItemsServicesData] = useState([]);
+
+    // Typing animation for greeting and subtitle rotation
+    const [typedGreeting, setTypedGreeting] = useState('');
+    const [showSubtitle, setShowSubtitle] = useState(false);
+    const [typedSubtitle, setTypedSubtitle] = useState('');
+    const [subtitleTipIndex, setSubtitleTipIndex] = useState(0);
+
+    const subtitleTips = [
+        "Here's what's happening with your business today.",
+        "Check out your pending tasks on the right.",
+        "Don't forget to review your latest reports.",
+        "Keep your inventory up to date for accurate numbers.",
+        "A quick reminder to reconcile your bank accounts."
+    ];
+
+    // Greeting Animation
+    useEffect(() => {
+        const h = new Date().getHours();
+        const timeWord = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
+        const name = user?.EmpName || user?.empName || user?.Emp_Name || user?.username || 'User';
+        const fullText = `${timeWord}, ${name}!`;
+        let i = 0;
+        setTypedGreeting('');
+        setShowSubtitle(false);
+        const interval = setInterval(() => {
+            i++;
+            setTypedGreeting(fullText.slice(0, i));
+            if (i >= fullText.length) {
+                clearInterval(interval);
+                setTimeout(() => setShowSubtitle(true), 200);
+            }
+        }, 40);
+        return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [user]);
+
+    // Subtitle Typing & Rotation
+    useEffect(() => {
+        if (!showSubtitle) return;
+        
+        const currentTip = subtitleTips[subtitleTipIndex];
+        setTypedSubtitle(currentTip);
+        
+        // Change tip every 30 seconds
+        const rotationInterval = setInterval(() => {
+            setShowSubtitle(false); // triggers fade out
+            setTimeout(() => {
+                setSubtitleTipIndex((prev) => (prev + 1) % subtitleTips.length);
+                setShowSubtitle(true); // triggers re-render
+            }, 500); // Wait for fade out
+        }, 30000);
+
+        return () => {
+            clearInterval(rotationInterval);
+        };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [showSubtitle, subtitleTipIndex]);
     const [isReportLoading, setIsReportLoading] = useState(false);
     const [showSubscriptionExpiredModal, setShowSubscriptionExpiredModal] = useState(false);
 
@@ -419,17 +515,36 @@ const Dashboard = () => {
         }, 100);
         tipTimerRef.current = setTimeout(() => {
             setShowNotificationTip(false);
+            
+            // Schedule the next tip since this one was ignored and auto-hid
+            const nextIdx = findNextTip(currentTipIndex + 1, dismissedTips);
+            if (nextIdx !== -1) {
+                setTimeout(() => {
+                    setCurrentTipIndex(nextIdx);
+                    setShowNotificationTip(true);
+                }, 3 * 60 * 1000); // 3 minutes
+            }
         }, duration);
     };
 
     useEffect(() => {
-        // Show first undismissed tip after 15 seconds
-        const idx = findNextTip(0, dismissedTips);
-        if (idx === -1) return;
+        // Show first undismissed tip after 2 seconds
+        let currentDismissed = dismissedTips;
+        let idx = findNextTip(0, currentDismissed);
+        
+        // If all tips have been dismissed, reset the array so they loop
+        if (idx === -1) {
+            currentDismissed = [];
+            setDismissedTips(currentDismissed);
+            localStorage.setItem('dismissedTips', '[]');
+            idx = 0;
+        }
+        
         setCurrentTipIndex(idx);
         const timer = setTimeout(() => {
             setShowNotificationTip(true);
-        }, 15000);
+        }, 2000);
+        
         return () => clearTimeout(timer);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
@@ -454,18 +569,31 @@ const Dashboard = () => {
         setShowNotificationTip(false);
         clearTimeout(tipTimerRef.current);
         clearInterval(tipProgressRef.current);
-        const updated = [...dismissedTips, id];
+        
+        let updated = [...dismissedTips, id];
+        
+        if (!scheduleNext) {
+            setDismissedTips(updated);
+            localStorage.setItem('dismissedTips', JSON.stringify(updated));
+            return;
+        }
+        
+        // Show next tip after 1 minute
+        let nextIdx = findNextTip(currentTipIndex + 1, updated);
+        
+        // Loop if all are dismissed
+        if (nextIdx === -1) {
+            updated = [];
+            nextIdx = 0;
+        }
+        
         setDismissedTips(updated);
         localStorage.setItem('dismissedTips', JSON.stringify(updated));
-        if (!scheduleNext) return;
-        // Show next tip after 3 minutes
-        const nextIdx = findNextTip(currentTipIndex + 1, updated);
-        if (nextIdx !== -1) {
-            setTimeout(() => {
-                setCurrentTipIndex(nextIdx);
-                setShowNotificationTip(true);
-            }, 3 * 60 * 1000);
-        }
+
+        setTimeout(() => {
+            setCurrentTipIndex(nextIdx);
+            setShowNotificationTip(true);
+        }, 60000);
     };
 
 
@@ -534,7 +662,7 @@ const Dashboard = () => {
         };
         fetchBiData();
 
-        // Sync system locks from backend on dashboard mount
+        // Sync module locks from ACC_Hidden_Modules (same pattern as hidden reports)
         const syncLocks = async () => {
             try {
                 const currentUser = authService.getCurrentUser();
@@ -543,14 +671,26 @@ const Dashboard = () => {
 
                 const empCode = currentUser?.EmpCode || currentUser?.empCode || currentUser?.emp_Code || currentUser?.id_No || currentUser?.Id_No || currentUser?.IdNo;
                 const companyCode = company?.Company_Id || company?.code || company?.companyCode;
-                const roleId = currentUser?.UserRoleId || currentUser?.userRoleId || currentUser?.role_Id || currentUser?.roleId;
 
-                const locks = await systemLocksService.getAllLocks(empCode, companyCode, roleId);
-                Object.entries(locks).forEach(([moduleId, isLocked]) => {
-                    localStorage.setItem(moduleId, isLocked ? 'true' : 'false');
-                });
+                if (empCode && companyCode) {
+                    // Fetch locked modules
+                    try {
+                        const modulesRes = await api.get(`/SuperAdmin/modules/hidden?empCode=${empCode}&companyCode=${companyCode}`);
+                        setLockedModules(modulesRes.data || []);
+                    } catch(e) {
+                        console.error("Failed to fetch hidden modules", e);
+                    }
+
+                    // Fetch hidden reports
+                    try {
+                        const reportsRes = await api.get(`/SuperAdmin/reports/hidden?empCode=${empCode}&companyCode=${companyCode}`);
+                        setHiddenReports(reportsRes.data || []);
+                    } catch(e) {
+                        console.error("Failed to fetch hidden reports", e);
+                    }
+                }
             } catch (err) {
-                console.error("Failed to sync system locks from server", err);
+                console.error("Failed to sync locks from server", err);
             }
         };
         syncLocks();
@@ -812,6 +952,15 @@ const Dashboard = () => {
         window.open(`/report/items-services?company=${companyId}&name=${encodeURIComponent(companyName)}`, '_blank');
     };
 
+    // --- Module lock state — fetched from ACC_Hidden_Modules API ---
+    const [lockedModules, setLockedModules] = useState([]);
+
+    const isModuleLocked = (lockId) => {
+        if (!lockId) return false;
+        // lockedModules is now a plain string[] of moduleIds from ACC_Hidden_Modules
+        return lockedModules.includes(lockId);
+    };
+
 
     const dashboardGroups = [
         {
@@ -840,11 +989,11 @@ const Dashboard = () => {
             color: "bg-blue-500",
             textColor: "text-blue-600",
             items: [
-                { icon: ShoppingCart, label: 'Purchase Order', onClick: () => setShowPurchaseOrderModal(true), color: '#0285fd' },
-                { icon: Package, label: 'GRN', onClick: () => setShowGRNModal(true), color: '#10b981' },
-                { icon: Layers, label: 'Bulk GRN', onClick: () => setShowBulkGRNModal(true), color: '#059669' },
-                { icon: FileText, label: 'Enter Bills', onClick: () => setShowEnterBillModal(true), color: '#f59e0b' },
-                { icon: CreditCard, label: 'Pay Bills', onClick: () => setShowPayBillModal(true), color: '#ef4444' },
+                { icon: ShoppingCart, label: 'Purchase Order', onClick: () => setShowPurchaseOrderModal(true), color: '#0285fd', lockId: 'trans_po' },
+                { icon: Package, label: 'GRN', onClick: () => setShowGRNModal(true), color: '#10b981', lockId: 'trans_grn' },
+                { icon: Layers, label: 'Bulk GRN', onClick: () => setShowBulkGRNModal(true), color: '#059669', lockId: 'trans_bulkGrn' },
+                { icon: FileText, label: 'Enter Bills', onClick: () => setShowEnterBillModal(true), color: '#f59e0b', lockId: 'trans_enterBills' },
+                { icon: CreditCard, label: 'Pay Bills', onClick: () => setShowPayBillModal(true), color: '#ef4444', lockId: 'trans_payBills' },
             ]
         },
         {
@@ -889,8 +1038,6 @@ const Dashboard = () => {
             textColor: "text-rose-600",
             items: [
                 { icon: BookOpen, label: 'Journal Entry', onClick: () => setShowJournalEntryModal(true), color: '#6366f1' },
-                { icon: PieChart, label: 'Acc.Balance', onClick: () => setShowAccountBalanceModal(true), color: '#10b981' },
-                { icon: BarChart2, label: 'Reports', onClick: () => setShowReportsCenterModal(true), color: '#4f46e5' },
                 { icon: Megaphone, label: 'Marketing Tool', onClick: () => setShowMarketingToolModal(true), color: '#ec4899' },
             ]
         }
@@ -899,7 +1046,7 @@ const Dashboard = () => {
     const navItems = dashboardGroups.flatMap(group => group.items);
 
     const menuBar = [
-        'Master File', 'View and Utility', 'Transaction', 'Reports', 'System Admin', 'Help', 'About'
+        'Master File', 'Transaction', 'Reports', 'System Admin', 'Help', 'About'
     ];
 
     const menuDropdownItems = {
@@ -914,50 +1061,41 @@ const Dashboard = () => {
             {
                 group: 'Organization Structure',
                 items: [
-                    { label: 'Create Department', onClick: () => setShowDepartmentModal(true) },
-                    { label: 'Create Category', onClick: () => setShowCategoryBoard(true) },
-                    { label: 'Create Route', onClick: () => setShowRouteBoard(true) },
-                    { label: 'Create Area', onClick: () => setShowAreaBoard(true) },
+                    { label: 'Create Department', onClick: () => setShowDepartmentModal(true), lockId: 'master_department' },
+                    { label: 'Create Category', onClick: () => setShowCategoryBoard(true), lockId: 'master_category' },
+                    { label: 'Create Route', onClick: () => setShowRouteBoard(true), lockId: 'master_route' },
+                    { label: 'Create Area', onClick: () => setShowAreaBoard(true), lockId: 'master_area' },
                 ]
             },
             {
                 group: 'Business Partners',
                 items: [
-                    { label: 'Supplier Master', onClick: () => setShowSupplierMasterBoard(true) },
-                    { label: 'Customer Master', onClick: () => setShowCustomerMasterBoard(true) },
-                    { label: 'Customer Type Master', onClick: () => setShowCustomerTypeBoard(true) },
-                    { label: 'Vendor Types', onClick: () => setShowVendorTypesBoard(true) },
+                    { label: 'Supplier Master', onClick: () => setShowSupplierMasterBoard(true), lockId: 'master_supplier' },
+                    { label: 'Customer Master', onClick: () => setShowCustomerMasterBoard(true), lockId: 'master_customer' },
+                    { label: 'Customer Type Master', onClick: () => setShowCustomerTypeBoard(true), lockId: 'master_customerType' },
+                    { label: 'Vendor Types', onClick: () => setShowVendorTypesBoard(true), lockId: 'master_vendorTypes' },
                 ]
             },
             {
                 group: 'Finance & Accounting',
                 items: [
-                    { label: 'Chart of Accountant', onClick: () => setShowChartOfAccountantModal(true) },
-                    { label: 'Card Sale Commission', onClick: () => setShowCardCommissionBoard(true) },
+                    { label: 'Chart of Accountant', onClick: () => setShowChartOfAccountantModal(true), lockId: 'master_chartOfAccount' },
+                    { label: 'Card Sale Commission', onClick: () => setShowCardCommissionBoard(true), lockId: 'master_cardSale' },
                 ]
             },
             {
                 group: 'System Administration',
                 items: [
-                    { label: 'User Profile Maintenance', onClick: () => setShowUserProfileBoard(true) },
-                    { label: 'Change Password', onClick: () => setShowChangePasswordBoard(true) },
+                    { label: 'User Profile Maintenance', onClick: () => setShowUserProfileBoard(true), lockId: 'master_userProfile' },
+                    { label: 'Change Password', onClick: () => setShowChangePasswordBoard(true), lockId: 'master_changePassword' },
+                ]
+            },
+            {
+                group: 'Utilities',
+                items: [
+                    { label: 'Reminder - To Do List', onClick: () => setShowToDoListBoard(true) },
                 ]
             }
-        ],
-        'View and Utility': [
-            { label: 'Customize Icon Bar', onClick: () => setShowCustomizeIconBarBoard(true) },
-            { label: 'View Side Bar', onClick: () => setShowSideBar(true) },
-            { label: 'Change Background', onClick: () => setShowChangeBackgroundBoard(true) },
-            { label: 'Send File', onClick: () => setShowSendFileBoard(true) },
-            { label: 'Use E-Mail', onClick: () => { } },
-            { label: 'Open Office Document', onClick: () => setShowOfficeDocumentModal(true) },
-            { label: 'Reminder - To Do List', onClick: () => setShowToDoListBoard(true) },
-            { label: 'Open Notepad', onClick: () => { } },
-            { label: 'Use Calculator', onClick: () => setShowCalculatorModal(true) },
-            { label: 'Find', onClick: () => setShowFindBoard(true) },
-            { label: 'Search', onClick: () => setShowDocSearchModal(true) },
-            { label: 'Printer Setup', onClick: () => { } },
-            { label: 'Prepare Letter with Envelopes', onClick: () => setShowLetterEnvelopesModal(true) },
         ],
         'Transaction': [
             {
@@ -1162,19 +1300,19 @@ const Dashboard = () => {
         {
             group: 'YOUR COMPANY',
             items: [
-                { label: 'Company Setup', onClick: () => setShowCompanyBoard(true) },
-                { label: 'Manage Users', onClick: () => setShowCompanyUsersModal(true) },
-                { label: 'Chart of Accounts', onClick: () => setShowChartOfAccountantModal(true) },
-                { label: 'Change Password', onClick: () => setShowChangePasswordBoard(true) },
+                { label: 'Company Setup', onClick: () => setShowCompanyBoard(true), lockId: 'master_company' },
+                { label: 'Manage Users', onClick: () => setShowCompanyUsersModal(true), lockId: 'users' },
+                { label: 'Chart of Accounts', onClick: () => setShowChartOfAccountantModal(true), lockId: 'master_chartOfAccount' },
+                { label: 'Change Password', onClick: () => setShowChangePasswordBoard(true), lockId: 'master_changePassword' },
             ]
         },
         {
             group: 'LISTS',
             items: [
-                { label: 'Customer Master', onClick: () => setShowCustomerMasterBoard(true) },
-                { label: 'Supplier Master', onClick: () => setShowSupplierMasterBoard(true) },
-                { label: 'Products & Categories', onClick: () => setShowCategoryBoard(true) },
-                { label: 'Cost Centers', onClick: () => setShowCostCenterBoard(true) },
+                { label: 'Customer Master', onClick: () => setShowCustomerMasterBoard(true), lockId: 'master_customer' },
+                { label: 'Supplier Master', onClick: () => setShowSupplierMasterBoard(true), lockId: 'master_supplier' },
+                { label: 'Products & Categories', onClick: () => setShowCategoryBoard(true), lockId: 'master_category' },
+                { label: 'Cost Centers', onClick: () => setShowCostCenterBoard(true), lockId: 'master_costCenter' },
             ]
         },
         {
@@ -1215,7 +1353,7 @@ const Dashboard = () => {
                     <div className="flex-1 overflow-hidden relative h-full flex items-center">
                         <div className="absolute inset-y-0 left-0 w-12 z-10 bg-gradient-to-r from-[#0078d4] to-transparent pointer-events-none" />
                         <div className="absolute inset-y-0 right-0 w-12 z-10 bg-gradient-to-l from-[#0078d4] to-transparent pointer-events-none" />
-                        <div className="whitespace-nowrap animate-marquee flex items-center gap-16" style={{ animationDuration: '180s' }}>
+                        <div className="whitespace-nowrap animate-marquee flex items-center gap-16" style={{ animationDuration: '120s' }}>
                             {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
                                 <div key={i} className="flex items-center gap-3">
                                     <span className="text-[9px] font-sans font-extrabold uppercase tracking-widest text-white">
@@ -1407,7 +1545,7 @@ const Dashboard = () => {
 
             {/* Subscription Management Modal */}
             {showSubscriptionModal && (
-                <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-slate-900/30 backdrop-blur-sm p-4">
+                <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-slate-900/30 backdrop-blur-sm p-4">
                     <div className="bg-white rounded-sm w-full max-w-5xl max-h-[85vh] overflow-y-auto shadow-2xl animate-in fade-in zoom-in-95 duration-200 relative">
                         <button
                             onClick={() => setShowSubscriptionModal(false)}
@@ -1440,9 +1578,16 @@ const Dashboard = () => {
             <ToDoListBoard isOpen={showToDoListBoard} onClose={() => setShowToDoListBoard(false)} />
             <SendFileBoard isOpen={showSendFileBoard} onClose={() => setShowSendFileBoard(false)} />
             <FindBoard isOpen={showFindBoard} onClose={() => setShowFindBoard(false)} />
-            <DocumentSearchModal isOpen={showDocSearchModal} onClose={() => setShowDocSearchModal(false)} />
             <CustomizeIconBarBoard isOpen={showCustomizeIconBarBoard} onClose={() => setShowCustomizeIconBarBoard(false)} onSave={() => window.location.reload()} />
-            <ChangeBackgroundBoard isOpen={showChangeBackgroundBoard} onClose={() => setShowChangeBackgroundBoard(false)} />
+            <ChangeBackgroundBoard 
+                isOpen={showChangeBackgroundBoard} 
+                onClose={() => setShowChangeBackgroundBoard(false)} 
+                currentTopBarColor={topBarColor}
+                onColorSelect={(color) => {
+                    setTopBarColor(color);
+                    localStorage.setItem('topBarColor', color);
+                }}
+            />
 
             {/* System Admin Modals */}
             <DatabaseBackupModal isOpen={showDatabaseBackupModal} onClose={() => setShowDatabaseBackupModal(false)} />
@@ -1456,7 +1601,13 @@ const Dashboard = () => {
             <JournalEntryEditorModal isOpen={showJournalEntryEditorModal} onClose={() => setShowJournalEntryEditorModal(false)} />
             <TransactionEditorModal isOpen={showTransactionEditorModal} onClose={() => setShowTransactionEditorModal(false)} />
             <CompanyUsersModal isOpen={showCompanyUsersModal} onClose={() => setShowCompanyUsersModal(false)} />
-            <ReportsCenterModal isOpen={showReportsCenterModal} onClose={() => setShowReportsCenterModal(false)} onSelectReport={setSelectedReport} />
+            <ReportsCenterModal 
+                isOpen={showReportsCenterModal} 
+                onClose={() => setShowReportsCenterModal(false)} 
+                onSelectReport={setSelectedReport} 
+                empCode={user?.EmpCode || user?.empCode || user?.emp_Code || user?.id_No || user?.Id_No || user?.IdNo}
+                companyCode={selectedCompany?.Company_Id || selectedCompany?.companyId || selectedCompany?.code || selectedCompany?.companyCode}
+            />
 
             {/* Reports Modals */}
 
@@ -1466,18 +1617,7 @@ const Dashboard = () => {
             <ChartOfAccountantModal isOpen={showChartOfAccountantModal} onClose={() => setShowChartOfAccountantModal(false)} />
 
             <CalculatorBoard isOpen={showCalculatorModal} onClose={() => setShowCalculatorModal(false)} />
-            <ReminderBoard
-                isOpen={showReminderModal}
-                onClose={() => {
-                    setShowReminderModal(false);
-                    setEditingTask(null);
-                }}
-                onViewAll={() => {
-                    setShowReminderModal(false);
-                    setShowReminderListModal(true);
-                }}
-                taskToEdit={editingTask}
-            />
+
             <ReminderListBoard
                 isOpen={showReminderListModal}
                 onClose={() => setShowReminderListModal(false)}
@@ -1640,17 +1780,32 @@ const Dashboard = () => {
                                     </button>
                                     {activeMenu === item && items.length > 0 && (() => {
                                         const isReports = item === 'Reports';
+                                        const baseItems = isReports 
+                                            ? [
+                                                ...(favoriteReports.length > 0 ? [{
+                                                    group: 'Favorites',
+                                                    items: favoriteReports.map(favLabel => {
+                                                        for (const g of items) {
+                                                            const found = g.items?.find(i => i.label === favLabel);
+                                                            if (found) return found;
+                                                        }
+                                                        return null;
+                                                    }).filter(Boolean)
+                                                }] : []),
+                                                ...items
+                                              ]
+                                            : items;
                                         const filteredItems = isReports && navReportSearch.trim()
-                                            ? items.map(g => ({
+                                            ? baseItems.map(g => ({
                                                 ...g,
                                                 items: g.items.filter(sub =>
                                                     sub.label.toLowerCase().includes(navReportSearch.toLowerCase())
                                                 )
                                               })).filter(g => g.items.length > 0)
-                                            : items;
+                                            : baseItems;
                                         return (
                                         <div
-                                            className="fixed sm:absolute top-[56px] sm:top-full left-2 sm:left-1/2 right-2 sm:right-auto sm:-translate-x-1/2 mt-0 sm:mt-3 bg-white shadow-[0_8px_30px_rgb(0,0,0,0.12)] rounded-none py-4 sm:py-6 px-4 sm:px-8 z-[200] border border-gray-100 w-auto sm:w-max max-h-[85vh] sm:max-h-none overflow-y-auto"
+                                            className="fixed sm:absolute top-[56px] sm:top-full left-2 sm:left-1/2 right-2 sm:right-auto sm:-translate-x-1/2 mt-0 sm:mt-3 bg-white shadow-[0_8px_30px_rgb(0,0,0,0.12)] rounded-none py-4 sm:py-6 px-4 sm:px-6 z-[200] border border-gray-100 w-auto sm:w-max max-w-[95vw] lg:max-w-6xl max-h-[85vh] sm:max-h-none overflow-y-auto"
                                             onMouseEnter={() => clearTimeout(menuTimeoutRef.current)}
                                             onMouseLeave={() => {
                                                 menuTimeoutRef.current = setTimeout(() => setActiveMenu(null), 200);
@@ -1678,31 +1833,79 @@ const Dashboard = () => {
                                                     <div className="py-8 text-center text-[13px] text-gray-400 min-w-[220px]">
                                                         No reports match <span className="font-bold text-gray-600">"{navReportSearch}"</span>
                                                     </div>
-                                                ) : filteredItems[0]?.group ? (
-                                                    <div className={`columns-1 sm:columns-2 ${filteredItems.length >= 3 ? 'lg:columns-3' : ''} ${filteredItems.length >= 4 ? 'xl:columns-4' : ''} gap-6 sm:gap-12`}>
-                                                        {filteredItems.map((menuItem, i) => (
-                                                            <div key={i} className="flex flex-col min-w-[140px] sm:min-w-[160px] break-inside-avoid mb-6 sm:mb-8">
-                                                                <h3 className="text-[11px] font-sans font-bold text-gray-500 uppercase tracking-widest mb-3 sm:mb-4">{menuItem.group}</h3>
-                                                                <div className="flex flex-col gap-2 sm:gap-3">
-                                                                    {menuItem.items.map((subItem, j) => (
-                                                                        <button
-                                                                            key={j}
-                                                                            onClick={() => {
-                                                                                subItem.onClick();
-                                                                                setActiveMenu(null);
-                                                                                setNavReportSearch('');
-                                                                            }}
-                                                                            className="w-full text-left text-[13px] font-sans font-medium text-gray-600 hover:text-[#0078d4] hover:bg-[#f4f5f8] px-2 py-1.5 -mx-2 rounded-md transition-all block"
-                                                                        >
-                                                                            {subItem.label}
-                                                                        </button>
-                                                                    ))}
-                                                                </div>
+                                                ) : filteredItems[0]?.group ? (() => {
+                                                    const renderMasonry = (numCols) => {
+                                                        const cols = Array.from({ length: numCols }, () => []);
+                                                        filteredItems.forEach((item, i) => {
+                                                            cols[i % numCols].push(item);
+                                                        });
+                                                        return cols.map((colItems, colIndex) => (
+                                                            <div key={colIndex} className="flex flex-col gap-6 sm:gap-8">
+                                                                {colItems.map((menuItem, i) => (
+                                                                    <div key={i} className="flex flex-col">
+                                                                        <h3 className="text-[11px] font-sans font-bold text-gray-500 uppercase tracking-widest mb-3 sm:mb-4">{menuItem.group}</h3>
+                                                                        <div className="flex flex-col gap-2 sm:gap-3">
+                                                                            {menuItem.items.map((subItem, j) => {
+                                                                                const isLockedReport = (isReports && (hiddenReports.includes(subItem.label) || hiddenReports.includes(subItem.label.toLowerCase().replace(/ /g, '-').replace(/\//g, '-')))) || (subItem.lockId && isModuleLocked(subItem.lockId));
+                                                                                return (
+                                                                                <div key={j} className={`flex items-center group/item relative ${isLockedReport ? 'opacity-60 cursor-not-allowed' : ''}`}>
+                                                                                    <button
+                                                                                        onClick={() => {
+                                                                                            if (isLockedReport) return;
+                                                                                            subItem.onClick();
+                                                                                            setActiveMenu(null);
+                                                                                            setNavReportSearch('');
+                                                                                        }}
+                                                                                        disabled={isLockedReport}
+                                                                                        className={`w-full text-left text-[13px] font-sans font-medium text-gray-600 ${isLockedReport ? '' : 'hover:text-[#0078d4] hover:bg-[#f4f5f8]'} px-2 py-1.5 -mx-2 rounded-md transition-all flex items-center justify-between pr-8`}
+                                                                                    >
+                                                                                        <span className="truncate">{subItem.label}</span>
+                                                                                        {isLockedReport && <Lock size={12} className="text-slate-400 group-hover/item:text-red-500 transition-colors shrink-0 ml-2" />}
+                                                                                    </button>
+                                                                                    {isReports && !isLockedReport && (
+                                                                                        <button
+                                                                                            onClick={(e) => toggleFavoriteReport(e, subItem.label)}
+                                                                                            className={`absolute right-2 p-1.5 transition-opacity ${favoriteReports.includes(subItem.label) ? 'opacity-100' : 'opacity-0 group-hover/item:opacity-100'}`}
+                                                                                        >
+                                                                                            <Star size={14} className={favoriteReports.includes(subItem.label) ? "fill-[#eab308] text-[#eab308]" : "text-gray-400 hover:text-[#eab308]"} />
+                                                                                        </button>
+                                                                                    )}
+                                                                                </div>
+                                                                            )})}
+                                                                        </div>
+                                                                    </div>
+                                                                ))}
                                                             </div>
-                                                        ))}
-                                                    </div>
-                                                ) : (
-                                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 sm:gap-x-12 gap-y-2 sm:gap-y-3 min-w-0 sm:min-w-[320px]">
+                                                        ));
+                                                    };
+
+                                                    let lgCols = 4;
+                                                    if (filteredItems.length === 1) lgCols = 1;
+                                                    else if (filteredItems.length === 2) lgCols = 2;
+                                                    else if (filteredItems.length === 3) lgCols = 3;
+                                                    else if (filteredItems.length === 4) lgCols = 4;
+                                                    else if (filteredItems.length === 5) lgCols = 3;
+                                                    else if (filteredItems.length === 6) lgCols = 3;
+                                                    else if (filteredItems.length === 7) lgCols = 4;
+                                                    else lgCols = 4;
+
+                                                    let smCols = Math.min(2, filteredItems.length);
+
+                                                    return (
+                                                        <>
+                                                            <div className="hidden lg:flex flex-row gap-8 xl:gap-12">
+                                                                {renderMasonry(lgCols)}
+                                                            </div>
+                                                            <div className="hidden sm:flex lg:hidden flex-row gap-8">
+                                                                {renderMasonry(smCols)}
+                                                            </div>
+                                                            <div className="flex sm:hidden flex-col gap-6">
+                                                                {renderMasonry(1)}
+                                                            </div>
+                                                        </>
+                                                    );
+                                                })() : (
+                                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 sm:gap-x-8 gap-y-2 sm:gap-y-3 min-w-0 sm:min-w-[320px]">
                                                         {filteredItems.map((menuItem, i) => (
                                                             <button
                                                                 key={i}
@@ -1747,18 +1950,24 @@ const Dashboard = () => {
                                             <div key={i} className="flex flex-col min-w-[140px]">
                                                 <h3 className="text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-4">{menuItem.group}</h3>
                                                 <div className="flex flex-col gap-3">
-                                                    {menuItem.items.map((subItem, j) => (
+                                                    {menuItem.items.map((subItem, j) => {
+                                                        const isLockedSettings = subItem.lockId && isModuleLocked(subItem.lockId);
+                                                        return (
                                                         <button
                                                             key={j}
+                                                            disabled={isLockedSettings}
                                                             onClick={() => {
+                                                                if (isLockedSettings) return;
                                                                 subItem.onClick();
                                                                 setShowSettingsDropdown(false);
                                                             }}
-                                                            className="w-full text-left text-[13px] text-gray-700 hover:text-[#0078d4] hover:underline transition-all block"
+                                                            className={`w-full text-left text-[13px] ${isLockedSettings ? 'text-gray-400 cursor-not-allowed flex items-center justify-between' : 'text-gray-700 hover:text-[#0078d4] hover:underline transition-all block'}`}
                                                         >
-                                                            {subItem.label}
+                                                            <span>{subItem.label}</span>
+                                                            {isLockedSettings && <Lock size={12} className="text-red-400" />}
                                                         </button>
-                                                    ))}
+                                                        );
+                                                    })}
                                                 </div>
                                             </div>
                                         ))}
@@ -1846,12 +2055,7 @@ const Dashboard = () => {
                     )}
                 </div>
 
-                {/* Alert Bar */}
-                {!isTopBarCollapsed && pendingJobsCount > 0 && (
-                    <div className="h-[2px] w-full bg-red-100 overflow-hidden relative">
-                        <div className="h-full w-1/3 bg-red-500 animate-[marquee_2s_linear_infinite]" />
-                    </div>
-                )}
+
             </header>
 
             {/* Main Content Area */}
@@ -1865,14 +2069,15 @@ const Dashboard = () => {
                             {/* Dynamic Greeting */}
                             <div className="flex flex-col items-center justify-center text-center w-full z-0">
                                 <h1 className="text-[36px] font-extrabold text-[#1e293b] leading-tight mb-1.5 text-center tracking-tight">
-                                    {(() => {
-                                        const h = new Date().getHours();
-                                        if (h < 12) return 'Good morning';
-                                        if (h < 17) return 'Good afternoon';
-                                        return 'Good evening';
-                                    })()}, {user?.EmpName || user?.empName || user?.Emp_Name || user?.username || 'User'}!
+                                    {typedGreeting}
+                                    <span className="inline-block w-[3px] h-[36px] ml-1 bg-[#0077c5] rounded-sm align-middle animate-pulse" style={{ opacity: typedGreeting.length > 0 && typedGreeting.endsWith('!') ? 0 : 1, transition: 'opacity 0.3s' }} />
                                 </h1>
-                                <p className="text-[16px] font-semibold text-slate-500 mt-1.5 text-center">Here's what's happening with your business today.</p>
+                                <p
+                                    className="text-[16px] font-semibold text-slate-500 mt-1.5 text-center transition-all duration-700 min-h-[24px]"
+                                    style={{ opacity: showSubtitle ? 1 : 0, transform: showSubtitle ? 'translateY(0)' : 'translateY(8px)' }}
+                                >
+                                    {typedSubtitle}
+                                </p>
                             </div>
 
                             {/* Actions Row */}
@@ -1919,14 +2124,14 @@ const Dashboard = () => {
                                                     journal_entry: { icon: BookOpen, label: 'Journal', onClick: () => setShowJournalEntryModal(true), active: showJournalEntryModal, iconColor: '#9333ea', bg: '#fdf4ff' },
                                                     bank_rec: { icon: RefreshCcw, label: 'Bank Rec', onClick: () => setShowBankRecModal(true), active: showBankRecModal, iconColor: '#0d9488', bg: '#f0fdfa' },
                                                     trial_balance: { icon: BarChart2, label: 'Trial Balance', onClick: () => setShowTrialBalanceModal(true), active: showTrialBalanceModal, iconColor: '#4f46e5', bg: '#eef2ff' },
-                                                    search: { icon: Search, label: 'Search', onClick: () => setShowSearchModal(true), active: showSearchModal, iconColor: '#64748b', bg: '#f8fafc' },
+                                                    // search: { icon: Search, label: 'Search', onClick: () => setShowSearchModal(true), active: showSearchModal, iconColor: '#64748b', bg: '#f8fafc' },
                                                     ai_chat: { icon: Bot, label: 'AI Chat', onClick: handleAIClick, active: showAIChatbotModal, iconColor: '#db2777', bg: '#fdf2f8' },
                                                     department: { icon: Building2, label: 'Department', onClick: () => setShowDepartmentModal(true), active: showDepartmentModal, iconColor: '#1d4ed8', bg: '#eff6ff' },
                                                     calculator: { icon: Calculator, label: 'Calculator', onClick: () => window.open('ms-calculator:'), iconColor: '#9333ea', bg: '#faf5ff' },
                                                     help: { icon: HelpCircle, label: 'Help', onClick: () => { }, iconColor: '#64748b', bg: '#f8fafc' },
                                                     category: { icon: Layers, label: 'Category', onClick: () => setShowCategoryModal(true), active: showCategoryModal, iconColor: '#ea580c', bg: '#fff7ed' },
-                                                    reminder: { icon: Bell, label: 'Reminder', onClick: () => setShowReminderModal(true), active: showReminderModal, iconColor: '#ca8a04', bg: '#fefce8' },
-                                                    dashboard: { icon: LayoutDashboard, label: 'BI Dashboard', onClick: () => navigate('/bi-dashboard'), active: showBiDashboardView, iconColor: '#0891b2', bg: '#ecfeff' },
+                                                    // reminder: { icon: Bell, label: 'Reminder', onClick: () => setShowReminderModal(true), active: showReminderModal, iconColor: '#ca8a04', bg: '#fefce8' },
+                                                    dashboard: { icon: LayoutDashboard, label: 'Get Things Done', onClick: () => setShowBiDashboardView(true), active: showBiDashboardView, iconColor: '#0891b2', bg: '#ecfeff' },
                                                 }[iconId];
                                                 if (!iconData) return null;
                                                 const Icon = iconData.icon;
@@ -2070,7 +2275,7 @@ const Dashboard = () => {
                                 <button
                                     key={group.category}
                                     onClick={() => setActiveCategory(group.category)}
-                                    className={`px-4 py-2 rounded-full text-[13px] font-bold transition-all shrink-0 border ${activeCategory === group.category ? 'bg-[#0078d4] text-white border-[#0078d4] shadow-md' : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50 hover:text-slate-700 hover:shadow-sm'}`}
+                                    className={`px-4 py-2 rounded-[15px] text-[13px] font-bold transition-all shrink-0 border ${activeCategory === group.category ? 'bg-[#0078d4] text-white border-[#0078d4] shadow-md' : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50 hover:text-slate-700 hover:shadow-sm'}`}
                                 >
                                     {group.category}
                                 </button>
@@ -2091,8 +2296,9 @@ const Dashboard = () => {
                                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
                                     {group.items.map((item) => {
                                         const Icon = item.icon;
+                                        const locked = isModuleLocked(item.lockId);
                                         return (
-                                            <ModuleCard key={item.label} item={item} Icon={Icon} setIsLoaderStopped={setIsLoaderStopped} />
+                                            <ModuleCard key={item.label} item={item} Icon={Icon} setIsLoaderStopped={setIsLoaderStopped} isLocked={locked} />
                                         );
                                     })}
                                 </div>
@@ -2111,6 +2317,11 @@ const Dashboard = () => {
                             selectedCompany={selectedCompany}
                             onAction={(id) => {
                                 setShowBiDashboardView(false);
+                                if (id.startsWith('open_report:')) {
+                                    const reportName = id.split(':')[1];
+                                    setSelectedReport(reportName);
+                                    return;
+                                }
                                 switch (id) {
                                     case 'new_account': setShowNewAccountModal(true); break;
                                     case 'customer': setShowCustomerModal(true); break;
@@ -2140,11 +2351,12 @@ const Dashboard = () => {
                                     case 'marketing': setShowMarketingToolModal(true); break;
                                     case 'account_balance': setShowAccountBalanceModal(true); break;
                                     case 'invoice': setShowSalesInvoiceModal(true); break;
-                                    case 'reports':
+                                    case 'reports': setShowReportsCenterModal(true); break;
                                     case 'profit_loss_detail':
                                     case 'expenses_detail': setSelectedReport('Expenses Detail'); break;
                                     case 'header_settings': setShowSystemAdminModal(true); break;
                                     case 'header_profile': setShowLogoutConfirmModal(true); break;
+                                    case 'header_subscribe': setShowPricingPlansModal(true); break;
                                     case 'header_ai': handleAIClick(); break;
                                     case 'header_help': setShowSoftwareAboutModal(true); break;
                                     case 'add_customer': setShowCustomerModal(true); break;
@@ -2169,55 +2381,7 @@ const Dashboard = () => {
                 />
             </div>
 
-            {/* Floating AI Assistant with Dynamic Positioning (Status-Based) */}
-            <div className={`fixed bottom-16 z-[60] flex flex-col pointer-events-none transition-all duration-700 ease-in-out ${pendingSnoozeTask ? 'left-10 items-start' : 'right-10 items-end'}`}>
-                {/* Minimalist Red Quote Frame Speech Bubble (Persistent Alert) */}
-                {pendingJobsCount > 0 && pendingSnoozeTask && (
-                    <div className="mb-4 ml-6 relative animate-in fade-in slide-in-from-bottom-2 duration-500 pointer-events-auto">
 
-                        {/* The Quote Frame Bubble */}
-                        <div className="bg-white/95 backdrop-blur-sm p-4 px-8 border-2 border-[#f05252] rounded-[18px] max-w-[420px] relative shadow-xl">
-
-                            {/* Top Left Quote Marks */}
-                            <div className="absolute -top-3 -left-1 bg-white px-1 flex gap-1">
-                                <span className="text-[#f05252] text-xl font-black rotate-180">„</span>
-                            </div>
-
-                            {/* Bottom Right Quote Marks */}
-                            <div className="absolute -bottom-4 -right-1 bg-white px-1 flex gap-1">
-                                <span className="text-[#f05252] text-xl font-black">“</span>
-                            </div>
-
-                            {/* Content Inner */}
-                            <div className="flex items-center gap-6 relative z-10">
-                                <div className="flex-1">
-                                    <div className="flex items-center gap-2 mb-1">
-                                        <div className="w-4 h-4 bg-[#f05252]/10 rounded-full flex items-center justify-center border border-[#f05252]/20">
-                                            <Bell size={8} className="text-[#f05252]" />
-                                        </div>
-                                        <p className="text-[9px] font-medium uppercase tracking-[0.2em] text-[#f05252]/80">System Reminder</p>
-                                    </div>
-
-                                    <p className="text-[13px] font-medium leading-none text-slate-800 whitespace-nowrap">
-                                        Navoda, You have {pendingJobsCount} pending {pendingJobsCount === 1 ? 'job' : 'jobs'}.
-                                    </p>
-                                </div>
-
-                                <button
-                                    onClick={() => handleCompleteAlarm(pendingSnoozeTask)}
-                                    className="px-5 py-2.5 bg-[#f05252] text-white text-[9px] font-black rounded-lg uppercase tracking-[0.2em] hover:bg-[#d43f3f] transition-all active:scale-95 shadow-lg shadow-red-500/20 shrink-0 whitespace-nowrap"
-                                >
-                                    Finish Now
-                                </button>
-                            </div>
-
-                            {/* Pointy Tail matching the Red Frame (Left-Side Pointing) */}
-                            <div className="absolute -bottom-2.5 left-6 w-6 h-6 bg-white rotate-[45deg] border-r-2 border-b-2 border-[#f05252]" />
-
-                        </div>
-                    </div>
-                )}
-            </div>
 
 
 
@@ -2298,52 +2462,53 @@ const Dashboard = () => {
                 return (
                     <div
                         key={tip.id}
-                        className="fixed bottom-0 left-0 right-0 z-[3000] animate-in slide-in-from-bottom duration-500"
+                        className="fixed bottom-0 left-0 right-0 z-[3000] animate-in slide-in-from-bottom duration-500 bg-white border-t border-slate-200 shadow-[0_-10px_40px_rgba(0,0,0,0.08)]"
                     >
-                        {/* Auto-progress bar at the very top */}
-                        <div className="h-[1px] bg-slate-100">
+                        {/* Gradient progress bar at the very top */}
+                        <div className="h-1 bg-slate-100 w-full">
                             <div
-                                className="h-full transition-none bg-[#0078d4]"
+                                className="h-full transition-none bg-gradient-to-r from-[#4ade80] to-[#2dd4bf]"
                                 style={{ width: `${tipProgress}%` }}
                             />
                         </div>
 
-                        <div
-                            className="bg-white border-t-[0.5px] border-[#0078d4] shadow-[0_-12px_50px_rgba(0,0,0,0.14)] px-10 py-6 flex items-center gap-8"
-                        >
-                            {/* Consistent Illustration Image (Left) */}
-                            <div className="hidden md:flex w-24 h-24 shrink-0 items-center justify-center bg-[#f0f8ff] rounded-full p-4 border border-[#e0f0ff] shadow-sm relative overflow-visible">
+                        <div className="max-w-[1400px] mx-auto px-8 py-10 flex justify-between items-start relative">
+                            {/* Dismiss X (Top Right) */}
+                            <button
+                                onClick={() => dismissTip(tip.id)}
+                                className="absolute top-4 right-6 text-slate-400 hover:text-slate-600 transition-colors"
+                                title="Dismiss"
+                            >
+                                <X size={28} strokeWidth={2} />
+                            </button>
+
+                            {/* Left Side: Text and Button */}
+                            <div className="flex-1 max-w-2xl pr-8 flex flex-col items-start pt-2">
+                                <h2 className="text-[20px] font-bold text-slate-800 mb-3">{tip.title}</h2>
+                                <p className="text-[14px] text-slate-600 leading-relaxed mb-6">
+                                    {tip.body}
+                                </p>
+                                <button
+                                    onClick={() => {
+                                        if (tip.onAction) tip.onAction();
+                                        dismissTip(tip.id);
+                                    }}
+                                    className="px-5 py-2.5 rounded text-white text-[14px] font-semibold transition-all hover:opacity-90 shadow-sm"
+                                    style={{ backgroundColor: tip.color || '#16a34a' }}
+                                >
+                                    {tip.action}
+                                </button>
+                            </div>
+
+                            {/* Right Side: Image */}
+                            <div className="hidden md:flex w-48 shrink-0 items-end justify-center self-stretch mr-12">
                                 <img
                                     src={tip.image}
                                     alt={tip.title}
-                                    className="w-[120%] h-[120%] object-contain drop-shadow-2xl saturate-[1.15] contrast-105 transition-all"
+                                    className="w-full h-auto object-contain max-h-40"
                                     style={{ imageRendering: 'high-quality' }}
                                 />
                             </div>
-
-                            {/* Text */}
-                            <div className="flex-1 min-w-0 flex flex-col justify-center">
-                                <p className="text-[19px] font-bold text-slate-800 mb-1.5 leading-snug tracking-tight">{tip.title}</p>
-                                <p className="text-[14px] text-slate-500 leading-relaxed max-w-4xl">{tip.body}</p>
-                            </div>
-
-                            {/* Action Button */}
-                            <button
-                                onClick={() => { tip.onAction(); dismissTip(tip.id, false); }}
-                                className="shrink-0 px-7 py-3 rounded-sm text-white text-[13px] font-bold transition-all hover:opacity-90 active:scale-95 shadow-md whitespace-nowrap"
-                                style={{ backgroundColor: tip.color }}
-                            >
-                                {tip.action}
-                            </button>
-
-                            {/* Dismiss X */}
-                            <button
-                                onClick={() => dismissTip(tip.id)}
-                                className="shrink-0 text-slate-400 hover:text-slate-700 transition-colors ml-1"
-                                title="Dismiss"
-                            >
-                                <X size={24} strokeWidth={1.5} />
-                            </button>
                         </div>
                     </div>
                 );
@@ -2355,7 +2520,7 @@ const Dashboard = () => {
 
 // Custom Rectangular Bento Card Component
 // Module Card Component
-const ModuleCard = ({ item, Icon, setIsLoaderStopped }) => {
+const ModuleCard = ({ item, Icon, setIsLoaderStopped, isLocked = false }) => {
     const animatedLabels = ['Dashboard', 'Accounts', 'Customers', 'Vendors', 'Billing', 'Pay Bills', 'Cheques', 'Cash', 'Deposit', 'Journal', 'Rec.', 'Report'];
     const isAnimated = item.gif && animatedLabels.includes(item.label);
     const color = item.color || '#0078d4';
@@ -2378,6 +2543,26 @@ const ModuleCard = ({ item, Icon, setIsLoaderStopped }) => {
         }
     };
 
+    if (isLocked) {
+        return (
+            <div
+                className="w-full flex flex-col items-center justify-center p-4 sm:p-5 bg-slate-50 border border-slate-200/80 relative overflow-hidden h-auto min-h-[200px] opacity-60 cursor-not-allowed select-none"
+                style={{ borderColor: 'rgba(0,0,0,0.06)', boxShadow: 'none' }}
+                title={`${item.label} is locked by the administrator`}
+            >
+                <div className="relative z-10 flex items-center justify-center mb-3">
+                    <div className="w-14 h-14 flex items-center justify-center bg-red-50 rounded-full">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                        </svg>
+                    </div>
+                </div>
+                <span className="text-[14px] font-bold text-slate-500 text-center leading-tight mt-2">{item.label}</span>
+                <span className="text-[11px] text-red-400 font-semibold text-center mt-1.5">Access Locked</span>
+            </div>
+        );
+    }
 
     return (
         <button

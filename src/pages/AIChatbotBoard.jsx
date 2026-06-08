@@ -108,6 +108,7 @@ const AIChatbotBoard = ({ isOpen, onClose, position = 'center' }) => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [messages, isTyping]);
 
+
     const handleSendMessage = async (e) => {
         e.preventDefault();
         if (!inputValue.trim() && !attachedFile) return;
@@ -268,9 +269,9 @@ const AIChatbotBoard = ({ isOpen, onClose, position = 'center' }) => {
                 <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'linear-gradient(rgba(0,0,0,1) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,1) 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
 
                 {/* Chat Area */}
-                <div className="flex-1 flex flex-col relative z-20 bg-transparent min-w-0">
+                <div className="flex-1 flex flex-col relative z-20 bg-transparent min-w-0 min-h-0 h-full">
 
-                    <div className="flex-1 overflow-y-auto p-4 md:p-10 space-y-8 custom-scrollbar">
+                    <div className="flex-1 overflow-y-auto p-4 md:p-10 space-y-8 custom-scrollbar h-0">
                         {(messages || []).map((msg) => (
                             <div key={msg.id} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
                                 <div className={`flex gap-3 items-end max-w-[90%] md:max-w-[75%] ${msg.sender === 'user' ? 'flex-row-reverse' : ''}`}>
@@ -358,7 +359,7 @@ const AIChatbotBoard = ({ isOpen, onClose, position = 'center' }) => {
                             </div>
                         )}
 
-                        <form onSubmit={handleSendMessage} className="flex gap-2 items-center relative">
+                        <form onSubmit={handleSendMessage} className="flex gap-1.5 items-center relative">
                             <input
                                 type="file"
                                 ref={fileInputRef}
@@ -369,9 +370,9 @@ const AIChatbotBoard = ({ isOpen, onClose, position = 'center' }) => {
                             <button
                                 type="button"
                                 onClick={() => fileInputRef.current.click()}
-                                className="p-3.5 bg-white border border-gray-200 text-slate-400 hover:text-blue-500 hover:border-blue-100 rounded-2xl transition-all active:scale-95 shadow-sm"
+                                className="p-2 bg-white border border-gray-200 text-slate-400 hover:text-blue-500 hover:border-blue-100 rounded-xl transition-all active:scale-95 shadow-sm"
                             >
-                                <Paperclip size={18} />
+                                <Paperclip size={16} />
                             </button>
 
                             <div className="flex-1 relative">
@@ -380,27 +381,39 @@ const AIChatbotBoard = ({ isOpen, onClose, position = 'center' }) => {
                                     value={inputValue}
                                     onChange={(e) => setInputValue(e.target.value)}
                                     placeholder={isRecording ? "Recording audio..." : "Write your message..."}
-                                    className={`w-full px-6 py-4 bg-white border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-300 transition-all font-mono text-[11px] shadow-inner placeholder:text-slate-300 ${isRecording ? 'text-red-500 animate-pulse' : ''}`}
+                                    className={`w-full px-4 py-2 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-300 transition-all font-mono text-[11px] shadow-inner placeholder:text-slate-300 ${isRecording ? 'text-red-500 animate-pulse' : ''}`}
                                 />
                             </div>
 
                             <button
                                 type="button"
                                 onClick={() => setIsRecording(!isRecording)}
-                                className={`p-4 rounded-2xl shadow-md border-none transition-all active:scale-95 ${isRecording ? 'bg-red-500 text-white animate-bounce' : 'bg-white border border-gray-100 text-slate-400 hover:text-blue-500'}`}
+                                className={`p-2 rounded-xl shadow-md border-none transition-all active:scale-95 ${isRecording ? 'bg-red-500 text-white animate-bounce' : 'bg-white border border-gray-100 text-slate-400 hover:text-blue-500'}`}
                             >
-                                <Mic size={18} />
+                                <Mic size={16} />
                             </button>
 
                             <button
                                 type="submit"
                                 disabled={!inputValue.trim() && !attachedFile}
-                                className="p-4 rounded-2xl text-white shadow-lg border-none disabled:bg-slate-200 disabled:shadow-none transition-all active:scale-95"
+                                className="p-2 rounded-xl text-white shadow-md border-none disabled:bg-slate-200 disabled:shadow-none transition-all active:scale-95"
                                 style={inputValue.trim() || attachedFile ? { backgroundColor: topBarColor } : {}}
                             >
-                                <Send size={18} />
+                                <Send size={16} />
                             </button>
                         </form>
+                        
+                        <div className="mt-3 flex items-center justify-between text-[10px] text-slate-400 border-t border-gray-100 pt-3">
+                            <span>ONIMTA AI Assistant</span>
+                            <div className="flex items-center gap-4">
+                                <button type="button" onClick={handleNewSession} className="hover:text-blue-500 transition-colors font-bold uppercase tracking-wide">
+                                    + New Chat
+                                </button>
+                                <button type="button" onClick={handleClearHistory} className="hover:text-red-500 transition-colors font-bold uppercase tracking-wide">
+                                    Clear Chat
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -529,12 +542,12 @@ const AIChatbotBoard = ({ isOpen, onClose, position = 'center' }) => {
                     </div>
 
                     {/* Chat Area */}
-                    <div className="flex-1 flex flex-col relative z-20 bg-transparent min-w-0">
+                    <div className="flex-1 flex flex-col relative z-20 bg-transparent min-w-0 min-h-0 h-full">
                         <button onClick={() => setSidebarCollapsed(!sidebarCollapsed)} className="hidden lg:flex absolute top-1/2 -left-3 -translate-y-1/2 w-6 h-12 border border-gray-200 text-white items-center justify-center rounded-r-lg z-[30] shadow-md" style={{ backgroundColor: topBarColor }}>
                             {sidebarCollapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
                         </button>
 
-                        <div className="flex-1 overflow-y-auto p-4 md:p-10 space-y-8 custom-scrollbar">
+                        <div className="flex-1 overflow-y-auto p-4 md:p-10 space-y-8 custom-scrollbar h-0">
                             {(messages || []).map((msg) => (
                                 <div key={msg.id} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
                                     <div className={`flex gap-3 items-end max-w-[90%] md:max-w-[75%] ${msg.sender === 'user' ? 'flex-row-reverse' : ''}`}>
@@ -622,7 +635,7 @@ const AIChatbotBoard = ({ isOpen, onClose, position = 'center' }) => {
                                 </div>
                             )}
 
-                            <form onSubmit={handleSendMessage} className="flex gap-2 items-center relative">
+                            <form onSubmit={handleSendMessage} className="flex gap-1.5 items-center relative">
                                 <input
                                     type="file"
                                     ref={fileInputRef}
@@ -633,9 +646,9 @@ const AIChatbotBoard = ({ isOpen, onClose, position = 'center' }) => {
                                 <button
                                     type="button"
                                     onClick={() => fileInputRef.current.click()}
-                                    className="p-3.5 bg-white border border-gray-200 text-slate-400 hover:text-blue-500 hover:border-blue-100 rounded-2xl transition-all active:scale-95 shadow-sm"
+                                    className="p-2 bg-white border border-gray-200 text-slate-400 hover:text-blue-500 hover:border-blue-100 rounded-xl transition-all active:scale-95 shadow-sm"
                                 >
-                                    <Paperclip size={18} />
+                                    <Paperclip size={16} />
                                 </button>
 
                                 <div className="flex-1 relative">
@@ -644,7 +657,7 @@ const AIChatbotBoard = ({ isOpen, onClose, position = 'center' }) => {
                                         value={inputValue}
                                         onChange={(e) => setInputValue(e.target.value)}
                                         placeholder={isRecording ? "Recording audio..." : "Write your message..."}
-                                        className={`w-full px-6 py-4 bg-white border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-300 transition-all font-mono text-[11px] shadow-inner placeholder:text-slate-300 ${isRecording ? 'text-red-500 animate-pulse' : ''}`}
+                                        className={`w-full px-4 py-2 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-300 transition-all font-mono text-[11px] shadow-inner placeholder:text-slate-300 ${isRecording ? 'text-red-500 animate-pulse' : ''}`}
                                     />
                                 </div>
 
@@ -652,28 +665,28 @@ const AIChatbotBoard = ({ isOpen, onClose, position = 'center' }) => {
                                     <button
                                         type="button"
                                         onClick={handleStopGeneration}
-                                        className="p-4 rounded-2xl bg-red-50 text-red-500 hover:bg-red-500 hover:text-white shadow-md transition-all active:scale-95"
+                                        className="p-2 rounded-xl bg-red-50 text-red-500 hover:bg-red-500 hover:text-white shadow-md transition-all active:scale-95"
                                         title="Stop Generation"
                                     >
-                                        <Square size={18} fill="currentColor" />
+                                        <Square size={16} fill="currentColor" />
                                     </button>
                                 ) : (
                                     <>
                                         <button
                                             type="button"
                                             onClick={() => setIsRecording(!isRecording)}
-                                            className={`p-4 rounded-2xl shadow-md border-none transition-all active:scale-95 ${isRecording ? 'bg-red-500 text-white animate-bounce' : 'bg-white border border-gray-100 text-slate-400 hover:text-blue-500'}`}
+                                            className={`p-2 rounded-xl shadow-md border-none transition-all active:scale-95 ${isRecording ? 'bg-red-500 text-white animate-bounce' : 'bg-white border border-gray-100 text-slate-400 hover:text-blue-500'}`}
                                         >
-                                            <Mic size={18} />
+                                            <Mic size={16} />
                                         </button>
 
                                         <button
                                             type="submit"
                                             disabled={!inputValue.trim() && !attachedFile}
-                                            className="p-4 rounded-2xl text-white shadow-lg border-none disabled:bg-slate-200 disabled:shadow-none transition-all active:scale-95"
+                                            className="p-2 rounded-xl text-white shadow-md border-none disabled:bg-slate-200 disabled:shadow-none transition-all active:scale-95"
                                             style={inputValue.trim() || attachedFile ? { backgroundColor: topBarColor } : {}}
                                         >
-                                            <Send size={18} />
+                                            <Send size={16} />
                                         </button>
                                     </>
                                 )}

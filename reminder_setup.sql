@@ -6,7 +6,8 @@ BEGIN
         Time NVARCHAR(100),
         Task NVARCHAR(MAX),
         Expire CHAR(10) DEFAULT 'F',
-        Type CHAR(10) DEFAULT 'INST'
+        Type CHAR(10) DEFAULT 'INST',
+        CompanyId NVARCHAR(50)
     );
 END
 GO

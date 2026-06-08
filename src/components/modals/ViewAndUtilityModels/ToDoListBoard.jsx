@@ -1,166 +1,293 @@
-import React, { useState, useEffect } from 'react';
-import { Save, Calendar, Clock, X, Bell, Plus, Trash2, CheckCircle2, Circle } from 'lucide-react';
-import toast from 'react-hot-toast';
-
-const accent = localStorage.getItem('topBarColor') || '#0388cc';
+import React, { useState, useEffect, useRef } from 'react';
+import { X, Save, Calendar, Clock, List, ClipboardList, Plus, CheckCircle2, Circle, Trash2, LayoutList } from 'lucide-react';
+import CalendarModal from '../../CalendarModal';
+import { showSuccessToast, showErrorToast } from '../../../utils/toastUtils';
+import { reminderService } from '../../../services/reminder.service';
 
 const ToDoListBoard = ({ isOpen, onClose }) => {
-    const [currentTime, setCurrentTime] = useState(new Date().toLocaleTimeString());
-    const [tasks, setTasks] = useState([
-        { id: 1, text: 'Review financial reports for Q2', done: false },
-        { id: 2, text: 'Submit vendor payment approvals', done: true },
-        { id: 3, text: 'Audit trail reconciliation', done: false },
-    ]);
-    const [newTask, setNewTask] = useState('');
+    const [view, setView] = useState('add'); // 'add' or 'list'
+    const [tasks, setTasks] = useState([]);
+    
+    // Form States
+    const [description, setDescription] = useState('');
+    const [date, setDate] = useState('');
+    const [time, setTime] = useState('');
+    
+    const [showCalendar, setShowCalendar] = useState(false);
+
+    const loadTasks = async () => {
+        try {
+            const data = await reminderService.getReminders();
+            // Optional: Map them if needed, but we can just use the DB fields directly
+            setTasks(data || []);
+        } catch (error) {
+            console.error("Failed to fetch reminders:", error);
+            showErrorToast('Failed to load tasks from database');
+        }
+    };
 
     useEffect(() => {
-        const timer = setInterval(() => {
-            setCurrentTime(new Date().toLocaleTimeString());
-        }, 1000);
-        return () => clearInterval(timer);
-    }, []);
+        if (isOpen) {
+            loadTasks();
+            
+            // Set default date/time when opening (YYYY-MM-DD for date, HH:MM for time)
+            const now = new Date();
+            setDate(now.toISOString().split('T')[0]);
+            setTime(now.toTimeString().substring(0, 5));
+            
+            // Default to add view
+            setView('add');
+        }
+    }, [isOpen]);
 
     if (!isOpen) return null;
 
-    const today = new Date().toLocaleDateString('en-GB', {
-        day: '2-digit', month: 'short', year: 'numeric'
-    });
+    const handleSave = async () => {
+        if (!description.trim()) {
+            showErrorToast('Task Description is required.');
+            return;
+        }
+        
+        try {
+            const dateParts = date.split('-');
+            const formattedDate = dateParts.length === 3 ? `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}` : date;
+            
+            const [hours, minutes] = time.split(':');
+            const h = parseInt(hours, 10);
+            const m = parseInt(minutes, 10);
+            const ampm = h >= 12 ? 'PM' : 'AM';
+            const formattedHours = h % 12 || 12;
+            const formattedTime = `${formattedHours.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')} ${ampm}`;
 
-    const addTask = () => {
-        if (!newTask.trim()) return;
-        setTasks([...tasks, { id: Date.now(), text: newTask.trim(), done: false }]);
-        setNewTask('');
-        toast.success('Task added', { className: 'text-xs font-bold' });
+            await reminderService.addReminder({
+                Task: description.trim(),
+                Date: formattedDate,
+                Time: formattedTime
+            });
+
+            showSuccessToast('Task Saved Successfully');
+            setDescription('');
+            
+            // Reload from DB
+            await loadTasks();
+            setView('list');
+        } catch (error) {
+            showErrorToast('Failed to save task to database');
+        }
     };
 
-    const toggleTask = (id) => {
-        setTasks(tasks.map(t => t.id === id ? { ...t, done: !t.done } : t));
+    const toggleTask = async (task) => {
+        try {
+            const expire = task.expire || task.Expire;
+            if (expire === 'T') return; // already done
+
+            const id = task.id_No || task.Id_No || task.idNo;
+            await reminderService.expireReminder(id);
+            await loadTasks();
+        } catch (error) {
+            showErrorToast('Failed to update task status');
+        }
     };
 
-    const deleteTask = (id) => {
-        setTasks(tasks.filter(t => t.id !== id));
+    const deleteTask = async (task) => {
+        try {
+            const id = task.Id_No || task.id_No || task.idNo;
+            await reminderService.deleteReminder(id);
+            showSuccessToast('Task Deleted Successfully');
+            await loadTasks();
+        } catch (error) {
+            showErrorToast('Failed to delete task');
+        }
     };
 
     return (
-        <div className="fixed inset-0 z-[300] flex items-center justify-center p-4">
-            <div className="absolute inset-0 bg-slate-900/30 backdrop-blur-sm" onClick={onClose} />
+        <div className="fixed inset-0 z-[600] flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={onClose} />
 
- <div className="relative w-full max-w-xl bg-white rounded-sm shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 flex flex-col max-h-[90vh]">
-                <div className="absolute left-0 top-0 bottom-0 w-[4px]" style={{ backgroundColor: accent }} />
+            <div className="relative w-full max-w-[500px] bg-white rounded-sm shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col max-h-[90vh]">
+                
+                <button onClick={onClose} className="absolute top-6 right-6 z-10 w-8 h-8 bg-white/50 hover:bg-slate-100 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-600 transition-all shrink-0 border-none" title="Close">
+                    <X size={24} strokeWidth={1.5} />
+                </button>
 
-                <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-white">
-                    <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-xl bg-[#4f83ff]/10 flex items-center justify-center">
-                            <Calendar size={16} className="text-[#4f83ff]" />
-                        </div>
-                        <div>
-                            <h2 className="text-[15px] font-black uppercase tracking-[0.25em] text-slate-900 leading-tight">Reminder & To-Do List</h2>
-                            <p className="text-[10px] text-slate-400 font-medium tracking-wider">{today}</p>
-                        </div>
-                    </div>
-                    <button onClick={onClose} className="w-9 h-9 rounded-xl bg-red-50 hover:bg-red-100 flex items-center justify-center transition-all active:scale-90">
-                        <X size={28} strokeWidth={1.5} className="text-red-600" />
-                    </button>
-                </div>
-
-                <div className="flex-1 overflow-y-auto custom-scrollbar p-6">
-                    <div className="select-none space-y-5">
-                        <div className="flex items-center justify-between bg-slate-50/50 p-4 rounded-xl border border-slate-100">
-                            <div className="flex items-center gap-4">
-                                <div className="relative w-12 h-12 flex items-center justify-center">
-                                    <div className="absolute inset-0 bg-amber-50 rounded-xl animate-pulse" />
-                                    <Bell size={24} className="text-amber-500 relative z-10" />
+                <div className="flex-1 overflow-y-auto custom-scrollbar p-6 bg-slate-50/50">
+                    
+                    {view === 'add' ? (
+                        <>
+                            {/* Add Task View */}
+                            <div className="flex items-center gap-5 mb-8 px-2 select-none">
+                                <div className="relative">
+                                    <div className="w-14 h-14 bg-red-500 rounded-lg flex items-center justify-center shadow-inner">
+                                        <ClipboardList size={32} className="text-white" strokeWidth={1.5} />
+                                    </div>
+                                    <div className="absolute -bottom-2 -right-2 bg-white rounded-full p-1 shadow-sm border border-slate-100">
+                                        <Clock size={20} className="text-slate-800" fill="white" strokeWidth={1.5} />
+                                    </div>
                                 </div>
                                 <div>
-                                    <h2 className="text-[14px] font-black text-slate-800 uppercase tracking-widest leading-none">Task Board</h2>
-                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-1.5">{today}</p>
+                                    <h2 className="text-2xl font-bold text-[#4f83ff] leading-none tracking-tight">Add Reminder</h2>
+                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mt-1.5">TASKS & REMINDERS</p>
                                 </div>
                             </div>
- <div className="flex items-center gap-3 px-4 py-2 bg-white rounded-sm shadow-sm ">
-                                <Clock size={14} className="text-[#4f83ff]" />
-                                <span className="text-[14px] font-black text-slate-700 font-mono tracking-wider">{currentTime}</span>
+
+                            <div className="space-y-5 bg-white p-5 rounded-lg border border-slate-200 shadow-sm">
+                                <div>
+                                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Task Description</label>
+                                    <textarea 
+                                        value={description}
+                                        onChange={(e) => setDescription(e.target.value)}
+                                        className="w-full h-28 p-3 text-sm resize-none border border-slate-200 rounded-md focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 transition-all text-slate-700 placeholder:text-slate-400 font-medium"
+                                        placeholder="What needs to be done?"
+                                    />
+                                </div>
+
+                                <div className="flex gap-4">
+                                    <div className="flex-1">
+                                        <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Date</label>
+                                        <div className="flex items-center border border-slate-200 rounded-md overflow-hidden focus-within:border-blue-400 focus-within:ring-1 focus-within:ring-blue-400 transition-all bg-white">
+                                            <input 
+                                                type="text" 
+                                                readOnly
+                                                value={date}
+                                                onClick={() => setShowCalendar(true)}
+                                                className="w-full h-10 px-3 text-sm font-medium outline-none text-slate-700 cursor-pointer" 
+                                            />
+                                            <div 
+                                                onClick={() => setShowCalendar(true)} 
+                                                className="w-10 h-10 flex items-center justify-center border-l border-slate-200 bg-slate-50 shrink-0 text-blue-500 cursor-pointer hover:bg-slate-100 transition-colors"
+                                            >
+                                                <Calendar size={16} />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="flex-1">
+                                        <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Time</label>
+                                        <div className="flex items-center border border-slate-200 rounded-md overflow-hidden px-3 gap-2 focus-within:border-blue-400 focus-within:ring-1 focus-within:ring-blue-400 transition-all bg-white cursor-pointer hover:bg-slate-50">
+                                            <Clock size={16} className="text-slate-400 shrink-0" />
+                                            <input 
+                                                type="time" 
+                                                value={time}
+                                                onChange={(e) => setTime(e.target.value)}
+                                                className="w-full h-10 text-sm font-medium outline-none text-slate-700 bg-transparent cursor-pointer" 
+                                                onClick={(e) => e.stopPropagation()}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
+                        </>
+                    ) : (
+                        <>
+                            {/* All Tasks View */}
+                            <div className="flex items-center gap-4 mb-6 px-2 select-none">
+                                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                                    <LayoutList size={24} className="text-blue-600" />
+                                </div>
+                                <div>
+                                    <h2 className="text-xl font-bold text-slate-800 leading-none">Your Tasks</h2>
+                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Manage Reminders</p>
+                                </div>
+                            </div>
 
-                        <div className="flex items-center gap-1">
-                            <input
-                                type="text"
-                                value={newTask}
-                                onChange={(e) => setNewTask(e.target.value)}
-                                onKeyDown={(e) => e.key === 'Enter' && addTask()}
-                                placeholder="Enter a new task..."
-                                className="flex-1 h-8 px-3 border border-slate-200 rounded-[5px] text-[12px] font-bold text-slate-700 bg-white outline-none focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 transition-all shadow-sm placeholder:text-slate-300"
-                            />
-                            <button
-                                onClick={addTask}
-                                className="w-10 h-8 bg-[#0285fd] hover:bg-[#0073ff] text-white rounded-[5px] flex items-center justify-center transition-all active:scale-95 shadow-sm border-none"
-                            >
-                                <Plus size={16} strokeWidth={3} />
-                            </button>
-                        </div>
-
- <div className=" rounded-sm overflow-hidden shadow-sm bg-white">
-                            <div className="max-h-[320px] overflow-y-auto no-scrollbar divide-y divide-slate-50">
+                            <div className="bg-white border border-slate-200 rounded-lg shadow-sm overflow-hidden min-h-[300px] flex flex-col">
                                 {tasks.length === 0 ? (
-                                    <div className="py-16 text-center">
-                                        <CheckCircle2 size={40} strokeWidth={1} className="text-slate-200 mx-auto mb-3" />
-                                        <p className="text-[11px] font-black text-slate-300 uppercase tracking-[3px]">No tasks yet</p>
+                                    <div className="flex-1 flex flex-col items-center justify-center p-8 text-slate-400">
+                                        <CheckCircle2 size={48} strokeWidth={1} className="mb-4 opacity-20" />
+                                        <p className="text-sm font-medium text-slate-500">No tasks remaining</p>
+                                        <p className="text-xs mt-1">You're all caught up!</p>
                                     </div>
                                 ) : (
-                                    tasks.map(task => (
-                                        <div
-                                            key={task.id}
-                                            className="flex items-center gap-3 px-5 py-3.5 group hover:bg-slate-50/50 transition-colors"
-                                        >
-                                            <button
-                                                onClick={() => toggleTask(task.id)}
-                                                className="shrink-0 focus:outline-none"
-                                            >
-                                                {task.done ? (
-                                                    <CheckCircle2 size={20} className="text-green-500 fill-green-500/10" />
-                                                ) : (
-                                                    <Circle size={20} className="text-slate-300 group-hover:text-[#4f83ff] transition-colors" />
-                                                )}
-                                            </button>
-                                            <span
-                                                className={`flex-1 text-[13px] font-bold transition-all ${
-                                                    task.done
-                                                        ? 'text-slate-300 line-through'
-                                                        : 'text-slate-700'
-                                                }`}
-                                            >
-                                                {task.text}
-                                            </span>
-                                            <button
-                                                onClick={() => deleteTask(task.id)}
-                                                className="opacity-0 group-hover:opacity-100 w-7 h-7 bg-red-50 text-red-400 rounded-lg flex items-center justify-center hover:bg-red-100 transition-all"
-                                            >
-                                                <Trash2 size={13} />
-                                            </button>
-                                        </div>
-                                    ))
+                                    <div className="divide-y divide-slate-100">
+                                        {tasks.map(task => {
+                                            const expire = task.expire || task.Expire;
+                                            const isDone = expire === 'T';
+                                            const taskDesc = task.task || task.Task || 'Unnamed Task';
+                                            const taskDate = task.date || task.Date || '';
+                                            const taskTime = task.time || task.Time || '';
+                                            const taskId = task.id_No || task.Id_No || task.idNo;
+                                            
+                                            return (
+                                                <div key={taskId} className="flex items-start gap-3 p-4 group hover:bg-slate-50 transition-colors">
+                                                    <button
+                                                        onClick={() => toggleTask(task)}
+                                                        className="mt-0.5 shrink-0 text-slate-400 hover:text-blue-500 transition-colors focus:outline-none"
+                                                    >
+                                                        {isDone ? (
+                                                            <CheckCircle2 size={20} className="text-green-500 fill-green-500/10" />
+                                                        ) : (
+                                                            <Circle size={20} />
+                                                        )}
+                                                    </button>
+                                                    <div className="flex-1 min-w-0">
+                                                        <p className={`text-sm font-medium transition-colors ${isDone ? 'text-slate-400 line-through' : 'text-slate-700'}`}>
+                                                            {taskDesc}
+                                                        </p>
+                                                        <div className="flex items-center gap-3 mt-1.5 opacity-60">
+                                                            <span className="flex items-center gap-1 text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                                                                <Calendar size={10} /> {taskDate}
+                                                            </span>
+                                                            <span className="flex items-center gap-1 text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                                                                <Clock size={10} /> {taskTime}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                    <button
+                                                        onClick={() => deleteTask(task)}
+                                                        className="w-8 h-8 rounded-md text-slate-300 hover:text-red-500 hover:bg-red-50 flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 shrink-0"
+                                                    >
+                                                        <Trash2 size={16} />
+                                                    </button>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
                                 )}
                             </div>
-                        </div>
-                    </div>
+                        </>
+                    )}
+
                 </div>
 
-                <div className="bg-slate-50 border-t border-slate-200 flex items-center justify-between shrink-0 px-6 py-4 rounded-b-[5px]">
-                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                        {tasks.filter(t => !t.done).length} pending tasks
-                    </span>
-                    <button
-                        onClick={() => {
-                            localStorage.setItem('todo_tasks', JSON.stringify(tasks));
-                            toast.success('Tasks saved', { className: 'text-xs font-bold' });
-                            onClose();
-                        }}
-                        className="px-8 h-10 bg-[#2bb744] hover:bg-[#259b3a] text-white font-mono font-bold text-[13px] uppercase tracking-widest rounded-[5px] shadow-md shadow-green-100 transition-all active:scale-95 flex items-center gap-2 border-none"
-                    >
-                        <Save size={14} /> SAVE & CLOSE
-                    </button>
+                {/* Footer matching modern web style */}
+                <div className="bg-white border-t border-slate-200 px-6 py-4 flex items-center justify-between shrink-0 rounded-b-sm">
+                    {view === 'add' ? (
+                        <>
+                            <button 
+                                onClick={() => setView('list')}
+                                className="h-9 px-5 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 hover:text-emerald-700 text-sm font-medium rounded-sm flex items-center gap-2 transition-colors border border-emerald-200"
+                            >
+                                <List size={16} /> View All Tasks
+                            </button>
+                            <button 
+                                onClick={handleSave}
+                                className="h-9 px-6 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-sm flex items-center gap-2 transition-colors shadow-sm"
+                            >
+                                <Save size={16} /> Save Task
+                            </button>
+                        </>
+                    ) : (
+                        <>
+                            <span className="text-xs font-medium text-slate-500">
+                                {tasks.filter(t => (t.expire || t.Expire) !== 'T').length} pending {tasks.filter(t => (t.expire || t.Expire) !== 'T').length === 1 ? 'task' : 'tasks'}
+                            </span>
+                            <button 
+                                onClick={() => setView('add')}
+                                className="h-9 px-6 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-sm flex items-center gap-2 transition-colors shadow-sm"
+                            >
+                                <Plus size={16} /> Add New Task
+                            </button>
+                        </>
+                    )}
                 </div>
             </div>
+
+            {/* Calendar Modal */}
+            <CalendarModal 
+                isOpen={showCalendar} 
+                onClose={() => setShowCalendar(false)} 
+                onDateSelect={(d) => setDate(d)} 
+                initialDate={date} 
+            />
         </div>
     );
 };

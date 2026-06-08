@@ -119,7 +119,7 @@ const SubscriptionModal = ({ isOpen, onClose }) => {
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-slate-900/30 backdrop-blur-sm font-sans">
+        <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-slate-900/30 backdrop-blur-sm font-sans">
  <div className="relative w-full max-w-[1200px] h-[75vh] bg-white shadow-2xl flex flex-col rounded-sm overflow-hidden animate-in fade-in zoom-in-95 duration-200">
                 {/* Header with Close */}
                 <div className="flex justify-end p-4">

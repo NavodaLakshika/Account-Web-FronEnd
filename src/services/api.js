@@ -33,9 +33,16 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Response interceptor: Handle 401 Unauthorized
+// Response interceptor: Handle 401 Unauthorized and Trigger Global Refreshes
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    // Intercept mutations to auto-refresh reports globally
+    const method = response.config?.method?.toLowerCase();
+    if (['post', 'put', 'delete', 'patch'].includes(method)) {
+      window.dispatchEvent(new Event('reportDataChanged'));
+    }
+    return response;
+  },
   (error) => {
     if (error.response?.status === 401) {
       // Skip redirect if this was the login request itself

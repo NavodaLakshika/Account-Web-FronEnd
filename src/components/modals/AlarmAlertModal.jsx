@@ -1,91 +1,73 @@
 import React from 'react';
-import { AlertTriangle, Check, X, Bell } from "lucide-react";
-import { DotLottiePlayer } from '@dotlottie/react-player';
+import { X, Check, Clock, Calendar, Bell } from "lucide-react";
 
 const AlarmAlertModal = ({ isOpen, onClose, task, onComplete }) => {
     React.useEffect(() => {
-        if (isOpen) {
-            const speech = new SpeechSynthesisUtterance("You have one reminder alert.");
-            speech.rate = 1.0;
-            speech.pitch = 1.0;
-            window.speechSynthesis.speak(speech);
-        }
+        // Voice alert removed for subtle toast style
     }, [isOpen]);
 
     if (!isOpen || !task) return null;
 
     return (
-        <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4 font-['Plus_Jakarta_Sans']">
-            {/* Soft Backdrop */}
-            <div 
-                className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity animate-in fade-in duration-500" 
-                onClick={onClose}
-            />
-            
-            {/* Modal Container (Compact small size) */}
- <div className="relative w-full max-w-[340px] bg-white rounded-[10px] shadow-[0_20px_40px_-10px_rgba(0,0,0,0.3)] overflow-hidden animate-in zoom-in-95 duration-300">
+        <div className="fixed top-0 left-0 right-0 z-[2000] flex items-start justify-center font-['Plus_Jakarta_Sans'] pointer-events-none">
+            {/* Top Bar Alert Container - Eye-catching Vibrant Red */}
+            <div className="relative w-full h-[40px] pointer-events-auto bg-[#de212d] rounded-none shadow-[0_4px_20px_rgba(255,0,60,0.4)] overflow-hidden animate-in slide-in-from-top-full fade-in duration-500 flex items-center">
                 
-                {/* Header Section (Flat Red - Compact) */}
-                <div className="bg-[#f05252] h-[150px] flex items-center justify-center relative overflow-hidden">
-                    {/* Background Decorative Bell */}
-                    <Bell size={140} className="absolute -left-8 -top-8 text-white/10 -rotate-12" />
+                {/* Wavy aesthetic patterns (subtle) */}
+                <div className="absolute -top-10 -left-10 w-32 h-32 bg-white/10 rounded-[40%] rotate-45 pointer-events-none" />
+                <div className="absolute top-0 right-40 w-24 h-24 bg-black/10 rounded-[40%] rotate-12 pointer-events-none" />
+                
+                <div className="px-6 flex items-center justify-between w-full h-full relative z-10 mx-auto">
                     
-                    {/* Main Bell Icon Animation in Top Center */}
-                    <div className="w-32 h-32 z-10">
-                        <DotLottiePlayer
-                            src="/lottiefile/Notification.lottie"
-                            autoplay
-                            loop
-                            className="w-full h-full drop-shadow-lg"
-                        />
-                    </div>
-                </div>
-
-                {/* Content Section (White) */}
-                <div className="p-8 pt-6 flex flex-col items-center text-center">
-                    <h2 className="text-[36px] font-mono font-bold text-slate-800 mb-1 tracking-tighter uppercase">
-                        Reminder!
-                    </h2>
-                    
-                    <p className="text-slate-600 text-[12px] font-mono font-bold leading-snug mb-6 px-2">
-                        You have one pending job for today.
-                    </p>
-
-                    {/* Time/Date Info Inside Content */}
-                    <div className="flex gap-3 mb-8 w-full">
-                        <div className="flex-1 py-2.5 bg-slate-50 rounded-xl border border-slate-100 uppercase">
-                             <span className="text-[12px] font-mono text-slate-400 block mb-0.5">Time</span>
-                             <span className="text-sm font-bold text-[#000080]">{task.time || task.Time}</span>
+                    {/* Left: Info */}
+                    <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-2">
+                            <Bell size={16} className="text-white animate-bounce" strokeWidth={2.5} />
+                            <h2 className="text-[13px] font-extrabold text-white tracking-wide uppercase">
+                                REMINDER:
+                            </h2>
+                            <span className="text-white/90 text-[13px] font-semibold">
+                                1 pending job
+                            </span>
                         </div>
-                        <div className="flex-1 py-2.5 bg-slate-50 rounded-xl border border-slate-100 uppercase">
-                             <span className="text-[12px] font-mono text-slate-400 block mb-0.5">Date</span>
-                             <span className="text-sm font-bold text-slate-700">{task.date || task.Date}</span>
+                        
+                        <div className="h-4 w-px bg-white/30 mx-2"></div>
+                        
+                        <div className="flex items-center gap-4">
+                            <div className="flex items-center gap-1.5">
+                                <Clock size={13} className="text-white/80" />
+                                <span className="text-[12px] font-bold text-white tracking-wider">{task.time || task.Time}</span>
+                            </div>
+                            <div className="flex items-center gap-1.5">
+                                <Calendar size={13} className="text-white/80" />
+                                <span className="text-[12px] font-bold text-white tracking-wider">{task.date || task.Date}</span>
+                            </div>
                         </div>
                     </div>
 
-                    {/* Capsule Buttons (Style matching the image) */}
-                    <div className="flex flex-col w-full gap-2.5">
+                    {/* Right: Buttons */}
+                    <div className="flex items-center gap-3">
                         <button 
                             onClick={() => {
                                 if (onComplete) onComplete(task);
                                 onClose();
                             }}
-                            className="w-full h-[48px] bg-[#f05252] text-white text-[13px] font-black rounded-[10px] hover:bg-red-600 shadow-lg shadow-red-100 transition-all active:scale-95 flex items-center justify-center gap-2 uppercase tracking-widest"
+                            className="h-[26px] px-4 bg-white text-[#FF003C] text-[11px] font-extrabold rounded-md shadow-sm hover:bg-slate-50 transition-all active:scale-95 flex items-center justify-center tracking-widest"
                         >
-                         Mark Done
+                            <Check size={14} className="mr-1.5" strokeWidth={3} />
+                            MARK DONE
                         </button>
                         
                         <button 
                             onClick={onClose}
-                            className="w-full h-[48px] bg-white border-2 border-slate-200 text-slate-500 text-[13px] font-black rounded-[10px] hover:bg-slate-50 transition-all active:scale-95 flex items-center justify-center gap-2 uppercase tracking-widest"
+                            className="h-[26px] px-3 border border-white/40 text-white text-[11px] font-extrabold rounded-md hover:bg-white/20 transition-all active:scale-95 flex items-center justify-center tracking-widest"
                         >
-                             Dismiss 
+                            <X size={14} className="mr-1" strokeWidth={3} />
+                            DISMISS
                         </button>
                     </div>
+                    
                 </div>
-                
-                {/* Visual Strip at bottom */}
-                <div className="h-2 bg-slate-50" />
             </div>
         </div>
     );

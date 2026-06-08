@@ -26,7 +26,7 @@ const animationStyle = (visible, position = 'top-right') => {
         slideIn = 'slide-in-from-right-5';
         slideOut = 'slide-out-to-right-5';
     }
-    
+
     return visible
         ? `animate-in ${slideIn} fade-in zoom-in-95 duration-300`
         : `animate-out ${slideOut} fade-out zoom-out-95 duration-200`;
@@ -44,18 +44,18 @@ const ToastLayout = ({
     position = 'top-right'
 }) => (
     <div className={`${toastBaseStyle} ${animationStyle(t.visible, position)}`}>
-        
+
         {/* Subtle Background Glow Gradient */}
         <div className={`absolute inset-y-0 left-0 w-32 bg-gradient-to-r ${gradientFrom} to-transparent opacity-20 pointer-events-none`} />
 
         {/* Main Content Area */}
         <div className="flex flex-row w-full flex-1 items-center p-3 gap-3 relative z-10">
-            
+
             {/* Icon */}
             <div className="flex-shrink-0">
                 {icon}
             </div>
-            
+
             {/* Content Area */}
             <div className="flex-1 min-w-0">
                 <h3 className={`text-[13px] font-semibold ${titleColor} leading-tight`}>
@@ -67,7 +67,7 @@ const ToastLayout = ({
                     </p>
                 )}
             </div>
-            
+
             {/* Dismiss overlay button (invisible but clickable over the whole toast or a tiny x) */}
             <button
                 onClick={() => toast.dismiss(t.id)}
@@ -79,11 +79,11 @@ const ToastLayout = ({
 
         {/* Progress Bar Loader */}
         <div className="w-full h-1 bg-slate-800 relative z-10">
-            <div 
-                className={`h-full ${progressColor}`} 
-                style={{ 
-                    animation: `toastProgress ${duration}ms linear forwards` 
-                }} 
+            <div
+                className={`h-full ${progressColor}`}
+                style={{
+                    animation: `toastProgress ${duration}ms linear forwards`
+                }}
             />
         </div>
     </div>

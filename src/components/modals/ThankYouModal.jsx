@@ -41,38 +41,38 @@ const ThankYouModal = ({ isOpen, onClose }) => {
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-[1000] flex items-center justify-center p-6 bg-slate-900/20 backdrop-blur-sm font-['Plus_Jakarta_Sans']">
- <div className="relative w-full max-w-md bg-white rounded-sm shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-300 ">
-                {/* Header Pattern / Accent */}
-                <div className="h-1.5 w-full bg-blue-600"></div>
+        <div className="fixed inset-0 z-[10000] flex items-center justify-center p-6 bg-[#1a1c21]/60 backdrop-blur-[2px]">
+            <div className="relative w-full max-w-sm bg-white rounded-[4px] shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-gray-200 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                {/* Header Accent */}
+                <div className="h-1 w-full bg-[#0077c5]"></div>
                 
                 <div className="p-8 text-center flex flex-col items-center">
-                    <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mb-6">
-                        <CheckCircle2 size={32} className="text-blue-600" />
+                    <div className="w-14 h-14 bg-[#eef6fc] rounded-full flex items-center justify-center mb-5 border border-[#b3d4f5]">
+                        <CheckCircle2 size={28} className="text-[#0077c5]" />
                     </div>
                     
-                    <h2 className="text-xl font-bold text-slate-800 mb-2">
+                    <h2 className="text-[18px] font-bold text-gray-900 mb-2 tracking-tight">
                         Successfully Logged Out
                     </h2>
                     
-                    <p className="text-slate-500 text-[13px] mb-8 leading-relaxed">
-                        Thank you for using the Onimta Enterprise Suite. You have been securely signed out of your account.
+                    <p className="text-gray-600 text-[13px] mb-8 leading-relaxed px-2">
+                        Thank you for using the ONIMTA Enterprise Suite. You have been securely signed out of your account.
                     </p>
 
-                    <div className="flex flex-col gap-3 w-full">
+                    <div className="flex flex-col w-full">
                         <button 
                             onClick={() => window.location.href = '/login'}
-                            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-semibold transition-colors shadow-sm"
+                            className="w-full h-10 flex items-center justify-center gap-2 bg-[#0077c5] hover:bg-[#005a9c] text-white rounded-[3px] text-[13px] font-bold transition-colors shadow-sm"
                         >
-                            Return to Login <ArrowRight size={16} />
+                            Return to Login <ArrowRight size={15} />
                         </button>
                     </div>
                 </div>
 
                 {/* Subtle bottom progress bar */}
-                <div className="h-1 w-full bg-slate-100">
+                <div className="h-1 w-full bg-gray-100">
                     <div 
-                        className="h-full bg-blue-500 transition-all duration-75 ease-linear"
+                        className="h-full bg-[#0077c5] transition-all duration-75 ease-linear"
                         style={{ width: `${progress}%` }}
                     />
                 </div>

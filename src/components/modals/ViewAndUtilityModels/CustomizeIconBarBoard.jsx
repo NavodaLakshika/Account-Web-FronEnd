@@ -3,10 +3,11 @@ import {
     X, ChevronRight, ChevronLeft, Save, RotateCcw,
     LogOut, Home, UserPlus, Users, Truck, FileText,
     CreditCard, PenTool, Wallet, ArrowDownLeft, BookOpen,
-    RefreshCcw, BarChart2, Search, Bot, Building2, Calculator, HelpCircle, Layers, PieChart, Bell
+    RefreshCcw, BarChart2, Search, Bot, Building2, Calculator, HelpCircle, Layers, PieChart, Bell,
+    ChevronsRight, ChevronsLeft, GripVertical
 } from 'lucide-react';
 
-const accent = localStorage.getItem('topBarColor') || '#0388cc';
+const accent = localStorage.getItem('topBarColor') || '#0ea5e9';
 
 const ALL_POSSIBLE_ICONS = [
     { id: 'logout', label: 'LogOut', icon: LogOut, color: 'text-red-500' },
@@ -29,10 +30,10 @@ const ALL_POSSIBLE_ICONS = [
     { id: 'calculator', label: 'Calculator', icon: Calculator },
     { id: 'help', label: 'Help', icon: HelpCircle },
     { id: 'category', label: 'Category', icon: Layers },
-    { id: 'reminder', label: 'Reminder', icon: Bell, color: 'text-yellow-400' },
+    { id: 'reminder', label: 'Reminder', icon: Bell, color: 'text-yellow-500' },
 ];
 
-const IconRow = ({ item, selected, onSelect }) => {
+const IconRow = ({ item, selected, onSelect, onDoubleClick }) => {
     const isSelected = selected?.id === item.id;
     const Icon = item.icon;
     return (
@@ -40,21 +41,22 @@ const IconRow = ({ item, selected, onSelect }) => {
             key={item.id}
             type="button"
             onClick={() => onSelect(item)}
-            className={`w-full flex items-center gap-3 px-3 py-2 text-left transition-colors border-b border-slate-100 last:border-b-0 ${
-                isSelected ? 'bg-[#4f83ff] text-white' : 'hover:bg-blue-50/30'
+            onDoubleClick={() => onDoubleClick(item)}
+            className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-all border-b border-slate-100 last:border-b-0 select-none group ${
+                isSelected ? 'bg-blue-50/80' : 'hover:bg-slate-50 bg-white'
             }`}
         >
             <div
-                className={`w-9 h-9 flex items-center justify-center border rounded-[5px] shadow-sm shrink-0 ${
-                    isSelected ? 'bg-white/15 border-white/25' : 'bg-slate-50 border-slate-200'
+                className={`w-8 h-8 flex items-center justify-center rounded-sm shadow-sm shrink-0 transition-colors ${
+                    isSelected ? 'bg-blue-500 border-transparent text-white' : 'bg-white border border-slate-200 text-slate-600 group-hover:border-slate-300'
                 }`}
             >
                 <Icon
-                    size={18}
-                    className={item.color || (isSelected ? 'text-white' : 'text-slate-600')}
+                    size={16}
+                    className={isSelected ? 'text-white' : item.color || 'text-slate-600'}
                 />
             </div>
-            <span className={`text-[12px] font-bold uppercase tracking-wide ${isSelected ? 'text-white' : 'text-slate-700'}`}>
+            <span className={`text-[13px] font-medium transition-colors ${isSelected ? 'text-blue-700 font-semibold' : 'text-slate-700 group-hover:text-slate-900'}`}>
                 {item.label}
             </span>
         </button>
@@ -66,6 +68,8 @@ const CustomizeIconBarBoard = ({ isOpen, onClose, onSave }) => {
     const [currentIcons, setCurrentIcons] = useState([]);
     const [selectedAvailable, setSelectedAvailable] = useState(null);
     const [selectedCurrent, setSelectedCurrent] = useState(null);
+    const [searchAvailable, setSearchAvailable] = useState('');
+    const [searchCurrent, setSearchCurrent] = useState('');
 
     const defaultIds = ['home', 'new_account', 'customer', 'vendor', 'enter_bill', 'pay_bill', 'write_chq', 'petty_cash', 'make_deposit', 'journal_entry', 'bank_rec', 'trial_balance', 'search', 'ai_chat', 'dashboard', 'logout'];
 
@@ -86,23 +90,41 @@ const CustomizeIconBarBoard = ({ isOpen, onClose, onSave }) => {
             }
             setSelectedAvailable(null);
             setSelectedCurrent(null);
+            setSearchAvailable('');
+            setSearchCurrent('');
         }
     }, [isOpen]);
 
     if (!isOpen) return null;
 
-    const handleAdd = () => {
-        if (selectedAvailable) {
-            setCurrentIcons([...currentIcons, selectedAvailable]);
-            setAvailableIcons(availableIcons.filter(i => i.id !== selectedAvailable.id));
+    const handleAdd = (itemToMove = selectedAvailable) => {
+        if (itemToMove) {
+            setCurrentIcons([...currentIcons, itemToMove]);
+            setAvailableIcons(availableIcons.filter(i => i.id !== itemToMove.id));
+            if (selectedAvailable?.id === itemToMove.id) setSelectedAvailable(null);
+        }
+    };
+
+    const handleRemove = (itemToMove = selectedCurrent) => {
+        if (itemToMove) {
+            setAvailableIcons([...availableIcons, itemToMove]);
+            setCurrentIcons(currentIcons.filter(i => i.id !== itemToMove.id));
+            if (selectedCurrent?.id === itemToMove.id) setSelectedCurrent(null);
+        }
+    };
+
+    const handleAddAll = () => {
+        if (filteredAvailable.length > 0) {
+            setCurrentIcons([...currentIcons, ...filteredAvailable]);
+            setAvailableIcons(availableIcons.filter(i => !filteredAvailable.find(f => f.id === i.id)));
             setSelectedAvailable(null);
         }
     };
 
-    const handleRemove = () => {
-        if (selectedCurrent) {
-            setAvailableIcons([...availableIcons, selectedCurrent]);
-            setCurrentIcons(currentIcons.filter(i => i.id !== selectedCurrent.id));
+    const handleRemoveAll = () => {
+        if (filteredCurrent.length > 0) {
+            setAvailableIcons([...availableIcons, ...filteredCurrent]);
+            setCurrentIcons(currentIcons.filter(i => !filteredCurrent.find(f => f.id === i.id)));
             setSelectedCurrent(null);
         }
     };
@@ -130,6 +152,8 @@ const CustomizeIconBarBoard = ({ isOpen, onClose, onSave }) => {
         setAvailableIcons(available);
         setSelectedAvailable(null);
         setSelectedCurrent(null);
+        setSearchAvailable('');
+        setSearchCurrent('');
     };
 
     const currentUserName = (() => {
@@ -141,118 +165,200 @@ const CustomizeIconBarBoard = ({ isOpen, onClose, onSave }) => {
         }
     })();
 
+    const filteredAvailable = availableIcons.filter(icon => icon.label.toLowerCase().includes(searchAvailable.toLowerCase()));
+    const filteredCurrent = currentIcons.filter(icon => icon.label.toLowerCase().includes(searchCurrent.toLowerCase()));
+
     return (
-        <div className="fixed inset-0 z-[300] flex items-center justify-center p-4">
-            <div className="absolute inset-0 bg-slate-900/30 backdrop-blur-sm" onClick={onClose} />
+        <div className="fixed inset-0 z-[600] flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={onClose} />
 
- <div className="relative w-full max-w-3xl bg-white rounded-sm shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 flex flex-col max-h-[90vh]">
-                <div className="absolute left-0 top-0 bottom-0 w-[4px]" style={{ backgroundColor: accent }} />
-
-                <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-white">
-                    <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-xl bg-[#4f83ff]/10 flex items-center justify-center">
-                            <Layers size={16} className="text-[#4f83ff]" />
-                        </div>
-                        <div>
-                            <h2 className="text-[15px] font-black uppercase tracking-[0.25em] text-slate-900 leading-tight">Customize Icon Bar</h2>
-                            <p className="text-[10px] text-slate-400 font-medium tracking-wider">Ribbon Icon Configuration</p>
-                        </div>
-                    </div>
-                    <button onClick={onClose} className="w-9 h-9 rounded-xl bg-red-50 hover:bg-red-100 flex items-center justify-center transition-all active:scale-90">
-                        <X size={28} strokeWidth={1.5} className="text-red-600" />
-                    </button>
-                </div>
-
-                <div className="flex-1 overflow-y-auto custom-scrollbar p-6">
-                    <div className="space-y-4 select-none">
-                        <div className="flex items-center gap-2">
-                            <span className="text-[12.5px] font-bold text-slate-700">Current User :</span>
-                            <span className="text-[12.5px] font-bold text-[#4f83ff] uppercase tracking-wide">
-                                {currentUserName}
-                            </span>
-                        </div>
-
-                        <div className="flex items-stretch gap-4">
-                            <div className="flex-1 space-y-2 min-w-0">
-                                <span className="text-[12px] font-bold text-slate-500 uppercase tracking-widest ml-1">All Icons</span>
- <div className=" rounded-[5px] shadow-sm bg-white h-[400px] overflow-y-auto no-scrollbar">
-                                    {availableIcons.length === 0 ? (
-                                        <p className="text-center py-10 text-slate-300 text-[12px] font-bold uppercase tracking-widest">No icons available</p>
-                                    ) : (
-                                        availableIcons.map(item => <IconRow key={item.id} item={item} selected={selectedAvailable} onSelect={setSelectedAvailable} />)
+            <div className="relative w-full max-w-4xl bg-white rounded-sm shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col max-h-[90vh]">
+                <div className="flex-1 overflow-y-auto p-6 bg-slate-50/50">
+                    <div className="flex items-stretch gap-6 h-[460px]">
+                        
+                        {/* Available Icons */}
+                        <div className="flex-1 flex flex-col min-w-0 bg-white border border-slate-200 rounded-sm shadow-sm overflow-hidden">
+                            <div className="px-4 py-3 border-b border-slate-100 bg-slate-50/50 flex flex-col gap-3">
+                                <div className="flex items-center justify-between">
+                                    <span className="text-sm font-semibold text-slate-700">Available Icons</span>
+                                    <span className="text-xs font-medium text-slate-500 bg-slate-200/50 px-2 py-0.5 rounded-full">{filteredAvailable.length}</span>
+                                </div>
+                                <div className="relative">
+                                    <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                                    <input 
+                                        type="text" 
+                                        placeholder="Search available..." 
+                                        value={searchAvailable}
+                                        onChange={(e) => setSearchAvailable(e.target.value)}
+                                        className="w-full pl-9 pr-8 py-1.5 text-sm bg-white border border-slate-200 rounded-sm focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition-all placeholder:text-slate-400"
+                                    />
+                                    {searchAvailable && (
+                                        <button onClick={() => setSearchAvailable('')} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+                                            <X size={14} />
+                                        </button>
                                     )}
                                 </div>
                             </div>
-
-                            <div className="flex flex-col justify-center gap-3 pt-8">
-                                <button
-                                    type="button"
-                                    onClick={handleAdd}
-                                    disabled={!selectedAvailable}
-                                    className={`w-10 h-8 flex items-center justify-center rounded-[5px] transition-all shadow-md active:scale-95 ${
-                                        selectedAvailable
-                                            ? 'bg-[#4f83ff] text-white hover:bg-[#3a6fdf] border-none'
-                                            : 'bg-slate-100 text-slate-300 cursor-not-allowed shadow-none'
-                                    }`}
-                                >
-                                    <ChevronRight size={20} strokeWidth={3} />
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={handleRemove}
-                                    disabled={!selectedCurrent}
-                                    className={`w-10 h-8 flex items-center justify-center rounded-[5px] transition-all shadow-md active:scale-95 ${
-                                        selectedCurrent
-                                            ? 'bg-[#4f83ff] text-white hover:bg-[#3a6fdf] border-none'
-                                            : 'bg-slate-100 text-slate-300 cursor-not-allowed shadow-none'
-                                    }`}
-                                >
-                                    <ChevronLeft size={20} strokeWidth={3} />
-                                </button>
-                            </div>
-
-                            <div className="flex-1 space-y-2 min-w-0">
-                                <span className="text-[12px] font-bold text-slate-500 uppercase tracking-widest ml-1">Current Icon</span>
- <div className=" rounded-[5px] shadow-sm bg-white h-[400px] overflow-y-auto no-scrollbar">
-                                    {currentIcons.length === 0 ? (
-                                        <p className="text-center py-10 text-slate-300 text-[12px] font-bold uppercase tracking-widest">No icons selected</p>
-                                    ) : (
-                                        currentIcons.map(item => <IconRow key={item.id} item={item} selected={selectedCurrent} onSelect={setSelectedCurrent} />)
-                                    )}
-                                </div>
+                            
+                            <div className="flex-1 overflow-y-auto custom-scrollbar relative">
+                                {filteredAvailable.length === 0 ? (
+                                    <div className="absolute inset-0 flex flex-col items-center justify-center text-slate-400">
+                                        <Search size={32} className="mb-3 opacity-20" />
+                                        <p className="text-sm font-medium">No icons found</p>
+                                        <p className="text-xs mt-1 text-slate-400">Try adjusting your search</p>
+                                    </div>
+                                ) : (
+                                    <div className="p-1">
+                                        {filteredAvailable.map(item => (
+                                            <IconRow 
+                                                key={item.id} 
+                                                item={item} 
+                                                selected={selectedAvailable} 
+                                                onSelect={setSelectedAvailable} 
+                                                onDoubleClick={() => handleAdd(item)}
+                                            />
+                                        ))}
+                                    </div>
+                                )}
                             </div>
                         </div>
 
-                        <div className="pt-4 flex justify-center opacity-25 grayscale pointer-events-none">
-                            <span className="text-xl font-black text-slate-300 tracking-tighter">
-                                onimta <span className="text-[#4f83ff]">IT</span>
+                        {/* Middle Controls */}
+                        <div className="flex flex-col justify-center gap-3 shrink-0">
+                            <button
+                                type="button"
+                                onClick={() => handleAdd()}
+                                disabled={!selectedAvailable}
+                                title="Move Selected Right"
+                                className="w-10 h-10 flex items-center justify-center rounded-sm bg-white border border-slate-200 text-slate-600 shadow-sm hover:bg-slate-50 hover:border-slate-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-95"
+                            >
+                                <ChevronRight size={20} strokeWidth={2.5} />
+                            </button>
+                            <button
+                                type="button"
+                                onClick={handleAddAll}
+                                disabled={filteredAvailable.length === 0}
+                                title="Move All Right"
+                                className="w-10 h-10 flex items-center justify-center rounded-sm bg-white border border-slate-200 text-slate-600 shadow-sm hover:bg-slate-50 hover:border-slate-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-95"
+                            >
+                                <ChevronsRight size={20} strokeWidth={2.5} />
+                            </button>
+                            
+                            <div className="h-px w-full bg-slate-200 my-2"></div>
+                            
+                            <button
+                                type="button"
+                                onClick={() => handleRemove()}
+                                disabled={!selectedCurrent}
+                                title="Move Selected Left"
+                                className="w-10 h-10 flex items-center justify-center rounded-sm bg-white border border-slate-200 text-slate-600 shadow-sm hover:bg-slate-50 hover:border-slate-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-95"
+                            >
+                                <ChevronLeft size={20} strokeWidth={2.5} />
+                            </button>
+                            <button
+                                type="button"
+                                onClick={handleRemoveAll}
+                                disabled={filteredCurrent.length === 0}
+                                title="Move All Left"
+                                className="w-10 h-10 flex items-center justify-center rounded-sm bg-white border border-slate-200 text-slate-600 shadow-sm hover:bg-slate-50 hover:border-slate-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-95"
+                            >
+                                <ChevronsLeft size={20} strokeWidth={2.5} />
+                            </button>
+                        </div>
+
+                        {/* Current Icons */}
+                        <div className="flex-1 flex flex-col min-w-0 bg-white border border-slate-200 rounded-sm shadow-sm overflow-hidden">
+                            <div className="px-4 py-3 border-b border-slate-100 bg-slate-50/50 flex flex-col gap-3">
+                                <div className="flex items-center justify-between">
+                                    <span className="text-sm font-semibold text-slate-700">Active Icons</span>
+                                    <span className="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-100">{filteredCurrent.length}</span>
+                                </div>
+                                <div className="relative">
+                                    <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                                    <input 
+                                        type="text" 
+                                        placeholder="Search active..." 
+                                        value={searchCurrent}
+                                        onChange={(e) => setSearchCurrent(e.target.value)}
+                                        className="w-full pl-9 pr-8 py-1.5 text-sm bg-white border border-slate-200 rounded-sm focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition-all placeholder:text-slate-400"
+                                    />
+                                    {searchCurrent && (
+                                        <button onClick={() => setSearchCurrent('')} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+                                            <X size={14} />
+                                        </button>
+                                    )}
+                                </div>
+                            </div>
+                            
+                            <div className="flex-1 overflow-y-auto custom-scrollbar relative">
+                                {filteredCurrent.length === 0 ? (
+                                    <div className="absolute inset-0 flex flex-col items-center justify-center text-slate-400">
+                                        <GripVertical size={32} className="mb-3 opacity-20" />
+                                        <p className="text-sm font-medium">No active icons</p>
+                                        <p className="text-xs mt-1 text-slate-400">Move icons here to show them</p>
+                                    </div>
+                                ) : (
+                                    <div className="p-1">
+                                        {filteredCurrent.map(item => (
+                                            <IconRow 
+                                                key={item.id} 
+                                                item={item} 
+                                                selected={selectedCurrent} 
+                                                onSelect={setSelectedCurrent} 
+                                                onDoubleClick={() => handleRemove(item)}
+                                            />
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div className="mt-4 flex items-center justify-between">
+                        <p className="text-xs text-slate-500 flex items-center gap-1.5">
+                            <span className="w-1.5 h-1.5 rounded-full bg-blue-400"></span>
+                            Pro tip: Double-click an icon to quickly move it
+                        </p>
+                        <div className="opacity-40 grayscale pointer-events-none flex items-center gap-1">
+                            <span className="text-sm font-bold text-slate-400 tracking-tight">
+                                onimta <span className="text-blue-500">IT</span>
                             </span>
                         </div>
                     </div>
                 </div>
 
-                <div className="bg-slate-50 border-t border-slate-200 flex items-center justify-between shrink-0 px-6 py-4 rounded-b-[5px]">
+                {/* Footer */}
+                <div className="bg-white border-t border-slate-200 flex items-center justify-between px-6 py-4 rounded-b-sm">
                     <button
                         type="button"
                         onClick={handleReset}
-                        className="px-8 h-10 bg-white text-[#00adff] border-2 border-[#00adff] font-mono font-bold text-[13px] uppercase tracking-widest rounded-[5px] hover:bg-blue-50 transition-all active:scale-95 flex items-center gap-2 shadow-sm"
+                        className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-sm transition-colors flex items-center gap-2"
                     >
-                        <RotateCcw size={14} /> RESET
+                        <RotateCcw size={16} />
+                        Reset to Default
                     </button>
-                    <div className="flex gap-4">
+                    <div className="flex items-center gap-3">
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            className="px-5 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-300 hover:bg-slate-50 rounded-sm transition-colors"
+                        >
+                            Cancel
+                        </button>
                         <button
                             type="button"
                             onClick={handleApply}
-                            className="px-8 h-10 bg-[#00adff] hover:bg-[#0099e6] text-white font-mono font-bold text-[13px] uppercase tracking-widest rounded-[5px] shadow-md shadow-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border-none"
+                            className="px-5 py-2 text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-sm transition-colors"
                         >
-                            APPLY
+                            Apply
                         </button>
                         <button
                             type="button"
                             onClick={handleSave}
-                            className="px-8 h-10 bg-[#2bb744] hover:bg-[#259b3a] text-white font-mono font-bold text-[13px] uppercase tracking-widest rounded-[5px] shadow-md shadow-green-100 transition-all active:scale-95 flex items-center justify-center gap-2 border-none"
+                            className="px-6 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-sm shadow-sm shadow-blue-200 transition-colors flex items-center gap-2"
                         >
-                            <Save size={14} /> OK
+                            <Save size={16} />
+                            Save Changes
                         </button>
                     </div>
                 </div>

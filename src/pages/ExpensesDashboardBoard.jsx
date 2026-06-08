@@ -170,7 +170,7 @@ const ExpensesDashboardBoard = ({
       isOpen={isOpen}
       onClose={onClose}
       title="Expenses & Spend Intelligence Center"
-      maxWidth="max-w-[1080px]"
+      maxWidth="max-w-[1200px]"
     >
       <div className="flex flex-col gap-6 select-none font-['Plus_Jakarta_Sans'] text-slate-800">
         
@@ -245,7 +245,7 @@ const ExpensesDashboardBoard = ({
             <div className="flex items-center gap-2 mb-2">
               <span className="text-emerald-100/90 text-[10px] font-black uppercase tracking-[0.2em]">Total Operating Spend</span>
             </div>
-            <div className="text-3xl font-black tracking-tight font-mono">
+            <div className="text-3xl font-black tracking-tight font-['Tahoma']">
               {loading ? (
                 <div className="h-9 w-32 bg-white/20 rounded animate-pulse" />
               ) : (
@@ -268,7 +268,7 @@ const ExpensesDashboardBoard = ({
                 <span className="px-2 py-0.5 bg-white/20 rounded text-[9px] opacity-80 font-black uppercase tracking-wider">AP Balance</span>
               )}
             </div>
-            <div className="text-3xl font-black tracking-tight font-mono">
+            <div className="text-3xl font-black tracking-tight font-['Tahoma']">
               {loading ? (
                 <div className="h-9 w-32 bg-white/20 rounded animate-pulse" />
               ) : (
@@ -291,7 +291,7 @@ const ExpensesDashboardBoard = ({
                 <span className="px-2 py-0.5 bg-red-700/30 border border-red-500/20 rounded text-[9px] font-black uppercase tracking-wider animate-pulse">Critical</span>
               )}
             </div>
-            <div className="text-3xl font-black tracking-tight font-mono">
+            <div className="text-3xl font-black tracking-tight font-['Tahoma']">
               {loading ? (
                 <div className="h-9 w-32 bg-white/20 rounded animate-pulse" />
               ) : (
@@ -385,7 +385,7 @@ const ExpensesDashboardBoard = ({
                       {data.recentTransactions.slice(0, 10).map((tx, idx) => (
                         <div key={idx} className="py-3 flex items-center justify-between hover:bg-slate-100/50 px-2 rounded-lg transition-colors">
                           <div className="flex flex-col gap-0.5">
-                            <span className="text-xs font-bold text-slate-800 truncate max-w-[220px]">{tx.payee || 'Direct Expense'}</span>
+                            <span className="text-xs font-bold text-slate-700 truncate max-w-[220px]">{tx.payee || 'Direct Expense'}</span>
                             <div className="flex items-center gap-2 text-[10px] text-slate-400 font-semibold">
                               <span>{tx.date.split('T')[0]}</span>
                               <span className="w-1 h-1 rounded-full bg-slate-300" />

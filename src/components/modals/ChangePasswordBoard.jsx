@@ -115,9 +115,9 @@ const ChangePasswordBoard = ({ isOpen, onClose }) => {
                 isOpen={isOpen}
                 onClose={onClose}
                 title="Security - Change Password"
-                maxWidth="max-w-md"
+                maxWidth="max-w-[500px]"
                 footer={
-                    <div className="bg-slate-50 px-6 py-4 w-full flex justify-end gap-3 border-t border-gray-100 mt-4 rounded-b-xl">
+                    <div className="bg-slate-50 px-6 py-4 w-full flex justify-end gap-3 border-t border-gray-100 mt-4">
                         <button 
                             onClick={handleSave} 
                             disabled={loading} 

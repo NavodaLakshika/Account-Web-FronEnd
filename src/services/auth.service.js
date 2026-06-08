@@ -8,9 +8,16 @@ const api = axios.create({
   },
 });
 
-// Add a response interceptor to handle token expiration (401)
+// Add a response interceptor to handle token expiration (401) and Trigger Global Refreshes
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    // Intercept mutations to auto-refresh reports globally
+    const method = response.config?.method?.toLowerCase();
+    if (['post', 'put', 'delete', 'patch'].includes(method)) {
+      window.dispatchEvent(new Event('reportDataChanged'));
+    }
+    return response;
+  },
   (error) => {
     if (error.response?.status === 401) {
       // Only redirect to login if this was NOT the login request itself
