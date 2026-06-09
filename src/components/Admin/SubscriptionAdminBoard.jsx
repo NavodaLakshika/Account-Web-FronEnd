@@ -95,26 +95,28 @@ const SubscriptionAdminBoard = () => {
   );
 
   return (
-    <div className="p-6 h-full flex flex-col bg-slate-50">
+    <div className="h-full flex flex-col">
       <div className="flex items-center justify-between mb-6">
-        <div>
-          <h2 className="text-2xl font-bold text-slate-800 flex items-center gap-2">
-            <UserCheck className="w-6 h-6 text-blue-600" />
-            Subscription & Pricing Management
-          </h2>
-          <p className="text-slate-500 text-sm mt-1">Manage employee free trials and subscription pricing plans</p>
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 bg-amber-50 flex items-center justify-center">
+            <CalendarClock className="w-4 h-4 text-amber-600" />
+          </div>
+          <div>
+            <h2 className="text-[15px] font-bold text-slate-800">Subscription & Pricing Management</h2>
+            <p className="text-[11px] text-slate-500 font-medium">Manage employee free trials and subscription pricing plans</p>
+          </div>
         </div>
         
-        <div className="flex bg-slate-200/50 p-1 rounded-xl">
+        <div className="flex bg-slate-200/50 p-1 rounded-[12px]">
             <button 
                 onClick={() => setActiveTab('users')}
-                className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${activeTab === 'users' ? 'bg-white shadow-sm text-blue-600' : 'text-slate-500 hover:text-slate-700'}`}
+                className={`px-4 py-2 rounded-[12px] text-xs font-bold transition-all ${activeTab === 'users' ? 'bg-white shadow-sm text-blue-600' : 'text-slate-500 hover:text-slate-700'}`}
             >
                 User Subscriptions
             </button>
             <button 
                 onClick={() => setActiveTab('plans')}
-                className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${activeTab === 'plans' ? 'bg-white shadow-sm text-blue-600' : 'text-slate-500 hover:text-slate-700'}`}
+                className={`px-4 py-2 rounded-[12px] text-xs font-bold transition-all ${activeTab === 'plans' ? 'bg-white shadow-sm text-blue-600' : 'text-slate-500 hover:text-slate-700'}`}
             >
                 Pricing Plans
             </button>
@@ -125,50 +127,49 @@ const SubscriptionAdminBoard = () => {
         <>
           <div className="flex items-center justify-end mb-4">
             <div className="relative w-64">
-              <Search className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
               <input 
                 type="text" 
                 placeholder="Search users..." 
-                className="w-full pl-10 pr-4 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
+                className="w-full pl-9 pr-4 py-2 text-[13px] bg-slate-100/60 border border-slate-200/60 rounded-[12px] focus:outline-none focus:ring-2 focus:ring-[#0078d4]/20 focus:border-[#0078d4]"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
               />
             </div>
           </div>
 
- <div className="flex-1 bg-white rounded-sm shadow-sm overflow-hidden flex flex-col">
-        <div className="overflow-x-auto">
+          <div className="flex-1 bg-white shadow-sm border border-slate-200/60 overflow-hidden flex flex-col">
+        <div className="w-full overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-slate-100/50 border-b border-slate-200 text-slate-600 text-sm">
-                <th className="p-4 font-semibold">Emp Code</th>
-                <th className="p-4 font-semibold">Name</th>
-                <th className="p-4 font-semibold">First Login</th>
-                <th className="p-4 font-semibold">Expiry Date</th>
-                <th className="p-4 font-semibold">Status</th>
-                <th className="p-4 font-semibold text-right">Actions</th>
+              <tr className="border-b border-slate-100 bg-slate-50/50">
+                <th className="py-3.5 px-6 text-[11px] font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap">Emp Code</th>
+                <th className="py-3.5 px-6 text-[11px] font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap">Name</th>
+                <th className="py-3.5 px-6 text-[11px] font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap">First Login</th>
+                <th className="py-3.5 px-6 text-[11px] font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap">Expiry Date</th>
+                <th className="py-3.5 px-6 text-[11px] font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap">Status</th>
+                <th className="py-3.5 px-6 text-[11px] font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap text-right">Actions</th>
               </tr>
             </thead>
             <tbody>
               {loadingUsers ? (
                 <tr>
-                  <td colSpan="6" className="p-8 text-center text-slate-400">
-                    <Loader2 className="w-8 h-8 animate-spin mx-auto mb-2" />
-                    Loading users...
+                  <td colSpan="6" className="py-8 text-center text-slate-400">
+                    <Loader2 className="w-6 h-6 animate-spin mx-auto" />
                   </td>
                 </tr>
               ) : filteredUsers.map(user => (
-                <tr key={user.emp_Code} className="border-b border-slate-100 hover:bg-slate-50/50 transition-colors">
-                  <td className="p-4 font-medium text-slate-700">{user.emp_Code}</td>
-                  <td className="p-4">{user.emp_Name}</td>
-                  <td className="p-4 text-slate-500">
+                <tr key={user.emp_Code} className="border-b border-slate-50 hover:bg-slate-50/80 transition-colors">
+                  <td className="py-3.5 px-6 font-mono text-[13px] text-slate-900 font-bold">{user.emp_Code}</td>
+                  <td className="py-3.5 px-6 text-[13px] text-slate-900 font-bold">{user.emp_Name}</td>
+                  <td className="py-3.5 px-6 text-[13px] text-slate-500 font-medium">
                     {user.first_Login_Date ? new Date(user.first_Login_Date).toLocaleDateString() : 'Never'}
                   </td>
-                  <td className="p-4 text-slate-500">
+                  <td className="py-3.5 px-6 text-[13px] text-slate-500 font-medium">
                     {user.subscription_End_Date ? new Date(user.subscription_End_Date).toLocaleDateString() : 'N/A'}
                   </td>
-                  <td className="p-4">
-                    <span className={`px-3 py-1 rounded-full text-xs font-bold ${
+                  <td className="py-3.5 px-6">
+                    <span className={`px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider ${
                       user.subscription_Status === 'Trial' ? 'bg-blue-100 text-blue-700' :
                       user.subscription_Status === 'Active' ? 'bg-emerald-100 text-emerald-700' :
                       'bg-red-100 text-red-700'
@@ -176,10 +177,10 @@ const SubscriptionAdminBoard = () => {
                       {user.subscription_Status || 'Trial'}
                     </span>
                   </td>
-                  <td className="p-4 text-right">
+                  <td className="py-3.5 px-6 text-right">
                     <button 
                       onClick={() => setSelectedUser(user)}
-                      className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-sm font-medium transition-colors"
+                      className="px-4 py-2 bg-[#0078d4]/10 hover:bg-[#0078d4]/20 text-[#0078d4] text-xs font-bold transition-colors"
                     >
                       Manage
                     </button>
@@ -188,7 +189,7 @@ const SubscriptionAdminBoard = () => {
               ))}
               {!loadingUsers && filteredUsers.length === 0 && (
                 <tr>
-                  <td colSpan="6" className="p-8 text-center text-slate-400">No users found.</td>
+                  <td colSpan="6" className="py-8 text-center text-[13px] text-slate-400 font-medium">No users found.</td>
                 </tr>
               )}
             </tbody>
@@ -206,7 +207,7 @@ const SubscriptionAdminBoard = () => {
                   setEditingPlan(null);
                   setShowPlanEditor(true);
                 }}
-                className="flex items-center gap-2 bg-[#f97316] text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-[#ea580c] transition-all shadow-sm"
+                className="flex items-center gap-2 bg-[#0078d4] hover:bg-[#005a9e] text-white px-4 py-2 text-xs font-bold shadow-sm transition-all"
              >
                 <Plus className="w-4 h-4" /> Add New Plan
              </button>
@@ -264,7 +265,7 @@ const SubscriptionAdminBoard = () => {
                         </div>
                     ))}
                     {plans.length === 0 && (
-                        <div className="col-span-full py-12 text-center text-slate-400 bg-white rounded-2xl border border-dashed border-slate-200">
+                        <div className="col-span-full py-12 text-center text-[13px] text-slate-400 font-medium bg-white border border-dashed border-slate-200">
                             No pricing plans created yet.
                         </div>
                     )}

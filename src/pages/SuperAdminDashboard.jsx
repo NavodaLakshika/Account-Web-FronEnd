@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import { DotLottiePlayer } from '@dotlottie/react-player';
 import { showSuccessToast } from '../utils/toastUtils';
 import api from '../services/api';
 import {
@@ -658,8 +659,14 @@ const SuperAdminDashboard = () => {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex items-center justify-center">
-                <Loader2 className="w-12 h-12 text-[#0078d4] animate-spin" />
+            <div className="fixed inset-0 z-[10010] flex items-center justify-center">
+                <div className="w-40 h-40">
+                    <DotLottiePlayer
+                        src="/lottiefile/DashboardLoader.lottie"
+                        autoplay
+                        loop
+                    />
+                </div>
             </div>
         );
     }
@@ -709,7 +716,7 @@ const SuperAdminDashboard = () => {
                             className={`w-full flex items-center  rounded-[12px] transition-all ${sidebarCollapsed ? 'justify-center px-0 py-3' : 'gap-3 px-3 py-2.5'} ${activeMenu === item.name
                                 ? 'bg-blue-50 text-[#0078d4] font-bold'
                                 : 'text-slate-600 hover:bg-[#f4f5f8] hover:text-[#0078d4] font-medium text-[13.5px]'
-                            }`}
+                                }`}
                             title={sidebarCollapsed ? item.name : undefined}
                         >
                             <item.icon className={`w-[18px] h-[18px] rounded-[12px] shrink-0 ${activeMenu === item.name ? 'text-[#0078d4]' : 'text-slate-400'}`} />
@@ -752,7 +759,7 @@ const SuperAdminDashboard = () => {
                                     className={`w-full flex items-center gap-3 px-3 py-2.5  rounded-[12px] transition-all ${activeMenu === item.name
                                         ? 'bg-blue-50 text-[#0078d4] font-bold'
                                         : 'text-slate-600 hover:bg-[#f4f5f8] hover:text-[#0078d4] font-medium text-[13.5px]'
-                                    }`}
+                                        }`}
                                 >
                                     <item.icon className={`w-[18px] h-[18px] ${activeMenu === item.name ? 'text-[#0078d4]' : 'text-slate-400'}`} />
                                     {item.name}
@@ -809,7 +816,7 @@ const SuperAdminDashboard = () => {
                                 {darkMode ? <Sun className="w-[18px] h-[18px]" /> : <Moon className="w-[18px] h-[18px]" />}
                             </button>
                             <div id="tour-topbar-messages" className="relative">
-                                <button 
+                                <button
                                     className="relative p-2  hover:bg-slate-100 text-slate-500 hover:text-[#0078d4] rounded-[12px] transition-colors"
                                     onClick={() => setShowMessageDropdown(!showMessageDropdown)}
                                 >
@@ -817,9 +824,9 @@ const SuperAdminDashboard = () => {
                                     <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500  border-2 border-white"></span>
                                 </button>
                                 {showMessageDropdown && (
-                                    <EmployeeMessageDropdown 
-                                        allEmployees={allEmployees} 
-                                        onClose={() => setShowMessageDropdown(false)} 
+                                    <EmployeeMessageDropdown
+                                        allEmployees={allEmployees}
+                                        onClose={() => setShowMessageDropdown(false)}
                                     />
                                 )}
                             </div>
@@ -1021,8 +1028,8 @@ const SuperAdminDashboard = () => {
                                                                 <span className="w-7 h-7  bg-emerald-100 text-emerald-700 flex items-center justify-center text-[11px] font-bold">
                                                                     {emp.companies.length}
                                                                 </span>
-                                                                {expandedEmps[emp.empCode] 
-                                                                    ? <ChevronDown className="w-[18px] h-[18px] text-slate-400" /> 
+                                                                {expandedEmps[emp.empCode]
+                                                                    ? <ChevronDown className="w-[18px] h-[18px] text-slate-400" />
                                                                     : <ChevronRight className="w-[18px] h-[18px] text-slate-400" />}
                                                             </div>
                                                         </td>
@@ -1040,8 +1047,8 @@ const SuperAdminDashboard = () => {
                                                                 >
                                                                     <Edit className="w-[18px] h-[18px]" />
                                                                 </button>
-                                                                <button 
-                                                                    className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50  rounded-[12px] transition-all" 
+                                                                <button
+                                                                    className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50  rounded-[12px] transition-all"
                                                                     onClick={(e) => handleDeleteEmployee(e, emp.empCode)}
                                                                     title="Delete Employee"
                                                                 >
@@ -1076,15 +1083,15 @@ const SuperAdminDashboard = () => {
                                                                                             <span className="text-[9px] font-bold uppercase tracking-widest text-slate-400 mb-0.5">Transactions</span>
                                                                                             <span className="text-[13px] font-black text-slate-700 bg-slate-100 px-2 py-0.5 ">{comp.transactions}</span>
                                                                                         </div>
-                                                                                        <button 
-                                                                                            className={`opacity-0 group-hover:opacity-100 p-1.5  rounded-[12px] transition-all ${comp.accDesable === 1 ? 'text-red-500 bg-red-50 hover:bg-red-100' : 'text-slate-400 hover:text-orange-500 hover:bg-orange-50'}`} 
+                                                                                        <button
+                                                                                            className={`opacity-0 group-hover:opacity-100 p-1.5  rounded-[12px] transition-all ${comp.accDesable === 1 ? 'text-red-500 bg-red-50 hover:bg-red-100' : 'text-slate-400 hover:text-orange-500 hover:bg-orange-50'}`}
                                                                                             onClick={(e) => { e.stopPropagation(); handleToggleCompanyLock(e, comp.companyCode); }}
                                                                                             title={comp.accDesable === 1 ? "Unlock Company" : "Lock Company"}
                                                                                         >
                                                                                             {comp.accDesable === 1 ? <Lock className="w-[18px] h-[18px]" /> : <Unlock className="w-[18px] h-[18px]" />}
                                                                                         </button>
-                                                                                        <button 
-                                                                                            className="opacity-0 group-hover:opacity-100 p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50  rounded-[12px] transition-all" 
+                                                                                        <button
+                                                                                            className="opacity-0 group-hover:opacity-100 p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50  rounded-[12px] transition-all"
                                                                                             onClick={(e) => { e.stopPropagation(); handleDeleteCompany(e, comp.companyCode, emp.empCode); }}
                                                                                             title="Remove Company Access"
                                                                                         >
@@ -1146,8 +1153,8 @@ const SuperAdminDashboard = () => {
                                                 <td className="py-3.5 px-6 text-[13px] text-slate-500 font-medium">{comp.phone || 'N/A'}</td>
                                                 <td className="py-3.5 px-6 text-right">
                                                     <div className="flex items-center justify-end gap-1">
-                                                        <button 
-                                                            className={`p-1.5  rounded-[12px] transition-all ${comp.acc_Desable === 1 ? 'text-red-500 bg-red-50 hover:bg-red-100' : 'text-slate-400 hover:text-orange-500 hover:bg-orange-50'}`} 
+                                                        <button
+                                                            className={`p-1.5  rounded-[12px] transition-all ${comp.acc_Desable === 1 ? 'text-red-500 bg-red-50 hover:bg-red-100' : 'text-slate-400 hover:text-orange-500 hover:bg-orange-50'}`}
                                                             onClick={(e) => handleToggleCompanyLock(e, comp.code)}
                                                             title={comp.acc_Desable === 1 ? "Unlock Company" : "Lock Company"}
                                                         >
@@ -1220,8 +1227,8 @@ const SuperAdminDashboard = () => {
                                                         >
                                                             <Edit className="w-[18px] h-[18px]" />
                                                         </button>
-                                                        <button 
-                                                            className={`p-1.5  rounded-[12px] transition-all ${emp.acc_Desable === "1" || emp.accDesable === "1" ? 'text-red-500 bg-red-50 hover:bg-red-100' : 'text-slate-400 hover:text-orange-500 hover:bg-orange-50'}`} 
+                                                        <button
+                                                            className={`p-1.5  rounded-[12px] transition-all ${emp.acc_Desable === "1" || emp.accDesable === "1" ? 'text-red-500 bg-red-50 hover:bg-red-100' : 'text-slate-400 hover:text-orange-500 hover:bg-orange-50'}`}
                                                             onClick={(e) => { e.stopPropagation(); handleToggleEmployeeLock(e, emp.empCode || emp.emp_Code); }}
                                                             title={(emp.acc_Desable === "1" || emp.accDesable === "1") ? "Unlock Employee" : "Lock Employee"}
                                                         >
@@ -1443,8 +1450,8 @@ const SuperAdminDashboard = () => {
                                                 key={role.id}
                                                 onClick={() => setSelectedRole(role.id)}
                                                 className={`px-3 py-1.5 text-xs font-bold rounded-[12px] transition-all ${selectedRole === role.id
-                                                        ? 'bg-[#0078d4] text-white shadow-sm'
-                                                        : 'bg-white hover:bg-slate-100 border border-slate-200 text-slate-600'
+                                                    ? 'bg-[#0078d4] text-white shadow-sm'
+                                                    : 'bg-white hover:bg-slate-100 border border-slate-200 text-slate-600'
                                                     }`}
                                             >
                                                 {role.name}
@@ -1467,7 +1474,13 @@ const SuperAdminDashboard = () => {
 
                             {loadingPermissions ? (
                                 <div className="flex flex-col items-center justify-center py-20 gap-3 text-slate-400">
-                                    <Loader2 className="animate-spin text-[#0078d4]" size={32} />
+                                    <div className="w-20 h-20">
+                                        <DotLottiePlayer
+                                            src="/lottiefile/DashboardLoader.lottie"
+                                            autoplay
+                                            loop
+                                        />
+                                    </div>
                                     <span className="text-xs font-bold">Fetching role permission matrix...</span>
                                 </div>
                             ) : !permissions.length ? (
@@ -1561,8 +1574,8 @@ const SuperAdminDashboard = () => {
                                                                     <button
                                                                         onClick={() => handleInitiateToggle(code)}
                                                                         className={`px-3 py-1 text-[10px] font-black uppercase tracking-wider rounded-[12px] transition-all ${isAllowed
-                                                                                ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                                                                                : 'bg-red-50 text-red-700 border border-red-200'
+                                                                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                                                                            : 'bg-red-50 text-red-700 border border-red-200'
                                                                             }`}
                                                                     >
                                                                         {isAllowed ? 'Allowed' : 'Denied'}
@@ -1588,11 +1601,11 @@ const SuperAdminDashboard = () => {
                                         const term = permSearch.toLowerCase();
                                         return code.includes(term) || desc.includes(term);
                                     }).length && (
-                                        <div className="flex items-center justify-center py-12 text-slate-400 gap-2">
-                                            <Search size={16} />
-                                            <span className="text-xs font-medium">No functions match your search.</span>
-                                        </div>
-                                    )}
+                                            <div className="flex items-center justify-center py-12 text-slate-400 gap-2">
+                                                <Search size={16} />
+                                                <span className="text-xs font-medium">No functions match your search.</span>
+                                            </div>
+                                        )}
                                 </div>
                             )}
                         </div>
@@ -1810,7 +1823,7 @@ const SuperAdminDashboard = () => {
             {/* Edit Role Modal */}
             {editingEmp && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/30 backdrop-blur-sm backdrop-blur-sm p-4">
- <div className="bg-white dark:bg-slate-800  shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200 font-sans">
+                    <div className="bg-white dark:bg-slate-800  shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200 font-sans">
                         {/* Header */}
                         <div className="p-6 border-b border-slate-100 dark:border-slate-700">
                             <div className="flex items-center justify-between">
@@ -1846,11 +1859,10 @@ const SuperAdminDashboard = () => {
                                         <button
                                             key={role.id}
                                             onClick={() => setSelectedRoleId(role.id)}
-                                            className={`px-3 py-1.5  text-xs font-bold rounded-[12px] transition-all ${
-                                                selectedRoleId === role.id
-                                                    ? 'bg-[#0078d4] text-white shadow-sm'
-                                                    : 'bg-white dark:bg-slate-700 hover:bg-slate-100 dark:hover:bg-slate-600 border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300'
-                                            }`}
+                                            className={`px-3 py-1.5  text-xs font-bold rounded-[12px] transition-all ${selectedRoleId === role.id
+                                                ? 'bg-[#0078d4] text-white shadow-sm'
+                                                : 'bg-white dark:bg-slate-700 hover:bg-slate-100 dark:hover:bg-slate-600 border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300'
+                                                }`}
                                         >
                                             {role.name} ({role.id})
                                         </button>
@@ -1867,11 +1879,10 @@ const SuperAdminDashboard = () => {
                                         <button
                                             key={g.group_Id}
                                             onClick={() => setSelectedGroupName(g.group_Name)}
-                                            className={`px-3 py-1.5  text-xs font-bold rounded-[12px] transition-all ${
-                                                selectedGroupName === g.group_Name
-                                                    ? 'bg-[#0078d4] text-white shadow-sm'
-                                                    : 'bg-white dark:bg-slate-700 hover:bg-slate-100 dark:hover:bg-slate-600 border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300'
-                                            }`}
+                                            className={`px-3 py-1.5  text-xs font-bold rounded-[12px] transition-all ${selectedGroupName === g.group_Name
+                                                ? 'bg-[#0078d4] text-white shadow-sm'
+                                                : 'bg-white dark:bg-slate-700 hover:bg-slate-100 dark:hover:bg-slate-600 border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300'
+                                                }`}
                                         >
                                             {g.group_Name}
                                         </button>
@@ -1905,7 +1916,7 @@ const SuperAdminDashboard = () => {
             {/* Employee Details View Modal */}
             {selectedEmployeeView && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/30 backdrop-blur-sm backdrop-blur-sm p-4">
- <div className="bg-white dark:bg-slate-800  shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden animate-in fade-in zoom-in duration-200 flex flex-col font-sans">
+                    <div className="bg-white dark:bg-slate-800  shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden animate-in fade-in zoom-in duration-200 flex flex-col font-sans">
                         <div className="p-6 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between bg-slate-50/50 dark:bg-slate-800/50 rounded-[12px] shrink-0">
                             <div className="flex items-center gap-4">
                                 <div className="w-12 h-12  bg-purple-50 dark:bg-purple-500/10 flex items-center justify-center">
@@ -1926,7 +1937,7 @@ const SuperAdminDashboard = () => {
                                     ...selectedEmployeeView,
                                     'PASSWORD': selectedEmployeeView.pass_Word || selectedEmployeeView.password || selectedEmployeeView.Pass_Word || '•••••••• (Encrypted by Backend)'
                                 }).map(([key, value]) => (
- <div key={key} className="bg-white dark:bg-slate-700 p-4  dark:border-slate-600 shadow-sm flex flex-col justify-center">
+                                    <div key={key} className="bg-white dark:bg-slate-700 p-4  dark:border-slate-600 shadow-sm flex flex-col justify-center">
                                         <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-1">{key.replace(/_/g, ' ')}</h3>
                                         <p className="text-sm font-bold text-slate-800 dark:text-slate-200 break-all">{value !== null && value !== undefined && value !== '' ? String(value) : <span className="text-slate-300 dark:text-slate-500 font-normal italic">Empty</span>}</p>
                                     </div>
@@ -2004,7 +2015,7 @@ const SuperAdminDashboard = () => {
             {/* Target Selection Sub-Modal for Role Features */}
             {showPermTargetModal && (
                 <div className="fixed inset-0 z-[200] flex items-center justify-center bg-slate-900/30 backdrop-blur-sm backdrop-blur-sm p-4 font-sans">
- <div className="bg-white dark:bg-slate-800  shadow-2xl w-full max-w-md overflow-visible animate-in fade-in zoom-in-95 duration-200 flex flex-col">
+                    <div className="bg-white dark:bg-slate-800  shadow-2xl w-full max-w-md overflow-visible animate-in fade-in zoom-in-95 duration-200 flex flex-col">
                         <div className="p-5 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between bg-slate-50 dark:bg-slate-700/50 ">
                             <h3 className="text-sm font-bold tracking-wide uppercase text-slate-900 dark:text-white">Select Target Scope</h3>
                             <button onClick={() => setShowPermTargetModal(false)} className="w-8 h-8 flex items-center justify-center  text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-[12px] transition-colors">
@@ -2036,7 +2047,7 @@ const SuperAdminDashboard = () => {
                                     </button>
 
                                     {permEmpSearchTriggered && (
- <div className="absolute top-[100%] mt-2 left-0 w-full z-50 bg-white dark:bg-slate-700 dark:border-slate-600  shadow-2xl max-h-[250px] overflow-y-auto flex flex-col">
+                                        <div className="absolute top-[100%] mt-2 left-0 w-full z-50 bg-white dark:bg-slate-700 dark:border-slate-600  shadow-2xl max-h-[250px] overflow-y-auto flex flex-col">
                                             <div
                                                 onClick={() => {
                                                     setSelectedPermEmployee('');
@@ -2110,7 +2121,7 @@ const SuperAdminDashboard = () => {
                                     </button>
 
                                     {permCompSearchTriggered && (
- <div className="absolute top-[100%] mt-2 left-0 w-full z-50 bg-white dark:bg-slate-700 dark:border-slate-600  shadow-2xl max-h-[250px] overflow-y-auto flex flex-col">
+                                        <div className="absolute top-[100%] mt-2 left-0 w-full z-50 bg-white dark:bg-slate-700 dark:border-slate-600  shadow-2xl max-h-[250px] overflow-y-auto flex flex-col">
                                             <div
                                                 onClick={() => {
                                                     setSelectedPermCompany('');

@@ -215,9 +215,9 @@ const Dashboard = () => {
     const [showCompanyUsersModal, setShowCompanyUsersModal] = useState(false);
     const [showReportsCenterModal, setShowReportsCenterModal] = useState(false);
     const [navReportSearch, setNavReportSearch] = useState('');
-    
+
     const getCompanyFavKey = () => `favorite_reports_${selectedCompany?.Company_Id || selectedCompany?.companyId || 'default'}`;
-    
+
     const [favoriteReports, setFavoriteReports] = useState([]);
 
     useEffect(() => {
@@ -232,11 +232,11 @@ const Dashboard = () => {
             localStorage.setItem(getCompanyFavKey(), JSON.stringify(favoriteReports));
         }
     }, [favoriteReports, selectedCompany]);
-    
+
     const toggleFavoriteReport = (e, reportLabel) => {
         e.stopPropagation();
-        setFavoriteReports(prev => 
-            prev.includes(reportLabel) 
+        setFavoriteReports(prev =>
+            prev.includes(reportLabel)
                 ? prev.filter(r => r !== reportLabel)
                 : [...prev, reportLabel]
         );
@@ -347,6 +347,7 @@ const Dashboard = () => {
     const [showQuickLaunchModal, setShowQuickLaunchModal] = useState(false);
     const [showPromoModal, setShowPromoModal] = useState(false);
     const [showFirstTimeGuide, setShowFirstTimeGuide] = useState(false);
+    const [showDashboardLoader, setShowDashboardLoader] = useState(false);
     const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
     const [showDashboardLockedModal, setShowDashboardLockedModal] = useState(false);
 
@@ -387,16 +388,16 @@ const Dashboard = () => {
             }
         }, 40);
         return () => clearInterval(interval);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [user]);
 
     // Subtitle Typing & Rotation
     useEffect(() => {
         if (!showSubtitle) return;
-        
+
         const currentTip = subtitleTips[subtitleTipIndex];
         setTypedSubtitle(currentTip);
-        
+
         // Change tip every 30 seconds
         const rotationInterval = setInterval(() => {
             setShowSubtitle(false); // triggers fade out
@@ -409,7 +410,7 @@ const Dashboard = () => {
         return () => {
             clearInterval(rotationInterval);
         };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [showSubtitle, subtitleTipIndex]);
     const [isReportLoading, setIsReportLoading] = useState(false);
     const [showSubscriptionExpiredModal, setShowSubscriptionExpiredModal] = useState(false);
@@ -515,7 +516,7 @@ const Dashboard = () => {
         }, 100);
         tipTimerRef.current = setTimeout(() => {
             setShowNotificationTip(false);
-            
+
             // Schedule the next tip since this one was ignored and auto-hid
             const nextIdx = findNextTip(currentTipIndex + 1, dismissedTips);
             if (nextIdx !== -1) {
@@ -531,7 +532,7 @@ const Dashboard = () => {
         // Show first undismissed tip after 2 seconds
         let currentDismissed = dismissedTips;
         let idx = findNextTip(0, currentDismissed);
-        
+
         // If all tips have been dismissed, reset the array so they loop
         if (idx === -1) {
             currentDismissed = [];
@@ -539,12 +540,12 @@ const Dashboard = () => {
             localStorage.setItem('dismissedTips', '[]');
             idx = 0;
         }
-        
+
         setCurrentTipIndex(idx);
         const timer = setTimeout(() => {
             setShowNotificationTip(true);
         }, 2000);
-        
+
         return () => clearTimeout(timer);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
@@ -569,24 +570,24 @@ const Dashboard = () => {
         setShowNotificationTip(false);
         clearTimeout(tipTimerRef.current);
         clearInterval(tipProgressRef.current);
-        
+
         let updated = [...dismissedTips, id];
-        
+
         if (!scheduleNext) {
             setDismissedTips(updated);
             localStorage.setItem('dismissedTips', JSON.stringify(updated));
             return;
         }
-        
+
         // Show next tip after 1 minute
         let nextIdx = findNextTip(currentTipIndex + 1, updated);
-        
+
         // Loop if all are dismissed
         if (nextIdx === -1) {
             updated = [];
             nextIdx = 0;
         }
-        
+
         setDismissedTips(updated);
         localStorage.setItem('dismissedTips', JSON.stringify(updated));
 
@@ -677,7 +678,7 @@ const Dashboard = () => {
                     try {
                         const modulesRes = await api.get(`/SuperAdmin/modules/hidden?empCode=${empCode}&companyCode=${companyCode}`);
                         setLockedModules(modulesRes.data || []);
-                    } catch(e) {
+                    } catch (e) {
                         console.error("Failed to fetch hidden modules", e);
                     }
 
@@ -685,7 +686,7 @@ const Dashboard = () => {
                     try {
                         const reportsRes = await api.get(`/SuperAdmin/reports/hidden?empCode=${empCode}&companyCode=${companyCode}`);
                         setHiddenReports(reportsRes.data || []);
-                    } catch(e) {
+                    } catch (e) {
                         console.error("Failed to fetch hidden reports", e);
                     }
                 }
@@ -705,20 +706,25 @@ const Dashboard = () => {
             setUser(currentUser);
             setSelectedCompany(company ? JSON.parse(company) : null);
 
-            // Show first-time onboarding guide (per-user — only once per employee)
-            const userId = currentUser?.EmpCode || currentUser?.empCode || currentUser?.emp_Code || currentUser?.id_No || currentUser?.Id_No || currentUser?.IdNo || currentUser?.username || currentUser?.EmpName;
-            const onboardKey = `onboardingDone_${userId}`;
-            if (!localStorage.getItem(onboardKey)) {
-                setTimeout(() => setShowFirstTimeGuide(true), 1000);
-            }
-
+            // Check subscription status — block expired accounts
+            const subStatus = currentUser?.SubscriptionStatus || currentUser?.subscriptionStatus || currentUser?.subscription_Status || '';
             const subEndDateStr = currentUser?.SubscriptionEndDate || currentUser?.subscriptionEndDate || currentUser?.subscription_End_Date;
-
-            if (subEndDateStr) {
+            let isExpired = subStatus.toLowerCase() === 'expired';
+            if (!isExpired && subEndDateStr) {
                 const endDate = new Date(subEndDateStr);
                 const now = new Date();
-                if (now > endDate) {
-                    setShowSubscriptionExpiredModal(true);
+                if (now > endDate) isExpired = true;
+            }
+
+            if (isExpired) {
+                // Only show the subscription expired modal — do NOT show the onboarding guide
+                setShowSubscriptionExpiredModal(true);
+            } else {
+                // Show first-time onboarding guide (per-user — only once per employee)
+                const userId = currentUser?.EmpCode || currentUser?.empCode || currentUser?.emp_Code || currentUser?.id_No || currentUser?.Id_No || currentUser?.IdNo || currentUser?.username || currentUser?.EmpName;
+                const onboardKey = `onboardingDone_${userId}`;
+                if (!localStorage.getItem(onboardKey)) {
+                    setTimeout(() => setShowFirstTimeGuide(true), 1000);
                 }
             }
 
@@ -1143,7 +1149,7 @@ const Dashboard = () => {
                 ]
             }
         ],
-                'Reports': [
+        'Reports': [
             {
                 group: 'Business Overview',
                 items: [
@@ -1275,7 +1281,7 @@ const Dashboard = () => {
                 ]
             }
         ],
-          'System Admin': [
+        'System Admin': [
             { label: 'Data Backup', onClick: () => setShowDatabaseBackupModal(true) },
             { label: 'Stock Balance Update', onClick: () => setShowStockBalanceUpdateModal(true) },
             { label: 'Inventory Download', onClick: () => setShowInventoryDownloadModal(true) },
@@ -1527,8 +1533,26 @@ const Dashboard = () => {
             />
             {selectedReport && <ReportTemplate companyName={selectedCompany?.CompanyName || selectedCompany?.companyName || 'ONIMTA IT SOLUTIONS'} title={selectedReport} subtitle={`As of ${new Date().toLocaleDateString()}`} onClose={() => setSelectedReport(null)} onSwitchReport={setSelectedReport} />}
             <SubmitReviewModal isOpen={showReviewModal} onClose={() => setShowReviewModal(false)} currentUser={user} />
-            <FirstTimeGuide isOpen={showFirstTimeGuide} onClose={() => setShowFirstTimeGuide(false)} onOpenMasterFile={() => setShowMasterFileModal(true)} onCloseMasterFile={() => setShowMasterFileModal(false)} user={user} />
+            <FirstTimeGuide
+                isOpen={showFirstTimeGuide}
+                onClose={() => {
+                    setShowFirstTimeGuide(false);
+                    setShowDashboardLoader(true);
+                    setTimeout(() => setShowDashboardLoader(false), 3000);
+                }}
+                onOpenMasterFile={() => setShowMasterFileModal(true)}
+                onCloseMasterFile={() => setShowMasterFileModal(false)}
+                user={user}
+            />
             <CompanyPromoBoard isOpen={showPromoModal} onClose={() => setShowPromoModal(false)} />
+            <SubscriptionExpiredModal
+                isOpen={showSubscriptionExpiredModal}
+                userStatus={user?.SubscriptionStatus || user?.subscriptionStatus || ''}
+                onSubscribe={() => {
+                    setShowSubscriptionExpiredModal(false);
+                    setShowPricingPlansModal(true);
+                }}
+            />
             <SystemAdminModal
                 isOpen={showSystemAdminModal}
                 onClose={() => setShowSystemAdminModal(false)}
@@ -1579,9 +1603,9 @@ const Dashboard = () => {
             <SendFileBoard isOpen={showSendFileBoard} onClose={() => setShowSendFileBoard(false)} />
             <FindBoard isOpen={showFindBoard} onClose={() => setShowFindBoard(false)} />
             <CustomizeIconBarBoard isOpen={showCustomizeIconBarBoard} onClose={() => setShowCustomizeIconBarBoard(false)} onSave={() => window.location.reload()} />
-            <ChangeBackgroundBoard 
-                isOpen={showChangeBackgroundBoard} 
-                onClose={() => setShowChangeBackgroundBoard(false)} 
+            <ChangeBackgroundBoard
+                isOpen={showChangeBackgroundBoard}
+                onClose={() => setShowChangeBackgroundBoard(false)}
                 currentTopBarColor={topBarColor}
                 onColorSelect={(color) => {
                     setTopBarColor(color);
@@ -1601,10 +1625,10 @@ const Dashboard = () => {
             <JournalEntryEditorModal isOpen={showJournalEntryEditorModal} onClose={() => setShowJournalEntryEditorModal(false)} />
             <TransactionEditorModal isOpen={showTransactionEditorModal} onClose={() => setShowTransactionEditorModal(false)} />
             <CompanyUsersModal isOpen={showCompanyUsersModal} onClose={() => setShowCompanyUsersModal(false)} />
-            <ReportsCenterModal 
-                isOpen={showReportsCenterModal} 
-                onClose={() => setShowReportsCenterModal(false)} 
-                onSelectReport={setSelectedReport} 
+            <ReportsCenterModal
+                isOpen={showReportsCenterModal}
+                onClose={() => setShowReportsCenterModal(false)}
+                onSelectReport={setSelectedReport}
                 empCode={user?.EmpCode || user?.empCode || user?.emp_Code || user?.id_No || user?.Id_No || user?.IdNo}
                 companyCode={selectedCompany?.Company_Id || selectedCompany?.companyId || selectedCompany?.code || selectedCompany?.companyCode}
             />
@@ -1636,6 +1660,19 @@ const Dashboard = () => {
                     setShowThankYouModal(true);
                 }}
             />
+
+            {/* Dashboard Loader Overlay */}
+            {showDashboardLoader && (
+                <div className="fixed inset-0 z-[999999] flex items-center justify-center bg-white/60 backdrop-blur-[3px]">
+                    <div className="w-[150px] h-[150px]">
+                        <DotLottiePlayer
+                            src="/lottiefile/DashboardLoader.lottie"
+                            autoplay
+                            loop
+                        />
+                    </div>
+                </div>
+            )}
 
             {/* AI Thinking Overlay (Robot Animation centered) */}
             {isAIThinking && (() => {
@@ -1780,7 +1817,7 @@ const Dashboard = () => {
                                     </button>
                                     {activeMenu === item && items.length > 0 && (() => {
                                         const isReports = item === 'Reports';
-                                        const baseItems = isReports 
+                                        const baseItems = isReports
                                             ? [
                                                 ...(favoriteReports.length > 0 ? [{
                                                     group: 'Favorites',
@@ -1793,7 +1830,7 @@ const Dashboard = () => {
                                                     }).filter(Boolean)
                                                 }] : []),
                                                 ...items
-                                              ]
+                                            ]
                                             : items;
                                         const filteredItems = isReports && navReportSearch.trim()
                                             ? baseItems.map(g => ({
@@ -1801,127 +1838,128 @@ const Dashboard = () => {
                                                 items: g.items.filter(sub =>
                                                     sub.label.toLowerCase().includes(navReportSearch.toLowerCase())
                                                 )
-                                              })).filter(g => g.items.length > 0)
+                                            })).filter(g => g.items.length > 0)
                                             : baseItems;
                                         return (
-                                        <div
-                                            className="fixed sm:absolute top-[56px] sm:top-full left-2 sm:left-1/2 right-2 sm:right-auto sm:-translate-x-1/2 mt-0 sm:mt-3 bg-white shadow-[0_8px_30px_rgb(0,0,0,0.12)] rounded-none py-4 sm:py-6 px-4 sm:px-6 z-[200] border border-gray-100 w-auto sm:w-max max-w-[95vw] lg:max-w-6xl max-h-[85vh] sm:max-h-none overflow-y-auto"
-                                            onMouseEnter={() => clearTimeout(menuTimeoutRef.current)}
-                                            onMouseLeave={() => {
-                                                menuTimeoutRef.current = setTimeout(() => setActiveMenu(null), 200);
-                                            }}
-                                        >
-                                            {isReports && (
-                                                <div className="mb-4 flex items-center gap-2 px-2 py-1.5 bg-gray-50 border border-gray-200 rounded-lg">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><circle cx="11" cy="11" r="8"/><path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35"/></svg>
-                                                    <input
-                                                        type="text"
-                                                        placeholder="Search reports..."
-                                                        value={navReportSearch}
-                                                        onChange={e => setNavReportSearch(e.target.value)}
-                                                        onMouseEnter={() => clearTimeout(menuTimeoutRef.current)}
-                                                        autoFocus
-                                                        className="flex-1 text-[13px] font-medium text-gray-800 bg-transparent outline-none placeholder:text-gray-400 min-w-[220px]"
-                                                    />
-                                                    {navReportSearch && (
-                                                        <button onClick={() => setNavReportSearch('')} className="text-gray-400 hover:text-gray-600 text-[10px] font-bold uppercase tracking-wide">✕</button>
-                                                    )}
-                                                </div>
-                                            )}
-                                            <div className="max-h-[75vh] overflow-y-auto overflow-x-hidden no-scrollbar">
-                                                {filteredItems.length === 0 ? (
-                                                    <div className="py-8 text-center text-[13px] text-gray-400 min-w-[220px]">
-                                                        No reports match <span className="font-bold text-gray-600">"{navReportSearch}"</span>
-                                                    </div>
-                                                ) : filteredItems[0]?.group ? (() => {
-                                                    const renderMasonry = (numCols) => {
-                                                        const cols = Array.from({ length: numCols }, () => []);
-                                                        filteredItems.forEach((item, i) => {
-                                                            cols[i % numCols].push(item);
-                                                        });
-                                                        return cols.map((colItems, colIndex) => (
-                                                            <div key={colIndex} className="flex flex-col gap-6 sm:gap-8">
-                                                                {colItems.map((menuItem, i) => (
-                                                                    <div key={i} className="flex flex-col">
-                                                                        <h3 className="text-[11px] font-sans font-bold text-gray-500 uppercase tracking-widest mb-3 sm:mb-4">{menuItem.group}</h3>
-                                                                        <div className="flex flex-col gap-2 sm:gap-3">
-                                                                            {menuItem.items.map((subItem, j) => {
-                                                                                const isLockedReport = (isReports && (hiddenReports.includes(subItem.label) || hiddenReports.includes(subItem.label.toLowerCase().replace(/ /g, '-').replace(/\//g, '-')))) || (subItem.lockId && isModuleLocked(subItem.lockId));
-                                                                                return (
-                                                                                <div key={j} className={`flex items-center group/item relative ${isLockedReport ? 'opacity-60 cursor-not-allowed' : ''}`}>
-                                                                                    <button
-                                                                                        onClick={() => {
-                                                                                            if (isLockedReport) return;
-                                                                                            subItem.onClick();
-                                                                                            setActiveMenu(null);
-                                                                                            setNavReportSearch('');
-                                                                                        }}
-                                                                                        disabled={isLockedReport}
-                                                                                        className={`w-full text-left text-[13px] font-sans font-medium text-gray-600 ${isLockedReport ? '' : 'hover:text-[#0078d4] hover:bg-[#f4f5f8]'} px-2 py-1.5 -mx-2 rounded-md transition-all flex items-center justify-between pr-8`}
-                                                                                    >
-                                                                                        <span className="truncate">{subItem.label}</span>
-                                                                                        {isLockedReport && <Lock size={12} className="text-slate-400 group-hover/item:text-red-500 transition-colors shrink-0 ml-2" />}
-                                                                                    </button>
-                                                                                    {isReports && !isLockedReport && (
-                                                                                        <button
-                                                                                            onClick={(e) => toggleFavoriteReport(e, subItem.label)}
-                                                                                            className={`absolute right-2 p-1.5 transition-opacity ${favoriteReports.includes(subItem.label) ? 'opacity-100' : 'opacity-0 group-hover/item:opacity-100'}`}
-                                                                                        >
-                                                                                            <Star size={14} className={favoriteReports.includes(subItem.label) ? "fill-[#eab308] text-[#eab308]" : "text-gray-400 hover:text-[#eab308]"} />
-                                                                                        </button>
-                                                                                    )}
-                                                                                </div>
-                                                                            )})}
-                                                                        </div>
-                                                                    </div>
-                                                                ))}
-                                                            </div>
-                                                        ));
-                                                    };
-
-                                                    let lgCols = 4;
-                                                    if (filteredItems.length === 1) lgCols = 1;
-                                                    else if (filteredItems.length === 2) lgCols = 2;
-                                                    else if (filteredItems.length === 3) lgCols = 3;
-                                                    else if (filteredItems.length === 4) lgCols = 4;
-                                                    else if (filteredItems.length === 5) lgCols = 3;
-                                                    else if (filteredItems.length === 6) lgCols = 3;
-                                                    else if (filteredItems.length === 7) lgCols = 4;
-                                                    else lgCols = 4;
-
-                                                    let smCols = Math.min(2, filteredItems.length);
-
-                                                    return (
-                                                        <>
-                                                            <div className="hidden lg:flex flex-row gap-8 xl:gap-12">
-                                                                {renderMasonry(lgCols)}
-                                                            </div>
-                                                            <div className="hidden sm:flex lg:hidden flex-row gap-8">
-                                                                {renderMasonry(smCols)}
-                                                            </div>
-                                                            <div className="flex sm:hidden flex-col gap-6">
-                                                                {renderMasonry(1)}
-                                                            </div>
-                                                        </>
-                                                    );
-                                                })() : (
-                                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 sm:gap-x-8 gap-y-2 sm:gap-y-3 min-w-0 sm:min-w-[320px]">
-                                                        {filteredItems.map((menuItem, i) => (
-                                                            <button
-                                                                key={i}
-                                                                onClick={() => {
-                                                                    menuItem.onClick();
-                                                                    setActiveMenu(null);
-                                                                }}
-                                                                className="w-full text-left text-[13px] font-sans font-medium text-gray-600 hover:text-[#0078d4] hover:bg-[#f4f5f8] px-2 py-1.5 -mx-2 rounded-md transition-all block"
-                                                            >
-                                                                {menuItem.label}
-                                                            </button>
-                                                        ))}
+                                            <div
+                                                className="fixed sm:absolute top-[56px] sm:top-full left-2 sm:left-1/2 right-2 sm:right-auto sm:-translate-x-1/2 mt-0 sm:mt-3 bg-white shadow-[0_8px_30px_rgb(0,0,0,0.12)] rounded-none py-4 sm:py-6 px-4 sm:px-6 z-[200] border border-gray-100 w-auto sm:w-max max-w-[95vw] lg:max-w-6xl max-h-[85vh] sm:max-h-none overflow-y-auto"
+                                                onMouseEnter={() => clearTimeout(menuTimeoutRef.current)}
+                                                onMouseLeave={() => {
+                                                    menuTimeoutRef.current = setTimeout(() => setActiveMenu(null), 200);
+                                                }}
+                                            >
+                                                {isReports && (
+                                                    <div className="mb-4 flex items-center gap-2 px-2 py-1.5 bg-gray-50 border border-gray-200 rounded-lg">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><circle cx="11" cy="11" r="8" /><path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35" /></svg>
+                                                        <input
+                                                            type="text"
+                                                            placeholder="Search reports..."
+                                                            value={navReportSearch}
+                                                            onChange={e => setNavReportSearch(e.target.value)}
+                                                            onMouseEnter={() => clearTimeout(menuTimeoutRef.current)}
+                                                            autoFocus
+                                                            className="flex-1 text-[13px] font-medium text-gray-800 bg-transparent outline-none placeholder:text-gray-400 min-w-[220px]"
+                                                        />
+                                                        {navReportSearch && (
+                                                            <button onClick={() => setNavReportSearch('')} className="text-gray-400 hover:text-gray-600 text-[10px] font-bold uppercase tracking-wide">✕</button>
+                                                        )}
                                                     </div>
                                                 )}
+                                                <div className="max-h-[75vh] overflow-y-auto overflow-x-hidden no-scrollbar">
+                                                    {filteredItems.length === 0 ? (
+                                                        <div className="py-8 text-center text-[13px] text-gray-400 min-w-[220px]">
+                                                            No reports match <span className="font-bold text-gray-600">"{navReportSearch}"</span>
+                                                        </div>
+                                                    ) : filteredItems[0]?.group ? (() => {
+                                                        const renderMasonry = (numCols) => {
+                                                            const cols = Array.from({ length: numCols }, () => []);
+                                                            filteredItems.forEach((item, i) => {
+                                                                cols[i % numCols].push(item);
+                                                            });
+                                                            return cols.map((colItems, colIndex) => (
+                                                                <div key={colIndex} className="flex flex-col gap-6 sm:gap-8">
+                                                                    {colItems.map((menuItem, i) => (
+                                                                        <div key={i} className="flex flex-col">
+                                                                            <h3 className="text-[11px] font-sans font-bold text-gray-500 uppercase tracking-widest mb-3 sm:mb-4">{menuItem.group}</h3>
+                                                                            <div className="flex flex-col gap-2 sm:gap-3">
+                                                                                {menuItem.items.map((subItem, j) => {
+                                                                                    const isLockedReport = (isReports && (hiddenReports.includes(subItem.label) || hiddenReports.includes(subItem.label.toLowerCase().replace(/ /g, '-').replace(/\//g, '-')))) || (subItem.lockId && isModuleLocked(subItem.lockId));
+                                                                                    return (
+                                                                                        <div key={j} className={`flex items-center group/item relative ${isLockedReport ? 'opacity-60 cursor-not-allowed' : ''}`}>
+                                                                                            <button
+                                                                                                onClick={() => {
+                                                                                                    if (isLockedReport) return;
+                                                                                                    subItem.onClick();
+                                                                                                    setActiveMenu(null);
+                                                                                                    setNavReportSearch('');
+                                                                                                }}
+                                                                                                disabled={isLockedReport}
+                                                                                                className={`w-full text-left text-[13px] font-sans font-medium text-gray-600 ${isLockedReport ? '' : 'hover:text-[#0078d4] hover:bg-[#f4f5f8]'} px-2 py-1.5 -mx-2 rounded-md transition-all flex items-center justify-between pr-8`}
+                                                                                            >
+                                                                                                <span className="truncate">{subItem.label}</span>
+                                                                                                {isLockedReport && <Lock size={12} className="text-slate-400 group-hover/item:text-red-500 transition-colors shrink-0 ml-2" />}
+                                                                                            </button>
+                                                                                            {isReports && !isLockedReport && (
+                                                                                                <button
+                                                                                                    onClick={(e) => toggleFavoriteReport(e, subItem.label)}
+                                                                                                    className={`absolute right-2 p-1.5 transition-opacity ${favoriteReports.includes(subItem.label) ? 'opacity-100' : 'opacity-0 group-hover/item:opacity-100'}`}
+                                                                                                >
+                                                                                                    <Star size={14} className={favoriteReports.includes(subItem.label) ? "fill-[#eab308] text-[#eab308]" : "text-gray-400 hover:text-[#eab308]"} />
+                                                                                                </button>
+                                                                                            )}
+                                                                                        </div>
+                                                                                    )
+                                                                                })}
+                                                                            </div>
+                                                                        </div>
+                                                                    ))}
+                                                                </div>
+                                                            ));
+                                                        };
+
+                                                        let lgCols = 4;
+                                                        if (filteredItems.length === 1) lgCols = 1;
+                                                        else if (filteredItems.length === 2) lgCols = 2;
+                                                        else if (filteredItems.length === 3) lgCols = 3;
+                                                        else if (filteredItems.length === 4) lgCols = 4;
+                                                        else if (filteredItems.length === 5) lgCols = 3;
+                                                        else if (filteredItems.length === 6) lgCols = 3;
+                                                        else if (filteredItems.length === 7) lgCols = 4;
+                                                        else lgCols = 4;
+
+                                                        let smCols = Math.min(2, filteredItems.length);
+
+                                                        return (
+                                                            <>
+                                                                <div className="hidden lg:flex flex-row gap-8 xl:gap-12">
+                                                                    {renderMasonry(lgCols)}
+                                                                </div>
+                                                                <div className="hidden sm:flex lg:hidden flex-row gap-8">
+                                                                    {renderMasonry(smCols)}
+                                                                </div>
+                                                                <div className="flex sm:hidden flex-col gap-6">
+                                                                    {renderMasonry(1)}
+                                                                </div>
+                                                            </>
+                                                        );
+                                                    })() : (
+                                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 sm:gap-x-8 gap-y-2 sm:gap-y-3 min-w-0 sm:min-w-[320px]">
+                                                            {filteredItems.map((menuItem, i) => (
+                                                                <button
+                                                                    key={i}
+                                                                    onClick={() => {
+                                                                        menuItem.onClick();
+                                                                        setActiveMenu(null);
+                                                                    }}
+                                                                    className="w-full text-left text-[13px] font-sans font-medium text-gray-600 hover:text-[#0078d4] hover:bg-[#f4f5f8] px-2 py-1.5 -mx-2 rounded-md transition-all block"
+                                                                >
+                                                                    {menuItem.label}
+                                                                </button>
+                                                            ))}
+                                                        </div>
+                                                    )}
+                                                </div>
                                             </div>
-                                        </div>
                                         );
                                     })()}
                                 </div>
@@ -1953,19 +1991,19 @@ const Dashboard = () => {
                                                     {menuItem.items.map((subItem, j) => {
                                                         const isLockedSettings = subItem.lockId && isModuleLocked(subItem.lockId);
                                                         return (
-                                                        <button
-                                                            key={j}
-                                                            disabled={isLockedSettings}
-                                                            onClick={() => {
-                                                                if (isLockedSettings) return;
-                                                                subItem.onClick();
-                                                                setShowSettingsDropdown(false);
-                                                            }}
-                                                            className={`w-full text-left text-[13px] ${isLockedSettings ? 'text-gray-400 cursor-not-allowed flex items-center justify-between' : 'text-gray-700 hover:text-[#0078d4] hover:underline transition-all block'}`}
-                                                        >
-                                                            <span>{subItem.label}</span>
-                                                            {isLockedSettings && <Lock size={12} className="text-red-400" />}
-                                                        </button>
+                                                            <button
+                                                                key={j}
+                                                                disabled={isLockedSettings}
+                                                                onClick={() => {
+                                                                    if (isLockedSettings) return;
+                                                                    subItem.onClick();
+                                                                    setShowSettingsDropdown(false);
+                                                                }}
+                                                                className={`w-full text-left text-[13px] ${isLockedSettings ? 'text-gray-400 cursor-not-allowed flex items-center justify-between' : 'text-gray-700 hover:text-[#0078d4] hover:underline transition-all block'}`}
+                                                            >
+                                                                <span>{subItem.label}</span>
+                                                                {isLockedSettings && <Lock size={12} className="text-red-400" />}
+                                                            </button>
                                                         );
                                                     })}
                                                 </div>
@@ -1999,7 +2037,7 @@ const Dashboard = () => {
                                     <div className="text-[13px] text-gray-500 text-center px-4 mb-5 w-full truncate">
                                         {selectedCompany?.name || selectedCompany?.companyName || 'ONIMTA Information Technology'}
                                     </div>
-                                    
+
                                     <button className="text-[13px] text-[#0077c5] hover:text-[#005ca6] font-medium hover:underline mb-5 transition-colors">
                                         Manage your Account
                                     </button>
@@ -2091,8 +2129,8 @@ const Dashboard = () => {
                                     <button
                                         data-tour="quick-launch"
                                         className={`flex items-center gap-2 px-4 h-[36px] border rounded-xl transition-all font-bold text-[12.5px] group shadow-sm ${showQuickActions
-                                                ? 'text-blue-600 border-blue-400 bg-blue-50 shadow-blue-100'
-                                                : 'bg-white border-slate-200 text-slate-600 hover:text-blue-600 hover:border-blue-300 hover:bg-blue-50/60'
+                                            ? 'text-blue-600 border-blue-400 bg-blue-50 shadow-blue-100'
+                                            : 'bg-white border-slate-200 text-slate-600 hover:text-blue-600 hover:border-blue-300 hover:bg-blue-50/60'
                                             }`}
                                     >
                                         <div className={`w-5 h-5 rounded-md flex items-center justify-center transition-colors ${showQuickActions ? 'bg-blue-600' : 'bg-slate-100 group-hover:bg-blue-100'
@@ -2112,45 +2150,45 @@ const Dashboard = () => {
                                             <div className="h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent mx-3 mb-2" />
                                             <div className="grid grid-cols-3 gap-1 px-2">
                                                 {ribbonIcons.map((iconId) => {
-                                                const iconData = {
-                                                    new_account: { icon: UserPlus, label: 'New Account', onClick: () => setShowNewAccountModal(true), active: showNewAccountModal, iconColor: '#2563eb', bg: '#eff6ff' },
-                                                    customer: { icon: Users, label: 'Customers', onClick: () => setShowCustomerModal(true), active: showCustomerModal, iconColor: '#059669', bg: '#f0fdf4' },
-                                                    vendor: { icon: Truck, label: 'Vendors', onClick: () => setShowVendorModal(true), active: showVendorModal, iconColor: '#d97706', bg: '#fffbeb' },
-                                                    enter_bill: { icon: FileText, label: 'Enter Bill', onClick: () => setShowEnterBillModal(true), active: showEnterBillModal, iconColor: '#dc2626', bg: '#fef2f2' },
-                                                    pay_bill: { icon: CreditCard, label: 'Pay Bill', onClick: () => setShowPayBillModal(true), active: showPayBillModal, iconColor: '#ea580c', bg: '#fff7ed' },
-                                                    write_chq: { icon: PenTool, label: 'Write Cheque', onClick: () => setShowWriteChequeModal(true), active: showWriteChequeModal, iconColor: '#7c3aed', bg: '#faf5ff' },
-                                                    petty_cash: { icon: Wallet, label: 'Petty Cash', onClick: () => setShowPettyCashModal(true), active: showPettyCashModal, iconColor: '#16a34a', bg: '#f0fdf4' },
-                                                    make_deposit: { icon: ArrowDownLeft, label: 'Deposit', onClick: () => setShowMakeDepositModal(true), active: showMakeDepositModal, iconColor: '#2563eb', bg: '#eff6ff' },
-                                                    journal_entry: { icon: BookOpen, label: 'Journal', onClick: () => setShowJournalEntryModal(true), active: showJournalEntryModal, iconColor: '#9333ea', bg: '#fdf4ff' },
-                                                    bank_rec: { icon: RefreshCcw, label: 'Bank Rec', onClick: () => setShowBankRecModal(true), active: showBankRecModal, iconColor: '#0d9488', bg: '#f0fdfa' },
-                                                    trial_balance: { icon: BarChart2, label: 'Trial Balance', onClick: () => setShowTrialBalanceModal(true), active: showTrialBalanceModal, iconColor: '#4f46e5', bg: '#eef2ff' },
-                                                    // search: { icon: Search, label: 'Search', onClick: () => setShowSearchModal(true), active: showSearchModal, iconColor: '#64748b', bg: '#f8fafc' },
-                                                    ai_chat: { icon: Bot, label: 'AI Chat', onClick: handleAIClick, active: showAIChatbotModal, iconColor: '#db2777', bg: '#fdf2f8' },
-                                                    department: { icon: Building2, label: 'Department', onClick: () => setShowDepartmentModal(true), active: showDepartmentModal, iconColor: '#1d4ed8', bg: '#eff6ff' },
-                                                    calculator: { icon: Calculator, label: 'Calculator', onClick: () => window.open('ms-calculator:'), iconColor: '#9333ea', bg: '#faf5ff' },
-                                                    help: { icon: HelpCircle, label: 'Help', onClick: () => { }, iconColor: '#64748b', bg: '#f8fafc' },
-                                                    category: { icon: Layers, label: 'Category', onClick: () => setShowCategoryModal(true), active: showCategoryModal, iconColor: '#ea580c', bg: '#fff7ed' },
-                                                    // reminder: { icon: Bell, label: 'Reminder', onClick: () => setShowReminderModal(true), active: showReminderModal, iconColor: '#ca8a04', bg: '#fefce8' },
-                                                    dashboard: { icon: LayoutDashboard, label: 'Get Things Done', onClick: () => setShowBiDashboardView(true), active: showBiDashboardView, iconColor: '#0891b2', bg: '#ecfeff' },
-                                                }[iconId];
-                                                if (!iconData) return null;
-                                                const Icon = iconData.icon;
-                                                const isActive = iconData.active;
-                                                return (
-                                                    <button
-                                                        key={iconId}
-                                                        onClick={() => { iconData.onClick(); setShowQuickActions(false); }}
-                                                        className={`w-full flex items-center gap-2 px-3 py-2 rounded-xl transition-all duration-150 group/item ${isActive ? 'bg-blue-50/80 text-blue-700' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
-                                                            }`}
-                                                    >
-                                                        <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 transition-transform group-hover/item:scale-110" style={{ backgroundColor: isActive ? '#dbeafe' : iconData.bg }}>
-                                                            <Icon size={14} strokeWidth={2.2} style={{ color: isActive ? '#1d4ed8' : iconData.iconColor }} />
-                                                        </div>
-                                                        <span className="text-[12px] font-semibold flex-1 text-left">{iconData.label}</span>
-                                                        {isActive && <span className="w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0" />}
-                                                    </button>
-                                                );
-                                            })}
+                                                    const iconData = {
+                                                        new_account: { icon: UserPlus, label: 'New Account', onClick: () => setShowNewAccountModal(true), active: showNewAccountModal, iconColor: '#2563eb', bg: '#eff6ff' },
+                                                        customer: { icon: Users, label: 'Customers', onClick: () => setShowCustomerModal(true), active: showCustomerModal, iconColor: '#059669', bg: '#f0fdf4' },
+                                                        vendor: { icon: Truck, label: 'Vendors', onClick: () => setShowVendorModal(true), active: showVendorModal, iconColor: '#d97706', bg: '#fffbeb' },
+                                                        enter_bill: { icon: FileText, label: 'Enter Bill', onClick: () => setShowEnterBillModal(true), active: showEnterBillModal, iconColor: '#dc2626', bg: '#fef2f2' },
+                                                        pay_bill: { icon: CreditCard, label: 'Pay Bill', onClick: () => setShowPayBillModal(true), active: showPayBillModal, iconColor: '#ea580c', bg: '#fff7ed' },
+                                                        write_chq: { icon: PenTool, label: 'Write Cheque', onClick: () => setShowWriteChequeModal(true), active: showWriteChequeModal, iconColor: '#7c3aed', bg: '#faf5ff' },
+                                                        petty_cash: { icon: Wallet, label: 'Petty Cash', onClick: () => setShowPettyCashModal(true), active: showPettyCashModal, iconColor: '#16a34a', bg: '#f0fdf4' },
+                                                        make_deposit: { icon: ArrowDownLeft, label: 'Deposit', onClick: () => setShowMakeDepositModal(true), active: showMakeDepositModal, iconColor: '#2563eb', bg: '#eff6ff' },
+                                                        journal_entry: { icon: BookOpen, label: 'Journal', onClick: () => setShowJournalEntryModal(true), active: showJournalEntryModal, iconColor: '#9333ea', bg: '#fdf4ff' },
+                                                        bank_rec: { icon: RefreshCcw, label: 'Bank Rec', onClick: () => setShowBankRecModal(true), active: showBankRecModal, iconColor: '#0d9488', bg: '#f0fdfa' },
+                                                        trial_balance: { icon: BarChart2, label: 'Trial Balance', onClick: () => setShowTrialBalanceModal(true), active: showTrialBalanceModal, iconColor: '#4f46e5', bg: '#eef2ff' },
+                                                        // search: { icon: Search, label: 'Search', onClick: () => setShowSearchModal(true), active: showSearchModal, iconColor: '#64748b', bg: '#f8fafc' },
+                                                        ai_chat: { icon: Bot, label: 'AI Chat', onClick: handleAIClick, active: showAIChatbotModal, iconColor: '#db2777', bg: '#fdf2f8' },
+                                                        department: { icon: Building2, label: 'Department', onClick: () => setShowDepartmentModal(true), active: showDepartmentModal, iconColor: '#1d4ed8', bg: '#eff6ff' },
+                                                        calculator: { icon: Calculator, label: 'Calculator', onClick: () => window.open('ms-calculator:'), iconColor: '#9333ea', bg: '#faf5ff' },
+                                                        help: { icon: HelpCircle, label: 'Help', onClick: () => { }, iconColor: '#64748b', bg: '#f8fafc' },
+                                                        category: { icon: Layers, label: 'Category', onClick: () => setShowCategoryModal(true), active: showCategoryModal, iconColor: '#ea580c', bg: '#fff7ed' },
+                                                        // reminder: { icon: Bell, label: 'Reminder', onClick: () => setShowReminderModal(true), active: showReminderModal, iconColor: '#ca8a04', bg: '#fefce8' },
+                                                        dashboard: { icon: LayoutDashboard, label: 'Get Things Done', onClick: () => setShowBiDashboardView(true), active: showBiDashboardView, iconColor: '#0891b2', bg: '#ecfeff' },
+                                                    }[iconId];
+                                                    if (!iconData) return null;
+                                                    const Icon = iconData.icon;
+                                                    const isActive = iconData.active;
+                                                    return (
+                                                        <button
+                                                            key={iconId}
+                                                            onClick={() => { iconData.onClick(); setShowQuickActions(false); }}
+                                                            className={`w-full flex items-center gap-2 px-3 py-2 rounded-xl transition-all duration-150 group/item ${isActive ? 'bg-blue-50/80 text-blue-700' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                                                                }`}
+                                                        >
+                                                            <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 transition-transform group-hover/item:scale-110" style={{ backgroundColor: isActive ? '#dbeafe' : iconData.bg }}>
+                                                                <Icon size={14} strokeWidth={2.2} style={{ color: isActive ? '#1d4ed8' : iconData.iconColor }} />
+                                                            </div>
+                                                            <span className="text-[12px] font-semibold flex-1 text-left">{iconData.label}</span>
+                                                            {isActive && <span className="w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0" />}
+                                                        </button>
+                                                    );
+                                                })}
                                             </div>
                                             <div className="h-px bg-slate-100 mx-3 mt-2" />
                                             <div className="px-4 pt-2 pb-1"><span className="text-[9px] text-slate-400 font-bold uppercase tracking-widest">Hover to explore</span></div>
@@ -2456,7 +2494,7 @@ const Dashboard = () => {
 
 
             {/* ===== Notification Tips Panel (one at a time, bigger) ===== */}
-            {showNotificationTip && (() => {
+            {(showNotificationTip && !showFirstTimeGuide) && (() => {
                 const tip = notificationTips[currentTipIndex];
                 if (!tip || dismissedTips.includes(tip.id)) return null;
                 return (
@@ -2553,8 +2591,8 @@ const ModuleCard = ({ item, Icon, setIsLoaderStopped, isLocked = false }) => {
                 <div className="relative z-10 flex items-center justify-center mb-3">
                     <div className="w-14 h-14 flex items-center justify-center bg-red-50 rounded-full">
                         <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-                            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
                         </svg>
                     </div>
                 </div>

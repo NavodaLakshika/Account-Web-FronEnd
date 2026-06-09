@@ -129,12 +129,12 @@ const AdminCompanyReportsBoard = ({ hierarchy, allEmployees }) => {
                         <FileText className="w-5 h-5 text-[#00acee]" />
                     </div>
                     <div>
-                        <h2 className="text-lg font-bold text-slate-900">Company Reports</h2>
-                        <p className="text-xs text-slate-500">Select an employee and company to view available reports</p>
+                        <h2 className="text-[15px] font-bold text-slate-800">Company Reports</h2>
+                        <p className="text-[11px] text-slate-500 font-medium">Select an employee and company to view available reports</p>
                     </div>
                 </div>
 
-                <div className="bg-slate-50 rounded-xl p-4 border border-slate-200/60">
+                <div className="bg-slate-50 p-4 border border-slate-200/60">
  <div className="bg-white p-4 rounded-sm flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
                         <div className="flex flex-col w-full sm:w-auto">
                             <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Selection Target</span>
@@ -211,13 +211,13 @@ const AdminCompanyReportsBoard = ({ hierarchy, allEmployees }) => {
                                             <div key={idx} className="relative group">
                                                 <button
                                                     onClick={() => handleOpenReport(item)}
-                                                    className={`w-full bg-white rounded-2xl shadow-sm border border-slate-200/50 hover:border-slate-400 p-5 transition-all text-left hover:shadow-lg active:scale-[0.98] ${isHidden ? 'opacity-50 grayscale' : ''}`}
+                                                    className={`w-full bg-white shadow-sm border border-slate-200/50 hover:border-slate-400 p-5 transition-all text-left hover:shadow-lg active:scale-[0.98] ${isHidden ? 'opacity-50 grayscale' : ''}`}
                                                 >
                                                     <div className={`w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform`}>
                                                         <FileText className={`w-5 h-5 text-slate-500`} />
                                                     </div>
-                                                    <h4 className="text-sm font-bold text-slate-900 mb-1.5 line-clamp-1" title={item}>{item}</h4>
-                                                    <p className="text-xs text-slate-500 leading-relaxed line-clamp-2">Detailed insights and records for {item}.</p>
+                                                    <h4 className="text-[13px] font-bold text-slate-900 mb-1.5 line-clamp-1" title={item}>{item}</h4>
+                                                    <p className="text-[11px] text-slate-500 font-medium leading-relaxed line-clamp-2">Detailed insights and records for {item}.</p>
                                                     <div className="mt-3 flex items-center gap-1.5 text-[#00acee] text-[10px] font-bold uppercase tracking-wider opacity-0 group-hover:opacity-100 transition-all">
                                                         <Eye className="w-3 h-3" />
                                                         View Report
@@ -242,20 +242,20 @@ const AdminCompanyReportsBoard = ({ hierarchy, allEmployees }) => {
             )}
 
             {selectedEmployee && !selectedCompany && (
-                <div className="bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200 p-12 flex flex-col items-center justify-center text-center">
+                <div className="bg-slate-50 border border-dashed border-slate-200 p-12 flex flex-col items-center justify-center text-center">
                     <Building2 className="w-12 h-12 text-slate-300 mb-3" />
-                    <h3 className="text-base font-bold text-slate-600">Select a Company</h3>
-                    <p className="text-sm text-slate-400 mt-1 max-w-md">
+                    <h3 className="text-[15px] font-bold text-slate-600">Select a Company</h3>
+                    <p className="text-[13px] text-slate-400 mt-1 max-w-md">
                         Choose a company to view available reports for {selectedEmployeeName}.
                     </p>
                 </div>
             )}
 
             {!selectedEmployee && (
-                <div className="bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200 p-12 flex flex-col items-center justify-center text-center">
+                <div className="bg-slate-50 border border-dashed border-slate-200 p-12 flex flex-col items-center justify-center text-center">
                     <Users className="w-12 h-12 text-slate-300 mb-3" />
-                    <h3 className="text-base font-bold text-slate-600">Select an Employee</h3>
-                    <p className="text-sm text-slate-400 mt-1 max-w-md">
+                    <h3 className="text-[15px] font-bold text-slate-600">Select an Employee</h3>
+                    <p className="text-[13px] text-slate-400 mt-1 max-w-md">
                         Choose an employee to see their associated companies and available reports.
                     </p>
                 </div>
@@ -265,9 +265,9 @@ const AdminCompanyReportsBoard = ({ hierarchy, allEmployees }) => {
             {showEmpModal && (
                 <div className="fixed inset-0 z-[200] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4">
  <div className="bg-white rounded-sm shadow-2xl w-full max-w-md overflow-visible animate-in fade-in zoom-in-95 duration-200 flex flex-col">
-                        <div className="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50 rounded-t-2xl">
-                            <h3 className="text-sm font-bold tracking-wide uppercase text-slate-900">Select Employee</h3>
-                            <button onClick={() => setShowEmpModal(false)} className="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-200 transition-colors">
+                        <div className="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+                            <h3 className="text-[13px] font-bold tracking-wide uppercase text-slate-900">Select Employee</h3>
+                            <button onClick={() => setShowEmpModal(false)} className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-200 transition-colors">
                                 <X size={28} />
                             </button>
                         </div>

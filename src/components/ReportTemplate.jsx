@@ -19,6 +19,26 @@ import CalendarPopover from './CalendarPopover';
 import ReportCustomizeModal from './modals/AdminReports/ReportCustomizeModal';
 import api from '../services/api';
 
+const compactTableStyles = `
+.compact-table {
+    border-collapse: collapse;
+    width: 100%;
+}
+.compact-table thead tr {
+    background: #f8fafc;
+}
+.compact-table tbody tr:nth-child(even) {
+    background: #fafbfc;
+}
+.compact-table tbody tr:hover {
+    background: #f1f5f9;
+}
+.compact-table td, .compact-table th {
+    white-space: nowrap;
+    line-height: 1.2;
+}
+`;
+
 const allReportsList = [
     "Profit and Loss Detail",
     "Profit and Loss year-to-date comparison",
@@ -181,6 +201,22 @@ const ReportTemplate = ({
     const [showCalendarModal, setShowCalendarModal] = useState(false);
     const [dismissAlert, setDismissAlert] = useState(false);
     const [showExportMenu, setShowExportMenu] = useState(false);
+    const [showMoreMenu, setShowMoreMenu] = useState(false);
+    const [compactView, setCompactView] = useState(false);
+    const [showCompactMenu, setShowCompactMenu] = useState(false);
+
+    useEffect(() => {
+        if (!document.getElementById('compact-table-styles')) {
+            const style = document.createElement('style');
+            style.id = 'compact-table-styles';
+            style.textContent = compactTableStyles;
+            document.head.appendChild(style);
+        }
+        return () => {
+            const el = document.getElementById('compact-table-styles');
+            if (el) el.remove();
+        };
+    }, []);
 
     const handleExportExcel = () => {
         if (!displayData || displayData.length === 0) return;
@@ -363,6 +399,90 @@ const ReportTemplate = ({
 
     const [customizations, setCustomizations] = useState(defaultCustomizations);
 
+    const formatCellValue = (value, col) => {
+        if (value === null || value === undefined || value === '') {
+            return customizations.showEmptyAs === 'dash' ? '-' : '';
+        }
+
+        if (typeof value === 'string' && isNaN(parseFloat(value))) {
+            return value;
+        }
+
+        let num = parseFloat(value);
+        if (isNaN(num)) return value;
+
+        if (customizations.divideBy1000) {
+            num = num / 1000;
+        }
+
+        if (customizations.roundWholeNumber) {
+            num = Math.round(num);
+        }
+
+        const isNegative = num < 0;
+        const absNum = Math.abs(num);
+
+        let formatted;
+        if (customizations.roundWholeNumber) {
+            formatted = absNum.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+        } else {
+            formatted = absNum.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        if (isNegative) {
+            if (customizations.negativeNumbers === '(100)') {
+                formatted = `(${formatted})`;
+            } else {
+                formatted = `-${formatted}`;
+            }
+        }
+
+        if (isNegative && customizations.negativeRed) {
+            return <span className="text-red-600">{formatted}</span>;
+        }
+
+        return formatted;
+    };
+
+    const formatTotalValue = (value) => {
+        if (value === null || value === undefined) return '';
+
+        let num = parseFloat(value);
+        if (isNaN(num)) return value;
+
+        if (customizations.divideBy1000) {
+            num = num / 1000;
+        }
+
+        if (customizations.roundWholeNumber) {
+            num = Math.round(num);
+        }
+
+        const isNegative = num < 0;
+        const absNum = Math.abs(num);
+
+        let formatted;
+        if (customizations.roundWholeNumber) {
+            formatted = absNum.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+        } else {
+            formatted = absNum.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        if (isNegative) {
+            if (customizations.negativeNumbers === '(100)') {
+                formatted = `(${formatted})`;
+            } else {
+                formatted = `-${formatted}`;
+            }
+        }
+
+        if (isNegative && customizations.negativeRed) {
+            return <span className="text-red-600">{formatted}</span>;
+        }
+
+        return formatted;
+    };
+
     const askAI = async () => {
         if (!aiQuestion.trim()) return;
         setIsAiLoading(true);
@@ -490,9 +610,36 @@ const ReportTemplate = ({
 
                     {/* Inner Toolbar */}
                     <div className="flex items-center justify-between p-4 border-b border-gray-100">
-                        <button className="flex items-center gap-1 text-[13px] text-gray-600 font-medium hover:text-gray-900">
-                            Compact <ChevronDown size={14} />
-                        </button>
+                        <div className="relative">
+                            <button
+                                onClick={() => setShowCompactMenu(!showCompactMenu)}
+                                className="flex items-center gap-1 text-[13px] text-gray-600 font-medium hover:text-gray-900"
+                            >
+                                {compactView ? 'Compact' : 'Detailed'} <ChevronDown size={14} />
+                            </button>
+                            {showCompactMenu && (
+                                <div
+                                    className="absolute top-full left-0 mt-1 bg-white border border-gray-200 shadow-[0_4px_12px_rgba(0,0,0,0.15)] rounded w-[140px] z-[1000] py-1"
+                                    onMouseLeave={() => setShowCompactMenu(false)}
+                                    onClick={() => setShowCompactMenu(false)}
+                                >
+                                    <button
+                                        onClick={() => { setCompactView(false); setShowCompactMenu(false); }}
+                                        className={`w-full text-left px-4 py-2 text-[13px] flex items-center justify-between ${!compactView ? 'text-[#0077c5] font-bold' : 'text-gray-700 hover:bg-gray-100'}`}
+                                    >
+                                        Detailed
+                                        {!compactView && <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>}
+                                    </button>
+                                    <button
+                                        onClick={() => { setCompactView(true); setShowCompactMenu(false); }}
+                                        className={`w-full text-left px-4 py-2 text-[13px] flex items-center justify-between ${compactView ? 'text-[#0077c5] font-bold' : 'text-gray-700 hover:bg-gray-100'}`}
+                                    >
+                                        Compact
+                                        {compactView && <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>}
+                                    </button>
+                                </div>
+                            )}
+                        </div>
 
                         <div className="flex items-center gap-3">
                             <button className="p-1.5 hover:bg-gray-100 rounded text-gray-600" title="Refresh" onClick={fetchReportData}>
@@ -516,9 +663,74 @@ const ReportTemplate = ({
                                     </div>
                                 )}
                             </div>
-                            <button className="p-1.5 hover:bg-gray-100 rounded text-gray-600">
-                                <MoreVertical size={16} />
-                            </button>
+                            <div className="relative">
+                                <button
+                                    className="p-1.5 hover:bg-gray-100 rounded text-gray-600"
+                                    title="More"
+                                    onClick={() => setShowMoreMenu(!showMoreMenu)}
+                                >
+                                    <MoreVertical size={16} />
+                                </button>
+                                {showMoreMenu && (
+                                    <div
+                                        className="absolute right-0 top-full mt-1 bg-white border border-gray-200 shadow-[0_4px_12px_rgba(0,0,0,0.15)] rounded w-[180px] z-[1000] py-1"
+                                        onMouseLeave={() => setShowMoreMenu(false)}
+                                        onClick={() => setShowMoreMenu(false)}
+                                    >
+                                        <button
+                                            onClick={() => { setShowCustomizeModal(true); setShowMoreMenu(false); }}
+                                            className="w-full text-left px-4 py-2 text-[13px] text-gray-700 hover:bg-gray-100 hover:text-[#0077c5] flex items-center gap-2"
+                                        >
+                                            <Settings2 size={14} />
+                                            Customise Report
+                                        </button>
+                                        <button
+                                            onClick={() => { setShowNoteArea(!showNoteArea); setShowMoreMenu(false); }}
+                                            className="w-full text-left px-4 py-2 text-[13px] text-gray-700 hover:bg-gray-100 hover:text-[#0077c5] flex items-center gap-2"
+                                        >
+                                            <FileText size={14} />
+                                            {showNoteArea ? 'Hide Note' : 'Add Note'}
+                                        </button>
+                                        <div className="border-t border-gray-100 my-1" />
+                                        <button
+                                            onClick={() => { fetchReportData(); setShowMoreMenu(false); }}
+                                            className="w-full text-left px-4 py-2 text-[13px] text-gray-700 hover:bg-gray-100 hover:text-[#0077c5] flex items-center gap-2"
+                                        >
+                                            <RefreshCw size={14} />
+                                            Refresh Data
+                                        </button>
+                                        <button
+                                            onClick={() => { setShowPrintModal(true); setShowMoreMenu(false); }}
+                                            className="w-full text-left px-4 py-2 text-[13px] text-gray-700 hover:bg-gray-100 hover:text-[#0077c5] flex items-center gap-2"
+                                        >
+                                            <Printer size={14} />
+                                            Print
+                                        </button>
+                                        <button
+                                            onClick={() => { setShowEmailModal(true); setShowMoreMenu(false); }}
+                                            className="w-full text-left px-4 py-2 text-[13px] text-gray-700 hover:bg-gray-100 hover:text-[#0077c5] flex items-center gap-2"
+                                        >
+                                            <Mail size={14} />
+                                            Email
+                                        </button>
+                                        <div className="border-t border-gray-100 my-1" />
+                                        <button
+                                            onClick={handleExportExcel}
+                                            className="w-full text-left px-4 py-2 text-[13px] text-gray-700 hover:bg-gray-100 hover:text-[#0077c5] flex items-center gap-2"
+                                        >
+                                            <Share size={14} />
+                                            Export to Excel
+                                        </button>
+                                        <button
+                                            onClick={handleExportCSV}
+                                            className="w-full text-left px-4 py-2 text-[13px] text-gray-700 hover:bg-gray-100 hover:text-[#0077c5] flex items-center gap-2"
+                                        >
+                                            <Share size={14} />
+                                            Export as CSV
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
                             <button
                                 onClick={() => setShowAIBox(!showAIBox)}
                                 className="ml-2 h-7 px-3 border border-[#0077c5] text-[#0077c5] hover:bg-blue-50 text-[12px] font-bold rounded-[14px] flex items-center gap-1.5 transition-colors"
@@ -598,20 +810,26 @@ const ReportTemplate = ({
                         )}
 
                         <div className="w-full overflow-x-auto border border-gray-200 bg-white">
-                            <table className="w-full text-left border-collapse">
+                            <table className={`w-full text-left border-collapse ${compactView ? 'compact-table' : ''}`}>
                                 <thead>
-                                    <tr className="border-b-2 border-gray-300">
+                                    <tr className={`${compactView ? 'border-b border-gray-300' : 'border-b-2 border-gray-300'}`}>
                                         {displayColumns.map((col, i) => (
-                                            <th key={i} className="p-2 text-[12px] font-bold text-gray-800" style={{ textAlign: col.align || 'left' }}>{col.header}</th>
+                                            <th key={i} className={`font-bold text-gray-800 ${compactView ? 'p-1.5 text-[10.5px]' : 'p-2 text-[12px]'}`} style={{ textAlign: col.align || 'left' }}>
+                                                {(() => {
+                                                    const headerLower = (col.header || '').toLowerCase().replace(/[^a-z]/g, '');
+                                                    const isCurrencyCol = columnsToTotal.some(c => headerLower.includes(c));
+                                                    return customizations.hideCurrency || !isCurrencyCol ? col.header : `${col.header} (LKR)`;
+                                                })()}
+                                            </th>
                                         ))}
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {apiLoading ? <tr><td colSpan="100%" className="text-center py-4">Loading data from database...</td></tr> : displayData.map((row, i) => (
-                                        <tr key={i} className="border-b border-gray-200 hover:bg-gray-50">
+                                        <tr key={i} className={`${compactView ? 'border-b border-gray-100' : 'border-b border-gray-200 hover:bg-gray-50'}`}>
                                             {displayColumns.map((col, j) => (
-                                                <td key={j} className="p-2 text-[12px] text-gray-700" style={{ textAlign: col.align || 'left' }}>
-                                                    {col.format ? col.format(row[col.accessor || col.key]) : row[col.accessor || col.key]}
+                                                <td key={j} className={`text-gray-700 ${compactView ? 'p-1 text-[11px]' : 'p-2 text-[12px]'}`} style={{ textAlign: col.align || 'left' }}>
+                                                    {formatCellValue(row[col.accessor || col.key], col)}
                                                 </td>
                                             ))}
                                         </tr>
@@ -624,7 +842,7 @@ const ReportTemplate = ({
                                         </tr>
                                     )}
                                     {hasTotals && displayData.length > 0 && !apiLoading && (
-                                        <tr className="border-t-[3px] border-double border-gray-400 bg-[#f8fafc] font-bold">
+                                        <tr className={`${compactView ? 'border-t-2 border-double border-gray-400' : 'border-t-[3px] border-double border-gray-400'} bg-[#f8fafc] font-bold`}>
                                             {displayColumns.map((col, j) => {
                                                 const accessor = col.accessor || col.key;
                                                 const isFirstCol = j === 0;
@@ -632,17 +850,17 @@ const ReportTemplate = ({
 
                                                 if (hasTotalVal) {
                                                     return (
-                                                        <td key={j} className="p-2 text-[12px] text-gray-900" style={{ textAlign: col.align || 'left' }}>
-                                                            {col.format ? col.format(totals[accessor]) : totals[accessor].toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                                        <td key={j} className={`text-gray-900 ${compactView ? 'p-1 text-[11px]' : 'p-2 text-[12px]'}`} style={{ textAlign: col.align || 'left' }}>
+                                                            {formatTotalValue(totals[accessor])}
                                                         </td>
                                                     );
                                                 }
 
                                                 if (isFirstCol) {
-                                                    return <td key={j} className="p-2 text-[12px] text-gray-900 uppercase tracking-widest text-right" style={{ textAlign: col.align || 'right' }}>Total:</td>;
+                                                    return <td key={j} className={`text-gray-900 uppercase tracking-widest text-right ${compactView ? 'p-1 text-[11px]' : 'p-2 text-[12px]'}`} style={{ textAlign: col.align || 'right' }}>Total:</td>;
                                                 }
 
-                                                return <td key={j} className="p-2"></td>;
+                                                return <td key={j} className={compactView ? 'p-1' : 'p-2'}></td>;
                                             })}
                                         </tr>
                                     )}

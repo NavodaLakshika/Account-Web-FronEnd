@@ -157,7 +157,7 @@ const FirstTimeGuide = ({ isOpen, onClose, user }) => {
 
             {/* Highlight glow ring around target element */}
             <div
-                className="absolute rounded-xl border-2 border-[#00acee] shadow-[0_0_25px_rgba(0,172,238,0.5)] animate-pulse pointer-events-none transition-all duration-500 ease-in-out"
+                className="absolute rounded-[12px] ring-2 ring-blue-500 shadow-[0_0_30px_rgba(59,130,246,0.5)] animate-[pulse_2s_ease-in-out_infinite] pointer-events-none transition-all duration-500 ease-in-out bg-blue-500/10"
                 style={{
                     left: rect.left - 8,
                     top: rect.top - 8,
@@ -180,46 +180,43 @@ const FirstTimeGuide = ({ isOpen, onClose, user }) => {
                         50% { transform: translate(-10px, -10px); }
                     }
                 `}</style>
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="white" stroke="#1e293b" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="animate-[diagonalBounce_1.2s_infinite] drop-shadow-[0_10px_20px_rgba(0,0,0,0.4)]">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="#2563eb" stroke="white" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className="animate-[diagonalBounce_1.2s_infinite] drop-shadow-[0_4px_8px_rgba(37,99,235,0.3)]">
                     <path d="M4 4l7.07 17 2.51-7.39L21 11.07z" />
                 </svg>
             </div>
 
-            {/* Premium Glassmorphic Tooltip */}
+            {/* Professional Solid Light Tooltip */}
             <div 
                 className="absolute z-[3010] transition-all duration-500 ease-out pointer-events-auto animate-in fade-in zoom-in-95" 
                 style={{ top: tooltipTop, left: tooltipLeft }}
             >
-                <div className="bg-[#0f172a]/85 backdrop-blur-2xl rounded-2xl shadow-[0_20px_40px_-10px_rgba(0,0,0,0.7)] border border-white/10 p-6 min-w-[340px] max-w-[400px]">
-                    {/* Decorative subtle gradient glow */}
-                    <div className="absolute -inset-[1px] bg-gradient-to-br from-[#00acee]/40 to-purple-500/40 rounded-2xl opacity-20 pointer-events-none" />
-                    
-                    <h3 className="text-lg font-bold text-white mb-2 flex items-center gap-2">
-                        <div className="p-1.5 rounded-lg bg-[#00acee]/20 text-[#00acee]">
-                            <Sparkles size={16} strokeWidth={2.5} />
-                        </div>
+                <div className="relative bg-white rounded-[5px] shadow-[0_12px_40px_rgba(0,0,0,0.12)] border border-slate-200 p-6 min-w-[340px] max-w-[380px]">
+                    <h3 className="text-[17px] font-bold text-slate-900 mb-2 flex items-center gap-3">
+                        {/* <div className="w-8 h-8 rounded-[10px] bg-blue-50 border border-blue-100 flex items-center justify-center shrink-0">
+                            <Sparkles size={16} className="text-blue-600" strokeWidth={2.5} />
+                        </div> */}
                         {step.title}
                     </h3>
-                    <p className="text-[13px] text-slate-300 leading-relaxed font-medium mt-3" dangerouslySetInnerHTML={{ __html: step.text }} />
+                    <p className="text-[14px] text-slate-600 leading-relaxed mt-4 font-medium [&>b]:text-slate-900" dangerouslySetInnerHTML={{ __html: step.text }} />
                     
-                    <div className="flex items-center justify-between mt-6 pt-4 border-t border-white/10 relative z-10">
-                        <div className="flex items-center gap-1.5">
+                    <div className="flex items-center justify-between mt-8 pt-5 border-t border-slate-100 relative z-50 pointer-events-auto">
+                        <div className="flex items-center gap-2">
                             {steps.map((_, idx) => (
- <div key={idx} className={`h-1.5 rounded-sm transition-all duration-300 ${idx === currentStep ? 'bg-gradient-to-r from-[#00acee] to-blue-500 w-5 shadow-[0_0_8px_rgba(0,172,238,0.6)]' : idx < currentStep ? 'bg-white/40 w-1.5' : 'bg-white/10 w-1.5'}`} />
+                                <div key={idx} className={`h-1.5 rounded-full transition-all duration-300 ${idx === currentStep ? 'bg-blue-600 w-6' : 'bg-slate-200 w-1.5'}`} />
                             ))}
                         </div>
-                        <div className="flex items-center gap-2">
-                            <button onClick={handleSkip} className="text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-white px-3 py-1.5 rounded-lg transition-all hover:bg-white/5 active:scale-95">
+                        <div className="flex items-center gap-3">
+                            <button onClick={handleSkip} className="text-[13px] font-medium text-slate-500 hover:text-slate-800 transition-colors px-2 cursor-pointer pointer-events-auto">
                                 Skip
                             </button>
                             {currentStep > 0 && (
-                                <button onClick={handleBack} className="w-8 h-8 flex items-center justify-center rounded-lg text-slate-300 hover:text-white hover:bg-white/10 transition-all border border-transparent hover:border-white/10 active:scale-95">
-                                    <ChevronLeft size={16} strokeWidth={2.5} />
+                                <button onClick={handleBack} className="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all active:scale-95 cursor-pointer pointer-events-auto">
+                                    <ChevronLeft size={16} strokeWidth={2.5} className="-ml-0.5" />
                                 </button>
                             )}
-                            <button onClick={handleNext} className="h-8 px-4 flex items-center justify-center gap-1.5 rounded-lg bg-gradient-to-r from-[#00acee] to-[#0082b3] text-white text-[10px] font-bold uppercase tracking-widest transition-all shadow-[0_0_15px_rgba(0,172,238,0.4)] hover:shadow-[0_0_25px_rgba(0,172,238,0.6)] active:scale-95 border border-white/10">
+                            <button onClick={handleNext} className="h-8 px-5 flex items-center justify-center gap-1.5 rounded-[10px] bg-blue-600 text-white hover:bg-blue-700 text-[13px] font-bold transition-all active:scale-95 cursor-pointer pointer-events-auto shadow-sm">
                                 {isLast ? 'Done' : 'Next'}
-                                {!isLast && <ChevronRight size={14} strokeWidth={2.5} />}
+                                {!isLast && <ChevronRight size={16} strokeWidth={2.5} className="-mr-1" />}
                             </button>
                         </div>
                     </div>

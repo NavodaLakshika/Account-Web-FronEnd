@@ -59,20 +59,20 @@ const SecurityAuditBoard = ({ allEmployees = [], allCompanies = [], hierarchy = 
     return (
         <div className="flex flex-col gap-6 animate-in fade-in zoom-in-95 duration-200 h-full max-h-[82vh] overflow-y-auto no-scrollbar pb-10">
             {/* Header */}
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0">
+            <div className="bg-white shadow-sm border border-slate-200/60 p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0">
                 <div>
-                    <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-                        <ShieldCheck className="text-emerald-500" size={20} />
+                    <h2 className="text-[15px] font-bold text-slate-800 flex items-center gap-2">
+                        <ShieldCheck className="text-emerald-500" size={18} />
                         Security Audit & Posture
                     </h2>
-                    <p className="text-slate-500 text-xs mt-1">Vulnerability scanning, access control audits, and threat detection.</p>
+                    <p className="text-[11px] text-slate-500 font-medium mt-1">Vulnerability scanning, access control audits, and threat detection.</p>
                 </div>
                 <div className="flex items-center gap-3">
-                    <span className="text-xs text-slate-400 font-medium mr-2">Last Scan: {lastScanDate}</span>
+                    <span className="text-[11px] text-slate-400 font-medium mr-2">Last Scan: {lastScanDate}</span>
                     <button 
                         onClick={runScan}
                         disabled={scanning}
-                        className="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold rounded-xl shadow-md transition-all active:scale-95 flex items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+                        className="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold shadow-md transition-all active:scale-95 flex items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
                     >
                         {scanning ? <RotateCw size={14} className="animate-spin" /> : <Scan size={14} />}
                         {scanning ? 'Analyzing Data...' : 'Run Security Scan'}
@@ -107,11 +107,11 @@ const SecurityAuditBoard = ({ allEmployees = [], allCompanies = [], hierarchy = 
                     { title: 'Inactive Accounts', value: inactiveUsers, desc: 'Dormant user accounts', icon: Key, color: inactiveUsers > 10 ? 'text-orange-500' : 'text-slate-700' },
                     { title: 'Admin Actions', value: adminActions, desc: 'Sensitive operations logged', icon: Activity, color: 'text-blue-500' },
                 ].map((stat, i) => (
-                    <div key={i} className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col relative overflow-hidden group">
+                    <div key={i} className="bg-white p-5 border border-slate-200/60 shadow-sm flex flex-col relative overflow-hidden group">
                         <div className="absolute -right-4 -top-4 w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center opacity-50 group-hover:scale-110 transition-transform">
                             <stat.icon className={`w-8 h-8 ${stat.color} opacity-20`} />
                         </div>
-                        <h3 className="text-slate-500 text-[10px] font-black uppercase tracking-widest mb-2 z-10">{stat.title}</h3>
+                        <h3 className="text-slate-500 text-[11px] font-bold uppercase tracking-widest mb-2 z-10">{stat.title}</h3>
                         <div className="flex items-end gap-2 z-10">
                             <p className={`text-3xl font-black ${stat.color}`}>{stat.value}</p>
                         </div>
@@ -121,33 +121,33 @@ const SecurityAuditBoard = ({ allEmployees = [], allCompanies = [], hierarchy = 
             </div>
 
             {/* Recent Security Events Table */}
-            <div className={`bg-white rounded-2xl shadow-sm border border-slate-200 flex flex-col overflow-hidden shrink-0 min-h-[300px] transition-opacity duration-300 ${scanning ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}>
-                <div className="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+            <div className={`bg-white shadow-sm border border-slate-200/60 flex flex-col overflow-hidden shrink-0 min-h-[300px] transition-opacity duration-300 ${scanning ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}>
+                <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
                     <div>
-                        <h3 className="text-sm font-bold text-slate-900 uppercase tracking-widest">Critical Security Events</h3>
-                        <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mt-1">Filtered from real system audit trail</p>
+                        <h3 className="text-[13px] font-bold text-slate-900">Critical Security Events</h3>
+                        <p className="text-[11px] text-slate-500 font-medium mt-0.5">Filtered from real system audit trail</p>
                     </div>
                 </div>
 
                 <div className="flex-1 overflow-auto">
                     {loading && !scanning ? (
-                        <div className="flex flex-col items-center justify-center h-48 gap-4 text-slate-400">
+                        <div className="flex items-center justify-center h-48 text-slate-400">
                             <Loader2 className="animate-spin text-emerald-500 w-8 h-8" />
                         </div>
                     ) : recentSecurityEvents.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center h-48 gap-4 text-slate-400">
+                        <div className="flex flex-col items-center justify-center h-48 text-slate-400">
                             <CheckCircle className="w-12 h-12 text-emerald-300" />
-                            <p className="text-sm font-bold">No critical security events found.</p>
+                            <p className="text-[13px] font-bold">No critical security events found.</p>
                         </div>
                     ) : (
                         <table className="w-full text-left border-collapse min-w-[800px]">
                             <thead>
-                                <tr className="bg-white border-b border-slate-200 text-xs font-bold text-slate-500 uppercase tracking-wider sticky top-0 shadow-sm z-10">
-                                    <th className="py-4 px-6 w-48">Timestamp</th>
-                                    <th className="py-4 px-6 w-40">User</th>
-                                    <th className="py-4 px-6">Event Description</th>
-                                    <th className="py-4 px-6 w-36">IP Address</th>
-                                    <th className="py-4 px-6 w-32 text-center">Severity</th>
+                                <tr className="border-b border-slate-100 bg-slate-50/50">
+                                    <th className="py-3.5 px-6 text-[11px] font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap w-48">Timestamp</th>
+                                    <th className="py-3.5 px-6 text-[11px] font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap w-40">User</th>
+                                    <th className="py-3.5 px-6 text-[11px] font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap">Event Description</th>
+                                    <th className="py-3.5 px-6 text-[11px] font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap w-36">IP Address</th>
+                                    <th className="py-3.5 px-6 text-[11px] font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap w-32 text-center">Severity</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-100">
@@ -155,17 +155,17 @@ const SecurityAuditBoard = ({ allEmployees = [], allCompanies = [], hierarchy = 
                                     const isCritical = log.status === 'Failed' || log.action?.toLowerCase().includes('fail');
                                     const isMedium = log.action?.toLowerCase().includes('role') || log.action?.toLowerCase().includes('password');
                                     return (
-                                        <tr key={log.id || idx} className="hover:bg-slate-50/80 transition-colors">
-                                            <td className="py-3 px-6 text-xs text-slate-500 font-medium whitespace-nowrap font-mono">
+                                        <tr key={log.id || idx} className="border-b border-slate-50 hover:bg-slate-50/80 transition-colors">
+                                            <td className="py-3.5 px-6 text-[13px] text-slate-500 font-medium whitespace-nowrap font-mono">
                                                 {log.date ? new Date(log.date).toLocaleString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true }) : 'N/A'}
                                             </td>
-                                            <td className="py-3 px-6 text-sm text-slate-900 font-bold">
+                                            <td className="py-3.5 px-6 text-[13px] text-slate-900 font-bold">
                                                 {log.user || 'System'}
                                             </td>
-                                            <td className="py-3 px-6">
-                                                <span className="text-sm text-slate-700 font-medium">{log.action || 'Unknown Action'}</span>
+                                            <td className="py-3.5 px-6">
+                                                <span className="text-[13px] text-slate-700 font-medium">{log.action || 'Unknown Action'}</span>
                                             </td>
-                                            <td className="py-3 px-6 text-xs font-mono text-slate-400">
+                                            <td className="py-3.5 px-6 text-[13px] font-mono text-slate-400 font-medium">
                                                 {log.ip || '0.0.0.0'}
                                             </td>
                                             <td className="py-3 px-6">

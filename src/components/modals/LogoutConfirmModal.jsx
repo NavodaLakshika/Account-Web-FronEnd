@@ -27,7 +27,7 @@ const LogoutConfirmModal = ({ isOpen, onClose, onConfirm, loading = false }) => 
                 <div className="p-8 text-center">
                     {/* Icon Container - Matching Red Circle Style */}
                     <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6 border-4 border-white shadow-lg">
-                        <LogOut size={40} className="text-[#d13438]" />
+                        <LogOut size={30} className="text-[#d13438]" />
                     </div>
 
                     {/* Content */}
@@ -42,14 +42,14 @@ const LogoutConfirmModal = ({ isOpen, onClose, onConfirm, loading = false }) => 
                         <button 
                             onClick={onClose}
                             disabled={loading}
-                            className="flex-1 h-12 bg-slate-100 text-slate-600 font-bold rounded-2xl hover:bg-slate-200 transition-all active:scale-95 disabled:opacity-50"
+                            className="flex-1 h-12 bg-slate-100 text-slate-600 font-bold rounded-[12px] hover:bg-slate-200 transition-all active:scale-95 disabled:opacity-50"
                         >
                             Cancel
                         </button>
                         <button 
                             onClick={onConfirm}
                             disabled={loading}
-                            className="flex-1 h-12 bg-[#d13438] text-white font-bold rounded-2xl hover:bg-[#a4262c] shadow-lg shadow-red-200 transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-50"
+                            className="flex-1 h-12 bg-[#d13438] text-white font-bold rounded-[12px] hover:bg-[#a4262c] shadow-lg shadow-red-200 transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-50"
                         >
                             {loading ? <Loader2 size={18} className="animate-spin" /> : "Yes, Logout"}
                         </button>

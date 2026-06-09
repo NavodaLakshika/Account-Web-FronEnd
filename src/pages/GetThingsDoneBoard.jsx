@@ -987,7 +987,7 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
   const topActions = activeTab === 'accounting' ? favActions.map(id => ALL_ACTIONS_MAP[id]).filter(Boolean) : (TAB_EXTRA_ACTIONS[activeTab] || []);
 
   return (
-    <div className={`${isInline ? 'relative w-full h-full' : 'fixed inset-0 z-[9999]'} flex flex-col font-['Plus_Jakarta_Sans'] text-slate-700 bg-[#f8fafc] overflow-hidden animate-in fade-in duration-300`}>
+    <div className={`${isInline ? 'relative w-full h-full' : 'fixed inset-0 z-[9999]'} flex flex-col font-['Plus_Jakarta_Sans'] text-slate-700 bg-[#f8fafc] overflow-hidden animate-in fade-in duration-300 mt-6`}>
       {/* QBO-style top header */}
       {!isInline && (
         <header className="shrink-0 bg-white/95 border-b border-slate-200/60 px-4 sm:px-5 lg:px-7 py-3">

@@ -312,29 +312,31 @@ const EngagementAdminBoard = () => {
     );
 
     return (
-        <div className="p-6 h-full flex flex-col bg-slate-50">
+        <div className="h-full flex flex-col">
             {/* Header */}
             <div className="flex items-center justify-between mb-6">
-                <div>
-                    <h2 className="text-2xl font-bold text-slate-800 flex items-center gap-2">
-                        <Megaphone className="w-6 h-6 text-orange-500" />
-                        Engagement Management
-                    </h2>
-                    <p className="text-slate-500 text-sm mt-1">Manage system reviews and promotional advertisements</p>
+                <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 bg-rose-50 flex items-center justify-center">
+                        <Megaphone className="w-4 h-4 text-rose-600" />
+                    </div>
+                    <div>
+                        <h2 className="text-[15px] font-bold text-slate-800">Engagement Management</h2>
+                        <p className="text-[11px] text-slate-500 font-medium">Manage system reviews and promotional advertisements</p>
+                    </div>
                 </div>
-                <div className="flex bg-slate-200/50 p-1 rounded-xl">
+                <div className="flex bg-slate-200/50 p-1 rounded-[12px]">
                     <button
                         onClick={() => setActiveTab('reviews')}
-                        className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${activeTab === 'reviews' ? 'bg-white shadow-sm text-blue-600' : 'text-slate-500 hover:text-slate-700'}`}
+                        className={`px-4 py-2 rounded-[12px] text-xs font-bold transition-all ${activeTab === 'reviews' ? 'bg-white shadow-sm text-blue-600' : 'text-slate-500 hover:text-slate-700'}`}
                     >
-                        <MessageSquare className="w-4 h-4 inline mr-1.5 -mt-0.5" />
+                        <MessageSquare className="w-3.5 h-3.5 inline mr-1.5 -mt-0.5" />
                         System Reviews
                     </button>
                     <button
                         onClick={() => setActiveTab('ads')}
-                        className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${activeTab === 'ads' ? 'bg-white shadow-sm text-orange-500' : 'text-slate-500 hover:text-slate-700'}`}
+                        className={`px-4 py-2 rounded-[12px] text-xs font-bold transition-all ${activeTab === 'ads' ? 'bg-white shadow-sm text-orange-500' : 'text-slate-500 hover:text-slate-700'}`}
                     >
-                        <Megaphone className="w-4 h-4 inline mr-1.5 -mt-0.5" />
+                        <Megaphone className="w-3.5 h-3.5 inline mr-1.5 -mt-0.5" />
                         Advertisements
                     </button>
                 </div>
@@ -344,73 +346,71 @@ const EngagementAdminBoard = () => {
             {activeTab === 'reviews' && (
                 <div className="w-full flex flex-col flex-1 h-full min-h-0">
                     <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center gap-3 bg-white rounded-xl px-4 py-2 border border-slate-200 shadow-sm">
+                        <div className="flex items-center gap-3">
                             <div className="flex items-center gap-1.5">
                                 <Star className="w-4 h-4 text-yellow-500 fill-current" />
                                 <span className="text-lg font-black text-slate-800">{averageRating}</span>
                             </div>
-                            <div className="w-px h-5 bg-slate-200" />
-                            <span className="text-xs font-bold text-slate-500">{reviews.length} reviews</span>
+                            <span className="text-[11px] text-slate-500 font-medium">{reviews.length} reviews</span>
                         </div>
                         <div className="relative w-64">
-                            <Search className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                             <input
                                 type="text"
                                 placeholder="Search reviews..."
-                                className="w-full pl-10 pr-4 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-sm"
+                                className="w-full pl-9 pr-4 py-2 text-[13px] bg-slate-100/60 border border-slate-200/60 rounded-[12px] focus:outline-none focus:ring-2 focus:ring-[#0078d4]/20 focus:border-[#0078d4]"
                                 value={reviewSearch}
                                 onChange={e => setReviewSearch(e.target.value)}
                             />
                         </div>
                     </div>
 
-                    <div className="flex-1 bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
-                        <div className="overflow-x-auto">
+                    <div className="flex-1 bg-white shadow-sm border border-slate-200/60 overflow-hidden flex flex-col">
+                        <div className="w-full overflow-x-auto">
                             <table className="w-full text-left border-collapse">
                                 <thead>
-                                    <tr className="bg-slate-100/50 border-b border-slate-200 text-slate-600 text-sm">
-                                        <th className="p-4 font-semibold">Employee</th>
-                                        <th className="p-4 font-semibold">Rating</th>
-                                        <th className="p-4 font-semibold">Comment</th>
-                                        <th className="p-4 font-semibold">Date</th>
-                                        <th className="p-4 font-semibold">Status</th>
-                                        <th className="p-4 font-semibold text-right">Actions</th>
+                                    <tr className="border-b border-slate-100 bg-slate-50/50">
+                                        <th className="py-3.5 px-6 text-[11px] font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap">Employee</th>
+                                        <th className="py-3.5 px-6 text-[11px] font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap">Rating</th>
+                                        <th className="py-3.5 px-6 text-[11px] font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap">Comment</th>
+                                        <th className="py-3.5 px-6 text-[11px] font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap">Date</th>
+                                        <th className="py-3.5 px-6 text-[11px] font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap">Status</th>
+                                        <th className="py-3.5 px-6 text-[11px] font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap text-right">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {loadingReviews ? (
                                         <tr>
-                                            <td colSpan="6" className="p-8 text-center text-slate-400">
-                                                <Loader2 className="w-8 h-8 animate-spin mx-auto mb-2" />
-                                                Loading reviews...
+                                            <td colSpan="6" className="py-8 text-center text-slate-400">
+                                                <Loader2 className="w-6 h-6 animate-spin mx-auto" />
                                             </td>
                                         </tr>
                                     ) : filteredReviews.map(review => (
-                                        <tr key={review.id} className="border-b border-slate-100 hover:bg-slate-50/50 transition-colors">
-                                            <td className="p-4">
-                                                <div className="font-bold text-slate-800">{review.empName}</div>
-                                                <div className="text-xs text-slate-500 mt-0.5">{review.empCode}</div>
+                                        <tr key={review.id} className="border-b border-slate-50 hover:bg-slate-50/80 transition-colors">
+                                            <td className="py-3.5 px-6">
+                                                <div className="text-[13px] text-slate-900 font-bold">{review.empName}</div>
+                                                <div className="text-[11px] text-slate-500 font-medium">{review.empCode}</div>
                                             </td>
-                                            <td className="p-4">
-                                                <div className="flex items-center gap-1">
+                                            <td className="py-3.5 px-6">
+                                                <div className="flex items-center gap-0.5">
                                                     {[...Array(5)].map((_, i) => (
                                                         <Star
                                                             key={i}
-                                                            className={`w-4 h-4 ${i < review.rating ? 'fill-yellow-400 text-yellow-400' : 'text-slate-200 fill-slate-50'}`}
+                                                            className={`w-3.5 h-3.5 ${i < review.rating ? 'fill-yellow-400 text-yellow-400' : 'text-slate-200 fill-slate-50'}`}
                                                         />
                                                     ))}
                                                 </div>
                                             </td>
-                                            <td className="p-4 max-w-md">
-                                                <p className="text-slate-600 text-sm truncate" title={review.comment}>
+                                            <td className="py-3.5 px-6 max-w-md">
+                                                <p className="text-[13px] text-slate-700 font-medium truncate" title={review.comment}>
                                                     {review.comment}
                                                 </p>
                                             </td>
-                                            <td className="p-4 text-sm text-slate-500">
+                                            <td className="py-3.5 px-6 text-[13px] text-slate-500 font-medium">
                                                 {new Date(review.createdAt).toLocaleDateString()}
                                             </td>
-                                            <td className="p-4">
-                                                <span className={`px-3 py-1 rounded-full text-xs font-bold ${
+                                            <td className="py-3.5 px-6">
+                                                <span className={`px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider ${
                                                     review.status === 'Approved' ? 'bg-emerald-100 text-emerald-700' :
                                                     review.status === 'Hidden' ? 'bg-slate-100 text-slate-600' :
                                                     'bg-amber-100 text-amber-700'
@@ -421,32 +421,32 @@ const EngagementAdminBoard = () => {
                                                     {review.status}
                                                 </span>
                                             </td>
-                                            <td className="p-4 text-right">
-                                                <div className="flex items-center justify-end gap-2">
+                                            <td className="py-3.5 px-6 text-right">
+                                                <div className="flex items-center justify-end gap-1">
                                                     {review.status !== 'Approved' && (
                                                         <button
                                                             onClick={() => handleReviewStatus(review.id, 'Approved')}
-                                                            className="p-2 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
+                                                            className="p-1.5 text-emerald-600 hover:bg-emerald-50 rounded-[12px] transition-all"
                                                             title="Approve"
                                                         >
-                                                            <CheckCircle className="w-4 h-4" />
+                                                            <CheckCircle className="w-[18px] h-[18px]" />
                                                         </button>
                                                     )}
                                                     {review.status !== 'Hidden' && (
                                                         <button
                                                             onClick={() => handleReviewStatus(review.id, 'Hidden')}
-                                                            className="p-2 text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
+                                                            className="p-1.5 text-slate-400 hover:text-[#0078d4] hover:bg-blue-50 rounded-[12px] transition-all"
                                                             title="Hide"
                                                         >
-                                                            <EyeOff className="w-4 h-4" />
+                                                            <EyeOff className="w-[18px] h-[18px]" />
                                                         </button>
                                                     )}
                                                     <button
                                                         onClick={() => handleDeleteReview(review.id)}
-                                                        className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                                        className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-[12px] transition-all"
                                                         title="Delete"
                                                     >
-                                                        <Trash2 className="w-4 h-4" />
+                                                        <Trash2 className="w-[18px] h-[18px]" />
                                                     </button>
                                                 </div>
                                             </td>
@@ -454,7 +454,7 @@ const EngagementAdminBoard = () => {
                                     ))}
                                     {!loadingReviews && filteredReviews.length === 0 && (
                                         <tr>
-                                            <td colSpan="6" className="p-8 text-center text-slate-400">No reviews found.</td>
+                                            <td colSpan="6" className="py-8 text-center text-[13px] text-slate-400 font-medium">No reviews found.</td>
                                         </tr>
                                     )}
                                 </tbody>
@@ -470,17 +470,17 @@ const EngagementAdminBoard = () => {
                     {isEditing ? (
                         <>
                             <div className="flex-1 overflow-y-auto">
-                                <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden w-full mb-4">
-                                    <div className="px-5 py-3 border-b border-slate-100 flex items-center justify-between">
-                                        <h3 className="text-base font-bold text-slate-800">
+                                <div className="bg-white shadow-sm border border-slate-200/60 overflow-hidden w-full mb-4">
+                                    <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+                                        <h3 className="text-[15px] font-bold text-slate-800">
                                             {currentAd ? 'Edit Advertisement' : 'Create New Advertisement'}
                                         </h3>
                                         <button
                                             type="button"
                                             onClick={handleCloseForm}
-                                            className="flex items-center gap-1.5 bg-slate-100 text-slate-600 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-slate-200 transition-colors"
+                                            className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold transition-colors"
                                         >
-                                            <Megaphone className="w-3.5 h-3.5" /> All Ads
+                                            <Megaphone className="w-3.5 h-3.5 inline mr-1.5" /> All Ads
                                         </button>
                                     </div>
                                  <form onSubmit={handleSubmitAd}>
@@ -660,16 +660,16 @@ const EngagementAdminBoard = () => {
                                         </div>
                                     </div>
 
-                                    <div className="px-6 py-4 bg-slate-50 border-t border-slate-200 flex items-center justify-end gap-3 rounded-b-2xl">
+                                    <div className="px-6 py-4 bg-slate-50 border-t border-slate-200 flex items-center justify-end gap-3">
                                         <button type="button" onClick={handleCloseForm} disabled={isSubmitting}
-                                            className="px-5 py-2.5 bg-white text-slate-700 font-bold rounded-xl border border-slate-300 hover:bg-slate-100 text-sm transition-all shadow-sm"
+                                            className="px-5 py-2.5 bg-white text-slate-700 font-bold border border-slate-300 hover:bg-slate-100 text-xs transition-all"
                                         >
                                             Cancel
                                         </button>
                                         <button type="submit" disabled={isSubmitting}
-                                            className="flex items-center justify-center gap-2 px-6 py-2.5 bg-[#f97316] text-white font-bold rounded-xl hover:bg-[#ea580c] transition-all shadow-md disabled:opacity-50 text-sm min-w-[140px]"
+                                            className="flex items-center justify-center gap-2 px-6 py-2.5 bg-[#0078d4] text-white font-bold hover:bg-[#005a9e] transition-all disabled:opacity-50 text-xs min-w-[140px]"
                                         >
-                                            {isSubmitting ? <><Loader2 size={18} className="animate-spin" /> Saving...</> : <><Save size={18} /> Save Advertisement</>}
+                                            {isSubmitting ? <><Loader2 size={16} className="animate-spin" /> Saving...</> : <><Save size={16} /> Save Advertisement</>}
                                         </button>
                                     </div>
                                  </form>
@@ -678,117 +678,114 @@ const EngagementAdminBoard = () => {
                         </>
                     ) : (
                         <>
-                            <div className="flex items-center justify-end mb-4">
-                                <div className="flex items-center gap-3">
-                                    <div className="relative w-64">
-                                        <Search className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                                        <input
-                                            type="text"
-                                            placeholder="Search ads..."
-                                            className="w-full pl-10 pr-4 py-2 border rounded-xl focus:ring-2 focus:ring-orange-500 outline-none text-sm"
-                                            value={adSearch}
-                                            onChange={e => setAdSearch(e.target.value)}
-                                        />
-                                    </div>
-                                    <button
-                                        onClick={() => handleOpenForm()}
-                                        className="flex items-center gap-2 bg-[#f97316] text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-[#ea580c] transition-all shadow-sm"
-                                    >
-                                        <Plus className="w-4 h-4" /> Add New Ad
-                                    </button>
+                            <div className="flex items-center justify-between mb-4">
+                                <div className="relative w-64">
+                                    <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                                    <input
+                                        type="text"
+                                        placeholder="Search ads..."
+                                        className="w-full pl-9 pr-4 py-2 text-[13px] bg-slate-100/60 border border-slate-200/60 rounded-[12px] focus:outline-none focus:ring-2 focus:ring-[#0078d4]/20 focus:border-[#0078d4]"
+                                        value={adSearch}
+                                        onChange={e => setAdSearch(e.target.value)}
+                                    />
                                 </div>
+                                <button
+                                    onClick={() => handleOpenForm()}
+                                    className="flex items-center gap-2 bg-[#0078d4] hover:bg-[#005a9e] text-white px-4 py-2 text-xs font-bold transition-all shadow-sm"
+                                >
+                                    <Plus className="w-4 h-4" /> Add New Ad
+                                </button>
                             </div>
 
-                            <div className="flex-1 bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
-                                <div className="overflow-x-auto">
+                            <div className="flex-1 bg-white shadow-sm border border-slate-200/60 overflow-hidden flex flex-col">
+                                <div className="w-full overflow-x-auto">
                                     <table className="w-full text-left border-collapse">
                                         <thead>
-                                            <tr className="bg-slate-100/50 border-b border-slate-200 text-slate-600 text-sm">
-                                                <th className="p-4 font-semibold">Advertisement</th>
-                                                <th className="p-4 font-semibold">Locations</th>
-                                                <th className="p-4 font-semibold">Accent</th>
-                                                <th className="p-4 font-semibold">Status</th>
-                                                <th className="p-4 font-semibold text-right">Actions</th>
+                                            <tr className="border-b border-slate-100 bg-slate-50/50">
+                                                <th className="py-3.5 px-6 text-[11px] font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap">Advertisement</th>
+                                                <th className="py-3.5 px-6 text-[11px] font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap">Locations</th>
+                                                <th className="py-3.5 px-6 text-[11px] font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap">Accent</th>
+                                                <th className="py-3.5 px-6 text-[11px] font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap">Status</th>
+                                                <th className="py-3.5 px-6 text-[11px] font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap text-right">Actions</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {loadingAds ? (
+                                                    {loadingAds ? (
                                                 <tr>
-                                                    <td colSpan="5" className="p-8 text-center text-slate-400">
-                                                        <Loader2 className="w-8 h-8 animate-spin mx-auto mb-2" />
-                                                        Loading ads...
+                                                    <td colSpan="5" className="py-8 text-center text-slate-400">
+                                                        <Loader2 className="w-6 h-6 animate-spin mx-auto" />
                                                     </td>
                                                 </tr>
                                             ) : filteredAds.length > 0 ? filteredAds.map(ad => {
                                                 const iconOpt = AVAILABLE_ICONS.find(i => i.name === ad.iconName) || AVAILABLE_ICONS[3];
                                                 const IconCmp = iconOpt.component;
                                                 return (
-                                                    <tr key={ad.id} className="border-b border-slate-100 hover:bg-slate-50/50 transition-colors">
-                                                        <td className="p-4">
+                                                    <tr key={ad.id} className="border-b border-slate-50 hover:bg-slate-50/80 transition-colors">
+                                                        <td className="py-3.5 px-6">
                                                             <div className="flex items-center gap-3">
                                                                 <div 
-                                                                    className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 shadow-sm ${ad.iconBg && ad.iconBg !== 'custom' ? ad.iconBg : 'bg-slate-500'}`}
+                                                                    className={`w-8 h-8 flex items-center justify-center shrink-0 ${ad.iconBg && ad.iconBg !== 'custom' ? ad.iconBg : 'bg-slate-500'}`}
                                                                     style={ad.iconBg === 'custom' ? { backgroundColor: ad.accent } : {}}
                                                                 >
-                                                                    <IconCmp size={18} className="text-white" />
+                                                                    <IconCmp size={14} className="text-white" />
                                                                 </div>
                                                                 <div>
-                                                                    <div className="font-bold text-slate-800">{ad.title}</div>
-                                                                    <div className="text-xs text-slate-500 truncate max-w-md mt-0.5">{ad.desc}</div>
+                                                                    <div className="text-[13px] text-slate-900 font-bold">{ad.title}</div>
+                                                                    <div className="text-[11px] text-slate-500 font-medium truncate max-w-md">{ad.desc}</div>
                                                                 </div>
                                                             </div>
                                                         </td>
-                                                        <td className="p-4">
+                                                        <td className="py-3.5 px-6">
                                                             <div className="flex flex-wrap gap-1.5 max-w-[260px]">
                                                                 {ad.popupLocations ? (() => {
                                                                     const locs = ad.popupLocations.split(',').map(s => s.trim());
                                                                     if (locs.length === AVAILABLE_LOCATIONS.length) {
-                                                                        return <span className="px-2.5 py-1 bg-indigo-50 text-indigo-700 text-[10px] font-bold rounded-md border border-indigo-100">All Pages</span>;
+                                                                        return <span className="px-2.5 py-1 bg-indigo-50 text-indigo-700 text-[10px] font-bold">All Pages</span>;
                                                                     }
                                                                     return locs.map((loc, i) => (
-                                                                        <span key={i} className="px-2 py-1 bg-slate-100 text-slate-600 text-[10px] font-bold rounded-md border border-slate-200">
+                                                                        <span key={i} className="px-2 py-1 bg-slate-100 text-slate-600 text-[10px] font-bold">
                                                                             {loc}
                                                                         </span>
                                                                     ));
-                                                                })() : <span className="text-xs text-slate-400 font-medium">None</span>}
+                                                                })() : <span className="text-[11px] text-slate-400 font-medium">None</span>}
                                                             </div>
                                                         </td>
-                                                        <td className="p-4">
+                                                        <td className="py-3.5 px-6">
                                                             <div className="flex items-center gap-2">
                                                                 <div className="w-4 h-4 rounded-full border border-slate-200" style={{ backgroundColor: ad.accent || '#78716c' }} />
-                                                                <span className="text-xs font-medium text-slate-600">{ad.accent || '#78716c'}</span>
+                                                                <span className="text-[11px] font-medium text-slate-500">{ad.accent || '#78716c'}</span>
                                                             </div>
                                                         </td>
-                                                        <td className="p-4">
-                                                            <span className={`px-3 py-1 rounded-full text-xs font-bold ${
+                                                        <td className="py-3.5 px-6">
+                                                            <span className={`px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider ${
                                                                 ad.isActive ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600'
                                                             }`}>
                                                                 {ad.isActive ? <CheckCircle className="w-3 h-3 inline mr-1 -mt-0.5" /> : <XCircle className="w-3 h-3 inline mr-1 -mt-0.5" />}
                                                                 {ad.isActive ? 'Active' : 'Inactive'}
                                                             </span>
                                                         </td>
-                                                        <td className="p-4 text-right">
-                                                            <div className="flex items-center justify-end gap-2">
+                                                        <td className="py-3.5 px-6 text-right">
+                                                            <div className="flex items-center justify-end gap-1">
                                                                 <button
                                                                     onClick={() => handleAdStatus(ad.id, !ad.isActive)}
-                                                                    className={`p-2 rounded-lg transition-colors ${ad.isActive ? 'text-amber-600 hover:bg-amber-50' : 'text-emerald-600 hover:bg-emerald-50'}`}
+                                                                    className={`p-1.5 rounded-[12px] transition-all ${ad.isActive ? 'text-amber-600 hover:bg-amber-50' : 'text-emerald-600 hover:bg-emerald-50'}`}
                                                                     title={ad.isActive ? 'Deactivate' : 'Activate'}
                                                                 >
-                                                                    {ad.isActive ? <XCircle className="w-4 h-4" /> : <CheckCircle className="w-4 h-4" />}
+                                                                    {ad.isActive ? <XCircle className="w-[18px] h-[18px]" /> : <CheckCircle className="w-[18px] h-[18px]" />}
                                                                 </button>
                                                                 <button
                                                                     onClick={() => handleOpenForm(ad)}
-                                                                    className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                                                    className="p-1.5 text-slate-400 hover:text-[#0078d4] hover:bg-blue-50 rounded-[12px] transition-all"
                                                                     title="Edit"
                                                                 >
-                                                                    <Edit className="w-4 h-4" />
+                                                                    <Edit className="w-[18px] h-[18px]" />
                                                                 </button>
                                                                 <button
                                                                     onClick={() => handleDeleteAd(ad.id)}
-                                                                    className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                                                    className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-[12px] transition-all"
                                                                     title="Delete"
                                                                 >
-                                                                    <Trash2 className="w-4 h-4" />
+                                                                    <Trash2 className="w-[18px] h-[18px]" />
                                                                 </button>
                                                             </div>
                                                         </td>
@@ -796,7 +793,7 @@ const EngagementAdminBoard = () => {
                                                 );
                                             }) : (
                                                 <tr>
-                                                    <td colSpan="5" className="p-8 text-center text-slate-400">No advertisements found.</td>
+                                                    <td colSpan="5" className="py-8 text-center text-[13px] text-slate-400 font-medium">No advertisements found.</td>
                                                 </tr>
                                             )}
                                         </tbody>
