@@ -8,6 +8,8 @@ const ReportEmailModal = ({ isOpen, onClose, title, companyName, userName }) => 
     const [format, setFormat] = useState('Excel');
     const [message, setMessage] = useState('');
     const [fileName, setFileName] = useState('');
+    const [isSending, setIsSending] = useState(false);
+    const [statusMsg, setStatusMsg] = useState('');
 
     useEffect(() => {
         if (isOpen) {
@@ -20,6 +22,43 @@ const ReportEmailModal = ({ isOpen, onClose, title, companyName, userName }) => 
     if (!isOpen) return null;
 
     const fileExtension = format === 'Excel' ? '.xlsx' : format === 'CSV' ? '.csv' : '.pdf';
+
+    const handleSend = () => {
+        if (!toEmails.trim()) {
+            setStatusMsg("Please enter at least one recipient email.");
+            return;
+        }
+
+        setIsSending(true);
+        setStatusMsg("Sending...");
+        
+        fetch('/send-email', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                to: toEmails,
+                subject: subject,
+                html: message.replace(/\n/g, "<br>")
+            })
+        }).then(res => res.json())
+        .then(data => {
+            setIsSending(false);
+            if (data.success) {
+                setStatusMsg("Email sent successfully!");
+                setTimeout(() => {
+                    onClose();
+                    setStatusMsg('');
+                }, 3000);
+            } else {
+                setStatusMsg("Failed to send: " + (data.error || 'Unknown error'));
+            }
+        }).catch(err => {
+            setIsSending(false);
+            setStatusMsg("Failed to load email service.");
+        });
+    };
 
     return (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4 font-sans">
@@ -126,12 +165,18 @@ const ReportEmailModal = ({ isOpen, onClose, title, companyName, userName }) => 
                 </div>
 
                 {/* Footer */}
-                <div className="p-6 pt-4 flex justify-end">
+                <div className="p-6 pt-4 flex justify-between items-center">
+                    <div className="flex items-center gap-3">
+                        <div className={`text-[13px] font-semibold ${statusMsg.includes('success') ? 'text-green-600' : statusMsg.includes('Please') || statusMsg.includes('Failed') || statusMsg.includes('Error') ? 'text-red-600' : 'text-[#0077c5]'}`}>
+                            {statusMsg}
+                        </div>
+                    </div>
                     <button 
-                        onClick={onClose}
-                        className="px-5 py-2 bg-[#0077c5] text-white font-bold hover:bg-[#005c9a] transition-colors shadow-md"
+                        onClick={handleSend}
+                        disabled={isSending}
+                        className={`px-5 py-2 text-white font-bold transition-colors shadow-md ${isSending ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#0077c5] hover:bg-[#005c9a]'}`}
                     >
-                        Send email
+                        {isSending ? 'Sending...' : 'Send email'}
                     </button>
                 </div>
             </div>

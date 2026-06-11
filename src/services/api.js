@@ -7,9 +7,26 @@ const api = axios.create({
   },
 });
 
+let activeRequests = 0;
+
+const startRequest = () => {
+  activeRequests++;
+  if (activeRequests === 1) {
+    window.dispatchEvent(new Event('globalLoadingStart'));
+  }
+};
+
+const endRequest = () => {
+  activeRequests = Math.max(0, activeRequests - 1);
+  if (activeRequests === 0) {
+    window.dispatchEvent(new Event('globalLoadingEnd'));
+  }
+};
+
 // Request interceptor: Attach Token and Company Code
 api.interceptors.request.use(
   (config) => {
+    startRequest();
     const token = localStorage.getItem('token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -30,12 +47,16 @@ api.interceptors.request.use(
     }
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => {
+    endRequest();
+    return Promise.reject(error);
+  }
 );
 
 // Response interceptor: Handle 401 Unauthorized and Trigger Global Refreshes
 api.interceptors.response.use(
   (response) => {
+    endRequest();
     // Intercept mutations to auto-refresh reports globally
     const method = response.config?.method?.toLowerCase();
     if (['post', 'put', 'delete', 'patch'].includes(method)) {
@@ -44,6 +65,7 @@ api.interceptors.response.use(
     return response;
   },
   (error) => {
+    endRequest();
     if (error.response?.status === 401) {
       // Skip redirect if this was the login request itself
       const isLoginRequest = error.config?.url?.includes('/Auth/login');

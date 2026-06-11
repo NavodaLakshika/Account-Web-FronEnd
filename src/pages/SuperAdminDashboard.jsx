@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import SystemLoader from '../components/SystemLoader';
 import toast from 'react-hot-toast';
 import { DotLottiePlayer } from '@dotlottie/react-player';
 import { showSuccessToast } from '../utils/toastUtils';
@@ -34,7 +35,8 @@ import {
     Moon,
     Megaphone,
     Lock,
-    Unlock
+    Unlock,
+    Sparkles
 } from 'lucide-react';
 import ConfirmModal from '../components/modals/ConfirmModal';
 import AlertModal from '../components/modals/AlertModal';
@@ -51,6 +53,8 @@ import CompanyOverviewBoard from '../HomeMaster/CompanyOverviewBoard';
 import AdminCompanyReportsBoard from '../HomeMaster/AdminCompanyReportsBoard';
 import EngagementAdminBoard from '../components/Admin/EngagementAdminBoard';
 import EmployeeMessageDropdown from '../components/Admin/EmployeeMessageDropdown';
+import AdminAIChatbot from '../components/modals/AdminAIChatbot';
+import AIAsterisk from '../components/AIAsterisk';
 
 const SuperAdminDashboard = () => {
     const navigate = useNavigate();
@@ -209,6 +213,7 @@ const SuperAdminDashboard = () => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
     const [darkMode, setDarkMode] = useState(false);
+    const [showAIChatbot, setShowAIChatbot] = useState(false);
 
     useEffect(() => {
         if (darkMode) {
@@ -223,6 +228,44 @@ const SuperAdminDashboard = () => {
     const [showDeletePasswordModal, setShowDeletePasswordModal] = useState(false);
     const [deletePasswordInput, setDeletePasswordInput] = useState('');
     const [pendingDeleteAction, setPendingDeleteAction] = useState(null);
+
+    // Feedback state
+    const [feedbackData, setFeedbackData] = useState([]);
+    const [feedbackLoading, setFeedbackLoading] = useState(false);
+    const [fullScreenImage, setFullScreenImage] = useState(null);
+
+    const fetchFeedback = async () => {
+        setFeedbackLoading(true);
+        try {
+            const res = await api.get('/reportfeedback/all');
+            setFeedbackData(res.data);
+        } catch (err) {
+            console.error('Error fetching feedback:', err);
+        } finally {
+            setFeedbackLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        if (activeMenu === 'User Feedback') {
+            fetchFeedback();
+        }
+    }, [activeMenu]);
+
+    const handleDeleteFeedback = (feedbackId) => {
+        setConfirmConfig({
+            isOpen: true,
+            title: 'Delete Feedback',
+            message: `Are you sure you want to permanently delete this feedback record?`,
+            loading: false,
+            onConfirm: () => {
+                closeConfirm();
+                setPendingDeleteAction({ type: 'feedback', feedbackId });
+                setDeletePasswordInput('');
+                setShowDeletePasswordModal(true);
+            }
+        });
+    };
 
     const closeConfirm = () => setConfirmConfig(prev => ({ ...prev, isOpen: false }));
 
@@ -617,6 +660,10 @@ const SuperAdminDashboard = () => {
                     return { ...emp, companies: newComps };
                 }));
                 showSuccessToast('Transaction deleted successfully.');
+            } else if (action.type === 'feedback') {
+                await api.delete(`/reportfeedback/${action.feedbackId}`);
+                setFeedbackData(prev => prev.filter(f => f.id !== action.feedbackId));
+                showSuccessToast('Feedback deleted successfully.');
             }
         } catch (error) {
             setAlertConfig({
@@ -658,17 +705,7 @@ const SuperAdminDashboard = () => {
     };
 
     if (loading) {
-        return (
-            <div className="fixed inset-0 z-[10010] flex items-center justify-center">
-                <div className="w-40 h-40">
-                    <DotLottiePlayer
-                        src="/lottiefile/DashboardLoader.lottie"
-                        autoplay
-                        loop
-                    />
-                </div>
-            </div>
-        );
+        return <SystemLoader />;
     }
 
     const filteredHierarchy = hierarchy.filter(e =>
@@ -691,7 +728,8 @@ const SuperAdminDashboard = () => {
         { name: 'Database', icon: Database },
         { name: 'Security Audit', icon: ShieldCheck },
         { name: 'Integrations', icon: Puzzle },
-        { name: 'App List', icon: AppWindow }
+        { name: 'App List', icon: AppWindow },
+        { name: 'User Feedback', icon: MessageSquare }
     ];
 
     return (
@@ -1473,16 +1511,7 @@ const SuperAdminDashboard = () => {
                             </div>
 
                             {loadingPermissions ? (
-                                <div className="flex flex-col items-center justify-center py-20 gap-3 text-slate-400">
-                                    <div className="w-20 h-20">
-                                        <DotLottiePlayer
-                                            src="/lottiefile/DashboardLoader.lottie"
-                                            autoplay
-                                            loop
-                                        />
-                                    </div>
-                                    <span className="text-xs font-bold">Fetching role permission matrix...</span>
-                                </div>
+                                <SystemLoader inline message="Fetching role permission matrix..." />
                             ) : !permissions.length ? (
                                 <div className="flex flex-col items-center justify-center py-20 gap-4 text-slate-400 mx-6 border border-dashed border-slate-200">
                                     <Database size={40} className="text-slate-300" />
@@ -1794,6 +1823,99 @@ const SuperAdminDashboard = () => {
                             </div>
                             <div className="p-6">
                                 <EngagementAdminBoard />
+                            </div>
+                        </div>
+                    )}
+
+                    {/* USER FEEDBACK VIEW */}
+                    {activeMenu === 'User Feedback' && (
+                        <div className="bg-white shadow-sm border border-slate-200/60 pb-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                            <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-8 h-8 bg-blue-50 flex items-center justify-center">
+                                        <MessageSquare className="w-4 h-4 text-[#0078d4]" />
+                                    </div>
+                                    <div>
+                                        <h2 className="text-[15px] font-bold text-slate-800">User Feedback</h2>
+                                        <p className="text-[11px] text-slate-500 font-medium">View and manage feedback submitted from Report Builder</p>
+                                    </div>
+                                </div>
+                                <span className="bg-blue-100 text-[#0078d4] text-[10px] font-bold px-2.5 py-1 ">{feedbackData.length} Records</span>
+                            </div>
+                            <div className="w-full overflow-x-auto">
+                                <table className="w-full text-left border-collapse">
+                                    <thead>
+                                        <tr className="border-b border-slate-100 bg-slate-50/50">
+                                            <th className="py-3.5 px-6 text-[11px] font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap">Date</th>
+                                            <th className="py-3.5 px-6 text-[11px] font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap">Employee Name</th>
+                                            <th className="py-3.5 px-6 text-[11px] font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap">Company</th>
+                                            <th className="py-3.5 px-6 text-[11px] font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap">Report Name</th>
+                                            <th className="py-3.5 px-6 text-[11px] font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap">Feedback</th>
+                                            <th className="py-3.5 px-6 text-[11px] font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap">Images</th>
+                                            <th className="py-3.5 px-6 text-[11px] font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap text-right">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {feedbackLoading ? (
+                                            <tr>
+                                                <td colSpan={7} className="py-12 text-center text-slate-400 text-[13px] font-medium">Loading feedback...</td>
+                                            </tr>
+                                        ) : feedbackData.length === 0 ? (
+                                            <tr>
+                                                <td colSpan={7} className="py-12 text-center text-slate-400 text-[13px] font-medium">No feedback records found.</td>
+                                            </tr>
+                                        ) : (
+                                            feedbackData.map((item) => (
+                                                <tr key={item.id} className="border-b border-slate-50 hover:bg-slate-50/80 transition-colors">
+                                                    <td className="py-3.5 px-6 text-[12px] text-slate-600 whitespace-nowrap">
+                                                        {new Date(item.createdAt).toLocaleString()}
+                                                    </td>
+                                                    <td className="py-3.5 px-6 text-[13px] text-slate-900 font-bold">
+                                                        {item.employeeName || '-'}
+                                                    </td>
+                                                    <td className="py-3.5 px-6 text-[12px] text-slate-600 font-mono">
+                                                        {item.companyId || '-'}
+                                                    </td>
+                                                    <td className="py-3.5 px-6 text-[12px] font-medium text-slate-800">
+                                                        {item.reportName || '-'}
+                                                    </td>
+                                                    <td className="py-3.5 px-6 text-[12px] text-slate-700 max-w-[250px] truncate" title={item.feedbackText}>
+                                                        {item.feedbackText}
+                                                    </td>
+                                                    <td className="py-3.5 px-6">
+                                                        {(() => {
+                                                            try {
+                                                                if (!item.images || item.images === '[]') return <span className="text-[12px] text-slate-400">-</span>;
+                                                                const imgs = JSON.parse(item.images);
+                                                                if (!Array.isArray(imgs) || imgs.length === 0) return <span className="text-[12px] text-slate-400">-</span>;
+                                                                return (
+                                                                    <div className="flex gap-1.5 overflow-x-auto max-w-[120px] pb-1">
+                                                                        {imgs.map((img, i) => (
+                                                                            <div key={i} onClick={() => setFullScreenImage(img)} className="shrink-0 block cursor-pointer" title="Click to view full image">
+                                                                                <img src={img} alt={`Attachment ${i+1}`} className="w-8 h-8 object-cover rounded shadow-sm border border-slate-200 hover:opacity-80 transition-opacity" />
+                                                                            </div>
+                                                                        ))}
+                                                                    </div>
+                                                                );
+                                                            } catch (e) {
+                                                                return <span className="text-[12px] text-slate-400">Error</span>;
+                                                            }
+                                                        })()}
+                                                    </td>
+                                                    <td className="py-3.5 px-6 text-right">
+                                                        <button
+                                                            className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-[12px] transition-all"
+                                                            onClick={() => handleDeleteFeedback(item.id)}
+                                                            title="Delete Feedback"
+                                                        >
+                                                            <Trash2 className="w-[18px] h-[18px]" />
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            ))
+                                        )}
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     )}
@@ -2170,6 +2292,33 @@ const SuperAdminDashboard = () => {
                 isOpen={showSystemLogReport}
                 onClose={() => setShowSystemLogReport(false)}
             />
+
+            {/* Full Screen Image Modal */}
+            {fullScreenImage && (
+                <div className="fixed inset-0 z-[10000] bg-black/90 flex items-center justify-center p-4 backdrop-blur-sm animate-in fade-in duration-200" onClick={() => setFullScreenImage(null)}>
+                    <button onClick={() => setFullScreenImage(null)} className="absolute top-6 right-6 text-white/70 hover:text-white bg-black/50 hover:bg-black/80 rounded-[12px] p-2 transition-all">
+                        <X className="w-8 h-8" />
+                    </button>
+                    <img src={fullScreenImage} alt="Full screen preview" className="max-w-full max-h-full object-contain shadow-2xl rounded-[12px]" onClick={(e) => e.stopPropagation()} />
+                </div>
+            )}
+
+            {/* AI Chatbot Trigger Button */}
+            {!showAIChatbot && (
+                <div className="fixed bottom-6 right-6 z-[9900] group">
+                    <div className="absolute inset-0 bg-indigo-400 rounded-full animate-ping opacity-25"></div>
+                    <button 
+                        onClick={() => setShowAIChatbot(true)}
+                        className="relative w-14 h-14 bg-white rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.12)] flex items-center justify-center hover:scale-110 transition-all border border-slate-100"
+                        title="Open Onimta Intelligence"
+                    >
+                        <AIAsterisk size={28} />
+                    </button>
+                </div>
+            )}
+
+            {/* AI Chatbot Component */}
+            <AdminAIChatbot isOpen={showAIChatbot} onClose={() => setShowAIChatbot(false)} />
         </div>
     );
 };

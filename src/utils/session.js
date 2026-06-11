@@ -8,13 +8,15 @@ export const getSessionData = () => {
     const companyData = localStorage.getItem('selectedCompany');
     const userData = localStorage.getItem('user');
     
-    let companyCode = 'COM001'; // Safe default for your specific environment
-    let userName = 'SYSTEM';
+    let companyCode = null;
+    let companyName = null;
+    let userName = null;
 
     if (companyData) {
         try {
             const parsed = JSON.parse(companyData);
-            companyCode = parsed.company_Code || parsed.companyCode || parsed.CompanyCode || companyData;
+            companyCode = parsed.company_Code || parsed.companyCode || parsed.CompanyCode || companyCode;
+            companyName = parsed.company_Name || parsed.companyName || parsed.CompanyName || companyName;
         } catch (e) { companyCode = companyData; }
     }
 
@@ -25,8 +27,9 @@ export const getSessionData = () => {
         } catch (e) { }
     }
 
-    return { companyCode, userName };
+    return { companyCode, companyName, userName };
 };
 
 export const getCompanyCode = () => getSessionData().companyCode;
+export const getCompanyName = () => getSessionData().companyName;
 export const getUserName = () => getSessionData().userName;

@@ -9,7 +9,10 @@ GO
 CREATE PROCEDURE dbo.ACC_sp_GetProfitAndLoss
     @CompanyId NVARCHAR(50) = NULL,
     @StartDate DATE = NULL,
-    @EndDate DATE = NULL
+    @EndDate DATE = NULL,
+    @AccountingMethod NVARCHAR(20) = NULL,
+    @DisplayColumnsBy NVARCHAR(50) = NULL,
+    @CompareTo NVARCHAR(MAX) = NULL
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -50,7 +53,12 @@ IF OBJECT_ID('dbo.ACC_sp_GetBalanceSheet', 'P') IS NOT NULL
 GO
 CREATE PROCEDURE dbo.ACC_sp_GetBalanceSheet
     @CompanyId NVARCHAR(50) = NULL,
-    @AsOfDate DATE = NULL
+    @AsOfDate DATE = NULL,
+    @StartDate DATE = NULL,
+    @EndDate DATE = NULL,
+    @AccountingMethod NVARCHAR(20) = NULL,
+    @DisplayColumnsBy NVARCHAR(50) = NULL,
+    @CompareTo NVARCHAR(MAX) = NULL
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -110,7 +118,12 @@ IF OBJECT_ID('dbo.ACC_sp_GetTrialBalance', 'P') IS NOT NULL
 GO
 CREATE PROCEDURE dbo.ACC_sp_GetTrialBalance
     @CompanyId NVARCHAR(50) = NULL,
-    @AsOfDate DATE = NULL
+    @AsOfDate DATE = NULL,
+    @StartDate DATE = NULL,
+    @EndDate DATE = NULL,
+    @AccountingMethod NVARCHAR(20) = NULL,
+    @DisplayColumnsBy NVARCHAR(50) = NULL,
+    @CompareTo NVARCHAR(MAX) = NULL
 AS
 BEGIN
     SET NOCOUNT ON;

@@ -130,6 +130,7 @@ import api from '../services/api';
 import SubscriptionAdminBoard from '../components/Admin/SubscriptionAdminBoard';
 import { biDashboardService } from '../services/biDashboard.service';
 import GetThingsDoneBoard from './GetThingsDoneBoard';
+import SystemLoader from '../components/SystemLoader';
 
 // Master File specific boards
 import CompanyBoard from '../components/modals/MasterSubModal/CompanyBoard';
@@ -166,8 +167,56 @@ import JournalEntryEditorModal from '../components/modals/SystemAdmin/JournalEnt
 import TransactionEditorModal from '../components/modals/SystemAdmin/TransactionEditorModal';
 import CompanyUsersModal from '../components/modals/SystemAdmin/CompanyUsersModal';
 import ReportsCenterModal from '../components/modals/AdminReports/ReportsCenterModal';
+import ReportLearnMoreModal from '../components/modals/AdminReports/ReportLearnMoreModal';
 
 // Reports Modals
+
+const LiveNotifications = () => {
+    const notifications = [
+        "Tip: Use Quick Actions for instant access to your daily tasks",
+        "New: You can now drag and drop widgets on your dashboard",
+        "Reminder: Reconcile your bank accounts before the month ends",
+        "Tip: Check the global search for quick navigation",
+        "System: All systems are operating normally today"
+    ];
+    const [currentIndex, setCurrentIndex] = React.useState(0);
+    const [fade, setFade] = React.useState(true);
+
+    React.useEffect(() => {
+        const interval = setInterval(() => {
+            setFade(false);
+            setTimeout(() => {
+                setCurrentIndex((prev) => (prev + 1) % notifications.length);
+                setFade(true);
+            }, 500);
+        }, 6000);
+        return () => clearInterval(interval);
+    }, []);
+
+    return (
+        <div className="hidden lg:flex absolute left-1/2 -translate-x-1/2 bottom-0 mb-1 items-center justify-center pointer-events-none">
+            <div className={`flex items-center gap-2 px-4 py-1.5 bg-slate-50/80 border border-slate-100 rounded-full text-slate-500 shadow-sm transition-opacity duration-500 ${fade ? 'opacity-100' : 'opacity-0'}`}>
+                <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></div>
+                <span className="text-[12px] font-medium tracking-wide text-slate-500">{notifications[currentIndex]}</span>
+            </div>
+        </div>
+    );
+};
+
+const LiveClock = () => {
+    const [time, setTime] = React.useState(new Date());
+    React.useEffect(() => {
+        const timer = setInterval(() => setTime(new Date()), 1000);
+        return () => clearInterval(timer);
+    }, []);
+
+    return (
+        <div className="flex flex-col items-end mr-4 pr-4 border-r border-slate-200/80 mb-0.5">
+            <span className="text-[13px] font-bold text-slate-700">{time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">{time.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' })}</span>
+        </div>
+    );
+};
 
 const Dashboard = () => {
 
@@ -214,6 +263,7 @@ const Dashboard = () => {
     const [showTransactionEditorModal, setShowTransactionEditorModal] = useState(false);
     const [showCompanyUsersModal, setShowCompanyUsersModal] = useState(false);
     const [showReportsCenterModal, setShowReportsCenterModal] = useState(false);
+    const [showLearnMoreModal, setShowLearnMoreModal] = useState(false);
     const [navReportSearch, setNavReportSearch] = useState('');
 
     const getCompanyFavKey = () => `favorite_reports_${selectedCompany?.Company_Id || selectedCompany?.companyId || 'default'}`;
@@ -1052,7 +1102,7 @@ const Dashboard = () => {
     const navItems = dashboardGroups.flatMap(group => group.items);
 
     const menuBar = [
-        'Master File', 'Transaction', 'Reports', 'System Admin', 'Help', 'About'
+        'Master File', 'Transaction', 'Reports', 'System Admin'
     ];
 
     const menuDropdownItems = {
@@ -1294,10 +1344,6 @@ const Dashboard = () => {
             { label: 'Period Lock Facility', onClick: () => setShowPeriodLockModal(true) },
             { label: 'User & Role Management', onClick: () => setShowCompanyUsersModal(true) },
             { label: 'Change Password', onClick: () => setShowChangePasswordBoard(true) },
-        ],
-        'Help': [],
-        'About': [
-            { label: 'About Software', onClick: () => setShowSoftwareAboutModal(true) },
         ],
     };
 
@@ -1632,6 +1678,7 @@ const Dashboard = () => {
                 empCode={user?.EmpCode || user?.empCode || user?.emp_Code || user?.id_No || user?.Id_No || user?.IdNo}
                 companyCode={selectedCompany?.Company_Id || selectedCompany?.companyId || selectedCompany?.code || selectedCompany?.companyCode}
             />
+            <ReportLearnMoreModal isOpen={showLearnMoreModal} onClose={() => setShowLearnMoreModal(false)} />
 
             {/* Reports Modals */}
 
@@ -1662,17 +1709,7 @@ const Dashboard = () => {
             />
 
             {/* Dashboard Loader Overlay */}
-            {showDashboardLoader && (
-                <div className="fixed inset-0 z-[999999] flex items-center justify-center bg-white/60 backdrop-blur-[3px]">
-                    <div className="w-[150px] h-[150px]">
-                        <DotLottiePlayer
-                            src="/lottiefile/DashboardLoader.lottie"
-                            autoplay
-                            loop
-                        />
-                    </div>
-                </div>
-            )}
+            {showDashboardLoader && <SystemLoader />}
 
             {/* AI Thinking Overlay (Robot Animation centered) */}
             {isAIThinking && (() => {
@@ -1778,7 +1815,7 @@ const Dashboard = () => {
             {/* 2. Accounting Website Style Header */}
             <header
                 data-tour="main-menu"
-                className={`z-50 bg-white shadow-[0_1px_4px_rgba(0,0,0,0.06)] transition-all duration-300 ease-in-out ${isTopBarCollapsed ? 'h-12 overflow-hidden' : ''}`}
+                className={`relative z-[300] bg-white shadow-[0_1px_4px_rgba(0,0,0,0.06)] transition-all duration-300 ease-in-out ${isTopBarCollapsed ? 'h-12 overflow-hidden' : ''}`}
             >
                 {/* Row 1: Logo + Centered Nav + User Area */}
                 <div className={`flex items-center justify-between px-6 border-b border-slate-100 transition-all duration-300 ${isTopBarCollapsed ? 'h-full border-transparent' : 'h-14'}`}>
@@ -1970,6 +2007,16 @@ const Dashboard = () => {
 
                     {/* Right: User + AI + Menu */}
                     <div className="flex items-center gap-3">
+                        {/* Help / Learn More Icon */}
+                        <div className="relative">
+                            <button
+                                onClick={() => setShowLearnMoreModal(true)}
+                                className="flex items-center justify-center w-[36px] h-[36px] rounded-full hover:bg-slate-100 transition-colors text-slate-500 hover:text-[#0078d4]"
+                                title="Learn More"
+                            >
+                                <HelpCircle size={20} />
+                            </button>
+                        </div>
                         {/* Settings Gear Icon */}
                         <div className="relative">
                             <button
@@ -2103,9 +2150,90 @@ const Dashboard = () => {
                     <div className="p-8 w-full flex flex-col gap-8">
 
                         {/* Header & BI Data Summary (QuickBooks Style) */}
-                        <div className="flex flex-col items-center justify-center gap-6 relative">
-                            {/* Dynamic Greeting */}
-                            <div className="flex flex-col items-center justify-center text-center w-full z-0">
+                        <div className="flex flex-row items-center justify-between w-full relative mb-6 z-[100]">
+                            
+                            {/* Left Side: Quick Actions */}
+                            <div className="flex-1 flex justify-start">
+                                <div className="relative z-[200] flex flex-col items-start gap-1">
+                                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Navigation</span>
+                                    <button
+                                        data-tour="quick-launch"
+                                        onClick={() => setShowQuickActions(!showQuickActions)}
+                                        className={`relative flex items-center gap-2 px-5 h-[40px] border-2 rounded-[8px] transition-all font-bold text-[13px] shadow-sm ${showQuickActions ? 'border-blue-500 bg-[#0078d4] text-white' : 'border-[#0078d4] bg-white text-blue-600 hover:bg-[#0078d4] hover:text-white'}`}
+                                    >
+                                        {!showQuickActions && (
+                                            <span className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[11px] font-bold text-white shadow-sm ring-2 ring-white animate-pulse">
+                                                12
+                                            </span>
+                                        )}
+                                        {/* <Sparkles size={16} className={showQuickActions ? 'text-white' : 'text-blue-500'} /> */}
+                                        Quick Actions
+                                        <ChevronRight size={12} className={`ml-1 transition-transform duration-300 ${showQuickActions ? 'rotate-90 text-white' : 'rotate-0 text-blue-500'}`} />
+                                    </button>
+
+                                    {showQuickActions && (
+                                        <>
+                                            {/* Invisible backdrop */}
+                                            <div className="fixed inset-0 z-[-1]" onClick={() => setShowQuickActions(false)} />
+                                            <div className="absolute top-[calc(100%+12px)] left-0 w-[420px] max-h-[70vh] overflow-y-auto no-scrollbar bg-white/95 backdrop-blur-xl border border-slate-200/60 shadow-[0_20px_60px_rgba(0,0,0,0.15)] rounded-[8px] py-4 transform origin-top-left transition-all duration-300 animate-in slide-in-from-top-2 zoom-in-95">
+                                                <div className="px-5 pb-3 mb-3 border-b border-slate-100 flex justify-between items-center">
+                                                    <div>
+                                                        <h3 className="text-[15px] font-extrabold text-slate-800">Quick Actions</h3>
+                                                        <p className="text-[12px] text-slate-500 font-medium">Fast access to your modules</p>
+                                                    </div>
+                                                    <button onClick={() => setShowQuickActions(false)} className="w-10 h-10 flex items-center justify-center text-slate-500 transition-colors">
+                                                        <X size={21} strokeWidth={2.5} />
+                                                    </button>
+                                                </div>
+                                                <div className="grid grid-cols-2 gap-2 px-3">
+                                                    {ribbonIcons.map((iconId) => {
+                                                        const iconData = {
+                                                            new_account: { icon: UserPlus, label: 'New Account', onClick: () => setShowNewAccountModal(true), active: showNewAccountModal, iconColor: '#2563eb', bg: '#eff6ff' },
+                                                            customer: { icon: Users, label: 'Customers', onClick: () => setShowCustomerModal(true), active: showCustomerModal, iconColor: '#059669', bg: '#f0fdf4' },
+                                                            vendor: { icon: Truck, label: 'Vendors', onClick: () => setShowVendorModal(true), active: showVendorModal, iconColor: '#d97706', bg: '#fffbeb' },
+                                                            enter_bill: { icon: FileText, label: 'Enter Bill', onClick: () => setShowEnterBillModal(true), active: showEnterBillModal, iconColor: '#dc2626', bg: '#fef2f2' },
+                                                            pay_bill: { icon: CreditCard, label: 'Pay Bill', onClick: () => setShowPayBillModal(true), active: showPayBillModal, iconColor: '#ea580c', bg: '#fff7ed' },
+                                                            write_chq: { icon: PenTool, label: 'Write Cheque', onClick: () => setShowWriteChequeModal(true), active: showWriteChequeModal, iconColor: '#7c3aed', bg: '#faf5ff' },
+                                                            petty_cash: { icon: Wallet, label: 'Petty Cash', onClick: () => setShowPettyCashModal(true), active: showPettyCashModal, iconColor: '#16a34a', bg: '#f0fdf4' },
+                                                            make_deposit: { icon: ArrowDownLeft, label: 'Deposit', onClick: () => setShowMakeDepositModal(true), active: showMakeDepositModal, iconColor: '#2563eb', bg: '#eff6ff' },
+                                                            journal_entry: { icon: BookOpen, label: 'Journal', onClick: () => setShowJournalEntryModal(true), active: showJournalEntryModal, iconColor: '#9333ea', bg: '#fdf4ff' },
+                                                            bank_rec: { icon: RefreshCcw, label: 'Bank Rec', onClick: () => setShowBankRecModal(true), active: showBankRecModal, iconColor: '#0d9488', bg: '#f0fdfa' },
+                                                            trial_balance: { icon: BarChart2, label: 'Trial Balance', onClick: () => setShowTrialBalanceModal(true), active: showTrialBalanceModal, iconColor: '#4f46e5', bg: '#eef2ff' },
+                                                            // search: { icon: Search, label: 'Search', onClick: () => setShowSearchModal(true), active: showSearchModal, iconColor: '#64748b', bg: '#f8fafc' },
+                                                            ai_chat: { icon: Bot, label: 'AI Chat', onClick: handleAIClick, active: showAIChatbotModal, iconColor: '#db2777', bg: '#fdf2f8' },
+                                                            department: { icon: Building2, label: 'Department', onClick: () => setShowDepartmentModal(true), active: showDepartmentModal, iconColor: '#1d4ed8', bg: '#eff6ff' },
+                                                            calculator: { icon: Calculator, label: 'Calculator', onClick: () => window.open('ms-calculator:'), iconColor: '#9333ea', bg: '#faf5ff' },
+                                                            help: { icon: HelpCircle, label: 'Help', onClick: () => { }, iconColor: '#64748b', bg: '#f8fafc' },
+                                                            category: { icon: Layers, label: 'Category', onClick: () => setShowCategoryModal(true), active: showCategoryModal, iconColor: '#ea580c', bg: '#fff7ed' },
+                                                            // reminder: { icon: Bell, label: 'Reminder', onClick: () => setShowReminderModal(true), active: showReminderModal, iconColor: '#ca8a04', bg: '#fefce8' },
+                                                            // dashboard: { icon: LayoutDashboard, label: 'Get Things Done', onClick: () => setShowBiDashboardView(true), active: showBiDashboardView, iconColor: '#0891b2', bg: '#ecfeff' },
+                                                        }[iconId];
+                                                        if (!iconData) return null;
+                                                        const Icon = iconData.icon;
+                                                        const isActive = iconData.active;
+                                                        return (
+                                                            <button
+                                                                key={iconId}
+                                                                onClick={() => { iconData.onClick(); setShowQuickActions(false); }}
+                                                                className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl transition-all duration-150 group/item ${isActive ? 'bg-blue-50/80 text-blue-700 shadow-sm' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'}`}
+                                                            >
+                                                                <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-transform group-hover/item:scale-110" style={{ backgroundColor: isActive ? '#dbeafe' : iconData.bg }}>
+                                                                    <Icon size={16} strokeWidth={2.2} style={{ color: isActive ? '#1d4ed8' : iconData.iconColor }} />
+                                                                </div>
+                                                                <span className="text-[12.5px] font-semibold flex-1 text-left">{iconData.label}</span>
+                                                                {isActive && <span className="w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0" />}
+                                                            </button>
+                                                        );
+                                                    })}
+                                                </div>
+                                            </div>
+                                        </>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Center: Dynamic Greeting */}
+                            <div className="flex flex-col items-center justify-center text-center px-8 z-0">
                                 <h1 className="text-[36px] font-extrabold text-[#1e293b] leading-tight mb-1.5 text-center tracking-tight">
                                     {typedGreeting}
                                     <span className="inline-block w-[3px] h-[36px] ml-1 bg-[#0077c5] rounded-sm align-middle animate-pulse" style={{ opacity: typedGreeting.length > 0 && typedGreeting.endsWith('!') ? 0 : 1, transition: 'opacity 0.3s' }} />
@@ -2117,102 +2245,32 @@ const Dashboard = () => {
                                     {typedSubtitle}
                                 </p>
                             </div>
-
-                            {/* Actions Row */}
-                            <div className="flex flex-row items-center justify-between z-10 w-full relative">
-                                {/* Quick Actions Button */}
-                                <div
-                                    className="relative"
-                                    onMouseEnter={() => { clearTimeout(menuTimeoutRef.current); setShowQuickActions(true); }}
-                                    onMouseLeave={() => { menuTimeoutRef.current = setTimeout(() => setShowQuickActions(false), 200); }}
-                                >
-                                    <button
-                                        data-tour="quick-launch"
-                                        className={`flex items-center gap-2 px-4 h-[36px] border rounded-xl transition-all font-bold text-[12.5px] group shadow-sm ${showQuickActions
-                                            ? 'text-blue-600 border-blue-400 bg-blue-50 shadow-blue-100'
-                                            : 'bg-white border-slate-200 text-slate-600 hover:text-blue-600 hover:border-blue-300 hover:bg-blue-50/60'
-                                            }`}
-                                    >
-                                        <div className={`w-5 h-5 rounded-md flex items-center justify-center transition-colors ${showQuickActions ? 'bg-blue-600' : 'bg-slate-100 group-hover:bg-blue-100'
-                                            }`}>
-                                            <LayoutGrid size={11} className={showQuickActions ? 'text-white' : 'text-blue-600'} />
+                            
+                            {/* Right Side: Tools & Clock */}
+                            <div className="flex-1 flex justify-end">
+                                <div className="flex items-end gap-3">
+                                    <LiveClock />
+                                    <div className="flex flex-col items-end gap-1">
+                                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pr-1">Feedback & Tools</span>
+                                        <div className="flex items-center gap-3">
+                                            <button
+                                                data-tour="rate-system"
+                                                onClick={() => setShowReviewModal(true)}
+                                                className="flex items-center gap-2 px-4 h-[40px] bg-white border border-slate-200/80 rounded-[8px] text-[13px] font-bold text-slate-500 hover:bg-orange-50 hover:text-orange-600 hover:border-orange-200 hover:shadow-sm active:scale-95 transition-all duration-200"
+                                            >
+                                                <Star size={14} />
+                                                Rate
+                                            </button>
+                                            <button
+                                                data-tour="global-search"
+                                                onClick={() => setShowSearchModal(true)}
+                                                className="flex items-center gap-2 px-4 h-[40px] bg-white border border-slate-200/80 rounded-[8px] text-[13px] font-bold text-slate-500 hover:bg-slate-100 hover:text-slate-700 hover:shadow-sm active:scale-95 transition-all duration-200"
+                                            >
+                                                <Search size={14} className="text-slate-400" />
+                                                Search
+                                            </button>
                                         </div>
-                                        Quick Actions
-                                        <ChevronRight size={12} className={`ml-0.5 transition-transform duration-200 ${showQuickActions ? 'rotate-90 text-blue-600' : 'rotate-0 text-slate-400'}`} />
-                                    </button>
-
-                                    {showQuickActions && (
-                                        <div
-                                            className="absolute top-full left-0 mt-1.5 w-[700px] max-h-[72vh] overflow-y-auto no-scrollbar bg-white border border-slate-100 shadow-[0_16px_48px_rgba(0,0,0,0.14)]  py-3 z-[200]"
-                                            onMouseEnter={() => clearTimeout(menuTimeoutRef.current)}
-                                            onMouseLeave={() => { menuTimeoutRef.current = setTimeout(() => setShowQuickActions(false), 200); }}
-                                        >
-                                            <div className="h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent mx-3 mb-2" />
-                                            <div className="grid grid-cols-3 gap-1 px-2">
-                                                {ribbonIcons.map((iconId) => {
-                                                    const iconData = {
-                                                        new_account: { icon: UserPlus, label: 'New Account', onClick: () => setShowNewAccountModal(true), active: showNewAccountModal, iconColor: '#2563eb', bg: '#eff6ff' },
-                                                        customer: { icon: Users, label: 'Customers', onClick: () => setShowCustomerModal(true), active: showCustomerModal, iconColor: '#059669', bg: '#f0fdf4' },
-                                                        vendor: { icon: Truck, label: 'Vendors', onClick: () => setShowVendorModal(true), active: showVendorModal, iconColor: '#d97706', bg: '#fffbeb' },
-                                                        enter_bill: { icon: FileText, label: 'Enter Bill', onClick: () => setShowEnterBillModal(true), active: showEnterBillModal, iconColor: '#dc2626', bg: '#fef2f2' },
-                                                        pay_bill: { icon: CreditCard, label: 'Pay Bill', onClick: () => setShowPayBillModal(true), active: showPayBillModal, iconColor: '#ea580c', bg: '#fff7ed' },
-                                                        write_chq: { icon: PenTool, label: 'Write Cheque', onClick: () => setShowWriteChequeModal(true), active: showWriteChequeModal, iconColor: '#7c3aed', bg: '#faf5ff' },
-                                                        petty_cash: { icon: Wallet, label: 'Petty Cash', onClick: () => setShowPettyCashModal(true), active: showPettyCashModal, iconColor: '#16a34a', bg: '#f0fdf4' },
-                                                        make_deposit: { icon: ArrowDownLeft, label: 'Deposit', onClick: () => setShowMakeDepositModal(true), active: showMakeDepositModal, iconColor: '#2563eb', bg: '#eff6ff' },
-                                                        journal_entry: { icon: BookOpen, label: 'Journal', onClick: () => setShowJournalEntryModal(true), active: showJournalEntryModal, iconColor: '#9333ea', bg: '#fdf4ff' },
-                                                        bank_rec: { icon: RefreshCcw, label: 'Bank Rec', onClick: () => setShowBankRecModal(true), active: showBankRecModal, iconColor: '#0d9488', bg: '#f0fdfa' },
-                                                        trial_balance: { icon: BarChart2, label: 'Trial Balance', onClick: () => setShowTrialBalanceModal(true), active: showTrialBalanceModal, iconColor: '#4f46e5', bg: '#eef2ff' },
-                                                        // search: { icon: Search, label: 'Search', onClick: () => setShowSearchModal(true), active: showSearchModal, iconColor: '#64748b', bg: '#f8fafc' },
-                                                        ai_chat: { icon: Bot, label: 'AI Chat', onClick: handleAIClick, active: showAIChatbotModal, iconColor: '#db2777', bg: '#fdf2f8' },
-                                                        department: { icon: Building2, label: 'Department', onClick: () => setShowDepartmentModal(true), active: showDepartmentModal, iconColor: '#1d4ed8', bg: '#eff6ff' },
-                                                        calculator: { icon: Calculator, label: 'Calculator', onClick: () => window.open('ms-calculator:'), iconColor: '#9333ea', bg: '#faf5ff' },
-                                                        help: { icon: HelpCircle, label: 'Help', onClick: () => { }, iconColor: '#64748b', bg: '#f8fafc' },
-                                                        category: { icon: Layers, label: 'Category', onClick: () => setShowCategoryModal(true), active: showCategoryModal, iconColor: '#ea580c', bg: '#fff7ed' },
-                                                        // reminder: { icon: Bell, label: 'Reminder', onClick: () => setShowReminderModal(true), active: showReminderModal, iconColor: '#ca8a04', bg: '#fefce8' },
-                                                        dashboard: { icon: LayoutDashboard, label: 'Get Things Done', onClick: () => setShowBiDashboardView(true), active: showBiDashboardView, iconColor: '#0891b2', bg: '#ecfeff' },
-                                                    }[iconId];
-                                                    if (!iconData) return null;
-                                                    const Icon = iconData.icon;
-                                                    const isActive = iconData.active;
-                                                    return (
-                                                        <button
-                                                            key={iconId}
-                                                            onClick={() => { iconData.onClick(); setShowQuickActions(false); }}
-                                                            className={`w-full flex items-center gap-2 px-3 py-2 rounded-xl transition-all duration-150 group/item ${isActive ? 'bg-blue-50/80 text-blue-700' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
-                                                                }`}
-                                                        >
-                                                            <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 transition-transform group-hover/item:scale-110" style={{ backgroundColor: isActive ? '#dbeafe' : iconData.bg }}>
-                                                                <Icon size={14} strokeWidth={2.2} style={{ color: isActive ? '#1d4ed8' : iconData.iconColor }} />
-                                                            </div>
-                                                            <span className="text-[12px] font-semibold flex-1 text-left">{iconData.label}</span>
-                                                            {isActive && <span className="w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0" />}
-                                                        </button>
-                                                    );
-                                                })}
-                                            </div>
-                                            <div className="h-px bg-slate-100 mx-3 mt-2" />
-                                            <div className="px-4 pt-2 pb-1"><span className="text-[9px] text-slate-400 font-bold uppercase tracking-widest">Hover to explore</span></div>
-                                        </div>
-                                    )}
-                                </div>
-
-                                <div className="flex items-center gap-3">
-                                    <button
-                                        data-tour="rate-system"
-                                        onClick={() => setShowReviewModal(true)}
-                                        className="flex items-center gap-2 px-4 h-[36px] bg-white border border-slate-200/80 rounded-xl text-[12px] font-bold text-slate-500 hover:bg-orange-50 hover:text-orange-600 hover:border-orange-200 hover:shadow-sm active:scale-95 transition-all duration-200"
-                                    >
-                                        <Star size={14} />
-                                        Rate
-                                    </button>
-                                    <button
-                                        data-tour="global-search"
-                                        onClick={() => setShowSearchModal(true)}
-                                        className="flex items-center gap-2 px-4 h-[36px] bg-white border border-slate-200/80 rounded-xl text-[12px] font-bold text-slate-500 hover:bg-slate-100 hover:text-slate-700 hover:shadow-sm active:scale-95 transition-all duration-200"
-                                    >
-                                        <Search size={14} className="text-slate-400" />
-                                        Search
-                                    </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>

@@ -158,33 +158,29 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   transition-duration: 400ms;
 }
 @media print {
-  /* Hide EVERYTHING on the page */
-  body * {
-    visibility: hidden !important;
-    overflow: visible !important;
+  /* Hide the main application entirely to prevent overlap or extra pages */
+  #root {
+    display: none !important;
   }
 
-  /* Show only the portal print document */
-  #report-print-document,
-  #report-print-document * {
-    visibility: visible !important;
-    display: revert !important;
+  body {
+    background: white !important;
+    margin: 0;
+    padding: 0;
   }
 
+  /* Configure the print portal container */
   #report-print-document {
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
+    display: block !important;
+    position: relative !important;
     width: 100% !important;
     height: auto !important;
-    overflow: visible !important;
     background: white !important;
-    z-index: 99999 !important;
-    padding: 24px 48px !important;
-    box-sizing: border-box !important;
+    padding: 1.5cm !important;
+    margin: 0 !important;
   }
 
-  /* Proper table rendering */
+  /* Proper table rendering for pagination */
   #report-print-document table {
     width: 100% !important;
     border-collapse: collapse !important;
@@ -193,10 +189,19 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
   #report-print-document tr {
     page-break-inside: avoid !important;
+    page-break-after: auto !important;
+  }
+
+  #report-print-document thead {
+    display: table-header-group !important;
+  }
+
+  #report-print-document tfoot {
+    display: table-footer-group !important;
   }
 
   @page {
-    margin: 1.5cm;
+    margin: 0mm;
     size: auto;
   }
 }
