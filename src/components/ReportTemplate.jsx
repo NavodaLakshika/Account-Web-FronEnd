@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import * as XLSX from 'xlsx';
 import {
     Settings2, Printer, Mail, Download, MoreVertical,
@@ -9,14 +9,15 @@ import {
     ChevronDown,
     Info,
     FileText,
-    Share,
-    Sparkles, X
+    Share, Camera,
+    Sparkles, X, Search, Calendar, Check
 } from 'lucide-react';
 import ReportPrintModal from './modals/AdminReports/ReportPrintModal';
 import ReportEmailModal from './modals/AdminReports/ReportEmailModal';
 import CalendarModal from './CalendarModal';
 import CalendarPopover from './CalendarPopover';
 import ReportCustomizeModal from './modals/AdminReports/ReportCustomizeModal';
+import ReportLearnMoreModal from './modals/AdminReports/ReportLearnMoreModal';
 import api from '../services/api';
 
 const compactTableStyles = `
@@ -188,17 +189,104 @@ const ReportTemplate = ({
     roleId,
     isStandalone = false
 }) => {
-    const [reportPeriod, setReportPeriod] = useState('Today');
+    const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+    const [showThankYouModal, setShowThankYouModal] = useState(false);
+    const [feedbackText, setFeedbackText] = useState('');
+    const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false);
+    const [feedbackImages, setFeedbackImages] = useState([]);
+    const fileInputRef = useRef(null);
+
+    const handleImageUpload = (e) => {
+        const files = Array.from(e.target.files);
+        
+        files.forEach(file => {
+            if (file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    setFeedbackImages(prev => [...prev, reader.result]);
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+        
+        if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+        }
+    };
+    
+    const removeFeedbackImage = (index) => {
+        setFeedbackImages(prev => prev.filter((_, i) => i !== index));
+    };
+    const [reportPeriod, setReportPeriod] = useState('This year to date');
     const [asOfDate, setAsOfDate] = useState(() => {
         const d = new Date();
         return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
     });
+    const [fromDate, setFromDate] = useState(() => {
+        const d = new Date();
+        return `01/01/${d.getFullYear()}`;
+    });
+    const [toDate, setToDate] = useState(() => {
+        const d = new Date();
+        return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
+    });
+    const [accountingMethod, setAccountingMethod] = useState('Accrual');
+    const [displayColumnsBy, setDisplayColumnsBy] = useState('Select');
+    const [compareTo, setCompareTo] = useState('Select Period');
+    const [compareToState, setCompareToState] = useState({
+        PY: false,
+        PP: false,
+        YTD: false,
+        PYYTD: false,
+        CP: false,
+        PctRow: false,
+        PctCol: false,
+        PctExp: false,
+        PctInc: false
+    });
+
+    const handlePeriodChange = (e) => {
+        const period = e.target.value;
+        setReportPeriod(period);
+        const d = new Date();
+        let fd, td;
+        if (period === 'Today') {
+            fd = td = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
+        } else if (period === 'This year to date') {
+            fd = `01/01/${d.getFullYear()}`;
+            td = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
+        } else if (period === 'This Month') {
+            fd = `01/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
+            const endD = new Date(d.getFullYear(), d.getMonth() + 1, 0);
+            td = `${String(endD.getDate()).padStart(2, '0')}/${String(endD.getMonth() + 1).padStart(2, '0')}/${endD.getFullYear()}`;
+        } else if (period === 'This Week') {
+            const first = d.getDate() - d.getDay();
+            const last = first + 6;
+            const firstday = new Date(d.getFullYear(), d.getMonth(), first);
+            const lastday = new Date(d.getFullYear(), d.getMonth(), last);
+            fd = `${String(firstday.getDate()).padStart(2, '0')}/${String(firstday.getMonth() + 1).padStart(2, '0')}/${firstday.getFullYear()}`;
+            td = `${String(lastday.getDate()).padStart(2, '0')}/${String(lastday.getMonth() + 1).padStart(2, '0')}/${lastday.getFullYear()}`;
+        } else if (period === 'This Year') {
+            fd = `01/01/${d.getFullYear()}`;
+            td = `31/12/${d.getFullYear()}`;
+        }
+        if (fd && td) {
+            setFromDate(fd);
+            setToDate(td);
+        }
+    };
+
     const [showNoteArea, setShowNoteArea] = useState(false);
     const [reportNote, setReportNote] = useState('');
     const [showPrintModal, setShowPrintModal] = useState(false);
     const [showEmailModal, setShowEmailModal] = useState(false);
     const [showCustomizeModal, setShowCustomizeModal] = useState(false);
+    const [showLearnMoreModal, setShowLearnMoreModal] = useState(false);
     const [showCalendarModal, setShowCalendarModal] = useState(false);
+    const [showFromCalendarModal, setShowFromCalendarModal] = useState(false);
+    const [showToCalendarModal, setShowToCalendarModal] = useState(false);
+    const [showDisplayColumnsMenu, setShowDisplayColumnsMenu] = useState(false);
+    const [showCompareToMenu, setShowCompareToMenu] = useState(false);
     const [dismissAlert, setDismissAlert] = useState(false);
     const [showExportMenu, setShowExportMenu] = useState(false);
     const [showMoreMenu, setShowMoreMenu] = useState(false);
@@ -268,35 +356,59 @@ const ReportTemplate = ({
 
                 let startStr = '';
                 let endStr = '';
-                if (asOfDate) {
-                    const parts = asOfDate.split('/');
-                    if (parts.length === 3) {
-                        const dd = parseInt(parts[0], 10);
-                        const mm = parseInt(parts[1], 10);
-                        const yyyy = parseInt(parts[2], 10);
-                        const endD = new Date(yyyy, mm - 1, dd);
-                        let startD = new Date(endD);
 
-                        if (reportPeriod === 'Today') {
-                            startD = new Date(endD);
-                        } else if (reportPeriod === 'This Week') {
-                            const day = startD.getDay();
-                            const diff = startD.getDate() - day + (day === 0 ? -6 : 1);
-                            startD.setDate(diff);
-                        } else if (reportPeriod === 'This Month') {
-                            startD = new Date(startD.getFullYear(), startD.getMonth(), 1);
-                        } else if (reportPeriod === 'This Year') {
-                            startD = new Date(startD.getFullYear(), 0, 1);
-                        }
-
+                // Use fromDate and toDate from state
+                if (fromDate && toDate) {
+                    const fromParts = fromDate.split('/');
+                    if (fromParts.length === 3) {
+                        const dd = parseInt(fromParts[0], 10);
+                        const mm = parseInt(fromParts[1], 10);
+                        const yyyy = parseInt(fromParts[2], 10);
+                        const startD = new Date(yyyy, mm - 1, dd);
                         const pad = (n) => n < 10 ? '0' + n : n;
                         startStr = `${startD.getFullYear()}-${pad(startD.getMonth() + 1)}-${pad(startD.getDate())}`;
+                    }
+
+                    const toParts = toDate.split('/');
+                    if (toParts.length === 3) {
+                        const dd = parseInt(toParts[0], 10);
+                        const mm = parseInt(toParts[1], 10);
+                        const yyyy = parseInt(toParts[2], 10);
+                        const endD = new Date(yyyy, mm - 1, dd);
+                        const pad = (n) => n < 10 ? '0' + n : n;
                         endStr = `${endD.getFullYear()}-${pad(endD.getMonth() + 1)}-${pad(endD.getDate())}`;
                     }
                 }
 
-                const response = await api.get(`/report/${endpoint}?companyId=${companyId}&startDate=${startStr}&endDate=${endStr}`);
-                setApiData(response.data);
+                const response = await api.get(`/report/${endpoint}?companyId=${companyId}&startDate=${startStr}&endDate=${endStr}&accountingMethod=${accountingMethod}&displayColumnsBy=${displayColumnsBy}&compareTo=${compareTo}`);
+                
+                let processedData = response.data;
+                if (processedData && processedData.length > 0 && processedData.some(r => 'PivotColumn' in r || 'pivotcolumn' in r)) {
+                    const rowsMap = new Map();
+                    const firstRow = processedData[0];
+                    const standardKeys = Object.keys(firstRow).filter(k => !['Balance', 'PivotColumn', 'balance', 'pivotcolumn'].includes(k));
+                    
+                    processedData.forEach(row => {
+                        const rowKey = standardKeys.map(k => row[k]).join('|');
+                        const pivotVal = row['PivotColumn'] || row['pivotcolumn'] || 'Total';
+                        const balance = parseFloat(row['Balance'] || row['balance'] || 0);
+                        
+                        if (!rowsMap.has(rowKey)) {
+                            const newRow = {};
+                            standardKeys.forEach(k => newRow[k] = row[k]);
+                            newRow['Total'] = 0;
+                            rowsMap.set(rowKey, newRow);
+                        }
+                        
+                        const existingRow = rowsMap.get(rowKey);
+                        existingRow[pivotVal] = (existingRow[pivotVal] || 0) + balance;
+                        existingRow['Total'] += balance;
+                    });
+                    
+                    processedData = Array.from(rowsMap.values());
+                }
+                
+                setApiData(processedData);
                 setApiError(null);
             } catch (error) {
                 console.error("Failed to fetch report data", error);
@@ -327,46 +439,16 @@ const ReportTemplate = ({
         return () => {
             window.removeEventListener('reportDataChanged', handleDataChange);
         };
-    }, [title, reportPeriod, asOfDate]);
+    }, [title, reportPeriod, fromDate, toDate, accountingMethod, displayColumnsBy, compareTo]);
 
-    // Use API data if available, otherwise fallback to props
-    const displayData = apiData || data;
-
-    // Automatically generate columns if apiData is present and columns prop is empty
-    const displayColumns = (apiData && apiData.length > 0 && columns.length === 0)
-        ? Object.keys(apiData[0]).map(key => ({ header: key, accessor: key }))
-        : columns;
-
-    // Calculate totals for specific columns dynamically
-    const columnsToTotal = ['amount', 'qty', 'quantity', 'credit', 'creadis', 'debit', 'total', 'balance', 'hours', 'price', 'discount'];
-    const totals = {};
-    let hasTotals = false;
-
-    if (displayData && displayData.length > 0) {
-        displayColumns.forEach(col => {
-            const headerLower = (col.header || '').toLowerCase().replace(/[^a-z0-9]/g, '');
-            const accessor = col.accessor || col.key;
-            
-            if (columnsToTotal.some(c => headerLower.includes(c))) {
-                let sum = 0;
-                let isValid = false;
-                displayData.forEach(row => {
-                    const val = parseFloat(row[accessor]);
-                    if (!isNaN(val)) {
-                        sum += val;
-                        isValid = true;
-                    }
-                });
-                
-                if (isValid) {
-                    totals[accessor] = sum;
-                    hasTotals = true;
-                }
-            }
-        });
-    }
+    const [searchQuery, setSearchQuery] = useState('');
+    const [columnFilters, setColumnFilters] = useState({});
+    const [activeFilterColumn, setActiveFilterColumn] = useState(null);
 
     const defaultCustomizations = {
+        filters: [],
+        showRows: 'active',
+        showCols: 'active',
         divideBy1000: false,
         hideCurrency: false,
         roundWholeNumber: false,
@@ -383,7 +465,201 @@ const ReportTemplate = ({
         showReportBasis: true,
         footerAlignment: 'Center'
     };
+    const [customizations, setCustomizations] = useState(defaultCustomizations);
+
+    // Use API data if available, otherwise fallback to props
+    const baseData = apiData || data;
+
+    // Filter data based on search query and column filters
+    const displayData = useMemo(() => {
+        let filtered = baseData;
+        
+        const checkMatch = (val, query) => {
+            const rawStr = String(val || '').toLowerCase();
+            if (rawStr.includes(query)) return true;
+            
+            if (val !== null && val !== undefined && val !== '') {
+                const num = Number(val);
+                if (!isNaN(num)) {
+                    const formatted1 = num.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }).toLowerCase();
+                    const formatted2 = num.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 }).toLowerCase();
+                    if (formatted1.includes(query) || formatted2.includes(query)) return true;
+                    
+                    if (num < 0) {
+                        const absFormatted1 = Math.abs(num).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }).toLowerCase();
+                        const absFormatted2 = Math.abs(num).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 }).toLowerCase();
+                        if (`(${absFormatted1})`.includes(query) || `(${absFormatted2})`.includes(query)) return true;
+                    }
+                }
+            }
+            
+            const strippedQuery = query.replace(/,/g, '');
+            if (strippedQuery !== query && strippedQuery.trim() !== '' && !isNaN(Number(strippedQuery))) {
+                if (rawStr.includes(strippedQuery)) return true;
+            }
+            
+            return false;
+        };
+        
+        if (searchQuery.trim()) {
+            const lowerQuery = searchQuery.toLowerCase();
+            filtered = filtered.filter(row => {
+                return Object.values(row).some(val => checkMatch(val, lowerQuery));
+            });
+        }
+
+        Object.entries(columnFilters).forEach(([accessor, filterValue]) => {
+            if (filterValue && filterValue.trim() !== '') {
+                const lowerFilter = filterValue.toLowerCase();
+                filtered = filtered.filter(row => checkMatch(row[accessor], lowerFilter));
+            }
+        });
+
+        // Apply custom filters
+        if (customizations.filters && customizations.filters.length > 0) {
+            filtered = filtered.filter(row => {
+                return customizations.filters.every(f => {
+                    if (!f.column || !f.condition || !f.value) return true;
+                    const cellValStr = String(row[f.column] || '').toLowerCase();
+                    const filterValStr = f.value.toLowerCase();
+                    const numCellVal = parseFloat(String(row[f.column] || '').replace(/,/g, ''));
+                    const numFilterVal = parseFloat(f.value);
+
+                    switch (f.condition) {
+                        case 'Equals':
+                            return cellValStr === filterValStr || numCellVal === numFilterVal;
+                        case 'Not Equals':
+                            return cellValStr !== filterValStr && numCellVal !== numFilterVal;
+                        case 'Contains':
+                            return cellValStr.includes(filterValStr);
+                        case 'Greater Than':
+                            return !isNaN(numCellVal) && !isNaN(numFilterVal) && numCellVal > numFilterVal;
+                        case 'Less Than':
+                            return !isNaN(numCellVal) && !isNaN(numFilterVal) && numCellVal < numFilterVal;
+                        default:
+                            return true;
+                    }
+                });
+            });
+        }
+
+        // Apply showRows: 'nonzero'
+        if (customizations.showRows === 'nonzero') {
+            filtered = filtered.filter(row => {
+                let hasNonZero = false;
+                Object.keys(row).forEach(key => {
+                    const val = row[key];
+                    if (val !== null && val !== undefined && val !== '') {
+                        const num = parseFloat(String(val).replace(/,/g, ''));
+                        if (!isNaN(num) && num !== 0) {
+                            hasNonZero = true;
+                        }
+                    }
+                });
+                return hasNonZero;
+            });
+        }
+
+        return filtered;
+    }, [baseData, searchQuery, columnFilters, customizations.filters, customizations.showRows]);
+
+    // Calculate totals for specific columns dynamically
+    const columnsToTotal = ['amount', 'qty', 'quantity', 'credit', 'creadis', 'debit', 'total', 'balance', 'hours', 'price', 'discount', 'netincome', 'income'];
     
+    // Automatically generate columns if apiData is present and columns prop is empty
+    let displayColumns = (apiData && apiData.length > 0 && columns.length === 0)
+        ? Object.keys(apiData[0]).map(key => {
+            const headerLower = key.toLowerCase().replace(/[^a-z0-9]/g, '');
+            const isCurrencyCol = columnsToTotal.some(c => headerLower.includes(c)) && !['qty', 'quantity', 'hours'].includes(headerLower);
+            
+            return {
+                header: (isCurrencyCol && !customizations.hideCurrency) ? `${key} (LKR)` : key,
+                accessor: key,
+                align: columnsToTotal.some(c => headerLower.includes(c)) ? 'right' : 'left',
+                format: isCurrencyCol ? (val) => {
+                    if (val === null || val === undefined || val === '') return '';
+                    if (typeof val === 'string' && isNaN(parseFloat(val))) return val;
+                    const num = parseFloat(val);
+                    if (isNaN(num)) return val;
+                    const absNum = Math.abs(num);
+                    let formatted = absNum.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                    if (num < 0) formatted = `-${formatted}`;
+                    return formatted;
+                } : undefined
+            };
+        })
+        : columns.map(col => {
+            if (col.format) return col;
+            const headerLower = (col.header || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+            const isCurrencyCol = columnsToTotal.some(c => headerLower.includes(c)) && !['qty', 'quantity', 'hours'].includes(headerLower);
+            return {
+                ...col,
+                header: (isCurrencyCol && !customizations.hideCurrency) ? (!col.header.includes('(LKR)') ? `${col.header} (LKR)` : col.header) : col.header.replace(' (LKR)', ''),
+                format: isCurrencyCol ? (val) => {
+                    if (val === null || val === undefined || val === '') return '';
+                    if (typeof val === 'string' && isNaN(parseFloat(val))) return val;
+                    const num = parseFloat(val);
+                    if (isNaN(num)) return val;
+                    const absNum = Math.abs(num);
+                    let formatted = absNum.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                    if (num < 0) formatted = `-${formatted}`;
+                    return formatted;
+                } : undefined
+            };
+        });
+
+    const nonTotalColumns = ['account_code', 'account_type', 'account_name', 'accountcode', 'accounttype', 'accountname', 'id', 'name', 'type', 'date', 'status', 'description', 'reference', 'memo'];
+    const totals = {};
+    let hasTotals = false;
+
+    if (displayData && displayData.length > 0) {
+        displayColumns.forEach(col => {
+            const headerLower = (col.header || '').toLowerCase().replace(/[^a-z0-9_]/g, '');
+            // use original accessor to calculate totals since header might have (LKR)
+            const accessor = col.accessor || col.key;
+            const accessorLower = String(accessor).toLowerCase().replace(/[^a-z0-9_]/g, '');
+            
+            const isNonTotal = nonTotalColumns.some(c => headerLower === c || accessorLower === c || headerLower.includes('code') || headerLower.includes('name') || headerLower.includes('type'));
+            const isExplicitTotal = columnsToTotal.some(c => headerLower.includes(c));
+            
+            if (isExplicitTotal || !isNonTotal) {
+                let sum = 0;
+                let isValid = false;
+                let isNumericColumn = true;
+                
+                displayData.forEach(row => {
+                    const rawVal = row[accessor];
+                    if (rawVal !== null && rawVal !== undefined && rawVal !== '') {
+                        const valStr = String(rawVal).trim().replace(/,/g, '');
+                        const val = parseFloat(valStr);
+                        if (!isNaN(val)) {
+                            sum += val;
+                            isValid = true;
+                        } else {
+                            isNumericColumn = false; // Has non-numeric data, do not total
+                        }
+                    }
+                });
+                
+                if (isValid && isNumericColumn) {
+                    totals[accessor] = sum;
+                    hasTotals = true;
+                }
+            }
+        });
+
+        // Apply showCols: 'nonzero'
+        if (customizations.showCols === 'nonzero') {
+            displayColumns = displayColumns.filter(col => {
+                const acc = col.accessor || col.key;
+                if (totals[acc] !== undefined) {
+                    return totals[acc] !== 0;
+                }
+                return true;
+            });
+        }
+    }
+
     // Dynamic company name from local storage
     const displayCompanyName = (() => {
         try {
@@ -397,11 +673,27 @@ const ReportTemplate = ({
         return companyName;
     })();
 
-    const [customizations, setCustomizations] = useState(defaultCustomizations);
+    // Dynamic user name from local storage
+    const displayUserName = (() => {
+        try {
+            const userRaw = localStorage.getItem('user');
+            if (userRaw) {
+                const parsed = JSON.parse(userRaw);
+                const name = parsed?.Emp_Name || parsed?.empName || parsed?.EmpName || parsed?.userName || parsed?.name;
+                if (name) return name;
+            }
+        } catch (e) {}
+        return "User";
+    })();
 
     const formatCellValue = (value, col) => {
         if (value === null || value === undefined || value === '') {
             return customizations.showEmptyAs === 'dash' ? '-' : '';
+        }
+
+        const colName = (col?.header || col?.accessor || '').toLowerCase();
+        if (colName.includes('code') || colName.includes('id') || colName.includes('phone') || colName.includes('year')) {
+            return value;
         }
 
         if (typeof value === 'string' && isNaN(parseFloat(value))) {
@@ -527,6 +819,51 @@ const ReportTemplate = ({
         }
     };
 
+    const handleSubmitFeedback = async () => {
+        if (!feedbackText.trim()) return;
+        setIsSubmittingFeedback(true);
+        try {
+            let activeCompanyCode = companyCode;
+            if (!activeCompanyCode) {
+                try {
+                    const companyStr = localStorage.getItem('selectedCompany');
+                    if (companyStr) {
+                        const company = JSON.parse(companyStr);
+                        activeCompanyCode = company.Company_Code || company.CompanyCode || company.companyCode || company.Company_Id || 'UNKNOWN';
+                    }
+                } catch (e) {
+                    activeCompanyCode = 'UNKNOWN';
+                }
+            }
+
+            const userStr = localStorage.getItem('user');
+            let employeeName = '';
+            try {
+                if (userStr) {
+                    const user = JSON.parse(userStr);
+                    employeeName = user.Emp_Name || user.empName || user.EmpName || '';
+                }
+            } catch (e) {}
+
+            await api.post('/reportfeedback', {
+                companyId: activeCompanyCode || 'UNKNOWN',
+                reportName: title,
+                feedbackText: feedbackText,
+                employeeName: employeeName,
+                images: feedbackImages
+            });
+            setShowFeedbackModal(false);
+            setFeedbackText('');
+            setFeedbackImages([]);
+            setShowThankYouModal(true);
+        } catch (error) {
+            console.error('Error submitting feedback:', error);
+            alert('Failed to submit feedback. Please try again later.');
+        } finally {
+            setIsSubmittingFeedback(false);
+        }
+    };
+
     return (
         <div className="fixed inset-0 z-[500] bg-[#f4f5f8] overflow-y-auto font-sans flex flex-col">
             {/* Top Navigation Bar */}
@@ -542,11 +879,14 @@ const ReportTemplate = ({
                 {onSwitchReport && <OtherReportsDropdown onSelect={onSwitchReport} />}
 
                 <div className="flex items-center gap-6">
-                    <button className="flex items-center gap-1.5 text-red-600 font-bold text-[13px] hover:underline">
+                    <button onClick={() => setShowLearnMoreModal(true)} className="flex items-center gap-1.5 text-red-600 font-bold text-[13px] hover:underline">
                         <BookOpen size={14} />
                         Learn more
                     </button>
-                    <button className="flex items-center gap-1.5 text-[#0077c5] font-bold text-[13px] hover:underline">
+                    <button 
+                        onClick={() => setShowFeedbackModal(true)}
+                        className="flex items-center gap-1.5 text-[#0077c5] font-bold text-[13px] hover:underline"
+                    >
                         <MessageSquare size={14} />
                         Give feedback
                     </button>
@@ -561,9 +901,10 @@ const ReportTemplate = ({
                         <div className="relative">
                             <select
                                 value={reportPeriod}
-                                onChange={(e) => setReportPeriod(e.target.value)}
-                                className="appearance-none w-[160px] h-9 px-3 border border-gray-300 rounded-[3px] text-[13px] font-medium text-gray-800 outline-none focus:border-[#0077c5] bg-white cursor-pointer"
+                                onChange={handlePeriodChange}
+                                className="appearance-none w-[150px] h-9 px-3 border border-gray-300 rounded-[3px] text-[13px] font-medium text-gray-800 outline-none focus:border-[#0077c5] bg-white cursor-pointer"
                             >
+                                <option>This year to date</option>
                                 <option>Today</option>
                                 <option>This Week</option>
                                 <option>This Month</option>
@@ -573,34 +914,171 @@ const ReportTemplate = ({
                         </div>
                     </div>
 
-                    <div className="flex flex-col gap-1.5 w-[140px] relative">
-                        <label className="text-[11px] font-medium text-gray-600">as of</label>
+                    <div className="flex flex-col gap-1.5 w-[130px] relative">
+                        <label className="text-[12px] text-gray-600 font-medium">From</label>
                         <button
-                            onClick={() => setShowCalendarModal(!showCalendarModal)}
-                            className="calendar-toggle-btn w-[140px] h-9 px-3 border border-gray-300 rounded-[3px] text-[13px] font-medium text-gray-800 outline-none focus:border-[#0077c5] bg-white cursor-pointer flex items-center justify-start text-left"
+                            onClick={() => setShowFromCalendarModal(!showFromCalendarModal)}
+                            className="calendar-toggle-btn w-full h-9 px-3 border border-gray-300 rounded-[3px] text-[13px] font-medium text-gray-800 outline-none focus:border-[#0077c5] bg-white cursor-pointer flex items-center justify-between text-left"
                         >
-                            {asOfDate}
+                            <span>{fromDate}</span>
+                            <Calendar size={14} className="text-gray-500" />
                         </button>
                         <CalendarPopover
-                            isOpen={showCalendarModal}
-                            onClose={() => setShowCalendarModal(false)}
+                            isOpen={showFromCalendarModal}
+                            onClose={() => setShowFromCalendarModal(false)}
                             onDateSelect={(dateStr) => {
                                 const [yyyy, mm, dd] = dateStr.split('-');
-                                setAsOfDate(`${dd}/${mm}/${yyyy}`);
+                                setFromDate(`${dd}/${mm}/${yyyy}`);
                             }}
-                            initialDate={asOfDate.split('/').reverse().join('-')}
+                            initialDate={fromDate.split('/').reverse().join('-')}
                         />
+                    </div>
+
+                    <div className="flex flex-col gap-1.5 w-[130px] relative">
+                        <label className="text-[12px] text-gray-600 font-medium">To</label>
+                        <button
+                            onClick={() => setShowToCalendarModal(!showToCalendarModal)}
+                            className="calendar-toggle-btn w-full h-9 px-3 border border-gray-300 rounded-[3px] text-[13px] font-medium text-gray-800 outline-none focus:border-[#0077c5] bg-white cursor-pointer flex items-center justify-between text-left"
+                        >
+                            <span>{toDate}</span>
+                            <Calendar size={14} className="text-gray-500" />
+                        </button>
+                        <CalendarPopover
+                            isOpen={showToCalendarModal}
+                            onClose={() => setShowToCalendarModal(false)}
+                            onDateSelect={(dateStr) => {
+                                const [yyyy, mm, dd] = dateStr.split('-');
+                                setToDate(`${dd}/${mm}/${yyyy}`);
+                            }}
+                            initialDate={toDate.split('/').reverse().join('-')}
+                        />
+                    </div>
+
+                    <div className="flex flex-col gap-1.5 ml-4">
+                        <label className="text-[12px] text-gray-600 font-medium">Accounting method</label>
+                        <div className="flex items-center bg-gray-100 p-[3px] rounded h-9">
+                            <button 
+                                onClick={() => setAccountingMethod('Cash')}
+                                className={`px-4 py-1 text-[13px] rounded-[3px] transition-colors ${accountingMethod === 'Cash' ? 'bg-white shadow-sm font-medium text-gray-800' : 'text-gray-600 hover:text-gray-800'}`}
+                            >
+                                Cash
+                            </button>
+                            <button 
+                                onClick={() => setAccountingMethod('Accrual')}
+                                className={`px-4 py-1 text-[13px] rounded-[3px] transition-colors ${accountingMethod === 'Accrual' ? 'bg-white shadow-sm font-medium text-gray-800' : 'text-gray-600 hover:text-gray-800'}`}
+                            >
+                                Accrual
+                            </button>
+                        </div>
+                    </div>
+
+                    <div className="flex flex-col gap-1.5 ml-4">
+                        <label className="text-[12px] text-gray-600 font-medium">Display columns by</label>
+                        <div className="relative">
+                            <button
+                                onClick={() => setShowDisplayColumnsMenu(!showDisplayColumnsMenu)}
+                                className={`w-[150px] h-9 px-3 border rounded-[3px] text-[13px] font-medium text-gray-800 outline-none bg-white flex items-center justify-between ${showDisplayColumnsMenu ? 'border-[#0077c5] shadow-[0_0_0_1px_rgba(0,119,197,0.5)]' : 'border-gray-300 hover:border-gray-400'}`}
+                            >
+                                <span>{displayColumnsBy}</span>
+                                <ChevronDown size={14} className={`text-gray-500 transition-transform ${showDisplayColumnsMenu ? 'rotate-180' : ''}`} />
+                            </button>
+                            
+                            {showDisplayColumnsMenu && (
+                                <>
+                                    <div className="fixed inset-0 z-[100]" onClick={() => setShowDisplayColumnsMenu(false)}></div>
+                                    <div className="absolute top-full left-0 mt-1 w-[200px] bg-white border border-gray-200 shadow-lg rounded-[3px] py-2 z-[101]">
+                                        {['Select', 'Customer', 'Employee', 'Product/Service', 'Supplier', 'Days', 'Weeks', 'Months', 'Quarters', 'Years'].map(option => (
+                                            <button
+                                                key={option}
+                                                onClick={() => { setDisplayColumnsBy(option); setShowDisplayColumnsMenu(false); }}
+                                                className="w-full text-left px-4 py-2 text-[13px] text-gray-700 hover:bg-gray-100 flex items-center gap-2"
+                                            >
+                                                <div className="w-4 flex justify-center">
+                                                    {displayColumnsBy === option && <Check size={14} className="text-green-600 font-bold" />}
+                                                </div>
+                                                <span>{option}</span>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </>
+                            )}
+                        </div>
+                    </div>
+
+                    <div className="flex flex-col gap-1.5 ml-2">
+                        <label className="text-[12px] text-gray-600 font-medium">Compare to</label>
+                        <div className="relative">
+                            <button
+                                onClick={() => setShowCompareToMenu(!showCompareToMenu)}
+                                className={`w-[140px] h-9 px-3 border rounded-[3px] text-[13px] font-medium text-gray-800 outline-none bg-white flex items-center justify-between ${showCompareToMenu ? 'border-[#0077c5] shadow-[0_0_0_1px_rgba(0,119,197,0.5)]' : 'border-gray-300 hover:border-gray-400'}`}
+                            >
+                                <span>{compareTo}</span>
+                                <ChevronDown size={14} className={`text-gray-500 transition-transform ${showCompareToMenu ? 'rotate-180' : ''}`} />
+                            </button>
+
+                            {showCompareToMenu && (
+                                <>
+                                    <div className="fixed inset-0 z-[100]" onClick={() => setShowCompareToMenu(false)}></div>
+                                    <div className="absolute top-full left-0 mt-1 w-[280px] bg-white border border-gray-200 shadow-lg rounded-[3px] py-3 z-[101]">
+                                        <div className="px-4 pb-2 text-[12px] text-gray-500 font-medium">Time Periods</div>
+                                        {[
+                                            { key: 'PY', label: 'Previous year (PY)' },
+                                            { key: 'PP', label: 'Previous Period (PP)' },
+                                            { key: 'YTD', label: 'Year-to-date (YTD)' },
+                                            { key: 'PYYTD', label: 'Previous year-to-date (PY YTD)' },
+                                            { key: 'CP', label: 'Custom period (CP)' }
+                                        ].map(option => (
+                                            <label key={option.key} className="flex items-center gap-3 px-4 py-2 hover:bg-gray-50 cursor-pointer">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={compareToState[option.key]}
+                                                    onChange={(e) => {
+                                                        const newVal = e.target.checked;
+                                                        setCompareToState(prev => ({ ...prev, [option.key]: newVal }));
+                                                        if (newVal) setCompareTo('Custom');
+                                                    }}
+                                                    className="w-[14px] h-[14px] rounded border-gray-300 text-[#0077c5] focus:ring-[#0077c5] cursor-pointer"
+                                                />
+                                                <span className="text-[13px] text-gray-700">{option.label}</span>
+                                            </label>
+                                        ))}
+
+                                        <div className="px-4 py-2 mt-1 border-t border-gray-100 text-[12px] text-gray-500 font-medium">Calculations</div>
+                                        {[
+                                            { key: 'PctRow', label: '% of Row' },
+                                            { key: 'PctCol', label: '% of Column' },
+                                            { key: 'PctExp', label: '% of Expense' },
+                                            { key: 'PctInc', label: '% of Income' }
+                                        ].map(option => (
+                                            <label key={option.key} className="flex items-center gap-3 px-4 py-2 hover:bg-gray-50 cursor-pointer">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={compareToState[option.key]}
+                                                    onChange={(e) => {
+                                                        const newVal = e.target.checked;
+                                                        setCompareToState(prev => ({ ...prev, [option.key]: newVal }));
+                                                        if (newVal) setCompareTo('Custom');
+                                                    }}
+                                                    className="w-[14px] h-[14px] rounded border-gray-300 text-[#0077c5] focus:ring-[#0077c5] cursor-pointer"
+                                                />
+                                                <span className="text-[13px] text-gray-700">{option.label}</span>
+                                            </label>
+                                        ))}
+                                    </div>
+                                </>
+                            )}
+                        </div>
                     </div>
                 </div>
 
                 <div className="flex items-center gap-3">
                     <button onClick={() => setShowCustomizeModal(true)} className="h-9 px-4 border border-gray-300 rounded-[3px] bg-white hover:bg-gray-50 flex items-center gap-1.5 text-[13px] font-bold text-[#393a3d] transition-colors">
                         <Settings2 size={14} />
-                        Customise
+                        Customise Report
                     </button>
-                    <button className="h-9 px-4 rounded-[3px] bg-[#0077c5] hover:bg-[#005ca6] text-white text-[13px] font-bold transition-colors">
+                    {/* <button className="h-9 px-4 rounded-[3px] bg-[#0077c5] hover:bg-[#005ca6] text-white text-[13px] font-bold transition-colors">
                         Save As
-                    </button>
+                    </button> */}
                 </div>
             </div>
 
@@ -610,35 +1088,48 @@ const ReportTemplate = ({
 
                     {/* Inner Toolbar */}
                     <div className="flex items-center justify-between p-4 border-b border-gray-100">
-                        <div className="relative">
-                            <button
-                                onClick={() => setShowCompactMenu(!showCompactMenu)}
-                                className="flex items-center gap-1 text-[13px] text-gray-600 font-medium hover:text-gray-900"
-                            >
-                                {compactView ? 'Compact' : 'Detailed'} <ChevronDown size={14} />
-                            </button>
-                            {showCompactMenu && (
-                                <div
-                                    className="absolute top-full left-0 mt-1 bg-white border border-gray-200 shadow-[0_4px_12px_rgba(0,0,0,0.15)] rounded w-[140px] z-[1000] py-1"
-                                    onMouseLeave={() => setShowCompactMenu(false)}
-                                    onClick={() => setShowCompactMenu(false)}
+                        <div className="flex items-center gap-4">
+                            <div className="relative">
+                                <button
+                                    onClick={() => setShowCompactMenu(!showCompactMenu)}
+                                    className="flex items-center gap-1 text-[13px] text-gray-600 font-medium hover:text-gray-900"
                                 >
-                                    <button
-                                        onClick={() => { setCompactView(false); setShowCompactMenu(false); }}
-                                        className={`w-full text-left px-4 py-2 text-[13px] flex items-center justify-between ${!compactView ? 'text-[#0077c5] font-bold' : 'text-gray-700 hover:bg-gray-100'}`}
+                                    {compactView ? 'Compact' : 'Detailed'} <ChevronDown size={14} />
+                                </button>
+                                {showCompactMenu && (
+                                    <div
+                                        className="absolute top-full left-0 mt-1 bg-white border border-gray-200 shadow-[0_4px_12px_rgba(0,0,0,0.15)] rounded w-[140px] z-[1000] py-1"
+                                        onMouseLeave={() => setShowCompactMenu(false)}
+                                        onClick={() => setShowCompactMenu(false)}
                                     >
-                                        Detailed
-                                        {!compactView && <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>}
-                                    </button>
-                                    <button
-                                        onClick={() => { setCompactView(true); setShowCompactMenu(false); }}
-                                        className={`w-full text-left px-4 py-2 text-[13px] flex items-center justify-between ${compactView ? 'text-[#0077c5] font-bold' : 'text-gray-700 hover:bg-gray-100'}`}
-                                    >
-                                        Compact
-                                        {compactView && <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>}
-                                    </button>
-                                </div>
-                            )}
+                                        <button
+                                            onClick={() => { setCompactView(false); setShowCompactMenu(false); }}
+                                            className={`w-full text-left px-4 py-2 text-[13px] flex items-center justify-between ${!compactView ? 'text-[#0077c5] font-bold' : 'text-gray-700 hover:bg-gray-100'}`}
+                                        >
+                                            Detailed
+                                            {!compactView && <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>}
+                                        </button>
+                                        <button
+                                            onClick={() => { setCompactView(true); setShowCompactMenu(false); }}
+                                            className={`w-full text-left px-4 py-2 text-[13px] flex items-center justify-between ${compactView ? 'text-[#0077c5] font-bold' : 'text-gray-700 hover:bg-gray-100'}`}
+                                        >
+                                            Compact
+                                            {compactView && <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>}
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className="relative">
+                                <input
+                                    type="text"
+                                    placeholder="Search in report..."
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    className="h-8 pl-8 pr-3 text-[12px] border border-gray-300 rounded-[3px] focus:outline-none focus:border-[#0077c5] w-[200px]"
+                                />
+                                <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400" />
+                            </div>
                         </div>
 
                         <div className="flex items-center gap-3">
@@ -795,56 +1286,78 @@ const ReportTemplate = ({
                                 <strong>API Error:</strong> {apiError}
                             </div>
                         )}
-                        {displayData.length === 0 && !dismissAlert && !apiError && !apiLoading && (
-                            <div className="border border-[#b3d4f5] bg-[#eef6fc] p-4 rounded-[3px] flex items-start justify-between gap-3 shadow-sm transition-all">
-                                <div className="flex gap-3">
-                                    <Info size={18} className="text-[#0077c5] shrink-0 mt-0.5 fill-blue-100" />
-                                    <p className="text-[13px] text-gray-800">
-                                        <strong className="font-bold">Your selection doesn't have any info.</strong> Change your selection or start a new search.
-                                    </p>
-                                </div>
-                                <button onClick={() => setDismissAlert(true)} className="text-gray-500 hover:text-gray-800 transition-colors p-1">
-                                    <X size={16} />
-                                </button>
+                        {displayData.length === 0 && !apiError && !apiLoading && (
+                            <div className="border border-[#b3d4f5] bg-[#eef6fc] p-4 rounded-[3px] flex items-start gap-3 shadow-sm transition-all">
+                                <Info size={18} className="text-[#0077c5] shrink-0 mt-0.5 fill-blue-100" />
+                                <p className="text-[13px] text-gray-800">
+                                    <strong className="font-bold">Your selection doesn't have any info.</strong> Change your selection or start a new search.
+                                </p>
                             </div>
                         )}
 
+                        {displayData.length > 0 && (
                         <div className="w-full overflow-x-auto border border-gray-200 bg-white">
                             <table className={`w-full text-left border-collapse ${compactView ? 'compact-table' : ''}`}>
                                 <thead>
                                     <tr className={`${compactView ? 'border-b border-gray-300' : 'border-b-2 border-gray-300'}`}>
-                                        {displayColumns.map((col, i) => (
-                                            <th key={i} className={`font-bold text-gray-800 ${compactView ? 'p-1.5 text-[10.5px]' : 'p-2 text-[12px]'}`} style={{ textAlign: col.align || 'left' }}>
-                                                {(() => {
-                                                    const headerLower = (col.header || '').toLowerCase().replace(/[^a-z]/g, '');
-                                                    const isCurrencyCol = columnsToTotal.some(c => headerLower.includes(c));
-                                                    return customizations.hideCurrency || !isCurrencyCol ? col.header : `${col.header} (LKR)`;
-                                                })()}
+                                        {displayColumns.map((col, i) => {
+                                            const acc = col.accessor || col.key || col.header;
+                                            const isFilterActive = activeFilterColumn === acc || (columnFilters[acc] && columnFilters[acc] !== '');
+                                            return (
+                                            <th key={i} className={`font-bold text-gray-800 group relative ${compactView ? 'p-1.5 text-[10.5px]' : 'p-2 text-[12px]'}`} style={{ textAlign: col.align || 'left' }}>
+                                                <div className="flex flex-col gap-1.5">
+                                                    <div className={`flex items-center gap-2 ${col.align === 'right' ? 'justify-end' : 'justify-between'}`}>
+                                                        <span>
+                                                            {col.header}
+                                                        </span>
+                                                        <button 
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                if (activeFilterColumn === acc) {
+                                                                    setActiveFilterColumn(null);
+                                                                    setColumnFilters(prev => ({ ...prev, [acc]: '' }));
+                                                                } else {
+                                                                    setActiveFilterColumn(acc);
+                                                                }
+                                                            }}
+                                                            className={`text-gray-400 hover:text-[#0077c5] transition-opacity ${isFilterActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}
+                                                        >
+                                                            <Search size={12} />
+                                                        </button>
+                                                    </div>
+                                                    {isFilterActive && (
+                                                        <input
+                                                            type="text"
+                                                            placeholder={`Filter...`}
+                                                            value={columnFilters[acc] || ''}
+                                                            onChange={(e) => setColumnFilters(prev => ({ ...prev, [acc]: e.target.value }))}
+                                                            className="h-6 px-2 text-[10px] font-normal border border-gray-200 rounded-[2px] focus:outline-none focus:border-[#0077c5] bg-white text-gray-700 w-full min-w-[60px]"
+                                                            onClick={(e) => e.stopPropagation()}
+                                                            autoFocus={activeFilterColumn === acc}
+                                                        />
+                                                    )}
+                                                </div>
                                             </th>
-                                        ))}
+                                        )})}
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {apiLoading ? <tr><td colSpan="100%" className="text-center py-4">Loading data from database...</td></tr> : displayData.map((row, i) => (
                                         <tr key={i} className={`${compactView ? 'border-b border-gray-100' : 'border-b border-gray-200 hover:bg-gray-50'}`}>
-                                            {displayColumns.map((col, j) => (
+                                            {displayColumns.map((col, j) => {
+                                                const acc = col.accessor || col.key || col.header;
+                                                return (
                                                 <td key={j} className={`text-gray-700 ${compactView ? 'p-1 text-[11px]' : 'p-2 text-[12px]'}`} style={{ textAlign: col.align || 'left' }}>
-                                                    {formatCellValue(row[col.accessor || col.key], col)}
+                                                    {formatCellValue(row[acc], col)}
                                                 </td>
-                                            ))}
+                                            )})}
                                         </tr>
                                     ))}
-                                    {displayData.length === 0 && !apiLoading && (
-                                        <tr>
-                                            <td colSpan={displayColumns.length || 1} className="p-8 text-center text-gray-400 text-[12px] opacity-80">
-                                                No data available for this report.
-                                            </td>
-                                        </tr>
-                                    )}
+
                                     {hasTotals && displayData.length > 0 && !apiLoading && (
                                         <tr className={`${compactView ? 'border-t-2 border-double border-gray-400' : 'border-t-[3px] border-double border-gray-400'} bg-[#f8fafc] font-bold`}>
                                             {displayColumns.map((col, j) => {
-                                                const accessor = col.accessor || col.key;
+                                                const accessor = col.accessor || col.key || col.header;
                                                 const isFirstCol = j === 0;
                                                 const hasTotalVal = totals[accessor] !== undefined;
 
@@ -867,6 +1380,7 @@ const ReportTemplate = ({
                                 </tbody>
                             </table>
                         </div>
+                        )}
                     </div>
 
                     {/* Note Area */}
@@ -912,7 +1426,7 @@ const ReportTemplate = ({
                 onClose={() => setShowEmailModal(false)}
                 title={title}
                 companyName={displayCompanyName}
-                userName="nawoda lakshika"
+                userName={displayUserName}
             />
 
             <ReportPrintModal
@@ -923,13 +1437,108 @@ const ReportTemplate = ({
                 subtitle={subtitle}
                 data={displayData}
                 columns={displayColumns}
+                totals={hasTotals ? totals : null}
             />
             <ReportCustomizeModal
                 isOpen={showCustomizeModal}
                 onClose={() => setShowCustomizeModal(false)}
                 customizations={customizations}
                 onApply={setCustomizations}
+                columns={displayColumns}
             />
+
+            <ReportLearnMoreModal
+                isOpen={showLearnMoreModal}
+                onClose={() => setShowLearnMoreModal(false)}
+            />
+
+
+            {showFeedbackModal && (
+                <div className="absolute right-6 top-[60px] z-[600]">
+                    <div className="bg-white rounded-[4px] shadow-2xl w-[350px] flex flex-col font-sans relative border border-gray-200">
+                        <div className="flex items-center justify-between p-4 border-b border-gray-200">
+                            <h3 className="text-[14px] font-bold text-gray-800 text-center w-full">Tell us what you think of the<br/>Report Builder</h3>
+                            <button onClick={() => setShowFeedbackModal(false)} className="text-gray-500 hover:text-gray-800 absolute right-4 top-4">
+                                <X size={18} />
+                            </button>
+                        </div>
+                        <div className="p-4">
+                            <div className="border border-gray-300 rounded-[2px] p-2 relative h-[180px] flex flex-col">
+                                <textarea
+                                    className="w-full flex-1 resize-none text-[13px] text-gray-800 outline-none bg-transparent"
+                                    placeholder="Share your feedback"
+                                    value={feedbackText}
+                                    onChange={(e) => setFeedbackText(e.target.value)}
+                                />
+                                {feedbackImages.length > 0 && (
+                                    <div className="flex gap-2 mb-6 overflow-x-auto py-1">
+                                        {feedbackImages.map((imgUrl, i) => (
+                                            <div key={i} className="relative w-12 h-12 shrink-0 border border-gray-200 rounded">
+                                                <img src={imgUrl} alt={`Feedback ${i}`} className="w-full h-full object-cover rounded" />
+                                                <button 
+                                                    onClick={() => removeFeedbackImage(i)}
+                                                    className="absolute -top-1.5 -right-1.5 bg-white rounded-full text-red-500 shadow-sm border border-gray-200 hover:bg-gray-50 flex items-center justify-center p-0.5"
+                                                >
+                                                    <X size={12} />
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                                <div className="absolute bottom-2 left-2">
+                                    <input 
+                                        type="file" 
+                                        ref={fileInputRef} 
+                                        accept="image/*" 
+                                        multiple 
+                                        onChange={handleImageUpload} 
+                                        className="hidden" 
+                                    />
+                                    <button 
+                                        onClick={() => fileInputRef.current?.click()}
+                                        className="text-gray-500 hover:text-[#0077c5] transition-colors"
+                                        title="Add image or screenshot"
+                                    >
+                                        <Camera size={16} />
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="p-4 pt-0 flex justify-end">
+                            <button
+                                onClick={handleSubmitFeedback}
+                                disabled={isSubmittingFeedback || !feedbackText.trim()}
+                                className="bg-[#0077c5] hover:bg-[#005ca6] text-white font-bold text-[13px] px-6 py-1.5 rounded-[2px]  transition-colors disabled:opacity-50"
+                            >
+                                {isSubmittingFeedback ? 'Submitting...' : 'Next'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {showThankYouModal && (
+                <div className="absolute right-6 top-[60px] z-[600]">
+                    <div className="bg-white rounded-[4px] shadow-2xl w-[350px] flex flex-col font-sans relative p-6 text-center border border-gray-200">
+                        <button onClick={() => setShowThankYouModal(false)} className="text-gray-500 hover:text-gray-800 absolute right-4 top-4">
+                            <X size={18} />
+                        </button>
+                        <div className="w-14 h-14 bg-[#0077c5] text-white rounded-full flex items-center justify-center mx-auto mb-4 mt-2">
+                            <Check size={28} strokeWidth={3} />
+                        </div>
+                        <h3 className="text-[18px] font-bold text-gray-800 mb-2">Thank you!</h3>
+                        <p className="text-[13px] text-gray-600 mb-6">
+                            Your feedback helps us improve the Report Builder for everyone.
+                        </p>
+                        <button
+                            onClick={() => setShowThankYouModal(false)}
+                            className="bg-[#0077c5] hover:bg-[#005ca6] text-white font-bold text-[13px] px-6 py-2 rounded-[2px]  transition-colors w-full"
+                        >
+                            Close
+                        </button>
+                    </div>
+                </div>
+            )}
 
         </div>
     );

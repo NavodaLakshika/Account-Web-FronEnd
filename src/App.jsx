@@ -9,10 +9,12 @@ import SuperAdminDashboard from './pages/SuperAdminDashboard';
 
 import SystemAnalyticsReportPage from './pages/SystemAnalyticsReportPage';
 import BIDashboardPage from './pages/BIDashboardPage';
+import GlobalLoader from './components/GlobalLoader';
 
 function App() {
   return (
     <Router>
+      <GlobalLoader />
       <div className="App selection:bg-blue-100 selection:text-blue-600">
         <Toaster 
             position="top-right"

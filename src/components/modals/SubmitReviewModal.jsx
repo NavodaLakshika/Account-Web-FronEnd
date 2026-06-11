@@ -103,10 +103,11 @@ const SubmitReviewModal = ({ isOpen, onClose, currentUser }) => {
                 <div className="px-8 md:px-12 pb-12 overflow-y-auto flex-1">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 min-h-[420px]">
                         {/* LEFT */}
-                        <div className="flex flex-col gap-5">
-                            {/* Overall Rating Card */}
- <div className="bg-white rounded-sm shadow-sm p-6 flex flex-col justify-center items-center flex-1">
-                                <div className="flex items-center justify-center gap-6">
+                        <div className="bg-white rounded-sm shadow-sm p-6 flex flex-col flex-1">
+                            {/* Overall Rating Section */}
+                            <div className="flex flex-col flex-1 relative mb-6">
+                                
+                                <div className="flex items-center justify-center gap-6 my-auto pt-4 pb-2">
                                     <div className="text-6xl font-bold text-slate-800 tracking-tight">{stats.average || "0.0"}</div>
                                     <div className="flex flex-col items-start">
                                         <div className="flex items-center gap-1 mb-1">
@@ -117,10 +118,18 @@ const SubmitReviewModal = ({ isOpen, onClose, currentUser }) => {
                                         <div className="text-sm text-slate-400 font-medium">({stats.total} {stats.total === 1 ? 'Review' : 'Reviews'})</div>
                                     </div>
                                 </div>
+
+                                <div className="text-center w-full mt-2">
+                                    <p className="text-[11.5px] text-slate-500 font-medium px-2">
+                                        Your honest feedback helps us improve our platform for everyone.
+                                    </p>
+                                </div>
                             </div>
 
+                            <hr className="border-slate-100 mb-6" />
+
                             {/* Rating Breakdown */}
- <div className="bg-white rounded-sm shadow-sm p-6 flex-1 flex flex-col justify-center">
+                            <div className="flex flex-col justify-center mb-6">
                                 <h3 className="text-sm font-bold text-slate-700 mb-5">Rating Breakdown</h3>
                                 <div className="space-y-3">
                                     {stats.distribution.map((row) => (
@@ -135,12 +144,24 @@ const SubmitReviewModal = ({ isOpen, onClose, currentUser }) => {
                                     ))}
                                 </div>
                             </div>
+
+                            {/* Trust Badge / Community Stats */}
+                            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-5 border border-blue-100 flex flex-col justify-center mt-auto">
+                                <div className="flex items-center gap-3 mb-2">
+                                    <div className="bg-blue-600 p-2 rounded-full text-white shadow-sm">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+                                    </div>
+                                    <h4 className="font-bold text-slate-800 text-sm">Trusted by Professionals</h4>
+                                </div>
+                                <p className="text-xs text-slate-600 leading-relaxed font-medium">
+                                    Join thousands of businesses who use our platform daily. Your feedback directly shapes the future of our modules and helps us build the perfect tools for your success.
+                                </p>
+                            </div>
                         </div>
 
                         {/* RIGHT — Submit Review Form */}
                         <div className="flex flex-col">
  <div className="bg-white rounded-sm shadow-sm p-6 flex-1 flex flex-col">
-                                <h3 className="text-base font-bold text-slate-700 mb-4">Write a Review</h3>
                                 <form onSubmit={handleSubmit} className="flex-1 flex flex-col gap-4">
                                     <div className="flex flex-col items-center gap-5 py-3">
                                         <div className="flex flex-row items-center justify-center gap-2">
@@ -191,13 +212,29 @@ const SubmitReviewModal = ({ isOpen, onClose, currentUser }) => {
                                         <span className="text-sm font-semibold text-slate-500 mt-1">{['', 'Poor', 'Fair', 'Good', 'Very Good', 'Excellent'][rating] || 'Select your rating'}</span>
                                     </div>
                                     <div className="relative flex-1 flex flex-col">
-                                        <textarea value={comment} onChange={(e) => setComment(e.target.value)} placeholder="Tell us what you like or what could be improved..." maxLength={MAX_CHARS} className="flex-1 w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:border-blue-400 focus:ring-2 focus:ring-blue-100 outline-none transition-all resize-none text-sm text-slate-700 placeholder:text-slate-400 min-h-[300px]" />
+                                        <textarea value={comment} onChange={(e) => setComment(e.target.value)} placeholder="Tell us what you like or what could be improved..." maxLength={MAX_CHARS} className="flex-1 w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:border-blue-400 focus:ring-2 focus:ring-blue-100 outline-none transition-all resize-none text-sm text-slate-700 placeholder:text-slate-400 min-h-[160px]" />
                                         <div className="flex items-center justify-end mt-1.5">
                                             <span className={`text-[11px] font-medium ${comment.length >= MAX_CHARS ? 'text-red-500' : comment.length > MAX_CHARS * 0.8 ? 'text-orange-500' : 'text-slate-400'}`}>
                                                 {comment.length}/{MAX_CHARS}
                                             </span>
                                         </div>
                                     </div>
+
+                                    {/* Review Guidelines */}
+                                    <div className="bg-slate-50 border border-slate-100 rounded-xl p-3.5 flex gap-3 items-start mt-1 mb-1">
+                                        <div className="text-blue-500 mt-0.5 shrink-0">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+                                        </div>
+                                        <div>
+                                            <h4 className="text-[12px] font-bold text-slate-700 mb-1">Review Guidelines</h4>
+                                            <ul className="text-[11.5px] text-slate-500 list-disc pl-3.5 space-y-1 font-medium">
+                                                <li>Share specific features you love or want improved.</li>
+                                                <li>Keep it constructive, respectful, and professional.</li>
+                                                <li>Please do not include personal or sensitive data.</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+
                                     <button type="submit" disabled={isSubmitting || rating === 0 || !comment.trim()} className="w-full h-11 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm rounded-xl shadow-sm shadow-blue-200 transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2 flex-shrink-0">
                                         {isSubmitting ? <Loader2 size={16} className="animate-spin" /> : <><Send size={14} /> Submit Review</>}
                                     </button>

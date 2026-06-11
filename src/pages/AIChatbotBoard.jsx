@@ -1,71 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { X, Send, Bot, User, Trash2, Plus, ChevronLeft, ChevronRight, Paperclip, File, Image as ImageIcon, Mic, Maximize2, Minimize2, Square } from 'lucide-react';
-import { DotLottiePlayer } from '@dotlottie/react-player';
-import { getUserName } from '../utils/session';
-
-// ─── DrawBorderBox ────────────────────────────────────────────────────────────
-// SVG stroke-dashoffset animation that perfectly traces the rounded-rect border.
-// AI bubbles → brand topBarColor with glow | User bubbles → Slate #94a3b8 (Simple & Charm)
-const DrawBorderBox = ({ children, color = '#0285fd', isUser = false, animKey }) => {
-    const [drawn, setDrawn] = useState(false);
-    const [contentVisible, setContent] = useState(false);
-    const [size, setSize] = useState({ w: 0, h: 0 });
-    const containerRef = useRef(null);
-    const rx = 12;
-
-    useEffect(() => {
-        const obs = new ResizeObserver(entries => {
-            if (containerRef.current) {
-                const w = containerRef.current.offsetWidth;
-                const h = containerRef.current.offsetHeight;
-                if (w > 0 && h > 0) setSize({ w, h });
-            }
-        });
-        if (containerRef.current) obs.observe(containerRef.current);
-
-        // Animation sequence
-        const t1 = setTimeout(() => setDrawn(true), 150);
-        const t2 = setTimeout(() => setContent(true), 1200);
-
-        return () => { obs.disconnect(); clearTimeout(t1); clearTimeout(t2); };
-    }, [animKey]);
-
-    const { w, h } = size;
-    const perimeter = 2 * (w - 2 * rx + h - 2 * rx) + 2 * Math.PI * rx;
-    const strokeColor = isUser ? '#94a3b8' : color;
-    const sparkFill = isUser ? '#cbd5e1' : '#e0f0ff';
-
-    const svgPath = `M ${rx},1 L ${w - rx},1 Q ${w - 1},1 ${w - 1},${rx} L ${w - 1},${h - rx} Q ${w - 1},${h - 1} ${w - rx},${h - 1} L ${rx},${h - 1} Q 1,${h - 1} 1,${h - rx} L 1,${rx} Q 1,1 ${rx},1 Z`;
-
-    return (
-        <div ref={containerRef} className="relative block w-fit min-w-[80px] max-w-full">
-            {w > 0 && h > 0 && (
-                <svg width={w} height={h} style={{ position: 'absolute', top: 0, left: 0, pointerEvents: 'none', zIndex: 10, overflow: 'visible' }}>
-                    <path
-                        d={svgPath} fill="none" stroke={strokeColor} strokeWidth={3} strokeLinecap="round" strokeLinejoin="round"
-                        strokeDasharray={perimeter} strokeDashoffset={drawn ? 0 : perimeter}
-                        opacity={0.12} style={{ transition: drawn ? `stroke-dashoffset 1.05s cubic-bezier(0.4,0,0.2,1)` : 'none' }}
-                    />
-                    <path
-                        d={svgPath} fill="none" stroke={strokeColor} strokeWidth={1} strokeLinecap="round" strokeLinejoin="round"
-                        strokeDasharray={perimeter} strokeDashoffset={drawn ? 0 : perimeter}
-                        style={{ transition: drawn ? `stroke-dashoffset 1.05s cubic-bezier(0.4,0,0.2,1)` : 'none' }}
-                    />
-                    {drawn && !contentVisible && (
-                        <circle r={3} fill={sparkFill} opacity={0.9}>
-                            <animateMotion dur="1.05s" path={svgPath} fill="freeze" />
-                        </circle>
-                    )}
-                </svg>
-            )}
-
-            <div style={{ opacity: contentVisible ? 1 : 0, transform: contentVisible ? 'translateY(0px)' : 'translateY(4px)', transition: 'opacity 0.4s ease, transform 0.4s ease' }}>
-                {children}
-            </div>
-        </div>
-    );
-};
-// ─────────────────────────────────────────────────────────────────────────────
+import { 
+    X, Send, Trash2, Plus, ChevronLeft, ChevronRight, Paperclip, 
+    File, Image as ImageIcon, Mic, Maximize2, Minimize2, Square, 
+    Sparkles, Clock, MoreVertical, Edit, PanelLeftClose, PanelLeft, 
+    ThumbsUp, ThumbsDown, Download, Copy, Check
+} from 'lucide-react';
+import { getUserName, getCompanyName } from '../utils/session';
+import AIAsterisk from '../components/AIAsterisk';
+import ThinkingProcess from '../components/ThinkingProcess';
+import HowWeUseAIModal from '../components/modals/HowWeUseAIModal';
 
 const AIChatbotBoard = ({ isOpen, onClose, position = 'center' }) => {
     // Persistent History from localStorage
@@ -76,19 +19,25 @@ const AIChatbotBoard = ({ isOpen, onClose, position = 'center' }) => {
 
     const [activeHistoryId, setActiveHistoryId] = useState(null);
 
-    const [messages, setMessages] = useState([
-        { id: 1, text: "System Online. I am your specialized AI Assistant. How can I assist with your accounts today?", sender: 'ai', timestamp: new Date() }
-    ]);
+    const [messages, setMessages] = useState([]);
     const [inputValue, setInputValue] = useState('');
     const [isTyping, setIsTyping] = useState(false);
-    const [sidebarCollapsed, setSidebarCollapsed] = useState(position === 'right');
+    
+    // We determine if we are showing the sidebar in the inline-right mode
+    const [sidebarCollapsed, setSidebarCollapsed] = useState(position === 'right' || position === 'inline-right');
+    const [copiedIndex, setCopiedIndex] = useState(null);
+    const [reactions, setReactions] = useState({});
     const [attachedFile, setAttachedFile] = useState(null);
     const [isRecording, setIsRecording] = useState(false);
     const [chatSize, setChatSize] = useState('standard'); // 'standard', 'wide', 'compact'
+    const [showAIInfoModal, setShowAIInfoModal] = useState(false);
     const abortControllerRef = useRef(null);
-    const topBarColor = '#0078d4'; // System blue color
+    
+    // Auto-scroll on new message
     const messagesEndRef = useRef(null);
     const fileInputRef = useRef(null);
+
+    const [showMenu, setShowMenu] = useState(false);
 
     // Sync history to localStorage
     useEffect(() => {
@@ -110,7 +59,7 @@ const AIChatbotBoard = ({ isOpen, onClose, position = 'center' }) => {
 
 
     const handleSendMessage = async (e) => {
-        e.preventDefault();
+        if (e) e.preventDefault();
         if (!inputValue.trim() && !attachedFile) return;
 
         const newUserMessage = {
@@ -129,9 +78,11 @@ const AIChatbotBoard = ({ isOpen, onClose, position = 'center' }) => {
         try {
             abortControllerRef.current = new AbortController();
             const API_KEY = import.meta.env.VITE_GROQ_API_KEY;
-            // Prepare messages for API
+            const userName = getUserName() || 'User';
+            const companyName = getCompanyName() || 'your company';
+            
             const apiMessages = [
-                { role: "system", content: "You are a helpful, professional AI Assistant integrated into ONIMTA Information Technology's accounting dashboard. You assist Navoda and other users with accounting queries, balances, and system workflows." },
+                { role: "system", content: `You are a helpful, professional AI Assistant integrated into ONIMTA Information Technology's accounting dashboard. You assist ${userName} and other users with accounting queries, balances, and system workflows for ${companyName}.` },
                 ...messages.map(m => ({
                     role: m.sender === 'user' ? "user" : "assistant",
                     content: m.text
@@ -162,6 +113,12 @@ const AIChatbotBoard = ({ isOpen, onClose, position = 'center' }) => {
             const aiText = data.choices && data.choices[0] && data.choices[0].message.content
                 ? data.choices[0].message.content
                 : "I couldn't process that response correctly.";
+
+            // Ensure minimum delay of 3.5s to show the thinking process
+            const elapsed = Date.now() - newUserMessage.timestamp.getTime();
+            if (elapsed < 3500) {
+                await new Promise(resolve => setTimeout(resolve, 3500 - elapsed));
+            }
 
             const aiResponse = { id: Date.now() + 1, text: aiText, sender: 'ai', timestamp: new Date() };
             setMessages(prev => [...prev, aiResponse]);
@@ -209,433 +166,353 @@ const AIChatbotBoard = ({ isOpen, onClose, position = 'center' }) => {
         reader.readAsDataURL(file);
     };
 
-    const getMockResponse = (query) => {
-        const q = query.toLowerCase();
-        if (q.includes('balance')) return "Analyzing ledgers... Your current total liquidity is $124,500.20. All balances are verified against recent bank feeds.";
-        if (q.includes('vendor')) return "Retrieving vendor profiles... You have 48 active vendor accounts. 3 payments are pending approval.";
-        return "Query processed. I can assist with balance inquiries, vendor reports, or general accounting logic.";
-    };
-
     // Archive current chat and start fresh
     const handleNewSession = () => {
-        if (!activeHistoryId && messages.length > 1) {
+        if (!activeHistoryId && messages.length > 0) {
             const firstUserMsg = messages.find(m => m.sender === 'user')?.text || "New Conversation";
             const summary = firstUserMsg.length > 20 ? firstUserMsg.substring(0, 18) + '...' : firstUserMsg;
             const newId = Date.now();
             setHistory(prev => [{ id: newId, title: summary, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), msgs: [...messages] }, ...prev.slice(0, 9)]);
         }
         setActiveHistoryId(null);
-        setMessages([{ id: Date.now(), text: "System Online. I am your specialized AI Assistant. How can I assist with your accounts today?", sender: 'ai', timestamp: new Date() }]);
+        setMessages([]);
         setInputValue('');
         setIsTyping(false);
+        setShowMenu(false);
     };
 
-    // Permanently wipe the history list
     const handleClearHistory = () => {
         setHistory([]);
         setActiveHistoryId(null);
+        setMessages([]);
+        setReactions({});
+        setShowMenu(false);
     };
+
+    const formatMessageText = (text) => {
+        if (!text) return null;
+        const parts = text.split(/(\*\*.*?\*\*)/g);
+        return parts.map((part, index) => {
+            if (part.startsWith('**') && part.endsWith('**') && part.length >= 4) {
+                return <strong key={index} className="font-semibold text-slate-800">{part.slice(2, -2)}</strong>;
+            }
+            return <span key={index}>{part}</span>;
+        });
+    };
+
+    const handleCopy = (text, idx) => {
+        navigator.clipboard.writeText(text);
+        setCopiedIndex(idx);
+        setTimeout(() => setCopiedIndex(null), 2000);
+    };
+
+    const handleDownload = (text, idx) => {
+        const element = document.createElement("a");
+        const file = new Blob([text], {type: 'text/plain'});
+        element.href = URL.createObjectURL(file);
+        element.download = `Onimta_AI_Response_${idx + 1}.txt`;
+        document.body.appendChild(element);
+        element.click();
+        document.body.removeChild(element);
+    };
+
+    const handleReaction = (idx, type) => {
+        setReactions(prev => ({ ...prev, [idx]: prev[idx] === type ? null : type }));
+    };
+
+    const handleSuggestionClick = (suggestion) => {
+        setInputValue(suggestion);
+    };
+
+    const suggestions = [
+        {
+            title: "Connecting your bank account is the first step to letting the system work for you.",
+            action: "Connect my bank account"
+        },
+        {
+            title: "Using the system to create and send invoices puts manual work on autopilot.",
+            action: "How do I create and send an invoice?"
+        },
+        {
+            title: "Use bulk entry to upload multiple supplier bills at once.",
+            action: "How I upload bills in bulk?"
+        }
+    ];
 
     if (!isOpen) return null;
 
-    const sizeClasses = {
-        standard: 'md:max-w-6xl md:max-h-[850px]',
-        wide: 'md:max-w-[98%] md:h-[95vh] md:max-h-[95vh]'
-    };
-
-    const isRight = position === 'right';
     const isInlineRight = position === 'inline-right';
 
-    if (isInlineRight) {
-        return (
-            <div className={`relative overflow-hidden flex flex-col h-full bg-white shadow-2xl shrink-0 border-l border-gray-200 transition-all duration-500 ease-out
-                ${chatSize === 'wide' ? 'w-full md:w-[800px] lg:w-[900px]' : 'w-full md:w-[450px] lg:w-[500px]'}
-            `}>
-                <div className="absolute left-0 top-0 bottom-0 w-1.5 z-[120]" style={{ backgroundColor: topBarColor }} />
-
-                <div className="absolute top-4 right-4 z-[100] flex items-center gap-2">
-                    <button
-                        onClick={() => setChatSize(prev => prev === 'standard' ? 'wide' : 'standard')}
-                        className="w-9 h-8 flex items-center justify-center bg-white border border-gray-200 text-slate-400 hover:text-blue-500 hover:border-blue-200 rounded-[8px] shadow-sm transition-all active:scale-90"
-                        title={chatSize === 'standard' ? "Switch to Wide View" : "Switch to Standard View"}
+    // Outer layout wrapper
+    // In inline-right mode, we assume it's part of the dashboard layout (e.g. flex flex-col h-full bg-white)
+    // We will render our Intuit UI entirely inside it.
+    
+    return (
+        <div className={isInlineRight 
+            ? `relative overflow-hidden flex flex-col h-full bg-white border-l border-slate-100 transition-all duration-500 ease-out shrink-0 ${chatSize === 'wide' ? 'w-full md:w-[800px] lg:w-[900px]' : 'w-full md:w-[450px] lg:w-[450px]'}`
+            : "fixed inset-0 z-[9999] bg-white flex flex-col animate-in zoom-in-95 duration-200"
+        }>
+            {/* Header */}
+            <div className="h-14 border-b border-slate-100 flex items-center justify-between px-4 shrink-0 bg-white z-20">
+                <div className="flex items-center gap-3">
+                    <button 
+                        onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+                        className="p-1.5 hover:bg-slate-100 text-slate-500 rounded-md transition-colors mr-2 hidden md:block"
+                        title={sidebarCollapsed ? "Show sidebar" : "Hide sidebar"}
                     >
-                        {chatSize === 'wide' ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
+                        {sidebarCollapsed ? <PanelLeft size={20} /> : <PanelLeftClose size={20} />}
                     </button>
-                    <button onClick={onClose} className="w-9 h-8 flex items-center justify-center bg-red-50 hover:bg-red-100 text-red-600 rounded-[8px] transition-all active:scale-90 border-none group">
-                        <X size={28} strokeWidth={1.5} />
-                    </button>
+                    <div className="w-6 h-6 flex items-center justify-center">
+                        <AIAsterisk size={24} isThinking={true} />
+                    </div>
+                    <h2 className="text-[15px] font-semibold text-slate-800 flex items-center gap-2">
+                        Onimta Intelligence
+                        <span className="text-[10px] font-bold bg-teal-600/90 text-white px-1.5 py-0.5 rounded-[4px] tracking-wider">
+                            BETA
+                        </span>
+                    </h2>
                 </div>
 
-                <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'linear-gradient(rgba(0,0,0,1) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,1) 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
-
-                {/* Chat Area */}
-                <div className="flex-1 flex flex-col relative z-20 bg-transparent min-w-0 min-h-0 h-full">
-
-                    <div className="flex-1 overflow-y-auto p-4 md:p-10 space-y-8 custom-scrollbar h-0">
-                        {(messages || []).map((msg) => (
-                            <div key={msg.id} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-                                <div className={`flex gap-3 items-end max-w-[90%] md:max-w-[75%] ${msg.sender === 'user' ? 'flex-row-reverse' : ''}`}>
-
-                                    {/* Avatar with Animation */}
-                                    <div className="relative flex-shrink-0 flex items-center justify-center">
-                                        <span className="absolute inset-0 rounded-full" style={msg.sender === 'ai'
-                                            ? { animation: 'aiRing 2.4s ease-in-out infinite', border: `2px solid ${topBarColor}`, opacity: 0 }
-                                            : { animation: 'userRing 2.4s ease-in-out infinite', border: '2px solid #94a3b8', opacity: 0 }}
-                                        />
-                                        <div className="w-7 h-7 md:w-8 md:h-8 rounded-full border flex items-center justify-center shadow" style={msg.sender === 'ai'
-                                            ? { borderColor: `${topBarColor}50`, backgroundColor: `${topBarColor}12`, animation: 'iconBob 3s ease-in-out infinite' }
-                                            : { borderColor: '#cbd5e1', backgroundColor: '#f8fafc', animation: 'iconPop 3s ease-in-out infinite' }}>
-                                            {msg.sender === 'user' ? <User size={13} className="text-slate-500" /> : <Bot size={14} style={{ color: topBarColor }} />}
-                                        </div>
-                                    </div>
-
-                                    <DrawBorderBox color={topBarColor} isUser={msg.sender === 'user'} animKey={msg.id}>
-                                        <div className={`px-5 py-3.5 font-mono text-[11px] leading-relaxed rounded-xl relative break-words whitespace-pre-wrap ${msg.sender === 'user' ? 'bg-slate-50 text-slate-700' : 'bg-slate-50 text-slate-800'}`} style={msg.sender === 'ai' ? { borderLeft: `2px solid ${topBarColor}` } : { borderLeft: '2px solid #94a3b8' }}>
-                                            <svg className={`absolute ${msg.sender === 'user' ? '-right-4 text-slate-50' : '-left-4 text-slate-50'} bottom-0 w-6 h-8`} viewBox="0 0 24 32" fill="none" preserveAspectRatio="none">
-                                                <path d={msg.sender === 'user' ? "M0 0V32H24C12 32 6 20 0 0Z" : "M24 0V32H0C12 32 18 20 24 0Z"} fill="currentColor" />
-                                                <path d={msg.sender === 'user' ? "M0 0V32H24C12 32 6 20 0 0Z" : "M24 0V32H0C12 32 18 20 24 0Z"} stroke="#e2e8f0" strokeWidth="1" />
-                                            </svg>
-
-                                            {msg.file && (
-                                                <div className="mb-3">
-                                                    {msg.file.isImage ? (
-                                                        <img src={msg.file.url} alt="upload" className="max-w-full rounded-lg border border-gray-100 shadow-sm" />
-                                                    ) : (
-                                                        <div className="flex items-center gap-3 p-3 bg-white/50 border border-gray-100 rounded-lg">
-                                                            <div className="p-2 bg-blue-50 text-blue-500 rounded-lg">
-                                                                <File size={20} />
-                                                            </div>
-                                                            <div className="flex-1 min-w-0">
-                                                                <div className="text-[10px] font-bold text-slate-700 truncate">{msg.file.name}</div>
-                                                                <div className="text-[8px] text-slate-400">{msg.file.size}</div>
-                                                            </div>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            )}
-
-                                            {msg.text}
-                                        </div>
-                                    </DrawBorderBox>
-                                </div>
-                            </div>
-                        ))}
-
-                        {isTyping && (
-                            <div className="flex justify-start">
-                                <div className="flex gap-2.5 items-end">
-                                    <div className="relative flex-shrink-0 flex items-center justify-center">
-                                        <span className="absolute inset-0 rounded-full" style={{ animation: 'aiRing 2.4s ease-in-out infinite', border: `2px solid ${topBarColor}`, opacity: 0 }} />
-                                        <div className="w-7 h-7 md:w-8 md:h-8 rounded-full border flex items-center justify-center shadow" style={{ borderColor: `${topBarColor}50`, backgroundColor: `${topBarColor}12`, animation: 'iconBob 3s ease-in-out infinite' }}>
-                                            <Bot size={14} style={{ color: topBarColor }} />
-                                        </div>
-                                    </div>
-                                    <div className="px-2 py-1.5 bg-slate-50 border border-gray-100 rounded-xl flex items-center gap-1 shadow-sm" style={{ borderLeft: `2px solid ${topBarColor}` }}>
-                                        <span className="w-1 h-1 rounded-full animate-bounce" style={{ backgroundColor: topBarColor, animationDelay: '0ms' }} />
-                                        <span className="w-1 h-1 rounded-full animate-bounce" style={{ backgroundColor: topBarColor, animationDelay: '150ms' }} />
-                                        <span className="w-1 h-1 rounded-full animate-bounce" style={{ backgroundColor: topBarColor, animationDelay: '300ms' }} />
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-                        <div ref={messagesEndRef} />
-                    </div>
-
-                    <div className="p-4 md:p-6 bg-slate-50 border-t border-gray-100">
-                        {attachedFile && (
-                            <div className="mb-4 flex items-center justify-between p-2.5 bg-white border border-blue-100 rounded-xl animate-in slide-in-from-bottom-2 fade-in">
-                                <div className="flex items-center gap-3 min-w-0">
-                                    <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center text-blue-500 overflow-hidden border border-blue-100">
-                                        {attachedFile.isImage ? <img src={attachedFile.url} className="w-full h-full object-cover" /> : <File size={18} />}
-                                    </div>
-                                    <div className="min-w-0">
-                                        <div className="text-[10px] font-bold text-slate-700 truncate">{attachedFile.name}</div>
-                                        <div className="text-[8px] text-slate-400">{attachedFile.size}</div>
-                                    </div>
-                                </div>
-                                <button onClick={() => setAttachedFile(null)} className="p-1.5 hover:bg-red-50 text-slate-300 hover:text-red-500 rounded-full transition-colors">
-                                    <X size={28} />
-                                </button>
-                            </div>
-                        )}
-
-                        <form onSubmit={handleSendMessage} className="flex gap-1.5 items-center relative">
-                            <input
-                                type="file"
-                                ref={fileInputRef}
-                                onChange={handleFileChange}
-                                className="hidden"
-                                accept="image/*,.pdf,.doc,.docx,.txt"
-                            />
-                            <button
-                                type="button"
-                                onClick={() => fileInputRef.current.click()}
-                                className="p-2 bg-white border border-gray-200 text-slate-400 hover:text-blue-500 hover:border-blue-100 rounded-xl transition-all active:scale-95 shadow-sm"
-                            >
-                                <Paperclip size={16} />
-                            </button>
-
-                            <div className="flex-1 relative">
-                                <input
-                                    type="text"
-                                    value={inputValue}
-                                    onChange={(e) => setInputValue(e.target.value)}
-                                    placeholder={isRecording ? "Recording audio..." : "Write your message..."}
-                                    className={`w-full px-4 py-2 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-300 transition-all font-mono text-[11px] shadow-inner placeholder:text-slate-300 ${isRecording ? 'text-red-500 animate-pulse' : ''}`}
-                                />
-                            </div>
-
-                            <button
-                                type="button"
-                                onClick={() => setIsRecording(!isRecording)}
-                                className={`p-2 rounded-xl shadow-md border-none transition-all active:scale-95 ${isRecording ? 'bg-red-500 text-white animate-bounce' : 'bg-white border border-gray-100 text-slate-400 hover:text-blue-500'}`}
-                            >
-                                <Mic size={16} />
-                            </button>
-
-                            <button
-                                type="submit"
-                                disabled={!inputValue.trim() && !attachedFile}
-                                className="p-2 rounded-xl text-white shadow-md border-none disabled:bg-slate-200 disabled:shadow-none transition-all active:scale-95"
-                                style={inputValue.trim() || attachedFile ? { backgroundColor: topBarColor } : {}}
-                            >
-                                <Send size={16} />
-                            </button>
-                        </form>
+                <div className="flex items-center gap-1 relative">
+                    <div className="relative">
+                        <button 
+                            onClick={() => setShowMenu(!showMenu)}
+                            className="p-1.5 hover:bg-slate-100 text-slate-500 rounded-md transition-colors"
+                        >
+                            <MoreVertical size={20} />
+                        </button>
                         
-                        <div className="mt-3 flex items-center justify-between text-[10px] text-slate-400 border-t border-gray-100 pt-3">
-                            <span>ONIMTA AI Assistant</span>
-                            <div className="flex items-center gap-4">
-                                <button type="button" onClick={handleNewSession} className="hover:text-blue-500 transition-colors font-bold uppercase tracking-wide">
-                                    + New Chat
-                                </button>
-                                <button type="button" onClick={handleClearHistory} className="hover:text-red-500 transition-colors font-bold uppercase tracking-wide">
-                                    Clear Chat
-                                </button>
-                            </div>
-                        </div>
+                        {showMenu && (
+                            <>
+                                <div className="fixed inset-0 z-10" onClick={() => setShowMenu(false)}></div>
+                                <div className="absolute top-[110%] right-0 mt-1 w-56 bg-white rounded-xl shadow-xl border border-slate-100 py-1.5 z-20">
+                                    <button onClick={handleNewSession} className="w-full text-left px-4 py-2.5 text-[13px] text-slate-700 hover:bg-slate-50 flex items-center gap-3 font-medium">
+                                        <Edit size={16} /> New chat
+                                    </button>
+                                    <button onClick={handleClearHistory} className="w-full text-left px-4 py-2.5 text-[13px] text-red-600 hover:bg-red-50 flex items-center gap-3 font-medium">
+                                        <Trash2 size={16} /> Clear chat history
+                                    </button>
+                                </div>
+                            </>
+                        )}
                     </div>
+
+                    {isInlineRight && (
+                        <button 
+                            onClick={() => setChatSize(prev => prev === 'standard' ? 'wide' : 'standard')}
+                            className="p-1.5 hover:bg-slate-100 text-slate-500 rounded-md transition-colors"
+                            title={chatSize === 'standard' ? "Wide view" : "Standard view"}
+                        >
+                            {chatSize === 'wide' ? <Minimize2 size={18} /> : <Maximize2 size={18} />}
+                        </button>
+                    )}
+                    
+                    <button 
+                        onClick={onClose}
+                        className="p-1.5 hover:bg-slate-100 text-slate-500 rounded-md transition-colors ml-1"
+                    >
+                        <X size={20} />
+                    </button>
                 </div>
             </div>
-        );
-    }
 
-    return (
-        <>
-            <div className={`fixed inset-0 z-[10000] flex ${isRight ? 'justify-end p-0 pointer-events-none' : 'items-center justify-center p-0 md:p-4'} transition-all duration-700 ${isOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'}`}>
-                {!isRight && (
-                    <div className="absolute inset-0 bg-slate-900/30 backdrop-blur-sm transition-all duration-700 pointer-events-auto" onClick={onClose} />
-                )}
-
-                <div className={`relative overflow-hidden flex transition-all duration-500 ease-out bg-white shadow-2xl 
-                    ${isRight ? `pointer-events-auto h-full rounded-none border-l border-gray-200 ${chatSize === 'wide' ? 'w-full md:w-[800px] lg:w-[900px]' : 'w-full md:w-[450px] lg:w-[500px]'}` : `w-full h-full md:h-[85vh] rounded-none md:rounded-2xl pointer-events-auto ${sizeClasses[chatSize]}`}
-                `}>
-
-                    <div className="absolute left-0 top-0 bottom-0 w-1.5 z-[120]" style={{ backgroundColor: topBarColor }} />
-
-                    <div className="absolute top-4 right-4 z-[100] flex items-center gap-2">
-                        <button
-                            onClick={() => {
-                                setChatSize(prev => prev === 'standard' ? 'wide' : 'standard');
-                            }}
-                            className="w-9 h-8 flex items-center justify-center bg-white border border-gray-200 text-slate-400 hover:text-blue-500 hover:border-blue-200 rounded-[8px] shadow-sm transition-all active:scale-90"
-                            title={chatSize === 'standard' ? "Switch to Wide View" : "Switch to Standard View"}
-                        >
-                            {chatSize === 'wide' ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
-                        </button>
-                        <button onClick={onClose} className="w-9 h-8 flex items-center justify-center bg-red-50 hover:bg-red-100 text-red-600 rounded-[8px] transition-all active:scale-90 border-none group">
-                            <X size={28} strokeWidth={1.5} />
-                        </button>
-                    </div>
-
-                    <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'linear-gradient(rgba(0,0,0,1) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,1) 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
-
-                    {/* Sidebar */}
-                    <div className={`hidden lg:flex flex-col border-r border-gray-100 relative z-10 bg-slate-50 transition-all duration-500 ${sidebarCollapsed ? 'w-[80px] p-4' : 'w-[300px] p-6'}`}>
-                        <div className="flex items-center justify-between mb-2">
-                            {/* Sidebar controls removed as requested */}
+            {/* Main Content Area (Sidebar + Chat) */}
+            <div className="flex-1 flex overflow-hidden bg-white">
+                
+                {/* Sidebar */}
+                {!sidebarCollapsed && (
+                    <div className="w-[260px] border-r border-slate-100 flex flex-col shrink-0 animate-in slide-in-from-left-4 duration-300">
+                        <div className="p-4">
+                            <button 
+                                className="w-full flex items-center gap-3 px-4 py-2.5 text-[14px] text-slate-700 font-medium hover:bg-slate-50 rounded-xl transition-colors"
+                                onClick={handleNewSession}
+                            >
+                                <Edit size={18} className="text-slate-500" /> New chat
+                            </button>
                         </div>
-                        {/* Header */}
-                        <div className={`mb-4 flex flex-col ${sidebarCollapsed ? 'hidden' : ''}`}>
-                            <h3 className="text-slate-900 text-xl font-black uppercase tracking-tight leading-none">
-                                {(() => {
-                                    const hour = new Date().getHours();
-                                    if (hour < 12) return "Good Morning";
-                                    if (hour < 17) return "Good Afternoon";
-                                    return "Good Evening";
-                                })()}, {getUserName().split(' ')[0]}
-                            </h3>
-                        </div>
-
-                        {/* Recent Activity (History) */}
-                        <div className={`flex-1 overflow-y-auto mb-6 custom-scrollbar min-h-0 pr-1 ${sidebarCollapsed ? 'hidden' : ''}`}>
-                            <h4 className="text-slate-400 text-[10px] font-black uppercase tracking-widest mb-4">Recent Activity</h4>
-                            <div className="space-y-2">
-                                {history.map((item, idx) => (
-                                    <div key={idx} className="group relative">
+                        
+                        <div className="px-4 py-2 flex-1 overflow-y-auto">
+                            <div className="text-[12px] font-bold text-slate-400 uppercase tracking-wider flex items-center justify-between mb-3 px-2">
+                                <div className="flex items-center gap-2"><Clock size={14} /> Recent</div>
+                            </div>
+                            
+                            {history.length === 0 ? (
+                                <div className="px-2 py-2 text-[13px] text-slate-500 bg-slate-50/50 rounded-lg border border-slate-100">
+                                    No conversations yet
+                                </div>
+                            ) : (
+                                <div className="space-y-1">
+                                    {history.map((item, idx) => (
                                         <button
+                                            key={idx}
                                             onClick={() => {
                                                 if (item.msgs) {
                                                     setMessages(item.msgs);
                                                     setActiveHistoryId(item.id);
                                                 }
                                             }}
-                                            className={`w-full text-left p-2 bg-white border rounded-lg shadow-sm hover:shadow-md transition-all flex items-center gap-2 relative overflow-hidden ${activeHistoryId === item.id ? 'border-blue-300 ring-1 ring-blue-50' : 'border-gray-50 hover:border-blue-100'}`}
+                                            className={`w-full text-left px-3 py-2 text-[13px] rounded-lg transition-colors truncate ${activeHistoryId === item.id ? 'bg-indigo-50 text-indigo-700 font-medium' : 'text-slate-600 hover:bg-slate-50'}`}
                                         >
-                                            <div className="absolute left-0 top-0 bottom-0 w-[3px] opacity-40 group-hover:opacity-100 transition-opacity" style={{ backgroundColor: activeHistoryId === item.id ? topBarColor : topBarColor + '80' }} />
-
-                                            <div className="w-7 h-7 rounded bg-slate-50 flex items-center justify-center flex-shrink-0 group-hover:bg-blue-50 transition-colors border border-gray-100">
-                                                <Bot size={12} className="text-slate-400 group-hover:text-blue-500 transition-colors" />
-                                            </div>
-
-                                            <div className="flex-1 min-w-0">
-                                                <div className="text-slate-700 text-[9px] font-black group-hover:text-blue-600 transition-colors truncate uppercase tracking-tight w-full">
-                                                    {item.title || "New Conversation"}
-                                                </div>
-
-                                                <div className="text-slate-400 text-[8px] truncate font-medium leading-none mt-1">
-                                                    {item.msgs && item.msgs.length > 0 ? item.msgs[item.msgs.length - 1].text : "No messages yet"}
-                                                </div>
-
-                                                <div className="mt-1.5 flex items-center gap-2">
-                                                    <div className="text-blue-400 text-[6.5px] font-black uppercase tracking-[0.1em] flex items-center gap-1 opacity-60 group-hover:opacity-100 transition-opacity">
-                                                        <div className="w-0.5 h-0.5 rounded-full bg-blue-400 animate-pulse" />
-                                                        {item.msgs?.length || 0} MESSAGES
-                                                    </div>
-                                                    <div className="text-slate-300 text-[6.5px] font-bold uppercase tracking-widest">• {item.time || "Recently"}</div>
-                                                </div>
-                                            </div>
+                                            {item.title}
                                         </button>
-                                        <button
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                setHistory(prev => prev.filter((_, i) => i !== idx));
-                                            }}
-                                            className="absolute right-1 top-1 opacity-0 group-hover:opacity-100 p-1 text-slate-300 hover:text-red-500 transition-all z-20"
-                                        >
-                                            <X size={28} strokeWidth={1.5} />
-                                        </button>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-
-                        {/* Sidebar Controls */}
-                        <div className="space-y-2.5 pt-6 border-t border-gray-200">
-                            <button
-                                onClick={handleNewSession}
-                                className={`flex items-center justify-center gap-2.5 rounded-xl transition-all shadow-md active:scale-95 border-none text-white font-black uppercase tracking-widest ${sidebarCollapsed ? 'w-10 h-10' : 'w-full py-2.5'}`}
-                                style={{ backgroundColor: topBarColor, boxShadow: `0 4px 12px ${topBarColor}25` }}
-                            >
-                                <Plus size={16} strokeWidth={3} />
-                                {!sidebarCollapsed && <span className="text-[9.5px]">New Session</span>}
-                            </button>
-
-                            <button
-                                onClick={handleClearHistory}
-                                className={`flex items-center justify-center gap-2.5 rounded-xl border border-gray-100 bg-white hover:bg-gray-50 transition-all active:scale-95 text-slate-500 shadow-sm ${sidebarCollapsed ? 'w-10 h-10' : 'w-full py-2.5'}`}
-                            >
-                                <Trash2 size={14} strokeWidth={2} />
-                                {!sidebarCollapsed && <span className="text-[8.5px] font-black uppercase tracking-widest">Clear Log</span>}
-                            </button>
+                                    ))}
+                                </div>
+                            )}
                         </div>
                     </div>
+                )}
 
-                    {/* Chat Area */}
-                    <div className="flex-1 flex flex-col relative z-20 bg-transparent min-w-0 min-h-0 h-full">
-                        <button onClick={() => setSidebarCollapsed(!sidebarCollapsed)} className="hidden lg:flex absolute top-1/2 -left-3 -translate-y-1/2 w-6 h-12 border border-gray-200 text-white items-center justify-center rounded-r-lg z-[30] shadow-md" style={{ backgroundColor: topBarColor }}>
-                            {sidebarCollapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
-                        </button>
+                {/* Chat Area */}
+                <div className="flex-1 flex flex-col relative">
+                    
+                    {/* Scrollable Messages / Empty State */}
+                    <div className="flex-1 overflow-y-auto p-6 flex flex-col">
+                        {messages.length === 0 ? (
+                            // Empty State
+                            <div className="max-w-[700px] w-full mx-auto mt-4 md:mt-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                                <h1 className="text-2xl md:text-3xl font-bold text-slate-800 mb-8 md:mb-12">
+                                    What can I do for you today?
+                                </h1>
 
-                        <div className="flex-1 overflow-y-auto p-4 md:p-10 space-y-8 custom-scrollbar h-0">
-                            {(messages || []).map((msg) => (
-                                <div key={msg.id} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-                                    <div className={`flex gap-3 items-end max-w-[90%] md:max-w-[75%] ${msg.sender === 'user' ? 'flex-row-reverse' : ''}`}>
-
-                                        {/* Avatar with Animation */}
-                                        <div className="relative flex-shrink-0 flex items-center justify-center">
-                                            <span className="absolute inset-0 rounded-full" style={msg.sender === 'ai'
-                                                ? { animation: 'aiRing 2.4s ease-in-out infinite', border: `2px solid ${topBarColor}`, opacity: 0 }
-                                                : { animation: 'userRing 2.4s ease-in-out infinite', border: '2px solid #94a3b8', opacity: 0 }}
-                                            />
-                                            <div className="w-7 h-7 md:w-8 md:h-8 rounded-full border flex items-center justify-center shadow" style={msg.sender === 'ai'
-                                                ? { borderColor: `${topBarColor}50`, backgroundColor: `${topBarColor}12`, animation: 'iconBob 3s ease-in-out infinite' }
-                                                : { borderColor: '#cbd5e1', backgroundColor: '#f8fafc', animation: 'iconPop 3s ease-in-out infinite' }}>
-                                                {msg.sender === 'user' ? <User size={13} className="text-slate-500" /> : <Bot size={14} style={{ color: topBarColor }} />}
-                                            </div>
+                                <div className="flex flex-col">
+                                    {suggestions.map((item, idx) => (
+                                        <div key={idx} className="border-b border-slate-100 py-6 first:pt-0 hover:bg-slate-50/50 transition-colors cursor-pointer group rounded-xl px-2 -mx-2" onClick={() => handleSuggestionClick(item.action)}>
+                                            <p className="text-[13px] text-slate-600 mb-2 leading-relaxed">
+                                                {item.title}
+                                            </p>
+                                            <p className="text-[13px] text-[#0077c5] font-medium group-hover:underline">
+                                                {item.action}
+                                            </p>
                                         </div>
-
-                                        <DrawBorderBox color={topBarColor} isUser={msg.sender === 'user'} animKey={msg.id}>
-                                            <div className={`px-5 py-3.5 font-mono text-[11px] leading-relaxed rounded-xl relative break-words whitespace-pre-wrap ${msg.sender === 'user' ? 'bg-slate-50 text-slate-700' : 'bg-slate-50 text-slate-800'}`} style={msg.sender === 'ai' ? { borderLeft: `2px solid ${topBarColor}` } : { borderLeft: '2px solid #94a3b8' }}>
-                                                <svg className={`absolute ${msg.sender === 'user' ? '-right-4 text-slate-50' : '-left-4 text-slate-50'} bottom-0 w-6 h-8`} viewBox="0 0 24 32" fill="none" preserveAspectRatio="none">
-                                                    <path d={msg.sender === 'user' ? "M0 0V32H24C12 32 6 20 0 0Z" : "M24 0V32H0C12 32 18 20 24 0Z"} fill="currentColor" />
-                                                    <path d={msg.sender === 'user' ? "M0 0V32H24C12 32 6 20 0 0Z" : "M24 0V32H0C12 32 18 20 24 0Z"} stroke="#e2e8f0" strokeWidth="1" />
-                                                </svg>
-
-                                                {msg.file && (
-                                                    <div className="mb-3">
-                                                        {msg.file.isImage ? (
-                                                            <img src={msg.file.url} alt="upload" className="max-w-full rounded-lg border border-gray-100 shadow-sm" />
-                                                        ) : (
-                                                            <div className="flex items-center gap-3 p-3 bg-white/50 border border-gray-100 rounded-lg">
-                                                                <div className="p-2 bg-blue-50 text-blue-500 rounded-lg">
-                                                                    <File size={20} />
+                                    ))}
+                                </div>
+                            </div>
+                        ) : (
+                            // Chat Messages
+                            <div className="max-w-[700px] w-full mx-auto flex flex-col gap-8 pb-10">
+                                {messages.map((msg, idx) => (
+                                    <div key={idx} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'} animate-in fade-in slide-in-from-bottom-2`}>
+                                        {msg.sender === 'user' ? (
+                                            <div className="flex flex-col items-end max-w-[85%]">
+                                                <div className="bg-[#f4f5f8] text-slate-800 px-5 py-3 rounded-2xl rounded-tr-sm text-[13px] shadow-sm">
+                                                    {msg.file && (
+                                                        <div className="mb-3">
+                                                            {msg.file.isImage ? (
+                                                                <img src={msg.file.url} alt="upload" className="max-w-full rounded-lg border border-slate-200 shadow-sm" />
+                                                            ) : (
+                                                                <div className="flex items-center gap-3 p-3 bg-white border border-slate-200 rounded-lg">
+                                                                    <div className="p-2 bg-indigo-50 text-indigo-500 rounded-lg">
+                                                                        <File size={20} />
+                                                                    </div>
+                                                                    <div className="flex-1 min-w-0 text-left">
+                                                                        <div className="text-[12px] font-bold text-slate-700 truncate">{msg.file.name}</div>
+                                                                        <div className="text-[10px] text-slate-400">{msg.file.size}</div>
+                                                                    </div>
                                                                 </div>
-                                                                <div className="flex-1 min-w-0">
-                                                                    <div className="text-[10px] font-bold text-slate-700 truncate">{msg.file.name}</div>
-                                                                    <div className="text-[8px] text-slate-400">{msg.file.size}</div>
-                                                                </div>
-                                                            </div>
-                                                        )}
+                                                            )}
+                                                        </div>
+                                                    )}
+                                                    {msg.text}
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <div className="flex gap-4 max-w-[90%]">
+                                                <div className="w-8 h-8 rounded-full bg-indigo-50 border border-indigo-100 flex items-center justify-center shrink-0 mt-1 group">
+                                                    <AIAsterisk size={16} />
+                                                </div>
+                                                <div className="flex flex-col gap-2">
+                                                    <div className="text-[12px] font-medium text-slate-400 flex items-center gap-1.5">
+                                                        Work done <span className="text-[10px]">❯</span>
                                                     </div>
-                                                )}
+                                                    <div className="text-slate-700 text-[13px] leading-relaxed whitespace-pre-wrap">
+                                                        {formatMessageText(msg.text)}
+                                                    </div>
+                                                    
+                                                    {/* AI Message Actions */}
+                                                    <div className="flex items-center gap-2 mt-2">
+                                                        <button 
+                                                            onClick={() => handleCopy(msg.text, idx)}
+                                                            className="flex items-center gap-1.5 px-2.5 py-1.5 text-[12px] font-medium text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
+                                                            title="Copy to clipboard"
+                                                        >
+                                                            {copiedIndex === idx ? <Check size={14} className="text-green-500" /> : <Copy size={14} />} {copiedIndex === idx ? 'Copied' : 'Copy'}
+                                                        </button>
+                                                        <button 
+                                                            onClick={() => handleReaction(idx, 'like')}
+                                                            className={`p-1.5 rounded-lg transition-colors ${reactions[idx] === 'like' ? 'text-indigo-600 bg-indigo-50' : 'text-slate-400 hover:text-slate-600 hover:bg-slate-100'}`}
+                                                            title="Helpful"
+                                                        >
+                                                            <ThumbsUp size={16} className={reactions[idx] === 'like' ? 'fill-indigo-600' : ''} />
+                                                        </button>
+                                                        <button 
+                                                            onClick={() => handleReaction(idx, 'dislike')}
+                                                            className={`p-1.5 rounded-lg transition-colors ${reactions[idx] === 'dislike' ? 'text-red-600 bg-red-50' : 'text-slate-400 hover:text-slate-600 hover:bg-slate-100'}`}
+                                                            title="Not helpful"
+                                                        >
+                                                            <ThumbsDown size={16} className={reactions[idx] === 'dislike' ? 'fill-red-600' : ''} />
+                                                        </button>
+                                                        <button 
+                                                            onClick={() => handleDownload(msg.text, idx)}
+                                                            className="flex items-center gap-1.5 px-2.5 py-1.5 text-[12px] font-medium text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors ml-auto"
+                                                            title="Download response"
+                                                        >
+                                                            <Download size={14} /> Download
+                                                        </button>
+                                                    </div>
 
-                                                {msg.text}
+                                                    {/* Suggested follow-ups (show only on last message) */}
+                                                    {idx === messages.length - 1 && (
+                                                        <div className="flex flex-col items-start gap-2 mt-4 pt-4 border-t border-slate-100/50 w-full">
+                                                            <button className="px-4 py-1.5 border border-[#0077c5] text-[#0077c5] text-[13px] font-medium rounded-full hover:bg-blue-50 transition-colors" onClick={() => handleSuggestionClick("Show me how to connect my bank account")}>
+                                                                Show me how to connect my bank account
+                                                            </button>
+                                                            <button className="px-4 py-1.5 border border-[#0077c5] text-[#0077c5] text-[13px] font-medium rounded-full hover:bg-blue-50 transition-colors" onClick={() => handleSuggestionClick("Guide me to create my first invoice")}>
+                                                                Guide me to create my first invoice
+                                                            </button>
+                                                        </div>
+                                                    )}
+                                                </div>
                                             </div>
-                                        </DrawBorderBox>
+                                        )}
                                     </div>
-                                </div>
-                            ))}
-
-                            {isTyping && (
-                                <div className="flex justify-start">
-                                    <div className="flex gap-2.5 items-end">
-                                        <div className="relative flex-shrink-0 flex items-center justify-center">
-                                            <span className="absolute inset-0 rounded-full" style={{ animation: 'aiRing 2.4s ease-in-out infinite', border: `2px solid ${topBarColor}`, opacity: 0 }} />
-                                            <div className="w-7 h-7 md:w-8 md:h-8 rounded-full border flex items-center justify-center shadow" style={{ borderColor: `${topBarColor}50`, backgroundColor: `${topBarColor}12`, animation: 'iconBob 3s ease-in-out infinite' }}>
-                                                <Bot size={14} style={{ color: topBarColor }} />
-                                            </div>
-                                        </div>
-                                        <div className="px-2 py-1.5 bg-slate-50 border border-gray-100 rounded-xl flex items-center gap-1 shadow-sm" style={{ borderLeft: `2px solid ${topBarColor}` }}>
-                                            <span className="w-1 h-1 rounded-full animate-bounce" style={{ backgroundColor: topBarColor, animationDelay: '0ms' }} />
-                                            <span className="w-1 h-1 rounded-full animate-bounce" style={{ backgroundColor: topBarColor, animationDelay: '150ms' }} />
-                                            <span className="w-1 h-1 rounded-full animate-bounce" style={{ backgroundColor: topBarColor, animationDelay: '300ms' }} />
+                                ))}
+                                
+                                {isTyping && (
+                                    <div className="flex justify-start animate-in fade-in slide-in-from-bottom-2">
+                                        <div className="flex gap-4 max-w-[90%]">
+                                            <ThinkingProcess />
                                         </div>
                                     </div>
-                                </div>
-                            )}
-                            <div ref={messagesEndRef} />
-                        </div>
+                                )}
+                                <div ref={messagesEndRef} />
+                            </div>
+                        )}
+                    </div>
 
-                        <div className="p-4 md:p-6 bg-slate-50 border-t border-gray-100">
-                            {attachedFile && (
-                                <div className="mb-4 flex items-center justify-between p-2.5 bg-white border border-blue-100 rounded-xl animate-in slide-in-from-bottom-2 fade-in">
-                                    <div className="flex items-center gap-3 min-w-0">
-                                        <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center text-blue-500 overflow-hidden border border-blue-100">
-                                            {attachedFile.isImage ? <img src={attachedFile.url} className="w-full h-full object-cover" /> : <File size={18} />}
-                                        </div>
-                                        <div className="min-w-0">
-                                            <div className="text-[10px] font-bold text-slate-700 truncate">{attachedFile.name}</div>
-                                            <div className="text-[8px] text-slate-400">{attachedFile.size}</div>
-                                        </div>
+                    {/* Input Area */}
+                    <div className="p-4 md:p-6 bg-white shrink-0 relative">
+                        {attachedFile && (
+                            <div className="absolute bottom-[100%] left-6 right-6 mb-2 max-w-[700px] mx-auto flex items-center justify-between p-2.5 bg-white border border-slate-200 shadow-sm rounded-xl animate-in slide-in-from-bottom-2 fade-in z-10">
+                                <div className="flex items-center gap-3 min-w-0">
+                                    <div className="w-10 h-10 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-500 overflow-hidden border border-indigo-100">
+                                        {attachedFile.isImage ? <img src={attachedFile.url} className="w-full h-full object-cover" /> : <File size={18} />}
                                     </div>
-                                    <button onClick={() => setAttachedFile(null)} className="p-1.5 hover:bg-red-50 text-slate-300 hover:text-red-500 rounded-full transition-colors">
-                                        <X size={28} />
-                                    </button>
+                                    <div className="min-w-0">
+                                        <div className="text-[12px] font-bold text-slate-700 truncate">{attachedFile.name}</div>
+                                        <div className="text-[10px] text-slate-400">{attachedFile.size}</div>
+                                    </div>
                                 </div>
-                            )}
+                                <button onClick={() => setAttachedFile(null)} className="p-1.5 hover:bg-slate-100 text-slate-400 hover:text-red-500 rounded-full transition-colors">
+                                    <X size={20} />
+                                </button>
+                            </div>
+                        )}
 
-                            <form onSubmit={handleSendMessage} className="flex gap-1.5 items-center relative">
+                        <div className="max-w-[700px] w-full mx-auto relative group">
+                            {/* Gradient Border Effect Wrapper */}
+                            <div className="absolute -inset-[1px] bg-gradient-to-r from-emerald-200 via-blue-200 to-indigo-200 rounded-2xl opacity-70 group-focus-within:opacity-100 group-focus-within:from-emerald-400 group-focus-within:via-blue-400 group-focus-within:to-indigo-400 transition-all duration-500"></div>
+                            
+                            <form onSubmit={handleSendMessage} className="relative bg-white rounded-2xl flex flex-col min-h-[100px] p-1 shadow-sm">
                                 <input
                                     type="file"
                                     ref={fileInputRef}
@@ -643,70 +520,69 @@ const AIChatbotBoard = ({ isOpen, onClose, position = 'center' }) => {
                                     className="hidden"
                                     accept="image/*,.pdf,.doc,.docx,.txt"
                                 />
-                                <button
-                                    type="button"
-                                    onClick={() => fileInputRef.current.click()}
-                                    className="p-2 bg-white border border-gray-200 text-slate-400 hover:text-blue-500 hover:border-blue-100 rounded-xl transition-all active:scale-95 shadow-sm"
-                                >
-                                    <Paperclip size={16} />
-                                </button>
-
-                                <div className="flex-1 relative">
-                                    <input
-                                        type="text"
-                                        value={inputValue}
-                                        onChange={(e) => setInputValue(e.target.value)}
-                                        placeholder={isRecording ? "Recording audio..." : "Write your message..."}
-                                        className={`w-full px-4 py-2 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-300 transition-all font-mono text-[11px] shadow-inner placeholder:text-slate-300 ${isRecording ? 'text-red-500 animate-pulse' : ''}`}
-                                    />
-                                </div>
-
-                                {isTyping ? (
-                                    <button
-                                        type="button"
-                                        onClick={handleStopGeneration}
-                                        className="p-2 rounded-xl bg-red-50 text-red-500 hover:bg-red-500 hover:text-white shadow-md transition-all active:scale-95"
-                                        title="Stop Generation"
+                                <textarea 
+                                    value={inputValue}
+                                    onChange={(e) => setInputValue(e.target.value)}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter' && !e.shiftKey) {
+                                            e.preventDefault();
+                                            handleSendMessage(e);
+                                        }
+                                    }}
+                                    placeholder={isRecording ? "Recording audio..." : "Ask anything"}
+                                    className={`w-full resize-none outline-none text-[15px] text-slate-700 bg-transparent px-4 py-4 min-h-[60px] ${isRecording ? 'text-red-500 animate-pulse' : ''}`}
+                                    rows={1}
+                                />
+                                <div className="flex items-center justify-between px-3 pb-3 mt-auto">
+                                    <button 
+                                        type="button" 
+                                        onClick={() => fileInputRef.current.click()}
+                                        className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-xl transition-colors"
                                     >
-                                        <Square size={16} fill="currentColor" />
+                                        <Plus size={20} />
                                     </button>
-                                ) : (
-                                    <>
-                                        <button
+                                    <div className="flex items-center gap-2">
+                                        <button 
                                             type="button"
                                             onClick={() => setIsRecording(!isRecording)}
-                                            className={`p-2 rounded-xl shadow-md border-none transition-all active:scale-95 ${isRecording ? 'bg-red-500 text-white animate-bounce' : 'bg-white border border-gray-100 text-slate-400 hover:text-blue-500'}`}
+                                            className={`p-2 rounded-xl transition-colors ${isRecording ? 'bg-red-500 text-white animate-bounce' : 'text-slate-400 hover:text-slate-600 hover:bg-slate-100'}`}
+                                            title="Voice Input"
                                         >
-                                            <Mic size={16} />
+                                            <Mic size={20} />
                                         </button>
-
-                                        <button
-                                            type="submit"
-                                            disabled={!inputValue.trim() && !attachedFile}
-                                            className="p-2 rounded-xl text-white shadow-md border-none disabled:bg-slate-200 disabled:shadow-none transition-all active:scale-95"
-                                            style={inputValue.trim() || attachedFile ? { backgroundColor: topBarColor } : {}}
-                                        >
-                                            <Send size={16} />
-                                        </button>
-                                    </>
-                                )}
+                                        {isTyping ? (
+                                            <button 
+                                                type="button"
+                                                onClick={handleStopGeneration}
+                                                className="px-4 py-1.5 bg-red-500 text-white text-[13px] font-bold rounded-xl hover:bg-red-600 transition-colors animate-in fade-in zoom-in-95 flex items-center gap-1"
+                                            >
+                                                <Square size={12} fill="currentColor" /> Stop
+                                            </button>
+                                        ) : (inputValue.trim() || attachedFile) ? (
+                                            <button 
+                                                type="submit"
+                                                className="px-4 py-1.5 bg-indigo-600 text-white text-[13px] font-bold rounded-xl hover:bg-indigo-700 transition-colors animate-in fade-in zoom-in-95"
+                                            >
+                                                Send
+                                            </button>
+                                        ) : null}
+                                    </div>
+                                </div>
                             </form>
                         </div>
+                        
+                        <div className="max-w-[700px] mx-auto text-center mt-3">
+                            <p className="text-[11px] text-slate-400 font-medium">
+                                Onimta Intelligence can make mistakes. Onimta protects privacy and adheres to responsible AI principles. <button type="button" onClick={() => setShowAIInfoModal(true)} className="text-[#0077c5] hover:underline cursor-pointer">How we use AI.</button>
+                            </p>
+                        </div>
                     </div>
+
                 </div>
             </div>
 
-            <style>{`
-                .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-                .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-                .custom-scrollbar::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; transition: background 0.3s; }
-                .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #cbd5e1; }
-                @keyframes aiRing { 0% { transform: scale(1); opacity: 0.7; } 70% { transform: scale(1.8); opacity: 0; } 100% { transform: scale(1.8); opacity: 0; } }
-                @keyframes userRing { 0% { transform: scale(1); opacity: 0.5; } 70% { transform: scale(1.8); opacity: 0; } 100% { transform: scale(1.8); opacity: 0; } }
-                @keyframes iconBob { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-2px); } }
-                @keyframes iconPop { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
-            `}</style>
-        </>
+            <HowWeUseAIModal isOpen={showAIInfoModal} onClose={() => setShowAIInfoModal(false)} />
+        </div>
     );
 };
 

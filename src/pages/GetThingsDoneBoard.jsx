@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
+import SystemLoader from '../components/SystemLoader';
 import {
   Check,
   X,
@@ -1217,23 +1218,7 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
             </div>
           )}
 
-          {loading && (
-            // <div className="fixed inset-0 z-[10010] flex items-center justify-center bg-slate-900/10 backdrop-blur-sm">
-            //   <div className="bg-white px-8 py-5 rounded-2xl shadow-2xl border border-slate-100 flex flex-col items-center gap-3">
-            //     <Loader2 size={32} className="animate-spin text-[#0078d4]" />
-            //     <span className="text-[14px] font-extrabold text-slate-800 tracking-tight">Loading your data...</span>
-            //   </div>
-            // </div>
-            <div className="fixed inset-0 z-[10010] flex items-center justify-center bg-slate-900/10 backdrop-blur-sm">
-              <div className="w-40 h-40">
-                <DotLottiePlayer
-                  src="/lottiefile/DashboardLoader.lottie"
-                  autoplay
-                  loop
-                />
-              </div>
-            </div>
-          )}
+          {loading && <SystemLoader />}
 
           {isPrivacyMode ? (
             <div className="relative mt-6 min-h-[500px]">

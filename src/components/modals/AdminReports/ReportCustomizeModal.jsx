@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { X, ChevronDown, ChevronUp } from 'lucide-react';
 
-const ReportCustomizeModal = ({ isOpen, onClose, customizations, onApply }) => {
+const ReportCustomizeModal = ({ isOpen, onClose, customizations, onApply, columns = [] }) => {
     const [localState, setLocalState] = React.useState(customizations || {});
     
     React.useEffect(() => {
@@ -11,7 +11,30 @@ const ReportCustomizeModal = ({ isOpen, onClose, customizations, onApply }) => {
     }, [isOpen, customizations]);
 
     const updateState = (key, value) => {
-        setLocalState(prev => ({ ...prev, [key]: value }));
+        setLocalState(prev => {
+            const newState = { ...prev, [key]: value };
+            if (onApply) onApply(newState);
+            return newState;
+        });
+    };
+
+    const addFilter = () => {
+        const currentFilters = localState.filters || [];
+        updateState('filters', [...currentFilters, { id: Date.now(), column: '', condition: 'Equals', value: '' }]);
+    };
+
+    const updateFilter = (id, key, value) => {
+        const currentFilters = localState.filters || [];
+        updateState('filters', currentFilters.map(f => f.id === id ? { ...f, [key]: value } : f));
+    };
+
+    const removeFilter = (id) => {
+        const currentFilters = localState.filters || [];
+        updateState('filters', currentFilters.filter(f => f.id !== id));
+    };
+
+    const clearFilters = () => {
+        updateState('filters', []);
     };
     const [activeTab, setActiveTab] = useState('data');
     const [expandedSections, setExpandedSections] = useState({
@@ -33,8 +56,8 @@ const ReportCustomizeModal = ({ isOpen, onClose, customizations, onApply }) => {
     };
 
     return (
-        <div className="fixed inset-0 z-[600] flex justify-end bg-black/40 backdrop-blur-sm">
-            <div className="w-[450px] bg-white h-full shadow-2xl flex flex-col animate-in slide-in-from-right duration-300">
+        <div className="fixed inset-0 z-[600] flex justify-end pointer-events-none">
+            <div className="w-[450px] bg-white h-full shadow-2xl flex flex-col animate-in slide-in-from-right duration-300 pointer-events-auto">
                 
                 {/* Header */}
                 <div className="px-6 py-4 flex justify-between items-center border-b border-gray-200 shrink-0">
@@ -75,31 +98,58 @@ const ReportCustomizeModal = ({ isOpen, onClose, customizations, onApply }) => {
                                     <div className="p-4 border-t border-gray-200">
                                         <div className="flex justify-between items-center mb-4">
                                             <p className="text-[12px] text-gray-600">Select how you want to filter your data.</p>
-                                            <button className="text-[#0077c5] text-[12px] font-bold hover:underline">Clear all</button>
+                                            <button onClick={clearFilters} className="text-[#0077c5] text-[12px] font-bold hover:underline">Clear all</button>
                                         </div>
                                         
-                                        <div className="space-y-3">
-                                            <div>
-                                                <label className="block text-[11px] text-gray-500 mb-1">Filter by</label>
-                                                <div className="flex items-center gap-2">
-                                                    <select className="flex-1 h-9 border border-gray-300 rounded px-2 text-[13px] text-gray-700 outline-none focus:border-[#0077c5]">
-                                                        <option>Select one</option>
-                                                    </select>
-                                                    <button className="text-gray-400 hover:text-gray-600"><X size={16} className="bg-gray-100 rounded-full p-0.5 border border-gray-300" /></button>
+                                        <div className="space-y-4">
+                                            {(localState.filters || []).map((filter, index) => (
+                                                <div key={filter.id} className="p-3 bg-gray-50 border border-gray-200 rounded relative group">
+                                                    <button onClick={() => removeFilter(filter.id)} className="absolute top-2 right-2 text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                        <X size={14} />
+                                                    </button>
+                                                    <div className="space-y-2">
+                                                        <div>
+                                                            <label className="block text-[11px] text-gray-500 mb-1">Filter by</label>
+                                                            <select 
+                                                                value={filter.column} 
+                                                                onChange={(e) => updateFilter(filter.id, 'column', e.target.value)}
+                                                                className="w-[calc(100%-24px)] h-8 border border-gray-300 rounded px-2 text-[13px] text-gray-700 outline-none focus:border-[#0077c5]"
+                                                            >
+                                                                <option value="">Select a column</option>
+                                                                {columns.map(col => (
+                                                                    <option key={col.accessor || col.header} value={col.accessor || col.header}>{col.header}</option>
+                                                                ))}
+                                                            </select>
+                                                        </div>
+                                                        <div>
+                                                            <label className="block text-[11px] text-gray-500 mb-1">Condition</label>
+                                                            <select 
+                                                                value={filter.condition}
+                                                                onChange={(e) => updateFilter(filter.id, 'condition', e.target.value)}
+                                                                className="w-[calc(100%-24px)] h-8 border border-gray-300 rounded px-2 text-[13px] text-gray-700 outline-none focus:border-[#0077c5]"
+                                                            >
+                                                                <option value="Equals">Equals</option>
+                                                                <option value="Not Equals">Not Equals</option>
+                                                                <option value="Contains">Contains</option>
+                                                                <option value="Greater Than">Greater Than</option>
+                                                                <option value="Less Than">Less Than</option>
+                                                            </select>
+                                                        </div>
+                                                        <div>
+                                                            <label className="block text-[11px] text-gray-500 mb-1">Value</label>
+                                                            <input 
+                                                                type="text" 
+                                                                placeholder="Enter value" 
+                                                                value={filter.value}
+                                                                onChange={(e) => updateFilter(filter.id, 'value', e.target.value)}
+                                                                className="w-[calc(100%-24px)] h-8 border border-gray-300 rounded px-2 text-[13px] text-gray-700 outline-none focus:border-[#0077c5]" 
+                                                            />
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <div>
-                                                <label className="block text-[11px] text-gray-500 mb-1">Condition</label>
-                                                <select className="w-[calc(100%-24px)] h-9 border border-gray-300 rounded px-2 text-[13px] text-gray-700 outline-none focus:border-[#0077c5]">
-                                                    <option>Select one</option>
-                                                </select>
-                                            </div>
-                                            <div>
-                                                <label className="block text-[11px] text-gray-500 mb-1">Value</label>
-                                                <input type="text" placeholder="Enter the text" className="w-[calc(100%-24px)] h-9 border border-gray-300 rounded px-3 text-[13px] text-gray-700 outline-none focus:border-[#0077c5]" />
-                                            </div>
+                                            ))}
                                             
-                                            <button className="text-[#0077c5] text-[12px] font-bold hover:underline mt-2 flex items-center">
+                                            <button onClick={addFilter} className="text-[#0077c5] text-[12px] font-bold hover:underline mt-2 flex items-center">
                                                 + Add another filter
                                             </button>
                                         </div>
@@ -157,15 +207,15 @@ const ReportCustomizeModal = ({ isOpen, onClose, customizations, onApply }) => {
                                             <label className="block text-[12px] font-bold text-gray-800 mb-2">Show rows</label>
                                             <div className="flex gap-6">
                                                 <label className="flex items-center gap-2 cursor-pointer">
-                                                    <input type="radio" name="showRows" className="w-4 h-4 text-[#0077c5] border-gray-300 focus:ring-[#0077c5]" defaultChecked />
+                                                    <input type="radio" name="showRows" checked={localState.showRows === 'active' || !localState.showRows} onChange={() => updateState('showRows', 'active')} className="w-4 h-4 text-[#0077c5] border-gray-300 focus:ring-[#0077c5]" />
                                                     <span className="text-[13px] text-gray-600">Active</span>
                                                 </label>
                                                 <label className="flex items-center gap-2 cursor-pointer">
-                                                    <input type="radio" name="showRows" className="w-4 h-4 text-[#0077c5] border-gray-300 focus:ring-[#0077c5]" />
+                                                    <input type="radio" name="showRows" checked={localState.showRows === 'all'} onChange={() => updateState('showRows', 'all')} className="w-4 h-4 text-[#0077c5] border-gray-300 focus:ring-[#0077c5]" />
                                                     <span className="text-[13px] text-gray-600">All</span>
                                                 </label>
                                                 <label className="flex items-center gap-2 cursor-pointer">
-                                                    <input type="radio" name="showRows" className="w-4 h-4 text-[#0077c5] border-gray-300 focus:ring-[#0077c5]" />
+                                                    <input type="radio" name="showRows" checked={localState.showRows === 'nonzero'} onChange={() => updateState('showRows', 'nonzero')} className="w-4 h-4 text-[#0077c5] border-gray-300 focus:ring-[#0077c5]" />
                                                     <span className="text-[13px] text-gray-600">Non-zero</span>
                                                 </label>
                                             </div>
@@ -174,15 +224,15 @@ const ReportCustomizeModal = ({ isOpen, onClose, customizations, onApply }) => {
                                             <label className="block text-[12px] font-bold text-gray-800 mb-2">Show columns</label>
                                             <div className="flex gap-6">
                                                 <label className="flex items-center gap-2 cursor-pointer">
-                                                    <input type="radio" name="showCols" className="w-4 h-4 text-[#0077c5] border-gray-300 focus:ring-[#0077c5]" defaultChecked />
+                                                    <input type="radio" name="showCols" checked={localState.showCols === 'active' || !localState.showCols} onChange={() => updateState('showCols', 'active')} className="w-4 h-4 text-[#0077c5] border-gray-300 focus:ring-[#0077c5]" />
                                                     <span className="text-[13px] text-gray-600">Active</span>
                                                 </label>
                                                 <label className="flex items-center gap-2 cursor-pointer">
-                                                    <input type="radio" name="showCols" className="w-4 h-4 text-[#0077c5] border-gray-300 focus:ring-[#0077c5]" />
+                                                    <input type="radio" name="showCols" checked={localState.showCols === 'all'} onChange={() => updateState('showCols', 'all')} className="w-4 h-4 text-[#0077c5] border-gray-300 focus:ring-[#0077c5]" />
                                                     <span className="text-[13px] text-gray-600">All</span>
                                                 </label>
                                                 <label className="flex items-center gap-2 cursor-pointer">
-                                                    <input type="radio" name="showCols" className="w-4 h-4 text-[#0077c5] border-gray-300 focus:ring-[#0077c5]" />
+                                                    <input type="radio" name="showCols" checked={localState.showCols === 'nonzero'} onChange={() => updateState('showCols', 'nonzero')} className="w-4 h-4 text-[#0077c5] border-gray-300 focus:ring-[#0077c5]" />
                                                     <span className="text-[13px] text-gray-600">Non-zero</span>
                                                 </label>
                                             </div>
@@ -308,11 +358,9 @@ const ReportCustomizeModal = ({ isOpen, onClose, customizations, onApply }) => {
                 {/* Footer */}
                 <div className="p-4 bg-[#f4f5f8] border-t border-gray-200 flex justify-between items-center shrink-0">
                     <button onClick={onClose} className="px-6 py-2.5 text-[14px] font-bold text-[#0077c5] hover:bg-[#eef6fc] rounded-full transition-colors">
-                        Cancel
+                        Close
                     </button>
-                    <button onClick={() => { if(onApply) onApply(localState); onClose(); }} className="px-6 py-2.5 text-[14px] font-bold bg-[#0077c5] text-white hover:bg-[#005ca6] transition-colors shadow-sm">
-                        Apply changes
-                    </button>
+                    {/* The Apply button is removed since changes now apply automatically */}
                 </div>
             </div>
         </div>
