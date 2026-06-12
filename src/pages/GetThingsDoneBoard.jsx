@@ -1399,11 +1399,8 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
                     onRemove={() => setSelectedWidgets(prev => ({ ...prev, add_widgets: false }))}
                   >
                     <div 
-                      className="bg-[#f8fafc] rounded-lg min-h-[240px] flex flex-col items-center justify-center h-full overflow-hidden cursor-pointer hover:bg-blue-50/50 transition-colors"
+                      className="bg-[#f8fafc] rounded-lg min-h-[240px] flex flex-col items-center justify-center h-full overflow-hidden cursor-pointer hover:bg-blue-50/50 transition-colors border-2 border-dashed border-[#0078d4]/50"
                       onClick={() => setIsAddWidgetsOpen(true)}
-                      style={{
-                        backgroundImage: `url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' rx='8' ry='8' stroke='%230078d4' stroke-width='1.5' stroke-dasharray='6%2c 10' stroke-dashoffset='0' stroke-linecap='square'/%3e%3c/svg%3e")`,
-                      }}
                     >
                       <span className="text-[15px] font-bold text-[#0078d4] mb-6">View Widgets</span>
                       
