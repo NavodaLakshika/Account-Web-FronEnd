@@ -6,7 +6,7 @@ import * as XLSX from 'xlsx';
 import CalendarModal from '../components/CalendarModal';
 import { grnService } from '../services/grn.service';
 import { paymentMethodService } from '../services/paymentMethod.service';
-
+import { reportService } from '../services/report.service';
 
 import FeatureLockedModal from '../components/modals/FeatureLockedModal';
 import { getSessionData } from '../utils/session';
@@ -243,26 +243,22 @@ const GRNBoard = ({ isOpen, onClose }) => {
         } catch (error) { showErrorToast('Failed to fetch PO details.'); }
     };
 
-    const downloadExcelTemplate = () => {
-        const template = [
-            { 
-                'Supplier Code': '', 
-                'Supplier Invoice': '',
-                'PO Number' :'',
-                'Payment Method': '',
-                'Comment': '',
-                'Product Code': '', 
-                'Qty': '', 
-                'Free Qty': '', 
-                'Purchase Price': '', 
-                'Selling Price': '' 
-            },
-        ];
-        const ws = XLSX.utils.json_to_sheet(template);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "GRN_Template");
-        XLSX.writeFile(wb, "GRN_Full_Template.xlsx");
-        showSuccessToast("Premium template downloaded. You can now import header data too!");
+    const downloadExcelTemplate = async () => {
+        try {
+            const template = [{
+                'Supplier Code': '', 'Supplier Invoice': '', 'PO Number': '', 'Payment Method': '', 'Comment': '',
+                'Product Code': '', 'Product Name': '', 'Unit': '', 'Pack Size': '', 'Category': '', 'Department': '',
+                'Available Stock': '', 'Purchase Price': '', 'Selling Price': '', 'Qty': '', 'Free Qty': ''
+            }];
+
+            const ws = XLSX.utils.json_to_sheet(template);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "GRN_Template");
+            XLSX.writeFile(wb, "GRN_Full_Template.xlsx");
+            showSuccessToast("Template downloaded. You can now import header data too!");
+        } catch (error) {
+            showErrorToast("Failed to generate template.");
+        }
     };
 
     const handleExcelUpload = (e) => {
@@ -307,6 +303,7 @@ const GRNBoard = ({ isOpen, onClose }) => {
                     const pCode = row['Product Code'] || row['prodCode'] || row['Item Code'];
                     if (!pCode) { skipCount++; return; }
 
+                    const pName = row['Product Name'] || row['prodName'] || row['Item Name'] || '';
                     const prod = lookups.products.find(p => p.code?.trim().toUpperCase() === pCode.toString().trim().toUpperCase());
                     
                     const qty = parseFloat(row['Qty'] || row['Quantity'] || 0);
@@ -316,7 +313,7 @@ const GRNBoard = ({ isOpen, onClose }) => {
 
                     importedProducts.push({
                         prodCode: pCode.toString().trim(),
-                        prodName: prod ? prod.name : 'Unknown Product',
+                        prodName: prod ? prod.name : (pName || 'Unknown Product'),
                         unit: prod ? prod.unit : 'Nos',
                         packSize: prod ? prod.packSize : 1,
                         qty: qty.toString(),

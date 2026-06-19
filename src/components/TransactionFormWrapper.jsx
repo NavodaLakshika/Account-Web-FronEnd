@@ -5,7 +5,7 @@ const TransactionFormWrapper = ({ isOpen, onClose, title, subtitle, icon: Icon, 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[300] flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-[500] flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-slate-900/30 backdrop-blur-sm" onClick={onClose} />
 
  <div className={`relative w-full ${maxWidth} bg-white rounded-none shadow-2xl overflow-hidden animate-in slide-in-from-bottom-10 fade-in duration-400 flex flex-col max-h-[95vh]`}>

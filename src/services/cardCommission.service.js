@@ -28,9 +28,9 @@ export const cardCommissionService = {
     }
   },
 
-  async getRate(bankCode, cardId) {
+  async getRate(bankCode, cardId, company) {
     try {
-      const response = await api.get('/rate', { params: { bankCode, cardId } });
+      const response = await api.get('/rate', { params: { bankCode, cardId, company } });
       return response.data;
     } catch (error) {
       throw error.response?.data || 'Failed to fetch rate';

@@ -860,8 +860,8 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
                                         return code.includes(q) || name.includes(q);
                                     }).map((c, i) => (
                                         <tr key={i} className="group hover:bg-blue-50/50 cursor-pointer transition-colors" onClick={() => { setFormData(prev => ({ ...prev, costCenter: c.CostCenterCode || c.costCenterCode || c.Code || c.code })); setShowCostCenterSearch(false); }}>
-                                            <td className="px-5 py-3 font-mono text-[12px] text-gray-700">{c.CostCenterCode || c.costCenterCode || c.Code || c.code}</td>
-                                            <td className="px-5 py-3 text-[12px] font-bold text-gray-700 uppercase group-hover:text-blue-600">{c.CostCenterName || c.costCenterName || c.Name || c.name}</td>
+                                            <td className="px-5 py-3 font-mono text-[10px] text-gray-700">{c.CostCenterCode || c.costCenterCode || c.Code || c.code}</td>
+                                            <td className="px-5 py-3 text-[10px] font-bold text-gray-700 uppercase group-hover:text-blue-600">{c.CostCenterName || c.costCenterName || c.Name || c.name}</td>
                                             <td className="px-5 py-3 text-right"><button className="bg-[#e49e1b] text-white text-[9px] px-4 py-1.5 rounded-[5px] font-mono font-bold uppercase tracking-widest hover:bg-[#cb9b34] transition-all active:scale-95">SELECT</button></td>
                                         </tr>
                                     ))}

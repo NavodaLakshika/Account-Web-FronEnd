@@ -88,9 +88,8 @@ const UserProfileBoard = ({ isOpen, onClose }) => {
                 isOpen={isOpen}
                 onClose={onClose}
                 title="User Profile Maintenance"
-                subtitle="Manage system user accounts & access"
                 icon={User}
-                maxWidth="max-w-[600px]"
+                maxWidth="max-w-[800px]"
                 isEditMode={isEditing}
                 loading={saving}
                 onClear={handleClear}
@@ -113,31 +112,31 @@ const UserProfileBoard = ({ isOpen, onClose }) => {
                     </div>
                 }
             >
-                <MasterFieldRow label="User Code" colSpan="col-span-12">
+                <MasterFieldRow label="User Code" colSpan="col-span-6">
                     <div className="flex-1 flex gap-1 min-w-0 items-center">
                         <div className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-sm font-mono font-bold text-[#0285fd] bg-slate-50 rounded outline-none flex items-center">{fetching ? 'LOADING...' : (emp_Code || '')}</div>
                         <button onClick={() => setShowSearchModal(true)} className="w-8 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0"><Search size={14} /></button>
                     </div>
                 </MasterFieldRow>
-                <MasterFieldRow label="User Name" colSpan="col-span-12">
+                <MasterFieldRow label="User Name" colSpan="col-span-6">
                     <MasterInput name="emp_Name" value={emp_Name} onChange={(e) => setEmp_Name(e.target.value)} placeholder="Enter user name" className="uppercase" />
                 </MasterFieldRow>
-                <MasterFieldRow label="Member Group" colSpan="col-span-12">
-                    <div className="flex-1 flex gap-1 min-w-0 items-center">
-                        <input type="text" value={member_Id} readOnly className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-sm font-mono font-bold text-gray-700 bg-slate-50 rounded outline-none cursor-default" />
-                        <button onClick={() => setShowGroupModal(true)} className="w-8 h-8 bg-[#e49e1b] text-white flex items-center justify-center hover:bg-[#cb9b34] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0"><Users size={14} /></button>
-                    </div>
-                </MasterFieldRow>
-                <MasterFieldRow label="Password" colSpan="col-span-12">
+                <MasterFieldRow label="Password" colSpan="col-span-6">
                     <div className="flex-1 flex gap-1 min-w-0 items-center">
                         <input type={showPassword ? "text" : "password"} value={pass_Word} onChange={(e) => setPass_Word(e.target.value)} className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-sm font-mono font-bold text-slate-700 bg-slate-50 rounded outline-none focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 transition-all" placeholder="Enter password" />
                         <button onClick={() => setShowPassword(!showPassword)} className="w-8 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">{showPassword ? <EyeOff size={14} /> : <Eye size={14} />}</button>
                     </div>
                 </MasterFieldRow>
-                <MasterFieldRow label="Confirm Pwd" colSpan="col-span-12">
+                <MasterFieldRow label="Confirm Pwd" colSpan="col-span-6">
                     <input type={showPassword ? "text" : "password"} value={conpass_Word} onChange={(e) => setConpass_Word(e.target.value)} className={`flex-1 min-w-0 h-8 border border-slate-200 px-3 text-sm font-mono font-bold text-slate-700 bg-slate-50 rounded outline-none focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 transition-all ${conpass_Word && pass_Word === conpass_Word ? 'border-green-400 bg-green-50/20' : ''}`} placeholder="Confirm password" />
                 </MasterFieldRow>
-                <MasterFieldRow label="Expiry Date" colSpan="col-span-12">
+                <MasterFieldRow label="Member Group" colSpan="col-span-6">
+                    <div className="flex-1 flex gap-1 min-w-0 items-center">
+                        <input type="text" value={member_Id} readOnly className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-sm font-mono font-bold text-gray-700 bg-slate-50 rounded outline-none cursor-default" />
+                        <button onClick={() => setShowGroupModal(true)} className="w-8 h-8 bg-[#e49e1b] text-white flex items-center justify-center hover:bg-[#cb9b34] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0"><Users size={14} /></button>
+                    </div>
+                </MasterFieldRow>
+                <MasterFieldRow label="Expiry Date" colSpan="col-span-6">
                     <div className="flex-1 flex gap-1 min-w-0 items-center">
                         <input type="text" value={exp_Date} readOnly onClick={() => setShowCalendar(true)} className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-sm font-mono font-bold text-gray-700 bg-slate-50 rounded outline-none cursor-pointer transition-all" placeholder="Select date..." />
                         <button onClick={() => setShowCalendar(true)} className="w-8 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0"><Calendar size={14} /></button>

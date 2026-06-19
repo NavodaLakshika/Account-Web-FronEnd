@@ -4,6 +4,7 @@ import { Search, RotateCcw, Save, Loader2, X, Calendar, DollarSign, User, PlusCi
 import { fixedExpensesService } from '../../../services/fixedExpenses.service';
 import { showSuccessToast, showErrorToast } from '../../../utils/toastUtils';
 import CalendarModal from '../../CalendarModal';
+import { getCompanyCode } from '../../../utils/session';
 
 const FixedExpensesBoard = ({ isOpen, onClose }) => {
     const initialState = {
@@ -31,12 +32,12 @@ const FixedExpensesBoard = ({ isOpen, onClose }) => {
     useEffect(() => {
         if (isOpen) {
             const user = JSON.parse(localStorage.getItem('user'));
-            const company = localStorage.getItem('companyCode') || 'C001';
+            const company = getCompanyCode() || '';
             
             setFormData(prev => ({ 
                 ...prev, 
                 Company: company,
-                CreateUser: user?.emp_Name || user?.empName || 'SYSTEM'
+                CreateUser: user?.emp_Name || user?.empName || ''
             }));
 
             fetchLookups();
@@ -70,11 +71,11 @@ const FixedExpensesBoard = ({ isOpen, onClose }) => {
 
     const handleClear = () => {
         const user = JSON.parse(localStorage.getItem('user'));
-        const company = localStorage.getItem('companyCode') || 'C001';
+        const company = getCompanyCode() || '';
         setFormData({
             ...initialState,
             Company: company,
-            CreateUser: user?.emp_Name || user?.empName || 'SYSTEM'
+            CreateUser: user?.emp_Name || user?.empName || ''
         });
     };
 
@@ -181,17 +182,20 @@ const FixedExpensesBoard = ({ isOpen, onClose }) => {
 
                             {/* Vendor Name */}
                             <div className="space-y-1.5">
-                                <label className="text-[11px] font-bold text-gray-500 uppercase tracking-widest flex items-center gap-2">
+                                <label className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">
                                     Vendor Name
                                 </label>
-                                <input 
-                                    name="Vendor"
-                                    value={formData.Vendor}
-                                    onChange={handleInputChange}
-                                    type="text"
-                                    placeholder=""
-                                    className="w-full h-8 border border-slate-200 rounded px-3 text-[12px] font-bold outline-none shadow-sm transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 text-gray-700 bg-white"
-                                />
+                                <div className="flex gap-1">
+                                    <input 
+                                        name="Vendor"
+                                        value={formData.Vendor}
+                                        onChange={handleInputChange}
+                                        type="text"
+                                        placeholder=""
+                                        className="flex-1 min-w-0 h-8 border border-slate-200 rounded px-3 text-[12px] font-bold outline-none shadow-sm transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 text-gray-700 bg-white"
+                                    />
+                                    <div className="w-9 h-8 shrink-0"></div>
+                                </div>
                             </div>
 
                             {/* Debit Date */}
@@ -331,34 +335,36 @@ const FixedExpensesBoard = ({ isOpen, onClose }) => {
                                 onChange={(e) => setSearchTerm(e.target.value)} 
                             />
                         </div>
-                        <div className="p-0">
-                            <table className="w-full text-left border-collapse">
-                                <thead className="bg-slate-50 sticky top-0 text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-slate-200 z-10">
-                                    <tr>
-                                        <th className="px-5 py-3 w-32">Account Code</th>
-                                        <th className="px-5 py-3">Account Name</th>
-                                        <th className="px-5 py-3 text-right">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-slate-100 max-h-[400px] overflow-y-auto custom-scrollbar block" style={{ maxHeight: '400px' }}>
-                                    {lookups.filter(a => 
-                                        (a.name || '').toLowerCase().includes(searchTerm.toLowerCase()) || 
-                                        (a.code || '').toLowerCase().includes(searchTerm.toLowerCase())
-                                    ).map((acc, idx) => (
-                                        <tr 
-                                            key={idx} 
-                                            onClick={() => handleAccountSelect(acc)}
-                                            className="group hover:bg-slate-50 cursor-pointer transition-colors flex w-full table-fixed"
-                                        >
-                                            <td className="px-5 py-3 w-32 font-mono text-[12px] font-bold text-slate-500">{acc.code}</td>
-                                            <td className="px-5 py-3 flex-1 text-[12px] font-bold text-slate-700 uppercase group-hover:text-[#ff3b30] transition-colors">{acc.name}</td>
-                                            <td className="px-5 py-3 text-right">
-                                                <button className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded font-bold hover:bg-[#cb9b34] shadow-sm transition-all active:scale-95 uppercase tracking-widest border-none">Select</button>
-                                            </td>
+                        <div className="border border-gray-100 overflow-hidden bg-white">
+                            <div className="max-h-[400px] overflow-y-auto custom-scrollbar">
+                                <table className="w-full text-left border-collapse">
+                                    <thead className="bg-slate-50 sticky top-0 text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-slate-200 z-10">
+                                        <tr>
+                                            <th className="px-5 py-3 w-32">Account Code</th>
+                                            <th className="px-5 py-3">Account Name</th>
+                                            <th className="px-5 py-3 text-right">Action</th>
                                         </tr>
-                                    ))}
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody className="divide-y divide-slate-100">
+                                        {lookups.filter(a => 
+                                            (a.name || '').toLowerCase().includes(searchTerm.toLowerCase()) || 
+                                            (a.code || '').toLowerCase().includes(searchTerm.toLowerCase())
+                                        ).map((acc, idx) => (
+                                            <tr 
+                                                key={idx} 
+                                                onClick={() => handleAccountSelect(acc)}
+                                                className="group hover:bg-slate-50 cursor-pointer transition-colors"
+                                            >
+                                                <td className="px-5 py-3 w-32 font-mono text-[12px] font-bold text-slate-500">{acc.code}</td>
+                                                <td className="px-5 py-3 flex-1 text-[12px] font-bold text-slate-700 uppercase group-hover:text-[#ff3b30] transition-colors">{acc.name}</td>
+                                                <td className="px-5 py-3 text-right">
+                                                    <button className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded font-bold hover:bg-[#cb9b34] shadow-sm transition-all active:scale-95 uppercase tracking-widest border-none">Select</button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -380,12 +386,7 @@ const FixedExpensesBoard = ({ isOpen, onClose }) => {
                             </button>
                         </div>
                         <div className="p-4 space-y-2">
-                            {(payTypes.length > 0 ? payTypes : [
-                                { code: 'CASH', name: 'CASH' },
-                                { code: 'CHQ', name: 'CHEQUE' },
-                                { code: 'CC', name: 'CREDIT CARD' },
-                                { code: 'BT', name: 'BANK TRANSFER' }
-                            ]).map((pay, idx) => (
+                            {payTypes.map((pay, idx) => (
                                 <button 
                                     key={idx} 
                                     onClick={() => handlePayTypeSelect(pay)}

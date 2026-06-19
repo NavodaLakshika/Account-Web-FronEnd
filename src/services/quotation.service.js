@@ -49,6 +49,11 @@ export const quotationService = {
     return response.data;
 },
 
+    getAppliedDoc: async (docNo, company) => {
+        const response = await api.get(`/applied/${docNo}`, { params: { company } });
+        return response.data;
+    },
+
     delete: async (docNo, company) => {
         const response = await api.delete(`/${docNo}`, { params: { company } });
         return response.data;

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useRef, createContext, useContext } from 'react';
 import SystemLoader from '../components/SystemLoader';
 import {
   Check,
@@ -53,6 +53,7 @@ import {
   Megaphone,
   Truck,
   Bot,
+  Coffee,
 } from 'lucide-react';
 import { expensesService } from '../services/expenses.service';
 import { biDashboardService } from '../services/biDashboard.service';
@@ -588,9 +589,17 @@ const AddWidgetsPanel = ({ isOpen, onClose, initialSelected, onSave }) => {
           </div>
         </div>
         <div className="bg-[#f4f5f8] p-4 flex items-center justify-between shrink-0">
-          <button onClick={onClose} className="text-[14px] font-bold text-[#2ca01c] hover:underline px-4 py-2">
-            Cancel
-          </button>
+          <div className="flex items-center gap-1">
+            <button onClick={onClose} className="text-[14px] font-bold text-[#2ca01c] hover:underline px-3 py-2">
+              Cancel
+            </button>
+            <button 
+              onClick={() => setSelected(DEFAULT_WIDGETS)} 
+              className="text-[13px] font-bold text-[#6b6c72] hover:text-[#393a3d] hover:bg-[#eceef1] rounded-md px-3 py-2 transition-colors"
+            >
+              Reset to default
+            </button>
+          </div>
           <button
             disabled={!hasChanges}
             onClick={() => {
@@ -610,76 +619,95 @@ const AddWidgetsPanel = ({ isOpen, onClose, initialSelected, onSave }) => {
   );
 };
 
-const EditWrapper = ({ children, isEditing, grabbers = [], className = '', onRemove }) => {
-  if (!isEditing) return <div className={className}>{children}</div>;
+const EditWrapper = ({ 
+  children, isEditing, grabbers = [], className = '', onRemove,
+  id, order, isDragged, isHovered, onDragStart, onDragEnter, onDragEnd 
+}) => {
+  if (!isEditing) return <div className={className} style={{ order }}>{children}</div>;
+  
   return (
-    <div className={`group relative rounded-2xl ring-[1.5px] ring-blue-500 z-10 transition-all ${className} hover:ring-2 hover:shadow-xl`}>
-      {grabbers.includes('left') && <div className="absolute left-[-5px] top-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-blue-500 z-20 cursor-move" title="Change place" />}
-      {grabbers.includes('right') && <div className="absolute right-[-5px] top-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-blue-500 z-20 cursor-move" title="Change place" />}
-      {grabbers.includes('top') && <div className="absolute top-[-5px] left-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-blue-500 z-20 cursor-move" title="Change place" />}
-      {grabbers.includes('bottom') && <div className="absolute bottom-[-5px] left-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-blue-500 z-20 cursor-move" title="Change place" />}
+    <div 
+      className={`group relative rounded-lg ring-[2.5px] ring-[#108a00] z-10 transition-all duration-200 bg-white ${className} ${isDragged ? 'opacity-40 scale-95 z-50 ring-offset-2 shadow-xl' : ''} ${isHovered && !isDragged ? 'ring-[#0078d4] ring-[3px] scale-[1.02] shadow-xl' : ''}`}
+      style={{ order }}
+      draggable={true}
+      onDragStart={(e) => onDragStart && onDragStart(e, id)}
+      onDragEnter={(e) => onDragEnter && onDragEnter(e, id)}
+      onDragEnd={onDragEnd}
+      onDragOver={(e) => e.preventDefault()}
+    >
+      
+      {/* Grabbers (Left, Right, Top, Bottom) */}
+      {grabbers.includes('left') && <div className="absolute left-[-6px] top-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-[#108a00] z-20 cursor-ew-resize" />}
+      {grabbers.includes('right') && <div className="absolute right-[-6px] top-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-[#108a00] z-20 cursor-ew-resize" />}
+      {grabbers.includes('top') && <div className="absolute top-[-6px] left-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-[#108a00] z-20 cursor-ns-resize" />}
+      {grabbers.includes('bottom') && <div className="absolute bottom-[-6px] left-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-[#108a00] z-20 cursor-ns-resize" />}
 
-      {onRemove && (
-        <button
-          onClick={onRemove}
-          className="absolute -top-3 -right-3 w-6 h-6 bg-white border border-slate-200 rounded-full flex items-center justify-center text-rose-500 shadow-md hover:bg-rose-550 hover:text-white hover:border-rose-550 transition-colors z-30 opacity-0 group-hover:opacity-100"
-          title="Delete widget"
-        >
-          <X size={28} strokeWidth={1.5} />
-        </button>
-      )}
+      {/* The widget content (faded out) */}
+      <div className="opacity-[0.4] pointer-events-none select-none transition-opacity duration-200 h-full group-hover:opacity-[0.25]">
+        {children}
+      </div>
 
-      {onRemove && (
-        <div
-          className="absolute bottom-[-2px] right-[-2px] w-4 h-4 cursor-se-resize z-30 opacity-0 group-hover:opacity-100 flex items-end justify-end p-0.5"
-          title="Change size"
-        >
-          <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="#2ca01c" strokeWidth="1.5">
-            <path d="M9 1L9 9L1 9" />
+      {/* Hover Overlay Controls */}
+      <div className="absolute inset-0 z-30 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none gap-2">
+        <div className="bg-[#108a00] rounded-full w-[64px] h-[64px] flex items-center justify-center cursor-move shadow-md pointer-events-auto">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="5 9 2 12 5 15"/>
+            <polyline points="9 5 12 2 15 5"/>
+            <polyline points="19 9 22 12 19 15"/>
+            <polyline points="9 19 12 22 15 19"/>
+            <line x1="2" y1="12" x2="22" y2="12"/>
+            <line x1="12" y1="2" x2="12" y2="22"/>
           </svg>
         </div>
-      )}
-
-      <div className="opacity-45 pointer-events-none select-none transition-opacity h-full">
-        {children}
+        {onRemove && (
+          <button 
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onRemove();
+            }}
+            className="bg-[#108a00] rounded-full w-[44px] h-[44px] flex items-center justify-center hover:bg-[#0c6b00] transition-colors shadow-md pointer-events-auto"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="3 6 5 6 21 6"/>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+            </svg>
+          </button>
+        )}
       </div>
     </div>
   );
 };
 
-/** QBO-style widget: white card + optional full-width footer button */
+/** Clean widget style */
 const WidgetShell = ({ title, subtitle, children, footerButtonLabel, onFooterButton, onHide }) => (
-  <div className="group relative bg-white rounded-sm shadow-[0_2px_12px_rgba(0,0,0,0.02),0_1px_3px_rgba(0,0,0,0.01)] flex flex-col min-h-[200px] h-full hover:shadow-[0_12px_24px_-8px_rgba(0,0,0,0.06)] hover:border-slate-350/80 transition-all duration-300 ease-out">
-    <div className="p-4 sm:p-4.5 flex-1 flex flex-col min-h-0 relative">
-      <div className="flex justify-between items-start gap-2 mb-1">
-        <span className="text-[9.5px] font-extrabold uppercase tracking-widest text-slate-400">
+  <div className="group relative bg-white border border-slate-200 rounded-lg shadow-sm flex flex-col min-h-[200px] h-full overflow-hidden transition-all duration-300 hover:shadow-md">
+    <div className="p-6 flex-1 flex flex-col min-h-0 relative z-10">
+      <div className="flex justify-between items-start gap-2 mb-2">
+        <span className="text-[12px] font-bold uppercase tracking-wider text-[#6b6c72]">
           {title}
         </span>
-        {onHide ? (
+        {onHide && (
           <button
             onClick={onHide}
-            className="text-[11.5px] font-bold text-blue-600 opacity-0 group-hover:opacity-100 transition-opacity absolute right-4 sm:right-5 top-4 sm:top-5 bg-white z-10 hover:text-blue-800"
+            className="text-[13px] font-bold text-[#108a00] opacity-0 group-hover:opacity-100 transition-opacity absolute right-6 top-6 hover:underline"
           >
             Hide
           </button>
-        ) : (
-          <ChevronDown size={13} className="text-slate-400 shrink-0 mt-0.5" />
         )}
       </div>
-      {subtitle && <p className="text-[13.5px] font-extrabold text-slate-800 leading-snug tracking-tight">{subtitle}</p>}
-      <div className="flex-1 min-h-0 mt-1.5 overflow-hidden">{children}</div>
+      {subtitle && <p className="text-[16px] font-bold text-[#393a3d] leading-snug mb-5">{subtitle}</p>}
+      <div className="flex-1 min-h-0 mt-1 overflow-visible relative z-10">{children}</div>
     </div>
     {footerButtonLabel && (
-      <div className="px-3 pb-3 pt-0 shrink-0">
+      <div className="px-6 pb-6 pt-0 shrink-0 z-10 relative">
         <button
           type="button"
           onClick={onFooterButton}
-          className="relative w-full h-8 rounded-xl border border-slate-200 bg-slate-50/50 text-[11px] font-bold text-slate-650 overflow-hidden transition-all duration-300 hover:border-blue-300 hover:bg-blue-50/50 hover:text-blue-600 hover:shadow-[0_4px_12px_rgba(59,130,246,0.15)] hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] group"
+          className="w-full h-11 rounded-md border border-slate-200 bg-white text-[12.5px] font-bold text-slate-600 hover:bg-slate-50 transition-colors flex items-center justify-center"
         >
-          <span className="relative z-10 flex items-center justify-center">
-            <span className="transition-transform duration-300 group-hover:-translate-x-1">{footerButtonLabel}</span>
-            <span className="absolute right-1/2 translate-x-[110%] opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-[120%] transition-all duration-300 text-blue-500">→</span>
-          </span>
+          {footerButtonLabel}
         </button>
       </div>
     )}
@@ -744,6 +772,57 @@ const SmartSuggestionsHelpModal = ({ isOpen, onClose }) => {
   );
 };
 
+const DragContext = createContext();
+
+const DraggableWidget = ({ id, children, ...props }) => {
+  const { 
+    widgetOrder, draggedWidget, hoveredWidget, 
+    handleDragStart, handleDragEnter, handleDragEnd, 
+    isCustomising, setSelectedWidgets 
+  } = useContext(DragContext);
+  
+  return (
+    <EditWrapper
+      id={id}
+      order={widgetOrder.indexOf(id) !== -1 ? widgetOrder.indexOf(id) : 999}
+      isDragged={draggedWidget === id}
+      isHovered={hoveredWidget === id}
+      onDragStart={handleDragStart}
+      onDragEnter={handleDragEnter}
+      onDragEnd={handleDragEnd}
+      isEditing={isCustomising}
+      onRemove={() => setSelectedWidgets(prev => ({ ...prev, [id]: false }))}
+      {...props}
+    >
+      {children}
+    </EditWrapper>
+  );
+};
+
+const DEFAULT_WIDGETS = {
+  'app_carousel': false,
+  'business_feed': false,
+  'create_actions': false,
+  'bank_accounts': true,
+  'cash_flow': true,
+  'expenses': true,
+  'profit_and_loss': true,
+  'add_widgets': true,
+  'inventory_reports': false,
+  'low_on_stock': false,
+  'invoices': true,
+  'customers_funnel': false,
+  'sales': false,
+  'accounts_payable': false,
+  'accounts_receivable': false,
+  'sales_orders': false,
+  'work_requests': false,
+  'reviews': false,
+  'overdue_invoices': false,
+  'referrals': false,
+  'video_tutorials': false,
+};
+
 const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, isInline = false }) => {
   const [activeTab, setActiveTab] = useState('expenses');
   const [activeGroup, setActiveGroup] = useState('Purchases');
@@ -751,38 +830,26 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
   const [isAddWidgetsOpen, setIsAddWidgetsOpen] = useState(false);
   const [bankPage, setBankPage] = useState(0);
   const [selectedWidgets, setSelectedWidgets] = useState(() => {
-    const defaultWidgets = {
-      'app_carousel': true,
-      'business_feed': true,
-      'create_actions': true,
-      'bank_accounts': true,
-      'cash_flow': true,
-      'expenses': true,
-      'profit_and_loss': true,
-      'add_widgets': true,
-      'inventory_reports': true,
-      'low_on_stock': true,
-      'invoices': true,
-      'customers_funnel': true,
-      'sales': true,
-      'accounts_payable': true,
-      'accounts_receivable': true,
-      'sales_orders': true,
-      'work_requests': true,
-      'reviews': true,
-      'overdue_invoices': true,
-      'referrals': true,
-      'video_tutorials': true,
-    };
-    const saved = localStorage.getItem('onimta_gtd_widgets');
+    const saved = localStorage.getItem('onimta_gtd_widgets_v4');
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        return { ...defaultWidgets, ...parsed };
+        return { ...DEFAULT_WIDGETS, ...parsed };
       } catch (e) { }
     }
-    return defaultWidgets;
+    return DEFAULT_WIDGETS;
   });
+  
+  const [widgetOrder, setWidgetOrder] = useState(() => {
+    const saved = localStorage.getItem('onimta_gtd_widget_order_v1');
+    if (saved) {
+      try { return JSON.parse(saved); } catch (e) { }
+    }
+    return Object.keys(DEFAULT_WIDGETS);
+  });
+  const [draggedWidget, setDraggedWidget] = useState(null);
+  const [hoveredWidget, setHoveredWidget] = useState(null);
+
   const [isPrivacyMode, setIsPrivacyMode] = useState(false);
   const [isShowAllActionsOpen, setIsShowAllActionsOpen] = useState(false);
   const [videoOpen, setVideoOpen] = useState(null);
@@ -820,12 +887,43 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
 
   // Persist preferences to localStorage when they change
   useEffect(() => {
-    localStorage.setItem('onimta_gtd_widgets', JSON.stringify(selectedWidgets));
+    localStorage.setItem('onimta_gtd_widgets_v4', JSON.stringify(selectedWidgets));
   }, [selectedWidgets]);
 
   useEffect(() => {
     localStorage.setItem('onimta_gtd_fav_actions', JSON.stringify(favActions));
   }, [favActions]);
+
+  useEffect(() => {
+    localStorage.setItem('onimta_gtd_widget_order_v1', JSON.stringify(widgetOrder));
+  }, [widgetOrder]);
+
+  const handleDragStart = (e, id) => {
+    setDraggedWidget(id);
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  const handleDragEnter = (e, id) => {
+    e.preventDefault();
+    if (draggedWidget && draggedWidget !== id) {
+      setHoveredWidget(id);
+      setWidgetOrder(prev => {
+        const newOrder = [...prev];
+        const draggedIndex = newOrder.indexOf(draggedWidget);
+        const hoveredIndex = newOrder.indexOf(id);
+        if (draggedIndex !== -1 && hoveredIndex !== -1) {
+          newOrder.splice(draggedIndex, 1);
+          newOrder.splice(hoveredIndex, 0, draggedWidget);
+        }
+        return newOrder;
+      });
+    }
+  };
+
+  const handleDragEnd = () => {
+    setDraggedWidget(null);
+    setHoveredWidget(null);
+  };
 
   const { companyCode } = getSessionData();
   const accent = '#0078d4';
@@ -954,23 +1052,30 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
       percentage: derivedTotal > 0 ? (c.amount / derivedTotal) * 100 : 0
     }));
 
-  // Compute monthly expense totals from real transactions for Cash Flow
+  // Compute monthly data from backend salesSummary for Cash Flow
   const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  const monthlyExpenses = Array(12).fill(0);
-  (expenseData.recentTransactions || []).forEach(tx => {
-    const d = new Date(tx.date);
-    if (!isNaN(d)) {
-      monthlyExpenses[d.getMonth()] += Number(tx.total || 0);
-    }
+  const monthlySales = biData?.salesSummary?.monthlySales || Array(12).fill(0);
+  const monthlyExpenses = biData?.salesSummary?.monthlyExpenses || Array(12).fill(0);
+  
+  const maxMonthly = Math.max(1, ...monthlySales, ...monthlyExpenses);
+  const monthlyData = MONTHS.map((m, i) => {
+    const s = monthlySales[i];
+    const e = monthlyExpenses[i];
+    return {
+      m,
+      salesVal: s,
+      expVal: e,
+      h1: Math.max(2, Math.round((s / maxMonthly) * 100)), // Green bar (Income)
+      h2: Math.max(2, Math.round((e / maxMonthly) * 100)), // Blue bar (Expenses)
+      hasData: s > 0 || e > 0,
+    };
   });
-  const maxMonthly = Math.max(...monthlyExpenses, 1);
-  const monthlyData = MONTHS.map((m, i) => ({
-    m,
-    h1: Math.max(4, Math.round((monthlyExpenses[i] / maxMonthly) * 100)),
-    h2: Math.max(2, Math.round((monthlyExpenses[i] / maxMonthly) * 90)),
-    hasData: monthlyExpenses[i] > 0,
-  }));
   const cashFlowMax = maxMonthly;
+
+  const invoiceSummary = biData?.invoiceSummary || { totalUnpaid: 0, totalOverdue: 0, totalPaid: 0, totalNotDeposited: 0, totalDeposited: 0 };
+  const totalSalesYTD = biData?.salesSummary?.totalSalesYTD || 0;
+  const ap = biData?.accountsPayable || { total: 0, current: 0, aging1_30: 0, aging31_60: 0, aging61_90: 0, aging91Plus: 0 };
+  const ar = biData?.accountsReceivable || { total: 0, current: 0, aging1_30: 0, aging31_60: 0, aging61_90: 0, aging91Plus: 0 };
 
   const runAction = (id) => {
     if (!onAction) return;
@@ -988,7 +1093,17 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
   const topActions = activeTab === 'accounting' ? favActions.map(id => ALL_ACTIONS_MAP[id]).filter(Boolean) : (TAB_EXTRA_ACTIONS[activeTab] || []);
 
   return (
-    <div className={`${isInline ? 'relative w-full h-full' : 'fixed inset-0 z-[9999]'} flex flex-col font-['Plus_Jakarta_Sans'] text-slate-700 bg-[#f8fafc] overflow-hidden animate-in fade-in duration-300 mt-6`}>
+    <div className={`${isInline ? 'relative w-full h-full' : 'fixed inset-0 z-[9999]'} flex flex-col font-['Plus_Jakarta_Sans'] text-slate-700 bg-[#f4f5f8] overflow-hidden animate-in fade-in duration-300 mt-0 relative`}>
+      {/* Top Banner */}
+      {!isInline && (
+        <div className="w-full bg-[#3b82f6] text-white text-center py-2 text-[12px] font-medium">
+          Save 50% for 3 months. <a href="#" className="underline font-bold ml-1">Subscribe now</a>
+          <button onClick={onClose} className="absolute right-4 top-2 text-white/80 hover:text-white">
+            <X size={16} />
+          </button>
+        </div>
+      )}
+
       {/* QBO-style top header */}
       {!isInline && (
         <header className="shrink-0 bg-white/95 border-b border-slate-200/60 px-4 sm:px-5 lg:px-7 py-3">
@@ -1073,9 +1188,7 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
         </header>
       )}
 
-
-
-      {/* Body (no duplicate slim chrome) */}
+      {/* Body */}
       <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden">
         <div className="w-full max-w-[min(2050px,100%)] mx-auto px-2.5 sm:px-5 lg:px-7 pb-4">
           {/* Greeting + utilities */}
@@ -1238,15 +1351,17 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
             </div>
           ) : (
             <>
-              {/* 4-column widget row */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-4">
+              {/* Unified Masonry-like Grid for Widgets */}
+            <DragContext.Provider value={{
+              widgetOrder, draggedWidget, hoveredWidget,
+              handleDragStart, handleDragEnter, handleDragEnd,
+              isCustomising, setSelectedWidgets
+            }}>
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8 mt-6 grid-flow-dense">
+
                 {/* Profit & Loss */}
                 {selectedWidgets.profit_and_loss && (
-                  <EditWrapper
-                    isEditing={isCustomising}
-                    grabbers={['left', 'right']}
-                    onRemove={() => setSelectedWidgets(prev => ({ ...prev, profit_and_loss: false }))}
-                  >
+                  <DraggableWidget id="profit_and_loss" grabbers={['left', 'right']} className="md:col-span-2 xl:col-span-1">
                     <WidgetShell
                       title="Profit & Loss"
                       subtitle="See what you make & spend across all your accounts"
@@ -1256,28 +1371,34 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
                     >
                       <div className="flex flex-col justify-center h-full gap-4.5 py-1 mt-1">
                         {[
-                          { label: 'Income', val: totalIncome, gradient: 'bg-gradient-to-r from-[#10b981] to-[#34d399] shadow-sm' },
-                          { label: 'Expenses', val: totalSpend, gradient: 'bg-gradient-to-r from-[#60a5fa] to-[#38bdf8] shadow-sm' },
+                          { label: 'Income', val: totalIncome, color: '#22c55e', fakeVal: 9611 },
+                          { label: 'Expenses', val: totalSpend, color: '#2596be', fakeVal: 6611 },
                         ].map((bar, idx) => {
                           const max = Math.max(totalIncome, totalSpend, 1);
-                          const hasData = bar.val > 0;
-                          const wPct = hasData ? Math.max(10, Math.round((bar.val / max) * 100)) : 0;
+                          const isOverallEmpty = totalIncome === 0 && totalSpend === 0;
+                          
+                          const actualPct = bar.val > 0 ? Math.max(10, Math.round((bar.val / max) * 100)) : 0;
+                          const fakePct = Math.round((bar.fakeVal / 9611) * 100);
+                          
+                          const wPct = isOverallEmpty ? fakePct : actualPct;
+                          const displayVal = isOverallEmpty ? bar.fakeVal : bar.val;
+
                           return (
                             <div key={idx} className="flex flex-col gap-1">
                               <div className="text-[15px] font-extrabold text-slate-800">
-                                {formatLkr(bar.val).replace('LKR', 'LKR ')}
+                                <span className="group-hover:hidden">LRs0</span>
+                                <span className="hidden group-hover:inline">{formatLkr(displayVal).replace('LKR', 'LKR ')}</span>
                               </div>
                               <div className="flex items-center gap-3">
                                 <div className="text-[12px] font-semibold text-slate-500 w-[60px] shrink-0">{bar.label}</div>
-                                <div className="flex-1 bg-slate-100 h-3  overflow-hidden">
-                                  {hasData ? (
-                                    <div
-                                      className={`h-full transition-all duration-1000 ease-out  ${bar.gradient}`}
-                                      style={{ width: `${wPct}%` }}
-                                    />
-                                  ) : (
-                                    <div className="h-full w-2 bg-slate-200 rounded-full" />
-                                  )}
+                                <div className="flex-1 h-3 flex items-center">
+                                  <style>{`
+                                    .pl-bar-${idx} { width: 6px; background-color: #9ca3af; }
+                                    .group:hover .pl-bar-${idx} { width: ${wPct}%; background-color: ${bar.color}; }
+                                  `}</style>
+                                  <div
+                                    className={`h-full transition-all duration-500 ease-out pl-bar-${idx}`}
+                                  />
                                 </div>
                               </div>
                             </div>
@@ -1285,16 +1406,12 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
                         })}
                       </div>
                     </WidgetShell>
-                  </EditWrapper>
+                  </DraggableWidget>
                 )}
 
                 {/* Expenses */}
                 {selectedWidgets.expenses && (
-                  <EditWrapper
-                    isEditing={isCustomising}
-                    grabbers={['left', 'right']}
-                    onRemove={() => setSelectedWidgets(prev => ({ ...prev, expenses: false }))}
-                  >
+                  <DraggableWidget id="expenses" grabbers={['left', 'right']} className="md:col-span-2 xl:col-span-1">
                     <WidgetShell
                       title="Expenses"
                       subtitle="See where your money is going"
@@ -1303,126 +1420,99 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
                       onHide={() => setWidgetToHide('expenses')}
                     >
                       <div className="flex flex-col sm:flex-row items-center justify-center gap-6 min-h-[120px] mt-2">
-                        {categories.length === 0 ? (
-                          <>
-                            <div className="relative w-[110px] h-[110px] shrink-0">
-                              <svg viewBox="0 0 100 100" className="w-full h-full">
-                                <circle cx="50" cy="50" r="38" fill="none" stroke="#e5e7eb" strokeWidth="24" />
-                              </svg>
-                            </div>
-                            <div className="flex-1 space-y-3 w-full max-w-[100px]">
-                              {[1, 2, 3, 4, 5].map((i) => (
-                                <div key={i} className="flex items-center gap-2">
-                                  <div className="w-2.5 h-2.5 rounded-full bg-[#e5e7eb] shrink-0" />
-                                  <div className="h-2 w-16 rounded bg-[#e5e7eb]" />
-                                </div>
-                              ))}
-                            </div>
-                          </>
-                        ) : (
-                          <>
+                        <div className="flex items-center justify-center gap-6 w-full">
+                          <div className="relative w-[110px] h-[110px] shrink-0 rounded-full">
+                            {/* Grey Donut (Visible normally, hidden on hover) */}
+                            <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full transition-opacity duration-500 group-hover:opacity-0">
+                              <circle cx="50" cy="50" r="38" fill="none" stroke="#e5e7eb" strokeWidth="24" />
+                            </svg>
+                            
+                            {/* Colored Donut (Hidden normally, visible on hover) */}
                             <div
-                              className="relative w-[110px] h-[110px] shrink-0 rounded-full"
+                              className="absolute inset-0 rounded-full transition-opacity duration-500 opacity-0 group-hover:opacity-100"
                               style={{
-                                background: `conic-gradient(${categories
-                                  .slice(0, 5)
-                                  .reduce(
-                                    (acc, cat, i) => {
-                                      const colors = ['#60a5fa', '#a78bfa', '#10b981', '#f59e0b', '#ec4899'];
-                                      const start = acc.offset;
-                                      const pct = Math.min(100, Math.max(0, Number(cat.percentage) || 0));
-                                      acc.offset += pct;
-                                      acc.parts.push(
-                                        `${colors[i % 5]} ${start}% ${acc.offset}%`
-                                      );
-                                      return acc;
-                                    },
-                                    { parts: [], offset: 0 }
-                                  )
-                                  .parts.join(', ')})`,
+                                background: categories.length > 0
+                                  ? `conic-gradient(${categories
+                                    .slice(0, 5)
+                                    .reduce(
+                                      (acc, cat, i) => {
+                                        const colors = ['#60a5fa', '#a78bfa', '#10b981', '#f59e0b', '#ec4899'];
+                                        const start = acc.offset;
+                                        const pct = Math.min(100, Math.max(0, Number(cat.percentage) || 0));
+                                        acc.offset += pct;
+                                        acc.parts.push(`${colors[i % 5]} ${start}% ${acc.offset}%`);
+                                        return acc;
+                                      },
+                                      { parts: [], offset: 0 }
+                                    ).parts.join(', ')})`
+                                  : `conic-gradient(#60a5fa 0% 20%, #a78bfa 20% 40%, #10b981 40% 60%, #f59e0b 60% 80%, #ec4899 80% 100%)`
                               }}
                             >
                               <div className="absolute inset-[18px] rounded-full bg-white" />
                             </div>
-                            <div className="flex-1 space-y-2.5 w-full max-w-[160px] text-[12px]">
-                              {categories.slice(0, 5).map((cat, i) => {
-                                const name = cat.categoryName || cat.CategoryName || cat.name || cat.Name || '';
-                                return (
-                                  <div key={i} className="flex items-center gap-2">
-                                    <span
-                                      className="w-2.5 h-2.5 rounded-full shrink-0"
-                                      style={{
-                                        backgroundColor: ['#60a5fa', '#a78bfa', '#10b981', '#f59e0b', '#ec4899'][i % 5],
-                                      }}
-                                    />
-                                    <span className="truncate flex-1 text-slate-650 font-bold text-[12px]">
-                                      {name || 'Category name'}
-                                    </span>
+                          </div>
+                          
+                          <div className="flex-1 space-y-2.5 w-full max-w-[160px] text-[12px]">
+                            {(categories.length > 0 ? categories.slice(0, 5) : [
+                              { name: 'Rent' }, { name: 'Food' }, { name: 'Travel' }, { name: 'Utilities' }, { name: 'Other' }
+                            ]).map((cat, i) => {
+                              const name = cat.categoryName || cat.CategoryName || cat.name || cat.Name || '';
+                              const color = ['#60a5fa', '#a78bfa', '#10b981', '#f59e0b', '#ec4899'][i % 5];
+                              return (
+                                <div key={i} className="flex items-center gap-2">
+                                  <div
+                                    className="w-2.5 h-2.5 rounded-full shrink-0 transition-colors duration-500 bg-[#e5e7eb] group-hover:bg-[var(--hover-color)]"
+                                    style={{ '--hover-color': color }}
+                                  />
+                                  <div className="flex-1 flex items-center truncate">
+                                    <span className="text-[#9ca3af] font-medium group-hover:hidden">--</span>
+                                    <span className="hidden group-hover:inline text-slate-650 font-bold truncate">{name || 'Category name'}</span>
                                   </div>
-                                );
-                              })}
-                            </div>
-                          </>
-                        )}
-                      </div>
-                      {/* Transactions */}
-                      {expenseData.recentTransactions?.length > 0 && (
-                        <div className="mt-4 pt-3 border-t border-[#eceef1] space-y-2">
-                          {expenseData.recentTransactions
-                            .slice(0, 4)
-                            .map((tx, i) => (
-                              <div
-                                key={i}
-                                className="flex justify-between text-[11px]"
-                              >
-                                <span className="font-semibold text-[#393a3d] truncate max-w-[65%] uppercase">
-                                  {suppliersMap[tx.payee] || tx.payee || tx.type}
-                                </span>
-
-                                <span className="font-mono font-bold text-[#111827]">
-                                  {formatLkr(tx.total)}
-                                </span>
-                              </div>
-                            ))}
+                                </div>
+                              );
+                            })}
+                          </div>
                         </div>
-                      )}
+                      </div>
                     </WidgetShell>
-                  </EditWrapper>
+                  </DraggableWidget>
                 )}
 
                 {/* Add widgets */}
                 {selectedWidgets.add_widgets && (
-                  <EditWrapper
-                    isEditing={isCustomising}
-                    grabbers={['left', 'right']}
-                    className="h-full"
-                    onRemove={() => setSelectedWidgets(prev => ({ ...prev, add_widgets: false }))}
-                  >
+                  <DraggableWidget id="add_widgets" grabbers={['left', 'right']} className="md:col-span-1 xl:col-span-1 h-full">
                     <div 
-                      className="bg-[#f8fafc] rounded-lg min-h-[240px] flex flex-col items-center justify-center h-full overflow-hidden cursor-pointer hover:bg-blue-50/50 transition-colors border-2 border-dashed border-[#0078d4]/50"
+                      className="bg-white rounded-lg min-h-[240px] flex flex-col h-full overflow-hidden cursor-pointer hover:bg-slate-50 transition-colors border-2 border-dashed border-[#eceef1]"
                       onClick={() => setIsAddWidgetsOpen(true)}
                     >
-                      <span className="text-[15px] font-bold text-[#0078d4] mb-6">View Widgets</span>
-                      
-                      <div className="w-14 h-14 rounded-full border border-dashed border-[#0078d4]/40 bg-[#0078d4]/5 flex items-center justify-center mb-6 relative">
-                        <LayoutGrid size={22} className="text-[#0078d4]" strokeWidth={1.8} />
+                      <div className="flex flex-col items-center justify-center flex-1 py-8">
+                        <span className="text-[13px] font-bold text-[#393a3d] mb-3">Add widgets</span>
+                        <div className="w-8 h-8 rounded-full bg-[#f4f5f8] flex items-center justify-center">
+                          <Plus size={16} className="text-[#6b6c72]" strokeWidth={2} />
+                        </div>
                       </div>
-
-                      <div className="flex items-center gap-2 text-[#4096ff] hover:text-[#0078d4] transition-colors">
-                        <Eye size={15} strokeWidth={2.5} />
-                        <span className="text-[13px] font-bold">Browse dashboards</span>
+                      
+                      <div className="border-t border-[#eceef1] mx-6" />
+                      
+                      <div className="flex flex-col items-center justify-center flex-1 py-6 px-4">
+                        <div className="flex items-center gap-2 mb-4">
+                          <Sparkles size={14} className="text-[#393a3d]" strokeWidth={2.5} />
+                          <span className="text-[12.5px] font-bold text-[#393a3d]">Smart suggestions</span>
+                        </div>
+                        <div className="w-9 h-9 rounded-full bg-[#f4f5f8] flex items-center justify-center mb-3">
+                          <Coffee size={16} className="text-[#6b6c72]" strokeWidth={2} />
+                        </div>
+                        <p className="text-[11.5px] text-[#6b6c72] text-center leading-relaxed max-w-[200px]">
+                          Nothing new here yet. Check back later for new suggestions.
+                        </p>
                       </div>
                     </div>
-                  </EditWrapper>
+                  </DraggableWidget>
                 )}
 
                 {/* Bank accounts */}
                 {selectedWidgets.bank_accounts && (
-                  <EditWrapper
-                    isEditing={isCustomising}
-                    grabbers={['top', 'bottom']}
-                    onRemove={() => setSelectedWidgets(prev => ({ ...prev, bank_accounts: false }))}
-                  >
+                  <DraggableWidget id="bank_accounts" grabbers={['top', 'bottom']} className="md:col-span-1 xl:col-span-1">
                     <WidgetShell
                       title="Bank accounts"
                       subtitle="Link your banks to see your balances in one place"
@@ -1432,62 +1522,34 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
                     >
                       {(function () {
                         const banks = biData?.bankAccounts?.length > 0 ? biData.bankAccounts : PLACEHOLDER_BANKS;
-                        const perPage = 5;
-                        const totalPages = Math.ceil(banks.length / perPage);
-                        const page = Math.min(bankPage, Math.max(0, totalPages - 1));
-                        const pageBanks = banks.slice(page * perPage, (page + 1) * perPage);
+                        const displayedBanks = banks.slice(0, 3);
                         return (
-                          <div>
-                            <div className="grid grid-cols-2 gap-2">
-                              {pageBanks.map((b, i) => (
-                                <div key={i} className="flex items-center gap-2 p-2 rounded-xl bg-slate-50 border border-slate-100 min-w-0">
-                                  <div className="w-8 h-8 rounded-lg bg-white border border-slate-150 flex items-center justify-center shrink-0">
-                                    <Landmark size={13} className="text-slate-500" />
-                                  </div>
-                                  <span className="text-[11px] font-bold text-slate-700 truncate leading-tight">{b.bankName || b.name || b.bankCode}</span>
-                                  <button type="button" onClick={() => runAction('bank_rec')} className="ml-auto w-6 h-6 rounded-lg hover:bg-blue-50 text-blue-655 flex items-center justify-center shrink-0 transition-colors" aria-label="Add">
-                                    <Plus size={14} strokeWidth={2.5} />
-                                  </button>
+                          <div className="flex flex-col gap-5 mt-2">
+                            {displayedBanks.map((b, i) => (
+                              <div key={i} className="flex items-center gap-4">
+                                <div className="w-9 h-9 rounded-full bg-white border border-[#eceef1] flex items-center justify-center shrink-0 p-1">
+                                  {b.logo ? (
+                                    <img src={b.logo} alt="" className="w-full h-full object-contain" />
+                                  ) : (
+                                    <Landmark size={14} className="text-[#393a3d]" />
+                                  )}
                                 </div>
-                              ))}
-                            </div>
-                            {totalPages > 1 && (
-                              <div className="flex items-center justify-center gap-2 mt-3">
-                                <button
-                                  type="button"
-                                  disabled={page === 0}
-                                  onClick={() => setBankPage(p => p - 1)}
-                                  className="px-3 py-1 text-[11px] font-bold text-slate-500 hover:text-slate-800 disabled:opacity-30 disabled:cursor-default transition-colors"
-                                >
-                                  Previous
-                                </button>
-                                <span className="text-[11px] font-bold text-slate-400">{page + 1} / {totalPages}</span>
-                                <button
-                                  type="button"
-                                  disabled={page >= totalPages - 1}
-                                  onClick={() => setBankPage(p => p + 1)}
-                                  className="px-3 py-1 text-[11px] font-bold text-slate-500 hover:text-slate-800 disabled:opacity-30 disabled:cursor-default transition-colors"
-                                >
-                                  Next
+                                <span className="text-[12.5px] font-bold text-[#393a3d] truncate flex-1 leading-snug">
+                                  {b.bankName || b.name || b.bankCode}
+                                </span>
+                                <button type="button" onClick={() => runAction('bank_rec')} className="text-[#0078d4] hover:text-[#005a9e] transition-colors p-1" aria-label="Add">
+                                  <Plus size={18} strokeWidth={2.5} />
                                 </button>
                               </div>
-                            )}
+                            ))}
                           </div>
                         );
                       })()}
                     </WidgetShell>
-                  </EditWrapper>
+                  </DraggableWidget>
                 )}
-              </div>
-              {/* Second Row: Cash Flow (span 2), Inventory Reports, Low on Stock */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-4">
-                {selectedWidgets.cash_flow && (
-                  <EditWrapper
-                    isEditing={isCustomising}
-                    grabbers={['left', 'right']}
-                    className="xl:col-span-2"
-                    onRemove={() => setSelectedWidgets(prev => ({ ...prev, cash_flow: false }))}
-                  >
+              {selectedWidgets.cash_flow && (
+                  <DraggableWidget id="cash_flow" grabbers={['left', 'right']} className="md:col-span-2 xl:col-span-2">
                     <WidgetShell
                       title="Cash flow"
                       subtitle="Track how your money is doing"
@@ -1499,8 +1561,9 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
 
                         {/* Y Axis */}
                         <div className="flex flex-col justify-between text-[11px] text-[#6b6c72] w-8 shrink-0 text-right pb-[22px]">
-                          <span>{formatShortK(cashFlowMax)}</span>
-                          <span>{formatShortK(cashFlowMax / 2)}</span>
+                          <span>{cashFlowMax > 0 ? formatShortK(cashFlowMax) : '6K'}</span>
+                          <span>{cashFlowMax > 0 ? formatShortK(cashFlowMax * 0.66) : '4K'}</span>
+                          <span>{cashFlowMax > 0 ? formatShortK(cashFlowMax * 0.33) : '2K'}</span>
                           <span>0</span>
                         </div>
 
@@ -1509,10 +1572,10 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
 
                           {/* Grid */}
                           <div className="absolute inset-0 flex flex-col justify-between pointer-events-none pb-[22px]">
-                            {[1, 2, 3].map((i) => (
+                            {[1, 2, 3, 4].map((i) => (
                               <div
                                 key={i}
-                                className="border-t border-[#e5e7eb] w-full"
+                                className="border-t border-[#eceef1] w-full"
                               />
                             ))}
                           </div>
@@ -1520,9 +1583,9 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
                           {/* Bars */}
                           <div className="absolute top-0 bottom-[22px] left-0 right-0 flex justify-between px-1">
                             {monthlyData.map((d) => (
-                              <div key={d.m} className="flex gap-[2px] items-end flex-1 justify-center relative group cursor-pointer hover:bg-slate-100 rounded-t-lg transition-all duration-200" title={`${d.m}: LKR ${formatShortK(monthlyExpenses[MONTHS.indexOf(d.m)])}`}>
-                                <div className={`w-[11px] rounded-t-sm transition-all duration-500 ${d.hasData ? 'bg-gradient-to-t from-[#10b981] to-[#34d399] shadow-[0_2px_4px_rgba(16,185,129,0.3)]' : 'bg-slate-200'}`} style={{ height: `${d.h1}%` }} />
-                                <div className={`w-[11px] rounded-t-sm transition-all duration-500 ${d.hasData ? 'bg-gradient-to-t from-[#60a5fa] to-[#38bdf8] shadow-[0_2px_4px_rgba(96,165,250,0.3)]' : 'bg-slate-300'}`} style={{ height: `${d.h2}%` }} />
+                              <div key={d.m} className="flex gap-[1px] items-end flex-1 justify-center relative group cursor-pointer hover:bg-slate-50 transition-all duration-200" title={`${d.m}: Income LKR ${formatShortK(d.salesVal)} | Expenses LKR ${formatShortK(d.expVal)}`}>
+                                <div className="w-[14px] bg-[#6bc13c] transition-all duration-500" style={{ height: `${Math.max(2, d.h1)}%` }} />
+                                <div className="w-[14px] bg-[#3dc0c5] transition-all duration-500" style={{ height: `${Math.max(2, d.h2)}%` }} />
                               </div>
                             ))}
                           </div>
@@ -1540,15 +1603,215 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
 
 
                     </WidgetShell>
-                  </EditWrapper>
+                  </DraggableWidget>
+                )}
+                {/* Invoices */}
+                {selectedWidgets.invoices && (
+                  <DraggableWidget id="invoices" grabbers={['left', 'right']} className="md:col-span-1 xl:col-span-1">
+                    <WidgetShell
+                      title="INVOICES"
+                      onHide={() => setWidgetToHide('invoices')}
+                    >
+                      <div className="flex flex-col gap-6 mt-1">
+                        {/* Unpaid */}
+                        <div className="flex flex-col gap-1.5">
+                          <div className="flex items-center gap-2">
+                            <span className="text-[13px] font-bold text-[#393a3d]">{formatLkr(invoiceSummary.totalUnpaid).replace('LKR', 'LKR ')} Unpaid</span>
+                            <span className="text-[11px] text-[#6b6c72]">Last 365 days</span>
+                          </div>
+                          <div className="flex justify-between items-center text-[12px] mt-1">
+                            <div className="flex flex-col">
+                              <span className="font-bold text-[#393a3d] text-[15px]">{formatLkr(invoiceSummary.totalOverdue).replace('LKR', 'LKR ')}</span>
+                              <span className="text-[#6b6c72] text-[11.5px]">Overdue</span>
+                            </div>
+                            <div className="flex flex-col text-right">
+                              <span className="font-bold text-[#393a3d] text-[15px]">{formatLkr(invoiceSummary.totalUnpaid - invoiceSummary.totalOverdue).replace('LKR', 'LKR ')}</span>
+                              <span className="text-[#6b6c72] text-[11.5px]">Not due yet</span>
+                            </div>
+                          </div>
+                          <div className="flex h-[18px] w-full mt-1 overflow-hidden gap-[1px]">
+                            <div className="h-full bg-[#d97736] rounded-l-[2px]" style={{ width: invoiceSummary.totalUnpaid > 0 ? `${(invoiceSummary.totalOverdue / invoiceSummary.totalUnpaid) * 100}%` : '50%' }} />
+                            <div className="h-full bg-[#d4d7dc] rounded-r-[2px]" style={{ width: invoiceSummary.totalUnpaid > 0 ? `${((invoiceSummary.totalUnpaid - invoiceSummary.totalOverdue) / invoiceSummary.totalUnpaid) * 100}%` : '50%' }} />
+                          </div>
+                        </div>
+
+                        {/* Paid */}
+                        <div className="flex flex-col gap-1.5">
+                          <div className="flex items-center gap-2">
+                            <span className="text-[13px] font-bold text-[#393a3d]">{formatLkr(invoiceSummary.totalPaid).replace('LKR', 'LKR ')} Paid</span>
+                            <span className="text-[11px] text-[#6b6c72]">Last 30 days</span>
+                          </div>
+                          <div className="flex justify-between items-center text-[12px] mt-1">
+                            <div className="flex flex-col">
+                              <span className="font-bold text-[#393a3d] text-[15px]">{formatLkr(invoiceSummary.totalNotDeposited).replace('LKR', 'LKR ')}</span>
+                              <span className="text-[#6b6c72] text-[11.5px]">Not deposited</span>
+                            </div>
+                            <div className="flex flex-col text-right">
+                              <span className="font-bold text-[#393a3d] text-[15px]">{formatLkr(invoiceSummary.totalDeposited).replace('LKR', 'LKR ')}</span>
+                              <span className="text-[#6b6c72] text-[11.5px]">Deposited</span>
+                            </div>
+                          </div>
+                          <div className="flex h-[18px] w-full mt-1 overflow-hidden gap-[1px]">
+                            <div className="h-full bg-[#53c351] rounded-l-[2px]" style={{ width: invoiceSummary.totalPaid > 0 ? `${(invoiceSummary.totalNotDeposited / invoiceSummary.totalPaid) * 100}%` : '50%' }} />
+                            <div className="h-full bg-[#2ca01c] rounded-r-[2px]" style={{ width: invoiceSummary.totalPaid > 0 ? `${(invoiceSummary.totalDeposited / invoiceSummary.totalPaid) * 100}%` : '50%' }} />
+                          </div>
+                        </div>
+                      </div>
+                    </WidgetShell>
+                  </DraggableWidget>
+                )}
+
+                {/* Sales */}
+                {selectedWidgets.sales && (
+                  <DraggableWidget id="sales" grabbers={['left', 'right']} className="md:col-span-1 xl:col-span-1">
+                    <WidgetShell
+                      title="SALES"
+                      onHide={() => setWidgetToHide('sales')}
+                    >
+                      <div className="absolute top-[22px] right-6 opacity-100 group-hover:opacity-0 transition-opacity">
+                         <div className="text-[11px] font-bold text-[#393a3d] flex items-center cursor-pointer hover:text-[#000]">
+                           This year to date <ChevronDown size={14} className="ml-0.5 text-[#6b6c72]" strokeWidth={2.5} />
+                         </div>
+                      </div>
+                      <div className="flex flex-col h-full mt-2">
+                        <div className="flex flex-col gap-0.5 mb-5">
+                          <span className="text-[12px] text-[#6b6c72]">Total Amount</span>
+                          <span className="text-[26px] font-light text-[#393a3d]">{formatLkr(totalSalesYTD).replace('LKR', 'LKR ')}</span>
+                        </div>
+                        
+                        {/* Chart Grid Lines */}
+                        <div className="flex-1 relative flex flex-col justify-between min-h-[110px] mt-2 mb-2">
+                          {[0.4, 0.3, 0.2, 0.1, 0].map((val, idx) => (
+                            <div key={idx} className="flex items-center gap-3 w-full">
+                              <span className="text-[11px] font-medium text-[#6b6c72] w-4 text-right shrink-0 leading-none">{val}</span>
+                              <div className="flex-1 border-t border-[#eceef1]" />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                      <div className="absolute bottom-4 right-4">
+                        <button className="p-1 hover:bg-[#f4f5f8] rounded-full text-[#6b6c72] transition-colors">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                            <circle cx="12" cy="5" r="1"/>
+                            <circle cx="12" cy="12" r="1"/>
+                            <circle cx="12" cy="19" r="1"/>
+                          </svg>
+                        </button>
+                      </div>
+                    </WidgetShell>
+                  </DraggableWidget>
+                )}
+
+                {/* Accounts Payable */}
+                {selectedWidgets.accounts_payable && (
+                  <DraggableWidget id="accounts_payable" grabbers={['left', 'right']} className="md:col-span-2 xl:col-span-2">
+                    <WidgetShell title="ACCOUNTS PAYABLE" onHide={() => setWidgetToHide('accounts_payable')}>
+                      <div className="absolute top-[22px] right-6 opacity-100 group-hover:opacity-0 transition-opacity">
+                         <div className="text-[11px] font-bold text-[#6b6c72] flex items-center">As of today</div>
+                      </div>
+                      <div className="flex flex-col mt-2">
+                        <span className="text-[12px] text-[#6b6c72]">Total</span>
+                        <span className="text-[26px] font-light text-[#393a3d]">{formatLkr(ap.total).replace('LKR', 'LKR ')}</span>
+                      </div>
+                      <div className="flex items-center gap-6 mt-4">
+                        {/* Donut Chart */}
+                        <div className="w-[100px] h-[100px] shrink-0 rounded-full relative"
+                          style={{
+                            background: ap.total > 0 
+                              ? `conic-gradient(#53c351 0% ${(ap.current/ap.total)*100}%, #3dc0c5 ${(ap.current/ap.total)*100}% ${((ap.current+ap.aging1_30)/ap.total)*100}%, #6b6c72 ${((ap.current+ap.aging1_30)/ap.total)*100}% ${((ap.current+ap.aging1_30+ap.aging31_60)/ap.total)*100}%, #0078d4 ${((ap.current+ap.aging1_30+ap.aging31_60)/ap.total)*100}% ${((ap.current+ap.aging1_30+ap.aging31_60+ap.aging61_90)/ap.total)*100}%, #1e3a8a ${((ap.current+ap.aging1_30+ap.aging31_60+ap.aging61_90)/ap.total)*100}% 100%)`
+                              : '#d4d7dc'
+                          }}
+                        >
+                          <div className="absolute inset-[18px] bg-white rounded-full"></div>
+                        </div>
+                        {/* Legend */}
+                        <div className="flex flex-col gap-1.5 flex-1">
+                          <div className="flex items-center gap-2 text-[11px] text-[#393a3d]">
+                            <div className="w-2 h-2 rounded-full bg-[#53c351]" /> Current: {formatLkr(ap.current).replace('LKR', 'LKR ')}
+                          </div>
+                          <div className="flex items-center gap-2 text-[11px] text-[#393a3d]">
+                            <div className="w-2 h-2 rounded-full bg-[#3dc0c5]" /> 1 - 30: {formatLkr(ap.aging1_30).replace('LKR', 'LKR ')}
+                          </div>
+                          <div className="flex items-center gap-2 text-[11px] text-[#393a3d]">
+                            <div className="w-2 h-2 rounded-full bg-[#6b6c72]" /> 31 - 60: {formatLkr(ap.aging31_60).replace('LKR', 'LKR ')}
+                          </div>
+                          <div className="flex items-center gap-2 text-[11px] text-[#393a3d]">
+                            <div className="w-2 h-2 rounded-full bg-[#0078d4]" /> 61 - 90: {formatLkr(ap.aging61_90).replace('LKR', 'LKR ')}
+                          </div>
+                          <div className="flex items-center gap-2 text-[11px] text-[#393a3d]">
+                            <div className="w-2 h-2 rounded-full bg-[#1e3a8a]" /> 91 and over: {formatLkr(ap.aging91Plus).replace('LKR', 'LKR ')}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="absolute bottom-4 right-4">
+                        <button className="p-1 hover:bg-[#f4f5f8] rounded-full text-[#6b6c72] transition-colors">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                            <circle cx="12" cy="5" r="1"/>
+                            <circle cx="12" cy="12" r="1"/>
+                            <circle cx="12" cy="19" r="1"/>
+                          </svg>
+                        </button>
+                      </div>
+                    </WidgetShell>
+                  </DraggableWidget>
+                )}
+
+                {/* Accounts Receivable */}
+                {selectedWidgets.accounts_receivable && (
+                  <DraggableWidget id="accounts_receivable" grabbers={['left', 'right']} className="md:col-span-2 xl:col-span-2">
+                    <WidgetShell title="ACCOUNTS RECEIVABLE" onHide={() => setWidgetToHide('accounts_receivable')}>
+                      <div className="absolute top-[22px] right-6 opacity-100 group-hover:opacity-0 transition-opacity">
+                         <div className="text-[11px] font-bold text-[#6b6c72] flex items-center">As of today</div>
+                      </div>
+                      <div className="flex flex-col mt-2">
+                        <span className="text-[12px] text-[#6b6c72]">Total</span>
+                        <span className="text-[26px] font-light text-[#393a3d]">{formatLkr(ar.total).replace('LKR', 'LKR ')}</span>
+                      </div>
+                      <div className="flex items-center gap-6 mt-4">
+                        {/* Donut Chart */}
+                        <div className="w-[100px] h-[100px] shrink-0 rounded-full relative"
+                          style={{
+                            background: ar.total > 0 
+                              ? `conic-gradient(#53c351 0% ${(ar.current/ar.total)*100}%, #3dc0c5 ${(ar.current/ar.total)*100}% ${((ar.current+ar.aging1_30)/ar.total)*100}%, #6b6c72 ${((ar.current+ar.aging1_30)/ar.total)*100}% ${((ar.current+ar.aging1_30+ar.aging31_60)/ar.total)*100}%, #0078d4 ${((ar.current+ar.aging1_30+ar.aging31_60)/ar.total)*100}% ${((ar.current+ar.aging1_30+ar.aging31_60+ar.aging61_90)/ar.total)*100}%, #1e3a8a ${((ar.current+ar.aging1_30+ar.aging31_60+ar.aging61_90)/ar.total)*100}% 100%)`
+                              : '#d4d7dc'
+                          }}
+                        >
+                          <div className="absolute inset-[18px] bg-white rounded-full"></div>
+                        </div>
+                        {/* Legend */}
+                        <div className="flex flex-col gap-1.5 flex-1">
+                          <div className="flex items-center gap-2 text-[11px] text-[#393a3d]">
+                            <div className="w-2 h-2 rounded-full bg-[#53c351]" /> Current: {formatLkr(ar.current).replace('LKR', 'LKR ')}
+                          </div>
+                          <div className="flex items-center gap-2 text-[11px] text-[#393a3d]">
+                            <div className="w-2 h-2 rounded-full bg-[#3dc0c5]" /> 1 - 30: {formatLkr(ar.aging1_30).replace('LKR', 'LKR ')}
+                          </div>
+                          <div className="flex items-center gap-2 text-[11px] text-[#393a3d]">
+                            <div className="w-2 h-2 rounded-full bg-[#6b6c72]" /> 31 - 60: {formatLkr(ar.aging31_60).replace('LKR', 'LKR ')}
+                          </div>
+                          <div className="flex items-center gap-2 text-[11px] text-[#393a3d]">
+                            <div className="w-2 h-2 rounded-full bg-[#0078d4]" /> 61 - 90: {formatLkr(ar.aging61_90).replace('LKR', 'LKR ')}
+                          </div>
+                          <div className="flex items-center gap-2 text-[11px] text-[#393a3d]">
+                            <div className="w-2 h-2 rounded-full bg-[#1e3a8a]" /> 91 and over: {formatLkr(ar.aging91Plus).replace('LKR', 'LKR ')}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="absolute bottom-4 right-4">
+                        <button className="p-1 hover:bg-[#f4f5f8] rounded-full text-[#6b6c72] transition-colors">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                            <circle cx="12" cy="5" r="1"/>
+                            <circle cx="12" cy="12" r="1"/>
+                            <circle cx="12" cy="19" r="1"/>
+                          </svg>
+                        </button>
+                      </div>
+                    </WidgetShell>
+                  </DraggableWidget>
                 )}
 
                 {selectedWidgets.inventory_reports && (
-                  <EditWrapper
-                    isEditing={isCustomising}
-                    grabbers={['left', 'right']}
-                    onRemove={() => setSelectedWidgets(prev => ({ ...prev, inventory_reports: false }))}
-                  >
+                  <DraggableWidget id="inventory_reports" grabbers={['left', 'right']} className="md:col-span-1 xl:col-span-1">
                     <WidgetShell
                       title="Inventory Reports"
                       footerButtonLabel="View all reports"
@@ -1564,15 +1827,11 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
                         ))}
                       </div>
                     </WidgetShell>
-                  </EditWrapper>
+                  </DraggableWidget>
                 )}
 
                 {selectedWidgets.low_on_stock && (
-                  <EditWrapper
-                    isEditing={isCustomising}
-                    grabbers={['left', 'right']}
-                    onRemove={() => setSelectedWidgets(prev => ({ ...prev, low_on_stock: false }))}
-                  >
+                  <DraggableWidget id="low_on_stock" grabbers={['left', 'right']} className="md:col-span-2 xl:col-span-2 row-span-2">
                     <WidgetShell
                       title="Low on Stock"
                       subtitle="Never miss a sale with items that are running low"
@@ -1604,65 +1863,13 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
                         </tbody>
                       </table>
                     </WidgetShell>
-                  </EditWrapper>
+                  </DraggableWidget>
                 )}
-              </div>
+              
 
-              {/* Third Row: Invoices, Customers Funnel */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-4">
-                {selectedWidgets.invoices && (
-                  <EditWrapper
-                    isEditing={isCustomising}
-                    grabbers={['left', 'right']}
-                    onRemove={() => setSelectedWidgets(prev => ({ ...prev, invoices: false }))}
-                  >
-                    <WidgetShell
-                      title="Invoices"
-                      onHide={() => setWidgetToHide('invoices')}
-                    >
-                      <div className="flex flex-col gap-8 py-2 mt-4">
-                        <div>
-                          <div className="flex justify-between text-[11.5px] font-bold text-slate-500 mb-1">
-                            <span>UNPAID <span className="font-normal text-slate-400 ml-1">Last 365 days</span></span>
-                          </div>
-                          <div className="flex gap-1 h-[14px] mt-8">
-                            <div className={`relative ${(biData?.invoiceSummary?.totalOverdue || 0) > 0 ? 'bg-gradient-to-r from-red-500 to-rose-500' : 'bg-slate-200'} rounded-l-full`} style={{ width: `${(biData?.invoiceSummary?.totalOverdue || 0) > 0 ? 50 : 50}%` }}>
-                              <span className="absolute bottom-full left-0 mb-1 text-[13.5px] font-extrabold text-slate-800">{formatLkr(biData?.invoiceSummary?.totalOverdue || 0)}</span>
-                              <span className="absolute top-full left-0 mt-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Overdue</span>
-                            </div>
-                            <div className="w-1/2 bg-slate-200 rounded-r-full relative">
-                              <span className="absolute bottom-full right-0 mb-1 text-[13.5px] font-extrabold text-slate-800">{formatLkr((biData?.invoiceSummary?.totalUnpaid || 0) - (biData?.invoiceSummary?.totalOverdue || 0))}</span>
-                              <span className="absolute top-full right-0 mt-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider text-right whitespace-nowrap">Not due yet</span>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="mt-6">
-                          <div className="flex justify-between text-[11.5px] font-bold text-slate-500 mb-1">
-                            <span>PAID <span className="font-normal text-slate-400 ml-1">Last 30 days</span></span>
-                          </div>
-                          <div className="flex gap-1 h-[14px] mt-8">
-                            <div className={`relative ${(biData?.invoiceSummary?.totalPaid || 0) > 0 ? 'bg-gradient-to-r from-green-500 to-emerald-500' : 'bg-slate-200'} rounded-l-full`} style={{ width: `${(biData?.invoiceSummary?.totalPaid || 0) > 0 ? 50 : 50}%` }}>
-                              <span className="absolute bottom-full left-0 mb-1 text-[13.5px] font-extrabold text-slate-800">{formatLkr(biData?.invoiceSummary?.totalNotDeposited || 0)}</span>
-                              <span className="absolute top-full left-0 mt-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Not deposited</span>
-                            </div>
-                            <div className="w-1/2 bg-emerald-500 rounded-r-full relative">
-                              <span className="absolute bottom-full right-0 mb-1 text-[13.5px] font-extrabold text-slate-800">{formatLkr(biData?.invoiceSummary?.totalDeposited || 0)}</span>
-                              <span className="absolute top-full right-0 mt-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider text-right whitespace-nowrap">Deposited</span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </WidgetShell>
-                  </EditWrapper>
-                )}
 
                 {selectedWidgets.customers_funnel && (
-                  <EditWrapper
-                    isEditing={isCustomising}
-                    grabbers={['left', 'right']}
-                    className="xl:col-span-3"
-                    onRemove={() => setSelectedWidgets(prev => ({ ...prev, customers_funnel: false }))}
-                  >
+                  <DraggableWidget id="customers_funnel" grabbers={['left', 'right']} className="md:col-span-2 xl:col-span-4">
                     <WidgetShell title="Customers Funnel" onHide={() => setWidgetToHide('customers_funnel')}>
                       <div className="absolute top-5 right-5 text-[11px] font-semibold text-slate-400">As of today</div>
                       <div className="flex items-center justify-between gap-1 overflow-x-auto py-2 h-full mt-4 pb-4 no-scrollbar">
@@ -1687,53 +1894,12 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
                         ))}
                       </div>
                     </WidgetShell>
-                  </EditWrapper>
+                  </DraggableWidget>
                 )}
-              </div>
-
-              {/* Fourth Row: Sales, AP, AR, Sales Orders */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-4">
-                {selectedWidgets.sales && (
-                  <EditWrapper
-                    isEditing={isCustomising}
-                    grabbers={['left', 'right']}
-                    onRemove={() => setSelectedWidgets(prev => ({ ...prev, sales: false }))}
-                  >
-                    <WidgetShell title="Sales" onHide={() => setWidgetToHide('sales')}>
-                      <div className="absolute top-4 right-6 text-[11px] text-[#6b6c72] flex items-center gap-1 cursor-pointer hover:text-[#393a3d]">
-                        This year to date <ChevronDown size={12} />
-                      </div>
-                      <div className="mt-4 text-[11px] text-[#6b6c72]">Total Amount</div>
-                      <div className="text-[20px] font-bold text-[#393a3d] mb-4">{formatLkr(biData?.salesSummary?.totalSalesYTD || 0)}</div>
-                      <div className="relative h-[80px] border-l border-[#d4d7dc] flex items-end ml-4 mt-6">
-                        <div className="absolute -left-5 bottom-[0%] text-[10px] text-[#8d9096]">0</div>
-                        <div className="absolute -left-6 bottom-[25%] text-[10px] text-[#8d9096]">{formatShortK((biData?.salesSummary?.totalSalesYTD || 0) / 4)}</div>
-                        <div className="absolute -left-6 bottom-[50%] text-[10px] text-[#8d9096]">{formatShortK((biData?.salesSummary?.totalSalesYTD || 0) / 2)}</div>
-                        <div className="absolute -left-6 bottom-[75%] text-[10px] text-[#8d9096]">{formatShortK((biData?.salesSummary?.totalSalesYTD || 0) * 3 / 4)}</div>
-                        <div className="absolute -left-6 bottom-[100%] text-[10px] text-[#8d9096]">{formatShortK(biData?.salesSummary?.totalSalesYTD || 0)}</div>
-                        {[0, 25, 50, 75, 100].map(p => (
-                          <div key={p} className="absolute left-0 right-0 border-t border-[#eceef1]" style={{ bottom: `${p}%` }} />
-                        ))}
-                        {(biData?.salesSummary?.monthlySales || []).map((amt, i) => {
-                          const max = Math.max(...(biData?.salesSummary?.monthlySales || [0]), 1);
-                          const h = max > 0 ? Math.round((amt / max) * 100) : 0;
-                          return (
-                            <div key={i} className="flex-1 flex items-end justify-center h-full relative group cursor-pointer" title={`Month ${i + 1}: ${formatLkr(amt)}`}>
-                              <div className="w-[6px] bg-gradient-to-t from-blue-600 to-sky-400 rounded-t-sm transition-all duration-500" style={{ height: `${Math.max(2, h)}%` }} />
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </WidgetShell>
-                  </EditWrapper>
-                )}
+              
 
                 {selectedWidgets.accounts_payable && (
-                  <EditWrapper
-                    isEditing={isCustomising}
-                    grabbers={['left', 'right']}
-                    onRemove={() => setSelectedWidgets(prev => ({ ...prev, accounts_payable: false }))}
-                  >
+                  <DraggableWidget id="accounts_payable" grabbers={['left', 'right']} className="md:col-span-1 xl:col-span-1">
                     <WidgetShell title="Accounts Payable" onHide={() => setWidgetToHide('accounts_payable')}>
                       <div className="absolute top-4 right-4 text-[11px] text-[#6b6c72]">As of today</div>
                       <div className="mt-4 text-[11px] text-[#6b6c72]">Total</div>
@@ -1751,15 +1917,11 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
                         </div>
                       </div>
                     </WidgetShell>
-                  </EditWrapper>
+                  </DraggableWidget>
                 )}
 
                 {selectedWidgets.accounts_receivable && (
-                  <EditWrapper
-                    isEditing={isCustomising}
-                    grabbers={['left', 'right']}
-                    onRemove={() => setSelectedWidgets(prev => ({ ...prev, accounts_receivable: false }))}
-                  >
+                  <DraggableWidget id="accounts_receivable" grabbers={['left', 'right']} className="md:col-span-1 xl:col-span-1">
                     <WidgetShell title="Accounts Receivable" onHide={() => setWidgetToHide('accounts_receivable')}>
                       <div className="absolute top-4 right-4 text-[11px] text-[#6b6c72]">As of today</div>
                       <div className="mt-4 text-[11px] text-[#6b6c72]">Total</div>
@@ -1777,15 +1939,11 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
                         </div>
                       </div>
                     </WidgetShell>
-                  </EditWrapper>
+                  </DraggableWidget>
                 )}
 
                 {selectedWidgets.sales_orders && (
-                  <EditWrapper
-                    isEditing={isCustomising}
-                    grabbers={['left', 'right']}
-                    onRemove={() => setSelectedWidgets(prev => ({ ...prev, sales_orders: false }))}
-                  >
+                  <DraggableWidget id="sales_orders" grabbers={['left', 'right']} className="md:col-span-2 xl:col-span-2 row-span-2">
                     <WidgetShell
                       title="Sales Orders"
                       subtitle="Take charge of your finances with open sales orders"
@@ -1817,18 +1975,11 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
                         </tbody>
                       </table>
                     </WidgetShell>
-                  </EditWrapper>
+                  </DraggableWidget>
                 )}
-              </div>
-
-              {/* Fifth Row: Work Requests, Reviews, Overdue Invoices, Referrals */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-8">
+              
                 {selectedWidgets.work_requests && (
-                  <EditWrapper
-                    isEditing={isCustomising}
-                    grabbers={['left', 'right']}
-                    onRemove={() => setSelectedWidgets(prev => ({ ...prev, work_requests: false }))}
-                  >
+                  <DraggableWidget id="work_requests" grabbers={['left', 'right']} className="md:col-span-1 xl:col-span-1">
                     <WidgetShell
                       title="Work Requests"
                       subtitle="Drive repeat business using the post-invoice survey"
@@ -1846,15 +1997,11 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
                         </div>
                       </div>
                     </WidgetShell>
-                  </EditWrapper>
+                  </DraggableWidget>
                 )}
 
                 {selectedWidgets.reviews && (
-                  <EditWrapper
-                    isEditing={isCustomising}
-                    grabbers={['left', 'right']}
-                    onRemove={() => setSelectedWidgets(prev => ({ ...prev, reviews: false }))}
-                  >
+                  <DraggableWidget id="reviews" grabbers={['left', 'right']} className="md:col-span-1 xl:col-span-1 row-span-2">
                     <WidgetShell title="Reviews" onHide={() => setWidgetToHide('reviews')}>
                       {biData?.reviews?.reviewCount > 0 ? (
                         <div className="mt-4 space-y-4">
@@ -1888,15 +2035,11 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
                         <div className="mt-4 text-[13px] text-slate-500">No reviews yet. Be the first to rate the system!</div>
                       )}
                     </WidgetShell>
-                  </EditWrapper>
+                  </DraggableWidget>
                 )}
 
                 {selectedWidgets.overdue_invoices && (
-                  <EditWrapper
-                    isEditing={isCustomising}
-                    grabbers={['left', 'right']}
-                    onRemove={() => setSelectedWidgets(prev => ({ ...prev, overdue_invoices: false }))}
-                  >
+                  <DraggableWidget id="overdue_invoices" grabbers={['left', 'right']} className="md:col-span-1 xl:col-span-1">
                     <WidgetShell
                       title="Overdue Invoices"
                       footerButtonLabel="Create an invoice for your next job!"
@@ -1910,15 +2053,11 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
                         {(biData?.overdueInvoiceTotal || 0) > 0 ? 'Review your overdue invoices to avoid late fees.' : 'Create an invoice for your next job!'}
                       </div>
                     </WidgetShell>
-                  </EditWrapper>
+                  </DraggableWidget>
                 )}
 
                 {selectedWidgets.referrals && (
-                  <EditWrapper
-                    isEditing={isCustomising}
-                    grabbers={['left', 'right']}
-                    onRemove={() => setSelectedWidgets(prev => ({ ...prev, referrals: false }))}
-                  >
+                  <DraggableWidget id="referrals" grabbers={['left', 'right']} className="md:col-span-1 xl:col-span-1">
                     <WidgetShell
                       title="Referrals"
                       subtitle="Generate referrals using the post-invoice survey"
@@ -1936,19 +2075,11 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
                         </div>
                       </div>
                     </WidgetShell>
-                  </EditWrapper>
+                  </DraggableWidget>
                 )}
-              </div>
-
-              {/* Sixth Row: Video Tutorials */}
+              {/* Video Tutorials */}
               {selectedWidgets.video_tutorials && (
-                <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 mb-8">
-                  <EditWrapper
-                    isEditing={isCustomising}
-                    grabbers={['left', 'right']}
-                    className="xl:col-span-1"
-                    onRemove={() => setSelectedWidgets(prev => ({ ...prev, video_tutorials: false }))}
-                  >
+                  <DraggableWidget id="video_tutorials" grabbers={['left', 'right']} className="md:col-span-2 xl:col-span-4 row-span-2">
                     <WidgetShell
                       title="Video tutorials"
                       subtitle="Watch and learn how to use your dashboard"
@@ -1981,9 +2112,10 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
                         </div>
                       </div>
                     </WidgetShell>
-                  </EditWrapper>
-                </div>
-              )}
+                  </DraggableWidget>
+                )}
+              </div>
+            </DragContext.Provider>
             </>
           )}
         </div>
@@ -2095,3 +2227,5 @@ const AITypingText = () => {
 };
 
 export default GetThingsDoneBoard;
+
+

@@ -7,6 +7,7 @@ import { salesInvoiceService } from '../services/salesInvoice.service';
 import { salesOrderService } from '../services/salesOrder.service';
 import { paymentMethodService } from '../services/paymentMethod.service';
 import { productService } from '../services/product.service';
+import { grnService } from '../services/grn.service';
 
 
 import { getSessionData } from '../utils/session';
@@ -91,8 +92,9 @@ const SalesInvoiceBoard = ({ isOpen, onClose }) => {
             const invData = await salesInvoiceService.getInitData(company);
             const methods = await paymentMethodService.getAll(company).catch(() => []);
             
-            // 2. Load Products from Product Service (to match SalesOrderBoard pattern)
-            const productsData = await productService.search(company, '').catch(() => []);
+            // 2. Load Products from Acc-web DB via GRN Service
+            const grnLookups = await grnService.getLookups(company).catch(() => ({ products: [] }));
+            const productsData = grnLookups.products || [];
             
             // 3. Get all Sales Orders for lookup
             const soList = await salesOrderService.searchOrders(company).catch(() => []);
@@ -102,10 +104,10 @@ const SalesInvoiceBoard = ({ isOpen, onClose }) => {
                 customers: soData.customers || [], 
                 products: productsData.map(p => ({
                     code: p.code,
-                    name: p.prod_Name,
+                    name: p.name,
                     unit: p.unit || '',
-                    cost: p.purchase_price || 0,
-                    selling: p.selling_Price || 0
+                    cost: p.price || 0,
+                    selling: p.sellingPrice || 0
                 })),
                 paymentMethods: methods,
                 salesAssistants: (invData.salesAssistants || soData.salesAssistants || []).map(sa => ({
@@ -321,6 +323,21 @@ const SalesInvoiceBoard = ({ isOpen, onClose }) => {
     const handleDelete = () => {
         if (!formData.docNo) return;
         setShowDeleteConfirm(true);
+    };
+
+    const confirmDelete = async () => {
+        setIsDeleting(true);
+        try {
+            await salesInvoiceService.deleteInvoice(formData.docNo, formData.company);
+            showSuccessToast(`Invoice deleted successfully.`);
+            handleClear();
+            setShowDeleteConfirm(false);
+            if (onClose) onClose();
+        } catch (error) {
+            showErrorToast(error.toString());
+        } finally {
+            setIsDeleting(false);
+        }
     };
 
     return (
@@ -612,6 +629,7 @@ const SalesInvoiceBoard = ({ isOpen, onClose }) => {
 
             <CalendarModal isOpen={showDatePicker} onClose={() => setShowDatePicker(false)} onDateSelect={(d) => { setFormData(prev => ({ ...prev, [datePickerField]: d })); setShowDatePicker(false); }} initialDate={formData[datePickerField]} />
             <ConfirmModal isOpen={showConfirmModal} onClose={() => setShowConfirmModal(false)} onConfirm={confirmApply} title="Confirm Final Application" message="Are you sure you want to apply this invoice to the ledger? This action will update inventory and accounting balances." isLoading={isApplying} />
+            <ConfirmModal isOpen={showDeleteConfirm} onClose={() => setShowDeleteConfirm(false)} onConfirm={confirmDelete} title="Confirm Deletion" message={`Are you sure you want to delete invoice ${formData.docNo}? This action cannot be undone.`} isLoading={isDeleting} />
         </>
     );
 };

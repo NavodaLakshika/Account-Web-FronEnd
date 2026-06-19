@@ -15,9 +15,21 @@ export const getSessionData = () => {
     if (companyData) {
         try {
             const parsed = JSON.parse(companyData);
-            companyCode = parsed.company_Code || parsed.companyCode || parsed.CompanyCode || companyCode;
-            companyName = parsed.company_Name || parsed.companyName || parsed.CompanyName || companyName;
+            if (typeof parsed === 'string') {
+                companyCode = parsed;
+            } else {
+                companyCode = parsed.company_Code || parsed.companyCode || parsed.CompanyCode || companyData;
+                companyName = parsed.company_Name || parsed.companyName || parsed.CompanyName || companyName;
+            }
         } catch (e) { companyCode = companyData; }
+    }
+
+    const companyMap = {
+        'C001': 'COM001',
+        'C002': 'COM002'
+    };
+    if (companyCode && companyMap[companyCode]) {
+        companyCode = companyMap[companyCode];
     }
 
     if (userData) {

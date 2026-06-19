@@ -124,18 +124,29 @@ const ReportPrintModal = ({ isOpen, onClose, companyName, title, subtitle, data 
 
             <div className="print-content-wrapper">
                 {showHeaders && (
-                    <div style={{ textAlign: 'center', marginBottom: '32px', borderBottom: '3px solid #0078d4', paddingBottom: '20px' }}>
-                        <div style={{ fontSize: '24px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#0078d4' }}>{companyName}</div>
-                        <div style={{ fontSize: '16px', fontWeight: 'bold', color: '#333', marginTop: '8px' }}>{title}</div>
-                        <div style={{ fontSize: '13px', color: '#666', marginTop: '4px' }}>{subtitle}</div>
+                    <div style={{ marginBottom: '30px', borderBottom: '2px solid #000', paddingBottom: '15px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                        <div style={{ textAlign: 'left', maxWidth: '40%' }}>
+                            <div style={{ fontSize: '18px', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.02em', color: '#000' }}>{companyName}</div>
+                            <div style={{ fontSize: '11px', color: '#444', marginTop: '4px' }}>Business Registration / Tax ID</div>
+                            <div style={{ fontSize: '11px', color: '#444' }}>Address Placeholder, City, Country</div>
+                        </div>
+                        <div style={{ textAlign: 'center', flex: 1, padding: '0 20px' }}>
+                            <div style={{ fontSize: '16px', fontWeight: 'bold', color: '#000', textTransform: 'uppercase' }}>{title}</div>
+                            <div style={{ fontSize: '12px', color: '#555', marginTop: '4px' }}>{subtitle}</div>
+                        </div>
+                        <div style={{ textAlign: 'right', maxWidth: '30%', fontSize: '10px', color: '#444' }}>
+                            <div><strong>Printed:</strong> {new Date().toLocaleDateString()} {new Date().toLocaleTimeString()}</div>
+                            <div style={{ marginTop: '2px' }}><strong>User:</strong> System Admin</div>
+                            <div style={{ marginTop: '2px' }}><strong>Status:</strong> Final / Approved</div>
+                        </div>
                     </div>
                 )}
                 
-                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px', color: '#000' }}>
                     <thead>
                         <tr>
                             {resolvedColumns.map((col, i) => (
-                                <th key={i} style={{ padding: '10px 12px', textAlign: col.align || 'left', fontWeight: 'bold', color: '#111', backgroundColor: '#f8fafc', borderBottom: '2px solid #0078d4', borderTop: '1px solid #e2e8f0', whiteSpace: 'nowrap' }}>
+                                <th key={i} style={{ padding: '8px 12px', textAlign: col.align || 'left', fontWeight: 'bold', color: '#000', borderBottom: '1px solid #000', borderTop: '1px solid #000', whiteSpace: 'nowrap', textTransform: 'uppercase' }}>
                                     {col.header}
                                 </th>
                             ))}
@@ -143,11 +154,11 @@ const ReportPrintModal = ({ isOpen, onClose, companyName, title, subtitle, data 
                     </thead>
                     <tbody>
                         {data.length === 0 ? (
-                            <tr><td colSpan={resolvedColumns.length} style={{ padding: '30px', textAlign: 'center', color: '#999', fontStyle: 'italic' }}>No data available</td></tr>
+                            <tr><td colSpan={resolvedColumns.length} style={{ padding: '30px', textAlign: 'center', color: '#666', fontStyle: 'italic' }}>No data available</td></tr>
                         ) : data.map((row, i) => (
-                            <tr key={i} style={{ backgroundColor: i % 2 === 1 ? '#f8fafc' : 'white' }}>
+                            <tr key={i} style={{ backgroundColor: i % 2 === 1 ? '#fafafa' : 'white' }}>
                                 {resolvedColumns.map((col, j) => (
-                                    <td key={j} style={{ padding: '8px 12px', textAlign: col.align || 'left', color: '#333', borderBottom: '1px solid #e2e8f0' }}>
+                                    <td key={j} style={{ padding: '6px 12px', textAlign: col.align || 'left', color: '#000', borderBottom: '1px solid #eee' }}>
                                         {formatCell(col, row)}
                                     </td>
                                 ))}
@@ -155,13 +166,13 @@ const ReportPrintModal = ({ isOpen, onClose, companyName, title, subtitle, data 
                         ))}
                     </tbody>
                     {totals && (
-                        <tbody style={{ borderTop: '2px solid #0078d4', borderBottom: '2px solid #cbd5e1', backgroundColor: '#f1f5f9' }}>
+                        <tbody style={{ borderTop: '1px solid #000', borderBottom: '3px double #000' }}>
                             <tr>
                                 {resolvedColumns.map((col, j) => {
                                     const accessor = col.accessor || col.key;
                                     const isFirstCol = j === 0;
                                     return (
-                                        <td key={j} style={{ padding: '10px 12px', textAlign: col.align || 'left', fontWeight: 'bold', color: '#0f172a' }}>
+                                        <td key={j} style={{ padding: '8px 12px', textAlign: col.align || 'left', fontWeight: 'bold', color: '#000' }}>
                                             {isFirstCol ? 'TOTAL' : (totals[accessor] !== undefined ? col.format ? col.format(totals[accessor]) : totals[accessor] : '')}
                                         </td>
                                     );
@@ -213,7 +224,7 @@ const ReportPrintModal = ({ isOpen, onClose, companyName, title, subtitle, data 
             {PrintDocument}
 
             {/* Modal UI */}
-            <div className={`fixed inset-0 z-[600] flex items-center justify-center bg-slate-900/50 backdrop-blur-sm ${isFullscreen ? 'p-0' : 'p-4'}`}>
+            <div className={`fixed inset-0 z-[1500] flex items-center justify-center bg-slate-900/50 backdrop-blur-sm ${isFullscreen ? 'p-0' : 'p-4'}`}>
                 <div className={`bg-white ${isFullscreen ? 'w-full h-full rounded-none' : 'w-full max-w-[1320px] h-[90vh] rounded-sm'} shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95 duration-200`}>
                     {/* Header */}
                     <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-start shrink-0">
@@ -335,8 +346,8 @@ const ReportPrintModal = ({ isOpen, onClose, companyName, title, subtitle, data 
                                     
                                     {showMoreMenu && (
                                         <>
-                                            <div className="fixed inset-0 z-[610]" onClick={() => setShowMoreMenu(false)}></div>
-                                            <div className="absolute top-[110%] right-0 mt-1 w-56 bg-[#2b2d2f] rounded-sm shadow-xl border border-gray-700 py-1.5 z-[620] text-[#e8eaed] text-[13px]">
+                                            <div className="fixed inset-0 z-[1510]" onClick={() => setShowMoreMenu(false)}></div>
+                                            <div className="absolute top-[110%] right-0 mt-1 w-56 bg-[#2b2d2f] rounded-sm shadow-xl border border-gray-700 py-1.5 z-[1520] text-[#e8eaed] text-[13px]">
                                                 <button 
                                                     onClick={() => { setIsTwoPageView(!isTwoPageView); setShowMoreMenu(false); }}
                                                     className="w-full text-left px-4 py-2 hover:bg-[#3c4043] transition-colors flex items-center"
@@ -405,10 +416,21 @@ const ReportPrintModal = ({ isOpen, onClose, companyName, title, subtitle, data 
                                         </div>
                                     )}
                                     {showHeaders && (
-                                        <div className="w-full text-center flex flex-col gap-1 mb-8">
-                                            <h1 className="text-[18px] font-bold text-gray-900 uppercase tracking-wide">{companyName}</h1>
-                                            <h2 className="text-[14px] text-gray-700 font-medium">{title}</h2>
-                                            <h3 className="text-[12px] text-gray-500">{subtitle}</h3>
+                                        <div className="w-full flex justify-between items-start border-b-2 border-gray-900 pb-5 mb-8">
+                                            <div className="text-left w-2/5">
+                                                <h1 className="text-[18px] font-extrabold text-gray-900 uppercase tracking-tight">{companyName}</h1>
+                                                <div className="text-[11px] text-gray-600 mt-1">Business Registration / Tax ID</div>
+                                                <div className="text-[11px] text-gray-600">Address Placeholder, City, Country</div>
+                                            </div>
+                                            <div className="text-center flex-1 px-4">
+                                                <h2 className="text-[16px] text-gray-900 font-bold uppercase tracking-wide">{title}</h2>
+                                                <h3 className="text-[12px] text-gray-600 mt-1 uppercase tracking-wider">{subtitle}</h3>
+                                            </div>
+                                            <div className="text-right w-[30%] text-[10px] text-gray-600">
+                                                <div><strong className="text-gray-900">Printed:</strong> {new Date().toLocaleDateString()} {new Date().toLocaleTimeString()}</div>
+                                                <div className="mt-0.5"><strong className="text-gray-900">User:</strong> System Admin</div>
+                                                <div className="mt-0.5"><strong className="text-gray-900">Status:</strong> Final / Approved</div>
+                                            </div>
                                         </div>
                                     )}
                                     <div className="flex-1">
@@ -417,9 +439,9 @@ const ReportPrintModal = ({ isOpen, onClose, companyName, title, subtitle, data 
                                         ) : (
                                             <table className="w-full text-left border-collapse">
                                                 <thead>
-                                                    <tr className="border-b-2 border-gray-900">
+                                                    <tr className="border-t border-b border-gray-900">
                                                         {resolvedColumns.map((col, i) => (
-                                                            <th key={i} className="p-2 text-[11px] font-bold text-gray-900 whitespace-nowrap" style={{ textAlign: col.align || 'left' }}>
+                                                            <th key={i} className="p-2 text-[10px] font-bold text-gray-900 uppercase tracking-wider whitespace-nowrap" style={{ textAlign: col.align || 'left' }}>
                                                                 {col.header}
                                                             </th>
                                                         ))}
@@ -427,9 +449,9 @@ const ReportPrintModal = ({ isOpen, onClose, companyName, title, subtitle, data 
                                                 </thead>
                                                 <tbody>
                                                     {data.map((row, i) => (
-                                                        <tr key={i} className={`border-b border-gray-100 ${i % 2 === 1 ? 'bg-gray-50' : ''}`}>
+                                                        <tr key={i} className={`border-b border-gray-200 ${i % 2 === 1 ? 'bg-gray-50' : ''}`}>
                                                             {resolvedColumns.map((col, j) => (
-                                                                <td key={j} className="p-2 text-[11px] text-gray-800" style={{ textAlign: col.align || 'left' }}>
+                                                                <td key={j} className="p-2 text-[11px] text-gray-900" style={{ textAlign: col.align || 'left' }}>
                                                                     {formatCell(col, row)}
                                                                 </td>
                                                             ))}
@@ -438,13 +460,13 @@ const ReportPrintModal = ({ isOpen, onClose, companyName, title, subtitle, data 
                                                 </tbody>
                                                 {totals && (
                                                     <tfoot>
-                                                        <tr className="border-t-2 border-b-2 border-gray-900 bg-gray-50/50">
+                                                        <tr className="border-t border-b-[3px] border-double border-gray-900 bg-white">
                                                             {resolvedColumns.map((col, j) => {
                                                                 const accessor = col.accessor || col.key;
                                                                 const isFirstCol = j === 0;
                                                                 return (
                                                                     <td key={j} className="p-2 text-[11px] font-bold text-gray-900 whitespace-nowrap" style={{ textAlign: col.align || 'left' }}>
-                                                                        {isFirstCol ? 'Total' : (totals[accessor] !== undefined ? col.format ? col.format(totals[accessor]) : totals[accessor] : '')}
+                                                                        {isFirstCol ? 'TOTAL' : (totals[accessor] !== undefined ? col.format ? col.format(totals[accessor]) : totals[accessor] : '')}
                                                                     </td>
                                                                 );
                                                             })}
@@ -516,9 +538,9 @@ const ReportPrintModal = ({ isOpen, onClose, companyName, title, subtitle, data 
 
             {/* Document Properties Modal */}
             {showDocProps && (
-                <div className="fixed inset-0 z-[700] flex items-center justify-center bg-transparent">
+                <div className="fixed inset-0 z-[1550] flex items-center justify-center bg-transparent">
                     <div className="absolute inset-0 bg-transparent" onClick={() => setShowDocProps(false)}></div>
-                    <div className="bg-[#202124] w-[400px] rounded-[4px] shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95 duration-200 z-[710] border border-gray-700">
+                    <div className="bg-[#202124] w-[400px] rounded-[4px] shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95 duration-200 z-[1560] border border-gray-700">
                         <div className="p-5 flex flex-col text-[#e8eaed] text-[13px]">
                             <h2 className="text-[15px] mb-4">Document properties</h2>
                             

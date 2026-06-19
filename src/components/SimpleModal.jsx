@@ -1,7 +1,7 @@
 import React from 'react';
 import { X } from 'lucide-react';
 
-const SimpleModal = ({ isOpen, onClose, title, children, footer, maxWidth = "max-w-4xl", zoom = 1, showHeaderClose = true, accentColor: accent = localStorage.getItem('topBarColor') || '#0285fd' }) => {
+const SimpleModal = ({ isOpen, onClose, title, subtitle, children, footer, maxWidth = "max-w-4xl", zoom = 1, showHeaderClose = true, accentColor: accent = localStorage.getItem('topBarColor') || '#0285fd' }) => {
     if (!isOpen) return null;
 
     return (
@@ -9,13 +9,20 @@ const SimpleModal = ({ isOpen, onClose, title, children, footer, maxWidth = "max
             <div className="absolute inset-0 bg-slate-900/30 backdrop-blur-sm" onClick={onClose} />
 
  <div className={`relative w-full ${maxWidth} bg-white shadow-2xl rounded-[5px] overflow-hidden flex flex-col animate-in slide-in-from-bottom-10 fade-in duration-400`} style={{ zoom }}>
-                <div className="bg-white px-6 py-3.5 flex items-center justify-between border-b border-slate-200 select-none relative shrink-0">
-                    <span className="text-[15px] font-mono font-bold text-slate-800 uppercase tracking-widest truncate">
-                        {title}
-                    </span>
+                <div className="bg-white px-6 py-3 flex items-center justify-between border-b border-slate-200 select-none relative shrink-0">
+                    <div className="flex flex-col gap-0.5 overflow-hidden">
+                        <span className="text-[15px] font-mono font-bold text-slate-800 uppercase tracking-widest truncate">
+                            {title}
+                        </span>
+                        {subtitle && (
+                            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider truncate">
+                                {subtitle}
+                            </span>
+                        )}
+                    </div>
 
                     {showHeaderClose && (
-                        <button onClick={onClose} className="w-8 h-8 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-600 transition-all shrink-0 border-none" title="Close">
+                        <button onClick={onClose} className="w-8 h-8 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-600 transition-all shrink-0 border-none ml-4" title="Close">
                             <X size={28} strokeWidth={1.5} />
                         </button>
                     )}

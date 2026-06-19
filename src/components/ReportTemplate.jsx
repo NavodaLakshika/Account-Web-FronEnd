@@ -10,7 +10,7 @@ import {
     Info,
     FileText,
     Share, Camera,
-    Sparkles, X, Search, Calendar, Check
+    Sparkles, X, Search, Calendar, Check, Receipt
 } from 'lucide-react';
 import ReportPrintModal from './modals/AdminReports/ReportPrintModal';
 import ReportEmailModal from './modals/AdminReports/ReportEmailModal';
@@ -18,6 +18,9 @@ import CalendarModal from './CalendarModal';
 import CalendarPopover from './CalendarPopover';
 import ReportCustomizeModal from './modals/AdminReports/ReportCustomizeModal';
 import ReportLearnMoreModal from './modals/AdminReports/ReportLearnMoreModal';
+import PaymentDetailModal from './PaymentDetailModal';
+import QuotationDetailModal from './QuotationDetailModal';
+import SalesOrderDetailModal from './SalesOrderDetailModal';
 import api from '../services/api';
 
 const compactTableStyles = `
@@ -128,7 +131,16 @@ const allReportsList = [
     "Business Snapshot",
     "Profit and Loss as % of total income",
     "Profit and Loss by Customer",
-    "Profit and Loss by Month"
+    "Profit and Loss by Month",
+    "Chart of Accounts",
+    "Fixed Assets Item List",
+    "Long Term Liability",
+    "Depreciation Procedure",
+    "Fixed Income",
+    "Fixed Expenses",
+    "Sales Tax ID List",
+    "Products Report",
+    "Sales Order Summary"
 ];
 
 
@@ -194,6 +206,9 @@ const ReportTemplate = ({
     const [feedbackText, setFeedbackText] = useState('');
     const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false);
     const [feedbackImages, setFeedbackImages] = useState([]);
+    const [selectedPayDoc, setSelectedPayDoc] = useState(null);
+    const [selectedQuotationDoc, setSelectedQuotationDoc] = useState(null);
+    const [selectedSalesOrderDoc, setSelectedSalesOrderDoc] = useState(null);
     const fileInputRef = useRef(null);
 
     const handleImageUpload = (e) => {
@@ -568,14 +583,14 @@ const ReportTemplate = ({
     
     // Automatically generate columns if apiData is present and columns prop is empty
     let displayColumns = (apiData && apiData.length > 0 && columns.length === 0)
-        ? Object.keys(apiData[0]).map(key => {
+        ? Object.keys(apiData[0]).filter(key => key !== 'DocNoHidden' && key !== 'docnohidden').map(key => {
             const headerLower = key.toLowerCase().replace(/[^a-z0-9]/g, '');
-            const isCurrencyCol = columnsToTotal.some(c => headerLower.includes(c)) && !['qty', 'quantity', 'hours'].includes(headerLower);
+            const isCurrencyCol = columnsToTotal.some(c => headerLower.includes(c)) && !['qty', 'quantity', 'hours', 'code', 'date', 'id', 'name', 'type', 'status', 'no'].some(exclude => headerLower.includes(exclude));
             
             return {
                 header: (isCurrencyCol && !customizations.hideCurrency) ? `${key} (LKR)` : key,
                 accessor: key,
-                align: columnsToTotal.some(c => headerLower.includes(c)) ? 'right' : 'left',
+                align: (columnsToTotal.some(c => headerLower.includes(c)) && !['code', 'date', 'id', 'name', 'type', 'status', 'no'].some(exclude => headerLower.includes(exclude))) ? 'right' : 'left',
                 format: isCurrencyCol ? (val) => {
                     if (val === null || val === undefined || val === '') return '';
                     if (typeof val === 'string' && isNaN(parseFloat(val))) return val;
@@ -591,7 +606,7 @@ const ReportTemplate = ({
         : columns.map(col => {
             if (col.format) return col;
             const headerLower = (col.header || '').toLowerCase().replace(/[^a-z0-9]/g, '');
-            const isCurrencyCol = columnsToTotal.some(c => headerLower.includes(c)) && !['qty', 'quantity', 'hours'].includes(headerLower);
+            const isCurrencyCol = columnsToTotal.some(c => headerLower.includes(c)) && !['qty', 'quantity', 'hours', 'code', 'date', 'id', 'name', 'type', 'status', 'no'].some(exclude => headerLower.includes(exclude));
             return {
                 ...col,
                 header: (isCurrencyCol && !customizations.hideCurrency) ? (!col.header.includes('(LKR)') ? `${col.header} (LKR)` : col.header) : col.header.replace(' (LKR)', ''),
@@ -608,6 +623,19 @@ const ReportTemplate = ({
             };
         });
 
+    const currencyCols = [];
+    const regularCols = [];
+    displayColumns.forEach(col => {
+        const headerLower = (col.header || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+        const isCurrency = columnsToTotal.some(c => headerLower.includes(c)) && !['qty', 'quantity', 'hours', 'code', 'date', 'id', 'name', 'type', 'status', 'no'].some(exclude => headerLower.includes(exclude));
+        if (isCurrency) {
+            currencyCols.push(col);
+        } else {
+            regularCols.push(col);
+        }
+    });
+    displayColumns = [...regularCols, ...currencyCols];
+
     const nonTotalColumns = ['account_code', 'account_type', 'account_name', 'accountcode', 'accounttype', 'accountname', 'id', 'name', 'type', 'date', 'status', 'description', 'reference', 'memo'];
     const totals = {};
     let hasTotals = false;
@@ -619,8 +647,8 @@ const ReportTemplate = ({
             const accessor = col.accessor || col.key;
             const accessorLower = String(accessor).toLowerCase().replace(/[^a-z0-9_]/g, '');
             
-            const isNonTotal = nonTotalColumns.some(c => headerLower === c || accessorLower === c || headerLower.includes('code') || headerLower.includes('name') || headerLower.includes('type'));
-            const isExplicitTotal = columnsToTotal.some(c => headerLower.includes(c));
+            const isNonTotal = nonTotalColumns.some(c => headerLower === c || accessorLower === c || headerLower.includes('code') || headerLower.includes('name') || headerLower.includes('type') || headerLower.includes('date') || headerLower.includes('id') || headerLower.includes('status') || headerLower.includes('no'));
+            const isExplicitTotal = columnsToTotal.some(c => headerLower.includes(c)) && !['code', 'date', 'id', 'name', 'type', 'status', 'no'].some(exclude => headerLower.includes(exclude));
             
             if (isExplicitTotal || !isNonTotal) {
                 let sum = 0;
@@ -692,7 +720,8 @@ const ReportTemplate = ({
         }
 
         const colName = (col?.header || col?.accessor || '').toLowerCase();
-        if (colName.includes('code') || colName.includes('id') || colName.includes('phone') || colName.includes('year')) {
+        if (colName.includes('code') || colName.includes('id') || colName.includes('phone') || colName.includes('year') || colName.includes('date')) {
+            if (typeof value === 'string' && value.includes('T') && colName.includes('date')) return value.split('T')[0];
             return value;
         }
 
@@ -1306,8 +1335,8 @@ const ReportTemplate = ({
                                             return (
                                             <th key={i} className={`font-bold text-gray-800 group relative ${compactView ? 'p-1.5 text-[10.5px]' : 'p-2 text-[12px]'}`} style={{ textAlign: col.align || 'left' }}>
                                                 <div className="flex flex-col gap-1.5">
-                                                    <div className={`flex items-center gap-2 ${col.align === 'right' ? 'justify-end' : 'justify-between'}`}>
-                                                        <span>
+                                                    <div className={`flex items-center gap-2 w-full ${col.align === 'right' ? 'justify-end text-right' : 'justify-between text-left'}`}>
+                                                        <span className="flex-1">
                                                             {col.header}
                                                         </span>
                                                         <button 
@@ -1342,17 +1371,43 @@ const ReportTemplate = ({
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {apiLoading ? <tr><td colSpan="100%" className="text-center py-4">Loading data from database...</td></tr> : displayData.map((row, i) => (
-                                        <tr key={i} className={`${compactView ? 'border-b border-gray-100' : 'border-b border-gray-200 hover:bg-gray-50'}`}>
+                                    {apiLoading ? <tr><td colSpan="100%" className="text-center py-4">Loading data from database...</td></tr> : displayData.map((row, i) => {
+                                        const isBillPaymentList = title === "Bill Payment List";
+                                        const isQuotationSummary = title === "Quotation Summary";
+                                        const isSalesOrderSummary = title === "Sales Order Summary";
+                                        const isClickableRow = isBillPaymentList || isQuotationSummary || isSalesOrderSummary;
+                                        const payDocAcc = displayColumns.find(c => c.header === 'No.' || c.accessor === 'No.' || c.header === 'No' || c.accessor === 'No' || c.header === 'Document ID')?.accessor;
+                                        const payDocVal = isClickableRow && payDocAcc ? row[payDocAcc] : null;
+
+                                        return (
+                                        <tr 
+                                            key={i} 
+                                            className={`${compactView ? 'border-b border-gray-100' : 'border-b border-gray-200 hover:bg-gray-50'} ${isClickableRow && payDocVal ? 'cursor-pointer group relative' : ''}`}
+                                            onClick={() => {
+                                                if (isBillPaymentList && payDocVal) {
+                                                    setSelectedPayDoc(payDocVal);
+                                                } else if (isQuotationSummary && payDocVal) {
+                                                    setSelectedQuotationDoc(payDocVal);
+                                                } else if (isSalesOrderSummary && payDocVal) {
+                                                    setSelectedSalesOrderDoc(payDocVal);
+                                                }
+                                            }}
+                                        >
                                             {displayColumns.map((col, j) => {
                                                 const acc = col.accessor || col.key || col.header;
                                                 return (
-                                                <td key={j} className={`text-gray-700 ${compactView ? 'p-1 text-[11px]' : 'p-2 text-[12px]'}`} style={{ textAlign: col.align || 'left' }}>
+                                                <td key={j} className={`text-gray-700 ${compactView ? 'p-1 text-[11px]' : 'p-2 text-[12px]'} relative`} style={{ textAlign: col.align || 'left' }}>
                                                     {formatCellValue(row[acc], col)}
+                                                    {isClickableRow && payDocVal && j === 0 && (
+                                                        <div className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 flex items-center gap-1 bg-[#0077c5] text-white text-[10px] font-bold px-2 py-1 rounded shadow-sm whitespace-nowrap transition-opacity pointer-events-none">
+                                                            <Receipt size={10} className="text-white" />
+                                                            View
+                                                        </div>
+                                                    )}
                                                 </td>
                                             )})}
                                         </tr>
-                                    ))}
+                                    )})}
 
                                     {hasTotals && displayData.length > 0 && !apiLoading && (
                                         <tr className={`${compactView ? 'border-t-2 border-double border-gray-400' : 'border-t-[3px] border-double border-gray-400'} bg-[#f8fafc] font-bold`}>
@@ -1439,6 +1494,26 @@ const ReportTemplate = ({
                 columns={displayColumns}
                 totals={hasTotals ? totals : null}
             />
+            {selectedPayDoc && (
+                <PaymentDetailModal
+                    isOpen={!!selectedPayDoc}
+                    onClose={() => setSelectedPayDoc(null)}
+                    payDoc={selectedPayDoc}
+                />
+            )}
+            {selectedQuotationDoc && (
+                <QuotationDetailModal
+                    docNo={selectedQuotationDoc}
+                    onClose={() => setSelectedQuotationDoc(null)}
+                />
+            )}
+            {selectedSalesOrderDoc && (
+                <SalesOrderDetailModal
+                    docNo={selectedSalesOrderDoc}
+                    isOpen={!!selectedSalesOrderDoc}
+                    onClose={() => setSelectedSalesOrderDoc(null)}
+                />
+            )}
             <ReportCustomizeModal
                 isOpen={showCustomizeModal}
                 onClose={() => setShowCustomizeModal(false)}

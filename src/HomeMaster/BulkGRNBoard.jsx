@@ -6,7 +6,7 @@ import * as XLSX from 'xlsx';
 import { grnService } from '../services/grn.service';
 import { getSessionData } from '../utils/session';
 import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
-
+import { reportService } from '../services/report.service';
 
 const BulkGRNBoard = ({ isOpen, onClose }) => {
     const [lookups, setLookups] = useState({ suppliers: [], products: [], pos: [], paymentMethods: [] });
@@ -47,38 +47,22 @@ const BulkGRNBoard = ({ isOpen, onClose }) => {
         }
     };
 
-    const downloadExcelTemplate = () => {
-        const template = [
-            { 
-                'Supplier Code': 'SUPP01', 
-                'Supplier Invoice': 'INV-123',
-                'PO Number' :'',
-                'Payment Method': 'Cash',
-                'Comment': 'Bulk upload',
-                'Product Code': 'PROD01', 
-                'Qty': '10', 
-                'Free Qty': '0', 
-                'Purchase Price': '100.00', 
-                'Selling Price': '150.00' 
-            },
-            { 
-                'Supplier Code': 'SUPP02', 
-                'Supplier Invoice': 'INV-456',
-                'PO Number' :'',
-                'Payment Method': 'Credit',
-                'Comment': 'Bulk upload 2',
-                'Product Code': 'PROD02', 
-                'Qty': '5', 
-                'Free Qty': '1', 
-                'Purchase Price': '200.00', 
-                'Selling Price': '250.00' 
-            },
-        ];
-        const ws = XLSX.utils.json_to_sheet(template);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Bulk_GRN_Template");
-        XLSX.writeFile(wb, "Bulk_GRN_Template.xlsx");
-        showSuccessToast("Bulk Template Downloaded!");
+    const downloadExcelTemplate = async () => {
+        try {
+            const template = [{
+                'Supplier Code': '', 'Supplier Invoice': '', 'PO Number': '', 'Payment Method': '', 'Comment': '',
+                'Product Code': '', 'Product Name': '', 'Unit': '', 'Pack Size': '', 'Category': '', 'Department': '',
+                'Available Stock': '', 'Purchase Price': '', 'Selling Price': '', 'Qty': '', 'Free Qty': ''
+            }];
+
+            const ws = XLSX.utils.json_to_sheet(template);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Bulk_GRN_Template");
+            XLSX.writeFile(wb, "Bulk_GRN_Template.xlsx");
+            showSuccessToast("Bulk Template Downloaded!");
+        } catch (error) {
+            showErrorToast("Failed to generate template.");
+        }
     };
 
     const handleExcelUpload = (e) => {
@@ -126,6 +110,7 @@ const BulkGRNBoard = ({ isOpen, onClose }) => {
                         };
                     }
 
+                    const pName = row['Product Name'] || row['prodName'] || row['Item Name'] || '';
                     const prod = lookups.products.find(p => p.code?.trim().toUpperCase() === pCode.toUpperCase());
                     
                     const qty = parseFloat(row['Qty'] || row['Quantity'] || 0);
@@ -135,7 +120,7 @@ const BulkGRNBoard = ({ isOpen, onClose }) => {
 
                     groups[key].products.push({
                         prodCode: pCode,
-                        prodName: prod ? prod.name : 'Unknown Product',
+                        prodName: prod ? prod.name : (pName || 'Unknown Product'),
                         unit: prod ? prod.unit : 'Nos',
                         packSize: prod ? prod.packSize : 1,
                         qty: qty.toString(),
@@ -149,7 +134,7 @@ const BulkGRNBoard = ({ isOpen, onClose }) => {
                 const parsedGroups = Object.values(groups);
                 
                 if (parsedGroups.length > 0) {
-                    setGroupedGrns(parsedGroups);
+                    setGroupedGrns(prev => [...prev, ...parsedGroups]);
                     showSuccessToast(`Successfully grouped ${parsedGroups.length} GRNs from Excel.`);
                 } else {
                     showErrorToast("Could not parse any valid GRN groups.");

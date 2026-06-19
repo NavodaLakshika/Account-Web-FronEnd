@@ -3,6 +3,7 @@ import { Save, RotateCcw, Loader2, AlertTriangle, CreditCard, Banknote, Percent 
 import { cardCommissionService } from '../../../services/cardCommission.service';
 import { showSuccessToast, showErrorToast } from '../../../utils/toastUtils';
 import { MasterFormWrapper, MasterFieldRow, MasterInput, MasterLookupInput, MasterLookupModal } from '../../MasterFormComponents';
+import { getCompanyCode } from '../../../utils/session';
 
 const CardCommissionBoard = ({ isOpen, onClose }) => {
     const initialState = { BankAccCode: '', BankAccName: '', CardID: '', CardType: '', Rate: '0.0' };
@@ -30,7 +31,7 @@ const CardCommissionBoard = ({ isOpen, onClose }) => {
     const handleCardSelect = async (id, name) => {
         setFormData(prev => ({ ...prev, CardID: id, CardType: name }));
         if (id && formData.BankAccCode) {
-            try { const rate = await cardCommissionService.getRate(formData.BankAccCode, id); setFormData(prev => ({ ...prev, CardID: id, CardType: name, Rate: rate.toString() })); } catch { setFormData(prev => ({ ...prev, CardID: id, CardType: name, Rate: '0.0' })); }
+            try { const rate = await cardCommissionService.getRate(formData.BankAccCode, id, getCompanyCode()); setFormData(prev => ({ ...prev, CardID: id, CardType: name, Rate: rate.rate.toString() })); } catch { setFormData(prev => ({ ...prev, CardID: id, CardType: name, Rate: '0.0' })); }
         }
         setShowCardModal(false);
     };
@@ -38,7 +39,7 @@ const CardCommissionBoard = ({ isOpen, onClose }) => {
     const handleBankSelect = async (code, name) => {
         setFormData(prev => ({ ...prev, BankAccCode: code, BankAccName: name }));
         if (formData.CardID && code) {
-            try { const rate = await cardCommissionService.getRate(code, formData.CardID); setFormData(prev => ({ ...prev, BankAccCode: code, BankAccName: name, Rate: rate.toString() })); } catch { setFormData(prev => ({ ...prev, BankAccCode: code, BankAccName: name, Rate: '0.0' })); }
+            try { const rate = await cardCommissionService.getRate(code, formData.CardID, getCompanyCode()); setFormData(prev => ({ ...prev, BankAccCode: code, BankAccName: name, Rate: rate.rate.toString() })); } catch { setFormData(prev => ({ ...prev, BankAccCode: code, BankAccName: name, Rate: '0.0' })); }
         }
         setShowBankModal(false);
     };
@@ -54,10 +55,10 @@ const CardCommissionBoard = ({ isOpen, onClose }) => {
         setShowSaveConfirm(false);
         setLoading(true);
         try {
-            await cardCommissionService.save({ ...formData, Rate: parseFloat(formData.Rate) });
+            await cardCommissionService.save({ ...formData, Rate: parseFloat(formData.Rate), Company: getCompanyCode() });
             showSuccessToast('Commission Rate Saved Successfully.');
             setFormData(prev => ({ ...prev, CardID: '', CardType: '', Rate: '0.0' }));
-        } catch (error) { showErrorToast(error); } finally { setLoading(false); }
+        } catch (error) { showErrorToast(error.message || error); } finally { setLoading(false); }
     };
 
     const handleClear = () => {
@@ -99,11 +100,11 @@ const CardCommissionBoard = ({ isOpen, onClose }) => {
                 onClose={() => setShowBankModal(false)}
                 title="Bank Account Lookup"
                 columns={[
-                    { label: 'CODE', key: 'sub_Code', isId: true, width: 'w-[100px]', render: (item) => <span className="font-mono text-[11px] font-bold text-[#0285fd]">{item.sub_Code}</span> },
-                    { label: 'ACCOUNT NAME', key: 'sub_Acc_Name', render: (item) => <span className="font-bold text-slate-700 uppercase text-[11px]">{item.sub_Acc_Name}</span> },
+                    { label: 'CODE', key: 'code', isId: true, width: 'w-[100px]', render: (item) => <span className="font-mono text-[11px] font-bold text-[#0285fd]">{item.code}</span> },
+                    { label: 'ACCOUNT NAME', key: 'name', render: (item) => <span className="font-bold text-slate-700 uppercase text-[11px]">{item.name}</span> },
                 ]}
                 items={bankAccounts}
-                onSelect={(b) => handleBankSelect(b.sub_Code, b.sub_Acc_Name)}
+                onSelect={(b) => handleBankSelect(b.code, b.name)}
                 emptyMsg="No bank accounts found"
             />
 
@@ -113,10 +114,10 @@ const CardCommissionBoard = ({ isOpen, onClose }) => {
                 title="Card Type Lookup"
                 columns={[
                     { label: 'CARD ID', key: 'cardID', isId: true, width: 'w-[100px]', render: (item) => <span className="font-mono text-[11px] font-bold text-[#0285fd]">{item.cardID}</span> },
-                    { label: 'CARD NAME', key: 'cardName', render: (item) => <span className="font-bold text-slate-700 uppercase text-[11px]">{item.cardName}</span> },
+                    { label: 'CARD NAME', key: 'name', render: (item) => <span className="font-bold text-slate-700 uppercase text-[11px]">{item.name}</span> },
                 ]}
                 items={cardTypes}
-                onSelect={(c) => handleCardSelect(c.cardID, c.cardName)}
+                onSelect={(c) => handleCardSelect(c.cardID, c.name)}
                 emptyMsg="No card types found"
             />
 

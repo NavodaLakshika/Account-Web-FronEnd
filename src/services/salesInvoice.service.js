@@ -55,5 +55,12 @@ export const salesInvoiceService = {
       const response = await api.get('/SalesOrder/getOrder', { params: { docNo, company } });
       return response.data;
     } catch (error) { throw error; }
+  },
+
+  deleteInvoice: async (docNo, company) => {
+    try {
+      const response = await api.delete(`/SalesInvoice/${docNo}`, { params: { company } });
+      return response.data;
+    } catch (error) { throw error; }
   }
 };

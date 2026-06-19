@@ -115,7 +115,7 @@ import AIChatbotBoard from './AIChatbotBoard';
 import FeatureLockedModal from '../components/modals/FeatureLockedModal';
 import ExpensesDashboardBoard from './ExpensesDashboardBoard';
 import QuickLaunchGridModal from '../components/modals/QuickLaunchGridModal';
-import DepartmentBoard from './DepartmentBoard';
+import DepartmentBoard from '../components/modals/MasterSubModal/DepartmentBoard';
 import CalculatorBoard from '../components/modals/ViewAndUtilityModels/CalculatorBoard';
 import EstimateBoard from './EstimateBoard';
 import { Layers } from 'lucide-react';
@@ -143,6 +143,11 @@ import UserProfileBoard from '../components/modals/MasterSubModal/UserProfileBoa
 import VendorTypesBoard from '../components/modals/MasterSubModal/VendorTypesBoard';
 import CustomerTypeBoard from '../components/modals/MasterSubModal/CustomerTypeBoard';
 import ChartOfAccountantModal from '../components/modals/ChartOfAccountsModels/ChartOfAccountantModal';
+import FixedAssetsBoard from '../components/modals/ChartOfAccountsModels/FixedAssetsBoard';
+import LongTermLiabilityBoard from '../components/modals/ChartOfAccountsModels/LongTermLiabilityBoard';
+import DepreciationBoard from '../components/modals/ChartOfAccountsModels/DepreciationBoard';
+import FixedIncomeBoard from '../components/modals/ChartOfAccountsModels/FixedIncomeBoard';
+import FixedExpensesBoard from '../components/modals/ChartOfAccountsModels/FixedExpensesBoard';
 
 
 // View and Utility Boards
@@ -296,6 +301,11 @@ const Dashboard = () => {
 
 
     const [showNewAccountModal, setShowNewAccountModal] = useState(false);
+    const [showFixedAssetsBoard, setShowFixedAssetsBoard] = useState(false);
+    const [showLiabilityBoard, setShowLiabilityBoard] = useState(false);
+    const [showDepreciationBoard, setShowDepreciationBoard] = useState(false);
+    const [showFixedIncomeBoard, setShowFixedIncomeBoard] = useState(false);
+    const [showFixedExpensesBoard, setShowFixedExpensesBoard] = useState(false);
     const [showCustomerModal, setShowCustomerModal] = useState(false);
     const [showVendorModal, setShowVendorModal] = useState(false);
     const [showEnterBillModal, setShowEnterBillModal] = useState(false);
@@ -1222,6 +1232,7 @@ const Dashboard = () => {
             {
                 group: 'Sales and Customers',
                 items: [
+                    { label: 'Quotation Summary', onClick: () => setSelectedReport('Quotation Summary') },
                     { label: 'Sales by Customer Summary', onClick: () => setSelectedReport('Sales by Customer Summary') },
                     { label: 'Sales by Customer Detail', onClick: () => setSelectedReport('Sales by Customer Detail') },
                     { label: 'Sales by Product/Service Summary', onClick: () => setSelectedReport('Sales by Product/Service Summary') },
@@ -1305,6 +1316,7 @@ const Dashboard = () => {
                     { label: 'Inventory Valuation Detail', onClick: () => setSelectedReport('Inventory Valuation Detail') },
                     { label: 'Stock Take Worksheet', onClick: () => setSelectedReport('Stock Take Worksheet') },
                     { label: 'Product/Service List', onClick: () => setSelectedReport('Product/Service List') },
+                    { label: 'Products Report', onClick: () => setSelectedReport('Products Report') },
                 ]
             },
             {
@@ -1685,7 +1697,21 @@ const Dashboard = () => {
             <CardCommissionBoard isOpen={showCardCommissionBoard} onClose={() => setShowCardCommissionBoard(false)} />
             <UserProfileBoard isOpen={showUserProfileBoard} onClose={() => setShowUserProfileBoard(false)} />
             <ChangePasswordBoard isOpen={showChangePasswordBoard} onClose={() => setShowChangePasswordBoard(false)} />
-            <ChartOfAccountantModal isOpen={showChartOfAccountantModal} onClose={() => setShowChartOfAccountantModal(false)} />
+            <ChartOfAccountantModal 
+                isOpen={showChartOfAccountantModal} 
+                onClose={() => setShowChartOfAccountantModal(false)} 
+                onCreateNewAccount={() => { setShowChartOfAccountantModal(false); setShowNewAccountModal(true); }}
+                onOpenFixedAssets={() => { setShowChartOfAccountantModal(false); setShowFixedAssetsBoard(true); }}
+                onOpenLiability={() => { setShowChartOfAccountantModal(false); setShowLiabilityBoard(true); }}
+                onOpenDepreciation={() => { setShowChartOfAccountantModal(false); setShowDepreciationBoard(true); }}
+                onOpenFixedIncome={() => { setShowChartOfAccountantModal(false); setShowFixedIncomeBoard(true); }}
+                onOpenFixedExpenses={() => { setShowChartOfAccountantModal(false); setShowFixedExpensesBoard(true); }}
+            />
+            {showFixedAssetsBoard && <FixedAssetsBoard isOpen={showFixedAssetsBoard} onClose={() => setShowFixedAssetsBoard(false)} />}
+            {showLiabilityBoard && <LongTermLiabilityBoard isOpen={showLiabilityBoard} onClose={() => setShowLiabilityBoard(false)} />}
+            {showDepreciationBoard && <DepreciationBoard isOpen={showDepreciationBoard} onClose={() => setShowDepreciationBoard(false)} />}
+            {showFixedIncomeBoard && <FixedIncomeBoard isOpen={showFixedIncomeBoard} onClose={() => setShowFixedIncomeBoard(false)} />}
+            {showFixedExpensesBoard && <FixedExpensesBoard isOpen={showFixedExpensesBoard} onClose={() => setShowFixedExpensesBoard(false)} />}
 
             <CalculatorBoard isOpen={showCalculatorModal} onClose={() => setShowCalculatorModal(false)} />
 
@@ -2151,7 +2177,7 @@ const Dashboard = () => {
 
                         {/* Header & BI Data Summary (QuickBooks Style) */}
                         <div className="flex flex-row items-center justify-between w-full relative mb-6 z-[100]">
-                            
+
                             {/* Left Side: Quick Actions */}
                             <div className="flex-1 flex justify-start">
                                 <div className="relative z-[200] flex flex-col items-start gap-1">
@@ -2245,7 +2271,7 @@ const Dashboard = () => {
                                     {typedSubtitle}
                                 </p>
                             </div>
-                            
+
                             {/* Right Side: Tools & Clock */}
                             <div className="flex-1 flex justify-end">
                                 <div className="flex items-end gap-3">

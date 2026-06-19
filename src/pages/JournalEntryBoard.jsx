@@ -489,7 +489,13 @@ const JournalEntryBoard = ({ isOpen, onClose, onComplete }) => {
                     <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-slate-200 rounded-b-[5px]">
                         <div className="flex gap-4">
                             <button
-                                onClick={() => { setTempEntries([]); resetLine(); }}
+                                onClick={async () => {
+                                    if(header.docNo) {
+                                        await journalService.clearTemp(header.docNo, companyCode);
+                                    }
+                                    setTempEntries([]); 
+                                    resetLine(); 
+                                }}
                                 className="px-6 h-10 bg-[#00adff] text-white text-[13px] font-mono font-bold tracking-widest uppercase rounded-[5px] hover:bg-[#0099e6] transition-all flex items-center gap-2 border-none active:scale-95 shadow-md shadow-blue-100"
                             >
                                 <RotateCcw size={14} /> CLEAR

@@ -45,7 +45,7 @@ const UserSearchModal = ({ isOpen, onClose, onSelect }) => {
             isOpen={isOpen}
             onClose={onClose}
             title="User Search"
-            maxWidth="max-w-md"
+            maxWidth="max-w-2xl"
         >
             <div className="p-1 space-y-4 font-['Tahoma']">
                 {/* Search Bar */}
@@ -80,8 +80,8 @@ const UserSearchModal = ({ isOpen, onClose, onSelect }) => {
                                     }}
                                     className="w-full flex items-center gap-4 px-4 py-3 hover:bg-blue-50 transition-colors border-b border-gray-50 last:border-0 text-left group"
                                 >
-                                    <span className="text-[12px] font-bold text-[#0078d4] w-16">{user.emp_Code}</span>
-                                    <span className="text-[13px] font-bold text-gray-700 group-hover:text-blue-600 flex-1 uppercase">{user.emp_Name}</span>
+                                    <span className="text-[11px] font-normal text-[#0078d4] w-16">{user.emp_Code}</span>
+                                    <span className="text-[11px] font-normal text-gray-700 group-hover:text-blue-600 flex-1 uppercase">{user.emp_Name}</span>
                                     <div className="bg-[#e49e1b] text-white text-[10px] px-4 py-1 rounded-md font-bold uppercase">Select</div>
                                 </button>
                             ))

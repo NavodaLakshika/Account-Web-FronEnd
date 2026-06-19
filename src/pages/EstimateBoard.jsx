@@ -13,6 +13,7 @@ import {
     Package
 } from 'lucide-react';
 import CalendarModal from '../components/CalendarModal';
+import QuotationDetailModal from '../components/QuotationDetailModal';
 
 
 import { quotationService } from '../services/quotation.service';
@@ -56,6 +57,12 @@ const EstimateBoard = ({ isOpen, onClose }) => {
     const [customerSearchQuery, setCustomerSearchQuery] = useState('');
     const [productSearchQuery, setProductSearchQuery] = useState('');
     const [termSearchQuery, setTermSearchQuery] = useState('');
+
+    // Receipt Modal
+    const [showReceipt, setShowReceipt] = useState(false);
+    const [receiptData, setReceiptData] = useState(null);
+    const [lastSavedDoc, setLastSavedDoc] = useState(null);
+    const [lastSavedData, setLastSavedData] = useState(null);
     const [archiveSearchQuery, setArchiveSearchQuery] = useState('');
 
     const qtyRef = useRef(null);
@@ -160,12 +167,72 @@ const EstimateBoard = ({ isOpen, onClose }) => {
 
             const resp = await quotationService.apply(payload);
             showSuccessToast(`Quotation ${resp.docNo} applied successfully.`);
+            
+            setLastSavedDoc(resp.docNo);
+            setLastSavedData(payload);
+            setReceiptData(payload);
+            setShowReceipt(true);
+            
+            handleClear();
+            // Do not auto-close so the user can see the receipt above the cleared form
+            // onClose();
+        } catch (error) {
+            showErrorToast(error.toString());
+        } finally {
+            setIsApplying(false);
+        }
+    };
+
+    const handleSaveDraft = async () => {
+        if (!formData.customerId) return showErrorToast('Please select a customer.');
+        if (items.length === 0) return showErrorToast('No products added.');
+
+        setIsApplying(true);
+        try {
+            const payload = {
+                docNo: formData.docNo,
+                company: formData.company,
+                createUser: formData.createUser,
+                postDate: formData.postDate,
+                expectedDate: formData.expectedDate,
+                customerId: formData.customerId,
+                paymentTerms: formData.paymentTerms,
+                remarks: formData.remarks,
+                comment: formData.comment,
+                taxPer: formData.taxPer || '0',
+                total: totals.sum,
+                netAmount: totals.netAmount,
+                items: items.map(i => ({
+                    prodCode: i.prodCode,
+                    prodName: i.prodName,
+                    unit: i.unit,
+                    packSize: parseFloat(i.packSize) || 1,
+                    qty: parseFloat(i.qty) || 0,
+                    price: parseFloat(i.selling) || 0,
+                    amount: parseFloat(i.amount) || 0
+                }))
+            };
+
+            const resp = await quotationService.save(payload);
+            showSuccessToast(`Draft ${resp.docNo} saved successfully.`);
             handleClear();
             onClose();
         } catch (error) {
             showErrorToast(error.toString());
         } finally {
             setIsApplying(false);
+        }
+    };
+
+    const handleDelete = async () => {
+        if (!formData.docNo) return;
+        try {
+            await quotationService.delete(formData.docNo, formData.company);
+            showSuccessToast(`Draft ${formData.docNo} deleted successfully.`);
+            handleClear();
+            onClose();
+        } catch (error) {
+            showErrorToast(error.toString());
         }
     };
 
@@ -220,25 +287,34 @@ const EstimateBoard = ({ isOpen, onClose }) => {
                 isOpen={isOpen}
                 onClose={onClose}
                 title="Quotation - Estimate"
+                subtitle={`COMPANY: ${formData.company || 'N/A'}${formData.docNo ? `  |  DOC: ${formData.docNo}` : ''}`}
                 maxWidth="max-w-[1050px]"
                 footer={
                     <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-gray-100 rounded-b-xl">
                         <div className="flex gap-3">
-                            <button className="px-6 h-10 bg-[#ff3b30] text-white text-sm font-black rounded-[5px] shadow-md shadow-red-100 hover:bg-[#e03127] transition-all active:scale-95 flex items-center gap-2 border-none">
-                                <Trash2 size={14} /> DELETE DOC
+                            <button onClick={handleDelete} className="px-6 h-10 bg-[#ff3b30] text-white text-sm font-black rounded-[5px] shadow-md shadow-red-100 hover:bg-[#e03127] transition-all active:scale-95 flex items-center gap-2 border-none">
+                                <Trash2 size={14} /> DELETE
                             </button>
                             <button onClick={handleClear} className="px-6 h-10 bg-[#00adff] text-white text-sm font-black rounded-[5px] hover:bg-[#0099e6] transition-all active:scale-95 flex items-center gap-2 border-none">
-                                <RotateCcw size={14} /> CLEAR FORM
+                                <RotateCcw size={14} /> CLEAR
                             </button>
                         </div>
                         <div className="flex gap-3">
+                            <button
+                                onClick={handleSaveDraft}
+                                disabled={isApplying || items.length === 0}
+                                className="px-6 h-10 bg-[#f5a623] text-white text-sm font-black rounded-[5px] shadow-md shadow-orange-100 hover:bg-[#e09612] transition-all active:scale-95 flex items-center gap-2 border-none disabled:opacity-50"
+                            >
+                                {isApplying ? <Loader2 className="animate-spin" size={14} /> : <Save size={14} />}
+                                SAVE
+                            </button>
                             <button
                                 onClick={handleApply}
                                 disabled={isApplying || items.length === 0}
                                 className="px-10 h-10 bg-[#2bb744] text-white text-sm font-black rounded-[5px] shadow-md shadow-green-100 hover:bg-[#259b3a] transition-all active:scale-95 flex items-center gap-2 border-none disabled:opacity-50"
                             >
                                 {isApplying ? <Loader2 className="animate-spin" size={14} /> : <CheckCircle size={14} />}
-                                CONFIRM & SAVE
+                                APPLY
                             </button>
                         </div>
                     </div>
@@ -435,34 +511,34 @@ const EstimateBoard = ({ isOpen, onClose }) => {
                 </div>
             </SimpleModal>
 
-            <SimpleModal isOpen={showTermsSearch} onClose={() => setShowTermsSearch(false)} title="Settlement Terms Directory" maxWidth="max-w-[500px]">
-                <div className="space-y-4 font-['Tahoma'] p-2">
-                    <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-lg border border-gray-100 mb-2">
-                        <span className="text-[12px] font-bold text-gray-500 uppercase tracking-widest">Quick Filter</span>
+            <SimpleModal isOpen={showTermsSearch} onClose={() => setShowTermsSearch(false)} title="Settlement Terms Directory" maxWidth="max-w-[400px]">
+                <div className="space-y-3 font-['Tahoma'] p-2">
+                    <div className="flex items-center gap-3 bg-slate-50 p-2 rounded-lg border border-gray-100 mb-1">
+                        <span className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">Quick Filter</span>
                         <div className="relative flex-1">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
-                            <input type="text" placeholder="Search terms..." className="w-full h-9 pl-10 pr-4 border border-gray-300 rounded-[5px] outline-none text-sm focus:border-[#0285fd] bg-white shadow-sm" value={termSearchQuery} onChange={(e) => setTermSearchQuery(e.target.value)} />
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={14} />
+                            <input type="text" placeholder="Search terms..." className="w-full h-8 pl-9 pr-3 border border-gray-300 rounded-[5px] outline-none text-[13px] focus:border-[#0285fd] bg-white shadow-sm" value={termSearchQuery} onChange={(e) => setTermSearchQuery(e.target.value)} />
                         </div>
                     </div>
-                    <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm max-h-[350px] overflow-y-auto no-scrollbar">
+                    <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm max-h-[250px] overflow-y-auto no-scrollbar">
                         <table className="w-full text-left">
-                            <thead className="bg-[#f8fafd] text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 sticky top-0">
+                            <thead className="bg-[#f8fafd] text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 sticky top-0">
                                 <tr>
-                                    <th className="px-6 py-3">Settlement Profile</th>
-                                    <th className="px-6 py-3 text-right">Action</th>
+                                    <th className="px-4 py-2">Settlement Profile</th>
+                                    <th className="px-4 py-2 text-right">Action</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-50">
                                 {lookups.terms.filter(t => !termSearchQuery || t.name.toLowerCase().includes(termSearchQuery.toLowerCase()) || t.code.toLowerCase().includes(termSearchQuery.toLowerCase())).map((t, i) => (
                                     <tr key={i} className="hover:bg-blue-50/50 cursor-pointer transition-colors group" onClick={() => { setFormData({ ...formData, paymentTerms: t.name }); setShowTermsSearch(false); }}>
-                                        <td className="px-6 py-3">
+                                        <td className="px-4 py-2">
                                             <div className="flex flex-col">
-                                                <span className="text-[13px] font-semibold  text-slate-700 uppercase group-hover:text-blue-600 transition-colors">{t.name}</span>
-                                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{t.code}</span>
+                                                <span className="text-[12px] font-semibold text-slate-700 uppercase group-hover:text-blue-600 transition-colors">{t.name}</span>
+                                                <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{t.code}</span>
                                             </div>
                                         </td>
-                                        <td className="px-6 py-3 text-right">
-                                            <button className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all whitespace-nowrap">SELECT</button>
+                                        <td className="px-4 py-2 text-right">
+                                            <button className="bg-[#e49e1b] text-white text-[10px] px-3 py-1.5 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all whitespace-nowrap">SELECT</button>
                                         </td>
                                     </tr>
                                 ))}
@@ -494,7 +570,7 @@ const EstimateBoard = ({ isOpen, onClose }) => {
                             <tbody className="divide-y divide-gray-50">
                                 {orders.filter(o => !archiveSearchQuery || o.docNo.toLowerCase().includes(archiveSearchQuery.toLowerCase())).map((order, i) => (
                                     <tr key={i} className="hover:bg-blue-50/50 cursor-pointer transition-all group" onClick={() => handleSelectOrder(order.docNo)}>
-                                        <td className="px-5 py-3 font-mono font-bold text-blue-600 uppercase group-hover:text-blue-700">{order.docNo}</td>
+                                        <td className="px-5 py-3 font-mono text-[13px] font-bold text-blue-600 uppercase group-hover:text-blue-700">{order.docNo}</td>
                                         <td className="px-5 py-3 font-mono text-[12px] text-slate-500 font-bold">{order.date?.split('T')[0]}</td>
                                         <td className="px-5 py-3 text-right">
                                             <button className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[5px] font-black shadow-md hover:bg-[#cb9b34] transition-all whitespace-nowrap min-w-[100px]">RETRIEVE</button>
@@ -509,6 +585,15 @@ const EstimateBoard = ({ isOpen, onClose }) => {
             </SimpleModal>
 
             <CalendarModal isOpen={showDatePicker} onClose={() => setShowDatePicker(false)} onSelect={handleDateSelect} initialDate={formData[datePickerField]} />
+            
+            {showReceipt && receiptData && (
+                <QuotationDetailModal
+                    isOpen={showReceipt}
+                    onClose={() => { setShowReceipt(false); setReceiptData(null); }}
+                    preloadedData={receiptData}
+                    docNo={receiptData.docNo}
+                />
+            )}
         </>
     );
 };

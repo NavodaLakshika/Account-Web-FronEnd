@@ -35,20 +35,23 @@ const EnterBillBoard = ({ isOpen, onClose }) => {
     const [billSearchQuery, setBillSearchQuery] = useState('');
     const [billSearchResults, setBillSearchResults] = useState([]);
 
-    const getInitialFormData = () => ({
-        docNo: '',
-        vendorId: '',
-        accId: '',
-        terms: '',
-        memo: '',
-        billNo: '',
-        refNo: '',
-        postDate: new Date().toISOString().split('T')[0],
-        billDueDate: new Date().toISOString().split('T')[0],
-        costCenter: '',
-        company: '',
-        createUser: ''
-    });
+    const getInitialFormData = () => {
+        const { companyCode, userName } = getSessionData();
+        return {
+            docNo: '',
+            vendorId: '',
+            accId: '',
+            terms: '',
+            memo: '',
+            billNo: '',
+            refNo: '',
+            postDate: new Date().toISOString().split('T')[0],
+            billDueDate: new Date().toISOString().split('T')[0],
+            costCenter: '',
+            company: companyCode || '',
+            createUser: userName || ''
+        };
+    };
 
     const [formData, setFormData] = useState(getInitialFormData());
 
@@ -67,6 +70,7 @@ const EnterBillBoard = ({ isOpen, onClose }) => {
             setFormData(getInitialFormData());
 
             const { companyCode, userName } = getSessionData();
+            setFormData(prev => ({ ...prev, company: companyCode, createUser: userName }));
 
             fetchLookups();
             generateDocNo(companyCode);
@@ -192,6 +196,8 @@ const EnterBillBoard = ({ isOpen, onClose }) => {
         setCcSearch('');
         setApSearch('');
         setExpSearch('');
+        setItemSearch('');
+        setBillType('Bill');
         generateDocNo();
     };
 
@@ -249,12 +255,12 @@ const EnterBillBoard = ({ isOpen, onClose }) => {
                 footer={
                     <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-slate-200 rounded-b-xl">
                         <div className="flex gap-3">
-                            <button onClick={handleClear} disabled={loading} className="px-6 py-3 bg-[#00adff] hover:bg-[#0099e6] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] transition-all active:scale-95 flex items-center justify-center gap-2 border-none">
+                            <button type="button" onClick={handleClear} disabled={loading} className="px-6 py-3 bg-[#00adff] hover:bg-[#0099e6] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] transition-all active:scale-95 flex items-center justify-center gap-2 border-none">
                                 <RotateCcw size={14} /> CLEAR FORM
                             </button>
                         </div>
                         <div className="flex gap-3">
-                            <button onClick={handleSave} disabled={loading} className={`px-6 py-3 bg-[#2bb744] hover:bg-[#259b3a] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] shadow-md shadow-green-100 transition-all active:scale-95 flex items-center justify-center gap-2 border-none ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                            <button type="button" onClick={handleSave} disabled={loading} className={`px-6 py-3 bg-[#2bb744] hover:bg-[#259b3a] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] shadow-md shadow-green-100 transition-all active:scale-95 flex items-center justify-center gap-2 border-none ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}>
                                 {loading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />} SAVE BILL
                             </button>
                         </div>
@@ -728,12 +734,12 @@ const EnterBillBoard = ({ isOpen, onClose }) => {
                             <tbody className="divide-y divide-gray-100">
                                 {billSearchResults.map((b, idx) => (
                                     <tr key={idx} className="hover:bg-blue-50/50 transition-colors border-b border-gray-50">
-                                        <td className="p-3 text-[13px] font-bold text-blue-600">{b.docNo}</td>
-                                        <td className="p-3 font-mono uppercase text-gray-700">{lookups.vendors?.find(v => v.code === b.vendorId)?.name || b.vendorId}</td>
-                                        <td className="p-3 font-mono text-gray-600">{b.date ? b.date.split('T')[0] : ''}</td>
-                                        <td className="p-3 text-right font-bold text-red-600">{b.amount?.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                                        <td className="p-3 text-center">
-                                            <button onClick={() => loadBill(b.docNo)} className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95">SELECT</button>
+                                        <td className="p-2 text-[11px] font-bold text-blue-600">{b.docNo}</td>
+                                        <td className="p-2 text-[11px] font-mono uppercase text-gray-700">{lookups.vendors?.find(v => v.code === b.vendorId)?.name || b.vendorId}</td>
+                                        <td className="p-2 text-[11px] font-mono text-gray-600">{b.date ? b.date.split('T')[0] : ''}</td>
+                                        <td className="p-2 text-[11px] text-right font-bold text-red-600">{b.amount?.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                                        <td className="p-2 text-center">
+                                            <button onClick={() => loadBill(b.docNo)} className="bg-[#e49e1b] text-white text-[9px] px-4 py-1.5 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95">SELECT</button>
                                         </td>
                                     </tr>
                                 ))}

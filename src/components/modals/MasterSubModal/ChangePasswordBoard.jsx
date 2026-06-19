@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Save, RotateCcw, Loader2, AlertTriangle, Key, User, Search } from 'lucide-react';
+import { Save, RotateCcw, Loader2, AlertTriangle, Key, User, Search, Eye, EyeOff } from 'lucide-react';
 import axios from 'axios';
 import { showSuccessToast, showErrorToast } from '../../../utils/toastUtils';
 import { MasterFormWrapper, MasterFieldRow, MasterInput, MasterLookupInput, MasterLookupModal } from '../../MasterFormComponents';
+import ConfirmModal from '../ConfirmModal';
 
 const api = axios.create({ baseURL: '/api' });
 
@@ -15,6 +16,7 @@ const ChangePasswordBoard = ({ isOpen, onClose }) => {
     const [userSearchQuery, setUserSearchQuery] = useState('');
     const [users, setUsers] = useState([]);
     const [showSaveConfirm, setShowSaveConfirm] = useState(false);
+    const [showPass, setShowPass] = useState({ cur: false, new: false, con: false });
 
     useEffect(() => {
         if (isOpen) {
@@ -76,7 +78,7 @@ const ChangePasswordBoard = ({ isOpen, onClose }) => {
                 title="Change Password"
                 subtitle="Update system user account passwords"
                 icon={Key}
-                maxWidth="max-w-xl"
+                maxWidth="max-w-[800px]"
                 isEditMode={false}
                 loading={loading}
                 onClear={handleClear}
@@ -97,17 +99,39 @@ const ChangePasswordBoard = ({ isOpen, onClose }) => {
                     </div>
                 }
             >
-                <MasterFieldRow label="User Name" colSpan="col-span-12">
+                <MasterFieldRow label="User Name" colSpan="col-span-6">
                     <MasterLookupInput value={formData.UserName} onSearchClick={() => setShowUserModal(true)} placeholder="Select user..." />
                 </MasterFieldRow>
-                <MasterFieldRow label="Current Password" colSpan="col-span-12">
-                    <MasterInput type="password" name="CurrentPassword" value={formData.CurrentPassword} onChange={handleInputChange} placeholder="Enter current password" />
+                <MasterFieldRow label="Current Password" colSpan="col-span-6">
+                    <div className="relative flex-1 flex">
+                        <MasterInput 
+                            type={showPass.cur ? "text" : "password"} 
+                            name="CurrentPassword" 
+                            value={formData.CurrentPassword} 
+                            onChange={handleInputChange} 
+                            placeholder="Enter current password" 
+                            className="pr-8"
+                        />
+                        <button type="button" onClick={() => setShowPass(p => ({ ...p, cur: !p.cur }))} className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#00D1FF] outline-none">
+                            {showPass.cur ? <EyeOff size={14} /> : <Eye size={14} />}
+                        </button>
+                    </div>
                 </MasterFieldRow>
-                <MasterFieldRow label="New Password" colSpan="col-span-12">
-                    <MasterInput type="password" name="NewPassword" value={formData.NewPassword} onChange={handleInputChange} placeholder="Enter new password" />
+                <MasterFieldRow label="New Password" colSpan="col-span-6">
+                    <div className="relative flex-1 flex">
+                        <MasterInput type={showPass.new ? "text" : "password"} name="NewPassword" value={formData.NewPassword} onChange={handleInputChange} placeholder="Enter new password" className="pr-8" />
+                        <button type="button" onClick={() => setShowPass(p => ({ ...p, new: !p.new }))} className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#00D1FF] outline-none">
+                            {showPass.new ? <EyeOff size={14} /> : <Eye size={14} />}
+                        </button>
+                    </div>
                 </MasterFieldRow>
-                <MasterFieldRow label="Confirm Password" colSpan="col-span-12">
-                    <MasterInput type="password" name="ConfirmPassword" value={formData.ConfirmPassword} onChange={handleInputChange} placeholder="Confirm new password" />
+                <MasterFieldRow label="Confirm Password" colSpan="col-span-6">
+                    <div className="relative flex-1 flex">
+                        <MasterInput type={showPass.con ? "text" : "password"} name="ConfirmPassword" value={formData.ConfirmPassword} onChange={handleInputChange} placeholder="Confirm new password" className="pr-8" />
+                        <button type="button" onClick={() => setShowPass(p => ({ ...p, con: !p.con }))} className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#00D1FF] outline-none">
+                            {showPass.con ? <EyeOff size={14} /> : <Eye size={14} />}
+                        </button>
+                    </div>
                 </MasterFieldRow>
             </MasterFormWrapper>
 
@@ -126,25 +150,17 @@ const ChangePasswordBoard = ({ isOpen, onClose }) => {
                 setSearchQuery={setUserSearchQuery}
             />
 
-            {showSaveConfirm && (
-                <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-slate-900/30 backdrop-blur-sm" onClick={() => !loading && setShowSaveConfirm(false)} />
- <div className="relative w-full max-w-md bg-white rounded-sm shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
-                        <div className="p-8 text-center">
-                            <div className="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-6 border-4 border-white shadow-lg"><AlertTriangle size={40} className="text-blue-500" /></div>
-                            <h3 className="text-lg font-black text-slate-800 mb-2 uppercase tracking-wider">Confirm Change</h3>
-                            <p className="text-slate-500 text-[12px] font-medium leading-relaxed mb-8">
-                                Are you sure you want to change the password for <span className="font-bold text-[#0285fd] uppercase">"{formData.UserName}"</span>?
-                            </p>
-                            <div className="flex gap-3">
-                                <button onClick={() => setShowSaveConfirm(false)} disabled={loading} className="flex-1 h-11 bg-slate-100 text-slate-600 text-[11px] font-black rounded-xl hover:bg-slate-200 transition-all uppercase tracking-widest disabled:opacity-50">Cancel</button>
-                                <button onClick={confirmChange} disabled={loading} className="flex-1 h-11 bg-blue-500 text-white text-[11px] font-black rounded-xl hover:bg-blue-600 shadow-lg shadow-blue-200 transition-all flex items-center justify-center gap-2 uppercase tracking-widest disabled:opacity-50">{loading ? <Loader2 size={16} className="animate-spin" /> : 'Change Password'}</button>
-                            </div>
-                        </div>
-                        <div className="bg-slate-50 py-3 border-t border-slate-100"><span className="text-[9px] text-slate-400 font-black uppercase tracking-[0.2em] block text-center">Security Verification Required</span></div>
-                    </div>
-                </div>
-            )}
+            <ConfirmModal
+                isOpen={showSaveConfirm}
+                onClose={() => setShowSaveConfirm(false)}
+                onConfirm={confirmChange}
+                title="Apply Changes?"
+                message={`Are you sure you want to change the password for "${formData.UserName}"?`}
+                loading={loading}
+                confirmText="UPDATE NOW"
+                cancelText="CANCEL"
+                variant="primary"
+            />
         </>
     );
 };
