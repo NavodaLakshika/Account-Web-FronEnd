@@ -19,9 +19,9 @@ api.interceptors.request.use(
 );
 
 export const longTermLiabService = {
-  async generateDocNo(company) {
+  async getNextCode(company) {
     try {
-      const response = await api.get('/generate-doc', { params: { company } });
+      const response = await api.get('/next-code', { params: { company } });
       return response.data;
     } catch (error) {
       throw error.response?.data || 'Failed to generate document number';

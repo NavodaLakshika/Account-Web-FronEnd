@@ -64,6 +64,16 @@ export const payBillService = {
     }
   },
 
+  // Fetch all payments for a company (used by report list)
+  async getAllPayments(companyId) {
+    try {
+      const response = await api.get('/all', { params: { company: companyId } });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || 'Failed to load payments report';
+    }
+  },
+
   async getPayment(payDoc) {
     try {
       const response = await api.get(`/${payDoc}`);

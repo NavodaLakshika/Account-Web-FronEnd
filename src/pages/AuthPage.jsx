@@ -10,7 +10,7 @@ import WelcomeModal from '../components/modals/WelcomeModal';
 import LegalTextModal from '../components/modals/LegalTextModal';
 import { showSuccessToast, showErrorToast, showInfoToast } from '../utils/toastUtils';
 import toast from 'react-hot-toast';
-
+import { Helmet } from 'react-helmet-async';
 import { DotLottiePlayer } from '@dotlottie/react-player';
 
 const AuthPage = () => {
@@ -180,6 +180,11 @@ const AuthPage = () => {
 
     return (
         <div className="min-h-screen relative flex flex-col items-center justify-center font-['Arial'] overflow-hidden bg-[#f8fafc] py-8">
+            <Helmet>
+                <title>Login | Onimta Accounting System</title>
+                <meta name="description" content="Securely login to the Onimta Accounting Web Application. Access your financials, dashboards, and enterprise resources." />
+                <link rel="canonical" href="https://onimta.com/login" />
+            </Helmet>
             <style>
                 {`
                     @keyframes toastProgress {

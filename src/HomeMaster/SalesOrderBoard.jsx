@@ -3,12 +3,13 @@ import SimpleModal from '../components/SimpleModal';
 import TransactionFormWrapper from '../components/TransactionFormWrapper';
 import { Search, Calendar, RefreshCw, Trash2, Plus, X, Save, Check, ShoppingCart } from 'lucide-react';
 import { salesOrderService } from '../services/salesOrder.service';
-import { productService } from '../services/product.service';
+import { grnService } from '../services/grn.service';
 
 import CalendarModal from '../components/CalendarModal';
 
 import { getSessionData } from '../utils/session';
 import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
+import SalesOrderDetailModal from '../components/SalesOrderDetailModal';
 
 
 const SalesOrderBoard = ({ isOpen, onClose }) => {
@@ -57,6 +58,8 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
     const [orderSearch, setOrderSearch] = useState('');
     const [showDateModal, setShowDateModal] = useState(false);
     const [showDueDateModal, setShowDueDateModal] = useState(false);
+    const [showReceipt, setShowReceipt] = useState(false);
+    const [receiptData, setReceiptData] = useState(null);
 
     // 1. Initial Load
     useEffect(() => {
@@ -82,14 +85,14 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
             });
             setFormData(prev => ({ ...prev, docNo: data.nextDocNo }));
 
-            // Load initial products using ProductController
-            const productsData = await productService.search(company, '');
-            setLookups(prev => ({ ...prev, products: productsData.map(p => ({
+            // Load initial products using Acc-web DB via GRN Service
+            const grnLookups = await grnService.getLookups(activeCompany);
+            setLookups(prev => ({ ...prev, products: (grnLookups.products || []).map(p => ({
                 code: p.code,
-                name: p.prod_Name,
+                name: p.name,
                 unit: p.unit || '',
-                cost: p.purchase_price || 0,
-                selling: p.selling_Price || 0
+                cost: p.price || 0,
+                selling: p.sellingPrice || 0
             })) }));
         } catch (error) {
             showErrorToast("Failed to initialize Sales Order");
@@ -100,14 +103,15 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
     useEffect(() => {
         const fetchProducts = async () => {
             if (!showProdModal) return;
+            if (!prodSearch || prodSearch.length < 2) return;
             try {
-                const results = await productService.search(company, prodSearch);
+                const results = await grnService.searchProducts(prodSearch);
                 setLookups(prev => ({ ...prev, products: results.map(p => ({
                     code: p.code,
-                    name: p.prod_Name,
+                    name: p.name,
                     unit: p.unit || '',
-                    cost: p.purchase_price || 0,
-                    selling: p.selling_Price || 0
+                    cost: p.price || 0,
+                    selling: p.sellingPrice || 0
                 })) }));
             } catch (error) {
                 console.error("Search failed", error);
@@ -232,7 +236,11 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
         try {
             const res = apply ? await salesOrderService.applyOrder(payload) : await salesOrderService.saveDraft(payload);
             showSuccessToast(res.message);
-            if (apply) handleClear();
+            if (apply) {
+                setReceiptData({ header: { ...payload.header, custName: formData.custName }, details: payload.details });
+                setShowReceipt(true);
+                handleClear();
+            }
         } catch (error) {
             showErrorToast(error.response?.data || "Operation failed");
         }
@@ -242,6 +250,18 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
         setFormData(getInitialForm());
         setRows([{ id: Date.now(), prodCode: '', prodName: '', unit: '', cost: 0, selling: 0, qty: 0, discPer: 0, discount: 0, amount: 0 }]);
         initComponent();
+    };
+
+    const handleDelete = async () => {
+        if (!formData.docNo) return;
+        try {
+            const res = await salesOrderService.deleteOrder(formData.docNo, formData.company);
+            showSuccessToast(res.message);
+            handleClear();
+            if (onClose) onClose();
+        } catch (error) {
+            showErrorToast(error.response?.data?.message || "Operation failed");
+        }
     };
 
     const handleSearchClick = async () => {
@@ -310,14 +330,17 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
                 maxWidth="max-w-7xl"
                 footer={
                     <div className="flex items-center justify-end gap-3 w-full">
+                                    <button onClick={handleDelete} className="px-6 py-3 bg-[#ff3b30] hover:bg-[#e03127] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] shadow-md shadow-red-100 transition-all active:scale-95 flex items-center justify-center gap-2 border-none">
+                                        <Trash2 size={14} /> DELETE
+                                    </button>
                                     <button onClick={handleClear} className="px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-500 font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] transition-all active:scale-95 flex items-center justify-center gap-2 border-none">
-                                        <RefreshCw size={14} /> CLEAR FORM
+                                        <RefreshCw size={14} /> CLEAR 
                                     </button>
                                     <button onClick={() => handleSave(false)} className="px-6 py-3 bg-[#00adff] hover:bg-[#0099e6] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] transition-all active:scale-95 flex items-center justify-center gap-2 border-none">
-                                        <Save size={14} /> SAVE DRAFT
+                                        <Save size={14} /> SAVE 
                                     </button>
                                     <button onClick={() => handleSave(true)} className="px-6 py-3 bg-[#2bb744] hover:bg-[#259b3a] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] shadow-md shadow-green-100 transition-all active:scale-95 flex items-center justify-center gap-2 border-none">
-                                        <Check size={14} /> SAVE ORDER
+                                        <Check size={14} /> APPLY
                                     </button>
                     </div>
                 }
@@ -809,6 +832,15 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
                     <CalendarModal isOpen={showDueDateModal} onClose={() => setShowDueDateModal(false)} currentDate={formData.dueDate} onDateChange={(d) => { setFormData({ ...formData, dueDate: d }); setShowDueDateModal(false); }} title="Select Due Date" />
                 )}
             </TransactionFormWrapper>
+
+            {showReceipt && receiptData && (
+                <SalesOrderDetailModal
+                    isOpen={showReceipt}
+                    onClose={() => { setShowReceipt(false); setReceiptData(null); }}
+                    preloadedData={receiptData}
+                    docNo={receiptData.header.docNo}
+                />
+            )}
         </>
     );
 };

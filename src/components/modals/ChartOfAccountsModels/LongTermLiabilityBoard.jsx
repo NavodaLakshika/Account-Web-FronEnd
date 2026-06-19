@@ -67,9 +67,9 @@ const LongTermLiabilityBoard = ({ isOpen, onClose }) => {
 
     const fetchNextDocNo = async (companyCode) => {
         try {
-            const result = await longTermLiabService.generateDocNo(companyCode || formData.Company);
-            if (result && result.docNo) {
-                setFormData(prev => ({ ...prev, LiabCode: result.docNo }));
+            const result = await longTermLiabService.getNextCode(companyCode || formData.Company);
+            if (result && result.nextCode) {
+                setFormData(prev => ({ ...prev, LiabCode: result.nextCode }));
             }
         } catch (error) {
             console.error('Failed to fetch next doc no:', error);
@@ -249,7 +249,7 @@ const LongTermLiabilityBoard = ({ isOpen, onClose }) => {
                                 <input 
                                     name="LiabCode" value={formData.LiabCode} onChange={handleInputChange}
                                     type="text" className="w-40 h-8 border text-[12px] border-slate-200 px-3 bg-slate-50 font-bold text-[#0285fd] rounded outline-none shadow-sm text-center cursor-not-allowed" 
-                                    placeholder=""
+                                    placeholder="Enter ID"
                                     readOnly
                                 />
                                 <div className="flex-1 flex gap-1 items-center">
@@ -431,36 +431,38 @@ const LongTermLiabilityBoard = ({ isOpen, onClose }) => {
                         </div>
 
                         {/* Results List */}
-                        <div className="p-0">
-                            <table className="w-full text-left border-collapse">
-                                <thead className="bg-slate-50 sticky top-0 text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-slate-200 z-10">
-                                    <tr>
-                                        <th className="px-5 py-3 w-32">Liability ID</th>
-                                        <th className="px-5 py-3">Registry Name</th>
-                                        <th className="px-5 py-3 text-right">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-slate-100 max-h-[400px] overflow-y-auto custom-scrollbar block" style={{ maxHeight: '400px' }}>
-                                    {searchList.map((liab, idx) => (
-                                        <tr 
-                                            key={idx} 
-                                            onClick={() => selectLiability(liab.liabCode)}
-                                            className="group hover:bg-slate-50 cursor-pointer transition-colors flex w-full table-fixed"
-                                        >
-                                            <td className="px-5 py-3 w-32 font-mono text-[12px] font-bold text-slate-500">{liab.liabCode}</td>
-                                            <td className="px-5 py-3 flex-1 text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors">{liab.liabName}</td>
-                                            <td className="px-5 py-3 text-right">
-                                                <button className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded font-bold hover:bg-[#cb9b34] shadow-sm transition-all active:scale-95 uppercase tracking-widest border-none">Select</button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                    {searchList.length === 0 && (
+                        <div className="border border-gray-100 overflow-hidden bg-white">
+                            <div className="max-h-[400px] overflow-y-auto custom-scrollbar">
+                                <table className="w-full text-left border-collapse">
+                                    <thead className="bg-[#f8fafd] text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-slate-200 sticky top-0 z-10">
                                         <tr>
-                                            <td colSpan="3" className="p-8 text-center text-gray-400 italic text-sm">No recorded liabilities found.</td>
+                                            <th className="px-5 py-3">Liability ID</th>
+                                            <th className="px-5 py-3">Registry Name</th>
+                                            <th className="px-5 py-3 text-right">Action</th>
                                         </tr>
-                                    )}
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody className="divide-y divide-slate-100 bg-white">
+                                        {searchList.map((liab, idx) => (
+                                            <tr 
+                                                key={idx} 
+                                                onClick={() => selectLiability(liab.liabCode)}
+                                                className="group hover:bg-blue-50/50 cursor-pointer transition-colors"
+                                            >
+                                                <td className="px-5 py-3 font-mono text-[13px] text-gray-600">{liab.liabCode}</td>
+                                                <td className="px-5 py-3 text-[13px] font-mono text-gray-600 uppercase font-bold group-hover:text-blue-600 transition-colors">{liab.liabName}</td>
+                                                <td className="px-5 py-3 text-right">
+                                                    <button className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95 uppercase tracking-widest border-none">SELECT</button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                        {searchList.length === 0 && (
+                                            <tr>
+                                                <td colSpan="3" className="p-8 text-center text-gray-400 italic text-sm">No recorded liabilities found.</td>
+                                            </tr>
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
 
                         {/* Footer */}
@@ -493,39 +495,41 @@ const LongTermLiabilityBoard = ({ isOpen, onClose }) => {
                             </div>
                             <input type="text" placeholder="Find by Account Name or Code..." className="h-9 border border-slate-200 px-3 text-xs rounded-md w-72 focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 outline-none shadow-sm transition-all" value={accSearchQuery} onChange={(e) => setAccSearchQuery(e.target.value)} />
                         </div>
-                        <div className="p-0">
-                            <table className="w-full text-left border-collapse">
-                                <thead className="bg-slate-50 sticky top-0 text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-slate-200 z-10">
-                                    <tr>
-                                        <th className="px-5 py-3 w-32">Account Code</th>
-                                        <th className="px-5 py-3">Account Description</th>
-                                        <th className="px-5 py-3 text-right">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-slate-100 max-h-[400px] overflow-y-auto custom-scrollbar block" style={{ maxHeight: '400px' }}>
-                                    {lookups.accounts.filter(a => 
-                                        ((a.name || a.Name || '').toLowerCase().includes(accSearchQuery.toLowerCase())) || 
-                                        ((a.code || a.Code || '').toLowerCase().includes(accSearchQuery.toLowerCase()))
-                                    ).map((acc, idx) => (
-                                        <tr 
-                                            key={idx} 
-                                            onClick={() => handleAccountSelect(acc)}
-                                            className="group hover:bg-slate-50 cursor-pointer transition-colors flex w-full table-fixed"
-                                        >
-                                            <td className="px-5 py-3 w-32 font-mono text-[12px] font-bold text-slate-500">{acc.code || acc.Code}</td>
-                                            <td className="px-5 py-3 flex-1 text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors">{acc.name || acc.Name}</td>
-                                            <td className="px-5 py-3 text-right">
-                                                <button className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded font-bold hover:bg-[#cb9b34] shadow-sm transition-all active:scale-95 uppercase tracking-widest border-none">Select</button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                    {lookups.accounts.filter(a => ((a.name || a.Name || '').toLowerCase().includes(accSearchQuery.toLowerCase())) || ((a.code || a.Code || '').toLowerCase().includes(accSearchQuery.toLowerCase()))).length === 0 && (
+                        <div className="border border-gray-100 overflow-hidden bg-white">
+                            <div className="max-h-[400px] overflow-y-auto custom-scrollbar">
+                                <table className="w-full text-left border-collapse">
+                                    <thead className="bg-[#f8fafd] text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-slate-200 sticky top-0 z-10">
                                         <tr>
-                                            <td colSpan="3" className="p-8 text-center text-gray-400 italic text-sm">No accounts found.</td>
+                                            <th className="px-5 py-3">Account Code</th>
+                                            <th className="px-5 py-3">Account Description</th>
+                                            <th className="px-5 py-3 text-right">Action</th>
                                         </tr>
-                                    )}
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody className="divide-y divide-slate-100 bg-white">
+                                        {lookups.accounts.filter(a => 
+                                            ((a.name || a.Name || '').toLowerCase().includes(accSearchQuery.toLowerCase())) || 
+                                            ((a.code || a.Code || '').toLowerCase().includes(accSearchQuery.toLowerCase()))
+                                        ).map((acc, idx) => (
+                                            <tr 
+                                                key={idx} 
+                                                onClick={() => handleAccountSelect(acc)}
+                                                className="group hover:bg-blue-50/50 cursor-pointer transition-colors"
+                                            >
+                                                <td className="px-5 py-3 font-mono text-[13px] text-gray-600">{acc.code || acc.Code}</td>
+                                                <td className="px-5 py-3 text-[13px] font-mono text-gray-600 uppercase font-bold group-hover:text-blue-600 transition-colors">{acc.name || acc.Name}</td>
+                                                <td className="px-5 py-3 text-right">
+                                                    <button className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95 uppercase tracking-widest border-none">SELECT</button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                        {lookups.accounts.filter(a => ((a.name || a.Name || '').toLowerCase().includes(accSearchQuery.toLowerCase())) || ((a.code || a.Code || '').toLowerCase().includes(accSearchQuery.toLowerCase()))).length === 0 && (
+                                            <tr>
+                                                <td colSpan="3" className="p-8 text-center text-gray-400 italic text-sm">No accounts found.</td>
+                                            </tr>
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -554,39 +558,41 @@ const LongTermLiabilityBoard = ({ isOpen, onClose }) => {
                             </div>
                             <input type="text" placeholder="Find by Lender Name or Code..." className="h-9 border border-slate-200 px-3 text-xs rounded-md w-72 focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 outline-none shadow-sm transition-all" value={lenderSearchQuery} onChange={(e) => setLenderSearchQuery(e.target.value)} />
                         </div>
-                        <div className="p-0">
-                            <table className="w-full text-left border-collapse">
-                                <thead className="bg-slate-50 sticky top-0 text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-slate-200 z-10">
-                                    <tr>
-                                        <th className="px-5 py-3 w-32">Provider Code</th>
-                                        <th className="px-5 py-3">Institution Name</th>
-                                        <th className="px-5 py-3 text-right">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-slate-100 max-h-[400px] overflow-y-auto custom-scrollbar block" style={{ maxHeight: '400px' }}>
-                                    {lookups.lenders.filter(l => 
-                                        ((l.name || l.Name || '').toLowerCase().includes(lenderSearchQuery.toLowerCase())) || 
-                                        ((l.code || l.Code || '').toLowerCase().includes(lenderSearchQuery.toLowerCase()))
-                                    ).map((lender, idx) => (
-                                        <tr 
-                                            key={idx} 
-                                            onClick={() => handleLenderSelect(lender)}
-                                            className="group hover:bg-slate-50 cursor-pointer transition-colors flex w-full table-fixed"
-                                        >
-                                            <td className="px-5 py-3 w-32 font-mono text-[12px] font-bold text-slate-500">{lender.code || lender.Code}</td>
-                                            <td className="px-5 py-3 flex-1 text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors">{lender.name || lender.Name}</td>
-                                            <td className="px-5 py-3 text-right">
-                                                <button className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded font-bold hover:bg-[#cb9b34] shadow-sm transition-all active:scale-95 uppercase tracking-widest border-none">Select</button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                    {lookups.lenders.filter(l => ((l.name || l.Name || '').toLowerCase().includes(lenderSearchQuery.toLowerCase())) || ((l.code || l.Code || '').toLowerCase().includes(lenderSearchQuery.toLowerCase()))).length === 0 && (
+                        <div className="border border-gray-100 overflow-hidden bg-white">
+                            <div className="max-h-[400px] overflow-y-auto custom-scrollbar">
+                                <table className="w-full text-left border-collapse">
+                                    <thead className="bg-[#f8fafd] text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-slate-200 sticky top-0 z-10">
                                         <tr>
-                                            <td colSpan="3" className="p-8 text-center text-gray-400 italic text-sm">No providers found.</td>
+                                            <th className="px-5 py-3">Provider Code</th>
+                                            <th className="px-5 py-3">Institution Name</th>
+                                            <th className="px-5 py-3 text-right">Action</th>
                                         </tr>
-                                    )}
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody className="divide-y divide-slate-100 bg-white">
+                                        {lookups.lenders.filter(l => 
+                                            ((l.name || l.Name || '').toLowerCase().includes(lenderSearchQuery.toLowerCase())) || 
+                                            ((l.code || l.Code || '').toLowerCase().includes(lenderSearchQuery.toLowerCase()))
+                                        ).map((lender, idx) => (
+                                            <tr 
+                                                key={idx} 
+                                                onClick={() => handleLenderSelect(lender)}
+                                                className="group hover:bg-blue-50/50 cursor-pointer transition-colors"
+                                            >
+                                                <td className="px-5 py-3 font-mono text-[13px] text-gray-600">{lender.code || lender.Code}</td>
+                                                <td className="px-5 py-3 text-[13px] font-mono text-gray-600 uppercase font-bold group-hover:text-blue-600 transition-colors">{lender.name || lender.Name}</td>
+                                                <td className="px-5 py-3 text-right">
+                                                    <button className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95 uppercase tracking-widest border-none">SELECT</button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                        {lookups.lenders.filter(l => ((l.name || l.Name || '').toLowerCase().includes(lenderSearchQuery.toLowerCase())) || ((l.code || l.Code || '').toLowerCase().includes(lenderSearchQuery.toLowerCase()))).length === 0 && (
+                                            <tr>
+                                                <td colSpan="3" className="p-8 text-center text-gray-400 italic text-sm">No providers found.</td>
+                                            </tr>
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -596,7 +602,7 @@ const LongTermLiabilityBoard = ({ isOpen, onClose }) => {
             <CalendarModal 
                 isOpen={showOrgDateModal} 
                 onClose={() => setShowOrgDateModal(false)} 
-                onSelect={(date) => handleDateSelect('OrgDate', date)} 
+                onDateSelect={(date) => handleDateSelect('OrgDate', date)} 
                 currentDate={formData.OrgDate}
             />
             {/* Payment Type Search Modal */}

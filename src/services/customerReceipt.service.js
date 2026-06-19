@@ -38,6 +38,20 @@ export const customerReceiptService = {
       const response = await api.get('/ReceivePayment/generate-doc', { params: { company } });
       return response.data;
     } catch (error) { throw error; }
+  },
+
+  saveDraft: async (data) => {
+    try {
+      const response = await api.post('/ReceivePayment/save', data);
+      return response.data;
+    } catch (error) { throw error; }
+  },
+
+  deleteReceipt: async (docNo, company) => {
+    try {
+      const response = await api.delete(`/ReceivePayment/${docNo}`, { params: { company } });
+      return response.data;
+    } catch (error) { throw error; }
   }
 };
 

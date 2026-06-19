@@ -5,7 +5,7 @@ const ModalWrapper = ({ isOpen, onClose, title, subtitle, icon: Icon, children, 
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[500] flex items-center justify-center p-4">
             <div className="absolute inset-0 bg-slate-900/30 backdrop-blur-sm" onClick={onClose} />
             <div className={`animate-in fade-in zoom-in-95 duration-300 w-full ${size} relative z-10`}>
  <div className="bg-white rounded-none shadow-2xl p-5 relative overflow-hidden">

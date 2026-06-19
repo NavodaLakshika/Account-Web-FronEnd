@@ -27,7 +27,7 @@ const menuGroups = [
         title: 'Inventory',
         icon: Package,
         items: [
-            "Inventory Valuation Detail", "Inventory Valuation Summary", "Open Purchase Order Detail", 
+            "Products Report", "Inventory Valuation Detail", "Inventory Valuation Summary", "Open Purchase Order Detail", 
             "Open Purchase Order List", "Stock Take Worksheet"
         ]
     },
@@ -39,7 +39,8 @@ const menuGroups = [
             "Customer Phone List", "Sales by Customer Summary", "Sales by Customer Detail", "Deposit Detail", 
             "Estimates by Customer", "Product/Service List", "Sales by Product/Service Summary", 
             "Sales by Product/Service Detail", "Payment Method List", "Time Activities by Customer Detail", 
-            "Transaction List by Customer", "Transaction List by Tag Group"
+            "Transaction List by Customer", "Transaction List by Tag Group", "Invoice Approval Status",
+            "Product/Item Profitability by Customer"
         ]
     },
     {
@@ -47,7 +48,8 @@ const menuGroups = [
         icon: CreditCard,
         items: [
             "Accounts payable ageing summary", "Accounts payable ageing detail", "Bills and Applied Payments", 
-            "Bill Payment List", "Unpaid Bills", "Supplier Balance Summary", "Supplier Balance Detail"
+            "Bill Payment List", "Unpaid Bills", "Supplier Balance Summary", "Supplier Balance Detail",
+            "Bill Approval Status"
         ]
     },
     {
@@ -97,6 +99,14 @@ const menuGroups = [
         icon: Clock,
         items: [
             "Timesheet Detail by Employee", "Time Summary by Pay Type"
+        ]
+    },
+    {
+        title: 'Chart of Accounts',
+        icon: PieChart,
+        items: [
+            "Chart of Accounts", "Fixed Assets Item List", "Long Term Liability", "Depreciation Procedure",
+            "Fixed Income", "Fixed Expenses", "Sales Tax ID List"
         ]
     }
 ];

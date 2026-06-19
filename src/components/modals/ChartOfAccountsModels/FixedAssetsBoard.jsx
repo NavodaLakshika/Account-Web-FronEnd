@@ -469,36 +469,38 @@ const FixedAssetsBoard = ({ isOpen, onClose }) => {
                         </div>
 
                         {/* Results List */}
-                        <div className="p-0">
-                            <table className="w-full text-left border-collapse">
-                                <thead className="bg-slate-50 sticky top-0 text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-slate-200 z-10">
-                                    <tr>
-                                        <th className="px-5 py-3 w-32">Asset ID</th>
-                                        <th className="px-5 py-3">Asset Description</th>
-                                        <th className="px-5 py-3 text-right">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-slate-100 max-h-[400px] overflow-y-auto custom-scrollbar block" style={{ maxHeight: '400px' }}>
-                                    {assetsList.filter(a => (a.assets_Name || '').toLowerCase().includes(searchQuery.toLowerCase()) || (a.assets_Code || '').toLowerCase().includes(searchQuery.toLowerCase())).map((asset, idx) => (
-                                        <tr 
-                                            key={idx} 
-                                            onClick={() => selectAsset(asset.assets_Code)}
-                                            className="group hover:bg-slate-50 cursor-pointer transition-colors flex w-full table-fixed"
-                                        >
-                                            <td className="px-5 py-3 w-32 font-mono text-[12px] font-bold text-slate-500">{asset.assets_Code}</td>
-                                            <td className="px-5 py-3 flex-1 text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors">{asset.assets_Name}</td>
-                                            <td className="px-5 py-3 text-right">
-                                                <button className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded font-bold hover:bg-[#cb9b34] shadow-sm transition-all active:scale-95 uppercase tracking-widest border-none">Select</button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                    {assetsList.length === 0 && (
+                        <div className="border border-gray-100 overflow-hidden bg-white">
+                            <div className="max-h-[400px] overflow-y-auto custom-scrollbar">
+                                <table className="w-full text-left border-collapse">
+                                    <thead className="bg-[#f8fafd] text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-slate-200 sticky top-0 z-10">
                                         <tr>
-                                            <td colSpan="3" className="p-8 text-center text-gray-400 italic text-sm">No assets found in registry.</td>
+                                            <th className="px-5 py-3">Asset ID</th>
+                                            <th className="px-5 py-3">Asset Description</th>
+                                            <th className="px-5 py-3 text-right">Action</th>
                                         </tr>
-                                    )}
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody className="divide-y divide-slate-100 bg-white">
+                                        {assetsList.filter(a => (a.assets_Name || '').toLowerCase().includes(searchQuery.toLowerCase()) || (a.assets_Code || '').toLowerCase().includes(searchQuery.toLowerCase())).map((asset, idx) => (
+                                            <tr 
+                                                key={idx} 
+                                                onClick={() => selectAsset(asset.assets_Code)}
+                                                className="group hover:bg-blue-50/50 cursor-pointer transition-colors"
+                                            >
+                                                <td className="px-5 py-3 font-mono text-[13px] text-gray-600">{asset.assets_Code}</td>
+                                                <td className="px-5 py-3 text-[13px] font-mono text-gray-600 uppercase font-bold group-hover:text-blue-600 transition-colors">{asset.assets_Name}</td>
+                                                <td className="px-5 py-3 text-right">
+                                                    <button className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95 uppercase tracking-widest border-none">SELECT</button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                        {assetsList.length === 0 && (
+                                            <tr>
+                                                <td colSpan="3" className="p-8 text-center text-gray-400 italic text-sm">No assets found in registry.</td>
+                                            </tr>
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
 
                         {/* Footer */}
@@ -549,36 +551,38 @@ const FixedAssetsBoard = ({ isOpen, onClose }) => {
                         </div>
 
                         {/* Results List */}
-                        <div className="p-0">
-                            <table className="w-full text-left border-collapse">
-                                <thead className="bg-slate-50 sticky top-0 text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-slate-200 z-10">
-                                    <tr>
-                                        <th className="px-5 py-3 w-32">Account Code</th>
-                                        <th className="px-5 py-3">Account Description</th>
-                                        <th className="px-5 py-3 text-right">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-slate-100 max-h-[400px] overflow-y-auto custom-scrollbar block" style={{ maxHeight: '400px' }}>
-                                    {accounts.filter(a => (a.name || '').toLowerCase().includes(accSearchQuery.toLowerCase()) || (a.code || '').toLowerCase().includes(accSearchQuery.toLowerCase())).map((acc, idx) => (
-                                        <tr 
-                                            key={idx} 
-                                            onClick={() => handleAccountSelect(acc.code, acc.name)}
-                                            className="group hover:bg-slate-50 cursor-pointer transition-colors flex w-full table-fixed"
-                                        >
-                                            <td className="px-5 py-3 w-32 font-mono text-[12px] font-bold text-slate-500">{acc.code}</td>
-                                            <td className="px-5 py-3 flex-1 text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors">{acc.name}</td>
-                                            <td className="px-5 py-3 text-right">
-                                                <button className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded font-bold hover:bg-[#cb9b34] shadow-sm transition-all active:scale-95 uppercase tracking-widest border-none">Select</button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                    {accounts.length === 0 && (
+                        <div className="border border-gray-100 overflow-hidden bg-white">
+                            <div className="max-h-[400px] overflow-y-auto custom-scrollbar">
+                                <table className="w-full text-left border-collapse">
+                                    <thead className="bg-[#f8fafd] text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-slate-200 sticky top-0 z-10">
                                         <tr>
-                                            <td colSpan="3" className="p-8 text-center text-gray-400 italic text-sm">No accounts found.</td>
+                                            <th className="px-5 py-3">Account Code</th>
+                                            <th className="px-5 py-3">Account Description</th>
+                                            <th className="px-5 py-3 text-right">Action</th>
                                         </tr>
-                                    )}
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody className="divide-y divide-slate-100 bg-white">
+                                        {accounts.filter(a => (a.name || '').toLowerCase().includes(accSearchQuery.toLowerCase()) || (a.code || '').toLowerCase().includes(accSearchQuery.toLowerCase())).map((acc, idx) => (
+                                            <tr 
+                                                key={idx} 
+                                                onClick={() => handleAccountSelect(acc.code, acc.name)}
+                                                className="group hover:bg-blue-50/50 cursor-pointer transition-colors"
+                                            >
+                                                <td className="px-5 py-3 font-mono text-[13px] text-gray-600">{acc.code}</td>
+                                                <td className="px-5 py-3 text-[13px] font-mono text-gray-600 uppercase font-bold group-hover:text-blue-600 transition-colors">{acc.name}</td>
+                                                <td className="px-5 py-3 text-right">
+                                                    <button className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95 uppercase tracking-widest border-none">SELECT</button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                        {accounts.length === 0 && (
+                                            <tr>
+                                                <td colSpan="3" className="p-8 text-center text-gray-400 italic text-sm">No accounts found.</td>
+                                            </tr>
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
 
                         {/* Footer */}
@@ -592,19 +596,19 @@ const FixedAssetsBoard = ({ isOpen, onClose }) => {
             <CalendarModal 
                 isOpen={showPurchDateModal} 
                 onClose={() => setShowPurchDateModal(false)} 
-                onSelect={(date) => handleDateSelect('PurchDate', date)} 
+                onDateSelect={(date) => handleDateSelect('PurchDate', date)} 
                 currentDate={formData.PurchDate}
             />
             <CalendarModal 
                 isOpen={showSalesDateModal} 
                 onClose={() => setShowSalesDateModal(false)} 
-                onSelect={(date) => handleDateSelect('SalesDate', date)} 
+                onDateSelect={(date) => handleDateSelect('SalesDate', date)} 
                 currentDate={formData.SalesDate}
             />
             <CalendarModal 
                 isOpen={showWarrantyExpiryModal} 
                 onClose={() => setShowWarrantyExpiryModal(false)} 
-                onSelect={(date) => handleDateSelect('WarrantyExpiry', date)} 
+                onDateSelect={(date) => handleDateSelect('WarrantyExpiry', date)} 
                 currentDate={formData.WarrantyExpiry}
             />
         </>

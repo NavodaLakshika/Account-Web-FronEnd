@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { User, Lock, Mail, Loader2, Phone, ShieldCheck, CheckCircle2, ArrowLeft, KeyRound } from 'lucide-react';
 import { authService } from '../services/auth.service';
 import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
+import { Helmet } from 'react-helmet-async';
 import AboutUsModal from '../components/modals/AboutUsModal';
 import HelpModal from '../components/modals/HelpModal';
 import LegalTextModal from '../components/modals/LegalTextModal';
@@ -102,6 +103,11 @@ const RegisterPage = () => {
 
     return (
         <div className="min-h-screen relative flex flex-col items-center justify-center font-['Arial'] overflow-hidden bg-[#f8fafc] py-8">
+            <Helmet>
+                <title>Create Account | Onimta Accounting System</title>
+                <meta name="description" content="Register a new account on the Onimta Accounting Web Application. Create secure access to enterprise financial management tools." />
+                <link rel="canonical" href="https://onimta.com/register" />
+            </Helmet>
             <style>{`
                 .otp-box { transition: border-color 0.2s, box-shadow 0.2s; }
                 .otp-box:focus { border-color: #00acee !important; box-shadow: 0 0 0 3px rgba(0,172,238,0.25); outline: none; }

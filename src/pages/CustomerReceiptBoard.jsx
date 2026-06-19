@@ -246,6 +246,44 @@ const CustomerReceiptBoard = ({ isOpen, onClose }) => {
         setShowDeleteConfirm(true);
     };
 
+    const confirmDelete = async () => {
+        setIsDeleting(true);
+        try {
+            await customerReceiptService.deleteReceipt(formData.docNo, formData.company);
+            showSuccessToast("Receipt Draft Deleted Successfully");
+            handleClear();
+            setShowDeleteConfirm(false);
+            if (onClose) onClose();
+        } catch (error) {
+            showErrorToast(error.toString());
+        } finally {
+            setIsDeleting(false);
+        }
+    };
+
+    const handleSave = async () => {
+        if (!formData.customerId) return showErrorToast("Please select a customer");
+        
+        setIsSaving(true);
+        try {
+            const payload = {
+                ...formData,
+                postDate: formData.date,
+                bankName: lookups.banks.find(b => (b.bank_Code || b.Bank_Code) === formData.bankCode)?.bank_Name || lookups.banks.find(b => (b.bank_Code || b.Bank_Code) === formData.bankCode)?.Bank_Name || '',
+                bankId: formData.bankCode,
+                branch: formData.branchCode,
+                accountType: "MM",
+                totalAllocated: totalAllocated
+            };
+            await customerReceiptService.saveDraft(payload);
+            showSuccessToast("Draft Saved Successfully");
+        } catch (error) {
+            showErrorToast(error.message);
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
     if (!isOpen) return null;
 
     return (
@@ -282,6 +320,13 @@ const CustomerReceiptBoard = ({ isOpen, onClose }) => {
                             </button>
                         </div>
                         <div className="flex gap-3">
+                            <button
+                                onClick={handleSave}
+                                disabled={isSaving}
+                                className="px-6 py-3 bg-white border-2 border-[#0285fd] text-[#0285fd] font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] shadow-sm transition-all hover:bg-blue-50 active:scale-95 flex items-center justify-center gap-2 disabled:opacity-50"
+                            >
+                                <Save size={14} /> SAVE DRAFT
+                            </button>
                             <button
                                 onClick={handleApply}
                                 disabled={isSaving}
@@ -559,12 +604,22 @@ const CustomerReceiptBoard = ({ isOpen, onClose }) => {
                                 <input type="text" value={(invoices.reduce((a,b) => a + b.balance, 0) - totalAllocated - totalDiscount - totalSetOff).toLocaleString(undefined, {minimumFractionDigits:2})} readOnly className="w-32 h-8 border-2 border-slate-300 outline-none px-2 text-right text-[14px] font-black font-mono shadow-inner bg-slate-50 text-black" />
                             </div>
                         </div>
-                    </div>
+
+                </div>
                 </div>
             </TransactionFormWrapper>
 
             {/* Sub Modals */}
             <CalendarModal isOpen={showDatePicker} onClose={() => setShowDatePicker(false)} onDateSelect={(d) => { setFormData(prev => ({ ...prev, [datePickerField]: d })); setShowDatePicker(false); }} initialDate={formData[datePickerField]} />
+            <SimpleModal isOpen={showDeleteConfirm} onClose={() => setShowDeleteConfirm(false)} title="Confirm Delete" maxWidth="max-w-[400px]">
+                <div className="p-4 flex flex-col gap-4">
+                    <p className="text-sm font-bold text-gray-700">Are you sure you want to delete this draft receipt?</p>
+                    <div className="flex justify-end gap-3">
+                        <button onClick={() => setShowDeleteConfirm(false)} className="px-4 py-2 bg-gray-200 text-gray-700 rounded text-xs font-bold">CANCEL</button>
+                        <button onClick={confirmDelete} disabled={isDeleting} className="px-4 py-2 bg-red-500 text-white rounded text-xs font-bold">{isDeleting ? 'DELETING...' : 'DELETE'}</button>
+                    </div>
+                </div>
+            </SimpleModal>
 
             {/* Customer Search Modal */}
             <SimpleModal isOpen={showCustomerSearch} onClose={() => { setShowCustomerSearch(false); setCustomerSearchQuery(''); }} title="Customer Directory Lookup" maxWidth="max-w-[600px]">

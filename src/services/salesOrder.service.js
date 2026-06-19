@@ -34,5 +34,12 @@ export const salesOrderService = {
       const response = await api.get('/SalesOrder/getOrder', { params: { docNo, company } });
       return response.data;
     } catch (error) { throw error; }
+  },
+
+  deleteOrder: async (docNo, company) => {
+    try {
+      const response = await api.delete(`/SalesOrder/${docNo}`, { params: { company } });
+      return response.data;
+    } catch (error) { throw error; }
   }
 };

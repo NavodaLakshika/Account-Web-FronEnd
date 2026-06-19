@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /login
+Allow: /register
+Allow: /
+Disallow: /dashboard
+Disallow: /report/
+Disallow: /super-admin
+Disallow: /bi-dashboard
+Disallow: /api/
+
+Sitemap: https://onimta.com/sitemap.xml

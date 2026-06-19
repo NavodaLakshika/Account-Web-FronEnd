@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import SimpleModal from '../SimpleModal';
-import { Search, Save, RotateCcw, X, Loader2, Lock, User, Key, Eye, EyeOff, CheckCircle2 } from 'lucide-react';
+import { Search, Save, RotateCcw, X, Loader2, Lock, User, Key, Eye, EyeOff, CheckCircle2, AlertTriangle } from 'lucide-react';
 import { userProfileService } from '../../services/userProfile.service';
 import { showSuccessToast, showErrorToast } from '../../utils/toastUtils';
+import { MasterFormWrapper, MasterFieldRow, MasterInput, MasterLookupInput, MasterLookupModal } from '../MasterFormComponents';
+import ConfirmModal from './ConfirmModal';
 
 
 const ChangePasswordBoard = ({ isOpen, onClose }) => {
@@ -20,8 +21,8 @@ const ChangePasswordBoard = ({ isOpen, onClose }) => {
     const [showUserModal, setShowUserModal] = useState(false);
     const [userSearchQuery, setUserSearchQuery] = useState('');
     const [users, setUsers] = useState([]);
-    const [showPass, setShowPass] = useState({ cur: false, new: false, con: false });
     const [showSaveConfirm, setShowSaveConfirm] = useState(false);
+    const [showPass, setShowPass] = useState({ cur: false, new: false, con: false });
 
     useEffect(() => {
         if (isOpen) {
@@ -33,7 +34,7 @@ const ChangePasswordBoard = ({ isOpen, onClose }) => {
                     const parsed = JSON.parse(companyData);
                     // Handle all potential property name variants
                     companyCode = parsed.companyCode || parsed.CompanyCode || parsed.company_Code || (typeof companyData === 'string' ? companyData : '');
-                } catch (e) { 
+                } catch { 
                     companyCode = companyData; 
                 }
             }
@@ -111,225 +112,115 @@ const ChangePasswordBoard = ({ isOpen, onClose }) => {
                     }
                 `}
             </style>
-            <SimpleModal
+            <MasterFormWrapper
                 isOpen={isOpen}
                 onClose={onClose}
                 title="Security - Change Password"
-                maxWidth="max-w-[500px]"
-                footer={
-                    <div className="bg-slate-50 px-6 py-4 w-full flex justify-end gap-3 border-t border-gray-100 mt-4">
+                subtitle="Update system user account passwords"
+                icon={Key}
+                maxWidth="max-w-[800px]"
+                isEditMode={false}
+                loading={loading}
+                onClear={handleClear}
+                onSave={handleSave}
+                saveLabel="CHANGE"
+                customFooter={
+                    <div className="bg-slate-50 px-6 py-4 w-full flex justify-end gap-3 border-t border-gray-100 mt-4 rounded-b-xl">
+                        <button 
+                            onClick={handleClear} 
+                            className="px-6 py-3 bg-[#00adff] hover:bg-[#0099e6] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] transition-all active:scale-95 flex items-center justify-center gap-2 border-none"
+                        >
+                            <RotateCcw size={14} /> CLEAR FORM
+                        </button>
                         <button 
                             onClick={handleSave} 
                             disabled={loading} 
-                            className={`px-6 h-10 bg-[#0078d4] text-white text-sm font-bold rounded-md shadow-md shadow-blue-200 hover:bg-[#005a9e] transition-all active:scale-95 flex items-center justify-center gap-2 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            className={`px-6 py-3 bg-[#0285fd] hover:bg-[#0073ff] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] shadow-md shadow-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border-none ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                         >
-                            {loading ? <Loader2 size={14} className="animate-spin" /> : <Lock size={14} />} 
-                            Change Password
-                        </button>
-                        <button 
-                            onClick={handleClear} 
-                            className="px-6 h-10 bg-slate-100 text-slate-600 text-sm font-bold rounded-md hover:bg-slate-200 transition-all active:scale-95 flex items-center justify-center gap-2 border-none"
-                        >
-                            <RotateCcw size={14} /> Clear
+                            {loading ? <Loader2 size={14} className="animate-spin" /> : <Lock size={14} />} CHANGE PASSWORD
                         </button>
                     </div>
                 }
             >
-                <div className="space-y-4 py-4 font-['Plus_Jakarta_Sans']">
-                    {/* User Profile Header */}
-                    <div className="flex flex-col items-center bg-blue-50/50 p-6 rounded-2xl border border-blue-100 mb-2">
- <div className="w-16 h-16 bg-white rounded-sm flex items-center justify-center shadow-md mb-3 border-2 border-blue-200">
-                             <User size={32} className="text-blue-600" />
-                        </div>
-                        <h4 className="text-lg font-black text-slate-800 uppercase tracking-tight">
-                            {formData.UserName || "Select Employee"}
-                        </h4>
-                        <span className="text-xs font-bold text-blue-600 tracking-widest uppercase">
-                            {formData.EmpCode || "User Security Module"}
-                        </span>
-                    </div>
+                <MasterFieldRow label="Target User" colSpan="col-span-6">
+                    <MasterLookupInput value={formData.UserName} onSearchClick={() => setShowUserModal(true)} placeholder="Search system user..." />
+                </MasterFieldRow>
 
-                    <div className="space-y-3">
-                        {/* Select User */}
-                        <div className="flex items-center gap-3">
-                            <label className="text-[12.5px] font-bold text-gray-700 w-32 shrink-0">Target User</label>
-                            <div className="flex-1 flex gap-2">
-                                <input type="text" value={formData.UserName} readOnly placeholder="Search system user..." className="flex-1 h-9 border border-gray-300 px-3 text-[12.5px] bg-gray-50 rounded-lg outline-none font-medium cursor-pointer" onClick={() => setShowUserModal(true)} />
-                                <button onClick={() => setShowUserModal(true)} className="w-9 h-9 bg-[#0078d4] text-white flex items-center justify-center hover:bg-[#005a9e] rounded-lg shadow-sm">
-                                    <Search size={16} />
-                                </button>
-                            </div>
-                        </div>
-
-                        {/* Current Password */}
-                        <div className="flex items-center gap-3">
-                            <label className="text-[12.5px] font-bold text-gray-700 w-32 shrink-0">Current Password</label>
-                            <div className="flex-1 relative">
-                                <input 
-                                    type={showPass.cur ? "text" : "password"} 
-                                    value={formData.CurrentPassword} 
-                                    onChange={(e) => setFormData(prev => ({ ...prev, CurrentPassword: e.target.value }))}
-                                    className="w-full h-9 border border-gray-300 px-3 pr-10 text-[12.5px] rounded-lg outline-none focus:border-blue-500 shadow-sm" 
-                                    placeholder="••••••••"
-                                />
-                                <button onClick={() => setShowPass(p => ({ ...p, cur: !p.cur }))} className="absolute right-3 top-2 text-gray-400 hover:text-blue-600">
-                                    {showPass.cur ? <EyeOff size={16} /> : <Eye size={16} />}
-                                </button>
-                            </div>
-                        </div>
-
-                        <div className="h-px bg-gray-100 my-4" />
-
-                        {/* New Password */}
-                        <div className="flex items-center gap-3">
-                            <label className="text-[12.5px] font-bold text-gray-700 w-32 shrink-0">New Password</label>
-                            <div className="flex-1 relative">
-                                <input 
-                                    type={showPass.new ? "text" : "password"} 
-                                    value={formData.NewPassword} 
-                                    onChange={(e) => setFormData(prev => ({ ...prev, NewPassword: e.target.value }))}
-                                    className="w-full h-9 border border-gray-300 px-3 pr-10 text-[12.5px] rounded-lg outline-none focus:border-blue-500 shadow-sm font-bold text-blue-600" 
-                                    placeholder="••••••••"
-                                />
-                                <button onClick={() => setShowPass(p => ({ ...p, new: !p.new }))} className="absolute right-3 top-2 text-gray-400 hover:text-blue-600">
-                                    {showPass.new ? <EyeOff size={16} /> : <Eye size={16} />}
-                                </button>
-                            </div>
-                        </div>
-
-                        {/* Confirm Password */}
-                        <div className="flex items-center gap-3">
-                            <label className="text-[12.5px] font-bold text-gray-700 w-32 shrink-0">Verify Password</label>
-                            <div className="flex-1">
-                                <input 
-                                    type="password" 
-                                    value={formData.ConfirmPassword} 
-                                    onChange={(e) => setFormData(prev => ({ ...prev, ConfirmPassword: e.target.value }))}
-                                    className={`w-full h-9 border ${formData.ConfirmPassword && formData.NewPassword === formData.ConfirmPassword ? 'border-green-500' : 'border-gray-300'} px-3 text-[12.5px] rounded-lg outline-none shadow-sm`}
-                                    placeholder="Re-enter password"
-                                />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </SimpleModal>
-
-            {/* User Selection Modal */}
-            <SimpleModal
-                isOpen={showUserModal}
-                onClose={() => setShowUserModal(false)}
-                title="Select System Employee"
-                maxWidth="max-w-[700px]"
-            >
-                <div className="space-y-4 font-['Tahoma']">
-                    {/* Search Section matching PurchaseOrderBoard style */}
-                    <div className="flex items-center gap-4 bg-slate-50/80 p-3 rounded-lg border border-gray-100 mb-2">
-                        <span className="text-[11px] font-bold text-gray-500 uppercase tracking-widest whitespace-nowrap">Global Archive Search</span>
-                        <div className="relative flex-1">
-                            <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                            <input 
-                                type="text" 
-                                placeholder="Filter by name or employee code..." 
-                                className="w-full h-9 pl-10 pr-4 border border-gray-300 rounded-[5px] outline-none text-sm focus:border-[#0285fd] bg-white shadow-sm transition-all"
-                                value={userSearchQuery} 
-                                onChange={(e) => setUserSearchQuery(e.target.value)} 
-                                autoFocus
-                            />
-                        </div>
-                        <button 
-                            onClick={() => {
-                                const companyData = localStorage.getItem('selectedCompany');
-                                let companyCode = '';
-                                if (companyData) {
-                                    try {
-                                        const parsed = JSON.parse(companyData);
-                                        companyCode = parsed.companyCode || parsed.CompanyCode || parsed.company_Code || '';
-                                    } catch (e) { companyCode = companyData; }
-                                }
-                                fetchUsers(companyCode);
-                            }}
-                            className="p-2 text-[#0285fd] hover:bg-blue-50 rounded-md transition-colors"
-                            title="Reload Data"
-                        >
-                            <RotateCcw size={16} />
+                <MasterFieldRow label="Current Password" colSpan="col-span-6">
+                    <div className="relative flex-1 flex">
+                        <MasterInput 
+                            type={showPass.cur ? "text" : "password"} 
+                            name="CurrentPassword" 
+                            value={formData.CurrentPassword} 
+                            onChange={(e) => setFormData(prev => ({ ...prev, CurrentPassword: e.target.value }))} 
+                            placeholder="••••••••" 
+                            className="pr-8"
+                        />
+                        <button type="button" onClick={() => setShowPass(p => ({ ...p, cur: !p.cur }))} className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#00D1FF] outline-none">
+                            {showPass.cur ? <EyeOff size={14} /> : <Eye size={14} />}
                         </button>
                     </div>
+                </MasterFieldRow>
 
-                    {/* Table matching PurchaseOrderBoard style */}
- <div className=" rounded-sm overflow-hidden shadow-sm bg-white">
-                        <table className="w-full text-left">
-                            <thead className="bg-[#f8fafd] text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 sticky top-0 z-10">
-                                <tr>
-                                    <th className="px-5 py-3 w-32">Reference ID</th>
-                                    <th className="px-5 py-3">Full Name / Description</th>
-                                    <th className="px-5 py-3 text-right">SELECT</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-50">
-                                {users.filter(u => u?.emp_Name?.toLowerCase().includes(userSearchQuery.toLowerCase()) || u?.emp_Code?.toLowerCase().includes(userSearchQuery.toLowerCase())).length === 0 ? (
-                                    <tr>
-                                        <td colSpan="3" className="text-center py-20 text-gray-300 text-[12px] font-bold uppercase tracking-widest">
-                                            {loading ? "Establishing database connection..." : "No matching employees found"}
-                                        </td>
-                                    </tr>
-                                ) : (
-                                    users.filter(u => u?.emp_Name?.toLowerCase().includes(userSearchQuery.toLowerCase()) || u?.emp_Code?.toLowerCase().includes(userSearchQuery.toLowerCase())).map((u, i) => (
-                                        <tr key={i} className="group hover:bg-blue-50/50 cursor-pointer transition-colors" onClick={() => handleUserSelect(u)}>
-                                            <td className="px-5 py-3 font-mono text-[13px] font-bold text-gray-600 border-r border-gray-50/50">
-                                                {u.emp_Code}
-                                            </td>
-                                            <td className="px-5 py-3 text-[13px] font-bold text-gray-600 uppercase group-hover:text-[#0285fd]">
-                                                {u.emp_Name}
-                                            </td>
-                                            <td className="px-5 py-3 text-right">
-                                                <button 
-                                                    onClick={(e) => { e.stopPropagation(); handleUserSelect(u); }}
-                                                    className="bg-[#e49e1b] hover:bg-[#cb9b34] text-white text-[10px] px-5 py-2 rounded-[5px] font-black shadow-md transition-all active:scale-95 uppercase tracking-wider"
-                                                >
-                                                    SELECT
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    ))
-                                )}
-                            </tbody>
-                        </table>
+                <MasterFieldRow label="New Password" colSpan="col-span-6">
+                    <div className="relative flex-1 flex">
+                        <MasterInput 
+                            type={showPass.new ? "text" : "password"} 
+                            name="NewPassword" 
+                            value={formData.NewPassword} 
+                            onChange={(e) => setFormData(prev => ({ ...prev, NewPassword: e.target.value }))} 
+                            placeholder="••••••••" 
+                            className="pr-8"
+                        />
+                        <button type="button" onClick={() => setShowPass(p => ({ ...p, new: !p.new }))} className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#00D1FF] outline-none">
+                            {showPass.new ? <EyeOff size={14} /> : <Eye size={14} />}
+                        </button>
                     </div>
+                </MasterFieldRow>
 
-                    {/* Status Bar */}
-                    <div className="flex items-center justify-between opacity-50 px-2 mt-2">
-                        <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest italic">Total Records: {users.length}</span>
-                        <div className="flex items-center gap-1.5">
-                            <div className={`w-1.5 h-1.5 rounded-full ${users.length > 0 ? 'bg-emerald-500' : 'bg-red-400'}`} />
-                            <span className="text-[9px] font-black text-slate-400 uppercase tracking-tight">Onimta User Registry v1.0</span>
-                        </div>
+                <MasterFieldRow label="Verify Password" colSpan="col-span-6">
+                    <div className="relative flex-1 flex">
+                        <MasterInput 
+                            type={showPass.con ? "text" : "password"} 
+                            name="ConfirmPassword" 
+                            value={formData.ConfirmPassword} 
+                            onChange={(e) => setFormData(prev => ({ ...prev, ConfirmPassword: e.target.value }))} 
+                            placeholder="Re-enter password" 
+                            className="pr-8"
+                        />
+                        <button type="button" onClick={() => setShowPass(p => ({ ...p, con: !p.con }))} className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#00D1FF] outline-none">
+                            {showPass.con ? <EyeOff size={14} /> : <Eye size={14} />}
+                        </button>
                     </div>
-                </div>
-            </SimpleModal>
+                </MasterFieldRow>
+            </MasterFormWrapper>
 
-            {/* Save Confirmation */}
-            {showSaveConfirm && (
-                <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4 font-['Plus_Jakarta_Sans']">
-                    <div className="absolute inset-0 bg-slate-900/30 backdrop-blur-sm" onClick={() => setShowSaveConfirm(false)} />
- <div className="relative w-full max-w-xs bg-white rounded-sm shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
-                        <div className="p-6 text-center">
-                            <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-white shadow-sm">
-                                <CheckCircle2 size={32} className="text-[#0078d4]" />
-                            </div>
-                            <h3 className="text-lg font-black text-slate-800 mb-1">Apply Changes?</h3>
-                            <p className="text-slate-500 text-xs leading-relaxed mb-6">
-                                Are you sure you want to change the password for <span className="font-bold text-blue-600 uppercase">"{formData.UserName}"</span>?
-                            </p>
-                            <div className="flex gap-2">
-                                <button onClick={() => setShowSaveConfirm(false)} className="flex-1 h-10 bg-slate-100 text-slate-600 font-bold rounded-lg hover:bg-slate-200 text-xs transition-all active:scale-95">Cancel</button>
-                                <button onClick={confirmChange} className="flex-1 h-10 bg-[#0078d4] text-white font-bold rounded-lg hover:bg-[#005a9e] text-xs transition-all active:scale-95 shadow-sm shadow-blue-200">
-                                    Update Now
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
+            <MasterLookupModal
+                isOpen={showUserModal}
+                onClose={() => setShowUserModal(false)}
+                title="System Users Lookup"
+                columns={[
+                    { label: 'EMPLOYEE ID', key: 'emp_Code', isId: true, width: 'w-[120px]', render: (item) => <span className="font-mono text-[11px] font-bold text-[#0285fd]">{item.emp_Code}</span> },
+                    { label: 'USER NAME', key: 'emp_Name', render: (item) => <span className="font-bold text-slate-700 uppercase text-[11px]">{item.emp_Name}</span> },
+                ]}
+                items={users.filter(u => (u?.emp_Name || '').toLowerCase().includes(userSearchQuery.toLowerCase()) || (u?.emp_Code || '').toLowerCase().includes(userSearchQuery.toLowerCase()))}
+                onSelect={handleUserSelect}
+                emptyMsg={users.length === 0 ? 'Synchronizing User Data...' : 'No matching records found'}
+                searchQuery={userSearchQuery}
+                setSearchQuery={setUserSearchQuery}
+            />
+
+            <ConfirmModal
+                isOpen={showSaveConfirm}
+                onClose={() => setShowSaveConfirm(false)}
+                onConfirm={confirmChange}
+                title="Apply Changes?"
+                message={`Are you sure you want to change the password for "${formData.UserName}"?`}
+                loading={loading}
+                confirmText="UPDATE NOW"
+                cancelText="CANCEL"
+                variant="primary"
+            />
         </>
     );
 };

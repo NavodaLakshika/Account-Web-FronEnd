@@ -53,8 +53,8 @@ export const MasterFormWrapper = ({
                             onClick={onSave}
                             disabled={loading}
                             className={`px-8 h-10 text-white font-mono font-bold text-[13px] uppercase tracking-widest rounded-[5px] transition-all active:scale-95 flex items-center justify-center gap-2 border-none disabled:opacity-50 shadow-md ${isEditMode
-                                    ? 'bg-[#2bb744] hover:bg-[#259b3a] shadow-green-100'
-                                    : 'bg-[#2bb744] hover:bg-[#259b3a] shadow-green-100'
+                                ? 'bg-[#2bb744] hover:bg-[#259b3a] shadow-green-100'
+                                : 'bg-[#2bb744] hover:bg-[#259b3a] shadow-green-100'
                                 }`}
                         >
                             {loading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
@@ -226,11 +226,9 @@ export const MasterLookupModal = ({
                                     >
                                         {columns.map((col, i) => (
                                             <td key={i} className={`px-5 py-3 ${col.align === 'right' ? 'text-right' : ''}`}>
-                                                {col.render ? col.render(item) : (
-                                                    <span className={`text-[12px] font-bold ${col.isId ? 'font-mono text-slate-500' : 'text-slate-700 uppercase group-hover:text-blue-600 transition-colors'}`}>
-                                                        {item[col.key]}
-                                                    </span>
-                                                )}
+                                                <span className={`text-[10px] font-bold ${col.isId ? 'font-mono text-slate-500' : 'text-slate-700 uppercase group-hover:text-blue-600 transition-colors'}`}>
+                                                    {col.render ? col.render(item) : item[col.key]}
+                                                </span>
                                             </td>
                                         ))}
                                         <td className="px-5 py-3 text-right">
