@@ -12,6 +12,7 @@ import { grnService } from '../services/grn.service';
 
 import { getSessionData } from '../utils/session';
 import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
+import SalesInvoiceDetailModal from '../components/SalesInvoiceDetailModal';
 
 
 const SalesInvoiceBoard = ({ isOpen, onClose }) => {
@@ -43,6 +44,7 @@ const SalesInvoiceBoard = ({ isOpen, onClose }) => {
     const [showSearchModal, setShowSearchModal] = useState(false);
     const [showConfirmModal, setShowConfirmModal] = useState(false);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    const [appliedDocNo, setAppliedDocNo] = useState(null);
     const [isApplying, setIsApplying] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
     const [showCustomerSearch, setShowCustomerSearch] = useState(false);
@@ -291,6 +293,7 @@ const SalesInvoiceBoard = ({ isOpen, onClose }) => {
         try {
             await salesInvoiceService.apply(payload);
             showSuccessToast(`Invoice applied successfully.`);
+            setAppliedDocNo(payload.docNo);
             handleClear();
             setShowConfirmModal(false);
         } catch (error) {
@@ -359,10 +362,10 @@ const SalesInvoiceBoard = ({ isOpen, onClose }) => {
                         </div>
                         <div className="flex gap-4">
                             <button onClick={handleSave} className="px-7 h-11 bg-white text-[#0285fd] text-[13px] font-black rounded-[8px] border-2 border-[#0285fd] hover:bg-blue-50 transition-all active:scale-95 flex items-center gap-2.5 shadow-sm">
-                                <Save size={16} strokeWidth={2.5} /> SAVE DRAFT
+                                <Save size={16} strokeWidth={2.5} /> SAVE
                             </button>
                             <button onClick={handleApply} className="px-7 h-11 bg-[#2bb744] text-white text-[13px] font-black rounded-[8px] shadow-lg shadow-green-200 hover:bg-[#259b3a] hover:-translate-y-0.5 transition-all active:scale-95 flex items-center gap-2.5 border-none">
-                                <CheckCircle size={16} strokeWidth={2.5} /> SAVE & APPLY
+                                <CheckCircle size={16} strokeWidth={2.5} /> APPLY
                             </button>
                         </div>
                     </div>
@@ -630,6 +633,13 @@ const SalesInvoiceBoard = ({ isOpen, onClose }) => {
             <CalendarModal isOpen={showDatePicker} onClose={() => setShowDatePicker(false)} onDateSelect={(d) => { setFormData(prev => ({ ...prev, [datePickerField]: d })); setShowDatePicker(false); }} initialDate={formData[datePickerField]} />
             <ConfirmModal isOpen={showConfirmModal} onClose={() => setShowConfirmModal(false)} onConfirm={confirmApply} title="Confirm Final Application" message="Are you sure you want to apply this invoice to the ledger? This action will update inventory and accounting balances." isLoading={isApplying} />
             <ConfirmModal isOpen={showDeleteConfirm} onClose={() => setShowDeleteConfirm(false)} onConfirm={confirmDelete} title="Confirm Deletion" message={`Are you sure you want to delete invoice ${formData.docNo}? This action cannot be undone.`} isLoading={isDeleting} />
+            
+            {appliedDocNo && (
+                <SalesInvoiceDetailModal
+                    docNo={appliedDocNo}
+                    onClose={() => setAppliedDocNo(null)}
+                />
+            )}
         </>
     );
 };

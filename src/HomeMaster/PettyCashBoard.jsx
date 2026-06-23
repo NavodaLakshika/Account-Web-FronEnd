@@ -8,6 +8,7 @@ import { getSessionData } from '../utils/session';
 import CalendarModal from '../components/CalendarModal';
 import CustomerMasterBoard from '../components/modals/MasterSubModal/CustomerMasterBoard';
 import NewAccountBoard from '../pages/NewAccountBoard';
+import PettyCashDetailModal from '../components/PettyCashDetailModal';
 import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
 
 
@@ -79,6 +80,8 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
 
     const [showCustomerMasterBoard, setShowCustomerMasterBoard] = useState(false);
     const [showAccountBoard, setShowAccountBoard] = useState(false);
+    const [showReceiptModal, setShowReceiptModal] = useState(false);
+    const [printedDocNo, setPrintedDocNo] = useState(null);
 
     const parseDateInternal = (dateStr) => {
         if (!dateStr) return new Date();
@@ -295,7 +298,9 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
             };
 
             const response = await pettyCashService.applyPettyCash(payload);
-            showSuccessToast(`${response.docNo} Record Applied Successfully.`);
+            showSuccessToast(`${response.docNo || response.orgDocNo} Record Applied Successfully.`);
+            setPrintedDocNo(response.docNo || response.orgDocNo || formData.docNo);
+            setShowReceiptModal(true);
             handleClear();
         } catch (error) {
             showErrorToast(error.response?.data || 'Failed to apply Petty Cash');
@@ -633,6 +638,14 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                     </div>
                 </div>
             </SimpleModal>
+
+            {/* PettyCash Receipt Modal */}
+            {showReceiptModal && (
+                <PettyCashDetailModal 
+                    docNo={printedDocNo} 
+                    onClose={() => setShowReceiptModal(false)} 
+                />
+            )}
 
             {/* Vendor Search Modal */}
             <SimpleModal

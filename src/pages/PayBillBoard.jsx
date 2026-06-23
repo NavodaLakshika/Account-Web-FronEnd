@@ -623,7 +623,7 @@ const PayBillBoard = ({ isOpen, onClose }) => {
                                     )}
                                     <div className="pt-0.5">
                                         <div className="flex items-center gap-4 bg-blue-50/50 p-1.5 rounded-lg border border-blue-100">
-                                            <label className="text-[12px] font-black text-blue-800 w-32 shrink-0 uppercase tracking-tighter">Funds Applied</label>
+                                            <label className="text-[12px] font-black text-blue-800 w-[120px] shrink-0 uppercase tracking-tighter">Funds Applied</label>
                                             <div className="flex-1 h-8 font-mono bg-white border border-blue-200 px-3 text-[18px] font-black text-blue-700 text-right flex items-center justify-end rounded-[5px] shadow-sm">
                                                 {totals.toPay.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                             </div>

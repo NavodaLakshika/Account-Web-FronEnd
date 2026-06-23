@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import SimpleModal from '../components/SimpleModal';
+import TransactionReceiptModal from '../components/modals/TransactionReceiptModal';
 import { 
   Search, Calendar, ChevronDown, Plus, Filter, FileText, 
   CreditCard, PenTool, Wallet, RefreshCw, Loader2, 
-  ArrowUpRight, TrendingUp, DollarSign, Users, PieChart, AlertCircle
+  ArrowUpRight, TrendingUp, DollarSign, Users, PieChart, AlertCircle, Printer, X
 } from 'lucide-react';
 import { expensesService } from '../services/expenses.service';
 import { supplierService } from '../services/supplier.service';
@@ -20,6 +21,7 @@ const ExpensesDashboardBoard = ({
   onPettyCash 
 }) => {
   const [selectedTab, setSelectedTab] = useState('overview');
+  const [selectedTx, setSelectedTx] = useState(null);
   const [dateRange, setDateRange] = useState('all');
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState({
@@ -236,71 +238,89 @@ const ExpensesDashboardBoard = ({
         </div>
 
         {/* Metric Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
           {/* Card 1: Total Expenses */}
-          <div className="relative overflow-hidden bg-gradient-to-br from-emerald-500 to-emerald-600 text-white p-6 rounded-2xl shadow-lg border border-emerald-400/20 group hover:shadow-xl hover:scale-[1.01] transition-all duration-300">
-            <div className="absolute top-0 right-0 p-8 opacity-5 transform translate-x-2 -translate-y-2">
-              <DollarSign size={100} />
+          <div className="relative overflow-hidden bg-gradient-to-br from-emerald-500 to-emerald-600 text-white p-6 rounded-xl shadow-lg border border-white/10 group hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col">
+            <div className="absolute -right-4 -bottom-4 p-8 opacity-10 transform group-hover:scale-110 group-hover:rotate-12 transition-all duration-500">
+              <DollarSign size={120} />
             </div>
-            <div className="flex items-center gap-2 mb-2">
-              <span className="text-emerald-100/90 text-[10px] font-black uppercase tracking-[0.2em]">Total Operating Spend</span>
+
+            <div className="flex justify-between items-start mb-6">
+              <div className="flex flex-col">
+                <span className="text-[11px] font-black uppercase tracking-widest text-emerald-100/70 mb-1">Total Operating Spend</span>
+                <span className="text-[10px] font-bold text-emerald-50">Calculated from all bills & checks</span>
+              </div>
+              <div className="w-10 h-10 rounded-full flex items-center justify-center bg-white/20 text-white group-hover:scale-110 transition-transform shadow-inner">
+                <DollarSign size={20} strokeWidth={2.5} />
+              </div>
             </div>
-            <div className="text-3xl font-black tracking-tight font-['Tahoma']">
-              {loading ? (
-                <div className="h-9 w-32 bg-white/20 rounded animate-pulse" />
-              ) : (
-                `LKR ${data.totalExpenses.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-              )}
+
+            <div className="mt-auto">
+              <div className="text-3xl font-black tracking-tight font-['Tahoma'] text-white">
+                {loading ? (
+                  <div className="h-9 w-32 bg-white/20 rounded animate-pulse" />
+                ) : (
+                  `LKR ${data.totalExpenses.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                )}
+              </div>
             </div>
-            <p className="text-[10px] text-emerald-100/70 font-bold mt-2 uppercase tracking-wider flex items-center gap-1.5">
-              Calculated from all bills, checks and cash items
-            </p>
           </div>
 
           {/* Card 2: Open Payables */}
-          <div className="relative overflow-hidden bg-gradient-to-br from-amber-500 to-amber-600 text-white p-6 rounded-2xl shadow-lg border border-amber-400/20 group hover:shadow-xl hover:scale-[1.01] transition-all duration-300">
-            <div className="absolute top-0 right-0 p-8 opacity-5 transform translate-x-2 -translate-y-2">
-              <FileText size={100} />
+          <div className="relative overflow-hidden bg-gradient-to-br from-amber-500 to-orange-500 text-white p-6 rounded-xl shadow-lg border border-white/10 group hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col">
+            <div className="absolute -right-4 -bottom-4 p-8 opacity-10 transform group-hover:scale-110 group-hover:-rotate-12 transition-all duration-500">
+              <FileText size={120} />
             </div>
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-amber-100/90 text-[10px] font-black uppercase tracking-[0.2em]">Unpaid / Open Bills</span>
+
+            <div className="flex justify-between items-start mb-6">
+              <div className="flex flex-col">
+                <span className="text-[11px] font-black uppercase tracking-widest text-orange-100/70 mb-1">Unpaid / Open Bills</span>
+                <span className="text-[10px] font-bold text-orange-50">Outstanding vendor obligations</span>
+              </div>
+              <div className="w-10 h-10 rounded-full flex items-center justify-center bg-white/20 text-white group-hover:scale-110 transition-transform shadow-inner">
+                <FileText size={20} strokeWidth={2.5} />
+              </div>
+            </div>
+
+            <div className="mt-auto flex items-end justify-between">
+              <div className="text-3xl font-black tracking-tight font-['Tahoma'] text-white">
+                {loading ? (
+                  <div className="h-9 w-32 bg-white/20 rounded animate-pulse" />
+                ) : (
+                  `LKR ${data.unpaidBills.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                )}
+              </div>
               {data.unpaidBills > 0 && (
-                <span className="px-2 py-0.5 bg-white/20 rounded text-[9px] opacity-80 font-black uppercase tracking-wider">AP Balance</span>
+                <span className="px-2 py-0.5 bg-white/20 text-white rounded text-[9px] font-black uppercase tracking-wider mb-1">AP Bal</span>
               )}
             </div>
-            <div className="text-3xl font-black tracking-tight font-['Tahoma']">
-              {loading ? (
-                <div className="h-9 w-32 bg-white/20 rounded animate-pulse" />
-              ) : (
-                `LKR ${data.unpaidBills.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-              )}
-            </div>
-            <p className="text-[10px] text-amber-100/70 font-bold mt-2 uppercase tracking-wider flex items-center gap-1.5">
-              Outstanding vendor obligations pending payment
-            </p>
           </div>
 
           {/* Card 3: Overdue Liabilities */}
-          <div className="relative overflow-hidden bg-gradient-to-br from-rose-500 to-rose-600 text-white p-6 rounded-2xl shadow-lg border border-rose-400/20 group hover:shadow-xl hover:scale-[1.01] transition-all duration-300">
-            <div className="absolute top-0 right-0 p-8 opacity-5 transform translate-x-2 -translate-y-2">
-              <AlertCircle size={100} />
+          <div className="relative overflow-hidden bg-gradient-to-br from-rose-500 to-red-600 text-white p-6 rounded-xl shadow-lg border border-white/10 group hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col">
+            <div className="absolute -right-4 -bottom-4 p-8 opacity-10 transform group-hover:scale-110 group-hover:rotate-12 transition-all duration-500">
+              <AlertCircle size={120} />
             </div>
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-rose-100/90 text-[10px] font-black uppercase tracking-[0.2em]">Overdue Bills</span>
-              {data.overdueBills > 0 && (
-                <span className="px-2 py-0.5 bg-red-700/30 border border-red-500/20 rounded text-[9px] font-black uppercase tracking-wider animate-pulse">Critical</span>
-              )}
+
+            <div className="flex justify-between items-start mb-6">
+              <div className="flex flex-col">
+                <span className="text-[11px] font-black uppercase tracking-widest text-rose-100/70 mb-1">Overdue Bills</span>
+                <span className="text-[10px] font-bold text-rose-50">Past negotiated due dates</span>
+              </div>
+              <div className="w-10 h-10 rounded-full flex items-center justify-center bg-white/20 text-white group-hover:scale-110 transition-transform shadow-inner">
+                <AlertCircle size={20} strokeWidth={2.5} />
+              </div>
             </div>
-            <div className="text-3xl font-black tracking-tight font-['Tahoma']">
-              {loading ? (
-                <div className="h-9 w-32 bg-white/20 rounded animate-pulse" />
-              ) : (
-                `LKR ${data.overdueBills.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-              )}
+
+            <div className="mt-auto flex items-end justify-between">
+              <div className="text-3xl font-black tracking-tight font-['Tahoma'] text-white">
+                {loading ? (
+                  <div className="h-9 w-32 bg-white/20 rounded animate-pulse" />
+                ) : (
+                  `LKR ${data.overdueBills.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                )}
+              </div>
             </div>
-            <p className="text-[10px] text-rose-100/70 font-bold mt-2 uppercase tracking-wider flex items-center gap-1.5">
-              Bills past their negotiated payment term due dates
-            </p>
           </div>
         </div>
 
@@ -383,7 +403,7 @@ const ExpensesDashboardBoard = ({
 
                     <div className="divide-y divide-slate-100 overflow-y-auto max-h-[360px] pr-2 no-scrollbar">
                       {data.recentTransactions.slice(0, 10).map((tx, idx) => (
-                        <div key={idx} className="py-3 flex items-center justify-between hover:bg-slate-100/50 px-2 rounded-lg transition-colors">
+                        <div key={idx} onClick={() => setSelectedTx(tx)} className="py-3 flex items-center justify-between hover:bg-slate-100/50 px-2 rounded-lg cursor-pointer transition-colors group">
                           <div className="flex flex-col gap-0.5">
                             <span className="text-xs font-bold text-slate-700 truncate max-w-[220px]">{tx.payee || 'Direct Expense'}</span>
                             <div className="flex items-center gap-2 text-[10px] text-slate-400 font-semibold">
@@ -482,7 +502,7 @@ const ExpensesDashboardBoard = ({
                       </thead>
                       <tbody className="divide-y divide-slate-100 text-xs font-bold text-slate-700">
                         {getFilteredTransactions().map((tx, idx) => (
-                          <tr key={idx} className="hover:bg-slate-50/50 transition-colors border-b border-slate-50">
+                          <tr key={idx} onClick={() => setSelectedTx(tx)} className="hover:bg-blue-50/50 cursor-pointer transition-colors border-b border-slate-50 group">
                             <td className="py-3 px-6 font-mono text-slate-500">{tx.date.split('T')[0]}</td>
                             <td className="py-3 px-6">
                               <span className="uppercase text-[9px] tracking-wider px-2 py-0.5 rounded font-black bg-slate-100 text-slate-500">
@@ -582,6 +602,13 @@ const ExpensesDashboardBoard = ({
           )}
         </div>
       </div>
+
+      {/* Transaction Receipt Modal */}
+      <TransactionReceiptModal 
+        selectedTx={selectedTx} 
+        onClose={() => setSelectedTx(null)} 
+      />
+
     </SimpleModal>
   );
 };

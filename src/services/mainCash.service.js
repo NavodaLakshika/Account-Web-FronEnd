@@ -6,12 +6,8 @@ export const mainCashService = {
             const resp = await api.get(`maincash/lookups?companyCode=${companyCode}`); 
             return resp.data;
         } catch (error) {
-            return {
-                mainAccounts: [],
-                expenseAccounts: [],
-                costCenters: [],
-                payees: []
-            };
+            console.error("Failed to fetch lookups", error);
+            throw error;
         }
     },
 
@@ -20,7 +16,8 @@ export const mainCashService = {
             const resp = await api.get(`maincash/gen-docno?companyCode=${companyCode}`);
             return resp.data;
         } catch (error) {
-            return { docNo: 'MCH001000001' };
+            console.error("Failed to generate doc no", error);
+            throw error;
         }
     },
 
@@ -29,7 +26,9 @@ export const mainCashService = {
             const resp = await api.post('maincash/save', data);
             return resp.data;
         } catch (error) {
-            throw error.response?.data?.message || 'Failed to save main cash entry.';
+            const errData = error.response?.data;
+            if (typeof errData === 'string') throw errData;
+            throw errData?.message || 'Failed to save main cash entry.';
         }
     }
 };

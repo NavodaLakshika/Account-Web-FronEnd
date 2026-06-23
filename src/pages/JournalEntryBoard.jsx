@@ -441,6 +441,31 @@ const JournalEntryBoard = ({ isOpen, onClose, onComplete }) => {
         }
     }, [header, companyCode, currentUser, lookups.costCenters]);
 
+    const handleLoadEditJournal = async (journalObj) => {
+        try {
+            setLoading(true);
+            const res = await journalService.loadForEdit({
+                docNo: journalObj.docNo,
+                entryNo: header.entryNo,
+                company: companyCode,
+                user: currentUser
+            });
+            
+            setTempEntries(res);
+            setHeader(prev => ({
+                ...prev,
+                docNo: journalObj.docNo,
+                date: journalObj.date ? journalObj.date.split('T')[0] : prev.date
+            }));
+            
+            showSuccessToast(`Journal ${journalObj.docNo} loaded for editing`);
+            setActiveModal(null);
+        } catch (err) {
+            showErrorToast(`Failed to load journal: ${err.message || err}`);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const handleSave = async () => {
         if (tempEntries.length === 0) return showErrorToast("No entries to save.");
@@ -602,9 +627,27 @@ const JournalEntryBoard = ({ isOpen, onClose, onComplete }) => {
                             {/* System Doc */}
                             <div className="col-span-3 flex items-center gap-2">
                                 <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">System Doc</label>
-                                <div className="flex-1 h-8 border border-slate-200 px-3 text-[11px] font-mono font-bold text-blue-500 bg-slate-50 rounded-[5px] flex items-center overflow-hidden shadow-sm">
-                                    <span className="truncate">{header.docNo}</span>
-                                </div>
+                                {header.editSaved ? (
+                                    <div className="flex-1 flex gap-1 h-8 min-w-0">
+                                        <input
+                                            type="text"
+                                            value={header.docNo}
+                                            onChange={e => setHeader({ ...header, docNo: e.target.value })}
+                                            onKeyDown={e => {
+                                                if (e.key === 'Enter') handleLoadEditJournal({ docNo: header.docNo });
+                                            }}
+                                            placeholder="Doc No"
+                                            className="flex-1 min-w-0 h-full border border-slate-200 px-3 text-[12px] font-bold text-blue-600 bg-white rounded outline-none transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 shadow-sm"
+                                        />
+                                        <button onClick={() => setActiveModal('history')} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
+                                            <Search size={16} />
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <div className="flex-1 h-8 border border-slate-200 px-3 text-[11px] font-mono font-bold text-blue-500 bg-slate-50 rounded-[5px] flex items-center overflow-hidden shadow-sm">
+                                        <span className="truncate">{header.docNo}</span>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -805,6 +848,8 @@ const JournalEntryBoard = ({ isOpen, onClose, onComplete }) => {
                     onClose={() => setActiveModal(null)} 
                     onSelectDateRange={() => setActiveModal('dateRange')}
                     selectedDateRange={selectedDateRange}
+                    isEditMode={header.editSaved}
+                    onEdit={handleLoadEditJournal}
                 />
             )}
 
@@ -849,7 +894,7 @@ const JournalEntryBoard = ({ isOpen, onClose, onComplete }) => {
     );
 };
 
-const HistoryArchiveModal = ({ history, onClose, onSelectDateRange, selectedDateRange }) => {
+const HistoryArchiveModal = ({ history, onClose, onSelectDateRange, selectedDateRange, isEditMode, onEdit }) => {
     const [search, setSearch] = useState('');
     const [selectedJournal, setSelectedJournal] = useState(null);
 
@@ -915,7 +960,7 @@ const HistoryArchiveModal = ({ history, onClose, onSelectDateRange, selectedDate
                                         <th className="px-5 py-3 w-40">Journal No</th>
                                         <th className="px-5 py-3 w-32 text-center">Post Date</th>
                                         <th className="px-5 py-3">General Narrative</th>
-                                        <th className="px-5 py-3 text-right w-32">Total Value</th>
+                                        <th className="px-5 py-3 text-right w-40">Total Value</th>
                                         <th className="px-5 py-3 text-center w-24">Entries</th>
                                         <th className="px-5 py-3 text-right">Action</th>
                                     </tr>
@@ -942,19 +987,28 @@ const HistoryArchiveModal = ({ history, onClose, onSelectDateRange, selectedDate
                                                 <div className="text-[11px] font-bold text-slate-800 uppercase group-hover:text-blue-700 transition-colors truncate max-w-xs">{h.memo || 'General Ledger Entry'}</div>
                                                 <div className="text-[10px] font-bold text-slate-400 mt-0.5 italic">Consolidated View</div>
                                             </td>
-                                            <td className="px-5 py-4 text-right font-mono text-[13px] font-black text-emerald-600">
+                                            <td className="px-5 py-4 text-right font-mono text-[13px] font-black text-emerald-600 whitespace-nowrap">
                                                 Rs. {h.totalDebit.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                             </td>
                                             <td className="px-5 py-4 text-center">
                                                 <span className="bg-slate-100 text-slate-500 text-[10px] font-black px-2 py-1 rounded-full">{h.lines.length} Lines</span>
                                             </td>
                                             <td className="px-5 py-4 text-right">
-                                                <button 
-                                                    onClick={(e) => { e.stopPropagation(); setSelectedJournal(h); }}
-                                                    className="bg-[#0285fd] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#0073ff] shadow-md transition-all active:scale-95 border-none uppercase tracking-widest"
-                                                >
-                                                    DETAILS
-                                                </button>
+                                                {isEditMode ? (
+                                                    <button 
+                                                        onClick={(e) => { e.stopPropagation(); onEdit(h); }}
+                                                        className="bg-[#2bb744] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#259b3a] shadow-md transition-all active:scale-95 border-none uppercase tracking-widest"
+                                                    >
+                                                        EDIT
+                                                    </button>
+                                                ) : (
+                                                    <button 
+                                                        onClick={(e) => { e.stopPropagation(); setSelectedJournal(h); }}
+                                                        className="bg-[#0285fd] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#0073ff] shadow-md transition-all active:scale-95 border-none uppercase tracking-widest"
+                                                    >
+                                                        DETAILS
+                                                    </button>
+                                                )}
                                             </td>
                                         </tr>
                                     ))}

@@ -272,18 +272,18 @@ const SuperAdminDashboard = () => {
     const fetchAdminData = async () => {
         try {
             const [hierarchyRes, resetsRes, compRes, empRes, modRes, groupsRes] = await Promise.all([
-                api.get('/SuperAdmin/hierarchy'),
-                api.get('/SuperAdmin/pending-resets'),
-                api.get('/SuperAdmin/companies'),
-                api.get('/SuperAdmin/employees'),
-                api.get('/SuperAdmin/modules'),
+                api.get('/SuperAdmin/hierarchy').catch(() => ({ data: [] })),
+                api.get('/SuperAdmin/pending-resets').catch(() => ({ data: [] })),
+                api.get('/SuperAdmin/companies').catch(() => ({ data: [] })),
+                api.get('/SuperAdmin/employees').catch(() => ({ data: [] })),
+                api.get('/SuperAdmin/modules').catch(() => ({ data: [] })),
                 api.get('/UserGroup/all').catch(() => ({ data: [] }))
             ]);
-            setHierarchy(hierarchyRes.data);
-            setPendingResets(resetsRes.data);
-            setAllCompanies(compRes.data);
-            setAllEmployees(empRes.data);
-            setAllModules(modRes.data?.data || []);
+            setHierarchy(hierarchyRes.data || []);
+            setPendingResets(resetsRes.data || []);
+            setAllCompanies(compRes.data || []);
+            setAllEmployees(empRes.data || []);
+            setAllModules(modRes.data?.data || modRes.data || []);
             setUserGroups(groupsRes.data || []);
         } catch (err) {
             console.error("Super Admin fetch error", err);
@@ -365,7 +365,7 @@ const SuperAdminDashboard = () => {
             const empCode = user.Emp_Code || user.empCode || 'unknown';
             setCurrentUserCode(empCode);
 
-            if (user.userRoleId !== "99" && user.UserRoleId !== "99") {
+            if (String(user.userRoleId) !== "99" && String(user.UserRoleId) !== "99" && String(user.role) !== "99" && String(user.Role) !== "99") {
                 navigate('/dashboard');
             } else {
                 fetchAdminData();

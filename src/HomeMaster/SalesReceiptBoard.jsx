@@ -7,6 +7,7 @@ import { salesReceiptService } from '../services/salesReceipt.service';
 
 import CalendarModal from '../components/CalendarModal';
 import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
+import SalesReceiptDetailModal from '../components/SalesReceiptDetailModal';
 
 
 const SalesReceiptBoard = ({ isOpen, onClose }) => {
@@ -33,6 +34,7 @@ const SalesReceiptBoard = ({ isOpen, onClose }) => {
     const [isLoading, setIsLoading] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
     const [isApplying, setIsApplying] = useState(false);
+    const [appliedDocNo, setAppliedDocNo] = useState(null);
 
     // Modals
     const [showCustLookup, setShowCustLookup] = useState(false);
@@ -201,6 +203,7 @@ const SalesReceiptBoard = ({ isOpen, onClose }) => {
             };
             const result = await salesReceiptService.apply(payload);
             showSuccessToast(`Receipt Finalized: ${result.appDocNo}`);
+            setAppliedDocNo(result.appDocNo);
             handleClear();
             setShowConfirmModal(false);
         } catch (error) {
@@ -292,7 +295,7 @@ const SalesReceiptBoard = ({ isOpen, onClose }) => {
                                 className="px-6 h-10 bg-white text-[#0285fd] text-sm font-black rounded-[5px] border-2 border-[#0285fd] hover:bg-blue-50 transition-all active:scale-95 flex items-center gap-2 disabled:opacity-50"
                             >
                                 {isSaving ? <Loader2 className="animate-spin" size={16} /> : <Save size={16} />} 
-                                SAVE DRAFT
+                                SAVE
                             </button>
                             <button
                                 onClick={() => setShowConfirmModal(true)}
@@ -700,6 +703,13 @@ const SalesReceiptBoard = ({ isOpen, onClose }) => {
                     loading={isApplying}
                     confirmText="Apply Receipt"
                 />
+
+                {appliedDocNo && (
+                    <SalesReceiptDetailModal
+                        docNo={appliedDocNo}
+                        onClose={() => setAppliedDocNo(null)}
+                    />
+                )}
 
             </SimpleModal>
         </>

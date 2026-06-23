@@ -593,8 +593,8 @@ const AddWidgetsPanel = ({ isOpen, onClose, initialSelected, onSave }) => {
             <button onClick={onClose} className="text-[14px] font-bold text-[#2ca01c] hover:underline px-3 py-2">
               Cancel
             </button>
-            <button 
-              onClick={() => setSelected(DEFAULT_WIDGETS)} 
+            <button
+              onClick={() => setSelected(DEFAULT_WIDGETS)}
               className="text-[13px] font-bold text-[#6b6c72] hover:text-[#393a3d] hover:bg-[#eceef1] rounded-md px-3 py-2 transition-colors"
             >
               Reset to default
@@ -619,14 +619,14 @@ const AddWidgetsPanel = ({ isOpen, onClose, initialSelected, onSave }) => {
   );
 };
 
-const EditWrapper = ({ 
+const EditWrapper = ({
   children, isEditing, grabbers = [], className = '', onRemove,
-  id, order, isDragged, isHovered, onDragStart, onDragEnter, onDragEnd 
+  id, order, isDragged, isHovered, onDragStart, onDragEnter, onDragEnd
 }) => {
   if (!isEditing) return <div className={className} style={{ order }}>{children}</div>;
-  
+
   return (
-    <div 
+    <div
       className={`group relative rounded-lg ring-[2.5px] ring-[#108a00] z-10 transition-all duration-200 bg-white ${className} ${isDragged ? 'opacity-40 scale-95 z-50 ring-offset-2 shadow-xl' : ''} ${isHovered && !isDragged ? 'ring-[#0078d4] ring-[3px] scale-[1.02] shadow-xl' : ''}`}
       style={{ order }}
       draggable={true}
@@ -635,7 +635,7 @@ const EditWrapper = ({
       onDragEnd={onDragEnd}
       onDragOver={(e) => e.preventDefault()}
     >
-      
+
       {/* Grabbers (Left, Right, Top, Bottom) */}
       {grabbers.includes('left') && <div className="absolute left-[-6px] top-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-[#108a00] z-20 cursor-ew-resize" />}
       {grabbers.includes('right') && <div className="absolute right-[-6px] top-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-[#108a00] z-20 cursor-ew-resize" />}
@@ -651,16 +651,16 @@ const EditWrapper = ({
       <div className="absolute inset-0 z-30 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none gap-2">
         <div className="bg-[#108a00] rounded-full w-[64px] h-[64px] flex items-center justify-center cursor-move shadow-md pointer-events-auto">
           <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="5 9 2 12 5 15"/>
-            <polyline points="9 5 12 2 15 5"/>
-            <polyline points="19 9 22 12 19 15"/>
-            <polyline points="9 19 12 22 15 19"/>
-            <line x1="2" y1="12" x2="22" y2="12"/>
-            <line x1="12" y1="2" x2="12" y2="22"/>
+            <polyline points="5 9 2 12 5 15" />
+            <polyline points="9 5 12 2 15 5" />
+            <polyline points="19 9 22 12 19 15" />
+            <polyline points="9 19 12 22 15 19" />
+            <line x1="2" y1="12" x2="22" y2="12" />
+            <line x1="12" y1="2" x2="12" y2="22" />
           </svg>
         </div>
         {onRemove && (
-          <button 
+          <button
             type="button"
             onClick={(e) => {
               e.preventDefault();
@@ -670,8 +670,8 @@ const EditWrapper = ({
             className="bg-[#108a00] rounded-full w-[44px] h-[44px] flex items-center justify-center hover:bg-[#0c6b00] transition-colors shadow-md pointer-events-auto"
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="3 6 5 6 21 6"/>
-              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+              <polyline points="3 6 5 6 21 6" />
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
             </svg>
           </button>
         )}
@@ -775,12 +775,12 @@ const SmartSuggestionsHelpModal = ({ isOpen, onClose }) => {
 const DragContext = createContext();
 
 const DraggableWidget = ({ id, children, ...props }) => {
-  const { 
-    widgetOrder, draggedWidget, hoveredWidget, 
-    handleDragStart, handleDragEnter, handleDragEnd, 
-    isCustomising, setSelectedWidgets 
+  const {
+    widgetOrder, draggedWidget, hoveredWidget,
+    handleDragStart, handleDragEnter, handleDragEnd,
+    isCustomising, setSelectedWidgets
   } = useContext(DragContext);
-  
+
   return (
     <EditWrapper
       id={id}
@@ -800,19 +800,19 @@ const DraggableWidget = ({ id, children, ...props }) => {
 };
 
 const DEFAULT_WIDGETS = {
+  'profit_and_loss': true,
+  'expenses': true,
+  'add_widgets': true,
+  'bank_accounts': true,
+  'cash_flow': true,
+  'invoices': true,
+  'sales': true,
   'app_carousel': false,
   'business_feed': false,
   'create_actions': false,
-  'bank_accounts': true,
-  'cash_flow': true,
-  'expenses': true,
-  'profit_and_loss': true,
-  'add_widgets': true,
   'inventory_reports': false,
   'low_on_stock': false,
-  'invoices': true,
   'customers_funnel': false,
-  'sales': false,
   'accounts_payable': false,
   'accounts_receivable': false,
   'sales_orders': false,
@@ -839,7 +839,7 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
     }
     return DEFAULT_WIDGETS;
   });
-  
+
   const [widgetOrder, setWidgetOrder] = useState(() => {
     const saved = localStorage.getItem('onimta_gtd_widget_order_v1');
     if (saved) {
@@ -964,6 +964,29 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
     return all.filter(w => !selectedWidgets[w.id]).slice(0, 2);
   }, [selectedWidgets]);
 
+  const SMART_SUGGESTIONS = useMemo(() => [
+    { text: "Connect your bank accounts to automatically sync daily transactions." },
+    { text: "Set up auto-reminders for overdue invoices to improve cash flow." },
+    { text: "Review your Profit & Loss report to track expense trends this week." },
+    { text: "Enable Period Lock to secure your finalized accounting periods." },
+    { text: "Upload your logo in Company Settings to customize your invoices." }
+  ], []);
+
+  const [suggestionIndex, setSuggestionIndex] = useState(0);
+  const [suggestionFade, setSuggestionFade] = useState(false);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const interval = setInterval(() => {
+      setSuggestionFade(true);
+      setTimeout(() => {
+        setSuggestionIndex(prev => (prev + 1) % SMART_SUGGESTIONS.length);
+        setSuggestionFade(false);
+      }, 300);
+    }, 8000);
+    return () => clearInterval(interval);
+  }, [isOpen, SMART_SUGGESTIONS.length]);
+
   useEffect(() => {
     if (!isOpen || !companyCode) return;
 
@@ -1056,7 +1079,7 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
   const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   const monthlySales = biData?.salesSummary?.monthlySales || Array(12).fill(0);
   const monthlyExpenses = biData?.salesSummary?.monthlyExpenses || Array(12).fill(0);
-  
+
   const maxMonthly = Math.max(1, ...monthlySales, ...monthlyExpenses);
   const monthlyData = MONTHS.map((m, i) => {
     const s = monthlySales[i];
@@ -1352,770 +1375,770 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
           ) : (
             <>
               {/* Unified Masonry-like Grid for Widgets */}
-            <DragContext.Provider value={{
-              widgetOrder, draggedWidget, hoveredWidget,
-              handleDragStart, handleDragEnter, handleDragEnd,
-              isCustomising, setSelectedWidgets
-            }}>
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8 mt-6 grid-flow-dense">
+              <DragContext.Provider value={{
+                widgetOrder, draggedWidget, hoveredWidget,
+                handleDragStart, handleDragEnter, handleDragEnd,
+                isCustomising, setSelectedWidgets
+              }}>
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8 mt-6 grid-flow-dense">
 
-                {/* Profit & Loss */}
-                {selectedWidgets.profit_and_loss && (
-                  <DraggableWidget id="profit_and_loss" grabbers={['left', 'right']} className="md:col-span-2 xl:col-span-1">
-                    <WidgetShell
-                      title="Profit & Loss"
-                      subtitle="See what you make & spend across all your accounts"
-                      footerButtonLabel="Bring in transactions automatically"
-                      onFooterButton={() => runAction('profit_loss_detail')}
-                      onHide={() => setWidgetToHide('profit_and_loss')}
-                    >
-                      <div className="flex flex-col justify-center h-full gap-4.5 py-1 mt-1">
-                        {[
-                          { label: 'Income', val: totalIncome, color: '#22c55e', fakeVal: 9611 },
-                          { label: 'Expenses', val: totalSpend, color: '#2596be', fakeVal: 6611 },
-                        ].map((bar, idx) => {
-                          const max = Math.max(totalIncome, totalSpend, 1);
-                          const isOverallEmpty = totalIncome === 0 && totalSpend === 0;
-                          
-                          const actualPct = bar.val > 0 ? Math.max(10, Math.round((bar.val / max) * 100)) : 0;
-                          const fakePct = Math.round((bar.fakeVal / 9611) * 100);
-                          
-                          const wPct = isOverallEmpty ? fakePct : actualPct;
-                          const displayVal = isOverallEmpty ? bar.fakeVal : bar.val;
+                  {/* Profit & Loss */}
+                  {selectedWidgets.profit_and_loss && (
+                    <DraggableWidget id="profit_and_loss" grabbers={['left', 'right']} className="md:col-span-2 xl:col-span-1">
+                      <WidgetShell
+                        title="Profit & Loss"
+                        subtitle="See what you make & spend across all your accounts"
+                        footerButtonLabel="Bring in transactions automatically"
+                        onFooterButton={() => runAction('profit_loss_detail')}
+                        onHide={() => setWidgetToHide('profit_and_loss')}
+                      >
+                        <div className="flex flex-col justify-center h-full gap-4.5 py-1 mt-1">
+                          {[
+                            { label: 'Income', val: totalIncome, color: '#22c55e', fakeVal: 9611 },
+                            { label: 'Expenses', val: totalSpend, color: '#2596be', fakeVal: 6611 },
+                          ].map((bar, idx) => {
+                            const max = Math.max(totalIncome, totalSpend, 1);
+                            const isOverallEmpty = totalIncome === 0 && totalSpend === 0;
 
-                          return (
-                            <div key={idx} className="flex flex-col gap-1">
-                              <div className="text-[15px] font-extrabold text-slate-800">
-                                <span className="group-hover:hidden">LRs0</span>
-                                <span className="hidden group-hover:inline">{formatLkr(displayVal).replace('LKR', 'LKR ')}</span>
-                              </div>
-                              <div className="flex items-center gap-3">
-                                <div className="text-[12px] font-semibold text-slate-500 w-[60px] shrink-0">{bar.label}</div>
-                                <div className="flex-1 h-3 flex items-center">
-                                  <style>{`
+                            const actualPct = bar.val > 0 ? Math.max(10, Math.round((bar.val / max) * 100)) : 0;
+                            const fakePct = Math.round((bar.fakeVal / 9611) * 100);
+
+                            const wPct = isOverallEmpty ? fakePct : actualPct;
+                            const displayVal = isOverallEmpty ? bar.fakeVal : bar.val;
+
+                            return (
+                              <div key={idx} className="flex flex-col gap-1">
+                                <div className="text-[15px] font-extrabold text-slate-800">
+                                  <span className="group-hover:hidden">LKR 0</span>
+                                  <span className="hidden group-hover:inline">{formatLkr(displayVal).replace('LKR', 'LKR ')}</span>
+                                </div>
+                                <div className="flex items-center gap-3">
+                                  <div className="text-[12px] font-semibold text-slate-500 w-[60px] shrink-0">{bar.label}</div>
+                                  <div className="flex-1 h-3 flex items-center">
+                                    <style>{`
                                     .pl-bar-${idx} { width: 6px; background-color: #9ca3af; }
                                     .group:hover .pl-bar-${idx} { width: ${wPct}%; background-color: ${bar.color}; }
                                   `}</style>
-                                  <div
-                                    className={`h-full transition-all duration-500 ease-out pl-bar-${idx}`}
-                                  />
-                                </div>
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </WidgetShell>
-                  </DraggableWidget>
-                )}
-
-                {/* Expenses */}
-                {selectedWidgets.expenses && (
-                  <DraggableWidget id="expenses" grabbers={['left', 'right']} className="md:col-span-2 xl:col-span-1">
-                    <WidgetShell
-                      title="Expenses"
-                      subtitle="See where your money is going"
-                      footerButtonLabel="Bring in transactions automatically"
-                      onFooterButton={() => runAction('expenses_detail')}
-                      onHide={() => setWidgetToHide('expenses')}
-                    >
-                      <div className="flex flex-col sm:flex-row items-center justify-center gap-6 min-h-[120px] mt-2">
-                        <div className="flex items-center justify-center gap-6 w-full">
-                          <div className="relative w-[110px] h-[110px] shrink-0 rounded-full">
-                            {/* Grey Donut (Visible normally, hidden on hover) */}
-                            <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full transition-opacity duration-500 group-hover:opacity-0">
-                              <circle cx="50" cy="50" r="38" fill="none" stroke="#e5e7eb" strokeWidth="24" />
-                            </svg>
-                            
-                            {/* Colored Donut (Hidden normally, visible on hover) */}
-                            <div
-                              className="absolute inset-0 rounded-full transition-opacity duration-500 opacity-0 group-hover:opacity-100"
-                              style={{
-                                background: categories.length > 0
-                                  ? `conic-gradient(${categories
-                                    .slice(0, 5)
-                                    .reduce(
-                                      (acc, cat, i) => {
-                                        const colors = ['#60a5fa', '#a78bfa', '#10b981', '#f59e0b', '#ec4899'];
-                                        const start = acc.offset;
-                                        const pct = Math.min(100, Math.max(0, Number(cat.percentage) || 0));
-                                        acc.offset += pct;
-                                        acc.parts.push(`${colors[i % 5]} ${start}% ${acc.offset}%`);
-                                        return acc;
-                                      },
-                                      { parts: [], offset: 0 }
-                                    ).parts.join(', ')})`
-                                  : `conic-gradient(#60a5fa 0% 20%, #a78bfa 20% 40%, #10b981 40% 60%, #f59e0b 60% 80%, #ec4899 80% 100%)`
-                              }}
-                            >
-                              <div className="absolute inset-[18px] rounded-full bg-white" />
-                            </div>
-                          </div>
-                          
-                          <div className="flex-1 space-y-2.5 w-full max-w-[160px] text-[12px]">
-                            {(categories.length > 0 ? categories.slice(0, 5) : [
-                              { name: 'Rent' }, { name: 'Food' }, { name: 'Travel' }, { name: 'Utilities' }, { name: 'Other' }
-                            ]).map((cat, i) => {
-                              const name = cat.categoryName || cat.CategoryName || cat.name || cat.Name || '';
-                              const color = ['#60a5fa', '#a78bfa', '#10b981', '#f59e0b', '#ec4899'][i % 5];
-                              return (
-                                <div key={i} className="flex items-center gap-2">
-                                  <div
-                                    className="w-2.5 h-2.5 rounded-full shrink-0 transition-colors duration-500 bg-[#e5e7eb] group-hover:bg-[var(--hover-color)]"
-                                    style={{ '--hover-color': color }}
-                                  />
-                                  <div className="flex-1 flex items-center truncate">
-                                    <span className="text-[#9ca3af] font-medium group-hover:hidden">--</span>
-                                    <span className="hidden group-hover:inline text-slate-650 font-bold truncate">{name || 'Category name'}</span>
+                                    <div
+                                      className={`h-full transition-all duration-500 ease-out pl-bar-${idx}`}
+                                    />
                                   </div>
                                 </div>
-                              );
-                            })}
-                          </div>
-                        </div>
-                      </div>
-                    </WidgetShell>
-                  </DraggableWidget>
-                )}
-
-                {/* Add widgets */}
-                {selectedWidgets.add_widgets && (
-                  <DraggableWidget id="add_widgets" grabbers={['left', 'right']} className="md:col-span-1 xl:col-span-1 h-full">
-                    <div 
-                      className="bg-white rounded-lg min-h-[240px] flex flex-col h-full overflow-hidden cursor-pointer hover:bg-slate-50 transition-colors border-2 border-dashed border-[#eceef1]"
-                      onClick={() => setIsAddWidgetsOpen(true)}
-                    >
-                      <div className="flex flex-col items-center justify-center flex-1 py-8">
-                        <span className="text-[13px] font-bold text-[#393a3d] mb-3">Add widgets</span>
-                        <div className="w-8 h-8 rounded-full bg-[#f4f5f8] flex items-center justify-center">
-                          <Plus size={16} className="text-[#6b6c72]" strokeWidth={2} />
-                        </div>
-                      </div>
-                      
-                      <div className="border-t border-[#eceef1] mx-6" />
-                      
-                      <div className="flex flex-col items-center justify-center flex-1 py-6 px-4">
-                        <div className="flex items-center gap-2 mb-4">
-                          <Sparkles size={14} className="text-[#393a3d]" strokeWidth={2.5} />
-                          <span className="text-[12.5px] font-bold text-[#393a3d]">Smart suggestions</span>
-                        </div>
-                        <div className="w-9 h-9 rounded-full bg-[#f4f5f8] flex items-center justify-center mb-3">
-                          <Coffee size={16} className="text-[#6b6c72]" strokeWidth={2} />
-                        </div>
-                        <p className="text-[11.5px] text-[#6b6c72] text-center leading-relaxed max-w-[200px]">
-                          Nothing new here yet. Check back later for new suggestions.
-                        </p>
-                      </div>
-                    </div>
-                  </DraggableWidget>
-                )}
-
-                {/* Bank accounts */}
-                {selectedWidgets.bank_accounts && (
-                  <DraggableWidget id="bank_accounts" grabbers={['top', 'bottom']} className="md:col-span-1 xl:col-span-1">
-                    <WidgetShell
-                      title="Bank accounts"
-                      subtitle="Link your banks to see your balances in one place"
-                      footerButtonLabel="Find your bank"
-                      onFooterButton={() => runAction('bank_rec')}
-                      onHide={() => setWidgetToHide('bank_accounts')}
-                    >
-                      {(function () {
-                        const banks = biData?.bankAccounts?.length > 0 ? biData.bankAccounts : PLACEHOLDER_BANKS;
-                        const displayedBanks = banks.slice(0, 3);
-                        return (
-                          <div className="flex flex-col gap-5 mt-2">
-                            {displayedBanks.map((b, i) => (
-                              <div key={i} className="flex items-center gap-4">
-                                <div className="w-9 h-9 rounded-full bg-white border border-[#eceef1] flex items-center justify-center shrink-0 p-1">
-                                  {b.logo ? (
-                                    <img src={b.logo} alt="" className="w-full h-full object-contain" />
-                                  ) : (
-                                    <Landmark size={14} className="text-[#393a3d]" />
-                                  )}
-                                </div>
-                                <span className="text-[12.5px] font-bold text-[#393a3d] truncate flex-1 leading-snug">
-                                  {b.bankName || b.name || b.bankCode}
-                                </span>
-                                <button type="button" onClick={() => runAction('bank_rec')} className="text-[#0078d4] hover:text-[#005a9e] transition-colors p-1" aria-label="Add">
-                                  <Plus size={18} strokeWidth={2.5} />
-                                </button>
                               </div>
-                            ))}
-                          </div>
-                        );
-                      })()}
-                    </WidgetShell>
-                  </DraggableWidget>
-                )}
-              {selectedWidgets.cash_flow && (
-                  <DraggableWidget id="cash_flow" grabbers={['left', 'right']} className="md:col-span-2 xl:col-span-2">
-                    <WidgetShell
-                      title="Cash flow"
-                      subtitle="Track how your money is doing"
-                      footerButtonLabel="Link your bank to see cash flow"
-                      onFooterButton={() => runAction('bank_rec')}
-                      onHide={() => setWidgetToHide('cash_flow')}
-                    >
-                      <div className="flex gap-3 h-[190px] pt-4 mt-2">
-
-                        {/* Y Axis */}
-                        <div className="flex flex-col justify-between text-[11px] text-[#6b6c72] w-8 shrink-0 text-right pb-[22px]">
-                          <span>{cashFlowMax > 0 ? formatShortK(cashFlowMax) : '6K'}</span>
-                          <span>{cashFlowMax > 0 ? formatShortK(cashFlowMax * 0.66) : '4K'}</span>
-                          <span>{cashFlowMax > 0 ? formatShortK(cashFlowMax * 0.33) : '2K'}</span>
-                          <span>0</span>
+                            );
+                          })}
                         </div>
+                      </WidgetShell>
+                    </DraggableWidget>
+                  )}
 
-                        {/* Chart */}
-                        <div className="flex-1 relative">
+                  {/* Expenses */}
+                  {selectedWidgets.expenses && (
+                    <DraggableWidget id="expenses" grabbers={['left', 'right']} className="md:col-span-2 xl:col-span-1">
+                      <WidgetShell
+                        title="Expenses"
+                        subtitle="See where your money is going"
+                        footerButtonLabel="Bring in transactions automatically"
+                        onFooterButton={() => runAction('expenses_detail')}
+                        onHide={() => setWidgetToHide('expenses')}
+                      >
+                        <div className="flex flex-col sm:flex-row items-center justify-center gap-6 min-h-[120px] mt-2">
+                          <div className="flex items-center justify-center gap-6 w-full">
+                            <div className="relative w-[110px] h-[110px] shrink-0 rounded-full">
+                              {/* Grey Donut (Visible normally, hidden on hover) */}
+                              <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full transition-opacity duration-500 group-hover:opacity-0">
+                                <circle cx="50" cy="50" r="38" fill="none" stroke="#e5e7eb" strokeWidth="24" />
+                              </svg>
 
-                          {/* Grid */}
-                          <div className="absolute inset-0 flex flex-col justify-between pointer-events-none pb-[22px]">
-                            {[1, 2, 3, 4].map((i) => (
+                              {/* Colored Donut (Hidden normally, visible on hover) */}
                               <div
-                                key={i}
-                                className="border-t border-[#eceef1] w-full"
-                              />
-                            ))}
-                          </div>
-
-                          {/* Bars */}
-                          <div className="absolute top-0 bottom-[22px] left-0 right-0 flex justify-between px-1">
-                            {monthlyData.map((d) => (
-                              <div key={d.m} className="flex gap-[1px] items-end flex-1 justify-center relative group cursor-pointer hover:bg-slate-50 transition-all duration-200" title={`${d.m}: Income LKR ${formatShortK(d.salesVal)} | Expenses LKR ${formatShortK(d.expVal)}`}>
-                                <div className="w-[14px] bg-[#6bc13c] transition-all duration-500" style={{ height: `${Math.max(2, d.h1)}%` }} />
-                                <div className="w-[14px] bg-[#3dc0c5] transition-all duration-500" style={{ height: `${Math.max(2, d.h2)}%` }} />
-                              </div>
-                            ))}
-                          </div>
-
-                          {/* Months */}
-                          <div className="absolute bottom-0 left-0 right-0 flex justify-between px-1 border-t border-slate-200/80 pt-2">
-                            {['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'].map((m) => (
-                              <div key={m} className="flex-1 text-center text-[10px] font-bold text-slate-500">
-                                {m}
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-
-
-                    </WidgetShell>
-                  </DraggableWidget>
-                )}
-                {/* Invoices */}
-                {selectedWidgets.invoices && (
-                  <DraggableWidget id="invoices" grabbers={['left', 'right']} className="md:col-span-1 xl:col-span-1">
-                    <WidgetShell
-                      title="INVOICES"
-                      onHide={() => setWidgetToHide('invoices')}
-                    >
-                      <div className="flex flex-col gap-6 mt-1">
-                        {/* Unpaid */}
-                        <div className="flex flex-col gap-1.5">
-                          <div className="flex items-center gap-2">
-                            <span className="text-[13px] font-bold text-[#393a3d]">{formatLkr(invoiceSummary.totalUnpaid).replace('LKR', 'LKR ')} Unpaid</span>
-                            <span className="text-[11px] text-[#6b6c72]">Last 365 days</span>
-                          </div>
-                          <div className="flex justify-between items-center text-[12px] mt-1">
-                            <div className="flex flex-col">
-                              <span className="font-bold text-[#393a3d] text-[15px]">{formatLkr(invoiceSummary.totalOverdue).replace('LKR', 'LKR ')}</span>
-                              <span className="text-[#6b6c72] text-[11.5px]">Overdue</span>
-                            </div>
-                            <div className="flex flex-col text-right">
-                              <span className="font-bold text-[#393a3d] text-[15px]">{formatLkr(invoiceSummary.totalUnpaid - invoiceSummary.totalOverdue).replace('LKR', 'LKR ')}</span>
-                              <span className="text-[#6b6c72] text-[11.5px]">Not due yet</span>
-                            </div>
-                          </div>
-                          <div className="flex h-[18px] w-full mt-1 overflow-hidden gap-[1px]">
-                            <div className="h-full bg-[#d97736] rounded-l-[2px]" style={{ width: invoiceSummary.totalUnpaid > 0 ? `${(invoiceSummary.totalOverdue / invoiceSummary.totalUnpaid) * 100}%` : '50%' }} />
-                            <div className="h-full bg-[#d4d7dc] rounded-r-[2px]" style={{ width: invoiceSummary.totalUnpaid > 0 ? `${((invoiceSummary.totalUnpaid - invoiceSummary.totalOverdue) / invoiceSummary.totalUnpaid) * 100}%` : '50%' }} />
-                          </div>
-                        </div>
-
-                        {/* Paid */}
-                        <div className="flex flex-col gap-1.5">
-                          <div className="flex items-center gap-2">
-                            <span className="text-[13px] font-bold text-[#393a3d]">{formatLkr(invoiceSummary.totalPaid).replace('LKR', 'LKR ')} Paid</span>
-                            <span className="text-[11px] text-[#6b6c72]">Last 30 days</span>
-                          </div>
-                          <div className="flex justify-between items-center text-[12px] mt-1">
-                            <div className="flex flex-col">
-                              <span className="font-bold text-[#393a3d] text-[15px]">{formatLkr(invoiceSummary.totalNotDeposited).replace('LKR', 'LKR ')}</span>
-                              <span className="text-[#6b6c72] text-[11.5px]">Not deposited</span>
-                            </div>
-                            <div className="flex flex-col text-right">
-                              <span className="font-bold text-[#393a3d] text-[15px]">{formatLkr(invoiceSummary.totalDeposited).replace('LKR', 'LKR ')}</span>
-                              <span className="text-[#6b6c72] text-[11.5px]">Deposited</span>
-                            </div>
-                          </div>
-                          <div className="flex h-[18px] w-full mt-1 overflow-hidden gap-[1px]">
-                            <div className="h-full bg-[#53c351] rounded-l-[2px]" style={{ width: invoiceSummary.totalPaid > 0 ? `${(invoiceSummary.totalNotDeposited / invoiceSummary.totalPaid) * 100}%` : '50%' }} />
-                            <div className="h-full bg-[#2ca01c] rounded-r-[2px]" style={{ width: invoiceSummary.totalPaid > 0 ? `${(invoiceSummary.totalDeposited / invoiceSummary.totalPaid) * 100}%` : '50%' }} />
-                          </div>
-                        </div>
-                      </div>
-                    </WidgetShell>
-                  </DraggableWidget>
-                )}
-
-                {/* Sales */}
-                {selectedWidgets.sales && (
-                  <DraggableWidget id="sales" grabbers={['left', 'right']} className="md:col-span-1 xl:col-span-1">
-                    <WidgetShell
-                      title="SALES"
-                      onHide={() => setWidgetToHide('sales')}
-                    >
-                      <div className="absolute top-[22px] right-6 opacity-100 group-hover:opacity-0 transition-opacity">
-                         <div className="text-[11px] font-bold text-[#393a3d] flex items-center cursor-pointer hover:text-[#000]">
-                           This year to date <ChevronDown size={14} className="ml-0.5 text-[#6b6c72]" strokeWidth={2.5} />
-                         </div>
-                      </div>
-                      <div className="flex flex-col h-full mt-2">
-                        <div className="flex flex-col gap-0.5 mb-5">
-                          <span className="text-[12px] text-[#6b6c72]">Total Amount</span>
-                          <span className="text-[26px] font-light text-[#393a3d]">{formatLkr(totalSalesYTD).replace('LKR', 'LKR ')}</span>
-                        </div>
-                        
-                        {/* Chart Grid Lines */}
-                        <div className="flex-1 relative flex flex-col justify-between min-h-[110px] mt-2 mb-2">
-                          {[0.4, 0.3, 0.2, 0.1, 0].map((val, idx) => (
-                            <div key={idx} className="flex items-center gap-3 w-full">
-                              <span className="text-[11px] font-medium text-[#6b6c72] w-4 text-right shrink-0 leading-none">{val}</span>
-                              <div className="flex-1 border-t border-[#eceef1]" />
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                      <div className="absolute bottom-4 right-4">
-                        <button className="p-1 hover:bg-[#f4f5f8] rounded-full text-[#6b6c72] transition-colors">
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                            <circle cx="12" cy="5" r="1"/>
-                            <circle cx="12" cy="12" r="1"/>
-                            <circle cx="12" cy="19" r="1"/>
-                          </svg>
-                        </button>
-                      </div>
-                    </WidgetShell>
-                  </DraggableWidget>
-                )}
-
-                {/* Accounts Payable */}
-                {selectedWidgets.accounts_payable && (
-                  <DraggableWidget id="accounts_payable" grabbers={['left', 'right']} className="md:col-span-2 xl:col-span-2">
-                    <WidgetShell title="ACCOUNTS PAYABLE" onHide={() => setWidgetToHide('accounts_payable')}>
-                      <div className="absolute top-[22px] right-6 opacity-100 group-hover:opacity-0 transition-opacity">
-                         <div className="text-[11px] font-bold text-[#6b6c72] flex items-center">As of today</div>
-                      </div>
-                      <div className="flex flex-col mt-2">
-                        <span className="text-[12px] text-[#6b6c72]">Total</span>
-                        <span className="text-[26px] font-light text-[#393a3d]">{formatLkr(ap.total).replace('LKR', 'LKR ')}</span>
-                      </div>
-                      <div className="flex items-center gap-6 mt-4">
-                        {/* Donut Chart */}
-                        <div className="w-[100px] h-[100px] shrink-0 rounded-full relative"
-                          style={{
-                            background: ap.total > 0 
-                              ? `conic-gradient(#53c351 0% ${(ap.current/ap.total)*100}%, #3dc0c5 ${(ap.current/ap.total)*100}% ${((ap.current+ap.aging1_30)/ap.total)*100}%, #6b6c72 ${((ap.current+ap.aging1_30)/ap.total)*100}% ${((ap.current+ap.aging1_30+ap.aging31_60)/ap.total)*100}%, #0078d4 ${((ap.current+ap.aging1_30+ap.aging31_60)/ap.total)*100}% ${((ap.current+ap.aging1_30+ap.aging31_60+ap.aging61_90)/ap.total)*100}%, #1e3a8a ${((ap.current+ap.aging1_30+ap.aging31_60+ap.aging61_90)/ap.total)*100}% 100%)`
-                              : '#d4d7dc'
-                          }}
-                        >
-                          <div className="absolute inset-[18px] bg-white rounded-full"></div>
-                        </div>
-                        {/* Legend */}
-                        <div className="flex flex-col gap-1.5 flex-1">
-                          <div className="flex items-center gap-2 text-[11px] text-[#393a3d]">
-                            <div className="w-2 h-2 rounded-full bg-[#53c351]" /> Current: {formatLkr(ap.current).replace('LKR', 'LKR ')}
-                          </div>
-                          <div className="flex items-center gap-2 text-[11px] text-[#393a3d]">
-                            <div className="w-2 h-2 rounded-full bg-[#3dc0c5]" /> 1 - 30: {formatLkr(ap.aging1_30).replace('LKR', 'LKR ')}
-                          </div>
-                          <div className="flex items-center gap-2 text-[11px] text-[#393a3d]">
-                            <div className="w-2 h-2 rounded-full bg-[#6b6c72]" /> 31 - 60: {formatLkr(ap.aging31_60).replace('LKR', 'LKR ')}
-                          </div>
-                          <div className="flex items-center gap-2 text-[11px] text-[#393a3d]">
-                            <div className="w-2 h-2 rounded-full bg-[#0078d4]" /> 61 - 90: {formatLkr(ap.aging61_90).replace('LKR', 'LKR ')}
-                          </div>
-                          <div className="flex items-center gap-2 text-[11px] text-[#393a3d]">
-                            <div className="w-2 h-2 rounded-full bg-[#1e3a8a]" /> 91 and over: {formatLkr(ap.aging91Plus).replace('LKR', 'LKR ')}
-                          </div>
-                        </div>
-                      </div>
-                      <div className="absolute bottom-4 right-4">
-                        <button className="p-1 hover:bg-[#f4f5f8] rounded-full text-[#6b6c72] transition-colors">
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                            <circle cx="12" cy="5" r="1"/>
-                            <circle cx="12" cy="12" r="1"/>
-                            <circle cx="12" cy="19" r="1"/>
-                          </svg>
-                        </button>
-                      </div>
-                    </WidgetShell>
-                  </DraggableWidget>
-                )}
-
-                {/* Accounts Receivable */}
-                {selectedWidgets.accounts_receivable && (
-                  <DraggableWidget id="accounts_receivable" grabbers={['left', 'right']} className="md:col-span-2 xl:col-span-2">
-                    <WidgetShell title="ACCOUNTS RECEIVABLE" onHide={() => setWidgetToHide('accounts_receivable')}>
-                      <div className="absolute top-[22px] right-6 opacity-100 group-hover:opacity-0 transition-opacity">
-                         <div className="text-[11px] font-bold text-[#6b6c72] flex items-center">As of today</div>
-                      </div>
-                      <div className="flex flex-col mt-2">
-                        <span className="text-[12px] text-[#6b6c72]">Total</span>
-                        <span className="text-[26px] font-light text-[#393a3d]">{formatLkr(ar.total).replace('LKR', 'LKR ')}</span>
-                      </div>
-                      <div className="flex items-center gap-6 mt-4">
-                        {/* Donut Chart */}
-                        <div className="w-[100px] h-[100px] shrink-0 rounded-full relative"
-                          style={{
-                            background: ar.total > 0 
-                              ? `conic-gradient(#53c351 0% ${(ar.current/ar.total)*100}%, #3dc0c5 ${(ar.current/ar.total)*100}% ${((ar.current+ar.aging1_30)/ar.total)*100}%, #6b6c72 ${((ar.current+ar.aging1_30)/ar.total)*100}% ${((ar.current+ar.aging1_30+ar.aging31_60)/ar.total)*100}%, #0078d4 ${((ar.current+ar.aging1_30+ar.aging31_60)/ar.total)*100}% ${((ar.current+ar.aging1_30+ar.aging31_60+ar.aging61_90)/ar.total)*100}%, #1e3a8a ${((ar.current+ar.aging1_30+ar.aging31_60+ar.aging61_90)/ar.total)*100}% 100%)`
-                              : '#d4d7dc'
-                          }}
-                        >
-                          <div className="absolute inset-[18px] bg-white rounded-full"></div>
-                        </div>
-                        {/* Legend */}
-                        <div className="flex flex-col gap-1.5 flex-1">
-                          <div className="flex items-center gap-2 text-[11px] text-[#393a3d]">
-                            <div className="w-2 h-2 rounded-full bg-[#53c351]" /> Current: {formatLkr(ar.current).replace('LKR', 'LKR ')}
-                          </div>
-                          <div className="flex items-center gap-2 text-[11px] text-[#393a3d]">
-                            <div className="w-2 h-2 rounded-full bg-[#3dc0c5]" /> 1 - 30: {formatLkr(ar.aging1_30).replace('LKR', 'LKR ')}
-                          </div>
-                          <div className="flex items-center gap-2 text-[11px] text-[#393a3d]">
-                            <div className="w-2 h-2 rounded-full bg-[#6b6c72]" /> 31 - 60: {formatLkr(ar.aging31_60).replace('LKR', 'LKR ')}
-                          </div>
-                          <div className="flex items-center gap-2 text-[11px] text-[#393a3d]">
-                            <div className="w-2 h-2 rounded-full bg-[#0078d4]" /> 61 - 90: {formatLkr(ar.aging61_90).replace('LKR', 'LKR ')}
-                          </div>
-                          <div className="flex items-center gap-2 text-[11px] text-[#393a3d]">
-                            <div className="w-2 h-2 rounded-full bg-[#1e3a8a]" /> 91 and over: {formatLkr(ar.aging91Plus).replace('LKR', 'LKR ')}
-                          </div>
-                        </div>
-                      </div>
-                      <div className="absolute bottom-4 right-4">
-                        <button className="p-1 hover:bg-[#f4f5f8] rounded-full text-[#6b6c72] transition-colors">
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                            <circle cx="12" cy="5" r="1"/>
-                            <circle cx="12" cy="12" r="1"/>
-                            <circle cx="12" cy="19" r="1"/>
-                          </svg>
-                        </button>
-                      </div>
-                    </WidgetShell>
-                  </DraggableWidget>
-                )}
-
-                {selectedWidgets.inventory_reports && (
-                  <DraggableWidget id="inventory_reports" grabbers={['left', 'right']} className="md:col-span-1 xl:col-span-1">
-                    <WidgetShell
-                      title="Inventory Reports"
-                      footerButtonLabel="View all reports"
-                      onFooterButton={() => runAction('reports')}
-                      onHide={() => setWidgetToHide('inventory_reports')}
-                    >
-                      <div className="space-y-2 mt-2">
-                        {['Inventory Valuation Detail', 'Inventory Valuation Summary', 'Open Purchase Order Detail', 'Open Purchase Order List', 'Stock Take Worksheet'].map(r => (
-                          <div key={r} className="flex justify-between items-center border-b border-[#eceef1] pb-1.5 last:border-0">
-                            <span className="text-[12px] text-[#393a3d] truncate pr-2">{r}</span>
-                            <button onClick={() => runAction(`open_report:${r}`)} className="text-[#0078d4] text-[12px] font-bold hover:underline shrink-0">View</button>
-                          </div>
-                        ))}
-                      </div>
-                    </WidgetShell>
-                  </DraggableWidget>
-                )}
-
-                {selectedWidgets.low_on_stock && (
-                  <DraggableWidget id="low_on_stock" grabbers={['left', 'right']} className="md:col-span-2 xl:col-span-2 row-span-2">
-                    <WidgetShell
-                      title="Low on Stock"
-                      subtitle="Never miss a sale with items that are running low"
-                      footerButtonLabel="Start tracking inventory"
-                      onFooterButton={() => runAction('items')}
-                      onHide={() => setWidgetToHide('low_on_stock')}
-                    >
-                      <table className="w-full text-left text-[11px] mt-4">
-                        <thead>
-                          <tr className="border-b border-[#eceef1] text-[#6b6c72]">
-                            <th className="font-bold py-1">PRODUCT</th>
-                            <th className="font-bold py-1 text-right">QTY</th>
-                            <th className="font-bold py-1 text-right">REORDER</th>
-                          </tr>
-                        </thead>
-                        <tbody className="text-[#393a3d]">
-                          {(biData?.lowStock?.length > 0 ? biData.lowStock : []).map((item, i) => (
-                            <tr key={i} className="border-b border-[#eceef1] border-dashed">
-                              <td className="py-2 truncate max-w-[100px]">{item.productName || item.productCode || 'Product name'}</td>
-                              <td className="py-2 text-right">{item.quantity}</td>
-                              <td className="py-2 text-right">Reorder</td>
-                            </tr>
-                          ))}
-                          {(biData?.lowStock?.length || 0) === 0 && (
-                            <tr>
-                              <td className="py-2 text-[#8d9096]" colSpan={3}>No low stock items</td>
-                            </tr>
-                          )}
-                        </tbody>
-                      </table>
-                    </WidgetShell>
-                  </DraggableWidget>
-                )}
-              
-
-
-                {selectedWidgets.customers_funnel && (
-                  <DraggableWidget id="customers_funnel" grabbers={['left', 'right']} className="md:col-span-2 xl:col-span-4">
-                    <WidgetShell title="Customers Funnel" onHide={() => setWidgetToHide('customers_funnel')}>
-                      <div className="absolute top-5 right-5 text-[11px] font-semibold text-slate-400">As of today</div>
-                      <div className="flex items-center justify-between gap-1 overflow-x-auto py-2 h-full mt-4 pb-4 no-scrollbar">
-                        {[
-                          { label: 'Open opportunities', val: String(biData?.customerFunnel?.totalCustomers || '0'), color: '#34d399' },
-                          { label: 'Open estimates', val: String(biData?.customerFunnel?.openEstimates || '0'), color: '#10b981' },
-                          { label: 'Open contracts', val: String(biData?.customerFunnel?.openContracts || '0'), color: '#059669' },
-                          { label: 'In progress projects', val: String(biData?.customerFunnel?.inProgressProjects || '0'), color: '#047857' },
-                          { label: 'Unpaid invoices', val: String(biData?.customerFunnel?.unpaidInvoices || '0'), color: '#064e3b' },
-                          { label: 'Reviews', val: String(biData?.customerFunnel?.reviewCount || '0'), color: '#022c22' },
-                        ].map((f, i, arr) => (
-                          <React.Fragment key={i}>
-                            <div className=" rounded-sm flex flex-col min-w-[115px] flex-1 shrink-0 h-[105px] overflow-hidden bg-slate-50/40 hover:bg-white hover:border-slate-200 hover:shadow-md transition-all duration-305 relative shadow-[0_1px_3px_rgba(0,0,0,0.01)]">
-                              <div className="h-1.5 w-full shrink-0" style={{ backgroundColor: f.color }} />
-                              <div className="p-4 flex-1 flex flex-col justify-between">
-                                <span className="text-[12px] font-bold text-slate-500 leading-tight">{f.label}</span>
-                                <span className="text-[22px] font-extrabold text-slate-800">{f.val}</span>
+                                className="absolute inset-0 rounded-full transition-opacity duration-500 opacity-0 group-hover:opacity-100"
+                                style={{
+                                  background: categories.length > 0
+                                    ? `conic-gradient(${categories
+                                      .slice(0, 5)
+                                      .reduce(
+                                        (acc, cat, i) => {
+                                          const colors = ['#60a5fa', '#a78bfa', '#10b981', '#f59e0b', '#ec4899'];
+                                          const start = acc.offset;
+                                          const pct = Math.min(100, Math.max(0, Number(cat.percentage) || 0));
+                                          acc.offset += pct;
+                                          acc.parts.push(`${colors[i % 5]} ${start}% ${acc.offset}%`);
+                                          return acc;
+                                        },
+                                        { parts: [], offset: 0 }
+                                      ).parts.join(', ')})`
+                                    : `conic-gradient(#60a5fa 0% 20%, #a78bfa 20% 40%, #10b981 40% 60%, #f59e0b 60% 80%, #ec4899 80% 100%)`
+                                }}
+                              >
+                                <div className="absolute inset-[18px] rounded-full bg-white" />
                               </div>
                             </div>
-                            {i < arr.length - 1 && <ChevronRight size={14} className="text-slate-400 shrink-0" />}
-                          </React.Fragment>
-                        ))}
-                      </div>
-                    </WidgetShell>
-                  </DraggableWidget>
-                )}
-              
 
-                {selectedWidgets.accounts_payable && (
-                  <DraggableWidget id="accounts_payable" grabbers={['left', 'right']} className="md:col-span-1 xl:col-span-1">
-                    <WidgetShell title="Accounts Payable" onHide={() => setWidgetToHide('accounts_payable')}>
-                      <div className="absolute top-4 right-4 text-[11px] text-[#6b6c72]">As of today</div>
-                      <div className="mt-4 text-[11px] text-[#6b6c72]">Total</div>
-                      <div className="text-[20px] font-bold text-[#393a3d] mb-4">{formatLkr(biData?.accountsPayable?.total || 0)}</div>
-                      <div className="flex items-center gap-6 mt-4">
-                        <div className="relative w-[70px] h-[70px] rounded-full border-[12px] shrink-0" style={{
-                          borderColor: (biData?.accountsPayable?.total || 0) > 0 ? '#2ca01c' : '#d4d7dc'
-                        }} />
-                        <div className="text-[11px] space-y-1.5 text-[#393a3d]">
-                          <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-[#2ca01c]" />Current: {formatLkr(biData?.accountsPayable?.current || 0)}</div>
-                          <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-[#0078d4]" />1 - 30: {formatLkr(biData?.accountsPayable?.aging1_30 || 0)}</div>
-                          <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-[#7c3aed]" />31 - 60: {formatLkr(biData?.accountsPayable?.aging31_60 || 0)}</div>
-                          <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-[#0d9488]" />61 - 90: {formatLkr(biData?.accountsPayable?.aging61_90 || 0)}</div>
-                          <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-[#e33e07]" />91 and over: {formatLkr(biData?.accountsPayable?.aging91Plus || 0)}</div>
-                        </div>
-                      </div>
-                    </WidgetShell>
-                  </DraggableWidget>
-                )}
-
-                {selectedWidgets.accounts_receivable && (
-                  <DraggableWidget id="accounts_receivable" grabbers={['left', 'right']} className="md:col-span-1 xl:col-span-1">
-                    <WidgetShell title="Accounts Receivable" onHide={() => setWidgetToHide('accounts_receivable')}>
-                      <div className="absolute top-4 right-4 text-[11px] text-[#6b6c72]">As of today</div>
-                      <div className="mt-4 text-[11px] text-[#6b6c72]">Total</div>
-                      <div className="text-[20px] font-bold text-[#393a3d] mb-4">{formatLkr(biData?.accountsReceivable?.total || 0)}</div>
-                      <div className="flex items-center gap-6 mt-4">
-                        <div className="relative w-[70px] h-[70px] rounded-full border-[12px] shrink-0" style={{
-                          borderColor: (biData?.accountsReceivable?.total || 0) > 0 ? '#2ca01c' : '#d4d7dc'
-                        }} />
-                        <div className="text-[11px] space-y-1.5 text-[#393a3d]">
-                          <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-[#2ca01c]" />Current: {formatLkr(biData?.accountsReceivable?.current || 0)}</div>
-                          <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-[#0078d4]" />1 - 30: {formatLkr(biData?.accountsReceivable?.aging1_30 || 0)}</div>
-                          <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-[#7c3aed]" />31 - 60: {formatLkr(biData?.accountsReceivable?.aging31_60 || 0)}</div>
-                          <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-[#0d9488]" />61 - 90: {formatLkr(biData?.accountsReceivable?.aging61_90 || 0)}</div>
-                          <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-[#e33e07]" />91 and over: {formatLkr(biData?.accountsReceivable?.aging91Plus || 0)}</div>
-                        </div>
-                      </div>
-                    </WidgetShell>
-                  </DraggableWidget>
-                )}
-
-                {selectedWidgets.sales_orders && (
-                  <DraggableWidget id="sales_orders" grabbers={['left', 'right']} className="md:col-span-2 xl:col-span-2 row-span-2">
-                    <WidgetShell
-                      title="Sales Orders"
-                      subtitle="Take charge of your finances with open sales orders"
-                      footerButtonLabel="Get started with sales orders"
-                      onFooterButton={() => runAction('sales_order')}
-                      onHide={() => setWidgetToHide('sales_orders')}
-                    >
-                      <table className="w-full text-left text-[11px] mt-4">
-                        <thead>
-                          <tr className="border-b border-[#eceef1] text-[#6b6c72]">
-                            <th className="font-bold py-1">SO NO.</th>
-                            <th className="font-bold py-1 text-center">CUSTOMER</th>
-                            <th className="font-bold py-1 text-right">AMOUNT</th>
-                          </tr>
-                        </thead>
-                        <tbody className="text-[#393a3d]">
-                          {(biData?.salesOrders?.length > 0 ? biData.salesOrders : []).map((so, i) => (
-                            <tr key={i} className="border-b border-[#eceef1] border-dashed">
-                              <td className="py-2">{so.docNo || 'SO'}</td>
-                              <td className="py-2 text-center">{so.customer || '--'}</td>
-                              <td className="py-2 text-right">{formatLkr(so.amount || 0)}</td>
-                            </tr>
-                          ))}
-                          {(biData?.salesOrders?.length || 0) === 0 && (
-                            <tr>
-                              <td className="py-2 text-[#8d9096]" colSpan={3}>No open sales orders</td>
-                            </tr>
-                          )}
-                        </tbody>
-                      </table>
-                    </WidgetShell>
-                  </DraggableWidget>
-                )}
-              
-                {selectedWidgets.work_requests && (
-                  <DraggableWidget id="work_requests" grabbers={['left', 'right']} className="md:col-span-1 xl:col-span-1">
-                    <WidgetShell
-                      title="Work Requests"
-                      subtitle="Drive repeat business using the post-invoice survey"
-                      footerButtonLabel="Manage survey settings"
-                      onFooterButton={() => runAction('survey_settings')}
-                      onHide={() => setWidgetToHide('work_requests')}
-                    >
-                      <div className="flex-1 flex items-center justify-center py-6">
-                        <div className="border border-[#eceef1] rounded-sm shadow-sm p-3 flex gap-3 max-w-[160px] bg-white z-10 relative">
-                          <div className="w-6 h-6 rounded-full bg-[#d4d7dc] shrink-0" />
-                          <div className="flex-1 space-y-1.5 pt-0.5">
-                            <div className="h-2.5 w-10 bg-[#eceef1] rounded-sm" />
-                            <div className="text-[10px] text-[#6b6c72] leading-tight">wants to work with you again</div>
+                            <div className="flex-1 space-y-2.5 w-full max-w-[160px] text-[12px]">
+                              {(categories.length > 0 ? categories.slice(0, 5) : [
+                                { name: 'Rent' }, { name: 'Food' }, { name: 'Travel' }, { name: 'Utilities' }, { name: 'Other' }
+                              ]).map((cat, i) => {
+                                const name = cat.categoryName || cat.CategoryName || cat.name || cat.Name || '';
+                                const color = ['#60a5fa', '#a78bfa', '#10b981', '#f59e0b', '#ec4899'][i % 5];
+                                return (
+                                  <div key={i} className="flex items-center gap-2">
+                                    <div
+                                      className="w-2.5 h-2.5 rounded-full shrink-0 transition-colors duration-500 bg-[#e5e7eb] group-hover:bg-[var(--hover-color)]"
+                                      style={{ '--hover-color': color }}
+                                    />
+                                    <div className="flex-1 flex items-center truncate">
+                                      <span className="text-[#9ca3af] font-medium group-hover:hidden">--</span>
+                                      <span className="hidden group-hover:inline text-slate-650 font-bold truncate">{name || 'Category name'}</span>
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </WidgetShell>
-                  </DraggableWidget>
-                )}
+                      </WidgetShell>
+                    </DraggableWidget>
+                  )}
 
-                {selectedWidgets.reviews && (
-                  <DraggableWidget id="reviews" grabbers={['left', 'right']} className="md:col-span-1 xl:col-span-1 row-span-2">
-                    <WidgetShell title="Reviews" onHide={() => setWidgetToHide('reviews')}>
-                      {biData?.reviews?.reviewCount > 0 ? (
-                        <div className="mt-4 space-y-4">
-                          <div className="flex items-center gap-3">
-                            <span className="text-[28px] font-extrabold text-slate-800">{biData.reviews.avgRating}</span>
-                            <div className="flex items-center gap-0.5">
-                              {[1, 2, 3, 4, 5].map(s => (
-                                <Star key={s} size={14} className={s <= Math.round(biData.reviews.avgRating) ? 'text-amber-400 fill-amber-400' : 'text-slate-300'} />
+                  {/* Add widgets */}
+                  {selectedWidgets.add_widgets && (
+                    <DraggableWidget id="add_widgets" grabbers={['left', 'right']} className="md:col-span-1 xl:col-span-1 h-full">
+                      <div
+                        className="bg-white rounded-lg min-h-[240px] flex flex-col h-full overflow-hidden cursor-pointer hover:bg-slate-50 transition-colors border-2 border-dashed border-[#eceef1]"
+                        onClick={() => setIsAddWidgetsOpen(true)}
+                      >
+                        <div className="flex flex-col items-center justify-center flex-1 py-8">
+                          <span className="text-[13px] font-bold text-[#393a3d] mb-3">Add widgets</span>
+                          <div className="w-8 h-8 rounded-full bg-[#f4f5f8] flex items-center justify-center">
+                            <Plus size={16} className="text-[#6b6c72]" strokeWidth={2} />
+                          </div>
+                        </div>
+
+                        <div className="border-t border-[#eceef1] mx-6" />
+
+                        <div className="flex flex-col items-center justify-center flex-1 py-6 px-4">
+                          <div className="flex items-center gap-2 mb-4">
+                            <Sparkles size={14} className="text-[#393a3d]" strokeWidth={2.5} />
+                            <span className="text-[12.5px] font-bold text-[#393a3d]">Smart suggestions</span>
+                          </div>
+                          <div className="w-9 h-9 rounded-full bg-[#f4f5f8] flex items-center justify-center mb-3">
+                            <Sparkles size={16} className="text-[#0078d4]" strokeWidth={2.5} />
+                          </div>
+                          <p className={`text-[11.5px] text-[#393a3d] font-medium text-center leading-relaxed max-w-[200px] transition-opacity duration-300 ${suggestionFade ? 'opacity-0' : 'opacity-100'}`}>
+                            {SMART_SUGGESTIONS[suggestionIndex].text}
+                          </p>
+                        </div>
+                      </div>
+                    </DraggableWidget>
+                  )}
+
+                  {/* Bank accounts */}
+                  {selectedWidgets.bank_accounts && (
+                    <DraggableWidget id="bank_accounts" grabbers={['top', 'bottom']} className="md:col-span-1 xl:col-span-1">
+                      <WidgetShell
+                        title="Bank accounts"
+                        subtitle="Link your banks to see your balances in one place"
+                        footerButtonLabel="Find your bank"
+                        onFooterButton={() => runAction('bank_rec')}
+                        onHide={() => setWidgetToHide('bank_accounts')}
+                      >
+                        {(function () {
+                          const banks = biData?.bankAccounts?.length > 0 ? biData.bankAccounts : PLACEHOLDER_BANKS;
+                          const displayedBanks = banks.slice(0, 3);
+                          return (
+                            <div className="flex flex-col gap-5 mt-2">
+                              {displayedBanks.map((b, i) => (
+                                <div key={i} className="flex items-center gap-4">
+                                  <div className="w-9 h-9 rounded-full bg-white border border-[#eceef1] flex items-center justify-center shrink-0 p-1">
+                                    {b.logo ? (
+                                      <img src={b.logo} alt="" className="w-full h-full object-contain" />
+                                    ) : (
+                                      <Landmark size={14} className="text-[#393a3d]" />
+                                    )}
+                                  </div>
+                                  <span className="text-[12.5px] font-bold text-[#393a3d] truncate flex-1 leading-snug">
+                                    {b.bankName || b.name || b.bankCode}
+                                  </span>
+                                  <button type="button" onClick={() => runAction('bank_rec')} className="text-[#0078d4] hover:text-[#005a9e] transition-colors p-1" aria-label="Add">
+                                    <Plus size={18} strokeWidth={2.5} />
+                                  </button>
+                                </div>
                               ))}
                             </div>
-                            <span className="text-[12px] text-slate-500 ml-1">({biData.reviews.reviewCount} reviews)</span>
+                          );
+                        })()}
+                      </WidgetShell>
+                    </DraggableWidget>
+                  )}
+                  {selectedWidgets.cash_flow && (
+                    <DraggableWidget id="cash_flow" grabbers={['left', 'right']} className="md:col-span-2 xl:col-span-2">
+                      <WidgetShell
+                        title="Cash flow"
+                        subtitle="Track how your money is doing"
+                        footerButtonLabel="Link your bank to see cash flow"
+                        onFooterButton={() => runAction('bank_rec')}
+                        onHide={() => setWidgetToHide('cash_flow')}
+                      >
+                        <div className="flex gap-3 h-[190px] pt-4 mt-2">
+
+                          {/* Y Axis */}
+                          <div className="flex flex-col justify-between text-[11px] text-[#6b6c72] w-8 shrink-0 text-right pb-[22px]">
+                            <span>{cashFlowMax > 0 ? formatShortK(cashFlowMax) : '6K'}</span>
+                            <span>{cashFlowMax > 0 ? formatShortK(cashFlowMax * 0.66) : '4K'}</span>
+                            <span>{cashFlowMax > 0 ? formatShortK(cashFlowMax * 0.33) : '2K'}</span>
+                            <span>0</span>
                           </div>
-                          <div className="space-y-1.5">
-                            {[5, 4, 3, 2, 1].map(s => {
-                              const count = biData.reviews.ratingDistribution?.[s] || 0;
-                              const pct = biData.reviews.reviewCount > 0 ? Math.round((count / biData.reviews.reviewCount) * 100) : 0;
-                              return (
-                                <div key={s} className="flex items-center gap-2 text-[11px]">
-                                  <span className="w-6 text-right font-bold text-slate-500">{s}</span>
-                                  <Star size={10} className="text-amber-400 fill-amber-400 shrink-0" />
-                                  <div className="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden">
-                                    <div className="h-full bg-amber-400 rounded-full" style={{ width: `${pct}%` }} />
-                                  </div>
-                                  <span className="w-8 text-right text-slate-500">{count}</span>
+
+                          {/* Chart */}
+                          <div className="flex-1 relative">
+
+                            {/* Grid */}
+                            <div className="absolute inset-0 flex flex-col justify-between pointer-events-none pb-[22px]">
+                              {[1, 2, 3, 4].map((i) => (
+                                <div
+                                  key={i}
+                                  className="border-t border-[#eceef1] w-full"
+                                />
+                              ))}
+                            </div>
+
+                            {/* Bars */}
+                            <div className="absolute top-0 bottom-[22px] left-0 right-0 flex justify-between px-1">
+                              {monthlyData.map((d) => (
+                                <div key={d.m} className="flex gap-[1px] items-end flex-1 justify-center relative group cursor-pointer hover:bg-slate-50 transition-all duration-200" title={`${d.m}: Income LKR ${formatShortK(d.salesVal)} | Expenses LKR ${formatShortK(d.expVal)}`}>
+                                  <div className="w-[14px] bg-[#6bc13c] transition-all duration-500" style={{ height: `${Math.max(2, d.h1)}%` }} />
+                                  <div className="w-[14px] bg-[#3dc0c5] transition-all duration-500" style={{ height: `${Math.max(2, d.h2)}%` }} />
                                 </div>
-                              );
-                            })}
+                              ))}
+                            </div>
+
+                            {/* Months */}
+                            <div className="absolute bottom-0 left-0 right-0 flex justify-between px-1 border-t border-slate-200/80 pt-2">
+                              {['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'].map((m) => (
+                                <div key={m} className="flex-1 text-center text-[10px] font-bold text-slate-500">
+                                  {m}
+                                </div>
+                              ))}
+                            </div>
                           </div>
                         </div>
-                      ) : (
-                        <div className="mt-4 text-[13px] text-slate-500">No reviews yet. Be the first to rate the system!</div>
-                      )}
-                    </WidgetShell>
-                  </DraggableWidget>
-                )}
 
-                {selectedWidgets.overdue_invoices && (
-                  <DraggableWidget id="overdue_invoices" grabbers={['left', 'right']} className="md:col-span-1 xl:col-span-1">
-                    <WidgetShell
-                      title="Overdue Invoices"
-                      footerButtonLabel="Create an invoice for your next job!"
-                      onFooterButton={() => runAction('invoice')}
-                      onHide={() => setWidgetToHide('overdue_invoices')}
-                    >
-                      <div className="mt-4 text-[14px] font-bold text-[#393a3d] leading-snug pr-4">
-                        You have {formatLkr(biData?.overdueInvoiceTotal || 0)} in invoices that are overdue.
-                      </div>
-                      <div className="text-[12px] text-[#6b6c72] mt-2">
-                        {(biData?.overdueInvoiceTotal || 0) > 0 ? 'Review your overdue invoices to avoid late fees.' : 'Create an invoice for your next job!'}
-                      </div>
-                    </WidgetShell>
-                  </DraggableWidget>
-                )}
 
-                {selectedWidgets.referrals && (
-                  <DraggableWidget id="referrals" grabbers={['left', 'right']} className="md:col-span-1 xl:col-span-1">
-                    <WidgetShell
-                      title="Referrals"
-                      subtitle="Generate referrals using the post-invoice survey"
-                      footerButtonLabel="Manage survey settings"
-                      onFooterButton={() => runAction('survey_settings')}
-                      onHide={() => setWidgetToHide('referrals')}
-                    >
-                      <div className="flex-1 flex items-center justify-center py-6">
-                        <div className="border border-[#eceef1] rounded-sm shadow-sm p-3 flex flex-col gap-3 max-w-[160px] bg-white z-10 relative">
-                          <div className="text-[10px] text-[#393a3d] font-bold text-center">You've received a new referral</div>
-                          <div className="flex items-center gap-3 justify-center">
+                      </WidgetShell>
+                    </DraggableWidget>
+                  )}
+                  {/* Invoices */}
+                  {selectedWidgets.invoices && (
+                    <DraggableWidget id="invoices" grabbers={['left', 'right']} className="md:col-span-1 xl:col-span-1">
+                      <WidgetShell
+                        title="INVOICES"
+                        onHide={() => setWidgetToHide('invoices')}
+                      >
+                        <div className="flex flex-col gap-6 mt-1">
+                          {/* Unpaid */}
+                          <div className="flex flex-col gap-1.5">
+                            <div className="flex items-center gap-2">
+                              <span className="text-[13px] font-bold text-[#393a3d]">{formatLkr(invoiceSummary.totalUnpaid).replace('LKR', 'LKR ')} Unpaid</span>
+                              <span className="text-[11px] text-[#6b6c72]">Last 365 days</span>
+                            </div>
+                            <div className="flex justify-between items-center text-[12px] mt-1">
+                              <div className="flex flex-col">
+                                <span className="font-bold text-[#393a3d] text-[15px]">{formatLkr(invoiceSummary.totalOverdue).replace('LKR', 'LKR ')}</span>
+                                <span className="text-[#6b6c72] text-[11.5px]">Overdue</span>
+                              </div>
+                              <div className="flex flex-col text-right">
+                                <span className="font-bold text-[#393a3d] text-[15px]">{formatLkr(invoiceSummary.totalUnpaid - invoiceSummary.totalOverdue).replace('LKR', 'LKR ')}</span>
+                                <span className="text-[#6b6c72] text-[11.5px]">Not due yet</span>
+                              </div>
+                            </div>
+                            <div className="flex h-[18px] w-full mt-1 overflow-hidden gap-[1px]">
+                              <div className="h-full bg-[#d97736] rounded-l-[2px]" style={{ width: invoiceSummary.totalUnpaid > 0 ? `${(invoiceSummary.totalOverdue / invoiceSummary.totalUnpaid) * 100}%` : '50%' }} />
+                              <div className="h-full bg-[#d4d7dc] rounded-r-[2px]" style={{ width: invoiceSummary.totalUnpaid > 0 ? `${((invoiceSummary.totalUnpaid - invoiceSummary.totalOverdue) / invoiceSummary.totalUnpaid) * 100}%` : '50%' }} />
+                            </div>
+                          </div>
+
+                          {/* Paid */}
+                          <div className="flex flex-col gap-1.5">
+                            <div className="flex items-center gap-2">
+                              <span className="text-[13px] font-bold text-[#393a3d]">{formatLkr(invoiceSummary.totalPaid).replace('LKR', 'LKR ')} Paid</span>
+                              <span className="text-[11px] text-[#6b6c72]">Last 30 days</span>
+                            </div>
+                            <div className="flex justify-between items-center text-[12px] mt-1">
+                              <div className="flex flex-col">
+                                <span className="font-bold text-[#393a3d] text-[15px]">{formatLkr(invoiceSummary.totalNotDeposited).replace('LKR', 'LKR ')}</span>
+                                <span className="text-[#6b6c72] text-[11.5px]">Not deposited</span>
+                              </div>
+                              <div className="flex flex-col text-right">
+                                <span className="font-bold text-[#393a3d] text-[15px]">{formatLkr(invoiceSummary.totalDeposited).replace('LKR', 'LKR ')}</span>
+                                <span className="text-[#6b6c72] text-[11.5px]">Deposited</span>
+                              </div>
+                            </div>
+                            <div className="flex h-[18px] w-full mt-1 overflow-hidden gap-[1px]">
+                              <div className="h-full bg-[#53c351] rounded-l-[2px]" style={{ width: invoiceSummary.totalPaid > 0 ? `${(invoiceSummary.totalNotDeposited / invoiceSummary.totalPaid) * 100}%` : '50%' }} />
+                              <div className="h-full bg-[#2ca01c] rounded-r-[2px]" style={{ width: invoiceSummary.totalPaid > 0 ? `${(invoiceSummary.totalDeposited / invoiceSummary.totalPaid) * 100}%` : '50%' }} />
+                            </div>
+                          </div>
+                        </div>
+                      </WidgetShell>
+                    </DraggableWidget>
+                  )}
+
+                  {/* Sales */}
+                  {selectedWidgets.sales && (
+                    <DraggableWidget id="sales" grabbers={['left', 'right']} className="md:col-span-1 xl:col-span-1">
+                      <WidgetShell
+                        title="SALES"
+                        onHide={() => setWidgetToHide('sales')}
+                      >
+                        <div className="absolute top-[22px] right-6 opacity-100 group-hover:opacity-0 transition-opacity">
+                          <div className="text-[11px] font-bold text-[#393a3d] flex items-center cursor-pointer hover:text-[#000]">
+                            This year to date <ChevronDown size={14} className="ml-0.5 text-[#6b6c72]" strokeWidth={2.5} />
+                          </div>
+                        </div>
+                        <div className="flex flex-col h-full mt-2">
+                          <div className="flex flex-col gap-0.5 mb-5">
+                            <span className="text-[12px] text-[#6b6c72]">Total Amount</span>
+                            <span className="text-[26px] font-light text-[#393a3d]">{formatLkr(totalSalesYTD).replace('LKR', 'LKR ')}</span>
+                          </div>
+
+                          {/* Chart Grid Lines */}
+                          <div className="flex-1 relative flex flex-col justify-between min-h-[110px] mt-2 mb-2">
+                            {[0.4, 0.3, 0.2, 0.1, 0].map((val, idx) => (
+                              <div key={idx} className="flex items-center gap-3 w-full">
+                                <span className="text-[11px] font-medium text-[#6b6c72] w-4 text-right shrink-0 leading-none">{val}</span>
+                                <div className="flex-1 border-t border-[#eceef1]" />
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                        <div className="absolute bottom-4 right-4">
+                          <button className="p-1 hover:bg-[#f4f5f8] rounded-full text-[#6b6c72] transition-colors">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                              <circle cx="12" cy="5" r="1" />
+                              <circle cx="12" cy="12" r="1" />
+                              <circle cx="12" cy="19" r="1" />
+                            </svg>
+                          </button>
+                        </div>
+                      </WidgetShell>
+                    </DraggableWidget>
+                  )}
+
+                  {/* Accounts Payable */}
+                  {selectedWidgets.accounts_payable && (
+                    <DraggableWidget id="accounts_payable" grabbers={['left', 'right']} className="md:col-span-2 xl:col-span-2">
+                      <WidgetShell title="ACCOUNTS PAYABLE" onHide={() => setWidgetToHide('accounts_payable')}>
+                        <div className="absolute top-[22px] right-6 opacity-100 group-hover:opacity-0 transition-opacity">
+                          <div className="text-[11px] font-bold text-[#6b6c72] flex items-center">As of today</div>
+                        </div>
+                        <div className="flex flex-col mt-2">
+                          <span className="text-[12px] text-[#6b6c72]">Total</span>
+                          <span className="text-[26px] font-light text-[#393a3d]">{formatLkr(ap.total).replace('LKR', 'LKR ')}</span>
+                        </div>
+                        <div className="flex items-center gap-6 mt-4">
+                          {/* Donut Chart */}
+                          <div className="w-[100px] h-[100px] shrink-0 rounded-full relative"
+                            style={{
+                              background: ap.total > 0
+                                ? `conic-gradient(#53c351 0% ${(ap.current / ap.total) * 100}%, #3dc0c5 ${(ap.current / ap.total) * 100}% ${((ap.current + ap.aging1_30) / ap.total) * 100}%, #6b6c72 ${((ap.current + ap.aging1_30) / ap.total) * 100}% ${((ap.current + ap.aging1_30 + ap.aging31_60) / ap.total) * 100}%, #0078d4 ${((ap.current + ap.aging1_30 + ap.aging31_60) / ap.total) * 100}% ${((ap.current + ap.aging1_30 + ap.aging31_60 + ap.aging61_90) / ap.total) * 100}%, #1e3a8a ${((ap.current + ap.aging1_30 + ap.aging31_60 + ap.aging61_90) / ap.total) * 100}% 100%)`
+                                : '#d4d7dc'
+                            }}
+                          >
+                            <div className="absolute inset-[18px] bg-white rounded-full"></div>
+                          </div>
+                          {/* Legend */}
+                          <div className="flex flex-col gap-1.5 flex-1">
+                            <div className="flex items-center gap-2 text-[11px] text-[#393a3d]">
+                              <div className="w-2 h-2 rounded-full bg-[#53c351]" /> Current: {formatLkr(ap.current).replace('LKR', 'LKR ')}
+                            </div>
+                            <div className="flex items-center gap-2 text-[11px] text-[#393a3d]">
+                              <div className="w-2 h-2 rounded-full bg-[#3dc0c5]" /> 1 - 30: {formatLkr(ap.aging1_30).replace('LKR', 'LKR ')}
+                            </div>
+                            <div className="flex items-center gap-2 text-[11px] text-[#393a3d]">
+                              <div className="w-2 h-2 rounded-full bg-[#6b6c72]" /> 31 - 60: {formatLkr(ap.aging31_60).replace('LKR', 'LKR ')}
+                            </div>
+                            <div className="flex items-center gap-2 text-[11px] text-[#393a3d]">
+                              <div className="w-2 h-2 rounded-full bg-[#0078d4]" /> 61 - 90: {formatLkr(ap.aging61_90).replace('LKR', 'LKR ')}
+                            </div>
+                            <div className="flex items-center gap-2 text-[11px] text-[#393a3d]">
+                              <div className="w-2 h-2 rounded-full bg-[#1e3a8a]" /> 91 and over: {formatLkr(ap.aging91Plus).replace('LKR', 'LKR ')}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="absolute bottom-4 right-4">
+                          <button className="p-1 hover:bg-[#f4f5f8] rounded-full text-[#6b6c72] transition-colors">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                              <circle cx="12" cy="5" r="1" />
+                              <circle cx="12" cy="12" r="1" />
+                              <circle cx="12" cy="19" r="1" />
+                            </svg>
+                          </button>
+                        </div>
+                      </WidgetShell>
+                    </DraggableWidget>
+                  )}
+
+                  {/* Accounts Receivable */}
+                  {selectedWidgets.accounts_receivable && (
+                    <DraggableWidget id="accounts_receivable" grabbers={['left', 'right']} className="md:col-span-2 xl:col-span-2">
+                      <WidgetShell title="ACCOUNTS RECEIVABLE" onHide={() => setWidgetToHide('accounts_receivable')}>
+                        <div className="absolute top-[22px] right-6 opacity-100 group-hover:opacity-0 transition-opacity">
+                          <div className="text-[11px] font-bold text-[#6b6c72] flex items-center">As of today</div>
+                        </div>
+                        <div className="flex flex-col mt-2">
+                          <span className="text-[12px] text-[#6b6c72]">Total</span>
+                          <span className="text-[26px] font-light text-[#393a3d]">{formatLkr(ar.total).replace('LKR', 'LKR ')}</span>
+                        </div>
+                        <div className="flex items-center gap-6 mt-4">
+                          {/* Donut Chart */}
+                          <div className="w-[100px] h-[100px] shrink-0 rounded-full relative"
+                            style={{
+                              background: ar.total > 0
+                                ? `conic-gradient(#53c351 0% ${(ar.current / ar.total) * 100}%, #3dc0c5 ${(ar.current / ar.total) * 100}% ${((ar.current + ar.aging1_30) / ar.total) * 100}%, #6b6c72 ${((ar.current + ar.aging1_30) / ar.total) * 100}% ${((ar.current + ar.aging1_30 + ar.aging31_60) / ar.total) * 100}%, #0078d4 ${((ar.current + ar.aging1_30 + ar.aging31_60) / ar.total) * 100}% ${((ar.current + ar.aging1_30 + ar.aging31_60 + ar.aging61_90) / ar.total) * 100}%, #1e3a8a ${((ar.current + ar.aging1_30 + ar.aging31_60 + ar.aging61_90) / ar.total) * 100}% 100%)`
+                                : '#d4d7dc'
+                            }}
+                          >
+                            <div className="absolute inset-[18px] bg-white rounded-full"></div>
+                          </div>
+                          {/* Legend */}
+                          <div className="flex flex-col gap-1.5 flex-1">
+                            <div className="flex items-center gap-2 text-[11px] text-[#393a3d]">
+                              <div className="w-2 h-2 rounded-full bg-[#53c351]" /> Current: {formatLkr(ar.current).replace('LKR', 'LKR ')}
+                            </div>
+                            <div className="flex items-center gap-2 text-[11px] text-[#393a3d]">
+                              <div className="w-2 h-2 rounded-full bg-[#3dc0c5]" /> 1 - 30: {formatLkr(ar.aging1_30).replace('LKR', 'LKR ')}
+                            </div>
+                            <div className="flex items-center gap-2 text-[11px] text-[#393a3d]">
+                              <div className="w-2 h-2 rounded-full bg-[#6b6c72]" /> 31 - 60: {formatLkr(ar.aging31_60).replace('LKR', 'LKR ')}
+                            </div>
+                            <div className="flex items-center gap-2 text-[11px] text-[#393a3d]">
+                              <div className="w-2 h-2 rounded-full bg-[#0078d4]" /> 61 - 90: {formatLkr(ar.aging61_90).replace('LKR', 'LKR ')}
+                            </div>
+                            <div className="flex items-center gap-2 text-[11px] text-[#393a3d]">
+                              <div className="w-2 h-2 rounded-full bg-[#1e3a8a]" /> 91 and over: {formatLkr(ar.aging91Plus).replace('LKR', 'LKR ')}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="absolute bottom-4 right-4">
+                          <button className="p-1 hover:bg-[#f4f5f8] rounded-full text-[#6b6c72] transition-colors">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                              <circle cx="12" cy="5" r="1" />
+                              <circle cx="12" cy="12" r="1" />
+                              <circle cx="12" cy="19" r="1" />
+                            </svg>
+                          </button>
+                        </div>
+                      </WidgetShell>
+                    </DraggableWidget>
+                  )}
+
+                  {selectedWidgets.inventory_reports && (
+                    <DraggableWidget id="inventory_reports" grabbers={['left', 'right']} className="md:col-span-1 xl:col-span-1">
+                      <WidgetShell
+                        title="Inventory Reports"
+                        footerButtonLabel="View all reports"
+                        onFooterButton={() => runAction('reports')}
+                        onHide={() => setWidgetToHide('inventory_reports')}
+                      >
+                        <div className="space-y-2 mt-2">
+                          {['Inventory Valuation Detail', 'Inventory Valuation Summary', 'Open Purchase Order Detail', 'Open Purchase Order List', 'Stock Take Worksheet'].map(r => (
+                            <div key={r} className="flex justify-between items-center border-b border-[#eceef1] pb-1.5 last:border-0">
+                              <span className="text-[12px] text-[#393a3d] truncate pr-2">{r}</span>
+                              <button onClick={() => runAction(`open_report:${r}`)} className="text-[#0078d4] text-[12px] font-bold hover:underline shrink-0">View</button>
+                            </div>
+                          ))}
+                        </div>
+                      </WidgetShell>
+                    </DraggableWidget>
+                  )}
+
+                  {selectedWidgets.low_on_stock && (
+                    <DraggableWidget id="low_on_stock" grabbers={['left', 'right']} className="md:col-span-2 xl:col-span-2 row-span-2">
+                      <WidgetShell
+                        title="Low on Stock"
+                        subtitle="Never miss a sale with items that are running low"
+                        footerButtonLabel="Start tracking inventory"
+                        onFooterButton={() => runAction('items')}
+                        onHide={() => setWidgetToHide('low_on_stock')}
+                      >
+                        <table className="w-full text-left text-[11px] mt-4">
+                          <thead>
+                            <tr className="border-b border-[#eceef1] text-[#6b6c72]">
+                              <th className="font-bold py-1">PRODUCT</th>
+                              <th className="font-bold py-1 text-right">QTY</th>
+                              <th className="font-bold py-1 text-right">REORDER</th>
+                            </tr>
+                          </thead>
+                          <tbody className="text-[#393a3d]">
+                            {(biData?.lowStock?.length > 0 ? biData.lowStock : []).map((item, i) => (
+                              <tr key={i} className="border-b border-[#eceef1] border-dashed">
+                                <td className="py-2 truncate max-w-[100px]">{item.productName || item.productCode || 'Product name'}</td>
+                                <td className="py-2 text-right">{item.quantity}</td>
+                                <td className="py-2 text-right">Reorder</td>
+                              </tr>
+                            ))}
+                            {(biData?.lowStock?.length || 0) === 0 && (
+                              <tr>
+                                <td className="py-2 text-[#8d9096]" colSpan={3}>No low stock items</td>
+                              </tr>
+                            )}
+                          </tbody>
+                        </table>
+                      </WidgetShell>
+                    </DraggableWidget>
+                  )}
+
+
+
+                  {selectedWidgets.customers_funnel && (
+                    <DraggableWidget id="customers_funnel" grabbers={['left', 'right']} className="md:col-span-2 xl:col-span-4">
+                      <WidgetShell title="Customers Funnel" onHide={() => setWidgetToHide('customers_funnel')}>
+                        <div className="absolute top-5 right-5 text-[11px] font-semibold text-slate-400">As of today</div>
+                        <div className="flex items-center justify-between gap-1 overflow-x-auto py-2 h-full mt-4 pb-4 no-scrollbar">
+                          {[
+                            { label: 'Open opportunities', val: String(biData?.customerFunnel?.totalCustomers || '0'), color: '#34d399' },
+                            { label: 'Open estimates', val: String(biData?.customerFunnel?.openEstimates || '0'), color: '#10b981' },
+                            { label: 'Open contracts', val: String(biData?.customerFunnel?.openContracts || '0'), color: '#059669' },
+                            { label: 'In progress projects', val: String(biData?.customerFunnel?.inProgressProjects || '0'), color: '#047857' },
+                            { label: 'Unpaid invoices', val: String(biData?.customerFunnel?.unpaidInvoices || '0'), color: '#064e3b' },
+                            { label: 'Reviews', val: String(biData?.customerFunnel?.reviewCount || '0'), color: '#022c22' },
+                          ].map((f, i, arr) => (
+                            <React.Fragment key={i}>
+                              <div className=" rounded-sm flex flex-col min-w-[115px] flex-1 shrink-0 h-[105px] overflow-hidden bg-slate-50/40 hover:bg-white hover:border-slate-200 hover:shadow-md transition-all duration-305 relative shadow-[0_1px_3px_rgba(0,0,0,0.01)]">
+                                <div className="h-1.5 w-full shrink-0" style={{ backgroundColor: f.color }} />
+                                <div className="p-4 flex-1 flex flex-col justify-between">
+                                  <span className="text-[12px] font-bold text-slate-500 leading-tight">{f.label}</span>
+                                  <span className="text-[22px] font-extrabold text-slate-800">{f.val}</span>
+                                </div>
+                              </div>
+                              {i < arr.length - 1 && <ChevronRight size={14} className="text-slate-400 shrink-0" />}
+                            </React.Fragment>
+                          ))}
+                        </div>
+                      </WidgetShell>
+                    </DraggableWidget>
+                  )}
+
+
+                  {selectedWidgets.accounts_payable && (
+                    <DraggableWidget id="accounts_payable" grabbers={['left', 'right']} className="md:col-span-1 xl:col-span-1">
+                      <WidgetShell title="Accounts Payable" onHide={() => setWidgetToHide('accounts_payable')}>
+                        <div className="absolute top-4 right-4 text-[11px] text-[#6b6c72]">As of today</div>
+                        <div className="mt-4 text-[11px] text-[#6b6c72]">Total</div>
+                        <div className="text-[20px] font-bold text-[#393a3d] mb-4">{formatLkr(biData?.accountsPayable?.total || 0)}</div>
+                        <div className="flex items-center gap-6 mt-4">
+                          <div className="relative w-[70px] h-[70px] rounded-full border-[12px] shrink-0" style={{
+                            borderColor: (biData?.accountsPayable?.total || 0) > 0 ? '#2ca01c' : '#d4d7dc'
+                          }} />
+                          <div className="text-[11px] space-y-1.5 text-[#393a3d]">
+                            <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-[#2ca01c]" />Current: {formatLkr(biData?.accountsPayable?.current || 0)}</div>
+                            <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-[#0078d4]" />1 - 30: {formatLkr(biData?.accountsPayable?.aging1_30 || 0)}</div>
+                            <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-[#7c3aed]" />31 - 60: {formatLkr(biData?.accountsPayable?.aging31_60 || 0)}</div>
+                            <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-[#0d9488]" />61 - 90: {formatLkr(biData?.accountsPayable?.aging61_90 || 0)}</div>
+                            <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-[#e33e07]" />91 and over: {formatLkr(biData?.accountsPayable?.aging91Plus || 0)}</div>
+                          </div>
+                        </div>
+                      </WidgetShell>
+                    </DraggableWidget>
+                  )}
+
+                  {selectedWidgets.accounts_receivable && (
+                    <DraggableWidget id="accounts_receivable" grabbers={['left', 'right']} className="md:col-span-1 xl:col-span-1">
+                      <WidgetShell title="Accounts Receivable" onHide={() => setWidgetToHide('accounts_receivable')}>
+                        <div className="absolute top-4 right-4 text-[11px] text-[#6b6c72]">As of today</div>
+                        <div className="mt-4 text-[11px] text-[#6b6c72]">Total</div>
+                        <div className="text-[20px] font-bold text-[#393a3d] mb-4">{formatLkr(biData?.accountsReceivable?.total || 0)}</div>
+                        <div className="flex items-center gap-6 mt-4">
+                          <div className="relative w-[70px] h-[70px] rounded-full border-[12px] shrink-0" style={{
+                            borderColor: (biData?.accountsReceivable?.total || 0) > 0 ? '#2ca01c' : '#d4d7dc'
+                          }} />
+                          <div className="text-[11px] space-y-1.5 text-[#393a3d]">
+                            <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-[#2ca01c]" />Current: {formatLkr(biData?.accountsReceivable?.current || 0)}</div>
+                            <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-[#0078d4]" />1 - 30: {formatLkr(biData?.accountsReceivable?.aging1_30 || 0)}</div>
+                            <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-[#7c3aed]" />31 - 60: {formatLkr(biData?.accountsReceivable?.aging31_60 || 0)}</div>
+                            <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-[#0d9488]" />61 - 90: {formatLkr(biData?.accountsReceivable?.aging61_90 || 0)}</div>
+                            <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-[#e33e07]" />91 and over: {formatLkr(biData?.accountsReceivable?.aging91Plus || 0)}</div>
+                          </div>
+                        </div>
+                      </WidgetShell>
+                    </DraggableWidget>
+                  )}
+
+                  {selectedWidgets.sales_orders && (
+                    <DraggableWidget id="sales_orders" grabbers={['left', 'right']} className="md:col-span-2 xl:col-span-2 row-span-2">
+                      <WidgetShell
+                        title="Sales Orders"
+                        subtitle="Take charge of your finances with open sales orders"
+                        footerButtonLabel="Get started with sales orders"
+                        onFooterButton={() => runAction('sales_order')}
+                        onHide={() => setWidgetToHide('sales_orders')}
+                      >
+                        <table className="w-full text-left text-[11px] mt-4">
+                          <thead>
+                            <tr className="border-b border-[#eceef1] text-[#6b6c72]">
+                              <th className="font-bold py-1">SO NO.</th>
+                              <th className="font-bold py-1 text-center">CUSTOMER</th>
+                              <th className="font-bold py-1 text-right">AMOUNT</th>
+                            </tr>
+                          </thead>
+                          <tbody className="text-[#393a3d]">
+                            {(biData?.salesOrders?.length > 0 ? biData.salesOrders : []).map((so, i) => (
+                              <tr key={i} className="border-b border-[#eceef1] border-dashed">
+                                <td className="py-2">{so.docNo || 'SO'}</td>
+                                <td className="py-2 text-center">{so.customer || '--'}</td>
+                                <td className="py-2 text-right">{formatLkr(so.amount || 0)}</td>
+                              </tr>
+                            ))}
+                            {(biData?.salesOrders?.length || 0) === 0 && (
+                              <tr>
+                                <td className="py-2 text-[#8d9096]" colSpan={3}>No open sales orders</td>
+                              </tr>
+                            )}
+                          </tbody>
+                        </table>
+                      </WidgetShell>
+                    </DraggableWidget>
+                  )}
+
+                  {selectedWidgets.work_requests && (
+                    <DraggableWidget id="work_requests" grabbers={['left', 'right']} className="md:col-span-1 xl:col-span-1">
+                      <WidgetShell
+                        title="Work Requests"
+                        subtitle="Drive repeat business using the post-invoice survey"
+                        footerButtonLabel="Manage survey settings"
+                        onFooterButton={() => runAction('survey_settings')}
+                        onHide={() => setWidgetToHide('work_requests')}
+                      >
+                        <div className="flex-1 flex items-center justify-center py-6">
+                          <div className="border border-[#eceef1] rounded-sm shadow-sm p-3 flex gap-3 max-w-[160px] bg-white z-10 relative">
                             <div className="w-6 h-6 rounded-full bg-[#d4d7dc] shrink-0" />
-                            <div className="h-2.5 w-10 bg-[#eceef1] rounded-sm" />
-                          </div>
-                        </div>
-                      </div>
-                    </WidgetShell>
-                  </DraggableWidget>
-                )}
-              {/* Video Tutorials */}
-              {selectedWidgets.video_tutorials && (
-                  <DraggableWidget id="video_tutorials" grabbers={['left', 'right']} className="md:col-span-2 xl:col-span-4 row-span-2">
-                    <WidgetShell
-                      title="Video tutorials"
-                      subtitle="Watch and learn how to use your dashboard"
-                      onHide={() => setWidgetToHide('video_tutorials')}
-                    >
-                      <div className="grid grid-cols-2 gap-5 mt-4 h-full pb-4">
-                        <div className="flex flex-col gap-2.5">
-                          <div
-                            className="relative w-full rounded-2xl overflow-hidden bg-slate-100 aspect-video group cursor-pointer flex items-center justify-center border border-slate-150 shadow-sm hover:shadow-lg transition-all duration-300"
-                            onClick={() => setVideoOpen('get_started')}
-                          >
-                            <img src="https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=400&q=80" alt="Thumbnail 1" className="absolute inset-0 w-full h-full object-cover opacity-75 group-hover:opacity-95 group-hover:scale-103 transition-all duration-350" />
-                            <div className="w-11 h-11 rounded-sm bg-white shadow-xl flex items-center justify-center z-10 text-emerald-600 group-hover:scale-110 transition-transform duration-200">
-                              <Play size={18} fill="currentColor" className="ml-0.5" />
+                            <div className="flex-1 space-y-1.5 pt-0.5">
+                              <div className="h-2.5 w-10 bg-[#eceef1] rounded-sm" />
+                              <div className="text-[10px] text-[#6b6c72] leading-tight">wants to work with you again</div>
                             </div>
                           </div>
-                          <div className="text-[12.5px] font-bold text-slate-700 leading-snug tracking-tight px-1">Getting started with ONIMTA Accounts</div>
                         </div>
-                        <div className="flex flex-col gap-2.5">
-                          <div
-                            className="relative w-full rounded-2xl overflow-hidden bg-slate-100 aspect-video group cursor-pointer flex items-center justify-center border border-slate-150 shadow-sm hover:shadow-lg transition-all duration-300"
-                            onClick={() => setVideoOpen('track_expenses')}
-                          >
-                            <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&q=80" alt="Thumbnail 2" className="absolute inset-0 w-full h-full object-cover opacity-75 group-hover:opacity-95 group-hover:scale-103 transition-all duration-350" />
-                            <div className="w-11 h-11 rounded-sm bg-white shadow-xl flex items-center justify-center z-10 text-emerald-600 group-hover:scale-110 transition-transform duration-200">
-                              <Play size={18} fill="currentColor" className="ml-0.5" />
+                      </WidgetShell>
+                    </DraggableWidget>
+                  )}
+
+                  {selectedWidgets.reviews && (
+                    <DraggableWidget id="reviews" grabbers={['left', 'right']} className="md:col-span-1 xl:col-span-1 row-span-2">
+                      <WidgetShell title="Reviews" onHide={() => setWidgetToHide('reviews')}>
+                        {biData?.reviews?.reviewCount > 0 ? (
+                          <div className="mt-4 space-y-4">
+                            <div className="flex items-center gap-3">
+                              <span className="text-[28px] font-extrabold text-slate-800">{biData.reviews.avgRating}</span>
+                              <div className="flex items-center gap-0.5">
+                                {[1, 2, 3, 4, 5].map(s => (
+                                  <Star key={s} size={14} className={s <= Math.round(biData.reviews.avgRating) ? 'text-amber-400 fill-amber-400' : 'text-slate-300'} />
+                                ))}
+                              </div>
+                              <span className="text-[12px] text-slate-500 ml-1">({biData.reviews.reviewCount} reviews)</span>
+                            </div>
+                            <div className="space-y-1.5">
+                              {[5, 4, 3, 2, 1].map(s => {
+                                const count = biData.reviews.ratingDistribution?.[s] || 0;
+                                const pct = biData.reviews.reviewCount > 0 ? Math.round((count / biData.reviews.reviewCount) * 100) : 0;
+                                return (
+                                  <div key={s} className="flex items-center gap-2 text-[11px]">
+                                    <span className="w-6 text-right font-bold text-slate-500">{s}</span>
+                                    <Star size={10} className="text-amber-400 fill-amber-400 shrink-0" />
+                                    <div className="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden">
+                                      <div className="h-full bg-amber-400 rounded-full" style={{ width: `${pct}%` }} />
+                                    </div>
+                                    <span className="w-8 text-right text-slate-500">{count}</span>
+                                  </div>
+                                );
+                              })}
                             </div>
                           </div>
-                          <div className="text-[12.5px] font-bold text-slate-700 leading-snug tracking-tight px-1">How to track your expenses efficiently</div>
+                        ) : (
+                          <div className="mt-4 text-[13px] text-slate-500">No reviews yet. Be the first to rate the system!</div>
+                        )}
+                      </WidgetShell>
+                    </DraggableWidget>
+                  )}
+
+                  {selectedWidgets.overdue_invoices && (
+                    <DraggableWidget id="overdue_invoices" grabbers={['left', 'right']} className="md:col-span-1 xl:col-span-1">
+                      <WidgetShell
+                        title="Overdue Invoices"
+                        footerButtonLabel="Create an invoice for your next job!"
+                        onFooterButton={() => runAction('invoice')}
+                        onHide={() => setWidgetToHide('overdue_invoices')}
+                      >
+                        <div className="mt-4 text-[14px] font-bold text-[#393a3d] leading-snug pr-4">
+                          You have {formatLkr(biData?.overdueInvoiceTotal || 0)} in invoices that are overdue.
                         </div>
-                      </div>
-                    </WidgetShell>
-                  </DraggableWidget>
-                )}
-              </div>
-            </DragContext.Provider>
+                        <div className="text-[12px] text-[#6b6c72] mt-2">
+                          {(biData?.overdueInvoiceTotal || 0) > 0 ? 'Review your overdue invoices to avoid late fees.' : 'Create an invoice for your next job!'}
+                        </div>
+                      </WidgetShell>
+                    </DraggableWidget>
+                  )}
+
+                  {selectedWidgets.referrals && (
+                    <DraggableWidget id="referrals" grabbers={['left', 'right']} className="md:col-span-1 xl:col-span-1">
+                      <WidgetShell
+                        title="Referrals"
+                        subtitle="Generate referrals using the post-invoice survey"
+                        footerButtonLabel="Manage survey settings"
+                        onFooterButton={() => runAction('survey_settings')}
+                        onHide={() => setWidgetToHide('referrals')}
+                      >
+                        <div className="flex-1 flex items-center justify-center py-6">
+                          <div className="border border-[#eceef1] rounded-sm shadow-sm p-3 flex flex-col gap-3 max-w-[160px] bg-white z-10 relative">
+                            <div className="text-[10px] text-[#393a3d] font-bold text-center">You've received a new referral</div>
+                            <div className="flex items-center gap-3 justify-center">
+                              <div className="w-6 h-6 rounded-full bg-[#d4d7dc] shrink-0" />
+                              <div className="h-2.5 w-10 bg-[#eceef1] rounded-sm" />
+                            </div>
+                          </div>
+                        </div>
+                      </WidgetShell>
+                    </DraggableWidget>
+                  )}
+                  {/* Video Tutorials */}
+                  {selectedWidgets.video_tutorials && (
+                    <DraggableWidget id="video_tutorials" grabbers={['left', 'right']} className="md:col-span-2 xl:col-span-4 row-span-2">
+                      <WidgetShell
+                        title="Video tutorials"
+                        subtitle="Watch and learn how to use your dashboard"
+                        onHide={() => setWidgetToHide('video_tutorials')}
+                      >
+                        <div className="grid grid-cols-2 gap-5 mt-4 h-full pb-4">
+                          <div className="flex flex-col gap-2.5">
+                            <div
+                              className="relative w-full rounded-2xl overflow-hidden bg-slate-100 aspect-video group cursor-pointer flex items-center justify-center border border-slate-150 shadow-sm hover:shadow-lg transition-all duration-300"
+                              onClick={() => setVideoOpen('get_started')}
+                            >
+                              <img src="https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=400&q=80" alt="Thumbnail 1" className="absolute inset-0 w-full h-full object-cover opacity-75 group-hover:opacity-95 group-hover:scale-103 transition-all duration-350" />
+                              <div className="w-11 h-11 rounded-sm bg-white shadow-xl flex items-center justify-center z-10 text-emerald-600 group-hover:scale-110 transition-transform duration-200">
+                                <Play size={18} fill="currentColor" className="ml-0.5" />
+                              </div>
+                            </div>
+                            <div className="text-[12.5px] font-bold text-slate-700 leading-snug tracking-tight px-1">Getting started with ONIMTA Accounts</div>
+                          </div>
+                          <div className="flex flex-col gap-2.5">
+                            <div
+                              className="relative w-full rounded-2xl overflow-hidden bg-slate-100 aspect-video group cursor-pointer flex items-center justify-center border border-slate-150 shadow-sm hover:shadow-lg transition-all duration-300"
+                              onClick={() => setVideoOpen('track_expenses')}
+                            >
+                              <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&q=80" alt="Thumbnail 2" className="absolute inset-0 w-full h-full object-cover opacity-75 group-hover:opacity-95 group-hover:scale-103 transition-all duration-350" />
+                              <div className="w-11 h-11 rounded-sm bg-white shadow-xl flex items-center justify-center z-10 text-emerald-600 group-hover:scale-110 transition-transform duration-200">
+                                <Play size={18} fill="currentColor" className="ml-0.5" />
+                              </div>
+                            </div>
+                            <div className="text-[12.5px] font-bold text-slate-700 leading-snug tracking-tight px-1">How to track your expenses efficiently</div>
+                          </div>
+                        </div>
+                      </WidgetShell>
+                    </DraggableWidget>
+                  )}
+                </div>
+              </DragContext.Provider>
             </>
           )}
         </div>

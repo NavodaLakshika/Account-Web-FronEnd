@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import SimpleModal from '../components/SimpleModal';
 import CalendarModal from '../components/CalendarModal';
-import { Search, Calendar, ChevronDown, Check, X, Save, RotateCcw, Loader2, Landmark, Wallet, Layers, Users, Trash2, Plus } from 'lucide-react';
+import { Search, Calendar, ChevronDown, Check, X, Save, RotateCcw, Loader2, Landmark, Wallet, Layers, Users, Trash2, Plus, CheckCircle } from 'lucide-react';
 import { mainCashService } from '../services/mainCash.service';
+import TransactionReceiptModal from '../components/modals/TransactionReceiptModal';
 
 import { getSessionData } from '../utils/session';
 import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
@@ -41,6 +42,8 @@ const MainCashBoard = ({ isOpen, onClose }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [datePickerField, setDatePickerField] = useState('date');
+    const [showReceipt, setShowReceipt] = useState(false);
+    const [receiptData, setReceiptData] = useState(null);
 
     useEffect(() => {
         if (isOpen) {
@@ -127,10 +130,34 @@ const MainCashBoard = ({ isOpen, onClose }) => {
 
         try {
             setLoading(true);
-            await mainCashService.save({ ...formData, items: rows });
+            const resp = await mainCashService.save({ ...formData, items: rows });
             showSuccessToast('Main Cash entry saved successfully!');
+            
+            setReceiptData({
+                type: 'MAIN CASH ENTRY',
+                total: parseFloat(formData.amount) || 0,
+                docNo: resp.orgDocNo || formData.docNo,
+                date: formData.date,
+                payee: formData.payeeName || 'Cash',
+                details: {
+                    header: {
+                        payType: 'Cash',
+                        memo: formData.memo,
+                        costCenter: formData.costCenterName,
+                        bank: formData.accountName
+                    },
+                    expenses: rows.map(r => ({
+                        accCode: `${r.expAccCode} - ${r.expAccName}`,
+                        amount: parseFloat(r.amount) || 0,
+                        memo: r.memo,
+                        costCenter: r.ccCode
+                    }))
+                }
+            });
+            setShowReceipt(true);
+
             handleClear();
-            onClose();
+            // onClose(); // Don't close immediately so they can see the receipt
         } catch (error) {
             showErrorToast(error.toString());
         } finally {
@@ -164,14 +191,13 @@ const MainCashBoard = ({ isOpen, onClose }) => {
                 footer={
                     <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-slate-200 rounded-b-xl">
                         <div className="flex gap-3">
-                            <button onClick={handleClear} disabled={loading} className="px-6 py-3 bg-[#00adff] hover:bg-[#0099e6] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] transition-all active:scale-95 flex items-center justify-center gap-2 border-none">
+                            <button onClick={handleClear} disabled={loading} className="px-6 h-10 bg-[#00adff] text-white text-[13px] font-mono font-bold uppercase tracking-widest rounded-[5px] hover:bg-[#0099e6] transition-all active:scale-95 flex items-center justify-center gap-2 border-none shadow-md shadow-blue-100">
                                 <RotateCcw size={14} /> CLEAR FORM
                             </button>
                         </div>
                         <div className="flex gap-3">
-                            
-                            <button onClick={handleSave} disabled={loading} className={`px-6 py-3 bg-[#0285fd] hover:bg-[#0073ff] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] shadow-md shadow-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border-none ${loading ? 'opacity-50' : ''}`}>
-                                {loading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />} SAVE ENTRY
+                            <button onClick={handleSave} disabled={loading} className={`px-8 h-10 bg-[#2bb744] text-white text-[13px] font-mono font-bold uppercase tracking-widest rounded-[5px] shadow-md shadow-green-100 hover:bg-[#259b3a] transition-all active:scale-95 flex items-center justify-center gap-2 border-none ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                                {loading ? <Loader2 size={14} className="animate-spin" /> : <CheckCircle size={14} />} SAVE ENTRY
                             </button>
                         </div>
                     </div>
@@ -251,7 +277,19 @@ const MainCashBoard = ({ isOpen, onClose }) => {
                             <div className="col-span-12 lg:col-span-5 space-y-3.5">
                                 <div className="flex items-center gap-2">
                                     <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Date</label>
-                                    <input name="date" type="date" value={formData.date} onChange={handleInputChange} className="flex-1 min-w-0 h-8 border border-slate-200 rounded px-3 text-[12px] font-bold outline-none bg-slate-50 text-gray-700 transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" />
+                                    <div className="flex-1 flex gap-1 h-8 min-w-0">
+                                        <input 
+                                            name="date" 
+                                            type="text" 
+                                            readOnly 
+                                            value={formData.date} 
+                                            onClick={() => { setDatePickerField('date'); setShowDatePicker(true); }}
+                                            className="flex-1 min-w-0 h-8 border border-slate-200 rounded px-3 text-[12px] font-bold outline-none bg-slate-50 text-gray-700 transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 cursor-pointer text-center" 
+                                        />
+                                        <button onClick={() => { setDatePickerField('date'); setShowDatePicker(true); }} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
+                                            <Calendar size={14} />
+                                        </button>
+                                    </div>
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Ending Bal</label>
@@ -278,13 +316,9 @@ const MainCashBoard = ({ isOpen, onClose }) => {
                     {/* Tabs & Grid */}
                     <div className="bg-white border border-slate-200 rounded-[5px] flex flex-col min-h-[300px] overflow-hidden">
                         <div className="flex border-b border-slate-200 bg-slate-50/80 overflow-x-auto no-scrollbar">
-                           <button onClick={() => setActiveTab('Expenses')} className={`px-10 py-3 text-[11px] font-bold uppercase tracking-widest flex items-center gap-2 relative transition-all ${activeTab === 'Expenses' ? 'text-[#0285fd] bg-white' : 'text-gray-400 hover:text-gray-600'}`}>
+                           <button className="px-10 py-3 text-[11px] font-bold uppercase tracking-widest flex items-center gap-2 relative transition-all text-[#0285fd] bg-white cursor-default">
                                <Layers size={14} /> Expenses
-                               {activeTab === 'Expenses' && <div className="absolute top-0 left-0 right-0 h-0.5 bg-[#0285fd]" />}
-                           </button>
-                           <button onClick={() => setActiveTab('Cost Center')} className={`px-10 py-3 text-[11px] font-bold uppercase tracking-widest flex items-center gap-2 relative transition-all ${activeTab === 'Cost Center' ? 'text-[#0285fd] bg-white' : 'text-gray-400 hover:text-gray-600'}`}>
-                               <Landmark size={14} /> Cost Center
-                               {activeTab === 'Cost Center' && <div className="absolute top-0 left-0 right-0 h-0.5 bg-[#0285fd]" />}
+                               <div className="absolute top-0 left-0 right-0 h-0.5 bg-[#0285fd]" />
                            </button>
                         </div>
 
@@ -344,7 +378,7 @@ const MainCashBoard = ({ isOpen, onClose }) => {
                                 ))}
                             </div>
                             <div className="p-4 border-t border-slate-200 bg-white">
-                                <button onClick={addRow} className="px-5 py-2 bg-[#0285fd] text-white font-mono font-bold text-[11px] uppercase tracking-widest rounded-[5px] hover:bg-[#0073ff] shadow-md active:scale-95 transition-all flex items-center justify-center gap-2 w-fit">
+                                <button onClick={addRow} className="h-8 px-4 bg-[#22c55e] hover:bg-green-600 text-white rounded-[5px] text-[11px] font-mono font-bold uppercase tracking-widest flex items-center gap-1 active:scale-95 shadow-md disabled:opacity-50 transition-all">
                                     <Plus size={14} /> Add Spend Item
                                 </button>
                             </div>
@@ -428,6 +462,13 @@ const MainCashBoard = ({ isOpen, onClose }) => {
                     </div>
                 </div>
             </SimpleModal>
+
+            {showReceipt && receiptData && (
+                <TransactionReceiptModal 
+                    selectedTx={receiptData}
+                    onClose={() => setShowReceipt(false)}
+                />
+            )}
         </>
     );
 };

@@ -113,7 +113,11 @@ const BankReconciliationBoard = ({ isOpen, onClose }) => {
 
             setHeader(prev => ({ ...prev, openingBalance: obData.openingBalance }));
             setTransactions(txData);
-            showSuccessToast('Ledger records synchronized');
+            if (txData.debits.length === 0 && txData.credits.length === 0) {
+                showErrorToast('No new transactions found for this period');
+            } else {
+                showSuccessToast('Ledger records synchronized');
+            }
         } catch (error) {
             showErrorToast('Failed to sync bank records');
         } finally {
@@ -148,32 +152,22 @@ const BankReconciliationBoard = ({ isOpen, onClose }) => {
         return { recDebit, recCredit, clearedBalance, difference };
     }, [transactions, header.openingBalance, header.endingBalance]);
 
-    const setDateRange = (type) => {
-        const now = new Date();
-        let from, to;
-        const fmt = (d) => d.toLocaleDateString('en-GB');
-
-        if (type === 'today') {
-            from = to = now;
-        } else if (type === 'yesterday') {
-            from = to = new Date(new Date().setDate(now.getDate() - 1));
-        } else if (type === 'thisMonth') {
-            from = new Date(now.getFullYear(), now.getMonth(), 1);
-            to = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-        } else if (type === 'lastMonth') {
-            from = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-            to = new Date(now.getFullYear(), now.getMonth(), 0);
+    // Auto-clear when opened
+    useEffect(() => {
+        if (isOpen) {
+            handleReset();
         }
+    }, [isOpen, companyCode]);
 
-        setHeader(prev => ({ ...prev, dateFrom: fmt(from), dateTo: fmt(to) }));
+    const handleReset = () => {
+        setHeader(getInitialHeader());
+        setTransactions({ debits: [], credits: [] });
+        generateDocNo(companyCode);
     };
 
     const handleApply = async () => {
-        if (Math.abs(totals.difference) > 0.01) {
-            return showErrorToast(`Cannot apply reconciliation. Difference must be zero. Current: ${totals.difference.toFixed(2)}`);
-        }
-
-        setIsApplying(true);
+        if (totals.difference !== 0) return;
+        setLoading(true);
         try {
             await bankingService.applyRecon({
                 docNo: header.docNo,
@@ -185,63 +179,63 @@ const BankReconciliationBoard = ({ isOpen, onClose }) => {
                 clearedBalance: totals.clearedBalance,
                 difference: totals.difference
             });
-            showSuccessToast('Bank Reconciliation Finalized');
-            onClose();
-        } catch (error) {
-            showErrorToast(error.toString());
+            showSuccessToast("Bank Reconciliation applied successfully!");
+            handleReset(); // Auto clear after apply
+        } catch (err) {
+            alert(err);
         } finally {
-            setIsApplying(false);
+            setLoading(false);
         }
     };
 
     const renderGrid = (title, type, items, icon, color) => (
         <div className="flex-1 flex flex-col bg-white border border-slate-200 rounded-[5px] shadow-sm overflow-hidden min-h-[450px]">
-            <div className={`p-3 border-b border-slate-200 flex items-center justify-between bg-slate-50`}>
+            <div className={`p-2.5 border-b border-slate-200 flex items-center justify-between bg-slate-50`}>
                 <div className="flex items-center gap-2">
-                    <div className={`p-1.5 rounded bg-${color}-50 text-${color}-600`}>{icon}</div>
-                    <span className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">{title}</span>
+                    <div className={`p-1 rounded bg-${color}-50 text-${color}-600`}>{icon}</div>
+                    <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">{title}</span>
                 </div>
-                <div className="text-[12px] font-bold text-slate-700">
+                <div className="text-[11px] font-bold text-slate-700">
                     {items.filter(i => i.chk).length} / {items.length} Selected
                 </div>
             </div>
             <div className="flex-1 overflow-y-auto no-scrollbar">
                 <table className="w-full text-left text-[11px]">
-                    <thead className="bg-slate-50 sticky top-0 border-b border-slate-200 text-gray-400 font-bold uppercase tracking-widest z-10 text-[10px]">
+                    <thead className="bg-slate-50 sticky top-0 border-b border-slate-200 text-gray-400 font-bold uppercase tracking-widest z-10 text-[9px]">
                         <tr>
-                            <th className="px-4 py-3 w-10 text-center">Recon</th>
-                            <th className="px-4 py-3">Date</th>
-                            <th className="px-4 py-3">Doc/CHQ</th>
-                            <th className="px-4 py-3 text-right">Amount</th>
+                            <th className="px-3 py-2 w-12 text-center">Recon</th>
+                            <th className="px-3 py-2">Date</th>
+                            <th className="px-3 py-2">Doc/CHQ</th>
+                            <th className="px-3 py-2 text-right">Amount</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100">
                         {items.map((item, i) => (
                             <tr key={i} onClick={() => toggleCheck(type, i)} className={`group cursor-pointer transition-colors ${item.chk ? 'bg-emerald-50/30' : 'hover:bg-slate-50'}`}>
-                                <td className="px-4 py-2 flex items-center justify-center">
-                                    <div className={`w-4 h-4 rounded border flex items-center justify-center transition-all ${item.chk ? 'bg-[#00D1FF] border-[#00D1FF] text-white' : 'border-slate-300 group-hover:border-[#00D1FF]'}`}>
-                                        {item.chk && <CheckCircle size={10} />}
+                                <td className="px-3 py-1.5 text-center align-middle">
+                                    <div className={`mx-auto w-3.5 h-3.5 rounded border flex items-center justify-center transition-all ${item.chk ? 'bg-[#00D1FF] border-[#00D1FF] text-white' : 'border-slate-300 group-hover:border-[#00D1FF]'}`}>
+                                        {item.chk && <CheckCircle size={8} />}
                                     </div>
                                 </td>
-                                <td className="px-4 py-2 font-mono font-bold text-slate-500">{item.date}</td>
-                                <td className="px-4 py-2">
-                                    <div className="font-bold text-slate-700 truncate max-w-[150px]">{item.docNo}</div>
-                                    <div className="text-[10px] font-bold text-slate-400">{item.chqNo || 'No CHQ'}</div>
+                                <td className="px-3 py-1.5 font-mono font-bold text-slate-500">{item.date}</td>
+                                <td className="px-3 py-1.5">
+                                    <div className="font-bold text-slate-700 truncate max-w-[120px]">{item.docNo}</div>
+                                    <div className="text-[9px] font-bold text-slate-400">{item.chqNo || 'No CHQ'}</div>
                                 </td>
-                                <td className={`px-4 py-2 text-right font-mono font-black ${type === 'credits' ? 'text-rose-600' : 'text-emerald-600'}`}>
+                                <td className={`px-3 py-1.5 text-right font-mono font-black ${type === 'credits' ? 'text-rose-600' : 'text-emerald-600'}`}>
                                     {(type === 'debits' ? item.debit : item.credit).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                 </td>
                             </tr>
                         ))}
                         {items.length === 0 && (
-                            <tr><td colSpan={4} className="py-20 text-center text-slate-300 font-bold uppercase opacity-50">No {title} Found</td></tr>
+                            <tr><td colSpan={4} className="py-10 text-center text-slate-300 font-bold uppercase opacity-50 text-[10px]">No {title} Found</td></tr>
                         )}
                     </tbody>
                 </table>
             </div>
-            <div className="p-3 bg-slate-50 border-t border-slate-200 flex justify-between items-center font-black">
-                <span className="text-[10px] text-gray-400 uppercase">Subtotal Reconciled</span>
-                <span className={`text-[13px] ${type === 'credits' ? 'text-rose-600' : 'text-emerald-600'}`}>
+            <div className="p-2.5 bg-slate-50 border-t border-slate-200 flex justify-between items-center font-black">
+                <span className="text-[9px] text-gray-400 uppercase">Subtotal Reconciled</span>
+                <span className={`text-[12px] ${type === 'credits' ? 'text-rose-600' : 'text-emerald-600'}`}>
                     {(type === 'debits' ? totals.recDebit : totals.recCredit).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                 </span>
             </div>
@@ -258,148 +252,133 @@ const BankReconciliationBoard = ({ isOpen, onClose }) => {
                     }
                 `}
             </style>
-            <SimpleModal isOpen={isOpen} onClose={onClose} title="Bank Reconciliation Board" maxWidth="max-w-[1600px]"
+            <SimpleModal isOpen={isOpen} onClose={onClose} title="Bank Reconciliation Board" maxWidth="max-w-[1536px]"
                 footer={
                     <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-slate-200 rounded-b-[5px]">
                         <div className="flex gap-4">
-                            <button onClick={() => window.location.reload()} className="px-6 h-10 bg-white text-slate-500 text-[13px] font-mono font-bold tracking-widest uppercase rounded-[5px] border border-slate-200 hover:bg-slate-50 transition-all flex items-center gap-2">
+                            <button onClick={handleReset} className="px-6 h-10 bg-white text-slate-500 text-[13px] font-mono font-bold tracking-widest uppercase rounded-[5px] border border-slate-200 hover:bg-slate-50 transition-all flex items-center gap-2">
                                 <RotateCcw size={14} /> RESET FORM
                             </button>
                             <button onClick={loadData} disabled={loading} className="px-6 h-10 bg-white text-blue-600 border border-blue-200 text-[13px] font-mono font-bold tracking-widest uppercase rounded-[5px] hover:bg-blue-50 transition-all flex items-center gap-2 active:scale-95">
-                                {loading ? <Loader2 size={14} className="animate-spin" /> : <ListChecks size={14} />} SYNC RECORDS
+                                {loading ? <Loader2 size={14} className="animate-spin" /> : <Search size={14} />} SYNC RECORDS
                             </button>
                         </div>
-                        <div className="flex items-center gap-8">
-                            <div className="text-right">
-                                <div className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Difference</div>
-                                <div className={`text-[20px] font-mono font-black leading-none ${Math.abs(totals.difference) < 0.01 ? 'text-emerald-600' : 'text-rose-600'}`}>
-                                    {totals.difference.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                                </div>
-                            </div>
-                            <button onClick={handleApply} disabled={isApplying || loading || Math.abs(totals.difference) > 0.01}
-                                className={`px-12 h-10 bg-[#2bb744] text-white text-[13px] font-mono font-bold tracking-widest uppercase rounded-[5px] shadow-md shadow-green-100 hover:bg-[#259b3a] transition-all flex items-center gap-2 border-none ${isApplying || loading || Math.abs(totals.difference) > 0.01 ? 'opacity-50 grayscale cursor-not-allowed' : 'active:scale-95'}`}
-                            >
-                                {isApplying ? <Loader2 size={14} className="animate-spin" /> : <CheckCircle2 size={14} />} FINALIZE RECONCILIATION
-                            </button>
-                        </div>
+                        <button onClick={handleApply} disabled={loading || totals.difference !== 0} className={`px-8 h-10 text-white text-[13px] font-mono font-bold tracking-widest uppercase rounded-[5px] transition-all flex items-center gap-2 ${totals.difference === 0 && !loading ? 'bg-[#2bb744] hover:bg-[#249e39] shadow-md shadow-[#2bb744]/20 active:scale-95' : 'bg-slate-300 cursor-not-allowed opacity-70'}`}>
+                            {loading ? <Loader2 size={14} className="animate-spin" /> : <CheckCircle2 size={14} />} FINALIZE RECONCILIATION
+                        </button>
                     </div>
                 }
             >
-                <div className="p-1 space-y-4 font-['Tahoma'] overflow-y-auto max-h-[calc(100vh-200px)] no-scrollbar">
-                    {/* Header Controls */}
-                    <div className="bg-white p-4 border border-slate-200 rounded-[5px] shadow-sm grid grid-cols-12 gap-6">
-                        <div className="col-span-12 lg:col-span-3">
-                            <label className="text-[11px] font-bold text-gray-500 uppercase tracking-widest mb-1.5 block">Recon Reference</label>
-                            <div className=" text-[11px] h-8 px-3 bg-slate-50 border border-slate-200 rounded flex items-center justify-between font-mono font-bold text-blue-600">
-                                <span>{header.docNo}</span>
-                                <span className="text-[9px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded uppercase tracking-tighter">{currentUser}</span>
-                            </div>
-                        </div>
+                <div className="p-2 space-y-4 font-['Tahoma'] overflow-y-auto max-h-[calc(100vh-200px)] no-scrollbar">
+                    
+                    {/* Top Configuration & Statement Setup */}
+                    <div className="bg-white p-3 border border-slate-200 rounded-[5px] shadow-sm flex flex-col gap-3">
                         
-                        <div className="col-span-12 lg:col-span-4">
-                            <label className="text-[11px] font-bold text-gray-500 uppercase tracking-widest mb-1.5 block">Select Bank Account</label>
-                            <div className="flex gap-1.5 h-8">
-                                <div onClick={() => setActiveModal('bank')} className="flex-1 px-3 border border-slate-200 rounded flex items-center justify-between cursor-pointer focus-within:border-[#00D1FF] focus-within:ring-2 focus-within:ring-[#00D1FF]/20 bg-white group transition-all shadow-sm">
-                                    <div className="flex items-center gap-3">
-                                        <Landmark size={14} className="text-slate-300 group-hover:text-blue-500" />
-                                        <span className="text-[12px] font-bold text-slate-700 uppercase truncate">
-                                            {header.bankId ? `${header.bankId} - ${header.bankName}` : 'Select target bank account...'}
-                                        </span>
-                                    </div>
-                                    <ChevronDown size={14} className="text-slate-300" />
-                                </div>
-                                <button onClick={() => setActiveModal('bank')} className="w-9 bg-[#0285fd] text-white flex items-center justify-center rounded hover:bg-[#0073ff] transition-all shadow-sm">
-                                    <Search size={14} />
-                                </button>
+                        <div className="flex justify-between items-center mb-1">
+                            <span className="text-[11px] font-black text-slate-400 uppercase tracking-widest">Statement Setup</span>
+                            <div className="bg-slate-50 px-3 py-1 rounded-[5px] border border-slate-200 flex items-center gap-2">
+                                <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Recon Ref:</span>
+                                <span className="text-[10px] font-mono font-bold text-blue-500">{header.docNo}</span>
+                                <span className="text-[8px] bg-blue-100 text-blue-700 px-1 py-0.5 rounded uppercase">{currentUser}</span>
                             </div>
                         </div>
 
-                        <div className="col-span-12 lg:col-span-5 grid grid-cols-12 gap-4">
-                            <div className="col-span-6">
-                                <label className="text-[11px] font-bold text-gray-500 uppercase tracking-widest mb-1.5 block">Period From</label>
-                                <div className="flex h-8 gap-1.5">
-                                    <div onClick={() => setActiveModal('dateFrom')} className="flex-1 px-3 border border-slate-200 rounded flex items-center justify-center cursor-pointer hover:border-[#00D1FF] bg-white group shadow-sm transition-all">
-                                        <span className="text-[12px] font-bold text-slate-700">{header.dateFrom}</span>
+                        <div className="grid grid-cols-12 gap-4">
+                            <div className="col-span-12 lg:col-span-4">
+                                <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1 block">Select Bank Account</label>
+                                <div className="flex gap-1.5 h-8">
+                                    <div onClick={() => setActiveModal('bank')} className="flex-1 px-3 border border-slate-200 rounded flex items-center justify-between cursor-pointer focus-within:border-[#00D1FF] bg-slate-50 hover:bg-white group transition-all shadow-sm">
+                                        <div className="flex items-center gap-3">
+                                            <Landmark size={14} className="text-blue-500" />
+                                            <span className="text-[12px] font-bold text-slate-700 uppercase truncate">
+                                                {header.bankId ? `${header.bankId} - ${header.bankName}` : 'Select bank account...'}
+                                            </span>
+                                        </div>
+                                        <ChevronDown size={14} className="text-slate-300" />
                                     </div>
-                                    <button onClick={() => setActiveModal('dateFrom')} className="w-9 bg-[#0285fd] text-white flex items-center justify-center rounded hover:bg-[#0073ff] transition-all shadow-sm active:scale-90 shrink-0">
-                                        <Calendar size={14} />
-                                    </button>
                                 </div>
                             </div>
-                            <div className="col-span-6">
-                                <label className="text-[11px] font-bold text-gray-500 uppercase tracking-widest mb-1.5 block">Period To</label>
-                                <div className="flex h-8 gap-1.5">
-                                    <div onClick={() => setActiveModal('dateTo')} className="flex-1 px-3 border border-slate-200 rounded flex items-center justify-center cursor-pointer hover:border-[#00D1FF] bg-white group shadow-sm transition-all">
-                                        <span className="text-[12px] font-bold text-slate-700">{header.dateTo}</span>
+                            
+                            <div className="col-span-12 lg:col-span-4 grid grid-cols-2 gap-2">
+                                <div>
+                                    <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1 block">Period From</label>
+                                    <div onClick={() => setActiveModal('dateFrom')} className="h-8 px-3 border border-slate-200 rounded flex items-center justify-between cursor-pointer bg-slate-50 hover:bg-white transition-all shadow-sm text-blue-600">
+                                        <span className="text-[11px] font-bold font-mono">{header.dateFrom}</span>
+                                        <Calendar size={12} className="text-slate-400" />
                                     </div>
-                                    <button onClick={() => setActiveModal('dateTo')} className="w-9 bg-[#0285fd] text-white flex items-center justify-center rounded hover:bg-[#0073ff] transition-all shadow-sm active:scale-90 shrink-0">
-                                        <Calendar size={14} />
-                                    </button>
+                                </div>
+                                <div>
+                                    <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1 block">Period To</label>
+                                    <div onClick={() => setActiveModal('dateTo')} className="h-8 px-3 border border-slate-200 rounded flex items-center justify-between cursor-pointer bg-slate-50 hover:bg-white transition-all shadow-sm text-blue-600">
+                                        <span className="text-[11px] font-bold font-mono">{header.dateTo}</span>
+                                        <Calendar size={12} className="text-slate-400" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="col-span-12 lg:col-span-4 grid grid-cols-2 gap-2">
+                                <div>
+                                    <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1 block">Statement Date</label>
+                                    <div onClick={() => setActiveModal('statementDate')} className="h-8 px-3 border border-slate-200 rounded flex items-center justify-between cursor-pointer bg-white transition-all shadow-sm text-slate-700">
+                                        <span className="text-[11px] font-bold font-mono">{header.statementDate}</span>
+                                        <Calendar size={12} className="text-blue-500" />
+                                    </div>
+                                </div>
+                                <div>
+                                    <label className="text-[10px] font-black text-rose-500 uppercase tracking-widest mb-1 block">Statement Ending Bal</label>
+                                    <input 
+                                        type="number" value={header.endingBalance} onChange={e => setHeader({...header, endingBalance: parseFloat(e.target.value) || 0})}
+                                        className="w-full bg-rose-50 border border-rose-200 h-8 rounded px-2 text-[13px] font-mono font-black text-rose-700 outline-none focus:border-rose-400 focus:ring-1 focus:ring-rose-400 transition-all text-right shadow-sm"
+                                        placeholder="0.00"
+                                    />
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    {/* Dashboard Summary Section */}
-                    <div className="grid grid-cols-12 gap-4">
-                        <div className="col-span-12 lg:col-span-3 flex flex-col gap-2">
-                            <label className="text-[11px] font-bold text-gray-500 uppercase tracking-widest mb-1.5 block">Quick Ranges</label>
-                            <div className="grid grid-cols-2 gap-2">
-                                <button onClick={() => setDateRange('today')} className="h-8 bg-white hover:bg-slate-50 text-[10px] font-bold uppercase tracking-widest text-slate-500 hover:text-blue-600 rounded-[5px] border border-slate-200 transition-all shadow-sm">Today</button>
-                                <button onClick={() => setDateRange('yesterday')} className="h-8 bg-white hover:bg-slate-50 text-[10px] font-bold uppercase tracking-widest text-slate-500 hover:text-blue-600 rounded-[5px] border border-slate-200 transition-all shadow-sm">Yesterday</button>
-                                <button onClick={() => setDateRange('thisMonth')} className="h-8 bg-white hover:bg-slate-50 text-[10px] font-bold uppercase tracking-widest text-slate-500 hover:text-blue-600 rounded-[5px] border border-slate-200 transition-all shadow-sm">This Month</button>
-                                <button onClick={() => setDateRange('lastMonth')} className="h-8 bg-white hover:bg-slate-50 text-[10px] font-bold uppercase tracking-widest text-slate-500 hover:text-blue-600 rounded-[5px] border border-slate-200 transition-all shadow-sm">Last Month</button>
-                            </div>
-                        </div>
-                        <div className="col-span-12 lg:col-span-6 grid grid-cols-4 gap-3">
-                            <div className="bg-slate-50 p-3 rounded-[5px] border border-slate-200 flex flex-col justify-center">
+                    {/* Summary & Difference Dashboard */}
+                    <div className="grid grid-cols-12 gap-3">
+                        <div className="col-span-12 lg:col-span-8 flex gap-2">
+                            <div className="flex-1 bg-slate-50 p-3 rounded-[5px] border border-slate-200 flex flex-col justify-center">
                                 <div className="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-1">Opening Balance</div>
-                                <div className="text-[16px] font-mono font-black text-slate-700">{header.openingBalance.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
+                                <div className="text-[15px] font-mono font-black text-slate-700">{header.openingBalance.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
                             </div>
-                            <div className="bg-emerald-50/30 p-3 rounded-[5px] border border-emerald-100 flex flex-col justify-center">
+                            <div className="flex items-center justify-center text-slate-300 font-black">+</div>
+                            <div className="flex-1 bg-emerald-50/30 p-3 rounded-[5px] border border-emerald-100 flex flex-col justify-center">
                                 <div className="text-[9px] font-black text-emerald-600 uppercase tracking-widest mb-1 flex items-center gap-1">
-                                    <ArrowDownLeft size={10} /> Reconciled Deposits
+                                    <ArrowDownLeft size={10} /> Deposits
                                 </div>
-                                <div className="text-[16px] font-mono font-black text-emerald-700">{totals.recDebit.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
+                                <div className="text-[15px] font-mono font-black text-emerald-700">{totals.recDebit.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
                             </div>
-                            <div className="bg-rose-50/30 p-3 rounded-[5px] border border-rose-100 flex flex-col justify-center">
+                            <div className="flex items-center justify-center text-slate-300 font-black">-</div>
+                            <div className="flex-1 bg-rose-50/30 p-3 rounded-[5px] border border-rose-100 flex flex-col justify-center">
                                 <div className="text-[9px] font-black text-rose-600 uppercase tracking-widest mb-1 flex items-center gap-1">
-                                    <ArrowUpRight size={10} /> Reconciled Payments
+                                    <ArrowUpRight size={10} /> Payments
                                 </div>
-                                <div className="text-[16px] font-mono font-black text-rose-700">{totals.recCredit.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
+                                <div className="text-[15px] font-mono font-black text-rose-700">{totals.recCredit.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
                             </div>
-                            <div className="bg-blue-50/30 p-3 rounded-[5px] border border-blue-100 flex flex-col justify-center">
-                                <div className="text-[9px] font-black text-blue-600 uppercase tracking-widest mb-1">Cleared Ledger Balance</div>
-                                <div className="text-[16px] font-mono font-black text-blue-700">{totals.clearedBalance.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
+                            <div className="flex items-center justify-center text-blue-300 font-black">=</div>
+                            <div className="flex-1 bg-blue-50 p-3 rounded-[5px] border border-blue-200 flex flex-col justify-center shadow-inner">
+                                <div className="text-[9px] font-black text-blue-600 uppercase tracking-widest mb-1">Cleared Ledger Bal</div>
+                                <div className="text-[15px] font-mono font-black text-blue-700">{totals.clearedBalance.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
                             </div>
                         </div>
 
-                        <div className="col-span-12 lg:col-span-3 bg-white p-3.5 rounded-[5px] shadow-sm flex flex-col gap-3 border border-slate-200">
-                            <div className="flex-1">
-                                <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1 block">Statement Ending Balance</label>
-                                <input 
-                                    type="number" value={header.endingBalance} onChange={e => setHeader({...header, endingBalance: parseFloat(e.target.value) || 0})}
-                                    className="w-full bg-slate-50 border border-slate-200 h-8 rounded px-3 text-[14px] font-mono font-black text-slate-800 outline-none focus:border-[#00D1FF] transition-all text-right shadow-sm"
-                                />
+                        {/* MASSIVE DIFFERENCE INDICATOR */}
+                        <div className={`col-span-12 lg:col-span-4 p-3 rounded-[5px] border flex flex-col justify-center items-center shadow-inner transition-all duration-500 ${totals.difference === 0 ? 'bg-[#2bb744]/10 border-[#2bb744]/30' : 'bg-red-50 border-red-200'}`}>
+                            <div className={`text-[10px] font-black uppercase tracking-widest mb-0.5 ${totals.difference === 0 ? 'text-[#2bb744]' : 'text-red-500'}`}>
+                                {totals.difference === 0 ? 'PERFECTLY BALANCED' : 'DIFFERENCE TO RECONCILE'}
                             </div>
-                            <div className="flex-1">
-                                <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1 block">Statement Date</label>
-                                <div className="flex h-8 gap-1.5">
-                                    <div onClick={() => setActiveModal('statementDate')} className="flex-1 px-3 border border-slate-200 rounded flex items-center justify-center cursor-pointer hover:border-[#00D1FF] bg-white group shadow-sm transition-all text-center">
-                                        <span className="text-[12px] font-bold text-slate-700">{header.statementDate}</span>
-                                    </div>
-                                    <button onClick={() => setActiveModal('statementDate')} className="w-9 bg-[#0285fd] text-white flex items-center justify-center rounded hover:bg-[#0073ff] transition-all shadow-sm active:scale-90 shrink-0">
-                                        <Calendar size={14} />
-                                    </button>
-                                </div>
+                            <div className={`text-[24px] font-mono font-black tracking-tight ${totals.difference === 0 ? 'text-[#2bb744]' : 'text-red-600'}`}>
+                                {Math.abs(totals.difference).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                             </div>
                         </div>
                     </div>
 
                     {/* Transaction Grids Side-by-Side */}
-                    <div className="flex gap-6 min-h-0 flex-1">
-                        {renderGrid("Deposits & Transfers (Debits)", "debits", transactions.debits, <ArrowDownLeft size={14} />, "emerald")}
-                        {renderGrid("Payments & Withdrawals (Credits)", "credits", transactions.credits, <ArrowUpRight size={14} />, "rose")}
+                    <div className="flex gap-4 min-h-0 flex-1 pt-2">
+                        {renderGrid("Uncleared Deposits & Transfers", "debits", transactions.debits, <ArrowDownLeft size={12} />, "emerald")}
+                        {renderGrid("Uncleared Payments & Withdrawals", "credits", transactions.credits, <ArrowUpRight size={12} />, "rose")}
                     </div>
                 </div>
             </SimpleModal>

@@ -1,14 +1,14 @@
 import api from './api';
 
 export const customerReceiptService = {
-  getInitData: async (company, type = 'MM') => {
+  getInitData: async (company, type = 'All') => {
     try {
       const response = await api.get('/ReceivePayment/lookups', { params: { company, type } });
       return response.data;
     } catch (error) { throw error; }
   },
 
-  getOutstanding: async (customerId, company, docNo, accountType = 'MM') => {
+  getOutstanding: async (customerId, company, docNo, accountType = 'All') => {
     try {
       const response = await api.get('/ReceivePayment/outstanding', { 
         params: { customerId, company, docNo, accountType } 
@@ -17,7 +17,7 @@ export const customerReceiptService = {
     } catch (error) { throw error; }
   },
 
-  updateRow: async (item, company, docNo, customerId, accountType = 'MM') => {
+  updateRow: async (item, company, docNo, customerId, accountType = 'All') => {
     try {
       const response = await api.post('/ReceivePayment/update-row', item, { 
         params: { company, docNo, customerId, accountType } 

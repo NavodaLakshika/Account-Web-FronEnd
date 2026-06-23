@@ -9,7 +9,7 @@ import { customerReceiptService } from '../services/customerReceipt.service';
 import { salesOrderService } from '../services/salesOrder.service'; // For customer lookup initially
 import { getSessionData } from '../utils/session';
 import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
-
+import TransactionReceiptModal from '../components/modals/TransactionReceiptModal';
 
 const CustomerReceiptBoard = ({ isOpen, onClose }) => {
     const { companyCode, userName } = getSessionData();
@@ -51,6 +51,7 @@ const CustomerReceiptBoard = ({ isOpen, onClose }) => {
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [datePickerField, setDatePickerField] = useState('date');
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    const [receiptTx, setReceiptTx] = useState(null);
 
     // Search Queries
     const [customerSearchQuery, setCustomerSearchQuery] = useState('');
@@ -80,20 +81,12 @@ const CustomerReceiptBoard = ({ isOpen, onClose }) => {
             } catch (e) { console.warn("Failed to load sales order fallback data:", e); }
 
             try {
-                invData = await customerReceiptService.getInitData(company, "MM");
+                invData = await customerReceiptService.getInitData(company, "All");
             } catch (e) { console.warn("Failed to load receipt init data:", e); }
-            
-            // Generate standard payment methods if API doesn't return them directly in lookups
-            const paymentMethods = [
-                { code: 'CASH', name: 'Cash Payment' },
-                { code: 'CHQ', name: 'Cheque Payment' },
-                { code: 'CARD', name: 'Credit Card' },
-                { code: 'BANK', name: 'Bank Transfer' }
-            ];
 
             setLookups({
                 customers: invData.customers?.length > 0 ? invData.customers : (soData.customers || []),
-                paymentMethods: paymentMethods,
+                paymentMethods: invData.paymentMethods?.length > 0 ? invData.paymentMethods : [],
                 banks: invData.banks?.length > 0 ? invData.banks : [],
                 costCenters: invData.costCenters?.length > 0 ? invData.costCenters : (soData.costCenters || [])
             });
@@ -173,13 +166,23 @@ const CustomerReceiptBoard = ({ isOpen, onClose }) => {
                 payment: inv.payment,
                 discount: inv.discount,
                 setOff: inv.setOff
-            }, formData.company, formData.docNo, formData.customerId, formData.accountType);
+            }, formData.company, formData.docNo, formData.customerId, "All");
         } catch (e) { console.error("Row Update Fail:", e); }
     };
 
     const totalAllocated = useMemo(() => invoices.reduce((acc, inv) => acc + (inv.selected ? inv.payment : 0), 0), [invoices]);
     const totalDiscount = useMemo(() => invoices.reduce((acc, inv) => acc + (inv.selected ? inv.discount : 0), 0), [invoices]);
     const totalSetOff = useMemo(() => invoices.reduce((acc, inv) => acc + (inv.selected ? inv.setOff : 0), 0), [invoices]);
+
+    useEffect(() => {
+        const receivedAmount = parseFloat(formData.amount) || 0;
+        const allocated = totalAllocated;
+        if (receivedAmount > allocated) {
+            setOverPayment(receivedAmount - allocated);
+        } else {
+            setOverPayment(0);
+        }
+    }, [formData.amount, totalAllocated]);
 
     const handleClear = () => {
         setFormData(prev => ({
@@ -194,14 +197,8 @@ const CustomerReceiptBoard = ({ isOpen, onClose }) => {
     };
 
     const handleSelectAll = async () => {
-        let remaining = parseFloat(formData.amount);
         const newInvoices = [...invoices].map(inv => {
-            let payment = 0;
-            if (remaining > 0) {
-                payment = Math.min(inv.balance, remaining);
-                remaining -= payment;
-            }
-            return { ...inv, selected: payment > 0, payment };
+            return { ...inv, selected: true, payment: inv.balance };
         });
         setInvoices(newInvoices);
         for (const inv of newInvoices) {
@@ -229,10 +226,46 @@ const CustomerReceiptBoard = ({ isOpen, onClose }) => {
                 bankName: lookups.banks.find(b => (b.bank_Code || b.Bank_Code) === formData.bankCode)?.bank_Name || lookups.banks.find(b => (b.bank_Code || b.Bank_Code) === formData.bankCode)?.Bank_Name || '',
                 bankId: formData.bankCode,
                 branch: formData.branchCode,
-                accountType: "MM"
+                accountType: "All",
+                overPayment: overPayment
             };
-            await customerReceiptService.apply(payload);
+            const response = await customerReceiptService.apply(payload);
             showSuccessToast("Payment Applied Successfully");
+
+            // Format receipt data
+            setReceiptTx({
+                type: 'CUSTOMER RECEIPT',
+                docNo: response.docNo || formData.docNo,
+                date: formData.date,
+                payee: lookups.customers.find(c => (c.code || c.Code) === formData.customerId)?.name || lookups.customers.find(c => (c.code || c.Code) === formData.customerId)?.Cust_Name || '',
+                total: parseFloat(formData.amount),
+                details: {
+                    header: {
+                        memo: formData.memo,
+                        customerCode: formData.customerId,
+                        refNo: formData.reference,
+                        postDate: formData.date,
+                        payType: formData.payType,
+                        bank: lookups.banks?.find(b => (b.bank_Code || b.Bank_Code) === formData.bankCode)?.bank_Name || lookups.banks?.find(b => (b.bank_Code || b.Bank_Code) === formData.bankCode)?.Bank_Name || formData.bankCode || '',
+                        branch: formData.branchCode,
+                        chequeNo: formData.chequeNo,
+                        chequeDate: formData.chequeDate,
+                        costCenter: (() => {
+                            const cc = lookups.costCenters?.find(c => (c.code || c.Code || c.CostCenterCode || c.costCenterCode) === formData.costCenter);
+                            return cc ? (cc.name || cc.Name || cc.CostCenterName || cc.costCenterName || '') : formData.costCenter;
+                        })(),
+                        discountAmount: totalDiscount,
+                        setOff: totalSetOff,
+                        overPayment: overPayment
+                    },
+                    expenses: invoices.filter(i => i.selected && i.payment > 0).map(i => ({
+                        accCode: i.doc_No,
+                        memo: i.ref_No || '',
+                        amount: i.payment
+                    }))
+                }
+            });
+
             handleClear();
         } catch (error) {
             showErrorToast(error.message);
@@ -261,6 +294,11 @@ const CustomerReceiptBoard = ({ isOpen, onClose }) => {
         }
     };
 
+    const handleReceiptClose = () => {
+        setReceiptTx(null);
+        if (onClose) onClose();
+    };
+
     const handleSave = async () => {
         if (!formData.customerId) return showErrorToast("Please select a customer");
         
@@ -272,7 +310,7 @@ const CustomerReceiptBoard = ({ isOpen, onClose }) => {
                 bankName: lookups.banks.find(b => (b.bank_Code || b.Bank_Code) === formData.bankCode)?.bank_Name || lookups.banks.find(b => (b.bank_Code || b.Bank_Code) === formData.bankCode)?.Bank_Name || '',
                 bankId: formData.bankCode,
                 branch: formData.branchCode,
-                accountType: "MM",
+                accountType: "All",
                 totalAllocated: totalAllocated
             };
             await customerReceiptService.saveDraft(payload);
@@ -441,7 +479,10 @@ const CustomerReceiptBoard = ({ isOpen, onClose }) => {
                                     <input
                                         type="text"
                                         readOnly
-                                        value={lookups.costCenters?.find(c => (c.CostCenterCode || c.costCenterCode) === formData.costCenter)?.CostCenterName || lookups.costCenters?.find(c => (c.CostCenterCode || c.costCenterCode) === formData.costCenter)?.costCenterName || ''}
+                                        value={(() => {
+                                            const cc = lookups.costCenters?.find(c => (c.code || c.Code || c.CostCenterCode || c.costCenterCode) === formData.costCenter);
+                                            return cc ? (cc.name || cc.Name || cc.CostCenterName || cc.costCenterName || '') : '';
+                                        })()}
                                         className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-mono font-bold text-gray-700 bg-slate-50 rounded outline-none shadow-sm cursor-pointer"
                                         onClick={() => setShowCostCenterSearch(true)}
                                     />
@@ -533,75 +574,48 @@ const CustomerReceiptBoard = ({ isOpen, onClose }) => {
                     {/* Actions and Summary Section */}
                     <div className="grid grid-cols-12 gap-4 mt-2">
                         {/* Left Side: Buttons & Memo */}
-                        <div className="col-span-4 flex flex-col gap-2">
-                            <div className="flex gap-2">
-                                <div className="flex flex-col gap-2 border border-[#0285fd] p-1.5 rounded-sm relative mt-2">
-                                    <span className="absolute -top-[10px] left-2 bg-white text-[10px] px-1 font-mono font-bold text-[#0285fd]">Bill Reference</span>
-                                    <button onClick={handleSelectAll} className="h-7 px-3 bg-white border border-[#0285fd] hover:bg-blue-50 text-[#0285fd] text-[11px] font-bold shadow-sm active:scale-95 transition-all">Select All Bill</button>
-                                    <button className="h-7 px-3 bg-white border border-[#0285fd] hover:bg-blue-50 text-[#0285fd] text-[11px] font-bold shadow-sm active:scale-95 transition-all">Go To Bill</button>
-                                </div>
-                                <div className="flex flex-col gap-2 pt-2">
-                                    <button onClick={handleClearSelections} className="h-7 px-4 bg-white border border-gray-400 hover:bg-gray-50 text-gray-700 text-[11px] font-bold shadow-sm active:scale-95 transition-all">Clear Selections</button>
-                                    <button className="h-7 px-4 bg-white border border-gray-400 hover:bg-gray-50 text-gray-700 text-[11px] font-bold shadow-sm active:scale-95 transition-all">Set Discount</button>
-                                </div>
-                                <div className="flex flex-col gap-2 pt-2">
-                                    <button className="h-7 px-4 bg-white border border-gray-400 hover:bg-gray-50 text-gray-700 text-[11px] font-bold shadow-sm active:scale-95 transition-all mt-[36px]">Set off Over</button>
+                        <div className="col-span-4 flex flex-col gap-3">
+                            <div className="flex flex-col gap-3 border border-[#0285fd]/30 bg-blue-50/20 p-3 rounded-md relative mt-2">
+                                <span className="absolute -top-[10px] left-3 bg-white text-[10px] px-2 font-mono font-bold text-[#0285fd]">Bill Reference Actions</span>
+                                <div className="flex gap-2">
+                                    <button onClick={handleSelectAll} className="flex-1 h-8 bg-[#0285fd] hover:bg-blue-600 text-white text-[11px] font-bold shadow-sm active:scale-95 transition-all rounded-[4px] border-none">Select All Bills</button>
+                                    <button onClick={handleClearSelections} className="flex-1 h-8 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 text-[11px] font-bold shadow-sm active:scale-95 transition-all rounded-[4px]">Clear Selections</button>
                                 </div>
                             </div>
-                            <textarea className="w-full flex-1 border border-slate-200 outline-none p-2 text-[12px] font-mono shadow-sm resize-none focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 rounded-sm bg-slate-50"></textarea>
-                            <div className="flex items-center gap-2 mt-auto pb-1">
-                                <span className="text-[11px] font-mono font-bold text-gray-500 uppercase tracking-wider">Over Debit Value</span>
-                                <input type="text" className="w-24 h-7 border border-slate-200 outline-none px-2 text-right text-[11px] font-mono shadow-inner focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 bg-slate-50" />
-                                <label className="flex items-center gap-1 text-[11px] font-mono font-bold text-gray-500 ml-2 cursor-pointer">
-                                    <input type="checkbox" className="w-3.5 h-3.5 cursor-pointer accent-[#0285fd]" />
-                                    Print Debit Note
-                                </label>
-                            </div>
+                            <textarea name="reference" value={formData.reference} onChange={handleInput} placeholder="Additional Reference / Notes" className="w-full flex-1 border border-slate-200 outline-none p-3 text-[12px] font-mono shadow-sm resize-none focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 rounded-md bg-slate-50 transition-all"></textarea>
                         </div>
 
                         {/* Middle Side: Over Payment Display */}
-                        <div className="col-span-4 flex flex-col gap-4 pt-2">
-                            <div className="bg-[#8aff8a] border border-green-500 p-3 flex items-center shadow-sm w-fit ml-4">
-                                <div className="border border-dotted border-gray-800 p-1.5 flex gap-2 items-center bg-white/20">
-                                    <span className="text-[12px] font-mono font-bold text-gray-800">Current Over Payment</span>
-                                    <span className="text-[14px] font-black text-red-600">{advanceBalance.toLocaleString(undefined, {minimumFractionDigits:2})}</span>
+                        <div className="col-span-4 flex flex-col gap-2 pt-2">
+                            <div className="flex items-center gap-4 bg-green-50/50 p-1.5 rounded-lg border border-green-200">
+                                <label className="text-[12px] font-black text-green-800 w-32 shrink-0 uppercase tracking-tighter">Current Over Payment</label>
+                                <div className="flex-1 h-8 font-mono bg-white border border-green-200 px-3 text-[14px] font-black text-green-700 text-right flex items-center justify-end rounded-[5px] shadow-sm">
+                                    {advanceBalance.toLocaleString(undefined, {minimumFractionDigits:2})}
                                 </div>
                             </div>
-                            <div className="flex items-center gap-3 ml-4 mt-2">
-                                <span className="text-[11px] font-mono font-bold text-gray-500 uppercase tracking-wider">Over Payment</span>
-                                <input type="text" value={overPayment.toLocaleString(undefined, {minimumFractionDigits:2})} readOnly className="w-24 h-7 border border-slate-200 outline-none px-2 text-right text-[12px] font-mono font-bold shadow-inner bg-slate-50" />
+                            <div className="flex items-center gap-4 bg-blue-50/50 p-1.5 rounded-lg border border-blue-100">
+                                <label className="text-[12px] font-black text-blue-800 w-32 shrink-0 uppercase tracking-tighter">Over Payment Usage</label>
+                                <div className="flex-1 h-8 font-mono bg-white border border-blue-200 px-3 text-[14px] font-black text-blue-700 text-right flex items-center justify-end rounded-[5px] shadow-sm">
+                                    {overPayment.toLocaleString(undefined, {minimumFractionDigits:2})}
+                                </div>
                             </div>
                         </div>
 
                         {/* Right Side: Totals */}
-                        <div className="col-span-4 flex flex-col gap-1.5 pt-2 pr-2">
-                            <div className="flex justify-between items-center">
-                                <span className="text-[11px] font-mono font-bold text-gray-500 uppercase tracking-wider">Number Of Debit</span>
-                                <input type="text" readOnly className="w-32 h-7 border border-slate-200 outline-none px-2 text-right text-[12px] font-mono shadow-inner bg-slate-50" />
-                            </div>
-                            <div className="flex justify-between items-center">
-                                <span className="text-[11px] font-mono font-bold text-gray-500 uppercase tracking-wider">Total Debit Available</span>
-                                <input type="text" readOnly className="w-32 h-7 border border-slate-200 outline-none px-2 text-right text-[12px] font-mono shadow-inner bg-slate-50" />
-                            </div>
-                            <div className="flex justify-between items-center mt-2">
-                                <span className="text-[11px] font-mono font-bold text-gray-500 uppercase tracking-wider">Total Amount Due</span>
-                                <input type="text" value={invoices.reduce((a,b) => a + b.balance, 0).toLocaleString(undefined, {minimumFractionDigits:2})} readOnly className="w-32 h-7 border border-slate-200 outline-none px-2 text-right text-[12px] font-bold font-mono shadow-inner bg-slate-50 text-gray-800" />
-                            </div>
-                            <div className="flex justify-between items-center">
-                                <span className="text-[11px] font-mono font-bold text-gray-500 uppercase tracking-wider">Payment Received</span>
-                                <input type="text" value={parseFloat(formData.amount).toLocaleString(undefined, {minimumFractionDigits:2})} readOnly className="w-32 h-7 border border-slate-200 outline-none px-2 text-right text-[12px] font-bold font-mono shadow-inner bg-slate-50 text-[#0285fd]" />
-                            </div>
-                            <div className="flex justify-between items-center">
-                                <span className="text-[11px] font-mono font-bold text-gray-500 uppercase tracking-wider">Discount Applied</span>
-                                <input type="text" value={totalDiscount.toLocaleString(undefined, {minimumFractionDigits:2})} readOnly className="w-32 h-7 border border-slate-200 outline-none px-2 text-right text-[12px] font-bold font-mono shadow-inner bg-slate-50 text-red-500" />
-                            </div>
-                            <div className="flex justify-between items-center">
-                                <span className="text-[11px] font-mono font-bold text-gray-500 uppercase tracking-wider">Debit Applied</span>
-                                <input type="text" value={totalSetOff.toLocaleString(undefined, {minimumFractionDigits:2})} readOnly className="w-32 h-7 border border-slate-200 outline-none px-2 text-right text-[12px] font-bold font-mono shadow-inner bg-slate-50 text-emerald-600" />
-                            </div>
-                            <div className="flex justify-between items-center mt-1 pt-1 border-t border-slate-200">
-                                <span className="text-[12px] font-mono font-black text-gray-500 uppercase tracking-wider">Ending Balance Rs.</span>
-                                <input type="text" value={(invoices.reduce((a,b) => a + b.balance, 0) - totalAllocated - totalDiscount - totalSetOff).toLocaleString(undefined, {minimumFractionDigits:2})} readOnly className="w-32 h-8 border-2 border-slate-300 outline-none px-2 text-right text-[14px] font-black font-mono shadow-inner bg-slate-50 text-black" />
+                        <div className="col-span-4 space-y-1.5 bg-slate-50 p-4 rounded-[5px] border border-slate-200">
+                            <StatRow label="Number Of Debit" value={invoices.filter(i => i.selected).length} />
+                            <StatRow label="Total Debit Available" value={advanceBalance.toLocaleString(undefined, {minimumFractionDigits:2})} />
+                            <StatRow label="Total Amount Due" value={invoices.reduce((a,b) => a + b.balance, 0).toLocaleString(undefined, {minimumFractionDigits:2})} />
+                            <StatRow label="Payment Received" value={parseFloat(formData.amount || 0).toLocaleString(undefined, {minimumFractionDigits:2})} />
+                            <StatRow label="Discount Applied" value={totalDiscount.toLocaleString(undefined, {minimumFractionDigits:2})} />
+                            <StatRow label="Debit Applied" value={totalSetOff.toLocaleString(undefined, {minimumFractionDigits:2})} />
+                            <div className="pt-2 border-t border-slate-200 mt-2">
+                                <div className="flex items-center justify-between">
+                                    <span className="text-[11px] font-black text-blue-600 uppercase tracking-[0.2em]">ENDING BALANCE</span>
+                                    <span className="text-[20px] font-black text-slate-900 tracking-tighter tabular-nums drop-shadow-sm">
+                                        {(invoices.reduce((a,b) => a + b.balance, 0) - totalAllocated - totalDiscount - totalSetOff).toLocaleString(undefined, {minimumFractionDigits:2})}
+                                    </span>
+                                </div>
                             </div>
                         </div>
 
@@ -743,13 +757,13 @@ const CustomerReceiptBoard = ({ isOpen, onClose }) => {
                                 <tbody className="divide-y divide-gray-50">
                                     {lookups.costCenters.filter(c => {
                                         const q = costCenterSearchQuery.toLowerCase();
-                                        const code = (c.CostCenterCode || c.costCenterCode || c.Code || '').toLowerCase();
-                                        const name = (c.CostCenterName || c.costCenterName || c.Name || '').toLowerCase();
+                                        const code = (c.code || c.Code || c.CostCenterCode || c.costCenterCode || '').toLowerCase();
+                                        const name = (c.name || c.Name || c.CostCenterName || c.costCenterName || '').toLowerCase();
                                         return code.includes(q) || name.includes(q);
                                     }).map((c, i) => (
-                                        <tr key={i} className="group hover:bg-blue-50/50 cursor-pointer transition-colors" onClick={() => { setFormData(prev => ({ ...prev, costCenter: c.CostCenterCode || c.costCenterCode || c.Code })); setShowCostCenterSearch(false); setCostCenterSearchQuery(''); }}>
-                                            <td className="px-5 py-3 font-mono text-[12px] font-mono text-gray-700">{c.CostCenterCode || c.costCenterCode || c.Code}</td>
-                                            <td className="px-5 py-3 text-[12px] font-mono text-gray-700 uppercase group-hover:text-blue-600">{c.CostCenterName || c.costCenterName || c.Name}</td>
+                                        <tr key={i} className="group hover:bg-blue-50/50 cursor-pointer transition-colors" onClick={() => { setFormData(prev => ({ ...prev, costCenter: c.code || c.Code || c.CostCenterCode || c.costCenterCode })); setShowCostCenterSearch(false); setCostCenterSearchQuery(''); }}>
+                                            <td className="px-5 py-3 font-mono text-[12px] font-mono text-gray-700">{c.code || c.Code || c.CostCenterCode || c.costCenterCode}</td>
+                                            <td className="px-5 py-3 text-[12px] font-mono text-gray-700 uppercase group-hover:text-blue-600">{c.name || c.Name || c.CostCenterName || c.costCenterName}</td>
                                             <td className="px-5 py-3 text-right"><button className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95">SELECT</button></td>
                                         </tr>
                                     ))}
@@ -760,8 +774,31 @@ const CustomerReceiptBoard = ({ isOpen, onClose }) => {
                 </div>
             </SimpleModal>
 
+            {receiptTx && (
+                <TransactionReceiptModal 
+                    selectedTx={receiptTx} 
+                    onClose={handleReceiptClose} 
+                />
+            )}
+
         </>
     );
 };
+
+const StatRow = ({ label, value, isEmpty, emphasized }) => (
+    <div className="flex items-center justify-between gap-4">
+        <label className="text-[12.5px] font-bold text-gray-700 whitespace-nowrap">{label}</label>
+        <input
+            type="text"
+            value={value}
+            readOnly
+            className={`
+                w-32 h-6 border border-gray-200 px-2 text-[11px] text-right outline-none rounded-sm bg-gray-50/30
+                ${emphasized ? 'font-black text-black border-[#0078d4]/50 bg-blue-50/50 shadow-sm text-[12px]' : 'font-semibold text-gray-600'}
+                ${isEmpty ? 'bg-white border-gray-300' : ''}
+            `}
+        />
+    </div>
+);
 
 export default CustomerReceiptBoard;

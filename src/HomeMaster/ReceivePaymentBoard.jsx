@@ -329,11 +329,11 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
 
             setFormData(prev => ({
                 ...prev,
-                docNo: header.doc_No,
-                date: header.post_Date?.split('T')[0],
-                customerId: header.vendor_Id,
-                amount: header.amount?.toString() || '0.00',
-                payType: header.pay_Type,
+                docNo: header.doc_No || header.docNo || docNo,
+                date: (header.post_Date || header.postDate || header.date)?.split('T')[0] || new Date().toISOString().split('T')[0],
+                customerId: header.vendor_Id || header.vendorId,
+                amount: (header.amount || header.net_Amount || header.netAmount || 0).toString(),
+                payType: header.pay_Type || header.payType || 'Cash',
                 bankCode: header.bank,
                 branchCode: header.remarks, // Mapped to Remarks in SP
                 costCenter: header.costCenter,
@@ -346,15 +346,15 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
             }));
 
             setInvoices(details.map(d => ({
-                doc_No: d.docNo,
-                payment: d.amount,
+                doc_No: d.accountCode || d.docNo, // accountCode contains Prod_Code (Invoice No)
+                payment: d.amount || 0,
                 selected: true,
-                inv_Amount: d.amount,
+                inv_Amount: d.amount || 0,
                 balance: 0,
                 discount: 0,
                 setOff: 0,
-                ref_No: d.accountCode,
-                date_Due: header.post_Date
+                ref_No: d.docNo, // The payment reference
+                date_Due: header.post_Date || header.postDate || header.date
             })));
 
             setShowSearchModal(false);

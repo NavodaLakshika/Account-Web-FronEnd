@@ -3,6 +3,7 @@ import SimpleModal from '../components/SimpleModal';
 import TransactionFormWrapper from '../components/TransactionFormWrapper';
 import { Search, Calendar, RefreshCw, X, Save, RotateCcw, Loader2, CreditCard } from 'lucide-react';
 import receivePaymentService from '../services/receivePayment.service';
+import ReceivedPaymentDetailModal from '../components/ReceivedPaymentDetailModal';
 
 
 import CalendarModal from '../components/CalendarModal';
@@ -38,6 +39,8 @@ const ReceivedPaymentBoard = ({ isOpen, onClose }) => {
     const [showReceiptDateModal, setShowReceiptDateModal] = useState(false);
     const [showChequeDateModal, setShowChequeDateModal] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
+    const [receiptData, setReceiptData] = useState(null);
+    const [showReceipt, setShowReceipt] = useState(false);
 
     useEffect(() => {
         if (isOpen) {
@@ -100,8 +103,9 @@ const ReceivedPaymentBoard = ({ isOpen, onClose }) => {
         try {
             await receivePaymentService.apply(formData);
             showSuccessToast('Payment received successfully!');
+            setReceiptData({ ...formData });
+            setShowReceipt(true);
             handleClear();
-            onClose();
         } catch (error) {
             showErrorToast(error.toString());
         } finally {
@@ -322,6 +326,17 @@ const ReceivedPaymentBoard = ({ isOpen, onClose }) => {
             )}
             {showChequeDateModal && (
                 <CalendarModal isOpen={showChequeDateModal} onClose={() => setShowChequeDateModal(false)} currentDate={formData.chequeDate} onDateChange={(d) => { setFormData({ ...formData, chequeDate: d }); setShowChequeDateModal(false); }} title="Select Cheque Date" />
+            )}
+            
+            {showReceipt && (
+                <ReceivedPaymentDetailModal 
+                    docNo={receiptData?.receiptNo}
+                    preloadedData={receiptData}
+                    onClose={() => {
+                        setShowReceipt(false);
+                        onClose();
+                    }}
+                />
             )}
         </>
     );

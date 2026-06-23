@@ -52,6 +52,7 @@ import {
 
 import { authService } from '../services/auth.service';
 import { systemLocksService } from '../services/systemLocks.service';
+import { getSessionData } from '../utils/session';
 
 import NewAccountBoard from './NewAccountBoard';
 import CustomerMasterBoard from '../components/modals/MasterSubModal/CustomerMasterBoard';
@@ -383,22 +384,31 @@ const Dashboard = () => {
     const [showEstimateModal, setShowEstimateModal] = useState(false);
     const [showPricingPlansModal, setShowPricingPlansModal] = useState(false);
     const [showSubscriptionBanner, setShowSubscriptionBanner] = useState(true);
+    const [showAdBlockAlert, setShowAdBlockAlert] = useState(true); // Auto popup
+    const adBlockTimeoutRef = useRef(null);
+    const isAdBlockActiveRef = useRef(false);
 
-    useEffect(() => {
-        let timeout;
-        if (showSubscriptionBanner) {
-            // Hide after 30 seconds
-            timeout = setTimeout(() => {
-                setShowSubscriptionBanner(false);
-            }, 30 * 1000);
-        } else {
-            // Show after 10 minutes
-            timeout = setTimeout(() => {
-                setShowSubscriptionBanner(true);
-            }, 30 * 1000);
+    const handleBlockAds = () => {
+        setShowSubscriptionBanner(false);
+        setShowAdBlockAlert(false);
+        setShowPromoModal(false);
+        isAdBlockActiveRef.current = true;
+        
+        // Clear any existing timer
+        if (adBlockTimeoutRef.current) {
+            clearTimeout(adBlockTimeoutRef.current);
         }
-        return () => clearTimeout(timeout);
-    }, [showSubscriptionBanner]);
+        
+        // Auto load the ads again after 30 minutes (30 * 60 * 1000 ms)
+        adBlockTimeoutRef.current = setTimeout(() => {
+            setShowSubscriptionBanner(true);
+            isAdBlockActiveRef.current = false;
+        }, 30 * 60 * 1000);
+    };
+
+    const handleAllowAds = () => {
+        setShowAdBlockAlert(false);
+    };
 
 
     const [activeMenu, setActiveMenu] = useState(null);
@@ -710,9 +720,7 @@ const Dashboard = () => {
         // Fetch BI dashboard summary
         const fetchBiData = async () => {
             try {
-                const companyRaw = localStorage.getItem('selectedCompany');
-                const company = companyRaw ? JSON.parse(companyRaw) : null;
-                const companyCode = company?.Company_Id || company?.companyId || company?.code || company?.id || '';
+                const { companyCode } = getSessionData();
                 if (companyCode) {
                     const data = await biDashboardService.getSummary(companyCode);
                     setBiData(data);
@@ -794,7 +802,7 @@ const Dashboard = () => {
                 setRibbonIcons(parsed);
             }
         }
-    }, [navigate]);
+    }, [navigate, selectedCompany?.Company_Id, selectedCompany?.company_Code, selectedCompany?.companyCode, selectedCompany?.id]);
 
     // Reset reminder states when user or company changes to prevent leaks across sessions
     useEffect(() => {
@@ -874,7 +882,9 @@ const Dashboard = () => {
     // Show promo popup every 10 minutes (first after 8s)
     useEffect(() => {
         const showPromo = () => {
-            setShowPromoModal(true);
+            if (!isAdBlockActiveRef.current) {
+                setShowPromoModal(true);
+            }
         };
 
         const onMount = setTimeout(showPromo, 8000);
@@ -1432,6 +1442,39 @@ const Dashboard = () => {
             )}
 
             {/* 1. Modal Overlays */}
+            {/* Ad Block Alert Popup - Top Left */}
+            {showAdBlockAlert && (
+                <div className="fixed top-4 left-4 z-[999999] font-sans">
+                    <div className="relative w-[340px] bg-white shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-slate-200 flex flex-col rounded-sm overflow-hidden animate-in slide-in-from-left duration-300">
+                        <div className="px-5 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                            <h3 className="text-[14px] font-black text-slate-800 tracking-tight">Advertisement Settings</h3>
+                            <button onClick={() => setShowAdBlockAlert(false)} className="text-slate-400 hover:text-slate-800 transition-colors p-1">
+                                <X size={16} strokeWidth={2} />
+                            </button>
+                        </div>
+                        <div className="p-5">
+                            <p className="text-[12px] font-medium text-slate-600 mb-5 leading-relaxed">
+                                Would you like to block the top subscription banner? If blocked, it will stay hidden and auto-reload after <strong>30 minutes</strong>.
+                            </p>
+                            <div className="flex gap-2 justify-end">
+                                <button 
+                                    onClick={handleAllowAds}
+                                    className="px-4 h-8 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-sm font-bold text-[12px] transition-colors"
+                                >
+                                    Allow Ads
+                                </button>
+                                <button 
+                                    onClick={handleBlockAds}
+                                    className="px-4 h-8 bg-red-500 hover:bg-red-600 text-white rounded-sm font-bold text-[12px] transition-colors shadow-sm"
+                                >
+                                    Block
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             <SubscriptionModal isOpen={showPricingPlansModal} onClose={() => setShowPricingPlansModal(false)} />
 
             <NewAccountBoard isOpen={showNewAccountModal} onClose={() => setShowNewAccountModal(false)} />
@@ -2302,11 +2345,11 @@ const Dashboard = () => {
                         </div>
 
                         {/* Quickbooks-style Metric Cards */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-2">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-5 mb-2">
                             {/* Bank Accounts */}
-                            <div className="bg-white p-5 shadow-sm hover:shadow-md transition-shadow">
+                            <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:shadow-lg hover:-translate-y-1 hover:border-[#0078d4]/30 transition-all duration-300 flex flex-col justify-between group">
                                 <div className="flex justify-between items-start mb-4">
-                                    <h3 className="text-[13px] font-extrabold text-slate-700 uppercase tracking-wide">Bank accounts</h3>
+                                    <h3 className="text-[13px] font-extrabold text-slate-700 uppercase tracking-wide group-hover:text-[#0078d4] transition-colors">Bank accounts</h3>
                                     <button className="text-[11px] text-[#0078d4] hover:underline font-bold">Connect</button>
                                 </div>
                                 {biData?.bankAccounts?.length > 0 ? (
@@ -2314,7 +2357,9 @@ const Dashboard = () => {
                                         {biData.bankAccounts.slice(0, 2).map((bank, i) => (
                                             <div key={i} className="flex justify-between items-center border-b border-slate-100 pb-2 last:border-0 last:pb-0">
                                                 <span className="text-[12px] font-semibold text-slate-600 truncate mr-2">{bank.name}</span>
-                                                <span className="text-[13px] font-black text-slate-800 shrink-0">Rs {Number(bank.balance).toLocaleString()}</span>
+                                                <span className="text-[13px] font-black text-slate-800 shrink-0">
+                                                    Rs {Number(String(bank.balance).replace(/,/g, '')).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                                </span>
                                             </div>
                                         ))}
                                     </div>
@@ -2324,35 +2369,60 @@ const Dashboard = () => {
                             </div>
 
                             {/* Invoices */}
-                            <div className="bg-white p-5 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
+                            <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:shadow-lg hover:-translate-y-1 hover:border-[#0078d4]/30 transition-all duration-300 flex flex-col justify-between group">
                                 <div className="flex justify-between items-start mb-4">
-                                    <h3 className="text-[13px] font-extrabold text-slate-700 uppercase tracking-wide">Invoices</h3>
-                                    <button className="text-[11px] text-[#0078d4] hover:underline font-bold">New</button>
+                                    <h3 className="text-[13px] font-extrabold text-slate-700 uppercase tracking-wide group-hover:text-[#0078d4] transition-colors">Invoices</h3>
+                                    <button className="text-[11px] text-[#0078d4] hover:underline font-bold bg-blue-50 px-2 py-0.5 rounded-full">New</button>
                                 </div>
-                                <div className="flex flex-col gap-2 mt-auto">
-                                    <div className="flex justify-between items-center text-sm">
-                                        <span className="text-[12px] font-bold text-slate-500">Unpaid</span>
-                                        <span className="text-[13px] font-black text-slate-800">Rs {(biData?.invoiceSummary?.totalUnpaid || 0).toLocaleString()}</span>
+                                <div className="mt-auto">
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <span className="text-[14px] font-black text-slate-800">
+                                            Rs {(biData?.invoiceSummary?.totalUnpaid || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                        </span>
+                                        <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Unpaid Total</span>
                                     </div>
-                                    <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
-                                        <div className="bg-[#0078d4] h-full rounded-full transition-all" style={{ width: `${Math.min(((biData?.invoiceSummary?.totalOverdue || 0) / (biData?.invoiceSummary?.totalUnpaid || 1)) * 100, 100)}%` }}></div>
+                                    <div className="flex justify-between items-center mt-3">
+                                        <div className="flex flex-col">
+                                            <span className="font-bold text-slate-700 group-hover:text-[#0078d4] transition-colors text-[13px]">
+                                                Rs {(biData?.invoiceSummary?.totalOverdue || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                            </span>
+                                            <span className="text-slate-400 font-bold text-[10px] uppercase tracking-wider">Overdue</span>
+                                        </div>
+                                        <div className="flex flex-col text-right">
+                                            <span className="font-bold text-slate-700 text-[13px]">
+                                                Rs {Math.max(0, (biData?.invoiceSummary?.totalUnpaid || 0) - (biData?.invoiceSummary?.totalOverdue || 0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                            </span>
+                                            <span className="text-slate-400 font-bold text-[10px] uppercase tracking-wider">Not due yet</span>
+                                        </div>
                                     </div>
-                                    <div className="flex justify-between items-center mt-1">
-                                        <span className="text-[12px] font-bold text-red-500">Overdue</span>
-                                        <span className="text-[13px] font-black text-red-600">Rs {(biData?.invoiceSummary?.totalOverdue || 0).toLocaleString()}</span>
+                                    <style>{`
+                                        .invoice-bar-left { width: 0%; }
+                                        .group:hover .invoice-bar-left { width: ${biData?.invoiceSummary?.totalUnpaid > 0 ? ((biData?.invoiceSummary?.totalOverdue || 0) / biData.invoiceSummary.totalUnpaid) * 100 : 0}%; }
+                                        .invoice-bar-right { width: 100%; }
+                                        .group:hover .invoice-bar-right { width: ${biData?.invoiceSummary?.totalUnpaid > 0 ? (Math.max(0, biData.invoiceSummary.totalUnpaid - (biData?.invoiceSummary?.totalOverdue || 0)) / biData.invoiceSummary.totalUnpaid) * 100 : 100}%; }
+                                    `}</style>
+                                    <div className="flex h-2.5 w-full mt-2 overflow-hidden gap-[1px] rounded-full">
+                                        <div 
+                                            className="h-full bg-[#0078d4] transition-all duration-700 ease-out invoice-bar-left" 
+                                        />
+                                        <div 
+                                            className="h-full bg-slate-200 transition-all duration-700 ease-out invoice-bar-right" 
+                                        />
                                     </div>
                                 </div>
                             </div>
 
                             {/* Sales */}
-                            <div className="bg-white p-5 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
+                            <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:shadow-lg hover:-translate-y-1 hover:border-[#0078d4]/30 transition-all duration-300 flex flex-col justify-between group">
                                 <div className="flex justify-between items-start mb-4">
-                                    <h3 className="text-[13px] font-extrabold text-slate-700 uppercase tracking-wide">Sales</h3>
-                                    <span className="text-[10px] font-bold text-slate-400 uppercase">YTD</span>
+                                    <h3 className="text-[13px] font-extrabold text-slate-700 uppercase tracking-wide group-hover:text-[#0078d4] transition-colors">Sales</h3>
+                                    <span className="text-[10px] font-bold text-slate-400 uppercase bg-slate-100 px-2 py-0.5 rounded-md">YTD</span>
                                 </div>
                                 <div className="flex flex-col mt-auto">
-                                    <span className="text-2xl font-black text-slate-800">Rs {(biData?.salesSummary?.totalSalesYTD || 0).toLocaleString()}</span>
-                                    <div className="text-[11px] text-emerald-600 font-bold mt-2 flex items-center gap-1">
+                                    <span className="text-2xl font-black text-slate-800 tracking-tight">
+                                        Rs {(biData?.salesSummary?.totalSalesYTD || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                    </span>
+                                    <div className="text-[11px] text-emerald-600 font-bold mt-2 flex items-center gap-1 bg-emerald-50 w-max px-2 py-1 rounded-md">
                                         <BarChart2 size={12} strokeWidth={3} />
                                         <span>Trending upward</span>
                                     </div>
@@ -2360,30 +2430,34 @@ const Dashboard = () => {
                             </div>
 
                             {/* Expenses */}
-                            <div className="bg-white p-5 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
+                            <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:shadow-lg hover:-translate-y-1 hover:border-[#0078d4]/30 transition-all duration-300 flex flex-col justify-between group">
                                 <div className="flex justify-between items-start mb-4">
-                                    <h3 className="text-[13px] font-extrabold text-slate-700 uppercase tracking-wide">Expenses</h3>
-                                    <span className="text-[10px] font-bold text-slate-400 uppercase">Payables</span>
+                                    <h3 className="text-[13px] font-extrabold text-slate-700 uppercase tracking-wide group-hover:text-[#0078d4] transition-colors">Expenses</h3>
+                                    <span className="text-[10px] font-bold text-slate-400 uppercase bg-slate-100 px-2 py-0.5 rounded-md">Payables</span>
                                 </div>
                                 <div className="flex flex-col mt-auto">
-                                    <span className="text-2xl font-black text-slate-800">Rs {(biData?.accountsPayable?.total || 0).toLocaleString()}</span>
-                                    <div className="text-[11px] font-bold text-slate-500 mt-2">
-                                        <span className="text-orange-500 mr-1">Overdue:</span>
-                                        Rs {(biData?.accountsPayable?.aging91Plus || 0).toLocaleString()}
+                                    <span className="text-2xl font-black text-slate-800 tracking-tight">
+                                        Rs {(biData?.totalExpenses || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                    </span>
+                                    <div className="text-[11px] font-bold text-slate-500 mt-2 flex items-center gap-1">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-orange-500"></div>
+                                        <span className="text-slate-500"><span className="text-orange-500 mr-1">Overdue:</span>
+                                            Rs {(biData?.overdueBills || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                        </span>
                                     </div>
                                 </div>
                             </div>
 
                             {/* View widgets card */}
                             <div
-                                className="bg-white p-5 border-2 border-dashed border-[#0078d4]/50 animate-border-pulse hover:bg-[#f0f7ff] transition-all cursor-pointer flex flex-col items-center justify-center text-center shadow-sm hover:shadow-md hover:scale-[1.02]"
+                                className="bg-gradient-to-br from-white to-[#f8fbff] p-5 rounded-xl border-2 border-dashed border-[#0078d4]/40 hover:border-[#0078d4] animate-border-pulse hover:bg-[#f0f7ff] transition-all duration-300 cursor-pointer flex flex-col items-center justify-center text-center shadow-sm hover:shadow-lg hover:-translate-y-1 group"
                                 onClick={() => navigate('/bi-dashboard')}
                             >
-                                <h3 className="text-[13px] font-bold text-[#0078d4] mb-4">View Widgets</h3>
-                                <div className="w-10 h-10 rounded-full border-2 border-dashed border-[#0078d4]/30 flex items-center justify-center mb-4 bg-[#e8f2fb]">
-                                    <LayoutGrid size={20} className="text-[#0078d4]" />
+                                <h3 className="text-[13px] font-bold text-[#0078d4] mb-4 group-hover:scale-105 transition-transform">View Widgets</h3>
+                                <div className="w-12 h-12 rounded-full border-2 border-[#0078d4]/20 flex items-center justify-center mb-4 bg-white shadow-sm group-hover:bg-[#0078d4] group-hover:text-white transition-colors duration-300">
+                                    <LayoutGrid size={20} className="text-[#0078d4] group-hover:text-white transition-colors" />
                                 </div>
-                                <span className="text-[11px] font-bold text-[#0078d4]/70 flex items-center gap-1">
+                                <span className="text-[11px] font-bold text-[#0078d4]/70 flex items-center gap-1 group-hover:text-[#0078d4] transition-colors">
                                     <Eye size={14} /> Browse dashboards
                                 </span>
                             </div>

@@ -4,6 +4,7 @@ import TransactionFormWrapper from '../components/TransactionFormWrapper';
 import CalendarModal from '../components/CalendarModal';
 import { Search, Calendar, X, Save, RotateCcw, Loader2, FileText } from 'lucide-react';
 import { customerInvoiceService } from '../services/customerInvoice.service';
+import TransactionReceiptModal from '../components/modals/TransactionReceiptModal';
 
 import { getSessionData } from '../utils/session';
 import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
@@ -128,6 +129,7 @@ const CustomerInvoiceBoard = ({ isOpen, onClose }) => {
 
     const [activeModal, setActiveModal] = useState(null); // 'customer' | 'account'
     const [showDatePicker, setShowDatePicker] = useState(false);
+    const [receiptTx, setReceiptTx] = useState(null);
 
     // ── Toast helpers (AdvancePay style) ─────────────────────────────────────
     // ── Lifecycle ─────────────────────────────────────────────────────────────
@@ -244,8 +246,31 @@ const CustomerInvoiceBoard = ({ isOpen, onClose }) => {
             };
             const resp = await customerInvoiceService.save(payload);
             showSuccessToast(`Invoice saved! Doc ID: ${resp.docNo}`);
+            setReceiptTx({
+                type: 'CUSTOMER INVOICE',
+                docNo: resp.docNo,
+                date: formData.postDate,
+                payee: formData.customerName,
+                total: parseFloat(formData.netAmount),
+                details: {
+                    header: {
+                        memo: formData.description
+                    },
+                    expenses: [
+                        {
+                            accCode: formData.accountCode,
+                            memo: formData.description,
+                            amount: parseFloat(formData.amount)
+                        },
+                        parseFloat(formData.discount) > 0 ? {
+                            accCode: "DISCOUNT",
+                            memo: "Trade Discount",
+                            amount: -parseFloat(formData.discount)
+                        } : null
+                    ].filter(Boolean)
+                }
+            });
             handleClear();
-            onClose();
         } catch (error) {
             showErrorToast(error?.toString() || 'Failed to save invoice.');
         } finally {
@@ -503,6 +528,17 @@ const CustomerInvoiceBoard = ({ isOpen, onClose }) => {
                 initialDate={formData.postDate}
                 onDateSelect={date => setFormData(prev => ({ ...prev, postDate: date }))}
             />
+
+            {/* Receipt Modal */}
+            {receiptTx && (
+                <TransactionReceiptModal 
+                    selectedTx={receiptTx} 
+                    onClose={() => {
+                        setReceiptTx(null);
+                        onClose(); // close the main board after dismissing the receipt
+                    }} 
+                />
+            )}
         </>
     );
 };
