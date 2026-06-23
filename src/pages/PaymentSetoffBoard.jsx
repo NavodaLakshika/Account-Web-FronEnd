@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import SimpleModal from '../components/SimpleModal';
-import { Search, X, RotateCcw, Loader2, ArrowRightLeft, UserCircle, Briefcase, FileCheck, CheckCircle2, History, AlertTriangle } from 'lucide-react';
+import TransactionReceiptModal from '../components/modals/TransactionReceiptModal';
+import CalendarModal from '../components/CalendarModal';
+import { Search, X, RotateCcw, Loader2, ArrowRightLeft, UserCircle, Briefcase, FileCheck, CheckCircle2, History, AlertTriangle, Plus, Calendar } from 'lucide-react';
 import { paymentSetoffService } from '../services/paymentSetoff.service';
 import { getSessionData } from '../utils/session';
 import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
@@ -25,12 +27,21 @@ const PaymentSetoffBoard = ({ isOpen, onClose }) => {
 
     const [formData, setFormData] = useState(getInitialFormData());
 
+
     const [pendingPayments, setPendingPayments] = useState([]);
     const [returns, setReturns] = useState([]);
     const [selectedSetoffs, setSelectedSetoffs] = useState([]);
+    const [selectedPendingRow, setSelectedPendingRow] = useState(null);
+    const [selectedReturnRow, setSelectedReturnRow] = useState(null);
+    const [setoffAmountInput, setoffAmountInputSet] = useState('');
     
     const [activeSupplierModal, setActiveSupplierModal] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
+    const [showCalendar, setShowCalendar] = useState(false);
+
+    // Receipt Modal States
+    const [showReceipt, setShowReceipt] = useState(false);
+    const [lastSavedTx, setLastSavedTx] = useState(null);
 
     useEffect(() => {
         if (isOpen) {
@@ -90,9 +101,32 @@ const PaymentSetoffBoard = ({ isOpen, onClose }) => {
         try {
             setLoading(true);
             await paymentSetoffService.apply({ ...formData, lines: selectedSetoffs });
-             showSuccessToast('Payment setoff applied successfully!');
+            showSuccessToast('Payment setoff applied successfully!');
+
+            const totalSetoff = selectedSetoffs.reduce((sum, s) => sum + s.setoffAmount, 0);
+            setLastSavedTx({
+                type: 'PAYMENT SET OFF',
+                docNo: formData.docNo,
+                payee: formData.supplierName ? `${formData.supplierId} - ${formData.supplierName}` : '',
+                date: formData.date,
+                total: totalSetoff,
+                details: {
+                    header: {
+                        docNo: formData.docNo,
+                        date: formData.date,
+                        payee: formData.supplierName,
+                        amount: totalSetoff,
+                    },
+                    expenses: selectedSetoffs.map(s => ({
+                        accCode: `Offset: ${s.pendDoc}`,
+                        memo: `Against Return: ${s.retDoc}`,
+                        amount: s.setoffAmount
+                    }))
+                }
+            });
+            setShowReceipt(true);
+
             handleClear();
-            onClose();
         } catch (error) {
             showErrorToast(error.toString());
         } finally {
@@ -114,20 +148,48 @@ const PaymentSetoffBoard = ({ isOpen, onClose }) => {
         loadInitialData();
     };
 
-    const allocateSetoff = (pend, ret, amount) => {
-        // Simple logic for UI demo/tracking
+    const handleAddAllocation = () => {
+        if (!selectedPendingRow || !selectedReturnRow) {
+            showErrorToast("Please select one pending payment and one return to offset.");
+            return;
+        }
+        
+        const amount = parseFloat(setoffAmountInput);
+        if (isNaN(amount) || amount <= 0) {
+            showErrorToast("Please enter a valid amount greater than 0.");
+            return;
+        }
+
+        if (amount > selectedPendingRow.balanceAmount) {
+            showErrorToast("Setoff amount cannot exceed the pending payment balance.");
+            return;
+        }
+
+        if (amount > selectedReturnRow.balanceAmount) {
+            showErrorToast("Setoff amount cannot exceed the return balance.");
+            return;
+        }
+
         const newSetoff = {
             id: Date.now(),
-            pendDoc: pend.documentNo,
-            pendDate: pend.date,
-            pendBal: pend.balanceAmount,
+            pendDoc: selectedPendingRow.documentNo,
+            pendDate: selectedPendingRow.date,
+            pendBal: selectedPendingRow.balanceAmount,
             setoffAmount: amount,
-            retDoc: ret.documentNo,
-            retDate: ret.date,
+            retDoc: selectedReturnRow.documentNo,
+            retDate: selectedReturnRow.date,
             retAmount: amount,
-            retBal: ret.balanceAmount
+            retBal: selectedReturnRow.balanceAmount
         };
+
+        // Deduct from local state so they can't double allocate
+        setPendingPayments(prev => prev.map(p => p.documentNo === selectedPendingRow.documentNo ? { ...p, balanceAmount: p.balanceAmount - amount } : p));
+        setReturns(prev => prev.map(r => r.documentNo === selectedReturnRow.documentNo ? { ...r, balanceAmount: r.balanceAmount - amount } : r));
+
         setSelectedSetoffs([...selectedSetoffs, newSetoff]);
+        setSelectedPendingRow(null);
+        setSelectedReturnRow(null);
+        setoffAmountInputSet('');
     };
 
     const filteredSuppliers = () => lookups.suppliers.filter(s => (s.name || '').toLowerCase().includes(searchTerm.toLowerCase()) || (s.code || '').toLowerCase().includes(searchTerm.toLowerCase()));
@@ -146,44 +208,59 @@ const PaymentSetoffBoard = ({ isOpen, onClose }) => {
                 isOpen={isOpen}
                 onClose={onClose}
                 title="Payment Set Off"
-                maxWidth="max-w-[1400px]"
+                maxWidth="max-w-[1100px]"
                 footer={
                     <div className="bg-slate-50/80 px-6 py-3 w-full flex justify-end gap-3 border-t border-slate-200 rounded-b-[5px]">
                         <button onClick={handleApplySetoff} disabled={loading} className={`px-6 py-3 bg-[#2bb744] hover:bg-[#259b3a] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] shadow-md shadow-green-100 transition-all active:scale-95 flex items-center justify-center gap-2 border-none ${loading ? 'opacity-50' : ''}`}>
                             {loading ? <Loader2 size={16} className="animate-spin" /> : <CheckCircle2 size={18} />} APPLY SETOFF
                         </button>
-                        <button onClick={onClose} className="px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-500 font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] transition-all active:scale-95 flex items-center justify-center gap-2 border-none">
-                             <X size={28} /> EXIT
-                        </button>
                     </div>
                 }
             >
                 <div className="space-y-4">
-                    {/* Header Section */}
-                    <div className="bg-white p-4 border border-slate-200 rounded-[5px] flex items-center justify-between">
-                         <div className="flex items-center gap-4 flex-1">
-                            <label className="text-[11px] font-bold text-gray-500 uppercase w-20 shrink-0">Supplier</label>
-                            <div className="flex-1 max-w-[500px] flex gap-2">
-                                <input 
-                                    type="text" 
-                                    readOnly 
-                                    value={formData.supplierName ? `${formData.supplierId} - ${formData.supplierName}` : ''} 
-                                    placeholder="Search supplier to load pending payments & returns..." 
-                                    className="flex-1 h-8 border border-slate-200 px-4 text-sm font-mono font-bold text-[#0285fd] rounded bg-slate-50 outline-none" 
-                                />
-                                <button onClick={() => { setActiveSupplierModal(true); setSearchTerm(''); }} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-90 border-none">
-                                    <Search size={16} />
-                                </button>
+                    <div className="bg-white p-3 border border-slate-200 rounded-[5px] relative overflow-hidden">
+                        <div className="flex flex-col md:flex-row gap-6 relative z-10">
+                            {/* Supplier */}
+                            <div className="flex-1 flex items-center gap-2 min-w-0">
+                                <label className="text-[11px] font-bold text-gray-500 uppercase shrink-0 w-16">Supplier</label>
+                                <div className="flex-1 flex gap-1 h-8 min-w-0">
+                                    <input 
+                                        type="text" 
+                                        readOnly 
+                                        value={formData.supplierName ? `${formData.supplierId} - ${formData.supplierName}` : ''} 
+                                        className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-bold text-gray-700 bg-slate-50 rounded outline-none cursor-pointer transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" 
+                                        onClick={() => { setActiveSupplierModal(true); setSearchTerm(''); }}
+                                    />
+                                    <button onClick={() => { setActiveSupplierModal(true); setSearchTerm(''); }} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
+                                        <Search size={16} />
+                                    </button>
+                                </div>
                             </div>
-                        </div>
-                        <div className="flex items-center gap-6">
-                            <div className="flex items-center gap-3">
-                                <label className="text-[11px] font-bold text-gray-500 uppercase">Document No:</label>
-                                <input type="text" value={formData.docNo} readOnly className="w-40 h-8 border border-slate-200 px-3 text-sm font-mono font-bold text-[#0285fd] bg-slate-50 rounded outline-none" />
+
+                            <div className="w-[200px] flex items-center gap-2 shrink-0">
+                                <label className="text-[11px] font-bold text-gray-500 uppercase shrink-0">Doc No</label>
+                                <div className="flex-1">
+                                    <input type="text" value={formData.docNo} readOnly className="w-full h-8 border border-slate-200 rounded px-3 text-[12px] font-mono outline-none bg-slate-50 text-gray-700 transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" />
+                                </div>
                             </div>
-                            <div className="flex items-center gap-3">
-                                <label className="text-[11px] font-bold text-gray-500 uppercase">Date:</label>
-                                <input type="date" value={formData.date} readOnly className="w-44 h-8 border border-slate-200 px-3 text-sm font-mono font-bold rounded bg-slate-50 outline-none" />
+
+                            <div className="w-[200px] flex items-center gap-2 shrink-0">
+                                <label className="text-[11px] font-bold text-gray-500 uppercase shrink-0">Date</label>
+                                <div className="flex-1 flex gap-1 h-8 min-w-0">
+                                    <input 
+                                        type="text" 
+                                        value={formData.date} 
+                                        readOnly 
+                                        className="flex-1 min-w-0 h-8 border border-slate-200 rounded px-3 text-[12px] font-mono outline-none bg-slate-50 text-gray-700 cursor-pointer transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" 
+                                        onClick={() => setShowCalendar(true)}
+                                    />
+                                    <button 
+                                        onClick={() => setShowCalendar(true)} 
+                                        className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0"
+                                    >
+                                        <Calendar size={15} />
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -197,7 +274,7 @@ const PaymentSetoffBoard = ({ isOpen, onClose }) => {
                                     <span className="text-[10px] font-mono font-bold uppercase text-gray-400 tracking-widest">Pending Payments</span>
                                 </div>
                             </div>
-                            <div className="h-[250px] overflow-y-auto overflow-x-hidden">
+                            <div className="h-[180px] overflow-y-auto overflow-x-hidden">
                                 <table className="w-full text-left text-[12px] border-collapse sticky-header">
                                     <thead className="bg-slate-50/80 border-b border-slate-200 text-[10px] font-mono font-bold text-gray-400 uppercase tracking-widest">
                                         <tr>
@@ -209,7 +286,11 @@ const PaymentSetoffBoard = ({ isOpen, onClose }) => {
                                     </thead>
                                     <tbody className="divide-y divide-slate-100">
                                         {pendingPayments.map((p, i) => (
-                                            <tr key={i} className="hover:bg-slate-50 transition-colors cursor-pointer group">
+                                            <tr 
+                                                key={i} 
+                                                onClick={() => setSelectedPendingRow(p)}
+                                                className={`transition-colors cursor-pointer group ${selectedPendingRow?.documentNo === p.documentNo ? 'bg-blue-50 border-l-4 border-blue-500' : 'hover:bg-slate-50'}`}
+                                            >
                                                 <td className="px-4 py-2 font-mono text-[12px] font-bold text-slate-700">{p.documentNo}</td>
                                                 <td className="px-4 py-2 font-mono text-[12px] text-slate-500">{p.date}</td>
                                                 <td className="px-4 py-2 text-right font-mono text-[12px]">{p.amount.toLocaleString()}</td>
@@ -236,7 +317,7 @@ const PaymentSetoffBoard = ({ isOpen, onClose }) => {
                                     <span className="text-[10px] font-mono font-bold uppercase text-gray-400 tracking-widest">Returns & Advances</span>
                                 </div>
                             </div>
-                            <div className="h-[250px] overflow-y-auto overflow-x-hidden">
+                            <div className="h-[180px] overflow-y-auto overflow-x-hidden">
                                <table className="w-full text-left text-[12px] border-collapse sticky-header">
                                     <thead className="bg-slate-50/80 border-b border-slate-200 text-[10px] font-mono font-bold text-gray-400 uppercase tracking-widest">
                                         <tr>
@@ -248,7 +329,11 @@ const PaymentSetoffBoard = ({ isOpen, onClose }) => {
                                     </thead>
                                     <tbody className="divide-y divide-slate-100">
                                         {returns.map((r, i) => (
-                                            <tr key={i} className="hover:bg-slate-50 transition-colors cursor-pointer group">
+                                            <tr 
+                                                key={i} 
+                                                onClick={() => setSelectedReturnRow(r)}
+                                                className={`transition-colors cursor-pointer group ${selectedReturnRow?.documentNo === r.documentNo ? 'bg-green-50 border-l-4 border-green-500' : 'hover:bg-slate-50'}`}
+                                            >
                                                 <td className="px-4 py-2 font-mono text-[12px] font-bold text-slate-700">{r.documentNo}</td>
                                                 <td className="px-4 py-2 font-mono text-[12px] text-slate-500">{r.date || '---'}</td>
                                                 <td className="px-4 py-2 text-right font-mono text-[12px]">{r.amount.toLocaleString()}</td>
@@ -267,6 +352,40 @@ const PaymentSetoffBoard = ({ isOpen, onClose }) => {
                             </div>
                         </div>
                     </div>
+                    {/* Setoff Action Bar */}
+                    <div className="bg-white border border-slate-200 rounded-[5px] p-3 flex items-center gap-4 justify-between bg-gradient-to-r from-blue-50/50 to-green-50/50">
+                        <div className="flex items-center gap-4 flex-1">
+                            <div className="flex-1 max-w-[200px]">
+                                <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Selected Pending</label>
+                                <div className="h-8 bg-white border border-slate-200 rounded px-3 flex items-center text-[12px] font-mono font-bold text-slate-700">
+                                    {selectedPendingRow ? selectedPendingRow.documentNo : '-- Select --'}
+                                </div>
+                            </div>
+                            <ArrowRightLeft size={16} className="text-slate-400" />
+                            <div className="flex-1 max-w-[200px]">
+                                <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Selected Return</label>
+                                <div className="h-8 bg-white border border-slate-200 rounded px-3 flex items-center text-[12px] font-mono font-bold text-slate-700">
+                                    {selectedReturnRow ? selectedReturnRow.documentNo : '-- Select --'}
+                                </div>
+                            </div>
+                            <div className="w-32">
+                                <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Amount</label>
+                                <input 
+                                    type="number" 
+                                    className="w-full h-8 bg-white border border-blue-200 rounded px-3 text-[12px] font-mono font-bold text-blue-600 outline-none focus:ring-2 focus:ring-blue-500/20"
+                                    value={setoffAmountInput}
+                                    onChange={(e) => setoffAmountInputSet(e.target.value)}
+                                    placeholder="0.00"
+                                />
+                            </div>
+                        </div>
+                        <button 
+                            onClick={handleAddAllocation}
+                            className="h-10 px-6 bg-blue-600 hover:bg-blue-700 text-white font-mono text-[12px] font-bold uppercase tracking-widest rounded transition-colors flex items-center gap-2 shadow-sm"
+                        >
+                            <Plus size={16} /> ADD ALLOCATION
+                        </button>
+                    </div>
 
                     {/* Selected Set Off Summary Grid */}
                     <div className="bg-white border border-slate-200 rounded-[5px] flex flex-col overflow-hidden">
@@ -274,7 +393,7 @@ const PaymentSetoffBoard = ({ isOpen, onClose }) => {
                              <FileCheck size={14} className="text-green-600" />
                              <h4 className="text-[10px] font-mono font-bold uppercase text-gray-400 tracking-widest">Selected Payment Set Off Allocation</h4>
                         </div>
-                        <div className="min-h-[200px] max-h-[300px] overflow-y-auto">
+                        <div className="min-h-[150px] max-h-[200px] overflow-y-auto">
                             <table className="w-full text-left text-[11px] border-collapse sticky-header">
                                 <thead className="bg-slate-50/80 border-b border-slate-200 text-[10px] font-mono font-bold text-gray-400 uppercase tracking-widest">
                                     <tr>
@@ -369,6 +488,24 @@ const PaymentSetoffBoard = ({ isOpen, onClose }) => {
                         </div>
                     </div>
                 </div>
+            )}
+            
+            <CalendarModal 
+                isOpen={showCalendar}
+                onClose={() => setShowCalendar(false)}
+                onDateSelect={(date) => { setFormData(prev => ({ ...prev, date })); setShowCalendar(false); }}
+                initialDate={formData.date}
+            />
+
+            {/* Receipt Modal */}
+            {showReceipt && lastSavedTx && (
+                <TransactionReceiptModal 
+                    selectedTx={lastSavedTx}
+                    onClose={() => {
+                        setShowReceipt(false);
+                        onClose();
+                    }}
+                />
             )}
         </>
     );

@@ -50,13 +50,21 @@ const SalesOrderDetailModal = ({ docNo, preloadedData, onClose }) => {
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#1a365d]"></div>
         </div>
       ) : (
-        <div className="relative w-full max-w-[750px] max-h-[90vh] flex flex-col bg-white shadow-2xl rounded-sm overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+        <div className="relative w-full max-w-[800px] flex flex-col items-center drop-shadow-2xl animate-in fade-in zoom-in-95 duration-200 print:shadow-none print:max-w-none print:w-full print:border-none mt-12">
+          
+          {/* Action Buttons */}
+          <div className="absolute -top-12 right-0 flex gap-3 print:hidden">
+              <button onClick={handlePrint} className="text-white hover:text-blue-200 p-2 transition-colors bg-white/20 rounded-full hover:bg-white/30 backdrop-blur-md" title="Print Document">
+                  <Printer size={20} />
+              </button>
+              <button onClick={onClose} className="text-white hover:text-red-200 p-2 transition-colors bg-white/20 rounded-full hover:bg-white/30 backdrop-blur-md">
+                  <X size={22} />
+              </button>
+          </div>
 
-            <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 transition-colors z-10 p-2 rounded-full hover:bg-gray-100">
-                <X size={20} />
-            </button>
-
-            <div className="flex-1 p-12 text-[#1e293b] overflow-y-auto no-scrollbar">
+          {/* Main Document Body */}
+          <div className="w-full bg-white pt-10 pb-10 px-12 relative overflow-hidden print:bg-white print:bg-none rounded-t-md print:rounded-none" style={{ boxShadow: '0 4px 60px rgba(0,0,0,0.05)' }}>
+            <div className="flex-1 text-[#1e293b] overflow-y-auto no-scrollbar">
                 <div className="flex flex-col items-center mb-8">
                     <h2 className="text-[22px] font-bold text-[#1a365d] tracking-wide uppercase">
                         {session.companyName || 'Accounts Web'}
@@ -208,6 +216,7 @@ const SalesOrderDetailModal = ({ docNo, preloadedData, onClose }) => {
                     </div>
                 </div>
             </div>
+        </div>
         </div>
       )}
     </div>

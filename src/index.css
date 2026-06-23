@@ -159,8 +159,29 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 @media print {
   /* Hide the main application entirely to prevent overlap or extra pages */
-  #root {
+  body:not(.printing-receipt) #root {
     display: none !important;
+  }
+
+  body.printing-receipt * {
+    visibility: hidden;
+  }
+  
+  body.printing-receipt #root,
+  body.printing-receipt .receipt-printable,
+  body.printing-receipt .receipt-printable * {
+    visibility: visible;
+  }
+
+  body.printing-receipt .receipt-printable {
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    transform: none !important;
+    box-shadow: none !important;
+    margin: 0 !important;
+    padding: 20px !important;
   }
 
   body {

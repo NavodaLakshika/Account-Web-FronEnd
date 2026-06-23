@@ -72,5 +72,14 @@ export const journalService = {
         } catch (error) {
             throw error.response?.data?.message || 'Failed to delete line.';
         }
+    },
+
+    loadForEdit: async (data) => {
+        try {
+            const resp = await api.post(`journal/load-for-edit`, data);
+            return resp.data;
+        } catch (error) {
+            throw error.response?.data?.message || 'Failed to load journal for edit.';
+        }
     }
 };

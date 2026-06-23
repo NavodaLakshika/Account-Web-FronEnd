@@ -7,6 +7,7 @@ import { customerAdvanceService } from '../services/customerAdvance.service';
 
 import { getSessionData } from '../utils/session';
 import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
+import TransactionReceiptModal from '../components/modals/TransactionReceiptModal';
 
 
 const formatDateToDMY = (dateStr) => {
@@ -90,21 +91,21 @@ const SearchModal = ({ isOpen, onClose, title, items, onSelect, searchPlaceholde
 };
 
 const CustomerAdvanceBoard = ({ isOpen, onClose }) => {
-    const [lookups, setLookups] = useState({ customers: [], drAccounts: [], banks: [] });
+    const [lookups, setLookups] = useState({ customers: [], drAccounts: [], banks: [], payTypes: [] });
     const [loading, setLoading] = useState(false);
 
     // Form States
     const getInitialFormData = () => ({
         receiptNo: '',
         postDate: new Date().toISOString().split('T')[0],
-        payType: 'CASH',
+        payType: '',
         chequeNo: '',
         chequeDate: new Date().toISOString().split('T')[0],
         bank: '',
         branch: '',
         amount: '0.00',
-        debitAccCode: '810-101',
-        debitAccName: 'Cash In Hand',
+        debitAccCode: '',
+        debitAccName: '',
         creditAccCode: '',
         creditAccName: '',
         memo: '',
@@ -118,6 +119,7 @@ const CustomerAdvanceBoard = ({ isOpen, onClose }) => {
     const [activeModal, setActiveModal] = useState(null); // 'customer', 'debitAcc', 'bank', 'payType'
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [showChqDatePicker, setShowChqDatePicker] = useState(false);
+    const [receiptTx, setReceiptTx] = useState(null);
 
     // Keyboard Focus References
     const inputRefs = {
@@ -184,14 +186,9 @@ const CustomerAdvanceBoard = ({ isOpen, onClose }) => {
             setLookups({
                 customers: data.customers || [],
                 drAccounts: data.drAccounts || [],
-                banks: (data.banks || []).map(b => ({ code: b, name: b }))
+                banks: (data.banks || []).map(b => ({ code: b, name: b })),
+                payTypes: data.paymentMethods || []
             });
-
-            // Set default debit account name if found in list
-            const defaultDr = (data.drAccounts || []).find(a => a.code === '810-101');
-            if (defaultDr) {
-                setFormData(prev => ({ ...prev, debitAccName: defaultDr.name }));
-            }
         } catch (error) {
             showErrorToast('Failed to load transaction lookups.');
         }
@@ -225,14 +222,14 @@ const CustomerAdvanceBoard = ({ isOpen, onClose }) => {
     const handleClear = () => {
         setFormData(prev => ({
             ...prev,
-            payType: 'CASH',
+            payType: '',
             chequeNo: '',
             chequeDate: new Date().toISOString().split('T')[0],
             bank: '',
             branch: '',
             amount: '0.00',
-            debitAccCode: '810-101',
-            debitAccName: 'Cash In Hand',
+            debitAccCode: '',
+            debitAccName: '',
             creditAccCode: '',
             creditAccName: '',
             memo: ''
@@ -257,8 +254,35 @@ const CustomerAdvanceBoard = ({ isOpen, onClose }) => {
         try {
             const resp = await customerAdvanceService.save(payload);
             showSuccessToast(resp.message || `Customer Advance received successfully! Doc ID: ${resp.docNo}`);
+            
+            // Format receipt data
+            setReceiptTx({
+                type: 'CUSTOMER ADVANCE RECEIPT',
+                docNo: resp.docNo || formData.receiptNo,
+                date: formData.postDate,
+                payee: formData.creditAccName,
+                total: parseFloat(formData.amount),
+                details: {
+                    header: {
+                        memo: formData.memo,
+                        customerCode: formData.creditAccCode,
+                        postDate: formData.postDate,
+                        payType: formData.payType,
+                        bank: formData.bank,
+                        branch: formData.branch,
+                        chequeNo: formData.chequeNo,
+                        chequeDate: formData.chequeDate,
+                    },
+                    expenses: [{
+                        accCode: formData.debitAccCode,
+                        amount: parseFloat(formData.amount),
+                        memo: formData.debitAccName
+                    }]
+                }
+            });
+
             handleClear();
-            onClose();
+            // onClose(); // Let user close the modal after seeing the receipt
         } catch (error) {
             showErrorToast(error.toString());
         } finally {
@@ -306,7 +330,7 @@ const CustomerAdvanceBoard = ({ isOpen, onClose }) => {
                 title="Customer Advance Receipt"
                 subtitle="Customer Advances"
                 icon={Banknote}
-                maxWidth="max-w-4xl"
+                maxWidth="max-w-5xl"
                 footer={
                     <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-gray-100 rounded-b-xl">
                         <div>
@@ -336,20 +360,20 @@ const CustomerAdvanceBoard = ({ isOpen, onClose }) => {
                     <div className="bg-white p-5 border border-slate-200 rounded-[5px] shadow-sm space-y-4">
                         <div className="grid grid-cols-12 gap-x-6 gap-y-3.5">
                             
-                            {/* Receipt No / Doc ID */}
-                            <div className="col-span-6 flex items-center gap-2">
+                            {/* Doc ID */}
+                            <div className="col-span-4 flex items-center gap-2">
                                 <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Doc ID</label>
                                 <input 
                                     type="text" 
                                     value={formData.receiptNo} 
                                     readOnly 
-                                    className="flex-1 h-8 border border-slate-200 px-3 text-[12px] font-mono font-bold text-slate-700 bg-slate-50 rounded outline-none shadow-sm focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" 
+                                    className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-mono font-bold text-slate-700 bg-slate-50 rounded outline-none shadow-sm focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" 
                                 />
                             </div>
 
                             {/* Post Date */}
-                            <div className="col-span-6 flex items-center gap-2">
-                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0 text-right pr-2">Rec. Date</label>
+                            <div className="col-span-4 flex items-center gap-2">
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Rec. Date</label>
                                 <div className="flex-1 flex gap-1 h-8 min-w-0">
                                     <input 
                                         type="text" 
@@ -368,8 +392,23 @@ const CustomerAdvanceBoard = ({ isOpen, onClose }) => {
                                 </div>
                             </div>
 
-                            {/* Credit Account / Customer Selection */}
-                            <div className="col-span-12 flex items-center gap-2">
+                            {/* Amount */}
+                            <div className="col-span-4 flex items-center gap-2">
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Amount *</label>
+                                <input 
+                                    type="number" 
+                                    ref={inputRefs.amount}
+                                    name="amount" 
+                                    step="0.01"
+                                    value={formData.amount} 
+                                    onChange={handleInputChange} 
+                                    onKeyDown={(e) => handleKeyDown(e, 'amount')}
+                                    className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[14px] text-right font-black text-red-600 bg-slate-50 rounded outline-none shadow-sm focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" 
+                                />
+                            </div>
+
+                            {/* Customer Selection */}
+                            <div className="col-span-8 flex items-center gap-2">
                                 <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Customer *</label>
                                 <div className="flex-1 flex gap-1 h-8 min-w-0">
                                     <input 
@@ -377,34 +416,12 @@ const CustomerAdvanceBoard = ({ isOpen, onClose }) => {
                                         ref={inputRefs.creditAccCode}
                                         readOnly 
                                         value={formData.creditAccCode ? `${formData.creditAccCode} - ${formData.creditAccName}` : ''} 
-                                        className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-mono font-bold text-red-600 bg-slate-50 rounded outline-none shadow-sm cursor-pointer"
+                                        className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-mono font-bold text-red-600 bg-slate-50 rounded outline-none shadow-sm cursor-pointer truncate"
                                         onClick={() => setActiveModal('customer')}
                                         onKeyDown={(e) => handleKeyDown(e, 'creditAccCode')}
                                     />
                                     <button 
                                         onClick={() => setActiveModal('customer')} 
-                                        className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0 border-none"
-                                    >
-                                        <Search size={16} />
-                                    </button>
-                                </div>
-                            </div>
-
-                            {/* Debit Account Selection */}
-                            <div className="col-span-12 flex items-center gap-2">
-                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Debit Acc *</label>
-                                <div className="flex-1 flex gap-1 h-8 min-w-0">
-                                    <input 
-                                        type="text" 
-                                        ref={inputRefs.debitAccCode}
-                                        readOnly 
-                                        value={formData.debitAccCode ? `${formData.debitAccCode} - ${formData.debitAccName}` : ''} 
-                                        className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-mono font-bold text-slate-700 bg-slate-50 rounded outline-none shadow-sm cursor-pointer"
-                                        onClick={() => setActiveModal('debitAcc')}
-                                        onKeyDown={(e) => handleKeyDown(e, 'debitAccCode')}
-                                    />
-                                    <button 
-                                        onClick={() => setActiveModal('debitAcc')} 
                                         className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0 border-none"
                                     >
                                         <Search size={16} />
@@ -420,8 +437,8 @@ const CustomerAdvanceBoard = ({ isOpen, onClose }) => {
                                         type="text" 
                                         ref={inputRefs.payType}
                                         readOnly 
-                                        value={formData.payType} 
-                                        className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-mono font-bold text-slate-700 bg-slate-50 rounded outline-none shadow-sm cursor-pointer"
+                                        value={lookups.payTypes?.find(m => m.code === formData.payType)?.name || formData.payType || ''} 
+                                        className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-mono font-bold text-slate-700 bg-slate-50 rounded outline-none shadow-sm cursor-pointer truncate"
                                         onClick={() => setActiveModal('payType')}
                                         onKeyDown={(e) => handleKeyDown(e, 'payType')}
                                     />
@@ -434,9 +451,31 @@ const CustomerAdvanceBoard = ({ isOpen, onClose }) => {
                                 </div>
                             </div>
 
-                            {/* Cheque Details (Only if PayType === 'CHEQUE') */}
+                            {/* Debit Account Selection */}
+                            <div className="col-span-8 flex items-center gap-2">
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Debit Acc *</label>
+                                <div className="flex-1 flex gap-1 h-8 min-w-0">
+                                    <input 
+                                        type="text" 
+                                        ref={inputRefs.debitAccCode}
+                                        readOnly 
+                                        value={formData.debitAccCode ? `${formData.debitAccCode} - ${formData.debitAccName}` : ''} 
+                                        className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-mono font-bold text-slate-700 bg-slate-50 rounded outline-none shadow-sm cursor-pointer truncate"
+                                        onClick={() => setActiveModal('debitAcc')}
+                                        onKeyDown={(e) => handleKeyDown(e, 'debitAccCode')}
+                                    />
+                                    <button 
+                                        onClick={() => setActiveModal('debitAcc')} 
+                                        className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0 border-none"
+                                    >
+                                        <Search size={16} />
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Cheque No */}
                             <div className="col-span-4 flex items-center gap-2">
-                                <label className="text-[11px] font-bold text-gray-500 uppercase w-20 shrink-0 text-right pr-2">Chq No</label>
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Chq No</label>
                                 <input 
                                     type="text" 
                                     ref={inputRefs.chequeNo}
@@ -445,12 +484,49 @@ const CustomerAdvanceBoard = ({ isOpen, onClose }) => {
                                     onChange={handleInputChange} 
                                     disabled={formData.payType !== 'CHEQUE'}
                                     onKeyDown={(e) => handleKeyDown(e, 'chequeNo')}
-                                    className="flex-1 h-8 border border-slate-200 px-3 text-[12px] font-mono rounded outline-none bg-slate-50 shadow-sm focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 disabled:bg-gray-100 disabled:text-gray-400" 
+                                    className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-mono rounded outline-none bg-slate-50 shadow-sm focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 disabled:bg-gray-100 disabled:text-gray-400" 
                                 />
                             </div>
 
+                            {/* Bank / Branch */}
+                            <div className="col-span-8 flex items-center gap-2">
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Bank / Branch</label>
+                                <div className="flex-1 flex gap-1 h-8 min-w-0">
+                                    <input 
+                                        type="text" 
+                                        ref={inputRefs.bank}
+                                        readOnly 
+                                        value={formData.bank || ''} 
+                                        disabled={formData.payType !== 'CHEQUE'}
+                                        className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-mono font-bold text-slate-700 bg-slate-50 rounded outline-none shadow-sm cursor-pointer disabled:bg-gray-100 disabled:text-gray-400 truncate"
+                                        onClick={() => formData.payType === 'CHEQUE' && setActiveModal('bank')}
+                                        onKeyDown={(e) => handleKeyDown(e, 'bank')}
+                                        placeholder="Select Bank"
+                                    />
+                                    <button 
+                                        disabled={formData.payType !== 'CHEQUE'}
+                                        onClick={() => setActiveModal('bank')} 
+                                        className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0 border-none disabled:opacity-50"
+                                    >
+                                        <Search size={16} />
+                                    </button>
+                                </div>
+                                <input 
+                                    type="text" 
+                                    ref={inputRefs.branch}
+                                    name="branch" 
+                                    value={formData.branch} 
+                                    onChange={handleInputChange} 
+                                    disabled={formData.payType !== 'CHEQUE'}
+                                    onKeyDown={(e) => handleKeyDown(e, 'branch')}
+                                    placeholder="Branch"
+                                    className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-mono rounded outline-none bg-slate-50 shadow-sm focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 disabled:bg-gray-100 disabled:text-gray-400" 
+                                />
+                            </div>
+
+                            {/* Cheque Date */}
                             <div className="col-span-4 flex items-center gap-2">
-                                <label className="text-[11px] font-bold text-gray-500 uppercase w-20 shrink-0 text-right pr-2">Chq Date</label>
+                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Chq Date</label>
                                 <div className="flex-1 flex gap-1 h-8 min-w-0">
                                     <input 
                                         type="text" 
@@ -471,60 +547,6 @@ const CustomerAdvanceBoard = ({ isOpen, onClose }) => {
                                 </div>
                             </div>
 
-                            {/* Bank Selection (Cheque only) */}
-                            <div className="col-span-6 flex items-center gap-2">
-                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Bank</label>
-                                <div className="flex-1 flex gap-1 h-8 min-w-0">
-                                    <input 
-                                        type="text" 
-                                        ref={inputRefs.bank}
-                                        readOnly 
-                                        value={formData.bank || ''} 
-                                        disabled={formData.payType !== 'CHEQUE'}
-                                        className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-mono font-bold text-slate-700 bg-slate-50 rounded outline-none shadow-sm cursor-pointer disabled:bg-gray-100 disabled:text-gray-400"
-                                        onClick={() => formData.payType === 'CHEQUE' && setActiveModal('bank')}
-                                        onKeyDown={(e) => handleKeyDown(e, 'bank')}
-                                    />
-                                    <button 
-                                        disabled={formData.payType !== 'CHEQUE'}
-                                        onClick={() => setActiveModal('bank')} 
-                                        className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0 border-none disabled:opacity-50"
-                                    >
-                                        <Search size={16} />
-                                    </button>
-                                </div>
-                            </div>
-
-                            {/* Branch (Cheque only) */}
-                            <div className="col-span-6 flex items-center gap-2">
-                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0 text-right pr-2">Branch</label>
-                                <input 
-                                    type="text" 
-                                    ref={inputRefs.branch}
-                                    name="branch" 
-                                    value={formData.branch} 
-                                    onChange={handleInputChange} 
-                                    disabled={formData.payType !== 'CHEQUE'}
-                                    onKeyDown={(e) => handleKeyDown(e, 'branch')}
-                                    className="flex-1 h-8 border border-slate-200 px-3 text-[12px] font-mono rounded outline-none bg-slate-50 shadow-sm focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 disabled:bg-gray-100 disabled:text-gray-400" 
-                                />
-                            </div>
-
-                            {/* Amount */}
-                            <div className="col-span-12 flex items-center gap-2">
-                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Amount *</label>
-                                <input 
-                                    type="number" 
-                                    ref={inputRefs.amount}
-                                    name="amount" 
-                                    step="0.01"
-                                    value={formData.amount} 
-                                    onChange={handleInputChange} 
-                                    onKeyDown={(e) => handleKeyDown(e, 'amount')}
-                                    className="w-48 h-8 border border-slate-200 px-3 text-[14px] text-right font-black text-red-600 bg-slate-50 rounded outline-none shadow-sm focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" 
-                                />
-                            </div>
-
                             {/* Memo */}
                             <div className="col-span-12 flex items-start gap-2 pt-2">
                                 <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0 pt-1.5">Remarks / Memo</label>
@@ -535,7 +557,7 @@ const CustomerAdvanceBoard = ({ isOpen, onClose }) => {
                                     value={formData.memo} 
                                     onChange={handleInputChange} 
                                     onKeyDown={(e) => handleKeyDown(e, 'memo')}
-                                    className="flex-1 h-9 border border-slate-200 px-3 text-[12px] font-mono rounded outline-none bg-slate-50 shadow-sm focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" 
+                                    className="flex-1 min-w-0 h-9 border border-slate-200 px-3 text-[12px] font-mono rounded outline-none bg-slate-50 shadow-sm focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" 
                                 />
                             </div>
 
@@ -573,10 +595,7 @@ const CustomerAdvanceBoard = ({ isOpen, onClose }) => {
                 isOpen={activeModal === 'payType'} 
                 onClose={() => setActiveModal(null)} 
                 title="Select Pay Type" 
-                items={[
-                    { code: 'CASH', name: 'CASH' },
-                    { code: 'CHEQUE', name: 'CHEQUE' }
-                ]} 
+                items={lookups.payTypes} 
                 onSelect={(item) => {
                     handlePayTypeChange(item.code);
                     setTimeout(() => {
@@ -613,6 +632,17 @@ const CustomerAdvanceBoard = ({ isOpen, onClose }) => {
                 }} 
                 currentDate={formData.chequeDate} 
             />
+
+            {/* Receipt Modal */}
+            {receiptTx && (
+                <TransactionReceiptModal 
+                    selectedTx={receiptTx} 
+                    onClose={() => {
+                        setReceiptTx(null);
+                        onClose(); // Close the main board when receipt is closed
+                    }} 
+                />
+            )}
         </>
     );
 };

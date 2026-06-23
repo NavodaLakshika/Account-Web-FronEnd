@@ -7,6 +7,7 @@ import { bankingService } from '../services/banking.service';
 
 import { getSessionData } from '../utils/session';
 import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
+import TransactionReceiptModal from '../components/modals/TransactionReceiptModal';
 
 
 const DirectBankTransactionBoard = ({ isOpen, onClose }) => {
@@ -37,6 +38,10 @@ const DirectBankTransactionBoard = ({ isOpen, onClose }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [datePickerField, setDatePickerField] = useState('date');
+    
+    // Receipt Modal States
+    const [showReceipt, setShowReceipt] = useState(false);
+    const [lastSavedTx, setLastSavedTx] = useState(null);
 
     useEffect(() => {
         if (isOpen) {
@@ -57,7 +62,7 @@ const DirectBankTransactionBoard = ({ isOpen, onClose }) => {
             const activeComp = compCode || formData.company;
             const [lookupRes, docRes] = await Promise.all([
                 bankingService.getDirectTransactionLookups(activeComp),
-                bankingService.generateDocNo('BDT', activeComp)
+                bankingService.generateDocNo('MDPO', activeComp)
             ]);
             setLookups(lookupRes);
             setFormData(prev => ({ ...prev, docNo: docRes.docNo }));
@@ -76,10 +81,55 @@ const DirectBankTransactionBoard = ({ isOpen, onClose }) => {
 
         try {
             setLoading(true);
-            await bankingService.saveDirectTransaction(formData);
+
+            const isExpense = formData.type === 'Expenses';
+            const transactionAmount = isExpense ? -Math.abs(formData.amount) : Math.abs(formData.amount);
+
+            const payload = {
+                DocNo: formData.docNo,
+                Company: formData.company,
+                CreateUser: formData.createUser,
+                DepositTo: formData.bankAccount,
+                DepositDate: formData.date,
+                Memo: formData.memo || `${formData.type} Transaction`,
+                RefNo: formData.docNo,
+                TotalAmount: transactionAmount,
+                Entries: [
+                    {
+                        ReceivedFrom: formData.apAccountName || '',
+                        AccountCode: formData.apAccount,
+                        Memo: formData.memo || `${formData.type} Transaction`,
+                        Amount: transactionAmount
+                    }
+                ]
+            };
+
+            await bankingService.saveDirectTransaction(payload);
             showSuccessToast('Direct transaction saved successfully!');
+            
+            setLastSavedTx({
+                type: 'BANK DIRECT TRANSACTION',
+                docNo: formData.docNo,
+                payee: formData.apAccountName ? `${formData.apAccount} - ${formData.apAccountName}` : '',
+                date: formData.date,
+                total: formData.amount,
+                details: {
+                    header: {
+                        docNo: formData.docNo,
+                        date: formData.date,
+                        payee: formData.apAccountName,
+                        amount: formData.amount,
+                    },
+                    expenses: [{
+                        accCode: formData.bankAccountName,
+                        memo: formData.memo || `${formData.type} Transaction`,
+                        amount: formData.amount
+                    }]
+                }
+            });
+            setShowReceipt(true);
+            
             handleClear();
-            onClose();
         } catch (error) {
             showErrorToast(error.toString());
         } finally {
@@ -104,9 +154,9 @@ const DirectBankTransactionBoard = ({ isOpen, onClose }) => {
     };
 
     const filteredLookup = () => {
-        if (activeModal === 'bank') return lookups.banks.filter(l => l.name.toLowerCase().includes(searchTerm.toLowerCase()));
-        if (activeModal === 'ap') return lookups.accounts.filter(l => l.name.toLowerCase().includes(searchTerm.toLowerCase()));
-        if (activeModal === 'costCenter') return lookups.costCenters.filter(l => l.name.toLowerCase().includes(searchTerm.toLowerCase()));
+        if (activeModal === 'bank') return (lookups?.banks || []).filter(l => (l.name || '').toLowerCase().includes(searchTerm.toLowerCase()) || (l.code || '').toLowerCase().includes(searchTerm.toLowerCase()));
+        if (activeModal === 'ap') return (lookups?.accounts || []).filter(l => (l.name || '').toLowerCase().includes(searchTerm.toLowerCase()) || (l.code || '').toLowerCase().includes(searchTerm.toLowerCase()));
+        if (activeModal === 'costCenter') return (lookups?.costCenters || []).filter(l => (l.name || '').toLowerCase().includes(searchTerm.toLowerCase()) || (l.code || '').toLowerCase().includes(searchTerm.toLowerCase()));
         return [];
     };
 
@@ -126,18 +176,13 @@ const DirectBankTransactionBoard = ({ isOpen, onClose }) => {
                 title="Bank Direct Transaction"
                 maxWidth="max-w-[1000px]"
                 footer={
-                    <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-slate-200 rounded-b-xl">
-                        <div className="flex gap-3">
-                            <button onClick={handleClear} disabled={loading} className="px-6 py-3 bg-[#00adff] hover:bg-[#0099e6] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] transition-all active:scale-95 flex items-center justify-center gap-2 border-none">
-                                <RotateCcw size={14} /> CLEAR FORM
-                            </button>
-                        </div>
-                        <div className="flex gap-3">
-                            
-                            <button onClick={handleSave} disabled={loading} className={`px-6 py-3 bg-[#0285fd] hover:bg-[#0073ff] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] shadow-md shadow-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border-none ${loading ? 'opacity-50' : ''}`}>
-                                {loading ? <Loader2 size={14} className="animate-spin" /> : <CheckCircle2 size={14} />} SAVE
-                            </button>
-                        </div>
+                    <div className="bg-slate-50/80 px-6 py-3 w-full flex justify-end gap-3 border-t border-slate-200 rounded-b-[5px]">
+                        <button onClick={handleClear} disabled={loading} className="px-6 py-3 bg-slate-200 hover:bg-slate-300 text-slate-700 font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] transition-all active:scale-95 flex items-center justify-center gap-2 border-none">
+                            <RotateCcw size={16} /> CLEAR FORM
+                        </button>
+                        <button onClick={handleSave} disabled={loading} className={`px-6 py-3 bg-[#2bb744] hover:bg-[#259b3a] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] shadow-md shadow-green-100 transition-all active:scale-95 flex items-center justify-center gap-2 border-none ${loading ? 'opacity-50' : ''}`}>
+                            {loading ? <Loader2 size={16} className="animate-spin" /> : <CheckCircle2 size={18} />} SAVE
+                        </button>
                     </div>
                 }
             >
@@ -318,6 +363,17 @@ const DirectBankTransactionBoard = ({ isOpen, onClose }) => {
                     </div>
                 </div>
             </SimpleModal>
+
+            {/* Receipt Modal */}
+            {showReceipt && lastSavedTx && (
+                <TransactionReceiptModal 
+                    selectedTx={lastSavedTx}
+                    onClose={() => {
+                        setShowReceipt(false);
+                        onClose();
+                    }}
+                />
+            )}
         </>
     );
 };

@@ -200,11 +200,11 @@ const ReportsCenterModal = ({ isOpen, onClose, onSelectReport, empCode, companyC
                             <button onClick={() => setSearchQuery('')} className="mt-4 text-sm font-bold text-blue-600 hover:text-blue-700">Clear search</button>
                         </div>
                     ) : (
-                        <div className="columns-1 md:columns-2 lg:columns-3 xl:columns-4 gap-6 space-y-6">
+                        <div className="columns-1 md:columns-2 lg:columns-3 xl:columns-4 gap-6">
                             {filteredGroups.map((group, gi) => {
                                 const Icon = group.icon;
                                 return (
-                                    <div key={gi} className="break-inside-avoid bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden flex flex-col">
+                                    <div key={gi} className="break-inside-avoid mb-6 bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden flex flex-col">
                                         <div className="px-4 py-3 bg-slate-50 border-b border-gray-100 flex items-center gap-3">
                                             <div className="w-8 h-8 rounded-lg bg-white border border-gray-200 shadow-sm flex items-center justify-center">
                                                 <Icon size={16} className="text-gray-600" />
@@ -224,10 +224,10 @@ const ReportsCenterModal = ({ isOpen, onClose, onSelectReport, empCode, companyC
                                                         if (!isLocked) handleSelect(item);
                                                     }}
                                                     disabled={isLocked}
-                                                    className={`w-full text-left px-5 py-2 text-[13px] transition-colors group flex justify-between items-center ${isLocked ? 'text-gray-400 cursor-not-allowed opacity-70' : 'text-gray-700 hover:bg-blue-50 hover:text-blue-700'}`}
+                                                    className={`w-full text-left px-5 py-2 text-[13px] transition-colors group flex justify-between items-start gap-2 ${isLocked ? 'text-gray-400 cursor-not-allowed opacity-70' : 'text-gray-700 hover:bg-blue-50 hover:text-blue-700'}`}
                                                 >
-                                                    <span className="font-medium truncate pr-4">{item}</span>
-                                                    {isLocked && <Lock size={14} className="text-gray-300 group-hover:text-red-500 transition-colors" />}
+                                                    <span className="font-medium leading-snug break-words">{item}</span>
+                                                    {isLocked && <Lock size={14} className="text-gray-300 group-hover:text-red-500 transition-colors mt-0.5 shrink-0" />}
                                                 </button>
                                             )})}
                                         </div>

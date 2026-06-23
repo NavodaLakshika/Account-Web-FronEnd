@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import SimpleModal from '../components/SimpleModal';
 import CalendarModal from '../components/CalendarModal';
+import TransactionReceiptModal from '../components/modals/TransactionReceiptModal';
 import { Search, X, RotateCcw, Loader2, ArrowRightLeft, Landmark, Calendar, FileText, CheckCircle2, Wallet, ArrowRightCircle } from 'lucide-react';
 import { bankingService } from '../services/banking.service';
 
@@ -12,6 +13,7 @@ import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
 const FundsTransferBoard = ({ isOpen, onClose }) => {
     const [loading, setLoading] = useState(false);
     const [lookups, setLookups] = useState({ banks: [], costCenters: [] });
+    const [receiptData, setReceiptData] = useState(null);
     
     // Form States
     const getInitialFormData = () => ({
@@ -59,7 +61,7 @@ const FundsTransferBoard = ({ isOpen, onClose }) => {
             const activeComp = compCode || formData.company;
             const [lookupRes, docRes] = await Promise.all([
                 bankingService.getTransferLookups(activeComp),
-                bankingService.generateDocNo('FNT', activeComp)
+                bankingService.generateDocNo('FNTDN', activeComp)
             ]);
             setLookups(lookupRes);
             setFormData(prev => ({ ...prev, docNo: docRes.docNo }));
@@ -96,9 +98,38 @@ const FundsTransferBoard = ({ isOpen, onClose }) => {
         try {
             setLoading(true);
             await bankingService.saveTransfer(formData);
+            
+            setReceiptData({
+                type: 'FUNDS TRANSFER',
+                docNo: formData.docNo,
+                payee: `Transfer to ${formData.toAccountName}`,
+                date: formData.date,
+                total: formData.amount,
+                details: {
+                    header: {
+                        docNo: formData.docNo,
+                        date: formData.date,
+                        payee: `Transfer to ${formData.toAccountName}`,
+                        amount: formData.amount,
+                        memo: formData.memo || `Funds Transfer`,
+                    },
+                    expenses: [
+                        {
+                            accCode: formData.fromAccountName,
+                            memo: 'Source Account',
+                            amount: formData.amount
+                        },
+                        {
+                            accCode: formData.toAccountName,
+                            memo: 'Destination Account',
+                            amount: formData.amount
+                        }
+                    ]
+                }
+            });
+
             showSuccessToast('Funds transferred successfully!');
             handleClear();
-            onClose();
         } catch (error) {
             showErrorToast(error.toString());
         } finally {
@@ -149,18 +180,13 @@ const FundsTransferBoard = ({ isOpen, onClose }) => {
                 title="Funds Transfer"
                 maxWidth="max-w-[1000px]"
                 footer={
-                    <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-slate-200 rounded-b-xl">
-                        <div className="flex gap-3">
-                            <button onClick={handleClear} disabled={loading} className="px-6 py-3 bg-[#00adff] hover:bg-[#0099e6] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] transition-all active:scale-95 flex items-center justify-center gap-2 border-none">
-                                <RotateCcw size={14} /> CLEAR FORM
-                            </button>
-                        </div>
-                        <div className="flex gap-3">
-                            
-                            <button onClick={handleSave} disabled={loading} className={`px-6 py-3 bg-[#0285fd] hover:bg-[#0073ff] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] shadow-md shadow-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border-none ${loading ? 'opacity-50' : ''}`}>
-                                {loading ? <Loader2 size={14} className="animate-spin" /> : <CheckCircle2 size={14} />} SAVE
-                            </button>
-                        </div>
+                    <div className="bg-slate-50/80 px-6 py-3 w-full flex justify-end gap-3 border-t border-slate-200 rounded-b-[5px]">
+                        <button onClick={handleClear} disabled={loading} className="px-6 py-3 bg-slate-200 hover:bg-slate-300 text-slate-700 font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] transition-all active:scale-95 flex items-center justify-center gap-2 border-none">
+                            <RotateCcw size={16} /> CLEAR FORM
+                        </button>
+                        <button onClick={handleSave} disabled={loading} className={`px-6 py-3 bg-[#2bb744] hover:bg-[#259b3a] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] shadow-md shadow-green-100 transition-all active:scale-95 flex items-center justify-center gap-2 border-none ${loading ? 'opacity-50' : ''}`}>
+                            {loading ? <Loader2 size={16} className="animate-spin" /> : <CheckCircle2 size={18} />} SAVE
+                        </button>
                     </div>
                 }
             >
@@ -339,6 +365,17 @@ const FundsTransferBoard = ({ isOpen, onClose }) => {
                     </div>
                 </div>
             </SimpleModal>
+
+            {receiptData && (
+                <TransactionReceiptModal
+                    isOpen={true}
+                    onClose={() => {
+                        setReceiptData(null);
+                        onClose();
+                    }}
+                    selectedTx={receiptData}
+                />
+            )}
         </>
     );
 };

@@ -1,13 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { payBillService } from '../services/payBill.service';
 import { showErrorToast } from '../utils/toastUtils';
-import { X } from 'lucide-react';
+import { X, Printer } from 'lucide-react';
 import { getSessionData } from '../utils/session';
 
 const PaymentDetailModal = ({ payDoc, preloadedData, onClose }) => {
   const [detail, setDetail] = useState(preloadedData || null);
   const [loading, setLoading] = useState(!preloadedData);
   const session = getSessionData() || {};
+
+  const handlePrint = () => {
+    window.print();
+  };
 
   useEffect(() => {
     if (preloadedData) return;
@@ -33,19 +37,22 @@ const PaymentDetailModal = ({ payDoc, preloadedData, onClose }) => {
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#0077c5]"></div>
         </div>
       ) : (
-        <div className="relative w-full max-w-[380px] flex flex-col items-center drop-shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+        <div className="relative w-full max-w-[400px] flex flex-col items-center drop-shadow-2xl animate-in fade-in zoom-in-95 duration-200 print:shadow-none print:max-w-none print:w-full print:border-none mt-12">
           
+          {/* Action Buttons */}
+          <div className="absolute -top-12 right-0 flex gap-3 print:hidden">
+              <button onClick={handlePrint} className="text-white hover:text-blue-200 p-2 transition-colors bg-white/20 rounded-full hover:bg-white/30 backdrop-blur-md" title="Print Receipt">
+                  <Printer size={20} />
+              </button>
+              <button onClick={onClose} className="text-white hover:text-red-200 p-2 transition-colors bg-white/20 rounded-full hover:bg-white/30 backdrop-blur-md">
+                  <X size={22} />
+              </button>
+          </div>
+
           {/* Main Receipt Body */}
-          <div className="w-full bg-gradient-to-b from-white to-[#f4f6f9] pt-12 pb-6 px-10 relative overflow-hidden" 
+          <div className="w-full bg-gradient-to-b from-white to-[#f4f6f9] pt-10 pb-6 px-10 relative overflow-hidden print:bg-white print:bg-none rounded-t-md print:rounded-none" 
                style={{ boxShadow: 'inset 0 0 60px rgba(0,0,0,0.02)' }}>
             
-            {/* Action Buttons */}
-            <div className="absolute top-3 right-3 flex gap-2">
-                <button onClick={onClose} className="text-gray-400 hover:text-gray-700 p-1 transition-colors bg-white/50 rounded-full hover:bg-gray-200">
-                    <X size={18} />
-                </button>
-            </div>
-
             {/* Header */}
             <div className="text-center mb-6">
               <h2 className="text-[22px] font-mono tracking-[0.25em] text-[#5a677a]">RECEIPT</h2>

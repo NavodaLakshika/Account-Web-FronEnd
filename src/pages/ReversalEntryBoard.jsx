@@ -102,9 +102,17 @@ const ReversalEntryBoard = ({ isOpen, onClose }) => {
         }
         try {
             setLoading(true);
-            const data = await reversalEntryService.view(formData.voucherNo || formData.documentNo, formData.transactionType);
-            showSuccessToast("Transaction details loaded.");
-            // You could show a sub-modal or update state with details
+            const response = await reversalEntryService.view(formData.voucherNo || formData.documentNo, formData.transactionType);
+            const data = response.data || response;
+            showSuccessToast(data.message || "Transaction details loaded.");
+            
+            // Auto-fill reason with transaction details if available
+            if (data.total !== undefined) {
+                setFormData(prev => ({
+                    ...prev,
+                    reason: `Reversing transaction: ${formData.voucherNo || formData.documentNo}\nTotal Amount: ${data.total}\nDate: ${data.date ? new Date(data.date).toLocaleDateString() : 'N/A'}`
+                }));
+            }
         } catch (error) {
             showErrorToast(error.toString());
         } finally {
@@ -132,21 +140,20 @@ const ReversalEntryBoard = ({ isOpen, onClose }) => {
                 isOpen={isOpen}
                 onClose={onClose}
                 title="Reversal Entry Form"
-                maxWidth="max-w-[1000px]"
+                maxWidth="max-w-[600px]"
                 footer={
                     <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-slate-200 rounded-b-xl">
                         <div className="flex gap-3">
-                            <button onClick={handleClear} disabled={loading} className="px-6 py-3 bg-[#00adff] hover:bg-[#0099e6] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] transition-all active:scale-95 flex items-center justify-center gap-2 border-none">
+                            <button onClick={handleClear} disabled={loading} className="px-6 h-10 bg-white text-gray-600 border border-gray-200 text-[13px] font-mono font-bold tracking-widest uppercase rounded-[5px] hover:bg-gray-50 transition-all active:scale-95 flex items-center justify-center gap-2 shadow-sm">
                                 <RotateCcw size={14} /> CLEAR FORM
                             </button>
                         </div>
                         <div className="flex gap-3">
-                            
-                            <button onClick={handleView} disabled={loading} className="px-6 py-3 bg-white border-2 border-[#0285fd] text-[#0285fd] font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] hover:bg-blue-50 transition-all flex items-center justify-center gap-2">
+                            <button onClick={handleView} disabled={loading} className="px-6 h-10 bg-white text-blue-600 border border-blue-200 text-[13px] font-mono font-bold tracking-widest uppercase rounded-[5px] hover:bg-blue-50 transition-all flex items-center justify-center gap-2 shadow-sm">
                                 <FileSearch size={14} /> VIEW
                             </button>
-                            <button onClick={handleApply} disabled={loading} className={`px-6 py-3 bg-[#0285fd] hover:bg-[#0073ff] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] shadow-md shadow-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border-none ${loading ? 'opacity-50' : ''}`}>
-                                {loading ? <Loader2 size={14} className="animate-spin" /> : <CheckCircle2 size={14} />} APPLY
+                            <button onClick={handleApply} disabled={loading} className={`px-8 h-10 text-[13px] font-mono font-bold tracking-widest uppercase rounded-[5px] shadow-md transition-all active:scale-95 flex items-center gap-2 border-none bg-[#0285fd] hover:bg-[#0073ff] text-white shadow-blue-500/20 ${loading ? 'opacity-50' : ''}`}>
+                                {loading ? <Loader2 size={16} className="animate-spin" /> : <CheckCircle2 size={16} />} APPLY
                             </button>
                         </div>
                     </div>
@@ -155,10 +162,6 @@ const ReversalEntryBoard = ({ isOpen, onClose }) => {
                 <div className="space-y-4 font-['Tahoma']">
                     {/* Main Form Section */}
                     <div className="bg-white p-4 border border-slate-200 rounded-[5px] relative overflow-hidden space-y-4">
-                        <div className="absolute top-0 right-0 p-6 opacity-[0.05] pointer-events-none">
-                            <History size={150} className="text-blue-900" />
-                        </div>
-                        
                         <div className="grid grid-cols-12 gap-x-6 gap-y-3.5 relative z-10">
                             {/* Transaction Type - Full Width */}
                             <div className="col-span-12 flex items-center gap-2">
@@ -177,25 +180,33 @@ const ReversalEntryBoard = ({ isOpen, onClose }) => {
                                 </div>
                             </div>
 
-                            {/* Reference Numbers - 3 Columns */}
-                            <div className="col-span-12 lg:col-span-4 flex items-center gap-2">
+                            {/* Reference Numbers - Stacked vertically */}
+                            <div className="col-span-12 flex items-center gap-2">
                                 <label className="text-[11px] font-bold text-gray-500 uppercase w-32 shrink-0">Voucher No</label>
-                                <input name="voucherNo" value={formData.voucherNo} onChange={handleInputChange} type="text" className="flex-1 min-w-0 h-8 border border-slate-200 rounded px-3 text-[12px] font-mono outline-none bg-slate-50 text-gray-700 transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" />
+                                <div className="flex-1 max-w-[400px]">
+                                    <input name="voucherNo" value={formData.voucherNo} onChange={handleInputChange} type="text" className="w-full h-8 border border-slate-200 rounded px-3 text-[12px] font-mono outline-none bg-slate-50 text-gray-700 transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" />
+                                </div>
                             </div>
 
-                            <div className="col-span-12 lg:col-span-4 flex items-center gap-2">
+                            <div className="col-span-12 flex items-center gap-2">
                                 <label className="text-[11px] font-bold text-gray-500 uppercase w-32 shrink-0">Document No.</label>
-                                <input name="documentNo" value={formData.documentNo} onChange={handleInputChange} type="text" className="flex-1 min-w-0 h-8 border border-slate-200 rounded px-3 text-[12px] font-mono outline-none bg-slate-50 text-gray-700 transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" />
+                                <div className="flex-1 max-w-[400px]">
+                                    <input name="documentNo" value={formData.documentNo} onChange={handleInputChange} type="text" className="w-full h-8 border border-slate-200 rounded px-3 text-[12px] font-mono outline-none bg-slate-50 text-gray-700 transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" />
+                                </div>
                             </div>
 
-                            <div className="col-span-12 lg:col-span-4 flex items-center gap-2">
+                            <div className="col-span-12 flex items-center gap-2">
                                 <label className="text-[11px] font-bold text-gray-500 uppercase w-32 shrink-0">Cheque No</label>
-                                <input name="chequeNo" value={formData.chequeNo} onChange={handleInputChange} type="text" className="flex-1 min-w-0 h-8 border border-slate-200 rounded px-3 text-[12px] font-mono outline-none bg-slate-50 text-gray-700 transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" />
+                                <div className="flex-1 max-w-[400px]">
+                                    <input name="chequeNo" value={formData.chequeNo} onChange={handleInputChange} type="text" className="w-full h-8 border border-slate-200 rounded px-3 text-[12px] font-mono outline-none bg-slate-50 text-gray-700 transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" />
+                                </div>
                             </div>
 
                             <div className="col-span-12 flex items-start gap-2 pt-2">
                                 <label className="text-[11px] font-bold text-gray-500 uppercase w-32 shrink-0 mt-2">Reason</label>
-                                <textarea name="reason" value={formData.reason} onChange={handleInputChange} className="flex-1 min-w-0 h-24 border border-slate-200 rounded px-3 py-2 font-mono text-[12px] outline-none bg-slate-50 text-gray-700 transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 resize-none italic" />
+                                <div className="flex-1 max-w-[400px]">
+                                    <textarea name="reason" value={formData.reason} onChange={handleInputChange} className="w-full h-24 border border-slate-200 rounded px-3 py-2 font-mono text-[12px] outline-none bg-slate-50 text-gray-700 transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 resize-none italic" />
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -208,9 +219,9 @@ const ReversalEntryBoard = ({ isOpen, onClose }) => {
                         </div>
                         
                         <div className="grid grid-cols-12 gap-x-6 gap-y-3.5">
-                            <div className="col-span-12 lg:col-span-6 flex items-center gap-2">
+                            <div className="col-span-12 flex items-center gap-2">
                                 <label className="text-[11px] font-bold text-gray-500 uppercase w-32 shrink-0">User Name</label>
-                                <div className="flex-1 flex gap-1 h-8 min-w-0">
+                                <div className="flex-1 max-w-[400px] flex gap-1 h-8 min-w-0">
                                     <input 
                                         type="text" 
                                         readOnly 
@@ -223,9 +234,9 @@ const ReversalEntryBoard = ({ isOpen, onClose }) => {
                                     </button>
                                 </div>
                             </div>
-                            <div className="col-span-12 lg:col-span-6 flex items-center gap-2">
+                            <div className="col-span-12 flex items-center gap-2">
                                 <label className="text-[11px] font-bold text-gray-500 uppercase w-32 shrink-0">Password</label>
-                                <div className="flex-1 relative h-8 min-w-0">
+                                <div className="flex-1 max-w-[400px] relative h-8 min-w-0">
                                     <input 
                                         name="authPassword" 
                                         type="password" 
@@ -237,25 +248,9 @@ const ReversalEntryBoard = ({ isOpen, onClose }) => {
                                 </div>
                             </div>
                         </div>
-                        
-                        <div className="mt-4 flex items-center gap-2 px-3 py-2 bg-blue-50/50 rounded-[5px] border border-blue-100/50">
-                            <AlertCircle size={14} className="text-[#0285fd]" />
-                            <p className="text-[10px] font-mono font-bold text-blue-800 uppercase tracking-widest italic">
-                                Note: Reversing a transaction will create a counter-entry to offset the original financial impact.
-                            </p>
-                        </div>
                     </div>
                 </div>
             </SimpleModal>
-
-            {/* Selection Modals */}
-
-            <CalendarModal
-                isOpen={showDatePicker}
-                onClose={() => setShowDatePicker(false)}
-                currentDate={formData[datePickerField]}
-                onDateSelect={(date) => setFormData({...formData, [datePickerField]: date})}
-            />
 
             <SimpleModal
                 isOpen={!!activeModal}

@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import SimpleModal from '../components/SimpleModal';
+import TransactionReceiptModal from '../components/modals/TransactionReceiptModal';
 import { 
   Search, Calendar, ChevronDown, Plus, Filter, FileText, 
   CreditCard, PenTool, Wallet, RefreshCw, Loader2, 
-  ArrowUpRight, TrendingUp, DollarSign, Users, PieChart, AlertCircle
+  ArrowUpRight, TrendingUp, DollarSign, Users, PieChart, AlertCircle, Printer, X
 } from 'lucide-react';
 import { biDashboardService } from '../services/biDashboard.service';
 import { getSessionData } from '../utils/session';
@@ -18,6 +19,7 @@ const ProfitLossDashboardBoard = ({
   onPettyCash 
 }) => {
   const [selectedTab, setSelectedTab] = useState('overview');
+  const [selectedTx, setSelectedTx] = useState(null);
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState({
     totalIncome: 0,
@@ -101,49 +103,85 @@ const ProfitLossDashboardBoard = ({
         </div>
 
         {/* Metric Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
           {/* Net Profit */}
-          <div className={`relative overflow-hidden bg-gradient-to-br ${profitBg} text-white p-6 rounded-2xl shadow-lg group hover:shadow-xl hover:scale-[1.01] transition-all duration-300`}>
-            <div className="absolute top-0 right-0 p-8 opacity-5 transform translate-x-2 -translate-y-2">
-              <TrendingUp size={100} />
+          <div className={`relative overflow-hidden bg-gradient-to-br ${profitBg} text-white p-6 rounded-xl shadow-lg border border-white/10 group hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col`}>
+            <div className="absolute -right-4 -bottom-4 p-8 opacity-10 transform group-hover:scale-110 group-hover:rotate-12 transition-all duration-500">
+              <TrendingUp size={120} />
             </div>
-            <div className="flex items-center gap-2 mb-2">
-              <span className="text-white/90 text-[10px] font-black uppercase tracking-[0.2em]">Net Profit (Loss)</span>
+
+            <div className="flex justify-between items-start mb-6">
+              <div className="flex flex-col">
+                <span className="text-[11px] font-black uppercase tracking-widest text-white/70 mb-1">Net Profit (Loss)</span>
+                <span className="text-[12px] font-bold text-white/90">Current Period</span>
+              </div>
+              <div className="w-10 h-10 rounded-full flex items-center justify-center bg-white/20 text-white group-hover:scale-110 transition-transform shadow-inner">
+                <TrendingUp size={20} strokeWidth={2.5} />
+              </div>
             </div>
-            <div className="text-3xl font-black tracking-tight font-['Tahoma']">
-              {loading ? (
-                <div className="h-9 w-32 bg-white/20 rounded animate-pulse" />
-              ) : (
-                `LKR ${netProfit.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-              )}
+
+            <div className="mt-auto">
+              <div className="text-3xl font-black tracking-tight font-['Tahoma'] text-white">
+                {loading ? (
+                  <div className="h-9 w-32 bg-white/20 rounded animate-pulse" />
+                ) : (
+                  `LKR ${netProfit.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                )}
+              </div>
             </div>
           </div>
 
           {/* Income */}
-          <div className="relative overflow-hidden bg-white text-slate-800 p-6 rounded-2xl shadow-sm border border-slate-200 group hover:border-blue-400 transition-all duration-300">
-            <div className="flex items-center gap-2 mb-2">
-              <span className="text-blue-500 text-[10px] font-black uppercase tracking-[0.2em]">Total Income</span>
+          <div className="relative overflow-hidden bg-gradient-to-br from-blue-500 to-blue-600 text-white p-6 rounded-xl shadow-lg border border-white/10 group hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col">
+            <div className="absolute -right-4 -bottom-4 p-8 opacity-10 transform group-hover:scale-110 group-hover:-rotate-12 transition-all duration-500">
+              <DollarSign size={120} />
             </div>
-            <div className="text-3xl font-black tracking-tight font-['Tahoma']">
-              {loading ? (
-                <div className="h-9 w-32 bg-slate-100 rounded animate-pulse" />
-              ) : (
-                `LKR ${data.totalIncome.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-              )}
+
+            <div className="flex justify-between items-start mb-6">
+              <div className="flex flex-col">
+                <span className="text-[11px] font-black uppercase tracking-widest text-blue-100/70 mb-1">Total Income</span>
+                <span className="text-[12px] font-bold text-blue-50">Operating Revenue</span>
+              </div>
+              <div className="w-10 h-10 rounded-full flex items-center justify-center bg-white/20 text-white group-hover:scale-110 transition-transform shadow-inner">
+                <ArrowUpRight size={20} strokeWidth={2.5} />
+              </div>
+            </div>
+
+            <div className="mt-auto">
+              <div className="text-3xl font-black tracking-tight font-['Tahoma'] text-white">
+                {loading ? (
+                  <div className="h-9 w-32 bg-white/20 rounded animate-pulse" />
+                ) : (
+                  `LKR ${data.totalIncome.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                )}
+              </div>
             </div>
           </div>
 
           {/* Expenses */}
-          <div className="relative overflow-hidden bg-white text-slate-800 p-6 rounded-2xl shadow-sm border border-slate-200 group hover:border-amber-400 transition-all duration-300">
-            <div className="flex items-center gap-2 mb-2">
-              <span className="text-amber-500 text-[10px] font-black uppercase tracking-[0.2em]">Total Expenses</span>
+          <div className="relative overflow-hidden bg-gradient-to-br from-amber-500 to-orange-500 text-white p-6 rounded-xl shadow-lg border border-white/10 group hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col">
+            <div className="absolute -right-4 -bottom-4 p-8 opacity-10 transform group-hover:scale-110 group-hover:rotate-12 transition-all duration-500">
+              <Wallet size={120} />
             </div>
-            <div className="text-3xl font-black tracking-tight font-['Tahoma']">
-              {loading ? (
-                <div className="h-9 w-32 bg-slate-100 rounded animate-pulse" />
-              ) : (
-                `LKR ${data.totalExpenses.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-              )}
+
+            <div className="flex justify-between items-start mb-6">
+              <div className="flex flex-col">
+                <span className="text-[11px] font-black uppercase tracking-widest text-orange-100/70 mb-1">Total Expenses</span>
+                <span className="text-[12px] font-bold text-orange-50">Operating Costs</span>
+              </div>
+              <div className="w-10 h-10 rounded-full flex items-center justify-center bg-white/20 text-white group-hover:scale-110 transition-transform shadow-inner">
+                <AlertCircle size={20} strokeWidth={2.5} />
+              </div>
+            </div>
+
+            <div className="mt-auto">
+              <div className="text-3xl font-black tracking-tight font-['Tahoma'] text-white">
+                {loading ? (
+                  <div className="h-9 w-32 bg-white/20 rounded animate-pulse" />
+                ) : (
+                  `LKR ${data.totalExpenses.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -183,9 +221,15 @@ const ProfitLossDashboardBoard = ({
           ) : (
             <>
               {selectedTab === 'overview' && (
-                <div className="bg-slate-50 border border-slate-100 p-6 rounded-2xl flex flex-col items-center justify-center min-h-[300px]">
-                    <PieChart size={64} className="text-slate-300 mb-4" />
-                    <span className="text-slate-500 font-bold">More charts coming soon!</span>
+                <div className="bg-slate-50/50 border-2 border-dashed border-slate-200 p-6 rounded-2xl flex flex-col items-center justify-center min-h-[300px] group hover:bg-slate-50 hover:border-blue-300 transition-all duration-500">
+                    <div className="w-20 h-20 bg-white rounded-full shadow-sm flex items-center justify-center mb-5 group-hover:scale-110 group-hover:shadow-md transition-all duration-500 relative">
+                        <div className="absolute inset-0 rounded-full border border-slate-100 group-hover:border-blue-100 animate-ping opacity-20"></div>
+                        <PieChart size={32} className="text-slate-400 group-hover:text-blue-500 transition-colors" />
+                    </div>
+                    <span className="text-[14px] text-slate-800 font-black tracking-tight mb-1">Visualizations in Progress</span>
+                    <span className="text-[12px] text-slate-500 font-medium max-w-xs text-center leading-relaxed">
+                        We're currently building advanced charts and analytics for your profit & loss data. Check back soon!
+                    </span>
                 </div>
               )}
               {selectedTab === 'transactions' && (
@@ -203,14 +247,14 @@ const ProfitLossDashboardBoard = ({
                       </thead>
                       <tbody className="divide-y divide-slate-100 text-xs font-bold text-slate-700">
                         {data.recentTransactions.map((tx, idx) => (
-                          <tr key={idx} className="hover:bg-slate-50/50 transition-colors border-b border-slate-50">
+                          <tr key={idx} className="hover:bg-blue-50/50 cursor-pointer transition-colors border-b border-slate-50 group" onClick={() => setSelectedTx(tx)}>
                             <td className="py-3 px-6 font-mono text-slate-500">{tx.date.split('T')[0]}</td>
                             <td className="py-3 px-6">
                               <span className="uppercase text-[9px] tracking-wider px-2 py-0.5 rounded font-black bg-slate-100 text-slate-500">
                                 {tx.type}
                               </span>
                             </td>
-                            <td className="py-3 px-6 font-mono text-blue-600">{tx.docNo}</td>
+                            <td className="py-3 px-6 font-mono text-blue-600 group-hover:underline">{tx.docNo}</td>
                             <td className="py-3 px-6 truncate max-w-[300px] font-mono">{tx.payee || tx.category || '---'}</td>
                             <td className="py-3 px-6 text-right font-mono font-black text-slate-900">
                               {tx.total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
@@ -233,6 +277,13 @@ const ProfitLossDashboardBoard = ({
           )}
         </div>
       </div>
+
+      {/* Transaction Receipt Modal */}
+      <TransactionReceiptModal 
+        selectedTx={selectedTx} 
+        onClose={() => setSelectedTx(null)} 
+      />
+
     </SimpleModal>
   );
 };

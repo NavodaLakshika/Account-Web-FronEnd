@@ -103,7 +103,7 @@ export const bankingService = {
 
     saveChequeCancel: async (data) => {
         try {
-            const resp = await api.post(`banking/cheque-cancel`, data);
+            const resp = await api.post(`banking/save-cancel`, data);
             return resp.data;
         } catch (error) {
             throw error.response?.data?.message || 'Failed to process cheque cancellation.';
