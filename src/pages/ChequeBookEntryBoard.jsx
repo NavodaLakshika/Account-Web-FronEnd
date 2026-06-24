@@ -11,7 +11,7 @@ import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
 const ChequeBookEntryBoard = ({ isOpen, onClose }) => {
     const [loading, setLoading] = useState(false);
     const [lookups, setLookups] = useState({ accounts: [] });
-    
+
     // Form States
     const getInitialFormData = () => ({
         accountCode: '',
@@ -40,7 +40,7 @@ const ChequeBookEntryBoard = ({ isOpen, onClose }) => {
                 company: companyCode,
                 createUser: userName
             }));
-            
+
             loadInitialData(companyCode);
         }
     }, [isOpen]);
@@ -60,10 +60,15 @@ const ChequeBookEntryBoard = ({ isOpen, onClose }) => {
     const handleSave = async () => {
         if (!formData.accountCode) return showErrorToast("Please select a valid Bank Account.");
         if (!formData.startNo || !formData.endNo) return showErrorToast("Start and End cheque numbers are required.");
-        
+
         const start = parseInt(formData.startNo);
         const end = parseInt(formData.endNo);
         if (isNaN(start) || isNaN(end) || start > end) return showErrorToast("Invalid cheque range protocol.");
+
+        if (end - start > 1000000) {
+            setLoading(false);
+            return showErrorToast("You are attempting to register over 1 Million cheques! Please check your serial numbers and try a smaller range.");
+        }
 
         try {
             setLoading(true);
@@ -96,7 +101,7 @@ const ChequeBookEntryBoard = ({ isOpen, onClose }) => {
         return [];
     };
 
-    const totalCheques = (formData.startNo && formData.endNo) ? 
+    const totalCheques = (formData.startNo && formData.endNo) ?
         Math.max(0, parseInt(formData.endNo) - parseInt(formData.startNo) + 1) : 0;
 
     return (
@@ -115,14 +120,14 @@ const ChequeBookEntryBoard = ({ isOpen, onClose }) => {
                 title="Cheque Book Inventory Registration"
                 maxWidth="max-w-[1000px]"
                 footer={
-                    <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-slate-200 rounded-b-xl">
+                    <div className="bg-slate-50/80 px-6 py-3 w-full flex justify-end gap-3 border-t border-slate-200 rounded-b-[5px]">
                         <div className="flex gap-3">
-                            <button onClick={handleClear} disabled={loading} className="px-6 py-3 bg-[#00adff] hover:bg-[#0099e6] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] transition-all active:scale-95 flex items-center justify-center gap-2 border-none">
-                                <RotateCcw size={14} /> CLEAR FORM
+                            <button onClick={handleClear} disabled={loading} className="px-6 py-3 bg-slate-200 hover:bg-slate-300 text-slate-700 font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] transition-all active:scale-95 flex items-center justify-center gap-2 border-none">
+                                <RotateCcw size={16} /> CLEAR FORM
                             </button>
                         </div>
                         <div className="flex gap-3">
-                            <button onClick={handleSave} disabled={loading} className={`px-6 py-3 bg-[#0285fd] hover:bg-[#0073ff] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] shadow-md shadow-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border-none ${loading ? 'opacity-50' : ''}`}>
+                            <button onClick={handleSave} disabled={loading} className={`px-6 py-3 bg-[#2bb744] hover:bg-[#259b3a] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] shadow-md shadow-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border-none ${loading ? 'opacity-50' : ''}`}>
                                 {loading ? <Loader2 size={14} className="animate-spin" /> : <ShieldCheck size={14} />} REGISTER PROTOCOL
                             </button>
                         </div>
@@ -135,7 +140,7 @@ const ChequeBookEntryBoard = ({ isOpen, onClose }) => {
                         <div className="absolute top-0 right-0 p-4 opacity-[0.03] pointer-events-none">
                             <BookOpen size={160} />
                         </div>
-                        
+
                         <div className="grid grid-cols-12 gap-x-6 gap-y-3.5 relative z-10">
                             {/* Row 1: Target Account */}
                             <div className="col-span-12 flex items-center gap-2">
@@ -151,10 +156,10 @@ const ChequeBookEntryBoard = ({ isOpen, onClose }) => {
                             {/* Row 2: Book No & Entry Date */}
                             <div className="col-span-12 lg:col-span-6 flex items-center gap-2">
                                 <label className="text-[11px] font-bold text-gray-500 uppercase w-32 shrink-0">Book No</label>
-                                <input 
-                                    type="text" 
-                                    value={formData.bookNo} 
-                                    onChange={e => setFormData({...formData, bookNo: e.target.value})} 
+                                <input
+                                    type="text"
+                                    value={formData.bookNo}
+                                    onChange={e => setFormData({ ...formData, bookNo: e.target.value })}
                                     className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-bold rounded bg-white outline-none focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 transition-all font-mono"
                                 />
                             </div>
@@ -172,33 +177,33 @@ const ChequeBookEntryBoard = ({ isOpen, onClose }) => {
 
                     {/* Serial Number Range Section */}
                     <div className="bg-white p-4 border border-slate-200 rounded-[5px] space-y-3.5 relative">
-                         <div className="flex items-center gap-2 mb-2 pb-2 border-b border-slate-100">
+                        <div className="flex items-center gap-2 mb-2 pb-2 border-b border-slate-100">
                             <Layers size={14} className="text-[#0285fd]" />
                             <span className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">Cheque Leaf Serial Protocol</span>
-                         </div>
-                         <div className="grid grid-cols-12 gap-x-6 gap-y-3.5 items-center">
-                             <div className="col-span-5 flex items-center gap-2">
+                        </div>
+                        <div className="grid grid-cols-12 gap-x-6 gap-y-3.5 items-center">
+                            <div className="col-span-5 flex items-center gap-2">
                                 <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Start Serial</label>
-                                <input 
-                                    type="text" 
-                                    value={formData.startNo} 
-                                    onChange={e => setFormData({...formData, startNo: e.target.value})} 
+                                <input
+                                    type="text"
+                                    value={formData.startNo}
+                                    onChange={e => setFormData({ ...formData, startNo: e.target.value })}
                                     className="flex-1 min-w-0 h-8 border border-blue-200 px-3 text-[13px] font-mono font-black text-[#0078d4] tracking-[0.2em] rounded outline-none focus:border-[#0285fd] shadow-inner transition-all"
                                 />
-                             </div>
-                             <div className="col-span-2 flex items-center justify-center">
-                                 <div className="w-8 h-[1px] bg-slate-300" />
-                             </div>
-                             <div className="col-span-5 flex items-center gap-2">
+                            </div>
+                            <div className="col-span-2 flex items-center justify-center">
+                                <div className="w-8 h-[1px] bg-slate-300" />
+                            </div>
+                            <div className="col-span-5 flex items-center gap-2">
                                 <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0 text-right">End Serial</label>
-                                <input 
-                                    type="text" 
-                                    value={formData.endNo} 
-                                    onChange={e => setFormData({...formData, endNo: e.target.value})} 
+                                <input
+                                    type="text"
+                                    value={formData.endNo}
+                                    onChange={e => setFormData({ ...formData, endNo: e.target.value })}
                                     className="flex-1 min-w-0 h-8 border border-blue-200 px-3 text-[13px] font-mono font-black text-[#0078d4] tracking-[0.2em] rounded outline-none focus:border-[#0285fd] shadow-inner transition-all"
                                 />
-                             </div>
-                         </div>
+                            </div>
+                        </div>
                     </div>
 
                     {/* Valuation Footer */}
@@ -247,11 +252,15 @@ const ChequeBookEntryBoard = ({ isOpen, onClose }) => {
                                 </thead>
                                 <tbody className="divide-y divide-slate-100">
                                     {filteredLookup().map((item, idx) => (
-                                        <tr key={idx} className="group hover:bg-blue-50/50 cursor-pointer transition-colors" onClick={() => {
-                                            setFormData({...formData, accountCode: item.code, accountName: item.name});
+                                        <tr key={idx} className="group hover:bg-blue-50/50 cursor-pointer transition-colors" onClick={async () => {
+                                            setFormData({ ...formData, accountCode: item.code, accountName: item.name });
                                             setActiveModal(null);
+                                            try {
+                                                const res = await bankingService.getChequeBookLookups(formData.company, item.code);
+                                                setFormData(prev => ({ ...prev, bookNo: res.nextBookNo.toString() }));
+                                            } catch (e) { }
                                         }}>
-                                            <td className="px-5 py-3 font-mono text-[12px] font-mono text-gray-700">{item.code}</td>
+                                            <td className="px-5 py-3 font-mono text-[12px] text-gray-700">{item.code}</td>
                                             <td className="px-5 py-3 text-[12px] font-mono text-gray-700 uppercase group-hover:text-blue-600">{item.name}</td>
                                         </tr>
                                     ))}
@@ -266,12 +275,12 @@ const ChequeBookEntryBoard = ({ isOpen, onClose }) => {
                     </div>
                 </div>
             </SimpleModal>
-            
+
             <CalendarModal
                 isOpen={showDatePicker}
                 onClose={() => setShowDatePicker(false)}
                 currentDate={formData.entryDate}
-                onDateSelect={(date) => setFormData({...formData, entryDate: date})}
+                onDateSelect={(date) => setFormData({ ...formData, entryDate: date })}
             />
         </>
     );
