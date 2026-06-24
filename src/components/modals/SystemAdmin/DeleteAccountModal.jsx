@@ -101,43 +101,76 @@ const LookupSearchModal = ({ isOpen, onClose, onSelect, title, data, searchPlace
 };
 
 const DeleteConfirmationModal = ({ isOpen, onClose, onConfirm, accountName, loading }) => {
+    const [confirmText, setConfirmText] = useState('');
+    const requiredText = "delete account";
+    
+    useEffect(() => {
+        if (isOpen) setConfirmText('');
+    }, [isOpen]);
+
+    if (!isOpen) return null;
+    
+    const isMatched = confirmText.toLowerCase() === requiredText;
+
     return (
-        <SimpleModal
-            isOpen={isOpen}
-            onClose={onClose}
-            title="CONFIRM DELETION"
-            maxWidth="max-w-[400px]"
-            showHeaderClose={false}
-        >
-            <div className="p-4 flex flex-col items-center text-center space-y-6 font-['Tahoma']">
-                <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center text-red-500 shadow-inner">
-                    <Trash2 size={40} strokeWidth={2.5} className="animate-pulse" />
-                </div>
-                
-                <div className="space-y-2">
-                    <h3 className="text-[15px] font-black text-slate-800 uppercase tracking-wider">Permanent Action</h3>
-                    <p className="text-[13px] text-slate-500 leading-relaxed font-bold">
-                        Are you sure you want to delete <span className="text-red-600">[{accountName}]</span>? This process cannot be undone.
-                    </p>
+        <div className="fixed inset-0 z-[1300] flex items-center justify-center font-['Plus_Jakarta_Sans'] pointer-events-auto">
+            <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" onClick={() => !loading && onClose()} />
+            
+            <div className={`relative w-full shadow-[0_10px_40px_rgb(0,0,0,0.3)] rounded-none overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col`}>
+                {/* Top Section */}
+                <div className={`bg-[#ea5b5b] py-10 px-6 relative overflow-hidden`}>
+                    <X className="absolute right-0 -top-8 w-48 h-48 text-black opacity-10 rotate-12 pointer-events-none" strokeWidth={4} />
+                    
+                    <div className="max-w-7xl mx-auto w-full relative z-10">
+                        {/* Header */}
+                        <div className="flex justify-between items-start">
+                            <h2 className="text-white text-[18px] font-medium tracking-wide">Delete Account?</h2>
+                            <button onClick={onClose} className="text-white/70 hover:text-white transition-colors">
+                                <X size={18} strokeWidth={2.5} />
+                            </button>
+                        </div>
+                        
+                        {/* Body Text */}
+                        <div className="mt-2 pr-4">
+                            <p className="text-white/90 text-[12px] leading-relaxed break-words font-['Tahoma']">
+                                You'll permanently lose your data related to:<br/>
+                                <span className="text-white font-bold">[{accountName}]</span>
+                            </p>
+                            <div className="mt-4 max-w-sm">
+                                <p className="text-[12px] text-white/90 mb-1 font-['Tahoma']">Type "{requiredText}" to confirm</p>
+                                <input 
+                                    type="text"
+                                    value={confirmText}
+                                    onChange={(e) => setConfirmText(e.target.value)}
+                                    placeholder={requiredText}
+                                    className="w-full border-none rounded-sm px-3 py-1.5 text-sm outline-none text-slate-800 shadow-inner"
+                                />
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <div className="w-full flex gap-3 pt-2">
-                    <button
-                        onClick={onConfirm}
-                        disabled={loading}
-                        className="flex-1 h-11 bg-[#ff3b30] text-white text-[12px] font-black rounded-[5px] shadow-lg shadow-red-100 hover:bg-[#e03127] transition-all active:scale-95 flex items-center justify-center gap-2 uppercase tracking-widest disabled:opacity-50"
-                    >
-                        {loading ? 'PROCESSING...' : 'YES, DELETE'}
-                    </button>
-                    <button
-                        onClick={onClose}
-                        className="flex-1 h-11 bg-white text-slate-400 text-[12px] font-black rounded-[5px] border border-gray-200 hover:bg-slate-50 transition-all active:scale-95 uppercase tracking-widest"
-                    >
-                        CANCEL
-                    </button>
+                {/* Bottom Section */}
+                <div className="bg-white py-4 px-6 flex relative z-10">
+                    <div className="max-w-7xl mx-auto w-full flex justify-end gap-2">
+                        <button 
+                            onClick={onClose}
+                            disabled={loading}
+                            className="px-5 py-1.5 bg-[#d1d5db] hover:bg-[#9ca3af] text-white uppercase text-[11px] font-bold tracking-widest transition-colors rounded-sm disabled:opacity-50"
+                        >
+                            Cancel
+                        </button>
+                        <button 
+                            onClick={() => isMatched && onConfirm()}
+                            disabled={loading || !isMatched}
+                            className={`px-6 py-1.5 text-white uppercase text-[11px] font-bold tracking-widest transition-colors rounded-sm flex items-center gap-2 ${isMatched && !loading ? 'bg-[#ea5b5b] hover:bg-[#d64545]' : 'bg-red-300 cursor-not-allowed'}`}
+                        >
+                            {loading ? <Loader2 size={14} className="animate-spin" /> : 'Confirm'}
+                        </button>
+                    </div>
                 </div>
             </div>
-        </SimpleModal>
+        </div>
     );
 };
 

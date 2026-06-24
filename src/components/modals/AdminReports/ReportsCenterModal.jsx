@@ -1,113 +1,41 @@
 import React, { useState, useEffect } from 'react';
-import { X, PieChart, Landmark, UserSquare, Users, Search, BarChart3, Package, Clock, FileText, Wallet, ShoppingCart, CreditCard, BookOpen, Lock } from 'lucide-react';
+import { X, PieChart, Landmark, UserSquare, Users, Search, BarChart3, Package, Clock, FileText, Wallet, ShoppingCart, CreditCard, BookOpen, Lock, ShieldAlert } from 'lucide-react';
 import api from '../../../services/api';
 
 export const menuGroups = [
     {
-        title: 'Business overview',
+        title: 'Business Overview',
         icon: PieChart,
         items: [
-            "Audit Log", "Balance Sheet", "Balance Sheet Comparison", "Balance Sheet Detail", 
-            "Balance Sheet Summary", "Statement of Cash Flows", "Business Snapshot", 
-            "Custom Summary Report", "Statement of Changes in Equity", "Profit and Loss", 
-            "Profit and Loss by Customer", "Profit and Loss by Month", "Profit and Loss By Tag Group", 
-            "Profit and Loss Comparison", "Profit and Loss Detail", "Profit and Loss as % of total income", 
-            "Profit and Loss year-to-date comparison", "Project Profitability Summary", "Quarterly Profit and Loss Summary"
+            "Profit and Loss", "Balance Sheet", "Trial Balance", "General Ledger", "Journal Report", "Statement of Cash Flows"
         ]
     },
     {
-        title: 'Who owes you',
-        icon: Wallet,
-        items: [
-            "Accounts receivable ageing summary", "Accounts receivable ageing detail", "Collections Report", 
-            "Customer Balance Summary", "Customer Balance Detail", "Invoice List", "Invoices and Received Payments", 
-            "Open Invoices", "Statement List", "Terms List", "Unbilled charges", "Unbilled time"
-        ]
-    },
-    {
-        title: 'Inventory',
-        icon: Package,
-        items: [
-            "Products Report", "Inventory Valuation Detail", "Inventory Valuation Summary", "Open Purchase Order Detail", 
-            "Open Purchase Order List", "Stock Take Worksheet"
-        ]
-    },
-    {
-        title: 'Sales and customers',
+        title: 'Sales and Customers',
         icon: Users,
         items: [
-            "Sales by Customer Type Detail", "Customer Contact List", "Income by Customer Summary", 
-            "Customer Phone List", "Sales by Customer Summary", "Sales by Customer Detail", "Deposit Detail", 
-            "Estimates by Customer", "Product/Service List", "Sales by Product/Service Summary", 
-            "Sales by Product/Service Detail", "Payment Method List", "Time Activities by Customer Detail", 
-            "Transaction List by Customer", "Transaction List by Tag Group", "Invoice Approval Status",
-            "Product/Item Profitability by Customer"
+            "Customer Balance Summary", "Invoice List", "Sales Orders Report", "Received Payments List", "Income by Customer"
         ]
     },
     {
-        title: 'What you owe',
-        icon: CreditCard,
-        items: [
-            "Accounts payable ageing summary", "Accounts payable ageing detail", "Bills and Applied Payments", 
-            "Bill Payment List", "Unpaid Bills", "Supplier Balance Summary", "Supplier Balance Detail",
-            "Bill Approval Status"
-        ]
-    },
-    {
-        title: 'Expenses and suppliers',
+        title: 'Purchases and Suppliers',
         icon: ShoppingCart,
         items: [
-            "Cheque Detail", "Purchases by Product/Service Detail", "Purchase List", "Transaction List by Supplier", 
-            "Purchases by Supplier Detail", "Supplier Contact List", "Expenses by Supplier Summary", "Supplier Phone List"
+            "Supplier Balance Summary", "Unpaid Bills", "Bill Payments Report", "Purchase Orders Report"
         ]
     },
     {
-        title: 'Sales tax',
-        icon: FileText,
-        items: [
-            "Tax Liability Report"
-        ]
-    },
-    {
-        title: 'Employees',
-        icon: UserSquare,
-        items: [
-            "Employee Contact List", "Recent/Edited Time Activities", "Time Activities by Employee Detail"
-        ]
-    },
-    {
-        title: 'For my accountant',
-        icon: BookOpen,
-        items: [
-            "Account List", "Balance Sheet", "Balance Sheet Comparison", "Balance Sheet Detail", "Balance Sheet Summary", 
-            "Statement of Cash Flows", "Invalid Journal Transactions", "General Ledger", "General Ledger List", 
-            "Journal", "Recurring Template List", "Profit and Loss", "Profit and Loss by Customer", 
-            "Profit and Loss by Month", "Profit and Loss Comparison", "Profit and Loss as % of total income", 
-            "Profit and Loss year-to-date comparison", "Quarterly Profit and Loss Summary", "Recent Transactions", 
-            "Reconciliation Reports", "Trial Balance", "Adjusted Trial Balance", "Transaction Detail by Account", 
-            "Transaction List by Date", "Transaction List with Splits"
-        ]
-    },
-    {
-        title: 'Payroll',
+        title: 'Banking and Cash',
         icon: Landmark,
         items: [
-            "Employee Contact List", "Recent/Edited Time Activities", "Time Activities by Employee Detail"
+            "Cheque Register", "Petty Cash Report", "Bank Reconciliation Report", "Deposits List"
         ]
     },
     {
-        title: 'Time',
-        icon: Clock,
+        title: 'System and Audit',
+        icon: ShieldAlert,
         items: [
-            "Timesheet Detail by Employee", "Time Summary by Pay Type"
-        ]
-    },
-    {
-        title: 'Chart of Accounts',
-        icon: PieChart,
-        items: [
-            "Chart of Accounts", "Fixed Assets Item List", "Long Term Liability", "Depreciation Procedure",
-            "Fixed Income", "Fixed Expenses", "Sales Tax ID List"
+            "System Log & Audit Report"
         ]
     }
 ];

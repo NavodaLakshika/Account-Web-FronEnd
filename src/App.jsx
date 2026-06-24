@@ -10,6 +10,8 @@ import ProductsReportPage from './pages/ProductsReportPage';
 import SystemAnalyticsReportPage from './pages/SystemAnalyticsReportPage';
 import ReportBillPayments from './pages/ReportBillPayments';
 import ReportSalesOrders from './pages/ReportSalesOrders';
+import ChequeRegisterReport from './pages/ChequeRegisterReport';
+import GeneralLedgerReport from './pages/GeneralLedgerReport';
 
 
 import SuperAdminDashboard from './pages/SuperAdminDashboard';
@@ -26,27 +28,7 @@ function App() {
           <Toaster 
               position="top-right"
               toastOptions={{
-                  className: 'font-["Plus_Jakarta_Sans"] shadow-2xl border border-gray-100 rounded-xl text-sm font-bold',
-                  duration: 4000,
-                  style: {
-                      background: '#ffffff',
-                      color: '#1e293b',
-                      borderRadius: '12px',
-                      padding: '16px 24px',
-                      boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
-                  },
-                  success: {
-                      iconTheme: {
-                          primary: '#10b981',
-                          secondary: '#ffffff',
-                      },
-                  },
-                  error: {
-                      iconTheme: {
-                          primary: '#d13438',
-                          secondary: '#ffffff',
-                      },
-                  }
+                  duration: 4000
               }}
           />
           <Routes>
@@ -62,6 +44,8 @@ function App() {
             <Route path="/report/system-analytics" element={<SystemAnalyticsReportPage />} />
             <Route path="/report/bill-payments" element={<ReportBillPayments />} />
             <Route path="/report/sales-orders" element={<ReportSalesOrders />} />
+            <Route path="/report/cheque-register" element={<ChequeRegisterReport />} />
+            <Route path="/report/general-ledger" element={<GeneralLedgerReport />} />
 
             {/* Default Route */}
             <Route path="/" element={<Navigate to="/login" replace />} />

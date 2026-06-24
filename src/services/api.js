@@ -26,7 +26,9 @@ const endRequest = () => {
 // Request interceptor: Attach Token and Company Code
 api.interceptors.request.use(
   (config) => {
-    startRequest();
+    if (!config.hideLoader) {
+      startRequest();
+    }
     const token = localStorage.getItem('token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -48,7 +50,11 @@ api.interceptors.request.use(
     return config;
   },
   (error) => {
-    endRequest();
+    if (!error.config?.hideLoader) {
+      endRequest();
+    }
+    const errMsg = error.response?.data?.message || error.response?.data || error.message || 'Network Error';
+    window.dispatchEvent(new CustomEvent('globalError', { detail: { message: typeof errMsg === 'string' ? errMsg : 'An unexpected error occurred.' } }));
     return Promise.reject(error);
   }
 );
@@ -56,7 +62,9 @@ api.interceptors.request.use(
 // Response interceptor: Handle 401 Unauthorized and Trigger Global Refreshes
 api.interceptors.response.use(
   (response) => {
-    endRequest();
+    if (!response.config?.hideLoader) {
+      endRequest();
+    }
     // Intercept mutations to auto-refresh reports globally
     const method = response.config?.method?.toLowerCase();
     if (['post', 'put', 'delete', 'patch'].includes(method)) {
@@ -65,7 +73,9 @@ api.interceptors.response.use(
     return response;
   },
   (error) => {
-    endRequest();
+    if (!error.config?.hideLoader) {
+      endRequest();
+    }
     if (error.response?.status === 401) {
       // Skip redirect if this was the login request itself
       const isLoginRequest = error.config?.url?.includes('/Auth/login');
@@ -76,6 +86,9 @@ api.interceptors.response.use(
         localStorage.removeItem('selectedCompany');
         window.location.href = '/'; // Force redirect to login
       }
+    } else {
+      const errMsg = error.response?.data?.message || error.response?.data || error.message || 'Network Error';
+      window.dispatchEvent(new CustomEvent('globalError', { detail: { message: typeof errMsg === 'string' ? errMsg : 'An unexpected error occurred.' } }));
     }
     return Promise.reject(error);
   }

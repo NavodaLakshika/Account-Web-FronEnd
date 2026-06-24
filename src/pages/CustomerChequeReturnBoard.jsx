@@ -164,17 +164,13 @@ const CustomerChequeReturnBoard = ({ isOpen, onClose }) => {
                 title="Customer Cheque Return Protocol"
                 maxWidth="max-w-[1000px]"
                 footer={
-                    <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-slate-200 rounded-b-xl">
-                        <div className="flex gap-3">
-                            <button onClick={handleClear} disabled={loading} className="px-6 py-3 bg-[#00adff] hover:bg-[#0099e6] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] transition-all active:scale-95 flex items-center justify-center gap-2 border-none">
-                                <RotateCcw size={14} /> CLEAR FORM
-                            </button>
-                        </div>
-                        <div className="flex gap-3">
-                            <button onClick={handleSave} disabled={loading} className={`px-6 py-3 bg-[#0285fd] hover:bg-[#0073ff] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] shadow-md shadow-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border-none ${loading ? 'opacity-50' : ''}`}>
-                                {loading ? <Loader2 size={14} className="animate-spin" /> : <RotateCcw size={14} />} RETURN INSTRUMENT
-                            </button>
-                        </div>
+                    <div className="bg-slate-50/80 px-6 py-3 w-full flex justify-end gap-3 border-t border-slate-200 rounded-b-[5px]">
+                        <button onClick={handleClear} disabled={loading} className="px-6 py-3 bg-slate-200 hover:bg-slate-300 text-slate-700 font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] transition-all active:scale-95 flex items-center justify-center gap-2 border-none">
+                            <RotateCcw size={16} /> CLEAR FORM
+                        </button>
+                        <button onClick={handleSave} disabled={loading} className={`px-6 py-3 bg-[#2bb744] hover:bg-[#259b3a] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] shadow-md shadow-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border-none ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                            {loading ? <Loader2 size={16} className="animate-spin" /> : <CheckCircle2 size={18} />} RETURN INSTRUMENT
+                        </button>
                     </div>
                 }
             >

@@ -166,7 +166,7 @@ export const bankingService = {
 
     getChequeBookLookups: async (companyCode = getCompanyCode(), accCode = '') => {
         try {
-            const resp = await api.get(`banking/cheque-book/lookups?companyCode=${companyCode}&accCode=${accCode}`);
+            const resp = await api.get(`banking/cheque-book/lookups?companyCode=${companyCode}&accCode=${accCode}`, { hideLoader: true });
             return resp.data;
         } catch (error) {
             return { accounts: [], nextBookNo: 1 };
@@ -184,7 +184,16 @@ export const bankingService = {
 
     saveChequeBook: async (data) => {
         try {
-            const resp = await api.post(`banking/cheque-book/save`, data);
+            const payload = {
+                AccCode: data.accountCode,
+                BookNo: parseInt(data.bookNo) || 0,
+                StartNo: parseInt(data.startNo) || 0,
+                EndNo: parseInt(data.endNo) || 0,
+                Date: data.entryDate,
+                Company: data.company,
+                CreateUser: data.createUser || 'Admin'
+            };
+            const resp = await api.post(`banking/cheque-book/save`, payload);
             return resp.data;
         } catch (error) {
             throw error.response?.data?.message || 'Failed to register cheque book.';
