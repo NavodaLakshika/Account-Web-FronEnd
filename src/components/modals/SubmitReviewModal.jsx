@@ -94,13 +94,21 @@ const SubmitReviewModal = ({ isOpen, onClose, currentUser }) => {
         <div className="fixed inset-0 z-[2050] flex items-center justify-center p-6 bg-slate-900/30 backdrop-blur-sm font-sans">
             <div className="relative w-full max-w-[1000px] bg-white shadow-2xl flex flex-col rounded-sm overflow-hidden animate-in fade-in zoom-in-95 duration-200">
                 {/* Header with Close */}
-                <div className="flex justify-end p-4">
-                    <button onClick={onClose} className="text-gray-400 hover:text-gray-800 transition-colors">
+                <div className="bg-white px-6 py-3 flex items-center justify-between border-b border-slate-200 select-none relative shrink-0">
+                    <div className="flex flex-col gap-0.5 overflow-hidden">
+                        <span className="text-[15px] font-mono font-bold text-slate-800 uppercase tracking-widest truncate">
+                            Review & Feedback
+                        </span>
+                        <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider truncate">
+                            Help us improve your experience
+                        </span>
+                    </div>
+                    <button onClick={onClose} className="w-8 h-8 bg-white/10 hover:bg-slate-100 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-600 transition-all shrink-0 border-none ml-4" title="Close">
                         <X size={28} strokeWidth={1.5} />
                     </button>
                 </div>
 
-                <div className="px-8 md:px-12 pb-12 overflow-y-auto flex-1">
+                <div className="px-8 md:px-12 py-8 overflow-y-auto flex-1">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 min-h-[420px]">
                         {/* LEFT */}
                         <div className="bg-white rounded-sm shadow-sm p-6 flex flex-col flex-1">
@@ -146,7 +154,7 @@ const SubmitReviewModal = ({ isOpen, onClose, currentUser }) => {
                             </div>
 
                             {/* Trust Badge / Community Stats */}
-                            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-5 border border-blue-100 flex flex-col justify-center mt-auto">
+                            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-[3px] p-5 border border-blue-100 flex flex-col justify-center mt-auto">
                                 <div className="flex items-center gap-3 mb-2">
                                     <div className="bg-blue-600 p-2 rounded-full text-white shadow-sm">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
@@ -212,7 +220,7 @@ const SubmitReviewModal = ({ isOpen, onClose, currentUser }) => {
                                         <span className="text-sm font-semibold text-slate-500 mt-1">{['', 'Poor', 'Fair', 'Good', 'Very Good', 'Excellent'][rating] || 'Select your rating'}</span>
                                     </div>
                                     <div className="relative flex-1 flex flex-col">
-                                        <textarea value={comment} onChange={(e) => setComment(e.target.value)} placeholder="Tell us what you like or what could be improved..." maxLength={MAX_CHARS} className="flex-1 w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:border-blue-400 focus:ring-2 focus:ring-blue-100 outline-none transition-all resize-none text-sm text-slate-700 placeholder:text-slate-400 min-h-[160px]" />
+                                        <textarea value={comment} onChange={(e) => setComment(e.target.value)} placeholder="Tell us what you like or what could be improved..." maxLength={MAX_CHARS} className="flex-1 w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-[3px] focus:border-blue-400 focus:ring-2 focus:ring-blue-100 outline-none transition-all resize-none text-sm text-slate-700 placeholder:text-slate-400 min-h-[160px]" />
                                         <div className="flex items-center justify-end mt-1.5">
                                             <span className={`text-[11px] font-medium ${comment.length >= MAX_CHARS ? 'text-red-500' : comment.length > MAX_CHARS * 0.8 ? 'text-orange-500' : 'text-slate-400'}`}>
                                                 {comment.length}/{MAX_CHARS}
@@ -221,7 +229,7 @@ const SubmitReviewModal = ({ isOpen, onClose, currentUser }) => {
                                     </div>
 
                                     {/* Review Guidelines */}
-                                    <div className="bg-slate-50 border border-slate-100 rounded-xl p-3.5 flex gap-3 items-start mt-1 mb-1">
+                                    <div className="bg-slate-50 border border-slate-100 rounded-[3px] p-3.5 flex gap-3 items-start mt-1 mb-1">
                                         <div className="text-blue-500 mt-0.5 shrink-0">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
                                         </div>
@@ -235,7 +243,7 @@ const SubmitReviewModal = ({ isOpen, onClose, currentUser }) => {
                                         </div>
                                     </div>
 
-                                    <button type="submit" disabled={isSubmitting || rating === 0 || !comment.trim()} className="w-full h-11 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm rounded-xl shadow-sm shadow-blue-200 transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2 flex-shrink-0">
+                                    <button type="submit" disabled={isSubmitting || rating === 0 || !comment.trim()} className="w-full h-11 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm rounded-[3px] shadow-sm shadow-blue-200 transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2 flex-shrink-0">
                                         {isSubmitting ? <Loader2 size={16} className="animate-spin" /> : <><Send size={14} /> Submit Review</>}
                                     </button>
                                 </form>

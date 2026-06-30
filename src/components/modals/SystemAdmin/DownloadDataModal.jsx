@@ -49,16 +49,16 @@ const DownloadDataModal = ({ isOpen, onClose }) => {
     };
 
     const footer = (
-        <div className="bg-slate-50 px-6 py-4 w-full flex justify-end gap-3 border-t border-gray-100 mt-4 rounded-b-xl font-['Tahoma']">
+        <div className="bg-slate-50 px-6 py-4 w-full flex justify-end gap-3 border-t border-gray-200 mt-4 rounded-b-xl font-['Tahoma']">
             <button 
                 onClick={() => setLoading(true)} 
-                className="px-8 h-10 bg-[#50af60] text-white text-[13px] font-bold rounded-[5px] shadow-md shadow-green-200 hover:bg-[#24db4e] transition-all active:scale-95 flex items-center justify-center gap-2"
+                className="px-8 h-10 bg-[#50af60] text-white text-[13px] font-bold rounded-[3px] shadow-md shadow-green-200 hover:bg-[#24db4e] transition-all active:scale-95 flex items-center justify-center gap-2"
             >
                 <Save size={14} /> Save
             </button>
             <button 
                 onClick={handleClear} 
-                className="px-8 h-10 bg-[#00adff] text-white text-[13px] font-bold rounded-[5px] hover:bg-[#0099e6] shadow-md shadow-blue-200 transition-all active:scale-95 border-none flex items-center justify-center gap-2"
+                className="px-8 h-10 bg-white text-[#00adff] border-2 border-[#00adff] hover:bg-blue-50 text-[13px] font-bold rounded-[3px] hover:bg-[#0099e6] shadow-md shadow-blue-200 transition-all active:scale-95 border-none flex items-center justify-center gap-2"
             >
                 <RotateCcw size={14} /> Clear
             </button>
@@ -71,7 +71,7 @@ const DownloadDataModal = ({ isOpen, onClose }) => {
                 isOpen={isOpen}
                 onClose={onClose}
                 title="Inventory Data Download"
-                maxWidth="max-w-5xl"
+                maxWidth="max-w-[700px]"
                 footer={footer}
             >
                 <div className="py-2 select-none font-['Tahoma'] space-y-4 text-[12.5px] mt-2">
@@ -83,12 +83,12 @@ const DownloadDataModal = ({ isOpen, onClose }) => {
                     </div>
 
                     {/* Filter Bar Row 1 */}
-                    <div className="bg-slate-50/50 p-4 border border-slate-100 rounded-[5px] space-y-4">
+                    <div className="bg-slate-50/50 p-4 border border-slate-100 rounded-[3px] space-y-4">
                         <div className="flex items-center gap-6">
                             {/* Date From */}
                             <div className="flex items-center gap-3">
                                 <label className="font-bold text-gray-700 whitespace-nowrap">Date From</label>
- <div className="flex items-center bg-white rounded-[5px] overflow-hidden shadow-sm focus-within:border-blue-400 transition-all">
+ <div className="flex items-center bg-white rounded-[3px] overflow-hidden shadow-sm focus-within:border-blue-400 transition-all">
                                     <input 
                                         type="text" 
                                         value={dateFrom} 
@@ -107,7 +107,7 @@ const DownloadDataModal = ({ isOpen, onClose }) => {
                             {/* Date To */}
                             <div className="flex items-center gap-3">
                                 <label className="font-bold text-gray-700 whitespace-nowrap">Date To</label>
- <div className="flex items-center bg-white rounded-[5px] overflow-hidden shadow-sm focus-within:border-blue-400 transition-all">
+ <div className="flex items-center bg-white rounded-[3px] overflow-hidden shadow-sm focus-within:border-blue-400 transition-all">
                                     <input 
                                         type="text" 
                                         value={dateTo} 
@@ -132,11 +132,11 @@ const DownloadDataModal = ({ isOpen, onClose }) => {
                                         value={location.name} 
                                         readOnly 
                                         placeholder="Select Location..."
-                                        className="flex-1 h-8 border border-gray-300 px-3 bg-gray-50 rounded-[5px] outline-none shadow-sm cursor-default font-mono text-gray-600 truncate" 
+                                        className="flex-1 h-8 border border-gray-300 px-3 bg-gray-50 rounded-[3px] outline-none shadow-sm cursor-default font-mono text-gray-600 truncate" 
                                     />
                                     <button 
                                         onClick={() => setShowLocationLookup(true)} 
-                                        className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95"
+                                        className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95"
                                     >
                                         <Search size={16} />
                                     </button>
@@ -153,11 +153,11 @@ const DownloadDataModal = ({ isOpen, onClose }) => {
                                     value={costCenter.name} 
                                     readOnly 
                                     placeholder="Select Cost Center Profile..."
-                                    className="flex-1 h-8 border border-gray-300 px-3 bg-gray-50 rounded-[5px] outline-none shadow-sm cursor-default font-mono text-gray-600" 
+                                    className="flex-1 h-8 border border-gray-300 px-3 bg-gray-50 rounded-[3px] outline-none shadow-sm cursor-default font-mono text-gray-600" 
                                 />
                                 <button 
                                     onClick={() => setShowCostCenterLookup(true)} 
-                                    className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95"
+                                    className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95"
                                 >
                                     <Search size={16} />
                                 </button>
@@ -166,7 +166,7 @@ const DownloadDataModal = ({ isOpen, onClose }) => {
                     </div>
 
                     {/* Inventory Table Container */}
- <div className=" rounded-[5px] overflow-hidden flex flex-col min-h-[400px] bg-white shadow-inner relative">
+ <div className=" rounded-[3px] overflow-hidden flex flex-col min-h-[400px] bg-white shadow-inner relative">
                         <div className="absolute inset-0 pointer-events-none opacity-[0.05]" 
                              style={{ backgroundImage: 'linear-gradient(#000 1px, transparent 1px)', backgroundSize: '100% 28px' }} 
                         />
@@ -179,7 +179,7 @@ const DownloadDataModal = ({ isOpen, onClose }) => {
                     </div>
 
                     {/* Stats/Totaling Bar */}
-                    <div className="bg-slate-100 border border-slate-200 px-6 py-2 rounded-[5px] flex items-center justify-between shadow-sm">
+                    <div className="bg-slate-100 border border-slate-200 px-6 py-2 rounded-[3px] flex items-center justify-between shadow-sm">
                         <div className="flex items-center gap-2">
                             <span className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Account Totals:</span>
                         </div>
@@ -253,7 +253,7 @@ const SearchModal = ({ title, list, onSelect, onClose, placeholder }) => {
                 </div>
 
                 {/* Search Input Area */}
-                <div className="p-3 bg-slate-50 border-b border-gray-100 flex items-center justify-between">
+                <div className="p-3 bg-slate-50 border-b border-gray-200 flex items-center justify-between">
                     <div className="flex items-center gap-2">
                         <Layers size={14} className="text-gray-400" />
                         <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Search Facility</span>
@@ -261,7 +261,7 @@ const SearchModal = ({ title, list, onSelect, onClose, placeholder }) => {
                     <input 
                         type="text" 
                         placeholder={placeholder} 
-                        className="h-8 border border-gray-300 px-3 text-xs rounded-md w-60 focus:border-[#0285fd] outline-none shadow-sm transition-all" 
+                        className="h-8 border border-gray-300 px-3 text-xs rounded-[3px] w-60 focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] outline-none shadow-sm transition-all" 
                         value={query} 
                         onChange={(e) => setQuery(e.target.value)} 
                     />
@@ -278,7 +278,7 @@ const SearchModal = ({ title, list, onSelect, onClose, placeholder }) => {
                             <button 
                                 key={x.code} 
                                 onClick={() => onSelect(x)}
-                                className="w-full flex items-center justify-between px-3 py-2 text-xs border-b border-gray-100 hover:bg-blue-50 transition-all text-left group"
+                                className="w-full flex items-center justify-between px-3 py-2 text-xs border-b border-gray-200 hover:bg-blue-50 transition-all text-left group"
                             >
                                 <div className="flex items-center gap-2 flex-1">
                                     <span className="w-24 text-center font-mono text-[11px] font-bold text-[#0078d4]">
@@ -288,7 +288,7 @@ const SearchModal = ({ title, list, onSelect, onClose, placeholder }) => {
                                         {x.name}
                                     </span>
                                 </div>
-                                <div className="bg-[#e49e1b] text-white text-[10px] px-5 py-1.5 rounded-md font-bold hover:bg-[#cb9b34] shadow-sm transition-all active:scale-95 uppercase">Select</div>
+                                <div className="bg-[#e49e1b] text-white text-[10px] px-5 py-1.5 rounded-[3px] font-bold hover:bg-[#cb9b34] shadow-sm transition-all active:scale-95 uppercase">Select</div>
                             </button>
                         ))}
                     </div>

@@ -153,7 +153,7 @@ const PromoAdminBoard = ({ isOpen, onClose, inlineView }) => {
                         {!isEditing && (
                             <button 
                                 onClick={() => handleOpenForm()}
-                                className="flex items-center gap-2 px-4 py-2 bg-[#00acee] hover:bg-[#009adb] text-white text-xs font-bold rounded-xl shadow-md transition-all active:scale-[0.98]"
+                                className="flex items-center gap-2 px-4 py-2 bg-[#00acee] hover:bg-[#009adb] text-white text-xs font-bold rounded-[3px] shadow-md transition-all active:scale-[0.98]"
                             >
                                 <Plus size={16} /> Create New Ad
                             </button>
@@ -181,7 +181,7 @@ const PromoAdminBoard = ({ isOpen, onClose, inlineView }) => {
                                         type="text" 
                                         value={title} 
                                         onChange={e => setTitle(e.target.value)} 
-                                        className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl focus:outline-none focus:border-[#00acee] focus:ring-1 focus:ring-[#00acee]/50 text-slate-900 dark:text-white"
+                                        className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-[3px] focus:outline-none focus:border-[#00acee] focus:ring-1 focus:ring-[#00acee]/50 text-slate-900 dark:text-white"
                                         placeholder="e.g. Merit Plus Finance"
                                         maxLength={40}
                                     />
@@ -192,7 +192,7 @@ const PromoAdminBoard = ({ isOpen, onClose, inlineView }) => {
                                     <textarea 
                                         value={desc} 
                                         onChange={e => setDesc(e.target.value)} 
-                                        className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl focus:outline-none focus:border-[#00acee] focus:ring-1 focus:ring-[#00acee]/50 resize-none h-24 text-slate-900 dark:text-white"
+                                        className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-[3px] focus:outline-none focus:border-[#00acee] focus:ring-1 focus:ring-[#00acee]/50 resize-none h-24 text-slate-900 dark:text-white"
                                         placeholder="Brief description of the promotion..."
                                         maxLength={100}
                                     />
@@ -209,7 +209,7 @@ const PromoAdminBoard = ({ isOpen, onClose, inlineView }) => {
                                                         key={iconOpt.name}
                                                         type="button"
                                                         onClick={() => setIconName(iconOpt.name)}
-                                                        className={`p-2 rounded-lg border transition-all ${iconName === iconOpt.name ? 'border-[#00acee] bg-[#00acee]/10 text-[#00acee] shadow-sm' : 'border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-600'}`}
+                                                        className={`p-2 rounded-[3px] border transition-all ${iconName === iconOpt.name ? 'border-[#00acee] bg-[#00acee]/10 text-[#00acee] shadow-sm' : 'border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-600'}`}
                                                         title={iconOpt.name}
                                                     >
                                                         <IconCmp size={20} />
@@ -252,7 +252,7 @@ const PromoAdminBoard = ({ isOpen, onClose, inlineView }) => {
                                     <button 
                                         type="submit" 
                                         disabled={isSubmitting}
-                                        className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-[#00acee] hover:bg-[#009adb] text-white font-bold rounded-xl shadow-md transition-all active:scale-[0.98] disabled:opacity-50"
+                                        className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-[#00acee] hover:bg-[#009adb] text-white font-bold rounded-[3px] shadow-md transition-all active:scale-[0.98] disabled:opacity-50"
                                     >
                                         {isSubmitting ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
                                         Save Advertisement
@@ -261,7 +261,7 @@ const PromoAdminBoard = ({ isOpen, onClose, inlineView }) => {
                                         type="button" 
                                         onClick={handleCloseForm}
                                         disabled={isSubmitting}
-                                        className="flex-1 px-4 py-2.5 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold rounded-xl hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors"
+                                        className="flex-1 px-4 py-2.5 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold rounded-[3px] hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors"
                                     >
                                         Cancel
                                     </button>
@@ -288,7 +288,7 @@ const PromoAdminBoard = ({ isOpen, onClose, inlineView }) => {
                                                     <Loader2 className="w-8 h-8 animate-spin mx-auto mb-3 text-blue-500" />
                                                     Loading ads...
                                                 </td>
-                                            </tr>
+                                            <th className="text-right px-5 py-3">Action</th></tr>
                                         ) : ads.map(ad => {
                                             const iconOpt = AVAILABLE_ICONS.find(i => i.name === ad.iconName) || AVAILABLE_ICONS[3];
                                             const IconCmp = iconOpt.component;
@@ -296,7 +296,7 @@ const PromoAdminBoard = ({ isOpen, onClose, inlineView }) => {
                                             <tr key={ad.id} className="border-b border-slate-50 dark:border-slate-700 hover:bg-slate-50/80 dark:hover:bg-slate-700/50 transition-colors">
                                                 <td className="py-4 px-6">
                                                     <div className="flex items-center gap-3">
-                                                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 shadow-sm ${ad.iconBg || 'bg-slate-500'}`}>
+                                                        <div className={`w-10 h-10 rounded-[3px] flex items-center justify-center shrink-0 shadow-sm ${ad.iconBg || 'bg-slate-500'}`}>
                                                             <IconCmp size={18} className="text-white" />
                                                         </div>
                                                         <div>
@@ -312,7 +312,7 @@ const PromoAdminBoard = ({ isOpen, onClose, inlineView }) => {
                                                     </div>
                                                 </td>
                                                 <td className="py-4 px-6">
-                                                    <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                                                    <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-[3px] text-[10px] font-bold uppercase tracking-wider ${
                                                         ad.isActive ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-400'
                                                     }`}>
                                                         {ad.isActive ? <CheckCircle className="w-3 h-3" /> : <XCircle className="w-3 h-3" />}
@@ -323,21 +323,21 @@ const PromoAdminBoard = ({ isOpen, onClose, inlineView }) => {
                                                     <div className="flex items-center justify-end gap-2">
                                                         <button 
                                                             onClick={() => handleUpdateStatus(ad.id, !ad.isActive)}
-                                                            className={`p-2 rounded-lg transition-colors ${ad.isActive ? 'text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-500/10' : 'text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-500/10'}`}
+                                                            className={`p-2 rounded-[3px] transition-colors ${ad.isActive ? 'text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-500/10' : 'text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-500/10'}`}
                                                             title={ad.isActive ? 'Deactivate' : 'Activate'}
                                                         >
                                                             {ad.isActive ? <XCircle className="w-4 h-4" /> : <CheckCircle className="w-4 h-4" />}
                                                         </button>
                                                         <button 
                                                             onClick={() => handleOpenForm(ad)}
-                                                            className="p-2 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-500/10 rounded-lg transition-colors"
+                                                            className="p-2 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-500/10 rounded-[3px] transition-colors"
                                                             title="Edit"
                                                         >
                                                             <Edit className="w-4 h-4" />
                                                         </button>
                                                         <button 
                                                             onClick={() => handleDelete(ad.id)}
-                                                            className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors"
+                                                            className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-[3px] transition-colors"
                                                             title="Delete"
                                                         >
                                                             <Trash2 className="w-4 h-4" />

@@ -41,7 +41,7 @@ const UserGroupSearchModal = ({ isOpen, onClose, onSelect }) => {
                 isOpen={isOpen}
                 onClose={onClose}
                 title="User Group Search"
-                maxWidth="max-w-md"
+                maxWidth="max-w-[700px]"
             >
                 <div className="p-1 space-y-4 font-['Tahoma']">
                     {/* Search Bar */}
@@ -50,7 +50,7 @@ const UserGroupSearchModal = ({ isOpen, onClose, onSelect }) => {
                         <input
                             type="text"
                             placeholder="Search by group name..."
-                            className="w-full h-10 pl-10 pr-4 bg-slate-50 border border-gray-200 rounded-lg outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition-all text-[13px] font-bold"
+                            className="w-full h-10 pl-10 pr-4 border border-gray-300 rounded-[3px] outline-none text-[13px] focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] shadow-sm bg-white"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                             autoFocus
@@ -59,8 +59,8 @@ const UserGroupSearchModal = ({ isOpen, onClose, onSelect }) => {
                     </div>
 
                     {/* Group List */}
-                    <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm bg-white">
-                        <div className="bg-slate-50 px-4 py-2.5 flex items-center gap-4 border-b border-gray-100">
+                    <div className="border border-gray-200 rounded-[3px] overflow-hidden shadow-sm bg-white">
+                        <div className="flex items-center gap-4 bg-slate-50 p-4 border-b border-gray-100 mb-2">
                             <span className="text-[11px] font-black text-gray-400 uppercase tracking-widest flex-1">Group Name</span>
                             <span className="text-[11px] font-black text-gray-400 uppercase tracking-widest w-16 text-center">Users</span>
                         </div>
@@ -74,7 +74,7 @@ const UserGroupSearchModal = ({ isOpen, onClose, onSelect }) => {
                                             onSelect(group.group_Name);
                                             onClose();
                                         }}
-                                        className="w-full flex items-center gap-4 px-4 py-3.5 hover:bg-blue-50/50 transition-colors border-b border-gray-50 last:border-0 text-left group"
+                                        className="w-full flex items-center gap-4 px-4 py-3.5 hover:bg-blue-50/50 transition-all border-b border-gray-50 last:border-0 text-left group cursor-pointer group border-b border-gray-50"
                                     >
                                         <div className="flex-1">
                                             <div className="flex items-center gap-2">
@@ -86,7 +86,7 @@ const UserGroupSearchModal = ({ isOpen, onClose, onSelect }) => {
                                             )}
                                         </div>
                                         <div className="w-16 flex justify-center">
-                                            <span className="bg-slate-100 text-slate-500 text-[11px] font-bold px-3 py-1 rounded-full group-hover:bg-blue-100 group-hover:text-blue-600 transition-all">
+                                            <span className="bg-slate-100 text-slate-500 text-[11px] font-bold px-3 py-1 rounded-[3px] group-hover:bg-blue-100 group-hover:text-blue-600 transition-all">
                                                 {group.user_Count}
                                             </span>
                                         </div>
@@ -107,7 +107,7 @@ const UserGroupSearchModal = ({ isOpen, onClose, onSelect }) => {
                     <div className="pt-2">
                         <button 
                             onClick={() => setShowCreateModal(true)}
-                            className="w-full h-11 border-2 border-dashed border-gray-100 text-gray-400 hover:border-blue-400 hover:text-blue-500 hover:bg-blue-50/30 transition-all rounded-xl flex items-center justify-center gap-2 text-[13px] font-bold group"
+                            className="w-full h-11 border-2 border-dashed border-gray-200 text-gray-400 hover:border-blue-400 hover:text-blue-500 hover:bg-blue-50/50/30 transition-all rounded-[3px] flex items-center justify-center gap-2 text-[13px] font-bold group cursor-pointer group border-b border-gray-50"
                         >
                             <Plus size={16} className="group-hover:rotate-90 transition-transform" /> 
                             Create New Group

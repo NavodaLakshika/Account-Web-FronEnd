@@ -65,19 +65,19 @@ import JournalEntryBoard from './JournalEntryBoard';
 import BankReconciliationBoard from './BankReconciliationBoard';
 import TrialBalanceBoard from './TrialBalanceBoard';
 import DocumentSearchBoard from './DocumentSearchBoard';
-import PurchaseOrderBoard from '../HomeMaster/PurchaseOrderBoard';
-import GRNBoard from '../HomeMaster/GRNBoard';
-import BulkGRNBoard from '../HomeMaster/BulkGRNBoard';
+import PurchaseOrderBoard from './PurchaseOrderBoard';
+import GRNBoard from './GRNBoard';
+import BulkGRNBoard from './BulkGRNBoard';
 import PettyCashBoard from '../HomeMaster/PettyCashBoard';
-import SalesOrderBoard from '../HomeMaster/SalesOrderBoard';
-import SalesReceiptBoard from '../HomeMaster/SalesReceiptBoard';
-import ReceivePaymentBoard from '../HomeMaster/ReceivePaymentBoard';
-import ChequeRegisterBoard from '../HomeMaster/ChequeRegisterBoard';
+import SalesOrderBoard from './SalesOrderBoard';
+import SalesReceiptBoard from './SalesReceiptBoard';
+import ReceivePaymentBoard from './ReceivePaymentBoard';
+import ChequeRegisterBoard from './ChequeRegisterBoard';
 
-import MarketingToolBoard from '../HomeMaster/MarketingToolBoard';
+import MarketingToolBoard from './MarketingToolBoard';
 import AccountBalanceBoard from '../HomeMaster/AccountBalanceBoard';
 import ReminderListBoard from '../HomeMaster/ReminderListBoard';
-import SalesInvoiceBoard from '../HomeMaster/SalesInvoiceBoard';
+import SalesInvoiceBoard from './SalesInvoiceBoard';
 import SystemSettingsBoard from '../HomeMaster/SystemSettingsBoard';
 import MasterFileModal from '../components/modals/MasterFileModal';
 import ViewUtilityModal from '../components/modals/ViewUtilityModal';
@@ -85,7 +85,7 @@ import TransactionModal from '../components/modals/TransactionModal';
 
 import SystemAdminModal from '../components/modals/SystemAdmin/SystemAdminModal';
 import SideBar from '../components/SideBar';
-import ChangePasswordBoard from '../components/modals/ChangePasswordBoard';
+import ChangePasswordBoard from './ChangePasswordBoard';
 import ThankYouModal from '../components/modals/ThankYouModal';
 import SoftwareAboutModal from '../components/modals/SoftwareAboutModal';
 import SubscriptionModal from '../components/modals/SubscriptionModal';
@@ -116,8 +116,9 @@ import AIChatbotBoard from './AIChatbotBoard';
 import FeatureLockedModal from '../components/modals/FeatureLockedModal';
 import ExpensesDashboardBoard from './ExpensesDashboardBoard';
 import QuickLaunchGridModal from '../components/modals/QuickLaunchGridModal';
-import DepartmentBoard from '../components/modals/MasterSubModal/DepartmentBoard';
+import DepartmentBoard from './DepartmentProfileBoard';
 import CalculatorBoard from '../components/modals/ViewAndUtilityModels/CalculatorBoard';
+import SimpleModal from '../components/SimpleModal';
 import EstimateBoard from './EstimateBoard';
 import { Layers } from 'lucide-react';
 import ReportTemplate from '../components/ReportTemplate';
@@ -134,21 +135,22 @@ import GetThingsDoneBoard from './GetThingsDoneBoard';
 import SystemLoader from '../components/SystemLoader';
 
 // Master File specific boards
-import CompanyBoard from '../components/modals/MasterSubModal/CompanyBoard';
-import CostCenterBoard from '../components/modals/MasterSubModal/CostCenterBoard';
-import CategoryBoard from '../components/modals/MasterSubModal/CategoryBoard';
-import RouteBoard from '../components/modals/MasterSubModal/RouteBoard';
-import AreaBoard from '../components/modals/MasterSubModal/AreaBoard';
-import CardCommissionBoard from '../components/modals/MasterSubModal/CardCommissionBoard';
-import UserProfileBoard from '../components/modals/MasterSubModal/UserProfileBoard';
-import VendorTypesBoard from '../components/modals/MasterSubModal/VendorTypesBoard';
-import CustomerTypeBoard from '../components/modals/MasterSubModal/CustomerTypeBoard';
+import CompanyBoard from './CompanyProfileBoard';
+import CostCenterBoard from './CostCenterProfileBoard';
+import CategoryBoard from './CategoryProfileBoard';
+import RouteBoard from './RouteProfileBoard';
+import AreaBoard from './AreaProfileBoard';
+import AddReminderBoard from './AddReminderBoard';
+import CardCommissionBoard from './CardSaleCommissionBoard';
+import UserProfileBoard from './UserProfileMaintenanceBoard';
+import VendorTypesBoard from './VendorTypesMasterBoard';
+import CustomerTypeBoard from './CustomerTypeProfileBoard';
 import ChartOfAccountantModal from '../components/modals/ChartOfAccountsModels/ChartOfAccountantModal';
-import FixedAssetsBoard from '../components/modals/ChartOfAccountsModels/FixedAssetsBoard';
-import LongTermLiabilityBoard from '../components/modals/ChartOfAccountsModels/LongTermLiabilityBoard';
-import DepreciationBoard from '../components/modals/ChartOfAccountsModels/DepreciationBoard';
-import FixedIncomeBoard from '../components/modals/ChartOfAccountsModels/FixedIncomeBoard';
-import FixedExpensesBoard from '../components/modals/ChartOfAccountsModels/FixedExpensesBoard';
+import FixedAssetsBoard from './FixedAssetsProfileBoard';
+import LongTermLiabilityBoard from './LongTermLiabilityProfileBoard';
+import DepreciationBoard from './DepreciationRateBoard';
+import FixedIncomeBoard from './FixedIncomeEntryBoard';
+import FixedExpensesBoard from './FixedExpensesEntryBoard';
 
 
 // View and Utility Boards
@@ -161,15 +163,14 @@ import CustomizeIconBarBoard from '../components/modals/ViewAndUtilityModels/Cus
 import ChangeBackgroundBoard from '../components/modals/ViewAndUtilityModels/ChangeBackgroundBoard';
 
 // System Admin Boards
-import DatabaseBackupModal from '../components/modals/SystemAdmin/DatabaseBackupModal';
+import BackupBoard from './BackupBoard';
 import StockBalanceUpdateModal from '../components/modals/SystemAdmin/StockBalanceUpdateModal';
-import InventoryDownloadModal from '../components/modals/SystemAdmin/InventoryDownloadModal';
+import InventoryDownloadBoard from './InventoryDownloadBoard';
 import DeleteAccountModal from '../components/modals/SystemAdmin/DeleteAccountModal';
-import TransactionSearchModal from '../components/modals/SystemAdmin/TransactionSearchModal';
 import SystemUpdateModal from '../components/modals/SystemAdmin/SystemUpdateModal';
 import ClearTempDataModal from '../components/modals/SystemAdmin/ClearTempDataModal';
 import PeriodLockModal from '../components/modals/SystemAdmin/PeriodLockModal';
-import JournalEntryEditorModal from '../components/modals/SystemAdmin/JournalEntryEditorModal';
+import JournalEntryEditorBoard from './JournalEntryEditorBoard';
 import TransactionEditorModal from '../components/modals/SystemAdmin/TransactionEditorModal';
 import CompanyUsersModal from '../components/modals/SystemAdmin/CompanyUsersModal';
 import ReportsCenterModal from '../components/modals/AdminReports/ReportsCenterModal';
@@ -201,7 +202,7 @@ const LiveNotifications = () => {
 
     return (
         <div className="hidden lg:flex absolute left-1/2 -translate-x-1/2 bottom-0 mb-1 items-center justify-center pointer-events-none">
-            <div className={`flex items-center gap-2 px-4 py-1.5 bg-slate-50/80 border border-slate-100 rounded-full text-slate-500 shadow-sm transition-opacity duration-500 ${fade ? 'opacity-100' : 'opacity-0'}`}>
+            <div className={`flex items-center gap-2 px-4 py-1.5 bg-slate-50/80 border border-slate-100 rounded-[3px] text-slate-500 shadow-sm transition-opacity duration-500 ${fade ? 'opacity-100' : 'opacity-0'}`}>
                 <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></div>
                 <span className="text-[12px] font-medium tracking-wide text-slate-500">{notifications[currentIndex]}</span>
             </div>
@@ -257,11 +258,11 @@ const Dashboard = () => {
     const [showChangeBackgroundBoard, setShowChangeBackgroundBoard] = useState(false);
 
     // System Admin States
+    const [showBackupBoard, setShowBackupBoard] = useState(false);
     const [showDatabaseBackupModal, setShowDatabaseBackupModal] = useState(false);
     const [showStockBalanceUpdateModal, setShowStockBalanceUpdateModal] = useState(false);
     const [showInventoryDownloadModal, setShowInventoryDownloadModal] = useState(false);
     const [showDeleteAccountModal, setShowDeleteAccountModal] = useState(false);
-    const [showTransactionSearchModal, setShowTransactionSearchModal] = useState(false);
     const [showSystemUpdateModal, setShowSystemUpdateModal] = useState(false);
     const [showClearTempDataModal, setShowClearTempDataModal] = useState(false);
     const [showPeriodLockModal, setShowPeriodLockModal] = useState(false);
@@ -384,7 +385,7 @@ const Dashboard = () => {
     const [showEstimateModal, setShowEstimateModal] = useState(false);
     const [showPricingPlansModal, setShowPricingPlansModal] = useState(false);
     const [showSubscriptionBanner, setShowSubscriptionBanner] = useState(true);
-    const [showAdBlockAlert, setShowAdBlockAlert] = useState(true); // Auto popup
+    const [showAdBlockAlert, setShowAdBlockAlert] = useState(false); // Triggered by banner close
     const adBlockTimeoutRef = useRef(null);
     const isAdBlockActiveRef = useRef(false);
 
@@ -393,12 +394,12 @@ const Dashboard = () => {
         setShowAdBlockAlert(false);
         setShowPromoModal(false);
         isAdBlockActiveRef.current = true;
-        
+
         // Clear any existing timer
         if (adBlockTimeoutRef.current) {
             clearTimeout(adBlockTimeoutRef.current);
         }
-        
+
         // Auto load the ads again after 30 minutes (30 * 60 * 1000 ms)
         adBlockTimeoutRef.current = setTimeout(() => {
             setShowSubscriptionBanner(true);
@@ -528,7 +529,7 @@ const Dashboard = () => {
             title: 'Back up your data today',
             body: 'Don\'t risk losing your valuable accounting data. Create a backup now to protect your records from unexpected hardware failures or data corruption.',
             action: 'Create a backup',
-            onAction: () => setShowDatabaseBackupModal(true),
+            onAction: () => setShowBackupBoard(true),
             image: '/backup.png',
             color: '#0891b2',
         },
@@ -1169,7 +1170,8 @@ const Dashboard = () => {
             {
                 group: 'Utilities',
                 items: [
-                    { label: 'Reminder - To Do List', onClick: () => setShowToDoListBoard(true) },
+                    { label: 'Add Reminder', onClick: () => setShowReminderModal(true) },
+                    { label: 'Reminder List', onClick: () => setShowReminderListModal(true) },
                 ]
             }
         ],
@@ -1354,11 +1356,10 @@ const Dashboard = () => {
             }
         ],
         'System Admin': [
-            { label: 'Data Backup', onClick: () => setShowDatabaseBackupModal(true) },
+            { label: 'Data Backup', onClick: () => setShowBackupBoard(true) },
             { label: 'Stock Balance Update', onClick: () => setShowStockBalanceUpdateModal(true) },
             { label: 'Inventory Download', onClick: () => setShowInventoryDownloadModal(true) },
             { label: 'Delete Account', onClick: () => setShowDeleteAccountModal(true) },
-            { label: 'Transaction Search', onClick: () => setShowTransactionSearchModal(true) },
             { label: 'Document Editor', onClick: () => setShowJournalEntryEditorModal(true) },
             { label: 'Transaction Editor', onClick: () => setShowTransactionEditorModal(true) },
             { label: 'System Update', onClick: () => setShowSystemUpdateModal(true) },
@@ -1392,7 +1393,7 @@ const Dashboard = () => {
         {
             group: 'TOOLS',
             items: [
-                { label: 'Data Backup', onClick: () => setShowDatabaseBackupModal(true) },
+            { label: 'Data Backup', onClick: () => setShowBackupBoard(true) },
                 { label: 'System Update', onClick: () => setShowSystemUpdateModal(true) },
                 { label: 'Reconcile', onClick: () => setShowBankRecModal(true) },
                 { label: 'Audit Log', onClick: () => setSelectedReport('Audit Log') },
@@ -1412,13 +1413,13 @@ const Dashboard = () => {
     const [showProfileDropdown, setShowProfileDropdown] = useState(false);
 
     return (
-        <div className="h-screen w-screen flex flex-col font-['Plus_Jakarta_Sans'] bg-[#f8fafc] select-none text-slate-800 overflow-hidden">
+        <div className="h-screen w-screen flex flex-col font-['Plus_Jakarta_Sans'] bg-slate-50 select-none text-slate-800 overflow-hidden">
             {/* Top Subscription Banner OR Marquee Bar */}
             {showSubscriptionBanner ? (
                 <div className="bg-[#0078d4] text-white text-[13px] h-9 flex justify-center items-center gap-2 relative z-50 transition-all animate-in slide-in-from-top duration-300 mb-2">
                     <span>Save 50% for 3 months.</span>
                     <button onClick={() => setShowPricingPlansModal(true)} className="underline font-bold hover:text-white/80 transition-colors">Subscribe now</button>
-                    <button onClick={() => setShowSubscriptionBanner(false)} className="absolute right-4 text-white/70 hover:text-white transition-colors">
+                    <button onClick={() => setShowAdBlockAlert(true)} className="absolute right-4 text-white/70 hover:text-white transition-colors">
                         <X size={28} strokeWidth={1.5} />
                     </button>
                 </div>
@@ -1442,38 +1443,39 @@ const Dashboard = () => {
             )}
 
             {/* 1. Modal Overlays */}
-            {/* Ad Block Alert Popup - Top Left */}
-            {showAdBlockAlert && (
-                <div className="fixed top-4 left-4 z-[999999] font-sans">
-                    <div className="relative w-[340px] bg-white shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-slate-200 flex flex-col rounded-sm overflow-hidden animate-in slide-in-from-left duration-300">
-                        <div className="px-5 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
-                            <h3 className="text-[14px] font-black text-slate-800 tracking-tight">Advertisement Settings</h3>
-                            <button onClick={() => setShowAdBlockAlert(false)} className="text-slate-400 hover:text-slate-800 transition-colors p-1">
-                                <X size={16} strokeWidth={2} />
-                            </button>
-                        </div>
-                        <div className="p-5">
-                            <p className="text-[12px] font-medium text-slate-600 mb-5 leading-relaxed">
-                                Would you like to block the top subscription banner? If blocked, it will stay hidden and auto-reload after <strong>30 minutes</strong>.
-                            </p>
-                            <div className="flex gap-2 justify-end">
-                                <button 
-                                    onClick={handleAllowAds}
-                                    className="px-4 h-8 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-sm font-bold text-[12px] transition-colors"
-                                >
-                                    Allow Ads
-                                </button>
-                                <button 
-                                    onClick={handleBlockAds}
-                                    className="px-4 h-8 bg-red-500 hover:bg-red-600 text-white rounded-sm font-bold text-[12px] transition-colors shadow-sm"
-                                >
-                                    Block
-                                </button>
-                            </div>
-                        </div>
+            {/* Ad Block Alert Modal */}
+            <SimpleModal
+                isOpen={showAdBlockAlert}
+                onClose={() => setShowAdBlockAlert(false)}
+                title="Advertisement Settings"
+                maxWidth="max-w-[450px]"
+                footer={
+                    <div className="bg-slate-50 px-6 py-4 w-full flex justify-end items-center border-t border-slate-200 rounded-b-xl gap-3">
+                        <button
+                            onClick={handleAllowAds}
+                            className="px-6 py-2.5 bg-white text-slate-700 border border-slate-300 hover:bg-slate-50 font-bold text-[12px] uppercase tracking-widest rounded-[3px] transition-all active:scale-95"
+                        >
+                            Keep Banner
+                        </button>
+                        <button
+                            onClick={handleBlockAds}
+                            className="px-6 py-2.5 bg-[#de212d] hover:bg-[#c91823] text-white font-bold text-[12px] uppercase tracking-widest rounded-[3px] shadow-sm transition-all active:scale-95"
+                        >
+                            Block for 30m
+                        </button>
                     </div>
+                }
+            >
+                <div className="p-6 flex flex-col items-center text-center gap-4">
+                    <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center border-4 border-white shadow-sm mb-2">
+                        <X size={32} className="text-[#de212d]" />
+                    </div>
+                    <h2 className="text-[16px] font-extrabold text-slate-800 tracking-tight">Hide Subscription Banner?</h2>
+                    <p className="text-[13px] font-medium text-slate-500 leading-relaxed max-w-[350px]">
+                        Would you like to block the top subscription banner? If blocked, it will stay hidden and auto-reload after <strong>30 minutes</strong>.
+                    </p>
                 </div>
-            )}
+            </SimpleModal>
 
             <SubscriptionModal isOpen={showPricingPlansModal} onClose={() => setShowPricingPlansModal(false)} />
 
@@ -1715,15 +1717,15 @@ const Dashboard = () => {
             />
 
             {/* System Admin Modals */}
-            <DatabaseBackupModal isOpen={showDatabaseBackupModal} onClose={() => setShowDatabaseBackupModal(false)} />
+            
+            <InventoryDownloadBoard isOpen={showInventoryDownloadModal} onClose={() => setShowInventoryDownloadModal(false)} />
             <StockBalanceUpdateModal isOpen={showStockBalanceUpdateModal} onClose={() => setShowStockBalanceUpdateModal(false)} />
-            <InventoryDownloadModal isOpen={showInventoryDownloadModal} onClose={() => setShowInventoryDownloadModal(false)} />
+            
             <DeleteAccountModal isOpen={showDeleteAccountModal} onClose={() => setShowDeleteAccountModal(false)} />
-            <TransactionSearchModal isOpen={showTransactionSearchModal} onClose={() => setShowTransactionSearchModal(false)} />
             <SystemUpdateModal isOpen={showSystemUpdateModal} onClose={() => setShowSystemUpdateModal(false)} />
             <ClearTempDataModal isOpen={showClearTempDataModal} onClose={() => setShowClearTempDataModal(false)} />
             <PeriodLockModal isOpen={showPeriodLockModal} onClose={() => setShowPeriodLockModal(false)} />
-            <JournalEntryEditorModal isOpen={showJournalEntryEditorModal} onClose={() => setShowJournalEntryEditorModal(false)} />
+            <JournalEntryEditorBoard isOpen={showJournalEntryEditorModal} onClose={() => setShowJournalEntryEditorModal(false)} />
             <TransactionEditorModal isOpen={showTransactionEditorModal} onClose={() => setShowTransactionEditorModal(false)} />
             <CompanyUsersModal isOpen={showCompanyUsersModal} onClose={() => setShowCompanyUsersModal(false)} />
             <ReportsCenterModal
@@ -1740,9 +1742,9 @@ const Dashboard = () => {
             <CardCommissionBoard isOpen={showCardCommissionBoard} onClose={() => setShowCardCommissionBoard(false)} />
             <UserProfileBoard isOpen={showUserProfileBoard} onClose={() => setShowUserProfileBoard(false)} />
             <ChangePasswordBoard isOpen={showChangePasswordBoard} onClose={() => setShowChangePasswordBoard(false)} />
-            <ChartOfAccountantModal 
-                isOpen={showChartOfAccountantModal} 
-                onClose={() => setShowChartOfAccountantModal(false)} 
+            <ChartOfAccountantModal
+                isOpen={showChartOfAccountantModal}
+                onClose={() => setShowChartOfAccountantModal(false)}
                 onCreateNewAccount={() => { setShowChartOfAccountantModal(false); setShowNewAccountModal(true); }}
                 onOpenFixedAssets={() => { setShowChartOfAccountantModal(false); setShowFixedAssetsBoard(true); }}
                 onOpenLiability={() => { setShowChartOfAccountantModal(false); setShowLiabilityBoard(true); }}
@@ -1822,9 +1824,9 @@ const Dashboard = () => {
                                 src="/images/Ai Robot Vector Art.lottie"
                                 autoplay
                                 loop
-                                className="w-[320px] h-[320px]"
+                                style={{ width: 300, height: 300 }}
                             />
-                            <div className="mt-2 text-[#0285fd] text-[13px] font-black uppercase tracking-[0.55em] font-mono">
+                            <div className="mt-2 text-[#0285fd] text-[20px] font-black uppercase tracking-[0.55em] font-mono">
                                 <AITypingText />
                             </div>
                         </div>
@@ -1917,7 +1919,7 @@ const Dashboard = () => {
                                 >
                                     <button
                                         onClick={() => setActiveMenu(activeMenu === item ? null : item)}
-                                        className={`text-[13.5px] font-sans font-semibold tracking-wide ${activeMenu === item ? 'text-[#0078d4] bg-blue-50' : 'text-slate-600'} hover:text-[#0078d4] hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-[#0078d4]/30 px-4 py-2 rounded-lg transition-all whitespace-nowrap active:scale-95`}
+                                        className={`text-[13.5px] font-sans font-semibold tracking-wide ${activeMenu === item ? 'text-[#0078d4] bg-blue-50' : 'text-slate-600'} hover:text-[#0078d4] hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-[#0078d4]/30 px-4 py-2 rounded-[3px] transition-all whitespace-nowrap active:scale-95`}
                                     >
                                         {item}
                                     </button>
@@ -1948,14 +1950,14 @@ const Dashboard = () => {
                                             : baseItems;
                                         return (
                                             <div
-                                                className="fixed sm:absolute top-[56px] sm:top-full left-2 sm:left-1/2 right-2 sm:right-auto sm:-translate-x-1/2 mt-0 sm:mt-3 bg-white shadow-[0_8px_30px_rgb(0,0,0,0.12)] rounded-none py-4 sm:py-6 px-4 sm:px-6 z-[200] border border-gray-100 w-auto sm:w-max max-w-[95vw] lg:max-w-6xl max-h-[85vh] sm:max-h-none overflow-y-auto"
+                                                className="fixed sm:absolute top-[56px] sm:top-full left-2 sm:left-1/2 right-2 sm:right-auto sm:-translate-x-1/2 mt-0 sm:mt-3 bg-white shadow-[0_8px_30px_rgb(0,0,0,0.12)] rounded-none py-4 sm:py-6 px-4 sm:px-6 z-[200] border border-gray-200 w-auto sm:w-max max-w-[95vw] lg:max-w-6xl max-h-[85vh] sm:max-h-none overflow-y-auto"
                                                 onMouseEnter={() => clearTimeout(menuTimeoutRef.current)}
                                                 onMouseLeave={() => {
                                                     menuTimeoutRef.current = setTimeout(() => setActiveMenu(null), 200);
                                                 }}
                                             >
                                                 {isReports && (
-                                                    <div className="mb-4 flex items-center gap-2 px-2 py-1.5 bg-gray-50 border border-gray-200 rounded-lg">
+                                                    <div className="mb-4 flex items-center gap-2 px-2 py-1.5 bg-gray-50 border border-gray-200 rounded-[3px]">
                                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><circle cx="11" cy="11" r="8" /><path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35" /></svg>
                                                         <input
                                                             type="text"
@@ -2000,7 +2002,7 @@ const Dashboard = () => {
                                                                                                     setNavReportSearch('');
                                                                                                 }}
                                                                                                 disabled={isLockedReport}
-                                                                                                className={`w-full text-left text-[13px] font-sans font-medium text-gray-600 ${isLockedReport ? '' : 'hover:text-[#0078d4] hover:bg-[#f4f5f8]'} px-2 py-1.5 -mx-2 rounded-md transition-all flex items-center justify-between pr-8`}
+                                                                                                className={`w-full text-left text-[13px] font-sans font-medium text-gray-600 ${isLockedReport ? '' : 'hover:text-[#0078d4] hover:bg-[#f4f5f8]'} px-2 py-1.5 -mx-2 rounded-[3px] transition-all flex items-center justify-between pr-8`}
                                                                                             >
                                                                                                 <span className="truncate">{subItem.label}</span>
                                                                                                 {isLockedReport && <Lock size={12} className="text-slate-400 group-hover/item:text-red-500 transition-colors shrink-0 ml-2" />}
@@ -2057,7 +2059,7 @@ const Dashboard = () => {
                                                                         menuItem.onClick();
                                                                         setActiveMenu(null);
                                                                     }}
-                                                                    className="w-full text-left text-[13px] font-sans font-medium text-gray-600 hover:text-[#0078d4] hover:bg-[#f4f5f8] px-2 py-1.5 -mx-2 rounded-md transition-all block"
+                                                                    className="w-full text-left text-[13px] font-sans font-medium text-gray-600 hover:text-[#0078d4] hover:bg-[#f4f5f8] px-2 py-1.5 -mx-2 rounded-[3px] transition-all block"
                                                                 >
                                                                     {menuItem.label}
                                                                 </button>
@@ -2096,7 +2098,7 @@ const Dashboard = () => {
                             </button>
                             {showSettingsDropdown && (
                                 <div
-                                    className="absolute top-full right-0 mt-3 bg-white shadow-[0_8px_30px_rgb(0,0,0,0.12)] rounded-xl py-6 px-8 z-[200] border border-gray-100 min-w-[max-content]"
+                                    className="absolute top-full right-0 mt-3 bg-white shadow-[0_8px_30px_rgb(0,0,0,0.12)] rounded-[3px] py-6 px-8 z-[200] border border-gray-200 min-w-[max-content]"
                                     onMouseLeave={() => setShowSettingsDropdown(false)}
                                 >
                                     <div className="flex flex-row gap-12">
@@ -2154,7 +2156,13 @@ const Dashboard = () => {
                                         {selectedCompany?.name || selectedCompany?.companyName || 'ONIMTA Information Technology'}
                                     </div>
 
-                                    <button className="text-[13px] text-[#0077c5] hover:text-[#005ca6] font-medium hover:underline mb-5 transition-colors">
+                                    <button 
+                                        className="text-[13px] text-[#0077c5] hover:text-[#005ca6] font-medium hover:underline mb-5 transition-colors"
+                                        onClick={() => {
+                                            setShowProfileDropdown(false);
+                                            setShowUserProfileBoard(true);
+                                        }}
+                                    >
                                         Manage your Account
                                     </button>
 
@@ -2188,9 +2196,9 @@ const Dashboard = () => {
                                     {/* Custom AI Asterisk animated */}
                                     <div className="relative flex items-center justify-center w-[18px] h-[18px] group-hover:rotate-180 transition-transform duration-1000 ease-[cubic-bezier(0.34,1.56,0.64,1)] shrink-0">
                                         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[3px] h-full bg-gradient-to-b from-[#3b82f6] to-[#1e1b4b] rounded-full"></div>
-                                        <div className="absolute top-1/2 left-0 -translate-y-1/2 w-full h-[3px] bg-gradient-to-r from-[#60a5fa] to-[#4338ca] rounded-full"></div>
-                                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-[3px] bg-gradient-to-r from-[#93c5fd] to-[#312e81] rounded-full rotate-45"></div>
-                                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-[3px] bg-gradient-to-r from-[#bfdbfe] to-[#3730a3] rounded-full -rotate-45"></div>
+                                        <div className="absolute top-1/2 left-0 -translate-y-1/2 w-full h-[3px] bg-gradient-to-r from-[#60a5fa] to-[#4338ca] rounded-[3px]"></div>
+                                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-[3px] bg-gradient-to-r from-[#93c5fd] to-[#312e81] rounded-[3px] rotate-45"></div>
+                                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-[3px] bg-gradient-to-r from-[#bfdbfe] to-[#3730a3] rounded-[3px] -rotate-45"></div>
                                     </div>
 
                                     {/* Animated Shimmering Text */}
@@ -2215,7 +2223,7 @@ const Dashboard = () => {
             {/* Main Content Area */}
             <div className="flex-1 flex flex-row min-h-0 relative">
                 {/* 3. Main Workspace Area */}
-                <main className="flex-1 relative overflow-y-auto bg-[#f8fafc]">
+                <main className="flex-1 relative overflow-y-auto bg-slate-50">
                     <div className="p-8 w-full flex flex-col gap-8">
 
                         {/* Header & BI Data Summary (QuickBooks Style) */}
@@ -2284,9 +2292,9 @@ const Dashboard = () => {
                                                             <button
                                                                 key={iconId}
                                                                 onClick={() => { iconData.onClick(); setShowQuickActions(false); }}
-                                                                className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl transition-all duration-150 group/item ${isActive ? 'bg-blue-50/80 text-blue-700 shadow-sm' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'}`}
+                                                                className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-[3px] transition-all duration-150 group/item ${isActive ? 'bg-blue-50/80 text-blue-700 shadow-sm' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'}`}
                                                             >
-                                                                <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-transform group-hover/item:scale-110" style={{ backgroundColor: isActive ? '#dbeafe' : iconData.bg }}>
+                                                                <div className="w-8 h-8 rounded-[3px] flex items-center justify-center shrink-0 transition-transform group-hover/item:scale-110" style={{ backgroundColor: isActive ? '#dbeafe' : iconData.bg }}>
                                                                     <Icon size={16} strokeWidth={2.2} style={{ color: isActive ? '#1d4ed8' : iconData.iconColor }} />
                                                                 </div>
                                                                 <span className="text-[12.5px] font-semibold flex-1 text-left">{iconData.label}</span>
@@ -2323,6 +2331,13 @@ const Dashboard = () => {
                                         <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pr-1">Feedback & Tools</span>
                                         <div className="flex items-center gap-3">
                                             <button
+                                                onClick={() => navigate('/bi-dashboard')}
+                                                className="flex items-center gap-2 px-4 h-[40px] bg-white border border-[#0078d4]/20 rounded-[8px] text-[13px] font-bold text-[#0078d4] hover:bg-blue-50 hover:border-[#0078d4]/40 hover:shadow-sm active:scale-95 transition-all duration-200"
+                                            >
+                                                <LayoutGrid size={14} />
+                                                View Dashboards
+                                            </button>
+                                            <button
                                                 data-tour="rate-system"
                                                 onClick={() => setShowReviewModal(true)}
                                                 className="flex items-center gap-2 px-4 h-[40px] bg-white border border-slate-200/80 rounded-[8px] text-[13px] font-bold text-slate-500 hover:bg-orange-50 hover:text-orange-600 hover:border-orange-200 hover:shadow-sm active:scale-95 transition-all duration-200"
@@ -2344,129 +2359,11 @@ const Dashboard = () => {
                             </div>
                         </div>
 
-                        {/* Quickbooks-style Metric Cards */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-5 mb-2">
-                            {/* Bank Accounts */}
-                            <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:shadow-lg hover:-translate-y-1 hover:border-[#0078d4]/30 transition-all duration-300 flex flex-col justify-between group">
-                                <div className="flex justify-between items-start mb-4">
-                                    <h3 className="text-[13px] font-extrabold text-slate-700 uppercase tracking-wide group-hover:text-[#0078d4] transition-colors">Bank accounts</h3>
-                                    <button className="text-[11px] text-[#0078d4] hover:underline font-bold">Connect</button>
-                                </div>
-                                {biData?.bankAccounts?.length > 0 ? (
-                                    <div className="space-y-3">
-                                        {biData.bankAccounts.slice(0, 2).map((bank, i) => (
-                                            <div key={i} className="flex justify-between items-center border-b border-slate-100 pb-2 last:border-0 last:pb-0">
-                                                <span className="text-[12px] font-semibold text-slate-600 truncate mr-2">{bank.name}</span>
-                                                <span className="text-[13px] font-black text-slate-800 shrink-0">
-                                                    Rs {Number(String(bank.balance).replace(/,/g, '')).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                                </span>
-                                            </div>
-                                        ))}
-                                    </div>
-                                ) : (
-                                    <div className="text-[12px] text-slate-500 py-2 font-medium">No bank accounts linked.</div>
-                                )}
-                            </div>
-
-                            {/* Invoices */}
-                            <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:shadow-lg hover:-translate-y-1 hover:border-[#0078d4]/30 transition-all duration-300 flex flex-col justify-between group">
-                                <div className="flex justify-between items-start mb-4">
-                                    <h3 className="text-[13px] font-extrabold text-slate-700 uppercase tracking-wide group-hover:text-[#0078d4] transition-colors">Invoices</h3>
-                                    <button className="text-[11px] text-[#0078d4] hover:underline font-bold bg-blue-50 px-2 py-0.5 rounded-full">New</button>
-                                </div>
-                                <div className="mt-auto">
-                                    <div className="flex items-center gap-2 mb-2">
-                                        <span className="text-[14px] font-black text-slate-800">
-                                            Rs {(biData?.invoiceSummary?.totalUnpaid || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                        </span>
-                                        <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Unpaid Total</span>
-                                    </div>
-                                    <div className="flex justify-between items-center mt-3">
-                                        <div className="flex flex-col">
-                                            <span className="font-bold text-slate-700 group-hover:text-[#0078d4] transition-colors text-[13px]">
-                                                Rs {(biData?.invoiceSummary?.totalOverdue || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                            </span>
-                                            <span className="text-slate-400 font-bold text-[10px] uppercase tracking-wider">Overdue</span>
-                                        </div>
-                                        <div className="flex flex-col text-right">
-                                            <span className="font-bold text-slate-700 text-[13px]">
-                                                Rs {Math.max(0, (biData?.invoiceSummary?.totalUnpaid || 0) - (biData?.invoiceSummary?.totalOverdue || 0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                            </span>
-                                            <span className="text-slate-400 font-bold text-[10px] uppercase tracking-wider">Not due yet</span>
-                                        </div>
-                                    </div>
-                                    <style>{`
-                                        .invoice-bar-left { width: 0%; }
-                                        .group:hover .invoice-bar-left { width: ${biData?.invoiceSummary?.totalUnpaid > 0 ? ((biData?.invoiceSummary?.totalOverdue || 0) / biData.invoiceSummary.totalUnpaid) * 100 : 0}%; }
-                                        .invoice-bar-right { width: 100%; }
-                                        .group:hover .invoice-bar-right { width: ${biData?.invoiceSummary?.totalUnpaid > 0 ? (Math.max(0, biData.invoiceSummary.totalUnpaid - (biData?.invoiceSummary?.totalOverdue || 0)) / biData.invoiceSummary.totalUnpaid) * 100 : 100}%; }
-                                    `}</style>
-                                    <div className="flex h-2.5 w-full mt-2 overflow-hidden gap-[1px] rounded-full">
-                                        <div 
-                                            className="h-full bg-[#0078d4] transition-all duration-700 ease-out invoice-bar-left" 
-                                        />
-                                        <div 
-                                            className="h-full bg-slate-200 transition-all duration-700 ease-out invoice-bar-right" 
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Sales */}
-                            <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:shadow-lg hover:-translate-y-1 hover:border-[#0078d4]/30 transition-all duration-300 flex flex-col justify-between group">
-                                <div className="flex justify-between items-start mb-4">
-                                    <h3 className="text-[13px] font-extrabold text-slate-700 uppercase tracking-wide group-hover:text-[#0078d4] transition-colors">Sales</h3>
-                                    <span className="text-[10px] font-bold text-slate-400 uppercase bg-slate-100 px-2 py-0.5 rounded-md">YTD</span>
-                                </div>
-                                <div className="flex flex-col mt-auto">
-                                    <span className="text-2xl font-black text-slate-800 tracking-tight">
-                                        Rs {(biData?.salesSummary?.totalSalesYTD || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                    </span>
-                                    <div className="text-[11px] text-emerald-600 font-bold mt-2 flex items-center gap-1 bg-emerald-50 w-max px-2 py-1 rounded-md">
-                                        <BarChart2 size={12} strokeWidth={3} />
-                                        <span>Trending upward</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Expenses */}
-                            <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:shadow-lg hover:-translate-y-1 hover:border-[#0078d4]/30 transition-all duration-300 flex flex-col justify-between group">
-                                <div className="flex justify-between items-start mb-4">
-                                    <h3 className="text-[13px] font-extrabold text-slate-700 uppercase tracking-wide group-hover:text-[#0078d4] transition-colors">Expenses</h3>
-                                    <span className="text-[10px] font-bold text-slate-400 uppercase bg-slate-100 px-2 py-0.5 rounded-md">Payables</span>
-                                </div>
-                                <div className="flex flex-col mt-auto">
-                                    <span className="text-2xl font-black text-slate-800 tracking-tight">
-                                        Rs {(biData?.totalExpenses || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                    </span>
-                                    <div className="text-[11px] font-bold text-slate-500 mt-2 flex items-center gap-1">
-                                        <div className="w-1.5 h-1.5 rounded-full bg-orange-500"></div>
-                                        <span className="text-slate-500"><span className="text-orange-500 mr-1">Overdue:</span>
-                                            Rs {(biData?.overdueBills || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* View widgets card */}
-                            <div
-                                className="bg-gradient-to-br from-white to-[#f8fbff] p-5 rounded-xl border-2 border-dashed border-[#0078d4]/40 hover:border-[#0078d4] animate-border-pulse hover:bg-[#f0f7ff] transition-all duration-300 cursor-pointer flex flex-col items-center justify-center text-center shadow-sm hover:shadow-lg hover:-translate-y-1 group"
-                                onClick={() => navigate('/bi-dashboard')}
-                            >
-                                <h3 className="text-[13px] font-bold text-[#0078d4] mb-4 group-hover:scale-105 transition-transform">View Widgets</h3>
-                                <div className="w-12 h-12 rounded-full border-2 border-[#0078d4]/20 flex items-center justify-center mb-4 bg-white shadow-sm group-hover:bg-[#0078d4] group-hover:text-white transition-colors duration-300">
-                                    <LayoutGrid size={20} className="text-[#0078d4] group-hover:text-white transition-colors" />
-                                </div>
-                                <span className="text-[11px] font-bold text-[#0078d4]/70 flex items-center gap-1 group-hover:text-[#0078d4] transition-colors">
-                                    <Eye size={14} /> Browse dashboards
-                                </span>
-                            </div>
-                        </div>
 
 
 
                         {/* Category Tabs */}
-                        <div className="flex overflow-x-auto no-scrollbar gap-2 mb-6 pb-4 border-b border-slate-200">
+                        <div className="flex justify-center overflow-x-auto no-scrollbar gap-2 mb-6 pb-4 border-b border-slate-200">
                             {dashboardGroups.map(group => (
                                 <button
                                     key={group.category}
@@ -2574,6 +2471,15 @@ const Dashboard = () => {
                     isOpen={showAIChatbotModal}
                     onClose={() => setShowAIChatbotModal(false)}
                     position="inline-right"
+                />
+                <AddReminderBoard
+                    isOpen={showReminderModal}
+                    onClose={() => { setShowReminderModal(false); setEditingTask(null); }}
+                    editTask={editingTask}
+                />
+                <BackupBoard
+                    isOpen={showBackupBoard}
+                    onClose={() => setShowBackupBoard(false)}
                 />
             </div>
 

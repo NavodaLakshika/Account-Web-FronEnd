@@ -8,7 +8,7 @@ const FlipUnit = ({ value, showAmPm, isHour }) => {
   return (
     <div className="flex gap-2">
       {String(displayValue).padStart(2, '0').split('').map((digit, i) => (
-        <div key={i} className="relative w-6 h-9 rounded-md flex items-center justify-center overflow-hidden">
+        <div key={i} className="relative w-6 h-9 rounded-[3px] flex items-center justify-center overflow-hidden">
           {/* Top Half (Transparent) */}
           <div className="absolute top-0 left-0 right-0 h-1/2 border-b border-white/10" />
 

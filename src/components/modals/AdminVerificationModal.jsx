@@ -53,14 +53,14 @@ const AdminVerificationModal = ({
                 {/* Header */}
                 <div className="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50 rounded-t-2xl">
                     <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 flex items-center justify-center rounded-lg bg-blue-50 text-blue-500">
+                        <div className="w-8 h-8 flex items-center justify-center rounded-[3px] bg-blue-50 text-blue-500">
                             <ShieldCheck size={16} strokeWidth={2.5} />
                         </div>
                         <h3 className="text-sm font-bold tracking-wide uppercase text-slate-900">Security Verification</h3>
                     </div>
                     <button 
                         onClick={handleClose} 
-                        className="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-200 transition-colors"
+                        className="w-8 h-8 flex items-center justify-center rounded-[3px] text-slate-400 hover:text-slate-700 hover:bg-slate-200 transition-colors"
                         disabled={loading}
                     >
                         <X size={28} />
@@ -95,7 +95,7 @@ const AdminVerificationModal = ({
                             onChange={handleChange}
                             onKeyDown={handleKeyDown}
                             disabled={loading}
-                            className="w-full px-4 py-3 bg-white border border-blue-300 rounded-xl text-sm font-bold text-slate-700 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all tracking-[0.2em]"
+                            className="w-full px-4 py-3 bg-white border border-blue-300 rounded-[3px] text-sm font-bold text-slate-700 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all tracking-[0.2em]"
                         />
                     </div>
                     

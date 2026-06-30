@@ -29,7 +29,7 @@ const LogoutConfirmModal = ({ isOpen, onClose, onConfirm, loading = false }) => 
                     <div className="max-w-7xl mx-auto w-full relative z-10 px-6">
                         {/* Header */}
                         <div className="pb-2 border-b border-black/10 flex justify-between items-center">
-                            <h3 className="text-[20px] font-normal text-white tracking-wide">Confirm Logout</h3>
+                            <h3 className="text-[15px] font-mono font-bold text-white uppercase tracking-widest">Confirm Logout</h3>
                         </div>
                         
                         {/* Content */}

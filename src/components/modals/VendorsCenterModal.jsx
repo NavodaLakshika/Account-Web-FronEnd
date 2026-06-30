@@ -50,7 +50,7 @@ const VendorsCenterModal = ({ isOpen, onClose, onOpenEnterBill, onOpenPayBill, o
 
                 <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-white">
                     <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-xl bg-[${accent}]/10 flex items-center justify-center">
+                        <div className="w-9 h-9 rounded-[3px] bg-[${accent}]/10 flex items-center justify-center">
                             <Truck size={16} className="text-[${accent}]" />
                         </div>
                         <div>
@@ -60,7 +60,7 @@ const VendorsCenterModal = ({ isOpen, onClose, onOpenEnterBill, onOpenPayBill, o
                             <p className="text-[10px] text-slate-400 font-medium tracking-wider">Procurement Records &amp; Payables</p>
                         </div>
                     </div>
-                    <button onClick={onClose} className="w-9 h-9 rounded-xl bg-red-50 hover:bg-red-100 flex items-center justify-center transition-all active:scale-90">
+                    <button onClick={onClose} className="w-9 h-9 rounded-[3px] bg-red-50 hover:bg-red-100 flex items-center justify-center transition-all active:scale-90">
                         <X size={28} strokeWidth={1.5} className="text-red-600" />
                     </button>
                 </div>
@@ -73,7 +73,7 @@ const VendorsCenterModal = ({ isOpen, onClose, onOpenEnterBill, onOpenPayBill, o
                             placeholder="Search vendor transactions..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full h-9 pl-9 pr-3 text-[12px] border border-slate-200 rounded-lg bg-white outline-none focus:border-[${accent}] focus:ring-1 focus:ring-[${accent}]/20 transition-all placeholder:text-slate-300"
+                            className="w-full h-9 pl-9 pr-3 text-[12px] border border-slate-200 rounded-[3px] bg-white outline-none focus:border-[${accent}] focus:ring-1 focus:ring-[${accent}]/20 transition-all placeholder:text-slate-300"
                         />
                     </div>
                 </div>
@@ -100,7 +100,7 @@ const VendorsCenterModal = ({ isOpen, onClose, onOpenEnterBill, onOpenPayBill, o
                                             <button
                                                 key={idx}
                                                 onClick={() => handleAction(item.action)}
-                                                className="group w-full flex items-center gap-3 px-4 py-2.5 rounded-xl hover:bg-slate-50 transition-all duration-200 border border-transparent hover:border-slate-100 hover:shadow-sm text-left"
+                                                className="group w-full flex items-center gap-3 px-4 py-2.5 rounded-[3px] hover:bg-slate-50 transition-all duration-200 border border-transparent hover:border-slate-100 hover:shadow-sm text-left"
                                             >
  <div className="w-9 h-9 rounded-sm bg-white flex items-center justify-center shadow-sm group-hover:border-[${accent}]/20 group-hover:bg-[${accent}]/5 transition-all shrink-0">
                                                     <Icon size={16} strokeWidth={1.8} className="text-slate-500 group-hover:text-[${accent}] transition-colors" />

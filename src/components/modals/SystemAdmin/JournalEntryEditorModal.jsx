@@ -178,16 +178,16 @@ const JournalEntryEditorModal = ({ isOpen, onClose }) => {
     };
 
     const footer = (
-        <div className="bg-slate-50 px-6 py-4 w-full flex justify-end gap-3 border-t border-gray-100 rounded-b-xl font-['Tahoma']">
+        <div className="bg-slate-50 px-6 py-4 w-full flex justify-end gap-3 border-t border-gray-200 rounded-b-xl font-['Tahoma']">
             <button 
                 onClick={handleDone}
-                className="px-8 h-10 bg-[#0285fd] text-white text-[13px] font-bold rounded-[5px] hover:bg-[#0073ff] shadow-md transition-all active:scale-95 border-none flex items-center justify-center gap-2 uppercase tracking-widest"
+                className="px-8 h-10 bg-[#0285fd] text-white text-[13px] font-bold rounded-[3px] hover:bg-[#0073ff] shadow-md transition-all active:scale-95 border-none flex items-center justify-center gap-2 uppercase tracking-widest"
             >
                 <Check size={16} strokeWidth={3} /> Done
             </button>
             <button 
                 onClick={handleClear} 
-                className="px-8 h-10 bg-slate-400 text-white text-[13px] font-bold rounded-[5px] hover:bg-slate-500 shadow-md transition-all active:scale-95 border-none flex items-center justify-center gap-2 uppercase tracking-widest"
+                className="px-8 h-10 bg-slate-400 text-white text-[13px] font-bold rounded-[3px] hover:bg-slate-500 shadow-md transition-all active:scale-95 border-none flex items-center justify-center gap-2 uppercase tracking-widest"
             >
                 <RotateCcw size={14} /> Clear
             </button>
@@ -208,12 +208,12 @@ const JournalEntryEditorModal = ({ isOpen, onClose }) => {
                 isOpen={isOpen}
                 onClose={onClose}
                 title="JOURNAL ENTRY EDITOR"
-                maxWidth="max-w-[1000px]"
+                maxWidth="max-w-[700px]"
                 footer={footer}
             >
                 <div className="p-6 font-['Tahoma'] select-none">
                     {/* Header Inputs */}
-                    <div className="grid grid-cols-12 gap-6 mb-8 items-end bg-slate-50/50 p-4 border border-slate-100 rounded-xl shadow-sm">
+                    <div className="grid grid-cols-12 gap-6 mb-8 items-end bg-slate-50/50 p-4 border border-slate-100 rounded-[3px] shadow-sm">
                         <div className="col-span-4 space-y-2">
                             <label className="text-[11px] font-black text-slate-500 uppercase tracking-widest">Journal Entry Number</label>
                             <div className="flex gap-1.5">
@@ -221,12 +221,12 @@ const JournalEntryEditorModal = ({ isOpen, onClose }) => {
                                     type="text" 
                                     value={entryNo}
                                     onChange={(e) => setEntryNo(e.target.value)}
-                                    className="flex-1 h-9 border border-slate-200 px-3 bg-white rounded-[5px] outline-none font-bold text-slate-700 text-[13px] focus:border-[#0285fd] transition-colors shadow-sm"
+                                    className="flex-1 h-9 border border-slate-200 px-3 bg-white rounded-[3px] outline-none font-bold text-slate-700 text-[13px] focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] transition-colors shadow-sm"
                                     placeholder="JRN-00001"
                                 />
                                 <button 
                                     onClick={handleJournalSearch}
-                                    className="w-9 h-9 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] shadow-md transition-all active:scale-90"
+                                    className="w-9 h-9 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] shadow-md transition-all active:scale-90"
                                 >
                                     <Search size={16} strokeWidth={3}/>
                                 </button>
@@ -237,7 +237,7 @@ const JournalEntryEditorModal = ({ isOpen, onClose }) => {
                             <button 
                                 onClick={handleLoad}
                                 disabled={loading}
-                                className="w-full h-9 bg-[#e49e1b] text-white text-[12px] font-black rounded-[5px] hover:bg-[#cb9b34] shadow-md transition-all active:scale-95 uppercase tracking-widest flex items-center justify-center gap-2 disabled:opacity-50"
+                                className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase"
                             >
                                 {loading ? <Loader2 size={14} className="animate-spin" /> : 'Load'}
                             </button>
@@ -250,11 +250,11 @@ const JournalEntryEditorModal = ({ isOpen, onClose }) => {
                                     type="text" 
                                     value={entryDate}
                                     readOnly
-                                    className="flex-1 h-9 border border-slate-200 px-3 bg-white rounded-[5px] outline-none font-bold text-slate-700 text-[13px] shadow-sm"
+                                    className="flex-1 h-9 border border-slate-200 px-3 bg-white rounded-[3px] outline-none font-bold text-slate-700 text-[13px] shadow-sm"
                                 />
                                 <button 
                                     onClick={() => setShowCalendar(true)}
-                                    className="w-9 h-9 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] shadow-md transition-all active:scale-90"
+                                    className="w-9 h-9 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] shadow-md transition-all active:scale-90"
                                 >
                                     <Calendar size={16} strokeWidth={2}/>
                                 </button>
@@ -263,38 +263,38 @@ const JournalEntryEditorModal = ({ isOpen, onClose }) => {
                     </div>
 
                     {/* Entry Grid */}
-                    <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-lg shadow-slate-100 mb-6">
+                    <div className="bg-white border border-slate-200 rounded-[3px] overflow-hidden shadow-lg shadow-slate-100 mb-6">
                         <table className="w-full text-left border-collapse">
                             <thead>
-                                <tr className="bg-[#f8fafd] text-slate-400 uppercase text-[10px] tracking-[2px] font-black border-b border-gray-100">
-                                    <th className="px-4 py-3 border-r border-white/10 w-[150px]">Account Code</th>
-                                    <th className="px-4 py-3 border-r border-white/10">Account Name</th>
-                                    <th className="px-4 py-3 border-r border-white/10 w-[120px] text-right">Debit</th>
-                                    <th className="px-4 py-3 border-r border-white/10 w-[120px] text-right">Credit</th>
-                                    <th className="px-4 py-3 w-[250px]">Memo</th>
-                                    <th className="px-4 py-3 w-[50px]"></th>
+                                <tr className="bg-[#f8fafd] text-slate-400 uppercase text-[10px] tracking-[2px] font-black border-b border-gray-200">
+                                    <th className="border-r border-white/10 w-[150px] px-5 py-3">Account Code</th>
+                                    <th className="border-r border-white/10 px-5 py-3">Account Name</th>
+                                    <th className="border-r border-white/10 w-[120px] text-right px-5 py-3">Debit</th>
+                                    <th className="border-r border-white/10 w-[120px] text-right px-5 py-3">Credit</th>
+                                    <th className="w-[250px] px-5 py-3">Memo</th>
+                                    <th className="w-[50px] px-5 py-3"></th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-100">
                                 {rows.length === 0 ? (
                                     <tr>
-                                        <td colSpan="6" className="px-4 py-12 text-center text-slate-400 font-bold uppercase tracking-widest text-[10px] opacity-50">
+                                        <td colSpan="6" className="text-center py-16 text-gray-400 text-[11px] font-bold uppercase tracking-widest">
                                             No entries found. Please add a row below.
                                         </td>
-                                    </tr>
+                                    <th className="text-right px-5 py-3">Action</th></tr>
                                 ) : (
                                     rows.map((row) => (
                                         <tr key={row.id} className="hover:bg-slate-50 transition-colors group">
-                                            <td className="px-4 py-3 font-mono font-bold text-blue-600 text-[12px]">{row.accountCode}</td>
-                                            <td className="px-4 py-3 font-bold text-slate-700 text-[12px]">{row.accountName}</td>
-                                            <td className="px-4 py-3 font-mono font-bold text-slate-800 text-[12px] text-right">
+                                            <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{row.accountCode}</td>
+                                            <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{row.accountName}</td>
+                                            <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">
                                                 {parseFloat(row.debit || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                             </td>
-                                            <td className="px-4 py-3 font-mono font-bold text-slate-800 text-[12px] text-right">
+                                            <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">
                                                 {parseFloat(row.credit || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                             </td>
-                                            <td className="px-4 py-3 text-slate-500 text-[12px] italic">{row.memo}</td>
-                                            <td className="px-4 py-3 text-right">
+                                            <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{row.memo}</td>
+                                            <td className="text-right px-5 py-3">
                                                 <button onClick={() => handleRemoveRow(row.id)} className="text-slate-300 hover:text-red-500 transition-colors">
                                                     <Trash2 size={14} />
                                                 </button>
@@ -306,21 +306,21 @@ const JournalEntryEditorModal = ({ isOpen, onClose }) => {
                             {/* Totals Row */}
                             <tfoot className="bg-slate-50 border-t-2 border-slate-200">
                                 <tr className="font-black text-slate-800 text-[12px] uppercase">
-                                    <td colSpan="2" className="px-4 py-3 text-right tracking-[3px]">Total Balance</td>
-                                    <td className="px-4 py-3 text-right bg-blue-50/50 text-[#0285fd]">
+                                    <td colSpan="2" className="text-center py-16 text-gray-400 text-[11px] font-bold uppercase tracking-widest">Total Balance</td>
+                                    <td className="text-right bg-blue-50/50 text-[#0285fd] px-5 py-3">
                                         {totalDebit.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                     </td>
-                                    <td className="px-4 py-3 text-right bg-blue-50/50 text-[#0285fd]">
+                                    <td className="text-right bg-blue-50/50 text-[#0285fd] px-5 py-3">
                                         {totalCredit.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                     </td>
-                                    <td colSpan="2" className="px-4 py-3"></td>
+                                    <td colSpan="2" className="text-center py-16 text-gray-400 text-[11px] font-bold uppercase tracking-widest"></td>
                                 </tr>
                             </tfoot>
                         </table>
                     </div>
 
                     {/* Entry Input Row */}
-                    <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 grid grid-cols-12 gap-3 items-end shadow-inner">
+                    <div className="bg-slate-50 border border-slate-200 rounded-[3px] p-4 grid grid-cols-12 gap-3 items-end shadow-inner">
                         <div className="col-span-2 space-y-1.5">
                             <label className="text-[9px] font-black text-slate-400 uppercase tracking-wider">Acct Code</label>
                             <div className="flex gap-1">
@@ -435,7 +435,7 @@ const JournalEntryEditorModal = ({ isOpen, onClose }) => {
                     isOpen={showDeleteConfirm}
                     onClose={() => setShowDeleteConfirm(false)}
                     title="CONFIRM DELETION"
-                    maxWidth="max-w-[400px]"
+                    maxWidth="max-w-[700px]"
                 >
                     <div className="p-6 text-center">
                         <div className="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -448,13 +448,13 @@ const JournalEntryEditorModal = ({ isOpen, onClose }) => {
                         <div className="flex gap-3">
                             <button 
                                 onClick={() => setShowDeleteConfirm(false)}
-                                className="flex-1 h-10 bg-slate-100 text-slate-600 text-[11px] font-black rounded-[5px] uppercase tracking-widest hover:bg-slate-200 transition-colors"
+                                className="flex-1 h-10 bg-slate-100 text-slate-600 text-[11px] font-black rounded-[3px] uppercase tracking-widest hover:bg-slate-200 transition-colors"
                             >
                                 Cancel
                             </button>
                             <button 
                                 onClick={confirmDelete}
-                                className="flex-1 h-10 bg-red-600 text-white text-[11px] font-black rounded-[5px] uppercase tracking-widest hover:bg-red-700 shadow-md shadow-red-200 transition-all active:scale-95"
+                                className="flex-1 h-10 bg-red-600 text-white text-[11px] font-black rounded-[3px] uppercase tracking-widest hover:bg-red-700 shadow-md shadow-red-200 transition-all active:scale-95"
                             >
                                 Delete
                             </button>

@@ -25,7 +25,6 @@ const adminItems = [
     { label: 'Stock Balance Update', id: 'stockUpdate' },
     { label: 'Inventory Download', id: 'inventoryDownload' },
     { label: 'Delete Account', id: 'deleteAccount' },
-    { label: 'Transaction Search', id: 'search' },
     { label: 'Document Editor', id: 'journalEditor' },
     { label: 'Transaction Editor', id: 'transactionEditor' },
     { label: 'System Update', id: 'update' },
@@ -202,7 +201,7 @@ const AdminConfigPanel = ({ entityType, entityCode, company }) => {
     const renderItem = (item) => {
         const isLocked = settings[item.id] || false;
         return (
-            <div key={item.id} className="flex items-center justify-between py-2.5 px-3 hover:bg-blue-50/30 rounded-lg transition-all border border-transparent hover:border-blue-100/50 group">
+            <div key={item.id} className="flex items-center justify-between py-2.5 px-3 hover:bg-blue-50/30 rounded-[3px] transition-all border border-transparent hover:border-blue-100/50 group">
                 <div className="flex items-center gap-2.5 min-w-0">
                     <div className={`w-[32px] h-[32px] flex items-center justify-center transition-all duration-300 rounded-tl-xl rounded-br-xl rounded-tr-sm rounded-bl-sm shrink-0 ${isLocked ? 'bg-red-50 text-red-500 shadow-[0_4px_12px_rgba(239,68,68,0.2)]' : 'bg-[#f8fafd] text-[#0285fd] hover:bg-blue-50'}`}>
                         {isLocked ? <Lock size={14} strokeWidth={2.5} /> : <Unlock size={14} strokeWidth={2.5} />}
@@ -224,7 +223,7 @@ const AdminConfigPanel = ({ entityType, entityCode, company }) => {
     const renderSection = (title, Icon, items) => {
         const count = items.filter(i => settings[i.id]).length;
         return (
-            <div className="border border-slate-200 rounded-xl overflow-hidden">
+            <div className="border border-slate-200 rounded-[3px] overflow-hidden">
                 <div className="flex items-center gap-2 px-4 py-2.5 bg-slate-50/80 border-b border-slate-100">
                     <Icon size={12} className="text-slate-400" />
                     <h4 className="text-[10px] font-[900] text-slate-600 uppercase tracking-[0.2em]">{title}</h4>
@@ -244,7 +243,7 @@ const AdminConfigPanel = ({ entityType, entityCode, company }) => {
         <div className="mt-4 border-t border-gray-200 pt-3">
             <button
                 onClick={() => setIsExpanded(!isExpanded)}
-                className="w-full flex items-center justify-between px-3 py-2 bg-slate-50 hover:bg-slate-100 rounded-lg transition-all"
+                className="w-full flex items-center justify-between px-3 py-2 bg-slate-50 hover:bg-slate-100 rounded-[3px] transition-all"
             >
                 <div className="flex items-center gap-2">
                     <Settings size={14} className="text-slate-500" />
@@ -263,7 +262,7 @@ const AdminConfigPanel = ({ entityType, entityCode, company }) => {
 
             {isExpanded && (
                 <div className="mt-2">
-                    <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-200 shadow-sm shrink-0 mb-3">
+                    <div className="bg-slate-50 p-2.5 rounded-[3px] border border-slate-200 shadow-sm shrink-0 mb-3">
                         <div className="flex items-center gap-2">
                             <div className="flex-1 relative">
                                 <Search size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
@@ -272,7 +271,7 @@ const AdminConfigPanel = ({ entityType, entityCode, company }) => {
                                     placeholder="Search setting names..."
                                     value={searchQuery}
                                     onChange={e => setSearchQuery(e.target.value)}
-                                    className="w-full h-7 pl-8 pr-8 text-[10px] border border-slate-300 rounded-lg bg-white outline-none focus:border-blue-400 transition-all font-['Tahoma']"
+                                    className="w-full h-7 pl-8 pr-8 text-[10px] border border-slate-300 rounded-[3px] bg-white outline-none focus:border-blue-400 transition-all font-['Tahoma']"
                                 />
                                 {searchQuery && (
                                     <button onClick={() => setSearchQuery('')} className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-300 hover:text-slate-500 transition-all">

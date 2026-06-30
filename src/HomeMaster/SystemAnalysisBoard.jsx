@@ -71,7 +71,7 @@ const SystemAnalysisBoard = () => {
                 <button 
                     onClick={handleInitDB}
                     disabled={isInitializing}
-                    className="px-6 py-2.5 mt-4 bg-blue-500 hover:bg-blue-600 text-white text-sm font-bold uppercase tracking-wider rounded-xl shadow-md transition-all disabled:opacity-70 flex items-center gap-2 active:scale-95"
+                    className="px-6 py-2.5 mt-4 bg-blue-500 hover:bg-blue-600 text-white text-sm font-bold uppercase tracking-wider rounded-[3px] shadow-md transition-all disabled:opacity-70 flex items-center gap-2 active:scale-95"
                 >
                     {isInitializing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Activity className="w-4 h-4" />}
                     {isInitializing ? 'INITIALIZING...' : 'RUN DIAGNOSTICS'}
@@ -94,7 +94,7 @@ const SystemAnalysisBoard = () => {
                 </div>
                 <button 
                     onClick={fetchAnalysisData}
-                    className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold uppercase tracking-wider rounded-xl transition-all active:scale-95 flex items-center gap-2 w-fit"
+                    className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold uppercase tracking-wider rounded-[3px] transition-all active:scale-95 flex items-center gap-2 w-fit"
                 >
                     <RefreshCw size={14} /> Refresh Stats
                 </button>

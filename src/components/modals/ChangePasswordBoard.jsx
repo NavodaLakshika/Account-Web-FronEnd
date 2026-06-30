@@ -115,27 +115,27 @@ const ChangePasswordBoard = ({ isOpen, onClose }) => {
             <MasterFormWrapper
                 isOpen={isOpen}
                 onClose={onClose}
-                title="Security - Change Password"
+                title="Change Password"
                 subtitle="Update system user account passwords"
                 icon={Key}
-                maxWidth="max-w-[800px]"
+                maxWidth="max-w-[700px]"
                 isEditMode={false}
                 loading={loading}
                 onClear={handleClear}
                 onSave={handleSave}
                 saveLabel="CHANGE"
                 customFooter={
-                    <div className="bg-slate-50 px-6 py-4 w-full flex justify-end gap-3 border-t border-gray-100 mt-4 rounded-b-xl">
+                    <div className="bg-slate-50 px-6 py-4 w-full flex justify-end gap-3 border-t border-gray-200 mt-4 rounded-b-xl">
                         <button 
                             onClick={handleClear} 
-                            className="px-6 py-3 bg-[#00adff] hover:bg-[#0099e6] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] transition-all active:scale-95 flex items-center justify-center gap-2 border-none"
+                            className="px-6 py-3 bg-white text-[#00adff] border-2 border-[#00adff] hover:bg-blue-50 font-mono font-bold text-sm uppercase tracking-widest rounded-[3px] transition-all active:scale-95 flex items-center justify-center gap-2 border-none"
                         >
                             <RotateCcw size={14} /> CLEAR FORM
                         </button>
                         <button 
                             onClick={handleSave} 
                             disabled={loading} 
-                            className={`px-6 py-3 bg-[#0285fd] hover:bg-[#0073ff] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] shadow-md shadow-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border-none ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            className={`px-6 py-3 bg-[#0285fd] hover:bg-[#0073ff] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[3px] shadow-md shadow-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border-none ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                         >
                             {loading ? <Loader2 size={14} className="animate-spin" /> : <Lock size={14} />} CHANGE PASSWORD
                         </button>

@@ -122,17 +122,17 @@ const TransactionSearchModal = ({ isOpen, onClose }) => {
     };
 
     const footer = (
-        <div className="bg-slate-50 px-6 py-4 w-full flex justify-end gap-3 border-t border-gray-100 mt-4 rounded-b-xl font-['Tahoma']">
+        <div className="bg-slate-50 px-6 py-4 w-full flex justify-end gap-3 border-t border-gray-200 mt-4 rounded-b-xl font-['Tahoma']">
             <button 
                 onClick={handleClear} 
-                className="px-8 h-10 bg-[#00adff] text-white text-[13px] font-bold rounded-[5px] hover:bg-[#0099e6] shadow-md shadow-blue-200 transition-all active:scale-95 border-none flex items-center justify-center gap-2"
+                className="px-8 h-10 bg-white text-[#00adff] border-2 border-[#00adff] hover:bg-blue-50 text-[13px] font-bold rounded-[3px] hover:bg-[#0099e6] shadow-md shadow-blue-200 transition-all active:scale-95 border-none flex items-center justify-center gap-2"
             >
                 <RotateCcw size={14} /> Clear All
             </button>
             <button 
                 onClick={handleSearch}
                 disabled={isSearching}
-                className="px-10 h-10 bg-[#e49e1b] text-white text-[13px] font-black rounded-[5px] hover:bg-[#cb9b34] shadow-md transition-all active:scale-95 border-none flex items-center justify-center gap-2 uppercase tracking-widest"
+                className="px-10 h-10 bg-[#e49e1b] text-white text-[13px] font-black rounded-[3px] hover:bg-[#cb9b34] shadow-md transition-all active:scale-95 border-none flex items-center justify-center gap-2 uppercase tracking-widest"
             >
                 {isSearching ? <RotateCcw className="animate-spin" size={16} /> : <><Search size={16} strokeWidth={3} /> Find Records</>}
             </button>
@@ -153,7 +153,7 @@ const TransactionSearchModal = ({ isOpen, onClose }) => {
                 isOpen={isOpen}
                 onClose={onClose}
                 title="Document Searching"
-                maxWidth="max-w-[1400px]"
+                maxWidth="max-w-[700px]"
                 footer={footer}
             >
                 <div className="py-2 select-none font-['Tahoma'] space-y-6 text-[12.5px] mt-2">
@@ -167,7 +167,7 @@ const TransactionSearchModal = ({ isOpen, onClose }) => {
                     </div>
 
                     {/* Filter Grid System */}
-                    <div className="bg-slate-50/50 p-4 border border-slate-100 rounded-[5px] grid grid-cols-12 gap-4 shadow-sm relative overflow-hidden">
+                    <div className="bg-slate-50/50 p-4 border border-slate-100 rounded-[3px] grid grid-cols-12 gap-4 shadow-sm relative overflow-hidden">
                         
                         {/* Column 1: Core Identifiers */}
                         <div className="col-span-3 space-y-4 border-r border-slate-200 pr-4">
@@ -299,9 +299,9 @@ const TransactionSearchModal = ({ isOpen, onClose }) => {
                     </div>
 
                     {/* Transaction Search Results Grid */}
-                    <div className="border border-gray-300 rounded-[5px] overflow-hidden flex flex-col min-h-[450px] bg-white shadow-inner relative">
+                    <div className="border border-gray-300 rounded-[3px] overflow-hidden flex flex-col min-h-[450px] bg-white shadow-inner relative">
                         {/* Grid Header */}
-                        <div className="flex bg-[#f8fafc] border-b border-gray-300 select-none font-bold text-gray-600 text-[10px] uppercase tracking-wider sticky top-0 z-10">
+                        <div className="flex bg-slate-50 border-b border-gray-300 select-none font-bold text-gray-600 text-[10px] uppercase tracking-wider sticky top-0 z-10">
                             <div className="w-10 px-2 py-2 text-center border-r border-gray-200">#</div>
                             <div className="w-32 px-3 py-2 border-r border-gray-200">Date</div>
                             <div className="w-40 px-3 py-2 border-r border-gray-200">Document No</div>
@@ -317,7 +317,7 @@ const TransactionSearchModal = ({ isOpen, onClose }) => {
                             {results.length > 0 ? (
                                 <div className="divide-y divide-gray-100">
                                     {results.map((row, idx) => (
-                                        <div key={idx} className="flex border-b border-gray-50 hover:bg-blue-50/50 transition-colors text-[11px] font-mono text-slate-700 cursor-pointer group">
+                                        <div key={idx} className="flex border-b border-gray-50 hover:bg-blue-50/50 transition-all text-[11px] font-mono text-slate-700  group cursor-pointer group border-b border-gray-50">
                                             <div className="w-10 px-2 py-2 text-center border-r border-gray-50 flex items-center justify-center text-slate-300 font-bold group-hover:text-blue-500">{idx + 1}</div>
                                             <div className="w-32 px-3 py-2 border-r border-gray-50 font-bold">{row.Date || row.date}</div>
                                             <div className="w-40 px-3 py-2 border-r border-gray-50 font-black text-blue-600">{row['Document No'] || row.docNo}</div>

@@ -125,7 +125,7 @@ const AdminCompanyReportsBoard = ({ hierarchy, allEmployees }) => {
             {/* Header */}
  <div className="bg-white rounded-sm shadow-sm p-6">
                 <div className="flex items-center gap-3 mb-6">
-                    <div className="w-10 h-10 rounded-xl bg-[#00acee]/10 flex items-center justify-center">
+                    <div className="w-10 h-10 rounded-[3px] bg-[#00acee]/10 flex items-center justify-center">
                         <FileText className="w-5 h-5 text-[#00acee]" />
                     </div>
                     <div>
@@ -151,7 +151,7 @@ const AdminCompanyReportsBoard = ({ hierarchy, allEmployees }) => {
                         <div className="flex gap-2 w-full sm:w-auto">
                             <button
                                 onClick={() => { setShowEmpModal(true); setEmpSearch(''); setEmpSearchTriggered(false); }}
-                                className="flex-1 sm:flex-none px-5 py-2.5 bg-slate-50 border border-slate-200 hover:border-[#00acee] hover:text-[#00acee] text-slate-600 text-xs font-bold uppercase tracking-wider rounded-xl shadow-sm transition-all flex items-center justify-center gap-2"
+                                className="flex-1 sm:flex-none px-5 py-2.5 bg-slate-50 border border-slate-200 hover:border-[#00acee] hover:text-[#00acee] text-slate-600 text-xs font-bold uppercase tracking-wider rounded-[3px] shadow-sm transition-all flex items-center justify-center gap-2"
                             >
                                 <Users size={14} />
                                 Employee
@@ -159,7 +159,7 @@ const AdminCompanyReportsBoard = ({ hierarchy, allEmployees }) => {
                             <button
                                 onClick={() => { setShowCompModal(true); setCompSearch(''); setCompSearchTriggered(false); }}
                                 disabled={!selectedEmployee}
-                                className="flex-1 sm:flex-none px-5 py-2.5 bg-slate-50 border border-slate-200 hover:border-[#00acee] hover:text-[#00acee] text-slate-600 text-xs font-bold uppercase tracking-wider rounded-xl shadow-sm transition-all flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
+                                className="flex-1 sm:flex-none px-5 py-2.5 bg-slate-50 border border-slate-200 hover:border-[#00acee] hover:text-[#00acee] text-slate-600 text-xs font-bold uppercase tracking-wider rounded-[3px] shadow-sm transition-all flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
                             >
                                 <Building2 size={14} />
                                 Company
@@ -173,7 +173,7 @@ const AdminCompanyReportsBoard = ({ hierarchy, allEmployees }) => {
             {selectedCompany && (
                 <div className="space-y-8">
                     {/* Search Bar */}
-                    <div className="bg-slate-50/50 p-3 rounded-xl border border-slate-200/60 mb-6 flex items-center">
+                    <div className="bg-slate-50/50 p-3 rounded-[3px] border border-slate-200/60 mb-6 flex items-center">
                         <Search className="text-slate-400 ml-2 w-5 h-5 shrink-0" />
                         <input
                             type="text"
@@ -198,7 +198,7 @@ const AdminCompanyReportsBoard = ({ hierarchy, allEmployees }) => {
                         return (
                             <div key={gIdx}>
                                 <div className="flex items-center gap-3 mb-4">
-                                    <div className={`w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center`}>
+                                    <div className={`w-8 h-8 rounded-[3px] bg-blue-50 flex items-center justify-center`}>
                                         <CategoryIcon size={16} className="text-blue-600" />
                                     </div>
                                     <h3 className="text-sm font-bold text-slate-700 uppercase tracking-widest">{group.title}</h3>
@@ -213,7 +213,7 @@ const AdminCompanyReportsBoard = ({ hierarchy, allEmployees }) => {
                                                     onClick={() => handleOpenReport(item)}
                                                     className={`w-full bg-white shadow-sm border border-slate-200/50 hover:border-slate-400 p-5 transition-all text-left hover:shadow-lg active:scale-[0.98] ${isHidden ? 'opacity-50 grayscale' : ''}`}
                                                 >
-                                                    <div className={`w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform`}>
+                                                    <div className={`w-10 h-10 rounded-[3px] bg-slate-50 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform`}>
                                                         <FileText className={`w-5 h-5 text-slate-500`} />
                                                     </div>
                                                     <h4 className="text-[13px] font-bold text-slate-900 mb-1.5 line-clamp-1" title={item}>{item}</h4>
@@ -227,7 +227,7 @@ const AdminCompanyReportsBoard = ({ hierarchy, allEmployees }) => {
                                                 <button
                                                     onClick={(e) => handleToggleHide(e, itemId, item)}
                                                     title={isHidden ? "Show Report" : "Hide Report"}
-                                                    className={`absolute top-3 right-3 p-2 rounded-lg transition-all opacity-0 group-hover:opacity-100 ${isHidden ? 'bg-red-50 text-red-500 hover:bg-red-100' : 'bg-slate-50 text-slate-400 hover:text-[#00acee] hover:bg-[#00acee]/10'}`}
+                                                    className={`absolute top-3 right-3 p-2 rounded-[3px] transition-all opacity-0 group-hover:opacity-100 ${isHidden ? 'bg-red-50 text-red-500 hover:bg-red-100' : 'bg-slate-50 text-slate-400 hover:text-[#00acee] hover:bg-[#00acee]/10'}`}
                                                 >
                                                     {isHidden ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                                                 </button>
@@ -282,12 +282,12 @@ const AdminCompanyReportsBoard = ({ hierarchy, allEmployees }) => {
                                         value={empSearch}
                                         onChange={e => { setEmpSearch(e.target.value); setEmpSearchTriggered(false); }}
                                         onKeyDown={e => e.key === 'Enter' && setEmpSearchTriggered(true)}
-                                        className="w-full pl-9 pr-24 p-3 border border-slate-300 rounded-xl text-sm bg-white font-bold text-slate-700 outline-none focus:border-[#00acee] focus:ring-1 focus:ring-[#00acee] transition-all"
+                                        className="w-full pl-9 pr-24 p-3 border border-slate-300 rounded-[3px] text-sm bg-white font-bold text-slate-700 outline-none focus:border-[#00acee] focus:ring-1 focus:ring-[#00acee] transition-all"
                                         autoFocus
                                     />
                                     <button
                                         onClick={() => setEmpSearchTriggered(true)}
-                                        className="absolute right-1.5 top-1.5 bottom-1.5 px-4 bg-[#00acee] hover:bg-[#009adb] text-white text-[11px] font-bold uppercase tracking-wider rounded-lg transition-colors shadow-sm"
+                                        className="absolute right-1.5 top-1.5 bottom-1.5 px-4 bg-[#00acee] hover:bg-[#009adb] text-white text-[11px] font-bold uppercase tracking-wider rounded-[3px] transition-colors shadow-sm"
                                     >
                                         Load
                                     </button>
@@ -339,7 +339,7 @@ const AdminCompanyReportsBoard = ({ hierarchy, allEmployees }) => {
                     <div className="bg-white rounded-sm shadow-2xl w-full max-w-md overflow-visible animate-in fade-in zoom-in-95 duration-200 flex flex-col">
                         <div className="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50 rounded-t-2xl">
                             <h3 className="text-sm font-bold tracking-wide uppercase text-slate-900">Select Company</h3>
-                            <button onClick={() => setShowCompModal(false)} className="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-200 transition-colors">
+                            <button onClick={() => setShowCompModal(false)} className="w-8 h-8 flex items-center justify-center rounded-[3px] text-slate-400 hover:text-slate-700 hover:bg-slate-200 transition-colors">
                                 <X size={28} />
                             </button>
                         </div>
@@ -354,12 +354,12 @@ const AdminCompanyReportsBoard = ({ hierarchy, allEmployees }) => {
                                         value={compSearch}
                                         onChange={e => { setCompSearch(e.target.value); setCompSearchTriggered(false); }}
                                         onKeyDown={e => e.key === 'Enter' && setCompSearchTriggered(true)}
-                                        className="w-full pl-9 pr-24 p-3 border border-slate-300 rounded-xl text-sm bg-white font-bold text-slate-700 outline-none focus:border-[#00acee] focus:ring-1 focus:ring-[#00acee] transition-all"
+                                        className="w-full pl-9 pr-24 p-3 border border-slate-300 rounded-[3px] text-sm bg-white font-bold text-slate-700 outline-none focus:border-[#00acee] focus:ring-1 focus:ring-[#00acee] transition-all"
                                         autoFocus
                                     />
                                     <button
                                         onClick={() => setCompSearchTriggered(true)}
-                                        className="absolute right-1.5 top-1.5 bottom-1.5 px-4 bg-[#00acee] hover:bg-[#009adb] text-white text-[11px] font-bold uppercase tracking-wider rounded-lg transition-colors shadow-sm"
+                                        className="absolute right-1.5 top-1.5 bottom-1.5 px-4 bg-[#00acee] hover:bg-[#009adb] text-white text-[11px] font-bold uppercase tracking-wider rounded-[3px] transition-colors shadow-sm"
                                     >
                                         Load
                                     </button>

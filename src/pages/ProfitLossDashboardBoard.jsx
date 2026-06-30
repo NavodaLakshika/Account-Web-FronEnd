@@ -9,6 +9,7 @@ import {
 import { biDashboardService } from '../services/biDashboard.service';
 import { getSessionData } from '../utils/session';
 import { showErrorToast } from '../utils/toastUtils';
+import TransactionFormWrapper from '../components/TransactionFormWrapper';
 
 const ProfitLossDashboardBoard = ({ 
   isOpen, 
@@ -73,17 +74,16 @@ const ProfitLossDashboardBoard = ({
   const profitBg = netProfit >= 0 ? 'from-emerald-500 to-emerald-600' : 'from-rose-500 to-rose-600';
 
   return (
-    <SimpleModal
+    <TransactionFormWrapper subtitle="Transaction Management" icon={FileText}
       isOpen={isOpen}
       onClose={onClose}
-      title="Profit & Loss Intelligence Center"
-      maxWidth="max-w-[1180px]"
+      title="Profit & Loss"
     >
       <div className="flex flex-col gap-6 select-none font-['Plus_Jakarta_Sans'] text-slate-800">
         
         {/* Header Controls */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-4">
-          <div className="flex items-center gap-3">
+          <div className="">
             <div>
               <h2 className="text-lg font-bold text-slate-900 leading-none">Profit & Loss Dashboard</h2>
               <span className="text-xs text-blue-600 font-bold uppercase tracking-wider">{companyName}</span>
@@ -94,7 +94,7 @@ const ProfitLossDashboardBoard = ({
             <button 
               onClick={fetchDashboardData}
               disabled={loading}
-              className="p-2 border border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-500 rounded-lg transition-all active:scale-95 disabled:opacity-50 shrink-0"
+              className="border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-500 rounded-[3px] transition-all active:scale-95 disabled:opacity-50 shrink-0 px-5 py-3"
               title="Refresh Data"
             >
               <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
@@ -105,7 +105,7 @@ const ProfitLossDashboardBoard = ({
         {/* Metric Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
           {/* Net Profit */}
-          <div className={`relative overflow-hidden bg-gradient-to-br ${profitBg} text-white p-6 rounded-xl shadow-lg border border-white/10 group hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col`}>
+          <div className={`relative overflow-hidden bg-gradient-to-br ${profitBg} text-white p-6 rounded-[3px] shadow-lg border border-white/10 group hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col`}>
             <div className="absolute -right-4 -bottom-4 p-8 opacity-10 transform group-hover:scale-110 group-hover:rotate-12 transition-all duration-500">
               <TrendingUp size={120} />
             </div>
@@ -132,7 +132,7 @@ const ProfitLossDashboardBoard = ({
           </div>
 
           {/* Income */}
-          <div className="relative overflow-hidden bg-gradient-to-br from-blue-500 to-blue-600 text-white p-6 rounded-xl shadow-lg border border-white/10 group hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col">
+          <div className="relative overflow-hidden bg-gradient-to-br from-blue-500 to-blue-600 text-white p-6 rounded-[3px] shadow-lg border border-white/10 group hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col">
             <div className="absolute -right-4 -bottom-4 p-8 opacity-10 transform group-hover:scale-110 group-hover:-rotate-12 transition-all duration-500">
               <DollarSign size={120} />
             </div>
@@ -159,7 +159,7 @@ const ProfitLossDashboardBoard = ({
           </div>
 
           {/* Expenses */}
-          <div className="relative overflow-hidden bg-gradient-to-br from-amber-500 to-orange-500 text-white p-6 rounded-xl shadow-lg border border-white/10 group hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col">
+          <div className="relative overflow-hidden bg-gradient-to-br from-amber-500 to-orange-500 text-white p-6 rounded-[3px] shadow-lg border border-white/10 group hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col">
             <div className="absolute -right-4 -bottom-4 p-8 opacity-10 transform group-hover:scale-110 group-hover:rotate-12 transition-all duration-500">
               <Wallet size={120} />
             </div>
@@ -243,7 +243,7 @@ const ProfitLossDashboardBoard = ({
                           <th className="px-6 w-[20%]">Doc No</th>
                           <th className="px-6 w-[30%]">Details</th>
                           <th className="px-6 w-[20%] text-right">Amount</th>
-                        </tr>
+                        <th className="text-right px-5 py-3">Action</th></tr>
                       </thead>
                       <tbody className="divide-y divide-slate-100 text-xs font-bold text-slate-700">
                         {data.recentTransactions.map((tx, idx) => (
@@ -284,7 +284,7 @@ const ProfitLossDashboardBoard = ({
         onClose={() => setSelectedTx(null)} 
       />
 
-    </SimpleModal>
+    </TransactionFormWrapper>
   );
 };
 

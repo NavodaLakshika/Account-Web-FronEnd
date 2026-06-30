@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, Lock, Loader2, Facebook, Linkedin, Globe, X, ChevronRight, Settings, Info, RefreshCw, MinusCircle } from 'lucide-react';
+import { User, Lock, Loader2, Facebook, Linkedin, Globe, X, ChevronRight, Settings, Info, RefreshCw, MinusCircle, CheckCircle, AlertCircle } from 'lucide-react';
 import { authService } from '../services/auth.service';
 import CompanySelectModal from '../components/modals/CompanySelectModal';
 import AboutUsModal from '../components/modals/AboutUsModal';
@@ -8,8 +8,6 @@ import ContactModal from '../components/modals/ContactModal';
 import HelpModal from '../components/modals/HelpModal';
 import WelcomeModal from '../components/modals/WelcomeModal';
 import LegalTextModal from '../components/modals/LegalTextModal';
-import { showSuccessToast, showErrorToast, showInfoToast } from '../utils/toastUtils';
-import toast from 'react-hot-toast';
 import { Helmet } from 'react-helmet-async';
 import { DotLottiePlayer } from '@dotlottie/react-player';
 
@@ -40,6 +38,23 @@ const AuthPage = () => {
     const [showAccountSelector, setShowAccountSelector] = useState(() => !!localStorage.getItem('onimta_saved_account'));
     const [rememberMe, setRememberMe] = useState(false);
     const [displayedSignInText, setDisplayedSignInText] = useState('');
+    const [pageAlert, setPageAlert] = useState(null);
+    const [glowType, setGlowType] = useState(null);
+
+    useEffect(() => {
+        if (pageAlert) {
+            setGlowType(pageAlert.type);
+            const glowTimer = setTimeout(() => setGlowType(null), 1000);
+            const alertTimer = setTimeout(() => setPageAlert(null), 4000);
+            return () => {
+                clearTimeout(glowTimer);
+                clearTimeout(alertTimer);
+                setGlowType(null);
+            };
+        }
+    }, [pageAlert]);
+
+    const showPageAlert = (type, title, message) => setPageAlert({ type, title, message });
 
     const translations = {
         EN: {
@@ -109,15 +124,15 @@ const AuthPage = () => {
                 setSavedAccount(null);
             }
 
-            showSuccessToast(result.message || 'Verification Successful');
+            showPageAlert('success', 'Login Successful', result.message || 'Verification Successful');
 
-            // Show the welcome modal after toast animation starts
+            // Show the welcome modal after a short delay
             setTimeout(() => {
                 setShowWelcome(true);
             }, 1000);
         } catch (err) {
             const errorMessage = typeof err === 'object' ? (err.message || err.Message || 'Invalid credentials') : err;
-            showErrorToast(errorMessage);
+            showPageAlert('error', 'Login Failed', errorMessage);
         } finally {
             setLoading(false);
         }
@@ -141,16 +156,16 @@ const AuthPage = () => {
         setLoading(true);
         try {
             const result = await authService.forgotPassword(forgotEmail);
-            showSuccessToast(result.message || 'Recovery instruction sent');
+            showPageAlert('success', 'Recovery Email Sent', result.message || 'Recovery instruction sent');
 
             // Second alert for the 24 hour wait as requested
             setTimeout(() => {
-                showInfoToast('Waiting for 24 hours recovery and reset your password', 'Protocol Init');
+                showPageAlert('info', 'Protocol Init', 'Waiting for 24 hours recovery and reset your password');
             }, 1500);
 
             setRecoveryStep(2); // Move to reset step
         } catch (err) {
-            showErrorToast(typeof err === 'object' ? (err.message || 'Request failed') : err);
+            showPageAlert('error', 'Request Failed', typeof err === 'object' ? (err.message || 'Request failed') : err);
         } finally {
             setLoading(false);
         }
@@ -161,13 +176,13 @@ const AuthPage = () => {
         setLoading(true);
         try {
             const result = await authService.resetPassword(resetToken, newPassword);
-            showSuccessToast(result.message || 'Password reset successful');
+            showPageAlert('success', 'Password Reset', result.message || 'Password reset successful');
             setShowForgot(false);
             setRecoveryStep(1);
             setResetToken('');
             setNewPassword('');
         } catch (err) {
-            showErrorToast(typeof err === 'object' ? (err.message || 'Reset failed') : err);
+            showPageAlert('error', 'Reset Failed', typeof err === 'object' ? (err.message || 'Reset failed') : err);
         } finally {
             setLoading(false);
         }
@@ -179,21 +194,13 @@ const AuthPage = () => {
     };
 
     return (
-        <div className="min-h-screen relative flex flex-col items-center justify-center font-['Arial'] overflow-hidden bg-[#f8fafc] py-8">
+        <div className="min-h-screen relative flex flex-col items-center justify-center font-['Arial'] overflow-hidden bg-slate-50 py-8">
             <Helmet>
                 <title>Login | Onimta Accounting System</title>
                 <meta name="description" content="Securely login to the Onimta Accounting Web Application. Access your financials, dashboards, and enterprise resources." />
                 <link rel="canonical" href="https://onimta.com/login" />
             </Helmet>
-            <style>
-                {`
-                    @keyframes toastProgress {
-                        0% { width: 100%; }
-                        100% { width: 0%; }
-                    }
 
-                `}
-            </style>
 
 
 
@@ -530,6 +537,67 @@ const AuthPage = () => {
                 {...legalModalConfig}
                 onClose={() => setLegalModalConfig({ ...legalModalConfig, isOpen: false })}
             />
+
+            {/* Full-page Glow Effect */}
+            {glowType && (
+                <div
+                    className="fixed inset-0 w-full h-full pointer-events-none z-40 animate-in fade-in duration-300"
+                    style={{
+                        background: glowType === 'error'
+                            ? 'linear-gradient(180deg, rgba(220,38,38,0.15) 0%, rgba(220,38,38,0.04) 40%, transparent 70%)'
+                            : glowType === 'success'
+                            ? 'linear-gradient(180deg, rgba(5,150,105,0.15) 0%, rgba(5,150,105,0.04) 40%, transparent 70%)'
+                            : 'linear-gradient(180deg, rgba(2,132,199,0.15) 0%, rgba(2,132,199,0.04) 40%, transparent 70%)'
+                    }}
+                />
+            )}
+
+            {/* Full-width Bottom Alert Bar */}
+            {pageAlert && (
+                <div
+                    className={`fixed bottom-0 left-0 right-0 z-50 animate-in slide-in-from-bottom-full duration-300 ${pageAlert.type === 'error' ? 'bg-red-600' : pageAlert.type === 'success' ? 'bg-emerald-600' : 'bg-sky-600'} text-white shadow-2xl`}
+                >
+                    <div className="px-8 py-5">
+                        <div className="flex items-start justify-between">
+                            <div className="flex items-start gap-3 min-w-0">
+                                <div className="mt-0.5">
+                                    {pageAlert.type === 'error' ? (
+                                        <AlertCircle size={20} strokeWidth={2.5} />
+                                    ) : pageAlert.type === 'success' ? (
+                                        <CheckCircle size={20} strokeWidth={2.5} />
+                                    ) : (
+                                        <Info size={20} strokeWidth={2.5} />
+                                    )}
+                                </div>
+                                <div className="min-w-0">
+                                    <h3 className="font-bold text-[16px] font-sans tracking-wide">{pageAlert.title}</h3>
+                                    <p className="text-[13px] text-white/85 font-sans mt-0.5 leading-relaxed">{pageAlert.message}</p>
+                                </div>
+                            </div>
+                            <button
+                                onClick={() => setPageAlert(null)}
+                                className="text-white/70 hover:text-white transition-colors ml-4 shrink-0"
+                            >
+                                <X size={18} strokeWidth={3} />
+                            </button>
+                        </div>
+                    </div>
+                    <div className="w-full h-[3px] bg-white/20">
+                        <div
+                            className="h-full bg-white/90"
+                            style={{
+                                animation: 'toastProgress 4000ms linear forwards'
+                            }}
+                        />
+                    </div>
+                </div>
+            )}
+            <style>{`
+                @keyframes toastProgress {
+                    from { width: 100%; }
+                    to { width: 0%; }
+                }
+            `}</style>
         </div>
     );
 };

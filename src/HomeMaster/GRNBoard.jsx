@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
+import TransactionFormWrapper from '../components/TransactionFormWrapper';
 import SimpleModal from '../components/SimpleModal';
 import ConfirmModal from '../components/modals/ConfirmModal';
-import { Search, Calendar, ChevronDown, CheckCircle, Trash2, XCircle, Save, X, RotateCcw, ChevronLeft, ChevronRight, ClipboardList, Plus, FileUp, FileDown, Lock } from 'lucide-react';
+import { Search, Calendar, ChevronDown, CheckCircle, Trash2, XCircle, Save, X, RotateCcw, ChevronLeft, ChevronRight, ClipboardList, Plus, FileUp, FileDown, Lock , FileText} from 'lucide-react';
 import * as XLSX from 'xlsx';
 import CalendarModal from '../components/CalendarModal';
 import { grnService } from '../services/grn.service';
@@ -448,17 +449,17 @@ const GRNBoard = ({ isOpen, onClose }) => {
 
     return (
         <>
-        <SimpleModal
+        <TransactionFormWrapper subtitle="Transaction Management" icon={FileText}
             isOpen={isOpen}
             onClose={onClose}
-            title="Good Received Note (GRN)"
-            maxWidth="max-w-[1200px]"
+            title="Good Received Note"
+            maxWidth="max-w-[700px]"
             footer={
-                <div className="bg-slate-50 px-6 py-3 w-full flex justify-between items-center border-t border-gray-100 rounded-b-xl">
+                <div className="bg-slate-50 px-6 py-3 w-full flex justify-between items-center border-t border-gray-200 rounded-b-xl">
                     <div className="flex gap-3">
                         <button
                             onClick={handleClear}
-                            className="px-6 h-10 bg-[#00adff] text-white text-sm font-black rounded-[5px] hover:bg-[#0099e6] transition-all active:scale-95 flex  items-center gap-2 border-none"
+                            className="px-6 h-10 bg-white text-[#00adff] border-2 border-[#00adff] hover:bg-blue-50 text-sm font-black rounded-[3px] hover:bg-[#0099e6] transition-all active:scale-95 flex  items-center gap-2 border-none"
                         >
                             <RotateCcw size={14} /> CLEAR
                         </button>
@@ -466,14 +467,14 @@ const GRNBoard = ({ isOpen, onClose }) => {
                     <div className="flex gap-3">
                         <button
                             onClick={handleSaveDraft}
-                            className="px-6 h-10 bg-white text-[#0285fd] text-sm font-black rounded-[5px] border-2 border-[#0285fd] hover:bg-blue-50 transition-all active:scale-95 flex items-center gap-2"
+                            className="px-6 h-10 bg-white text-[#0285fd] text-sm font-black rounded-[3px] border-2 border-[#0285fd] hover:bg-blue-50 transition-all active:scale-95 flex items-center gap-2"
                         >
                             <Save size={14} /> SAVE
                         </button>
                         <button
                             onClick={handleApply}
                             disabled={isApplying}
-                            className="px-6 h-10 bg-[#2bb744] text-white text-sm font-black rounded-[5px] shadow-md shadow-green-100 hover:bg-[#259b3a] transition-all active:scale-95 flex items-center gap-2 border-none disabled:opacity-50"
+                            className="px-6 h-10 bg-white text-[#2bb744] border-2 border-[#2bb744] hover:bg-green-50 text-sm font-black rounded-[3px] shadow-md shadow-green-100 hover:bg-[#259b3a] transition-all active:scale-95 flex items-center gap-2 disabled:opacity-50"
                         >
                             {isApplying ? <Search className="animate-spin" size={14} /> : <CheckCircle size={14} />} APPLY
                         </button>
@@ -515,40 +516,40 @@ const GRNBoard = ({ isOpen, onClose }) => {
                     <div className="flex gap-2">
                         <button
                             onClick={downloadExcelTemplate}
-                            className="h-8 px-4 bg-white text-emerald-600 border-2 border-emerald-500 text-[10px] font-black rounded-[5px] hover:bg-emerald-50 transition-all flex items-center gap-2 uppercase active:scale-95 shadow-sm"
+                            className="h-8 px-4 bg-white text-emerald-600 border-2 border-emerald-500 text-[10px] font-black rounded-[3px] hover:bg-emerald-50 transition-all flex items-center gap-2 uppercase active:scale-95 shadow-sm"
                         >
                             <FileDown size={14} /> TEMPLATE
                         </button>
                         <button
                             onClick={() => excelInputRef.current?.click()}
-                            className="h-8 px-4 bg-white text-blue-600 border-2 border-blue-500 text-[10px] font-black rounded-[5px] hover:bg-blue-50 transition-all flex items-center gap-2 uppercase active:scale-95 shadow-sm"
+                            className="h-8 px-4 bg-white text-blue-600 border-2 border-blue-500 text-[10px] font-black rounded-[3px] hover:bg-blue-50 transition-all flex items-center gap-2 uppercase active:scale-95 shadow-sm"
                         >
                             <FileUp size={14} /> LOAD EXCEL
                         </button>
                     </div>
                 </div>
-                <div className="bg-white p-3 border border-gray-100 rounded-lg shadow-sm space-y-3">
+                <div className="bg-white p-3 border border-gray-200 rounded-[3px] shadow-sm space-y-3">
                     <div className="grid grid-cols-12 gap-x-4 gap-y-2.5">
                         {/* Row 1: Document ID | Post Date | Exp. Timeline */}
                         <div className="col-span-4 flex items-center gap-2">
                             <label className="text-[12px] font-bold text-gray-700 w-24 shrink-0">Document ID</label>
                             <div className="flex-1 flex gap-1 h-8 min-w-0">
-                                <input type="text" name="docNo" value={formData.docNo} onChange={handleInput} className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-blue-600 bg-gray-50 rounded-[5px] outline-none focus:border-[#0285fd] shadow-sm" />
-                                <button onClick={handleSearchClick} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0"><Search size={16} /></button>
+                                <input type="text" name="docNo" value={formData.docNo} onChange={handleInput} className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-blue-600 bg-gray-50 rounded-[3px] outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] shadow-sm" />
+                                <button onClick={handleSearchClick} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0"><Search size={16} /></button>
                             </div>
                         </div>
                         <div className="col-span-4 flex items-center gap-2">
                             <label className="text-[12px] font-bold text-gray-700 w-24 shrink-0 text-center">Post Date</label>
                             <div className="flex-1 flex gap-1 h-8 min-w-0">
-                                <input type="text" readOnly value={formData.grnDate} onClick={() => { setDatePickerField('grnDate'); setShowDatePicker(true); }} className="flex-1 min-w-0 h-8 border border-gray-300 rounded-[5px] px-3 text-[12px] outline-none bg-white text-gray-700 font-bold cursor-pointer shadow-sm" />
-                                <button onClick={() => { setDatePickerField('grnDate'); setShowDatePicker(true); }} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0"><Calendar size={16} /></button>
+                                <input type="text" readOnly value={formData.grnDate} onClick={() => { setDatePickerField('grnDate'); setShowDatePicker(true); }} className="flex-1 min-w-0 h-8 border border-gray-300 rounded-[3px] px-3 text-[12px] outline-none bg-white text-gray-700 font-bold cursor-pointer shadow-sm" />
+                                <button onClick={() => { setDatePickerField('grnDate'); setShowDatePicker(true); }} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0"><Calendar size={16} /></button>
                             </div>
                         </div>
                         <div className="col-span-4 flex items-center gap-2">
                             <label className="text-[12px] font-bold text-gray-700 w-24 shrink-0 text-center">Exp. Date</label>
                             <div className="flex-1 flex gap-1 h-8 min-w-0">
-                                <input type="text" readOnly value={formData.expectedDate} onClick={() => { setDatePickerField('expectedDate'); setShowDatePicker(true); }} className="flex-1 min-w-0 h-8 border border-gray-300 rounded-[5px] px-3 text-[12px] outline-none bg-white text-gray-700 font-bold cursor-pointer shadow-sm" />
-                                <button onClick={() => { setDatePickerField('expectedDate'); setShowDatePicker(true); }} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0"><Calendar size={16} /></button>
+                                <input type="text" readOnly value={formData.expectedDate} onClick={() => { setDatePickerField('expectedDate'); setShowDatePicker(true); }} className="flex-1 min-w-0 h-8 border border-gray-300 rounded-[3px] px-3 text-[12px] outline-none bg-white text-gray-700 font-bold cursor-pointer shadow-sm" />
+                                <button onClick={() => { setDatePickerField('expectedDate'); setShowDatePicker(true); }} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0"><Calendar size={16} /></button>
                             </div>
                         </div>
 
@@ -556,26 +557,26 @@ const GRNBoard = ({ isOpen, onClose }) => {
                         <div className="col-span-8 flex items-center gap-2">
                             <label className="text-[12px] font-bold text-gray-700 w-24 shrink-0">Supplier</label>
                             <div className="flex-1 flex gap-1 h-8 min-w-0">
-                                <input type="text" readOnly value={currentSupplierName} onClick={() => setShowSupplierSearch(true)} className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-red-600 bg-gray-50 rounded-[5px] outline-none shadow-sm cursor-pointer" />
-                                <button onClick={() => setShowSupplierSearch(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0"><Search size={16} /></button>
+                                <input type="text" readOnly value={currentSupplierName} onClick={() => setShowSupplierSearch(true)} className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-red-600 bg-gray-50 rounded-[3px] outline-none shadow-sm cursor-pointer" />
+                                <button onClick={() => setShowSupplierSearch(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0"><Search size={16} /></button>
                             </div>
                         </div>
                         <div className="col-span-4 flex items-center gap-2">
                             <label className="text-[12px] font-bold text-gray-700 w-24 shrink-0 text-center">PO Number</label>
                             <div className="flex-1 flex gap-1 h-8 min-w-0">
-                                <input type="text" readOnly value={formData.poNo || ''} onClick={() => setShowPOSearch(true)} className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-[#0285fd] bg-blue-50/20 rounded-[5px] outline-none cursor-pointer shadow-sm" />
-                                <button onClick={() => setShowPOSearch(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] shadow-md shrink-0"><ClipboardList size={16} /></button>
+                                <input type="text" readOnly value={formData.poNo || ''} onClick={() => setShowPOSearch(true)} className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-[#0285fd] bg-blue-50/20 rounded-[3px] outline-none cursor-pointer shadow-sm" />
+                                <button onClick={() => setShowPOSearch(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] shadow-md shrink-0"><ClipboardList size={16} /></button>
                             </div>
                         </div>
 
                         {/* Row 3: Supp. Inv | Amount | Payment */}
                         <div className="col-span-4 flex items-center gap-2">
                             <label className="text-[12px] font-bold text-gray-700 w-24 shrink-0">Supp. Inv.</label>
-                            <input type="text" name="suppInv" value={formData.suppInv} onChange={handleInput} className="flex-1 min-w-0 h-8 border border-gray-300 rounded-[5px] px-3 font-mono text-[12px] outline-none bg-white text-gray-700 shadow-sm focus:border-[#0285fd]" />
+                            <input type="text" name="suppInv" value={formData.suppInv} onChange={handleInput} className="flex-1 min-w-0 h-8 border border-gray-300 rounded-[3px] px-3 font-mono text-[12px] outline-none bg-white text-gray-700 shadow-sm focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd]" />
                         </div>
                         <div className="col-span-4 flex items-center gap-2">
                             <label className="text-[12px] font-bold text-gray-700 w-24 shrink-0 text-center">Inv. Amount</label>
-                            <input type="text" name="invAmount" value={formData.invAmount} onChange={handleInput} className="flex-1 min-w-0 h-8 border border-gray-300 rounded-[5px] px-3 font-mono text-[12px] font-black text-right outline-none bg-white text-gray-700 shadow-sm focus:border-[#0285fd]" />
+                            <input type="text" name="invAmount" value={formData.invAmount} onChange={handleInput} className="flex-1 min-w-0 h-8 border border-gray-300 rounded-[3px] px-3 font-mono text-[12px] font-black text-right outline-none bg-white text-gray-700 shadow-sm focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd]" />
                         </div>
                         <div className="col-span-4 flex items-center gap-2">
                             <label className="text-[12px] font-bold text-gray-700 w-24 shrink-0 text-center">Pay Method</label>
@@ -584,10 +585,10 @@ const GRNBoard = ({ isOpen, onClose }) => {
                                     type="text"
                                     readOnly
                                     value={lookups.paymentMethods?.find(m => m.code === formData.payType)?.name || formData.payType || 'Select...'}
-                                    className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-gray-700 bg-white rounded-[5px] outline-none shadow-sm cursor-pointer"
+                                    className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-gray-700 bg-white rounded-[3px] outline-none shadow-sm cursor-pointer"
                                     onClick={() => setShowPayMethodSearch(true)}
                                 />
-                                <button onClick={() => setShowPayMethodSearch(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
+                                <button onClick={() => setShowPayMethodSearch(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0">
                                     <Search size={16} />
                                 </button>
                             </div>
@@ -596,15 +597,15 @@ const GRNBoard = ({ isOpen, onClose }) => {
                         {/* Row 4: Comment (8) | Consignment/Other (4) */}
                         <div className="col-span-8 flex items-center gap-2">
                             <label className="text-[12px] font-bold text-gray-700 w-24 shrink-0">Comment</label>
-                            <input type="text" name="comment" value={formData.comment} onChange={handleInput} className="flex-1 min-w-0 h-8 border border-gray-300 rounded-[5px] px-3 text-[12px] outline-none bg-white text-gray-700 shadow-sm focus:border-[#0285fd]" />
+                            <input type="text" name="comment" value={formData.comment} onChange={handleInput} className="flex-1 min-w-0 h-8 border border-gray-300 rounded-[3px] px-3 text-[12px] outline-none bg-white text-gray-700 shadow-sm focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd]" />
                         </div>
                     </div>
                 </div>
 
-                <div className="border border-gray-100 rounded-lg bg-white shadow-sm flex flex-col min-h-[200px] overflow-hidden">
+                <div className="border border-gray-200 rounded-[3px] bg-white shadow-sm flex flex-col min-h-[200px] overflow-hidden">
                     {/* Table header */}
-                    <div className="flex bg-slate-50/80 border-b border-gray-100 text-[10px] font-black text-gray-400 uppercase tracking-widest items-center">
-                        <div className="flex-[2.5] py-2.5 px-4 border-r border-gray-100 truncate flex items-center justify-between">
+                    <div className="flex bg-slate-50/80 border-b border-gray-200 text-[10px] font-black text-gray-400 uppercase tracking-widest items-center">
+                        <div className="flex-[2.5] py-2.5 px-4 border-r border-gray-200 truncate flex items-center justify-between">
                             <span>Inventory Allocation</span>
                             <button
                                 onClick={() => {
@@ -616,15 +617,15 @@ const GRNBoard = ({ isOpen, onClose }) => {
                                     grnService.getLookups(formData.company).then(data => setLookups(prev => ({ ...prev, products: data.products })));
                                     setShowAddProductModal(true);
                                 }}
-                                className="w-8 h-7 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0"
+                                className="w-8 h-7 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0"
                                 title="Add Product"
                             ><Plus size={14} /></button>
                         </div>
-                        <div className="w-16 py-2.5 px-3 border-r border-gray-100 text-center">Unit</div>
-                        <div className="w-24 py-2.5 px-3 border-r border-gray-100 text-right">Cost</div>
-                        <div className="w-24 py-2.5 px-3 border-r border-gray-100 text-right">Selling</div>
-                        <div className="w-16 py-2.5 px-3 border-r border-gray-100 text-center">Qty</div>
-                        <div className="w-16 py-2.5 px-3 border-r border-gray-100 text-center">Free</div>
+                        <div className="w-16 py-2.5 px-3 border-r border-gray-200 text-center">Unit</div>
+                        <div className="w-24 py-2.5 px-3 border-r border-gray-200 text-right">Cost</div>
+                        <div className="w-24 py-2.5 px-3 border-r border-gray-200 text-right">Selling</div>
+                        <div className="w-16 py-2.5 px-3 border-r border-gray-200 text-center">Qty</div>
+                        <div className="w-16 py-2.5 px-3 border-r border-gray-200 text-center">Free</div>
                         <div className="w-32 py-2.5 px-4 text-right">Amount</div>
                         <div className="w-10"></div>
                     </div>
@@ -633,17 +634,17 @@ const GRNBoard = ({ isOpen, onClose }) => {
                             <div className="h-24 flex items-center justify-center text-gray-300 text-[11px] font-bold uppercase tracking-widest italic">
                             </div>
                         ) : products.map((p, idx) => (
-                            <div key={idx} className="flex border-b border-gray-100 text-[11px] font-bold text-slate-700 hover:bg-blue-50/30 items-center transition-colors group">
-                                <div className="flex-[2.5] py-2 px-4 border-r border-gray-100 truncate">
+                            <div key={idx} className="flex border-b border-gray-200 text-[11px] font-bold text-slate-700 hover:bg-blue-50/30 items-center transition-colors group">
+                                <div className="flex-[2.5] py-2 px-4 border-r border-gray-200 truncate">
                                     <div className="flex flex-col">
                                         <span className="text-blue-600 font-mono text-[10px]">{p.prodCode}</span>
                                         <span className="truncate">{p.prodName}</span>
                                     </div>
                                 </div>
-                                <div className="w-16 py-2 px-3 border-r border-gray-100 text-center text-gray-400">{p.unit}</div>
-                                <div className="w-24 py-2 px-3 border-r border-gray-100 text-right font-mono text-gray-800">{parseFloat(p.cost).toFixed(2)}</div>
-                                <div className="w-24 py-2 px-3 border-r border-gray-100 text-right font-mono text-blue-600">{parseFloat(p.selling).toFixed(2)}</div>
-                                <div className="w-16 border-r border-gray-100 px-1 py-1 bg-white group-hover:bg-transparent">
+                                <div className="w-16 py-2 px-3 border-r border-gray-200 text-center text-gray-400">{p.unit}</div>
+                                <div className="w-24 py-2 px-3 border-r border-gray-200 text-right font-mono text-gray-800">{parseFloat(p.cost).toFixed(2)}</div>
+                                <div className="w-24 py-2 px-3 border-r border-gray-200 text-right font-mono text-blue-600">{parseFloat(p.selling).toFixed(2)}</div>
+                                <div className="w-16 border-r border-gray-200 px-1 py-1 bg-white group-hover:bg-transparent">
                                     <input
                                         type="text"
                                         value={p.qty}
@@ -657,7 +658,7 @@ const GRNBoard = ({ isOpen, onClose }) => {
                                         className="w-full h-7 bg-transparent text-center text-[12px] font-mono font-black text-slate-900 outline-none focus:bg-white border-none px-1"
                                     />
                                 </div>
-                                <div className="w-16 border-r border-gray-100 px-1 py-1 bg-white group-hover:bg-transparent">
+                                <div className="w-16 border-r border-gray-200 px-1 py-1 bg-white group-hover:bg-transparent">
                                     <input
                                         type="text"
                                         value={p.free}
@@ -666,7 +667,7 @@ const GRNBoard = ({ isOpen, onClose }) => {
                                                 i === idx ? { ...item, free: e.target.value } : item
                                             ));
                                         }}
-                                        className="w-full h-7 bg-transparent text-center text-[12px] font-mono font-bold text-green-700 outline-none focus:bg-white border-none px-1"
+                                        className="w-full h-7 bg-transparent text-center text-[12px] font-mono font-bold text-blue-700 outline-none focus:bg-white border-none px-1"
                                     />
                                 </div>
                                 <div className="w-32 py-1.5 px-4 text-right font-mono font-black text-slate-800">
@@ -678,7 +679,7 @@ const GRNBoard = ({ isOpen, onClose }) => {
                                             setProductToDelete(p);
                                             setShowDeleteConfirm(true);
                                         }} 
-                                        className="text-red-300 hover:text-red-500 transition-all p-1.5 hover:bg-red-50 rounded-[5px]"
+                                        className="text-red-300 hover:text-red-500 transition-all p-1.5 hover:bg-red-50 rounded-[3px]"
                                     >
                                         <Trash2 size={13} />
                                     </button>
@@ -689,27 +690,27 @@ const GRNBoard = ({ isOpen, onClose }) => {
                 </div>
 
                 <div className="flex flex-row justify-between items-start gap-x-4">
-                    <div className="flex-1 bg-white border border-gray-100 rounded-lg p-3 shadow-sm space-y-3">
+                    <div className="flex-1 bg-white border border-gray-200 rounded-[3px] p-3 shadow-sm space-y-3">
                         <div className="grid grid-cols-2 gap-4">
                             <div className="flex items-center gap-3">
                                 <label className="text-[12px] font-bold text-gray-700 w-24 shrink-0">Expense Ac.</label>
                                 <div className="flex-1 flex gap-1 h-8 min-w-0">
-                                    <input type="text" readOnly value="" className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-gray-500 bg-gray-50 rounded-[5px] outline-none shadow-sm cursor-pointer" onClick={() => setShowExpenseSearch(true)} />
-                                    <button onClick={() => setShowExpenseSearch(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0"><Search size={16} /></button>
+                                    <input type="text" readOnly value="" className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-gray-500 bg-gray-50 rounded-[3px] outline-none shadow-sm cursor-pointer" onClick={() => setShowExpenseSearch(true)} />
+                                    <button onClick={() => setShowExpenseSearch(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0"><Search size={16} /></button>
                                 </div>
                             </div>
                             <div className="flex items-center gap-3">
                                 <label className="text-[12px] font-bold text-gray-700 w-24 shrink-0 text-right">Other Chg.</label>
-                                <input type="text" defaultValue="0.00" className="flex-1 h-8 border border-gray-300 px-3 rounded-[5px] text-[12px] text-right font-mono font-bold shadow-sm outline-none focus:border-[#0285fd]" />
+                                <input type="text" defaultValue="0.00" className="flex-1 h-8 border border-gray-300 px-3 rounded-[3px] text-[12px] text-right font-mono font-bold shadow-sm outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd]" />
                             </div>
                         </div>
                         <div className="space-y-1">
                             <label className="text-[12px] font-bold text-gray-700 ml-1">Internal Remarks & Disclaimers</label>
-                            <textarea name="comment" value={formData.comment} onChange={handleInput} className="w-full h-[128px] border border-gray-300 rounded-lg p-3 text-[12px] font-mono outline-none focus:border-[#0285fd] resize-none shadow-sm bg-gray-50/10" placeholder=""></textarea>
+                            <textarea name="comment" value={formData.comment} onChange={handleInput} className="w-full h-[128px] border border-gray-300 rounded-[3px] p-3 text-[12px] font-mono outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] resize-none shadow-sm bg-gray-50/10" placeholder=""></textarea>
                         </div>
                     </div>
 
-                    <div className="w-[350px] bg-white border border-gray-100 rounded-lg p-4 space-y-3 shadow-sm">
+                    <div className="w-[350px] bg-white border border-gray-200 rounded-[3px] p-4 space-y-3 shadow-sm">
                         <div className="flex items-center justify-between text-[12.5px]">
                             <span className="font-bold text-gray-500 uppercase tracking-tight text-[11px]">Gross Inventory</span>
                             <div className="text-[14px] font-mono font-black text-slate-800">
@@ -719,8 +720,8 @@ const GRNBoard = ({ isOpen, onClose }) => {
                         <div className="flex items-center justify-between gap-4">
                             <span className="text-[11px] font-bold text-gray-500 uppercase tracking-tight">Disc. Volume %</span>
                             <div className="flex items-center gap-2">
-                                <input type="text" name="discPer" value={formData.discPer} onChange={handleInput} className="w-12 h-7 bg-white border border-gray-200 px-2 text-center text-[12px] font-mono font-bold rounded-[5px] outline-none shadow-sm focus:border-[#0285fd]" />
-                                <div className="w-24 h-7 bg-gray-50 border border-gray-100 rounded-[5px] flex items-center justify-end px-2 text-[12px] font-mono text-gray-400">
+                                <input type="text" name="discPer" value={formData.discPer} onChange={handleInput} className="w-12 h-7 bg-white border border-gray-200 px-2 text-center text-[12px] font-mono font-bold rounded-[3px] outline-none shadow-sm focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd]" />
+                                <div className="w-24 h-7 bg-gray-50 border border-gray-200 rounded-[3px] flex items-center justify-end px-2 text-[12px] font-mono text-gray-400">
                                     {totals.discAmt.toFixed(2)}
                                 </div>
                             </div>
@@ -728,9 +729,9 @@ const GRNBoard = ({ isOpen, onClose }) => {
                         <div className="flex items-center justify-between gap-4">
                             <span className="text-[11px] font-bold text-gray-500 uppercase tracking-tight">Tax / NBT Levies</span>
                             <div className="flex items-center gap-1">
-                                <input type="text" name="taxPer" value={formData.taxPer} onChange={handleInput} placeholder="T" className="w-10 h-7 bg-white border border-gray-200 px-1 text-center text-[11px] font-mono rounded-[5px] outline-none shadow-sm focus:border-[#0285fd]" />
-                                <input type="text" name="nbtPer" value={formData.nbtPer} onChange={handleInput} placeholder="N" className="w-10 h-7 bg-white border border-gray-200 px-1 text-center text-[11px] font-mono rounded-[5px] outline-none shadow-sm focus:border-[#0285fd]" />
-                                <div className="w-24 h-7 bg-gray-50 border border-gray-100 rounded-[5px] flex items-center justify-end px-2 text-[12px] font-mono text-gray-400">
+                                <input type="text" name="taxPer" value={formData.taxPer} onChange={handleInput} placeholder="T" className="w-10 h-7 bg-white border border-gray-200 px-1 text-center text-[11px] font-mono rounded-[3px] outline-none shadow-sm focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd]" />
+                                <input type="text" name="nbtPer" value={formData.nbtPer} onChange={handleInput} placeholder="N" className="w-10 h-7 bg-white border border-gray-200 px-1 text-center text-[11px] font-mono rounded-[3px] outline-none shadow-sm focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd]" />
+                                <div className="w-24 h-7 bg-gray-50 border border-gray-200 rounded-[3px] flex items-center justify-end px-2 text-[12px] font-mono text-gray-400">
                                     {(totals.taxAmt + totals.nbtAmt).toFixed(2)}
                                 </div>
                             </div>
@@ -738,16 +739,16 @@ const GRNBoard = ({ isOpen, onClose }) => {
                         <div className="flex items-center justify-between gap-4">
                             <span className="text-[11px] font-bold text-gray-500 uppercase tracking-tight">Manual Adj.</span>
                             <div className="flex items-center gap-1">
-                                <select name="adjType" value={formData.adjType} onChange={handleInput} className="w-12 h-7 bg-white border border-gray-200 text-[10px] rounded-[5px] outline-none shadow-sm cursor-pointer">
+                                <select name="adjType" value={formData.adjType} onChange={handleInput} className="w-12 h-7 bg-white border border-gray-200 text-[10px] rounded-[3px] outline-none shadow-sm cursor-pointer">
                                     <option value="">±</option>
                                     <option value="Add">+</option>
                                     <option value="Less">-</option>
                                 </select>
-                                <input type="text" name="adjAmt" value={formData.adjAmt} onChange={handleInput} className="w-24 h-7 bg-white border border-gray-200 px-2 text-right text-[12px] font-mono font-bold rounded-[5px] outline-none shadow-sm focus:border-[#0285fd]" />
+                                <input type="text" name="adjAmt" value={formData.adjAmt} onChange={handleInput} className="w-24 h-7 bg-white border border-gray-200 px-2 text-right text-[12px] font-mono font-bold rounded-[3px] outline-none shadow-sm focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd]" />
                             </div>
                         </div>
                         <div className="h-[1px] bg-gray-100 my-1" />
-                        <div className="flex items-center justify-between bg-slate-50 p-2 rounded-md">
+                        <div className="flex items-center justify-between bg-slate-50 p-2 rounded-[3px]">
                             <span className="text-[13px] font-black text-slate-900 uppercase">Net Liability</span>
                             <div className="text-[18px] font-mono font-black text-blue-700 tracking-tighter">
                                 {totals.netAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
@@ -759,36 +760,36 @@ const GRNBoard = ({ isOpen, onClose }) => {
 
             <SimpleModal isOpen={showSearchModal} onClose={() => setShowSearchModal(false)} title="Archived GRN Lookup" maxWidth="max-w-[700px]">
                 <div className="space-y-4 font-['Tahoma']">
-                    <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-lg border border-gray-100 mb-2">
+                    <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-[3px] border border-gray-200 mb-2">
                         <span className="text-[12px] font-bold text-gray-500 uppercase tracking-widest">Search Facility</span>
                         <div className="relative flex-1">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
-                            <input type="text" placeholder="Filter archived GRNs..." className="w-full h-9 pl-10 pr-4 border border-gray-300 rounded-[5px] outline-none text-sm focus:border-[#0285fd] bg-white shadow-sm" autoFocus />
+                            <input type="text" placeholder="Filter archived GRNs..." className="w-full h-10 pl-10 pr-4 border border-gray-300 rounded-[3px] outline-none text-[13px] focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] shadow-sm bg-white" autoFocus />
                         </div>
                     </div>
-                    <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm">
+                    <div className="border border-gray-200 rounded-[3px] overflow-hidden shadow-sm">
                         <div className="max-h-[400px] overflow-y-auto no-scrollbar">
                             <table className="w-full text-left">
-                                <thead className="bg-[#f8fafd] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">
+                                <thead className="bg-[#f8fafd] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-200">
                                     <tr>
-                                        <th className="px-5 py-3">Doc No</th>
-                                        <th className="px-5 py-3">Date</th>
-                                        <th className="px-5 py-3">Supplier Name</th>
-                                        <th className="px-5 py-3 text-right">Action</th>
+                                        <th className=" px-5 py-3">Doc No</th>
+                                        <th className=" px-5 py-3">Date</th>
+                                        <th className=" px-5 py-3">Supplier Name</th>
+                                        <th className="text-right px-5 py-3">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-50">
                                     {orders.map((o, i) => (
-                                        <tr key={i} className="group hover:bg-blue-50/50 cursor-pointer transition-colors" onClick={() => handleSelectRow(o.docNo)}>
-                                            <td className="px-5 py-3 font-mono text-[12px] font-bold text-gray-700">{o.docNo}</td>
-                                            <td className="px-5 py-3 text-[12px] font-mono font-bold text-gray-600 uppercase ">{o.date?.split('T')[0]}</td>
-                                            <td className="px-5 py-3 text-[12px] font-mono font-bold text-gray-700 uppercase group-hover:text-blue-600 transition-colors">{o.supplier}</td>
-                                            <td className="px-5 py-3 text-right">
-                                                <button className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95">RETRIEVE</button>
+                                        <tr key={i} className="group hover:bg-blue-50/50  transition-all cursor-pointer group border-b border-gray-50" onClick={() => handleSelectRow(o.docNo)}>
+                                            <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{o.docNo}</td>
+                                            <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{o.date?.split('T')[0]}</td>
+                                            <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{o.supplier}</td>
+                                            <td className="text-right px-5 py-3">
+                                                <button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">RETRIEVE</button>
                                             </td>
                                         </tr>
                                     ))}
-                                    {orders.length === 0 && <tr><td colSpan="4" className="py-10 text-center text-gray-300 font-bold uppercase tracking-widest">Archive is empty</td></tr>}
+                                    {orders.length === 0 && <tr><td colSpan="4" className="text-center py-16 text-gray-400 text-[11px] font-bold uppercase tracking-widest">Archive is empty</td></tr>}
                                 </tbody>
                             </table>
                         </div>
@@ -796,36 +797,36 @@ const GRNBoard = ({ isOpen, onClose }) => {
                 </div>
             </SimpleModal>
 
-            <SimpleModal isOpen={showSupplierSearch} onClose={() => setShowSupplierSearch(false)} title="Supplier Directory Lookup" maxWidth="max-w-[650px]">
+            <SimpleModal isOpen={showSupplierSearch} onClose={() => setShowSupplierSearch(false)} title="Supplier Directory Lookup" maxWidth="max-w-[700px]">
                 <div className="space-y-4 font-['Tahoma']">
-                    <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-lg border border-gray-100 mb-2">
+                    <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-[3px] border border-gray-200 mb-2">
                         <span className="text-[12px] font-bold text-gray-500 uppercase tracking-widest">Search Facility</span>
                         <div className="relative flex-1">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
-                            <input type="text" placeholder="Find supplier by legal name or code..." className="w-full h-9 pl-10 pr-4 border border-gray-300 rounded-[5px] outline-none text-sm focus:border-[#0285fd] bg-white shadow-sm" value={supplierSearchQuery} onChange={(e) => setSupplierSearchQuery(e.target.value)} autoFocus />
+                            <input type="text" placeholder="Find supplier by legal name or code..." className="w-full h-10 pl-10 pr-4 border border-gray-300 rounded-[3px] outline-none text-[13px] focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] shadow-sm bg-white" value={supplierSearchQuery} onChange={(e) => setSupplierSearchQuery(e.target.value)} autoFocus />
                         </div>
                     </div>
-                    <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm">
+                    <div className="border border-gray-200 rounded-[3px] overflow-hidden shadow-sm">
                         <div className="max-h-[350px] overflow-y-auto no-scrollbar">
                             <table className="w-full text-left">
-                                <thead className="bg-[#f8fafd] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">
+                                <thead className="bg-[#f8fafd] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-200">
                                     <tr>
-                                        <th className="px-5 py-3">Code</th>
-                                        <th className="px-5 py-3">Legal Name</th>
-                                        <th className="px-5 py-3 text-right">Action</th>
+                                        <th className=" px-5 py-3">Code</th>
+                                        <th className=" px-5 py-3">Legal Name</th>
+                                        <th className="text-right px-5 py-3">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-50">
                                     {lookups.suppliers.filter(s => s.name?.toLowerCase().includes(supplierSearchQuery.toLowerCase()) || s.code?.toLowerCase().includes(supplierSearchQuery.toLowerCase())).map((s) => (
-                                        <tr key={s.code} className="group hover:bg-blue-50/50 cursor-pointer transition-colors" onClick={() => { setFormData(prev => ({ ...prev, suppCode: s.code?.trim() })); setShowSupplierSearch(false); setSupplierSearchQuery(''); }}>
-                                            <td className="px-5 py-3 font-mono text-[13px] font-black text-blue-700">{s.code}</td>
-                                            <td className="px-5 py-3 text-[13px] font-bold text-gray-700 uppercase group-hover:text-blue-600 transition-colors">{s.name}</td>
-                                            <td className="px-5 py-3 text-right">
-                                                <button className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95">SELECT</button>
+                                        <tr key={s.code} className="group hover:bg-blue-50/50  transition-all cursor-pointer group border-b border-gray-50" onClick={() => { setFormData(prev => ({ ...prev, suppCode: s.code?.trim() })); setShowSupplierSearch(false); setSupplierSearchQuery(''); }}>
+                                            <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{s.code}</td>
+                                            <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{s.name}</td>
+                                            <td className="text-right px-5 py-3">
+                                                <button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button>
                                             </td>
                                         </tr>
                                     ))}
-                                    {lookups.suppliers.filter(s => s.name?.toLowerCase().includes(supplierSearchQuery.toLowerCase()) || s.code?.toLowerCase().includes(supplierSearchQuery.toLowerCase())).length === 0 && <tr><td colSpan="3" className="py-6 text-center text-gray-300 font-bold uppercase tracking-widest">No suppliers found</td></tr>}
+                                    {lookups.suppliers.filter(s => s.name?.toLowerCase().includes(supplierSearchQuery.toLowerCase()) || s.code?.toLowerCase().includes(supplierSearchQuery.toLowerCase())).length === 0 && <tr><td colSpan="3" className="text-center py-16 text-gray-400 text-[11px] font-bold uppercase tracking-widest">No suppliers found</td></tr>}
                                 </tbody>
                             </table>
                         </div>
@@ -834,16 +835,16 @@ const GRNBoard = ({ isOpen, onClose }) => {
             </SimpleModal>
 
             {/* ── Add Product Modal (Catalog) ──────────────────────────────────── */}
-            <SimpleModal isOpen={showAddProductModal} onClose={() => { setShowAddProductModal(false); setProductSearchQuery(''); }} title="Inventory Acquisition Portal" maxWidth="max-w-[650px]">
+            <SimpleModal isOpen={showAddProductModal} onClose={() => { setShowAddProductModal(false); setProductSearchQuery(''); }} title="Inventory Acquisition Portal" maxWidth="max-w-[700px]">
                 <div className="space-y-4 px-1 font-['Tahoma']">
-                    <div className="flex items-center justify-between gap-4 bg-slate-50/80 p-3 rounded-xl border border-gray-100 mb-2">
+                    <div className="flex items-center justify-between gap-4 bg-slate-50/80 p-3 rounded-[3px] border border-gray-200 mb-2">
                         <div className="flex items-center gap-3 flex-1">
                             <div className="relative flex-1 max-w-[400px]">
                                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
                                 <input
                                     type="text"
                                     placeholder="Search Inventory"
-                                    className="w-full h-10 pl-10 pr-4 border border-gray-200 rounded-lg outline-none text-sm focus:border-blue-500 focus:ring-4 focus:ring-blue-50 transition-all bg-white shadow-sm font-medium"
+                                    className="w-full h-10 pl-10 pr-4 border border-gray-300 rounded-[3px] outline-none text-[13px] focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] shadow-sm bg-white"
                                     value={productSearchQuery}
                                     onChange={async (e) => {
                                         const val = e.target.value; setProductSearchQuery(val);
@@ -856,21 +857,21 @@ const GRNBoard = ({ isOpen, onClose }) => {
                         </div>
                         <button 
                             onClick={() => setShowItemMasterModal(true)}
-                            className="h-10 px-5 bg-[#2bb744] text-white text-[12px] font-black rounded-lg hover:bg-[#259b3a] transition-all flex items-center gap-2 border-none shadow-md shadow-green-100 active:scale-95 whitespace-nowrap"
+                            className="h-10 px-5 bg-white text-[#2bb744] border-2 border-[#2bb744] hover:bg-green-50 text-[12px] font-black rounded-[3px] hover:bg-[#259b3a] transition-all flex items-center gap-2 shadow-sm shadow-green-100 active:scale-95 whitespace-nowrap"
                         >
                             <Plus size={14} /> CREATE NEW ITEM
                         </button>
                     </div>
 
-                    <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm bg-white">
+                    <div className="border border-gray-200 rounded-[3px] overflow-hidden shadow-sm bg-white">
                         <div className="max-h-[420px] overflow-y-auto no-scrollbar">
                             <table className="w-full text-left border-collapse">
-                                <thead className="bg-[#f8fafd] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 z-10">
+                                <thead className="bg-[#f8fafd] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-200 z-10">
                                     <tr>
-                                        <th className="px-6 py-4">Code</th>
-                                        <th className="px-6 py-4">Item Description</th>
-                                        <th className="px-6 py-4 text-right">Base Price</th>
-                                    </tr>
+                                        <th className=" px-5 py-3">Code</th>
+                                        <th className=" px-5 py-3">Item Description</th>
+                                        <th className="text-right px-5 py-3">Base Price</th>
+                                    <th className="text-right px-5 py-3">Action</th></tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-50">
                                     {(lookups.products || []).map(p => (
@@ -891,13 +892,13 @@ const GRNBoard = ({ isOpen, onClose }) => {
                                                 entry.prodCode === p.code ? 'bg-blue-50/70' : ''
                                             }`}
                                         >
-                                            <td className="px-6 py-4 font-mono text-[13px] font-bold text-blue-600">{p.code}</td>
-                                            <td className="px-6 py-4">
+                                            <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{p.code}</td>
+                                            <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">
                                                 <div className="text-[13px] font-bold text-gray-700 uppercase group-hover:text-blue-600 transition-colors leading-snug line-clamp-2 max-w-[320px]">
                                                     {p.name}
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-4 text-right font-mono font-black text-gray-500">
+                                            <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">
                                                 <span className="text-[10px] text-gray-300 mr-1">Rs.</span>
                                                 {parseFloat(p.price || 0).toFixed(2)}
                                             </td>
@@ -915,16 +916,16 @@ const GRNBoard = ({ isOpen, onClose }) => {
                 isOpen={showProductQtyModal}
                 onClose={() => setShowProductQtyModal(false)}
                 title="Line Item Configuration"
-                maxWidth="max-w-[450px]"
+                maxWidth="max-w-[700px]"
             >
                 <div className="space-y-4 px-1 py-1 font-['Tahoma']">
-                    <div className="bg-slate-50/50 p-4 rounded-xl border border-slate-100 flex flex-col items-center text-center">
+                    <div className="bg-slate-50/50 p-4 rounded-[3px] border border-slate-100 flex flex-col items-center text-center">
                         <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1.5">Active Selection</span>
                         <h3 className="text-[18px] font-black text-slate-700 uppercase leading-[1.2] tracking-tight max-w-[90%] break-words">
                             {entry.prodName}
                         </h3>
                         <div className="flex items-center gap-2 mt-2">
-                            <span className="text-[11px] font-mono font-bold text-blue-500 bg-white px-3 py-0.5 rounded-md shadow-sm border border-slate-100">{entry.prodCode}</span>
+                            <span className="text-[11px] font-mono font-bold text-blue-500 bg-white px-3 py-0.5 rounded-[3px] shadow-sm border border-slate-100">{entry.prodCode}</span>
                             <span className="text-[10px] font-black text-slate-300 uppercase">Product Code</span>
                         </div>
                     </div>
@@ -940,7 +941,7 @@ const GRNBoard = ({ isOpen, onClose }) => {
                                     name="cost" 
                                     value={entry.cost} 
                                     onChange={handleEntryInput}
-                                    className="w-full h-12 border border-gray-300 px-5 text-right text-[16px] font-mono font-black rounded-xl outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-50 transition-all bg-white" 
+                                    className="w-full h-12 border border-gray-300 px-5 text-right text-[16px] font-mono font-black rounded-[3px] outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-50 transition-all bg-white" 
                                 />
                             </div>
                             <div className="space-y-2">
@@ -952,7 +953,7 @@ const GRNBoard = ({ isOpen, onClose }) => {
                                     name="selling" 
                                     value={entry.selling} 
                                     onChange={handleEntryInput}
-                                    className="w-full h-12 border border-gray-300 px-5 text-right text-[16px] font-mono font-black text-blue-600 rounded-xl outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-50 transition-all bg-white" 
+                                    className="w-full h-12 border border-gray-300 px-5 text-right text-[16px] font-mono font-black text-blue-600 rounded-[3px] outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-50 transition-all bg-white" 
                                 />
                             </div>
                         </div>
@@ -966,7 +967,7 @@ const GRNBoard = ({ isOpen, onClose }) => {
                                     value={entry.qty} 
                                     onChange={handleEntryInput}
                                     onKeyDown={e => { if (e.key === 'Enter') { addProduct(); setShowProductQtyModal(false); setShowAddProductModal(false); setProductSearchQuery(''); } }}
-                                    className="w-full h-12 border border-blue-500 px-5 text-center text-[18px] font-mono font-black rounded-xl outline-none bg-blue-50/20 focus:ring-4 focus:ring-blue-100 transition-all shadow-inner" 
+                                    className="w-full h-12 border border-blue-500 px-5 text-center text-[18px] font-mono font-black rounded-[3px] outline-none bg-blue-50/20 focus:ring-4 focus:ring-blue-100 transition-all shadow-inner" 
                                     autoFocus 
                                 />
                             </div>
@@ -977,13 +978,13 @@ const GRNBoard = ({ isOpen, onClose }) => {
                                     name="free" 
                                     value={entry.free} 
                                     onChange={handleEntryInput}
-                                    className="w-full h-12 border border-gray-300 px-5 text-center text-[18px] font-mono font-black text-green-600 rounded-xl outline-none focus:border-blue-500 transition-all bg-white shadow-sm" 
+                                    className="w-full h-12 border border-gray-300 px-5 text-center text-[18px] font-mono font-black text-blue-600 rounded-[3px] outline-none focus:border-blue-500 transition-all bg-white shadow-sm" 
                                 />
                             </div>
                         </div>
                     </div>
 
-                    <div className="pt-4 border-t border-gray-100 flex items-center justify-between">
+                    <div className="pt-4 border-t border-gray-200 flex items-center justify-between">
                         <div className="flex flex-col">
                             <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Total Valuation</span>
                             <div className="flex items-baseline gap-1.5 mt-0.5">
@@ -995,7 +996,7 @@ const GRNBoard = ({ isOpen, onClose }) => {
                         </div>
                         <button
                             onClick={() => { addProduct(); setShowProductQtyModal(false); setShowAddProductModal(false); setProductSearchQuery(''); }}
-                            className="h-11 px-8 bg-[#0285fd] text-white text-[13px] font-bold rounded-lg hover:bg-[#0073ff] transition-all active:scale-95 flex items-center gap-2 border-none"
+                            className="h-11 px-8 bg-[#0285fd] text-white text-[13px] font-bold rounded-[3px] hover:bg-[#0073ff] transition-all active:scale-95 flex items-center gap-2 border-none"
                         >
                             <Plus size={16} /> ADD TO LIST
                         </button>
@@ -1005,38 +1006,38 @@ const GRNBoard = ({ isOpen, onClose }) => {
 
             <SimpleModal isOpen={showProductSearch} onClose={() => { setShowProductSearch(false); setProductSearchQuery(''); }} title="Global Itemized Lookup" maxWidth="max-w-[700px]">
                 <div className="space-y-4 font-['Tahoma']">
-                    <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-lg border border-gray-100 mb-2">
+                    <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-[3px] border border-gray-200 mb-2">
                         <span className="text-[12px] font-bold text-gray-500 uppercase tracking-widest">Search Facility</span>
                         <div className="relative flex-1">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
-                            <input type="text" placeholder="Scan items by generic title or reference code..." className="w-full h-9 pl-10 pr-4 border border-gray-300 rounded-[5px] outline-none text-sm focus:border-[#0285fd] bg-white shadow-sm" value={productSearchQuery} onChange={async (e) => { const val = e.target.value; setProductSearchQuery(val); if (val.length >= 2) { try { const results = await grnService.searchProducts(val); setLookups(prev => ({ ...prev, products: results })); } catch (err) { } } else if (val.length === 0) { const init = await grnService.getLookups(formData.company); setLookups(prev => ({ ...prev, products: init.products })); } }} autoFocus />
+                            <input type="text" placeholder="Scan items by generic title or reference code..." className="w-full h-10 pl-10 pr-4 border border-gray-300 rounded-[3px] outline-none text-[13px] focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] shadow-sm bg-white" value={productSearchQuery} onChange={async (e) => { const val = e.target.value; setProductSearchQuery(val); if (val.length >= 2) { try { const results = await grnService.searchProducts(val); setLookups(prev => ({ ...prev, products: results })); } catch (err) { } } else if (val.length === 0) { const init = await grnService.getLookups(formData.company); setLookups(prev => ({ ...prev, products: init.products })); } }} autoFocus />
                         </div>
                     </div>
-                    <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm">
+                    <div className="border border-gray-200 rounded-[3px] overflow-hidden shadow-sm">
                         <div className="max-h-[400px] overflow-y-auto no-scrollbar">
                             <table className="w-full text-left">
-                                <thead className="bg-[#f8fafd] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">
+                                <thead className="bg-[#f8fafd] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-200">
                                     <tr>
-                                        <th className="px-5 py-3">Code</th>
-                                        <th className="px-5 py-3">Acquisition Title</th>
-                                        <th className="px-5 py-3 text-right">Cost</th>
-                                        <th className="px-5 py-3 text-right">Selling</th>
-                                        <th className="px-5 py-3 text-right">Action</th>
+                                        <th className=" px-5 py-3">Code</th>
+                                        <th className=" px-5 py-3">Acquisition Title</th>
+                                        <th className="text-right px-5 py-3">Cost</th>
+                                        <th className="text-right px-5 py-3">Selling</th>
+                                        <th className="text-right px-5 py-3">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-50">
                                     {(lookups.products || []).map(p => (
-                                        <tr key={p.code} className="group hover:bg-blue-50/50 cursor-pointer transition-colors" onClick={() => { handleEntryInput({ target: { name: 'prodCode', value: p.code } }); setShowProductSearch(false); setProductSearchQuery(''); }}>
-                                            <td className="px-5 py-3 font-mono text-[12px] font-bold text-blue-600">{p.code}</td>
-                                            <td className="px-5 py-3 text-[13px] font-bold text-gray-700 uppercase group-hover:text-blue-600 transition-colors">{p.name}</td>
-                                            <td className="px-5 py-3 text-right font-mono font-black text-gray-400">{parseFloat(p.price || 0).toFixed(2)}</td>
-                                            <td className="px-5 py-3 text-right font-mono font-black text-blue-600">{parseFloat(p.sellingPrice || 0).toFixed(2)}</td>
-                                            <td className="px-5 py-3 text-right">
-                                                <button className="bg-[#0285fd] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#0073ff] shadow-md transition-all active:scale-95">SELECT</button>
+                                        <tr key={p.code} className="group hover:bg-blue-50/50  transition-all cursor-pointer group border-b border-gray-50" onClick={() => { handleEntryInput({ target: { name: 'prodCode', value: p.code } }); setShowProductSearch(false); setProductSearchQuery(''); }}>
+                                            <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{p.code}</td>
+                                            <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{p.name}</td>
+                                            <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{parseFloat(p.price || 0).toFixed(2)}</td>
+                                            <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{parseFloat(p.sellingPrice || 0).toFixed(2)}</td>
+                                            <td className="text-right px-5 py-3">
+                                                <button className="bg-[#0285fd] text-white text-[10px] px-5 py-2 rounded-[3px] font-black hover:bg-[#0073ff] shadow-md transition-all active:scale-95">SELECT</button>
                                             </td>
                                         </tr>
                                     ))}
-                                    {lookups.products?.length === 0 && <tr><td colSpan="5" className="py-10 text-center text-gray-300 font-bold uppercase tracking-widest">No products available for capture</td></tr>}
+                                    {lookups.products?.length === 0 && <tr><td colSpan="5" className="text-center py-16 text-gray-400 text-[11px] font-bold uppercase tracking-widest">No products available for capture</td></tr>}
                                 </tbody>
                             </table>
                         </div>
@@ -1044,34 +1045,34 @@ const GRNBoard = ({ isOpen, onClose }) => {
                 </div>
             </SimpleModal>
 
-            <SimpleModal isOpen={showPOSearch} onClose={() => setShowPOSearch(false)} title="Select Purchase Order Lookup" maxWidth="max-w-[600px]">
+            <SimpleModal isOpen={showPOSearch} onClose={() => setShowPOSearch(false)} title="Select Purchase Order Lookup" maxWidth="max-w-[700px]">
                 <div className="space-y-4 font-['Tahoma']">
-                    <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-lg border border-gray-100 mb-2">
+                    <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-[3px] border border-gray-200 mb-2">
                         <span className="text-[12px] font-bold text-gray-500 uppercase tracking-widest">Search Facility</span>
                         <div className="relative flex-1">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
-                            <input type="text" placeholder="Filter active PO documents..." value={poSearchQuery} onChange={(e) => setPOSearchQuery(e.target.value)} className="w-full h-9 pl-10 pr-4 border border-gray-300 rounded-[5px] outline-none text-sm focus:border-[#0285fd] bg-white shadow-sm" autoFocus />
+                            <input type="text" placeholder="Filter active PO documents..." value={poSearchQuery} onChange={(e) => setPOSearchQuery(e.target.value)} className="w-full h-10 pl-10 pr-4 border border-gray-300 rounded-[3px] outline-none text-sm focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white shadow-sm" autoFocus />
                         </div>
                     </div>
-                    <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm">
+                    <div className="border border-gray-200 rounded-[3px] overflow-hidden shadow-sm">
                         <div className="max-h-[350px] overflow-y-auto no-scrollbar">
                             <table className="w-full text-left">
-                                <thead className="bg-[#f8fafd] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">
+                                <thead className="bg-[#f8fafd] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-200">
                                     <tr>
-                                        <th className="px-5 py-3">Document ID</th>
-                                        <th className="px-5 py-3 text-right">Action</th>
+                                        <th className=" px-5 py-3">Document ID</th>
+                                        <th className="text-right px-5 py-3">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-50">
                                     {lookups.pos.filter(p => p.docNo.toLowerCase().includes(poSearchQuery.toLowerCase())).map((p) => (
-                                        <tr key={p.docNo} className="group hover:bg-blue-50/50 cursor-pointer transition-colors" onClick={() => handleSelectPO(p.docNo)}>
-                                            <td className="px-5 py-3 font-mono text-[12px] font-bold text-gray-700">{p.docNo}</td>
-                                            <td className="px-5 py-3 text-right">
-                                                <button className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95">SELECT ORDER</button>
+                                        <tr key={p.docNo} className="group hover:bg-blue-50/50  transition-all cursor-pointer group border-b border-gray-50" onClick={() => handleSelectPO(p.docNo)}>
+                                            <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{p.docNo}</td>
+                                            <td className="text-right px-5 py-3">
+                                                <button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT ORDER</button>
                                             </td>
                                         </tr>
                                     ))}
-                                    {lookups.pos.length === 0 && <tr><td colSpan="2" className="py-10 text-center text-gray-300 font-bold uppercase tracking-widest">No active orders available</td></tr>}
+                                    {lookups.pos.length === 0 && <tr><td colSpan="2" className="text-center py-16 text-gray-400 text-[11px] font-bold uppercase tracking-widest">No active orders available</td></tr>}
                                 </tbody>
                             </table>
                         </div>
@@ -1097,48 +1098,50 @@ const GRNBoard = ({ isOpen, onClose }) => {
                     setPayMethodSearchQuery('');
                 }}
                 title="Payment Method Lookup"
-                maxWidth="max-w-[450px]"
+                maxWidth="max-w-[700px]"
             >
                 <div className="space-y-4 font-['Tahoma']">
-                    <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-lg border border-gray-100 mb-2">
+                    <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-[3px] border border-gray-200 mb-2">
                         <span className="text-[12px] font-bold text-gray-500 uppercase tracking-widest">Search Facility</span>
                         <div className="relative flex-1">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
                             <input
                                 type="text"
                                 placeholder="Filter payment methods..."
-                                className="w-full h-9 pl-10 pr-4 border border-gray-300 rounded-[5px] outline-none text-sm focus:border-[#0285fd] bg-white shadow-sm"
+                                className="w-full h-10 pl-10 pr-4 border border-gray-300 rounded-[3px] outline-none text-[13px] focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] shadow-sm bg-white"
                                 value={payMethodSearchQuery}
                                 onChange={(e) => setPayMethodSearchQuery(e.target.value)}
                                 autoFocus
                             />
                         </div>
                     </div>
-                    <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm">
+                    <div className="border border-gray-200 rounded-[3px] overflow-hidden shadow-sm">
                         <div className="max-h-[300px] overflow-y-auto no-scrollbar">
                             <table className="w-full text-left">
-                                <thead className="bg-[#f8fafd] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">
+                                <thead className="bg-[#f8fafd] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-200">
                                     <tr>
-                                        <th className="px-5 py-3">Code</th>
-                                        <th className="px-5 py-3">Method Title</th>
-                                    </tr>
+                                        <th className=" px-5 py-3">Code</th>
+                                        <th className=" px-5 py-3">Method Title</th>
+                                    <th className="text-right px-5 py-3">Action</th></tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-50">
                                     {(lookups.paymentMethods || [])
                                         .filter(m => !payMethodSearchQuery || m.name.toLowerCase().includes(payMethodSearchQuery.toLowerCase()) || m.code.toLowerCase().includes(payMethodSearchQuery.toLowerCase()))
                                         .map(m => (
-                                            <tr key={m.code} className="group hover:bg-blue-50/50 cursor-pointer transition-colors" onClick={() => {
+                                            <tr key={m.code} className="group hover:bg-blue-50/50  transition-all cursor-pointer group border-b border-gray-50" onClick={() => {
                                                 setFormData(prev => ({ ...prev, payType: m.code }));
                                                 setShowPayMethodSearch(false);
                                                 setPayMethodSearchQuery('');
                                             }}>
-                                                <td className="px-5 py-3 font-mono text-[12px] font-bold text-gray-700">{m.code}</td>
-                                                <td className="px-5 py-3 text-[12px] font-mono font-bold text-gray-600 uppercase group-hover:text-blue-600">{m.name}</td>
-                                            </tr>
+                                                <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{m.code}</td>
+                                                <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{m.name}</td>
+                                            
+                                            <td className="text-right px-5 py-3"><button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button></td>
+                                        </tr>
                                         ))}
                                     {(lookups.paymentMethods || []).length === 0 && (
                                         <tr>
-                                            <td colSpan="2" className="text-center py-6 text-gray-300 text-[12px] font-bold uppercase tracking-widest">No methods found</td>
+                                            <td colSpan="2" className="text-center py-16 text-gray-400 text-[11px] font-bold uppercase tracking-widest">No methods found</td>
                                         </tr>
                                     )}
                                 </tbody>
@@ -1152,33 +1155,33 @@ const GRNBoard = ({ isOpen, onClose }) => {
                 isOpen={showExpenseSearch}
                 onClose={() => setShowExpenseSearch(false)}
                 title="Expense Account Lookup"
-                maxWidth="max-w-[500px]"
+                maxWidth="max-w-[700px]"
             >
                 <div className="space-y-4 font-['Tahoma']">
-                    <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-lg border border-gray-100 mb-2">
+                    <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-[3px] border border-gray-200 mb-2">
                         <span className="text-[12px] font-bold text-gray-500 uppercase tracking-widest">Search Facility</span>
                         <div className="relative flex-1">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
                             <input
                                 type="text"
                                 placeholder="Filter ledger accounts..."
-                                className="w-full h-9 pl-10 pr-4 border border-gray-300 rounded-[5px] outline-none text-sm focus:border-[#0285fd] bg-white shadow-sm"
+                                className="w-full h-10 pl-10 pr-4 border border-gray-300 rounded-[3px] outline-none text-[13px] focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] shadow-sm bg-white"
                                 autoFocus
                             />
                         </div>
                     </div>
-                    <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm">
+                    <div className="border border-gray-200 rounded-[3px] overflow-hidden shadow-sm">
                         <div className="max-h-[300px] overflow-y-auto no-scrollbar">
                             <table className="w-full text-left">
-                                <thead className="bg-[#f8fafd] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">
+                                <thead className="bg-[#f8fafd] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-200">
                                     <tr>
-                                        <th className="px-5 py-3">Code</th>
-                                        <th className="px-5 py-3">Account Name</th>
-                                    </tr>
+                                        <th className=" px-5 py-3">Code</th>
+                                        <th className=" px-5 py-3">Account Name</th>
+                                    <th className="text-right px-5 py-3">Action</th></tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-50">
                                     <tr>
-                                        <td colSpan="2" className="text-center py-6 text-gray-300 text-[12px] font-bold uppercase tracking-widest">No accounts configured</td>
+                                        <td colSpan="2" className="text-center py-16 text-gray-400 text-[11px] font-bold uppercase tracking-widest">No accounts configured</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -1187,18 +1190,18 @@ const GRNBoard = ({ isOpen, onClose }) => {
                 </div>
             </SimpleModal>
 
-            </SimpleModal>
+            </TransactionFormWrapper>
 
             {/* Product Master Creation Modal (Quick Create) */}
             <SimpleModal
                 isOpen={showItemMasterModal}
                 onClose={() => setShowItemMasterModal(false)}
                 title="Product Master Creation"
-                maxWidth="max-w-[500px]"
+                maxWidth="max-w-[700px]"
                 footer={
-                    <div className="bg-slate-50 px-6 py-4 w-full flex justify-end gap-3 border-t border-gray-100 rounded-b-xl">
-                        <button onClick={() => setShowItemMasterModal(false)} className="px-6 h-9 bg-white text-gray-500 text-[13px] font-bold rounded-[5px] border border-gray-300 hover:bg-gray-50 transition-all active:scale-95 font-tahoma">CANCEL</button>
-                        <button onClick={handleCreateProduct} disabled={isCreatingProduct} className="px-8 h-9 bg-[#2bb744] text-white text-[13px] font-bold rounded-[5px] shadow-md shadow-green-50 hover:bg-[#259b3a] transition-all active:scale-95 flex items-center gap-2 border-none font-tahoma">
+                    <div className="bg-slate-50 px-6 py-4 w-full flex justify-end gap-3 border-t border-gray-200 rounded-b-xl">
+                        <button onClick={() => setShowItemMasterModal(false)} className="px-6 h-9 bg-white text-gray-500 text-[13px] font-bold rounded-[3px] border border-gray-300 hover:bg-blue-50/50 transition-all active:scale-95 font-tahoma cursor-pointer group border-b border-gray-50">CANCEL</button>
+                        <button onClick={handleCreateProduct} disabled={isCreatingProduct} className="px-8 h-9 bg-white text-[#2bb744] border-2 border-[#2bb744] hover:bg-green-50 text-[13px] font-bold rounded-[3px] shadow-md shadow-green-50 hover:bg-[#259b3a] transition-all active:scale-95 flex items-center gap-2 border-none font-tahoma">
                             {isCreatingProduct ? 'CREATING...' : 'CREATE PRODUCT'}
                         </button>
                     </div>
@@ -1208,32 +1211,32 @@ const GRNBoard = ({ isOpen, onClose }) => {
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-1">
                             <label className="text-[12px] font-bold text-gray-600 uppercase tracking-widest pl-1">Product Code</label>
-                            <input type="text" value={productMasterData.code} onChange={e => setProductMasterData({...productMasterData, code: e.target.value})} className="w-full h-10 border border-gray-300 rounded-lg px-4 text-[13px] outline-none focus:border-[#0285fd] bg-white font-mono uppercase shadow-sm" placeholder="" />
+                            <input type="text" value={productMasterData.code} onChange={e => setProductMasterData({...productMasterData, code: e.target.value})} className="w-full h-10 border border-gray-300 rounded-[3px] px-4 text-[13px] outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white font-mono uppercase shadow-sm" placeholder="" />
                         </div>
                         <div className="space-y-1">
                             <label className="text-[12px] font-bold text-gray-600 uppercase tracking-widest pl-1">Unit of Measure</label>
-                            <input type="text" value={productMasterData.unit} onChange={e => setProductMasterData({...productMasterData, unit: e.target.value})} className="w-full h-10 border border-gray-300 rounded-lg px-4 text-[13px] outline-none focus:border-[#0285fd] bg-white shadow-sm" placeholder="Nos" />
+                            <input type="text" value={productMasterData.unit} onChange={e => setProductMasterData({...productMasterData, unit: e.target.value})} className="w-full h-10 border border-gray-300 rounded-[3px] px-4 text-[13px] outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white shadow-sm" placeholder="Nos" />
                         </div>
                     </div>
                     <div className="space-y-1">
                         <label className="text-[12px] font-bold text-gray-600 uppercase tracking-widest pl-1">Product Description</label>
-                        <input type="text" value={productMasterData.name} onChange={e => setProductMasterData({...productMasterData, name: e.target.value})} className="w-full h-10 border border-gray-300 rounded-lg px-4 text-[13px] outline-none focus:border-[#0285fd] bg-white uppercase shadow-sm font-bold" placeholder="" />
+                        <input type="text" value={productMasterData.name} onChange={e => setProductMasterData({...productMasterData, name: e.target.value})} className="w-full h-10 border border-gray-300 rounded-[3px] px-4 text-[13px] outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white uppercase shadow-sm font-bold" placeholder="" />
                     </div>
                     <div className="grid grid-cols-3 gap-4">
                         <div className="space-y-1">
                             <label className="text-[11px] font-bold text-gray-600 uppercase tracking-widest pl-1">Purchase Price</label>
-                            <input type="text" value={productMasterData.purchasePrice} onChange={e => setProductMasterData({...productMasterData, purchasePrice: e.target.value})} className="w-full h-10 border border-gray-300 rounded-lg px-4 text-right text-[13px] font-mono outline-none focus:border-[#0285fd] bg-white shadow-sm" placeholder="0.00" />
+                            <input type="text" value={productMasterData.purchasePrice} onChange={e => setProductMasterData({...productMasterData, purchasePrice: e.target.value})} className="w-full h-10 border border-gray-300 rounded-[3px] px-4 text-right text-[13px] font-mono outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white shadow-sm" placeholder="0.00" />
                         </div>
                         <div className="space-y-1">
                             <label className="text-[11px] font-bold text-gray-600 uppercase tracking-widest pl-1">Selling Price</label>
-                            <input type="text" value={productMasterData.sellingPrice} onChange={e => setProductMasterData({...productMasterData, sellingPrice: e.target.value})} className="w-full h-10 border border-gray-300 rounded-lg px-4 text-right text-[13px] font-mono outline-none focus:border-[#0285fd] bg-white shadow-sm" placeholder="0.00" />
+                            <input type="text" value={productMasterData.sellingPrice} onChange={e => setProductMasterData({...productMasterData, sellingPrice: e.target.value})} className="w-full h-10 border border-gray-300 rounded-[3px] px-4 text-right text-[13px] font-mono outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white shadow-sm" placeholder="0.00" />
                         </div>
                         <div className="space-y-1">
                             <label className="text-[11px] font-bold text-gray-600 uppercase tracking-widest pl-1">Pack Size</label>
-                            <input type="text" value={productMasterData.packSize} onChange={e => setProductMasterData({...productMasterData, packSize: e.target.value})} className="w-full h-10 border border-gray-300 rounded-lg px-4 text-center text-[13px] font-mono outline-none focus:border-[#0285fd] bg-white shadow-sm" placeholder="1" />
+                            <input type="text" value={productMasterData.packSize} onChange={e => setProductMasterData({...productMasterData, packSize: e.target.value})} className="w-full h-10 border border-gray-300 rounded-[3px] px-4 text-center text-[13px] font-mono outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white shadow-sm" placeholder="1" />
                         </div>
                     </div>
-                    <div className="bg-blue-50/50 p-3.5 rounded-xl border border-blue-100/50 flex items-start gap-3">
+                    <div className="bg-blue-50/50 p-3.5 rounded-[3px] border border-blue-100/50 flex items-start gap-3">
                         <div className="w-2 h-2 rounded-full bg-blue-400 mt-1.5 shrink-0" />
                         <p className="text-[10px] text-blue-600 font-bold uppercase tracking-widest leading-relaxed">System Defaults: Category (1) and Department (1) will be automatically assigned to this record.</p>
                     </div>

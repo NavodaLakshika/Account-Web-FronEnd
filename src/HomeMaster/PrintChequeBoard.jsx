@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import SimpleModal from '../components/SimpleModal';
-import { Search, Calendar, X, Printer, RotateCcw } from 'lucide-react';
+import { Search, Calendar, X, Printer, RotateCcw , FileText} from 'lucide-react';
 import CalendarModal from '../components/CalendarModal';
+import TransactionFormWrapper from '../components/TransactionFormWrapper';
 
 const PrintChequeBoard = ({ isOpen, onClose }) => {
     const [rows, setRows] = useState([
@@ -9,11 +10,11 @@ const PrintChequeBoard = ({ isOpen, onClose }) => {
     ]);
 
     const footer = (
-        <div className="bg-slate-50 px-6 py-4 w-full flex justify-end gap-3 border-t border-gray-100 mt-2 rounded-b-xl">
-            <button className="px-6 h-10 bg-[#2bb744] text-white text-sm font-black rounded-[5px] shadow-md shadow-green-100 hover:bg-[#259b3a] transition-all active:scale-95 flex items-center justify-center gap-2 uppercase tracking-tight">
+        <div className="bg-slate-50 px-6 py-4 w-full flex justify-end gap-3 border-t border-gray-200 mt-2 rounded-b-xl">
+            <button className="px-6 h-10 bg-white text-[#2bb744] border-2 border-[#2bb744] hover:bg-green-50 text-sm font-black rounded-[3px] shadow-md shadow-green-100 hover:bg-[#259b3a] transition-all active:scale-95 flex items-center justify-center gap-2 uppercase tracking-tight">
                 <Printer size={16} /> PRINT SELECTED
             </button>
-            <button className="px-6 h-10 bg-[#00adff] text-white text-sm font-black rounded-[5px] hover:bg-[#0099e6] transition-all active:scale-95 flex items-center justify-center gap-2 border-none uppercase tracking-tight">
+            <button className="px-6 h-10 bg-white text-[#00adff] border-2 border-[#00adff] hover:bg-blue-50 text-sm font-black rounded-[3px] hover:bg-[#0099e6] transition-all active:scale-95 flex items-center justify-center gap-2 border-none uppercase tracking-tight">
                 <RotateCcw size={16} /> CLEAR FORM
             </button>
         </div>
@@ -38,15 +39,15 @@ const PrintChequeBoard = ({ isOpen, onClose }) => {
 
     return (
         <>
-            <SimpleModal
+            <TransactionFormWrapper subtitle="Transaction Management" icon={FileText}
                 isOpen={isOpen}
                 onClose={onClose}
-                title="Cheque Printing Utility"
-                maxWidth="max-w-[850px]"
+                title="Cheque Printing"
+                maxWidth="max-w-[700px]"
                 footer={footer}
             >
                 <div className="space-y-4 pt-1 font-['Tahoma',_sans-serif]">
-                    <div className="border-b border-gray-100 pb-2 flex items-center justify-center">
+                    <div className="border-b border-gray-200 pb-2 flex items-center justify-center">
                         <h2 className="text-[17px] font-mono font-bold text-black uppercase tracking-tight">Cheque Sorting & Batch Printing Facility</h2>
                     </div>
 
@@ -62,9 +63,9 @@ const PrintChequeBoard = ({ isOpen, onClose }) => {
                                 <input 
                                     type="text" 
                                     readOnly 
-                                    className="flex-1 h-9 border border-gray-300 rounded-[5px] px-3 font-mono font-bold text-slate-800 text-[12.5px] outline-none shadow-sm bg-gray-50" 
+                                    className="flex-1 h-9 border border-gray-300 rounded-[3px] px-3 font-mono font-bold text-slate-800 text-[12.5px] outline-none shadow-sm bg-gray-50" 
                                 />
-                                <button className="w-10 h-9 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
+                                <button className="w-10 h-9 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0">
                                     <Search size={16} />
                                 </button>
                             </div>
@@ -90,9 +91,9 @@ const PrintChequeBoard = ({ isOpen, onClose }) => {
                             </div>
                             <div className="w-12 text-[10px] font-black text-gray-400 text-center pr-2">FROM</div>
                             <div className="flex-1 flex items-center gap-3">
-                                <input type="text" className="flex-1 h-9 border border-gray-300 rounded-[5px] px-3 font-mono font-black text-[#0285fd] text-[13px] outline-none shadow-sm bg-white focus:border-slate-400" />
+                                <input type="text" className="flex-1 h-9 border border-gray-300 rounded-[3px] px-3 font-mono font-black text-[#0285fd] text-[13px] outline-none shadow-sm bg-white focus:border-slate-400" />
                                 <span className="w-6 text-[10px] font-black text-gray-400 text-center uppercase tracking-tighter">TO</span>
-                                <input type="text" className="flex-1 h-9 border border-gray-300 rounded-[5px] px-3 font-mono font-black text-[#0285fd] text-[13px] outline-none shadow-sm bg-white focus:border-slate-400" />
+                                <input type="text" className="flex-1 h-9 border border-gray-300 rounded-[3px] px-3 font-mono font-black text-[#0285fd] text-[13px] outline-none shadow-sm bg-white focus:border-slate-400" />
                             </div>
                         </div>
 
@@ -105,15 +106,15 @@ const PrintChequeBoard = ({ isOpen, onClose }) => {
                             <div className="w-12 text-[10px] font-black text-gray-400 text-center pr-2">FROM</div>
                             <div className="flex-1 flex items-center gap-4">
                                 <div className="flex-1 flex gap-2">
-                                    <input type="text" readOnly value={dates.from} className="flex-1 h-9 border border-gray-300 rounded-[5px] px-3 font-mono font-bold text-slate-800 text-[12.5px] outline-none bg-gray-50/50 shadow-sm" />
-                                    <button onClick={() => openCalendar('from')} className="w-10 h-9 bg-white border border-gray-300 text-slate-600 flex items-center justify-center hover:bg-slate-50 rounded-[5px] transition-all shadow-sm active:scale-90 shrink-0">
+                                    <input type="text" readOnly value={dates.from} className="flex-1 h-9 border border-gray-300 rounded-[3px] px-3 font-mono font-bold text-slate-800 text-[12.5px] outline-none bg-gray-50/50 shadow-sm" />
+                                    <button onClick={() => openCalendar('from')} className="w-10 h-9 bg-white border border-gray-300 text-slate-600 flex items-center justify-center hover:bg-slate-50 rounded-[3px] transition-all shadow-sm active:scale-90 shrink-0">
                                         <Calendar size={15} />
                                     </button>
                                 </div>
                                 <span className="w-4 text-[10px] font-black text-gray-400 text-center uppercase tracking-tighter">TO</span>
                                 <div className="flex-1 flex gap-2">
-                                    <input type="text" readOnly value={dates.to} className="flex-1 h-9 border border-gray-300 rounded-[5px] px-3 font-mono font-bold text-slate-800 text-[12.5px] outline-none bg-gray-50/50 shadow-sm" />
-                                    <button onClick={() => openCalendar('to')} className="w-10 h-9 bg-white border border-gray-300 text-slate-600 flex items-center justify-center hover:bg-slate-50 rounded-[5px] transition-all shadow-sm active:scale-90 shrink-0">
+                                    <input type="text" readOnly value={dates.to} className="flex-1 h-9 border border-gray-300 rounded-[3px] px-3 font-mono font-bold text-slate-800 text-[12.5px] outline-none bg-gray-50/50 shadow-sm" />
+                                    <button onClick={() => openCalendar('to')} className="w-10 h-9 bg-white border border-gray-300 text-slate-600 flex items-center justify-center hover:bg-slate-50 rounded-[3px] transition-all shadow-sm active:scale-90 shrink-0">
                                         <Calendar size={15} />
                                     </button>
                                 </div>
@@ -131,9 +132,9 @@ const PrintChequeBoard = ({ isOpen, onClose }) => {
                                 <input 
                                     type="text" 
                                     readOnly 
-                                    className="flex-1 h-9 border border-gray-300 rounded-[5px] px-3 font-mono font-bold text-slate-800 text-[12.5px] outline-none shadow-sm bg-gray-50" 
+                                    className="flex-1 h-9 border border-gray-300 rounded-[3px] px-3 font-mono font-bold text-slate-800 text-[12.5px] outline-none shadow-sm bg-gray-50" 
                                 />
-                                <button className="w-10 h-9 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
+                                <button className="w-10 h-9 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0">
                                     <Search size={16} />
                                 </button>
                             </div>
@@ -141,7 +142,7 @@ const PrintChequeBoard = ({ isOpen, onClose }) => {
 
                         {/* View Records Row */}
                         <div className="flex justify-end pt-2">
-                            <button className="px-10 h-10 bg-[#0285fd] text-white text-[12.5px] font-black rounded-[5px] hover:bg-[#0073ff] transition-all active:scale-95 shadow-md shadow-blue-100 uppercase tracking-widest flex items-center justify-center gap-2">
+                            <button className="px-10 h-10 bg-[#0285fd] text-white text-[12.5px] font-black rounded-[3px] hover:bg-[#0073ff] transition-all active:scale-95 shadow-md shadow-blue-100 uppercase tracking-widest flex items-center justify-center gap-2">
                                 <Search size={16} /> VIEW RECORDS / REFRESH
                             </button>
                         </div>
@@ -153,17 +154,17 @@ const PrintChequeBoard = ({ isOpen, onClose }) => {
                             <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse" />
                             <label className="text-[12px] font-bold text-gray-500 uppercase tracking-widest opacity-80">Pending Sorting Queue</label>
                         </div>
-                        <div className="border border-gray-200 rounded-[5px] shadow-sm bg-white overflow-hidden">
+                        <div className="border border-gray-200 rounded-[3px] shadow-sm bg-white overflow-hidden">
                             <div className="max-h-[250px] overflow-y-auto no-scrollbar">
                                 <table className="w-full text-left border-collapse">
                                     <thead className="bg-[#f8fafd] border-b border-gray-200 text-slate-500 font-black uppercase text-[10.5px] tracking-widest z-10 sticky top-0">
                                         <tr>
-                                            <th className="px-3 py-3 border-r border-gray-100 w-12 text-center select-none">SEL.</th>
-                                            <th className="px-3 py-3 border-r border-gray-100 w-28">CHQ. NO</th>
-                                            <th className="px-4 py-3 border-r border-gray-100 w-36 text-center">ISSUE DATE</th>
-                                            <th className="px-4 py-3 border-r border-gray-100">PAYEE / ENTITY TRANSCRIPT</th>
+                                            <th className="px-3 py-3 border-r border-gray-200 w-12 text-center select-none">SEL.</th>
+                                            <th className="px-3 py-3 border-r border-gray-200 w-28">CHQ. NO</th>
+                                            <th className="px-4 py-3 border-r border-gray-200 w-36 text-center">ISSUE DATE</th>
+                                            <th className="px-4 py-3 border-r border-gray-200">PAYEE / ENTITY TRANSCRIPT</th>
                                             <th className="px-4 py-3 w-32 text-right">VALUE (LKR)</th>
-                                        </tr>
+                                        <th className="text-right px-5 py-3">Action</th></tr>
                                     </thead>
                                     <tbody className="divide-y divide-gray-50">
                                         {rows.map((row, idx) => (
@@ -190,7 +191,7 @@ const PrintChequeBoard = ({ isOpen, onClose }) => {
                         </div>
                     </div>
                 </div>
-            </SimpleModal>
+            </TransactionFormWrapper>
 
             <CalendarModal 
                 isOpen={calendar.isOpen}

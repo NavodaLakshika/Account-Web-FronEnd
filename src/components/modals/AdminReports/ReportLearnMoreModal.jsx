@@ -30,7 +30,7 @@ const sections = [
             <div className="space-y-3 text-[13px] text-slate-700 leading-relaxed">
                 <p>Your ONIMTA Accounts system is integrated with the following core financial modules:</p>
                 <div className="grid grid-cols-1 gap-3 mt-2">
-                    <div className="bg-slate-50 p-3 rounded-lg border border-slate-100">
+                    <div className="bg-slate-50 p-3 rounded-[3px] border border-slate-100">
                         <h4 className="font-bold text-slate-800 text-[12px] mb-1.5">Banking & Cash</h4>
                         <ul className="list-disc pl-4 text-[12px] text-slate-600 space-y-0.5">
                             <li>Bank Reconciliation</li>
@@ -40,7 +40,7 @@ const sections = [
                             <li>Funds Transfers & Deposits</li>
                         </ul>
                     </div>
-                    <div className="bg-slate-50 p-3 rounded-lg border border-slate-100">
+                    <div className="bg-slate-50 p-3 rounded-[3px] border border-slate-100">
                         <h4 className="font-bold text-slate-800 text-[12px] mb-1.5">Sales & Payables</h4>
                         <ul className="list-disc pl-4 text-[12px] text-slate-600 space-y-0.5">
                             <li>Customer Invoices & Receipts</li>
@@ -49,7 +49,7 @@ const sections = [
                             <li>Payment Setoffs</li>
                         </ul>
                     </div>
-                    <div className="bg-slate-50 p-3 rounded-lg border border-slate-100">
+                    <div className="bg-slate-50 p-3 rounded-[3px] border border-slate-100">
                         <h4 className="font-bold text-slate-800 text-[12px] mb-1.5">General Accounting</h4>
                         <ul className="list-disc pl-4 text-[12px] text-slate-600 space-y-0.5">
                             <li>Chart of Accounts</li>
@@ -69,7 +69,7 @@ const sections = [
             <div className="space-y-3 text-[13px] text-slate-700 leading-relaxed">
                 <p>The system provides 90+ pre-built reports covering all aspects of your business. Here are the key categories:</p>
                 <div className="grid grid-cols-1 gap-3 mt-2">
-                    <div className="bg-slate-50 p-3 rounded-lg border border-slate-100">
+                    <div className="bg-slate-50 p-3 rounded-[3px] border border-slate-100">
                         <h4 className="font-bold text-slate-800 text-[12px] mb-1.5">Business Overview</h4>
                         <ul className="list-disc pl-4 text-[12px] text-slate-600 space-y-0.5">
                             <li>Profit and Loss</li>
@@ -78,7 +78,7 @@ const sections = [
                             <li>Business Snapshot</li>
                         </ul>
                     </div>
-                    <div className="bg-slate-50 p-3 rounded-lg border border-slate-100">
+                    <div className="bg-slate-50 p-3 rounded-[3px] border border-slate-100">
                         <h4 className="font-bold text-slate-800 text-[12px] mb-1.5">Who owes you (A/R)</h4>
                         <ul className="list-disc pl-4 text-[12px] text-slate-600 space-y-0.5">
                             <li>A/R Ageing Summary</li>
@@ -87,7 +87,7 @@ const sections = [
                             <li>Collections Report</li>
                         </ul>
                     </div>
-                    <div className="bg-slate-50 p-3 rounded-lg border border-slate-100">
+                    <div className="bg-slate-50 p-3 rounded-[3px] border border-slate-100">
                         <h4 className="font-bold text-slate-800 text-[12px] mb-1.5">What you owe (A/P)</h4>
                         <ul className="list-disc pl-4 text-[12px] text-slate-600 space-y-0.5">
                             <li>A/P Ageing Summary</li>
@@ -96,7 +96,7 @@ const sections = [
                             <li>Expenses by Supplier Summary</li>
                         </ul>
                     </div>
-                    <div className="bg-slate-50 p-3 rounded-lg border border-slate-100">
+                    <div className="bg-slate-50 p-3 rounded-[3px] border border-slate-100">
                         <h4 className="font-bold text-slate-800 text-[12px] mb-1.5">Accounting & Other</h4>
                         <ul className="list-disc pl-4 text-[12px] text-slate-600 space-y-0.5">
                             <li>General Ledger & Journal</li>
@@ -115,7 +115,7 @@ const sections = [
         content: (
             <div className="space-y-3 text-[13px] text-slate-700 leading-relaxed">
                 <p>You can control the time period for your report using the following options:</p>
-                <div className="bg-slate-50 p-4 rounded-lg space-y-2">
+                <div className="bg-slate-50 p-4 rounded-[3px] space-y-2">
                     <div className="flex items-start gap-3">
                         <Calendar size={16} className="text-[#0077c5] mt-0.5 shrink-0" />
                         <div>
@@ -140,7 +140,7 @@ const sections = [
         content: (
             <div className="space-y-3 text-[13px] text-slate-700 leading-relaxed">
                 <p>Toggle between Cash and Accrual accounting methods using the segmented control in the filters bar:</p>
-                <div className="bg-slate-50 p-4 rounded-lg space-y-2">
+                <div className="bg-slate-50 p-4 rounded-[3px] space-y-2">
                     <div className="flex items-start gap-3">
                         <div className="w-5 h-5 bg-emerald-100 rounded flex items-center justify-center text-[10px] font-bold text-emerald-700 mt-0.5 shrink-0">C</div>
                         <div>
@@ -164,7 +164,7 @@ const sections = [
         title: 'Display Columns By & Compare To',
         content: (
             <div className="space-y-3 text-[13px] text-slate-700 leading-relaxed">
-                <div className="bg-slate-50 p-4 rounded-lg space-y-3">
+                <div className="bg-slate-50 p-4 rounded-[3px] space-y-3">
                     <div>
                         <span className="font-bold text-slate-800">Display columns by:</span>
                         <span className="text-slate-600 ml-1">Pivots your report data into columns. Choose from Customer, Employee, Product/Service, Supplier, or time periods.</span>
@@ -183,7 +183,7 @@ const sections = [
         content: (
             <div className="space-y-3 text-[13px] text-slate-700 leading-relaxed">
                 <p>Click the <strong>Customise</strong> button to open the customisation panel with two tabs:</p>
-                <div className="bg-slate-50 p-4 rounded-lg space-y-3">
+                <div className="bg-slate-50 p-4 rounded-[3px] space-y-3">
                     <div>
                         <h4 className="font-bold text-slate-800 text-[12px] mb-1">Data tab</h4>
                         <ul className="list-disc pl-5 text-[12px] text-slate-600 space-y-1">
@@ -208,21 +208,21 @@ const sections = [
         content: (
             <div className="space-y-3 text-[13px] text-slate-700 leading-relaxed">
                 <div className="space-y-2">
-                    <div className="flex items-start gap-3 bg-slate-50 p-3 rounded-lg">
+                    <div className="flex items-start gap-3 bg-slate-50 p-3 rounded-[3px]">
                         <Download size={16} className="text-emerald-600 mt-0.5 shrink-0" />
                         <div>
                             <span className="font-bold text-slate-800">Export:</span>
                             <span className="text-slate-600 ml-1">Download your report as Excel (.xlsx), CSV, or PDF.</span>
                         </div>
                     </div>
-                    <div className="flex items-start gap-3 bg-slate-50 p-3 rounded-lg">
+                    <div className="flex items-start gap-3 bg-slate-50 p-3 rounded-[3px]">
                         <Printer size={16} className="text-blue-600 mt-0.5 shrink-0" />
                         <div>
                             <span className="font-bold text-slate-800">Print:</span>
                             <span className="text-slate-600 ml-1">Open the print preview with full controls.</span>
                         </div>
                     </div>
-                    <div className="flex items-start gap-3 bg-slate-50 p-3 rounded-lg">
+                    <div className="flex items-start gap-3 bg-slate-50 p-3 rounded-[3px]">
                         <Mail size={16} className="text-purple-600 mt-0.5 shrink-0" />
                         <div>
                             <span className="font-bold text-slate-800">Email:</span>
@@ -238,7 +238,7 @@ const sections = [
         title: 'Onimta AI Assistant (BETA)',
         content: (
             <div className="space-y-3 text-[13px] text-slate-700 leading-relaxed">
-                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-lg border border-blue-100">
+                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-[3px] border border-blue-100">
                     <div className="flex items-center gap-2 mb-2">
                         <Sparkles size={16} className="text-[#0077c5]" />
                         <span className="font-bold text-slate-800 text-[12px]">How it works</span>
@@ -302,7 +302,7 @@ const ReportLearnMoreModal = ({ isOpen, onClose }) => {
                 <div className="flex-1 overflow-y-auto bg-white">
                     <div className="p-7">
                         {/* Title & Meta */}
-                        <div className="border-t border-gray-100 pt-3 mb-6">
+                        <div className="border-t border-gray-200 pt-3 mb-6">
                             <h1 className="text-[22px] font-bold text-gray-900 leading-tight mb-4">
                                 Customise your reports with a modern view in ONIMTA
                             </h1>
@@ -352,9 +352,9 @@ const ReportLearnMoreModal = ({ isOpen, onClose }) => {
                         </div>
 
                         {/* Video Placeholder */}
-                        <div className="w-full aspect-video bg-gray-100 rounded-lg border border-gray-200 flex flex-col items-center justify-center mb-10 overflow-hidden relative group cursor-pointer">
+                        <div className="w-full aspect-video bg-gray-100 rounded-[3px] border border-gray-200 flex flex-col items-center justify-center mb-10 overflow-hidden relative group cursor-pointer">
                             <div className="absolute inset-0 bg-black/5 group-hover:bg-black/10 transition-colors z-10" />
-                            <div className="w-16 h-12 bg-red-600 rounded-xl flex items-center justify-center shadow-lg z-20 group-hover:bg-red-700 transition-colors">
+                            <div className="w-16 h-12 bg-red-600 rounded-[3px] flex items-center justify-center shadow-lg z-20 group-hover:bg-red-700 transition-colors">
                                 <div className="w-0 h-0 border-t-[8px] border-t-transparent border-l-[14px] border-l-white border-b-[8px] border-b-transparent ml-1" />
                             </div>
                             <span className="mt-3 font-bold text-gray-700 z-20">Watch on YouTube</span>
@@ -400,7 +400,7 @@ const ReportLearnMoreModal = ({ isOpen, onClose }) => {
                         )}
                     </div>
                     <div className="w-full border-t border-gray-200 my-1" />
-                    <button className="px-5 py-2 border-2 border-green-700 text-green-700 hover:bg-green-50 rounded-[3px] font-bold text-[14px] bg-white transition-colors shadow-sm">
+                    <button className="px-5 py-2 border-2 border-green-700 text-blue-700 hover:bg-blue-50 rounded-[3px] font-bold text-[14px] bg-white transition-colors shadow-sm">
                         Contact Us
                     </button>
                 </div>

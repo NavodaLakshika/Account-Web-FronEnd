@@ -45,7 +45,7 @@ const UserSearchModal = ({ isOpen, onClose, onSelect }) => {
             isOpen={isOpen}
             onClose={onClose}
             title="User Search"
-            maxWidth="max-w-2xl"
+            maxWidth="max-w-[700px]"
         >
             <div className="p-1 space-y-4 font-['Tahoma']">
                 {/* Search Bar */}
@@ -54,7 +54,7 @@ const UserSearchModal = ({ isOpen, onClose, onSelect }) => {
                     <input
                         type="text"
                         placeholder="Search by name or ID..."
-                        className="w-full h-10 pl-10 pr-4 bg-slate-50 border border-gray-200 rounded-lg outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition-all text-[13px]"
+                        className="w-full h-10 pl-10 pr-4 border border-gray-300 rounded-[3px] outline-none text-[13px] focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] shadow-sm bg-white"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         autoFocus
@@ -63,8 +63,8 @@ const UserSearchModal = ({ isOpen, onClose, onSelect }) => {
                 </div>
 
                 {/* User List */}
-                <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm">
-                    <div className="bg-[#f8fafd] px-4 py-2 flex items-center gap-4 border-b border-gray-100">
+                <div className="border border-gray-200 rounded-[3px] overflow-hidden shadow-sm">
+                    <div className="bg-[#f8fafd] px-4 py-2 flex items-center gap-4 border-b border-gray-200">
                         <span className="text-[11px] font-[900] text-gray-400 uppercase tracking-widest w-16">ID</span>
                         <span className="text-[11px] font-[900] text-gray-400 uppercase tracking-widest flex-1">User Name</span>
                     </div>
@@ -78,11 +78,11 @@ const UserSearchModal = ({ isOpen, onClose, onSelect }) => {
                                         onSelect(user);
                                         onClose();
                                     }}
-                                    className="w-full flex items-center gap-4 px-4 py-3 hover:bg-blue-50 transition-colors border-b border-gray-50 last:border-0 text-left group"
+                                    className="w-full flex items-center gap-4 px-4 py-3 hover:bg-blue-50/50 transition-all border-b border-gray-50 last:border-0 text-left group cursor-pointer group border-b border-gray-50"
                                 >
                                     <span className="text-[11px] font-normal text-[#0078d4] w-16">{user.emp_Code}</span>
                                     <span className="text-[11px] font-normal text-gray-700 group-hover:text-blue-600 flex-1 uppercase">{user.emp_Name}</span>
-                                    <div className="bg-[#e49e1b] text-white text-[10px] px-4 py-1 rounded-md font-bold uppercase">Select</div>
+                                    <div className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">Select</div>
                                 </button>
                             ))
                         ) : (

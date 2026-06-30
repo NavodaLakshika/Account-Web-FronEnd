@@ -51,7 +51,7 @@ const RegisterPage = () => {
     if (password.length > 0) {
         if (strengthCount <= 2) { strengthText = 'Weak'; strengthColor = 'bg-red-400'; }
         else if (strengthCount === 3) { strengthText = 'Good'; strengthColor = 'bg-yellow-400'; }
-        else { strengthText = 'Strong'; strengthColor = 'bg-green-500'; }
+        else { strengthText = 'Strong'; strengthColor = 'bg-blue-500'; }
     }
 
     const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -102,7 +102,7 @@ const RegisterPage = () => {
     };
 
     return (
-        <div className="min-h-screen relative flex flex-col items-center justify-center font-['Arial'] overflow-hidden bg-[#f8fafc] py-8">
+        <div className="min-h-screen relative flex flex-col items-center justify-center font-['Arial'] overflow-hidden bg-slate-50 py-8">
             <Helmet>
                 <title>Create Account | Onimta Accounting System</title>
                 <meta name="description" content="Register a new account on the Onimta Accounting Web Application. Create secure access to enterprise financial management tools." />
@@ -115,7 +115,7 @@ const RegisterPage = () => {
 
             <div className="relative z-10 w-full max-w-6xl px-12 flex items-center justify-center mt-16">
 
-                <div className="max-w-md w-full py-12">
+                <div className="w-full py-12">
                     {/* Step indicator */}
                     <div className="flex items-center gap-2 mb-8">
                         {[1,2,3].map(s => (
@@ -167,14 +167,14 @@ const RegisterPage = () => {
                                         required
                                         className="w-full px-4 py-3 bg-white font-mono text-slate-800 font-bold outline-none border border-slate-300 hover:border-[#00acee] focus:border-[#00acee] focus:ring-4 focus:ring-[#00acee]/30 transition-all" />
                                     
-                                        <div className="mt-2 w-full bg-slate-50/50 rounded-xl border border-slate-200 p-4 animate-in fade-in">
+                                        <div className="mt-2 w-full bg-slate-50/50 rounded-[3px] border border-slate-200 p-4 animate-in fade-in">
                                             {/* Strength Bar */}
                                             <div className="mb-4">
                                                 <div className="flex justify-between items-center mb-1.5">
                                                     <span className="text-[11px] font-bold text-slate-600 uppercase tracking-wider">Password Strength</span>
-                                                    <span className={`text-[11px] font-bold uppercase tracking-wider ${strengthText === 'Weak' ? 'text-red-500' : strengthText === 'Good' ? 'text-yellow-600' : strengthText === 'Strong' ? 'text-green-600' : 'text-slate-400'}`}>{strengthText}</span>
+                                                    <span className={`text-[11px] font-bold uppercase tracking-wider ${strengthText === 'Weak' ? 'text-red-500' : strengthText === 'Good' ? 'text-yellow-600' : strengthText === 'Strong' ? 'text-blue-600' : 'text-slate-400'}`}>{strengthText}</span>
                                                 </div>
-                                                <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden flex gap-1">
+                                                <div className="h-1.5 w-full bg-slate-100 rounded-[3px] overflow-hidden flex gap-1">
                                                     <div className={`h-full flex-1 rounded-full transition-all duration-300 ${strengthCount >= 1 ? strengthColor : 'bg-transparent'}`} />
                                                     <div className={`h-full flex-1 rounded-full transition-all duration-300 ${strengthCount >= 2 ? strengthColor : 'bg-transparent'}`} />
                                                     <div className={`h-full flex-1 rounded-full transition-all duration-300 ${strengthCount >= 3 ? strengthColor : 'bg-transparent'}`} />
@@ -184,19 +184,19 @@ const RegisterPage = () => {
 
                                             <p className="text-[12px] font-bold text-slate-700 mb-3">Your password must contain:</p>
                                             <ul className="space-y-2">
-                                                <li className={`text-[12px] font-semibold flex items-center gap-3 transition-colors ${criteria.length ? 'text-green-600' : 'text-slate-400'}`}>
+                                                <li className={`text-[12px] font-semibold flex items-center gap-3 transition-colors ${criteria.length ? 'text-blue-600' : 'text-slate-400'}`}>
                                                     <span className="text-sm font-bold w-3 text-center">{criteria.length ? '✓' : '−'}</span>
                                                     8 or more characters
                                                 </li>
-                                                <li className={`text-[12px] font-semibold flex items-center gap-3 transition-colors ${criteria.number ? 'text-green-600' : 'text-slate-400'}`}>
+                                                <li className={`text-[12px] font-semibold flex items-center gap-3 transition-colors ${criteria.number ? 'text-blue-600' : 'text-slate-400'}`}>
                                                     <span className="text-sm font-bold w-3 text-center">{criteria.number ? '✓' : '−'}</span>
                                                     Numbers
                                                 </li>
-                                                <li className={`text-[12px] font-semibold flex items-center gap-3 transition-colors ${criteria.letter ? 'text-green-600' : 'text-slate-400'}`}>
+                                                <li className={`text-[12px] font-semibold flex items-center gap-3 transition-colors ${criteria.letter ? 'text-blue-600' : 'text-slate-400'}`}>
                                                     <span className="text-sm font-bold w-3 text-center">{criteria.letter ? '✓' : '−'}</span>
                                                     Letters
                                                 </li>
-                                                <li className={`text-[12px] font-semibold flex items-center gap-3 transition-colors ${criteria.special ? 'text-green-600' : 'text-slate-400'}`}>
+                                                <li className={`text-[12px] font-semibold flex items-center gap-3 transition-colors ${criteria.special ? 'text-blue-600' : 'text-slate-400'}`}>
                                                     <span className="text-sm font-bold w-3 text-center">{criteria.special ? '✓' : '−'}</span>
                                                     Special characters
                                                 </li>

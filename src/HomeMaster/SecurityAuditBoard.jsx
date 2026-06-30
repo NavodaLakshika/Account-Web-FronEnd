@@ -92,7 +92,7 @@ const SecurityAuditBoard = ({ allEmployees = [], allCompanies = [], hierarchy = 
                         </div>
                         <h3 className="text-lg font-bold text-slate-900 tracking-widest uppercase">Executing Security Audit</h3>
                         <p className="text-slate-600 text-sm">Fetching real-time logs, checking access controls, and analyzing vulnerabilities...</p>
-                        <div className="w-full max-w-md bg-slate-100 rounded-full h-2 mt-2 overflow-hidden">
+                        <div className="w-full max-w-md bg-slate-100 rounded-[3px] h-2 mt-2 overflow-hidden">
                             <div className="bg-emerald-500 h-full rounded-full w-1/2 animate-pulse"></div>
                         </div>
                     </div>
@@ -170,7 +170,7 @@ const SecurityAuditBoard = ({ allEmployees = [], allCompanies = [], hierarchy = 
                                             </td>
                                             <td className="py-3 px-6">
                                                 <div className="flex justify-center">
-                                                    <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full border text-[10px] font-bold uppercase tracking-wider ${isCritical ? 'bg-red-50 text-red-600 border-red-200' : isMedium ? 'bg-orange-50 text-orange-600 border-orange-200' : 'bg-blue-50 text-blue-600 border-blue-200'}`}>
+                                                    <div className={`flex items-center gap-1.5 px-3 py-1 rounded-[3px] border text-[10px] font-bold uppercase tracking-wider ${isCritical ? 'bg-red-50 text-red-600 border-red-200' : isMedium ? 'bg-orange-50 text-orange-600 border-orange-200' : 'bg-blue-50 text-blue-600 border-blue-200'}`}>
                                                         {isCritical ? <XCircle className="w-3 h-3" /> : isMedium ? <AlertTriangle className="w-3 h-3" /> : <ShieldCheck className="w-3 h-3" />}
                                                         {isCritical ? 'High' : isMedium ? 'Medium' : 'Low'}
                                                     </div>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import SimpleModal from '../components/SimpleModal';
-import { Search, Calendar, RefreshCw, X, Save, RotateCcw, Loader2, Landmark, Wallet, Layers, Users, CheckCircle, Plus } from 'lucide-react';
+import TransactionFormWrapper from '../components/TransactionFormWrapper';
+import { Search, Calendar, X, Save, RotateCcw, Loader2, Wallet, CheckCircle, Plus, Users, Layers } from 'lucide-react';
 import { pettyCashService } from '../services/pettyCash.service';
 
 
@@ -62,7 +63,7 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
     const [vendorSearch, setVendorSearch] = useState('');
     const [showCCModal, setShowCCModal] = useState(false);
     const [ccSearch, setCcSearch] = useState('');
-    const [ccSource, setCcSource] = useState('header'); // 'header' or 'line'
+    const [ccSource, setCcSource] = useState('header');
     const [ccIndex, setCcIndex] = useState(null);
     const [showExpAccModal, setShowExpAccModal] = useState(false);
     const [expAccSearch, setExpAccSearch] = useState('');
@@ -154,13 +155,12 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
         try {
             setLoading(true);
             const data = await pettyCashService.getDraft(docNo, company);
-            // Map backend data to frontend state
             setFormData({
                 ...getInitialFormData(),
                 ...data.header,
                 date: toISODate(data.header.date),
                 dueDate: toISODate(data.header.dueDate),
-                items: [] // Items are handled separately below
+                items: []
             });
             
             if (data.items) {
@@ -331,604 +331,604 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                     }
                 `}
             </style>
-            <SimpleModal
+            <TransactionFormWrapper
                 isOpen={isOpen}
                 onClose={onClose}
                 title="Petty Cash Entry"
-                maxWidth="max-w-[1100px] "
+                subtitle="Petty Cash Management"
+                icon={Wallet}
                 footer={
-                    <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-slate-200 rounded-b-[5px] gap-3">
+                    <div className="bg-[#fcfcfc] px-6 py-4 w-full flex justify-between items-center border-t border-gray-200 rounded-b-[10px] shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]">
                         <div className="flex gap-3">
-                            <button onClick={() => setShowCustomerMasterBoard(true)} className="px-6 h-10 bg-indigo-50/50 backdrop-blur-md border border-indigo-200 text-indigo-700 text-[13px] font-mono font-bold tracking-widest uppercase rounded-[5px] shadow-sm hover:bg-indigo-100/80 transition-all active:scale-95 flex items-center gap-2">
+                            <button onClick={() => setShowCustomerMasterBoard(true)} className="px-6 py-2 border border-indigo-300 text-indigo-600 bg-white hover:bg-indigo-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2">
                                 <Users size={14} /> NEW CUSTOMER
                             </button>
-                            <button onClick={() => setShowAccountBoard(true)} className="px-6 h-10 bg-teal-50/50 backdrop-blur-md border border-teal-200 text-teal-700 text-[13px] font-mono font-bold tracking-widest uppercase rounded-[5px] shadow-sm hover:bg-teal-100/80 transition-all active:scale-95 flex items-center gap-2">
+                            <button onClick={() => setShowAccountBoard(true)} className="px-6 py-2 border border-teal-300 text-teal-600 bg-white hover:bg-teal-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2">
                                 <Layers size={14} /> NEW ACCOUNT
                             </button>
                         </div>
                         <div className="flex gap-3">
-                            <button onClick={handleClear} className="px-6 h-10 bg-[#00adff] text-white text-[13px] font-mono font-bold tracking-widest uppercase rounded-[5px] hover:bg-[#0099e6] transition-all active:scale-95 flex items-center gap-2 border-none shadow-md shadow-blue-100">
+                            <button onClick={handleClear} className="px-6 py-2 border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2">
                                 <RotateCcw size={14} /> CLEAR FORM
                             </button>
-                            <button onClick={handleSaveDraft} disabled={loading} className={`px-6 h-10 bg-white text-[#0285fd] text-[13px] font-mono font-bold tracking-widest uppercase rounded-[5px] border-2 border-[#0285fd] hover:bg-blue-50 transition-all active:scale-95 flex items-center gap-2 ${loading ? 'opacity-50' : ''}`}>
-                                <Save size={14} /> SAVE DRAFT
+                            <button onClick={handleSaveDraft} disabled={loading} className="px-6 py-2 border border-[#0285fd] text-[#0285fd] bg-white hover:bg-blue-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2">
+                                {loading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />} SAVE DRAFT
                             </button>
-                            <button onClick={handleSave} disabled={loading} className={`px-8 h-10 bg-[#2bb744] text-white text-[13px] font-mono font-bold tracking-widest uppercase rounded-[5px] shadow-md shadow-green-100 hover:bg-[#259b3a] transition-all active:scale-95 flex items-center justify-center gap-2 border-none ${loading ? 'opacity-50' : ''}`}>
-                                {loading ? <Loader2 size={14} className="animate-spin" /> : <CheckCircle size={14} />}
-                                APPLY
+                            <button onClick={handleSave} disabled={loading} className={`px-6 py-2 bg-[#0285fd] hover:bg-[#0073ff] text-white font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                                {loading ? <Loader2 size={14} className="animate-spin" /> : <CheckCircle size={14} />} APPLY
                             </button>
                         </div>
                     </div>
                 }
             >
-                <div className="space-y-3 overflow-y-auto no-scrollbar font-['Tahoma']">
-                    {/* 1. Header Information Section */}
-                    <div className="bg-white p-4 border border-slate-200 rounded-[5px] shadow-sm space-y-4">
-                        <div className="grid grid-cols-12 gap-x-6 gap-y-4">
-                            {/* Row 1: Document ID | Post Date | Exp. Timeline (Pay Date) */}
-                            <div className="col-span-4 flex items-center gap-2">
-                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Document ID</label>
-                                <div className="flex-1 flex gap-1 h-8 min-w-0">
-                                    <input type="text" name="docNo" value={formData.docNo} readOnly className="flex-1 min-w-0 h-full border border-slate-200 px-3 text-[12px] font-bold text-blue-600 bg-white rounded outline-none shadow-sm transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" />
-                                    <button onClick={handleSearchDocs} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0"><Search size={16} /></button>
-                                </div>
-                            </div>
-                            <div className="col-span-4 flex items-center gap-2">
-                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0 text-center">Post Date</label>
-                                <div className="flex-1 flex gap-1 h-8 min-w-0">
-                                    <input type="text" readOnly value={formatDate(formData.date)} onClick={() => setShowDateModal(true)} className="flex-1 min-w-0 h-full border border-slate-200 rounded px-3 text-[12px] outline-none bg-white text-gray-700 font-bold cursor-pointer transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 shadow-sm" />
-                                    <button onClick={() => setShowDateModal(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0"><Calendar size={16} /></button>
-                                </div>
-                            </div>
-                            <div className="col-span-4 flex items-center gap-2">
-                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0 text-center">Due Date</label>
-                                <div className="flex-1 flex gap-1 h-8 min-w-0">
-                                    <input type="text" readOnly value={formatDate(formData.dueDate)} onClick={() => setShowDueDateModal(true)} className="flex-1 min-w-0 h-full border border-slate-200 rounded px-3 text-[12px] outline-none bg-white text-gray-700 font-bold cursor-pointer transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 shadow-sm" />
-                                    <button onClick={() => setShowDueDateModal(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0"><Calendar size={16} /></button>
-                                </div>
-                            </div>
-
-                            {/* Row 2: Petty Account (8) | Cost Center (4) */}
-                            <div className="col-span-8 flex items-center gap-2">
-                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Petty A/C</label>
-                                <div className="flex-1 flex gap-1 h-8 min-w-0">
-                                    <input type="text" readOnly value={formData.account ? `${formData.account} - ${safePetty.find(a => a.code === formData.account)?.name || ''}` : ''} onClick={() => setShowAccModal(true)} className="flex-1 min-w-0 h-full border border-slate-200 px-3 text-[12px] font-bold text-gray-700 bg-white rounded outline-none shadow-sm cursor-pointer transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" />
-                                    <button onClick={() => setShowAccModal(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0"><Search size={16} /></button>
-                                </div>
-                            </div>
-                            <div className="col-span-4 flex items-center gap-2">
-                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0 text-center">Cost Center</label>
-                                <div className="flex-1 flex gap-1 h-8 min-w-0">
-                                    <input type="text" readOnly value={safeCC.find(c => c.code === formData.costCenter)?.name || ''} onClick={() => { setCcSource('header'); setShowCCModal(true); }} className="flex-1 min-w-0 h-full border border-slate-200 px-3 text-[12px] font-bold text-gray-700 bg-white rounded outline-none shadow-sm cursor-pointer transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" />
-                                    <button onClick={() => { setCcSource('header'); setShowCCModal(true); }} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] shadow-md shrink-0"><Search size={16} /></button>
-                                </div>
-                            </div>
-
-                            {/* Row 3: Vendor Selection & Payee (8) | Balance (4) */}
-                            <div className="col-span-8 flex items-center gap-3">
-                                <div className="flex items-center gap-2 w-24 shrink-0">
+                <div className="select-none font-['Tahoma']">
+                    {/* Header Information Section */}
+                    <div className="bg-white p-4 border border-slate-200 rounded-[3px] space-y-4">
+                        <div className="flex items-center justify-between border-b border-slate-200 pb-3 mb-2">
+                            <div className="">
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Doc No</label>
+                                <div className="relative">
                                     <input
-                                        type="checkbox"
-                                        checked={formData.isVendor}
-                                        onChange={(e) => setFormData({ ...formData, isVendor: e.target.checked, vendorId: '', payee: '' })}
-                                        className="w-4 h-4 text-[#00D1FF] border-slate-300 rounded focus:ring-[#00D1FF] transition-all"
+                                        type="text"
+                                        name="docNo"
+                                        value={formData.docNo}
+                                        readOnly
+                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700 truncate"
+                                        onClick={handleSearchDocs}
                                     />
-                                    <span className="text-[11px] font-bold text-gray-500 uppercase tracking-tighter">Vendor A/C</span>
+                                    <button onClick={handleSearchDocs} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
+                                        <Search size={16} />
+                                    </button>
                                 </div>
-                                <div className="flex-1 flex gap-1 h-8 min-w-0">
+                            </div>
+                            <div className="">
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Account Balance</label>
+                                <div className="w-full h-10 border border-blue-200 bg-blue-50/50 px-3 text-[14px] font-bold text-blue-700 text-right flex items-center justify-end rounded-[3px] min-w-[140px]">
+                                    {balance.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                </div>
+                            </div>
+                            <div className="">
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Post Date</label>
+                                <div className="relative w-full">
+                                    <input
+                                        type="text"
+                                        readOnly
+                                        value={formatDate(formData.date)}
+                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700 truncate"
+                                        onClick={() => setShowDateModal(true)}
+                                    />
+                                    <button onClick={() => setShowDateModal(true)} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
+                                        <Calendar size={16} />
+                                    </button>
+                                </div>
+                            </div>
+                            <div className="">
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Due Date</label>
+                                <div className="relative w-full">
+                                    <input
+                                        type="text"
+                                        readOnly
+                                        value={formatDate(formData.dueDate)}
+                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700 truncate"
+                                        onClick={() => setShowDueDateModal(true)}
+                                    />
+                                    <button onClick={() => setShowDueDateModal(true)} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
+                                        <Calendar size={16} />
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-12 gap-x-6 gap-y-3.5">
+                            {/* Left Column */}
+                            <div className="col-span-6 space-y-3.5">
+                                <div className="">
+                                    <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Petty Cash Account</label>
+                                    <div className="relative">
+                                        <input
+                                            type="text"
+                                            readOnly
+                                            value={formData.account ? `${formData.account} - ${safePetty.find(a => a.code === formData.account)?.name || ''}` : ''}
+                                            className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700 truncate"
+                                            onClick={() => setShowAccModal(true)}
+                                        />
+                                        <button onClick={() => setShowAccModal(true)} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
+                                            <Search size={16} />
+                                        </button>
+                                    </div>
+                                </div>
+                                <div className="">
+                                    <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Cost Center</label>
+                                    <div className="relative">
+                                        <input
+                                            type="text"
+                                            readOnly
+                                            value={safeCC.find(c => c.code === formData.costCenter)?.name || ''}
+                                            className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700"
+                                            onClick={() => { setCcSource('header'); setShowCCModal(true); }}
+                                        />
+                                        <button onClick={() => { setCcSource('header'); setShowCCModal(true); }} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
+                                            <Search size={16} />
+                                        </button>
+                                    </div>
+                                </div>
+                                <div className="">
+                                    <label className="block text-[13px] font-medium text-gray-700 mb-1.5">General Memo</label>
+                                    <input value={formData.memo} onChange={(e) => setFormData({ ...formData, memo: e.target.value })} type="text" className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700" />
+                                </div>
+                            </div>
+
+                            {/* Right Column */}
+                            <div className="col-span-6 space-y-3.5">
+                                <div className="">
+                                    <div className="flex items-center justify-between mb-1.5">
+                                        <label className="text-[13px] font-medium text-gray-700">Payee / Vendor</label>
+                                        <label className="flex items-center gap-1.5 cursor-pointer select-none">
+                                            <div onClick={() => setFormData({ ...formData, isVendor: !formData.isVendor, vendorId: '', payee: '' })}
+                                                className={`w-8 h-4 rounded-full transition-colors ${formData.isVendor ? 'bg-[#0285fd]' : 'bg-gray-300'} relative cursor-pointer`}>
+                                                <span className={`absolute top-0.5 w-3 h-3 bg-white rounded-full shadow transition-transform ${formData.isVendor ? 'translate-x-[17px]' : 'translate-x-0.5'}`} />
+                                            </div>
+                                            <span className="text-[9px] font-bold text-gray-400 uppercase tracking-wider">VENDOR</span>
+                                        </label>
+                                    </div>
                                     {formData.isVendor ? (
-                                        <>
-                                            <input type="text" readOnly value={formData.vendorId || ''} placeholder="ID" className="w-24 h-full border border-slate-200 px-3 text-[12px] font-mono font-bold text-gray-700 bg-slate-50 rounded outline-none" />
-                                            <input type="text" readOnly value={formData.payee || ''} placeholder="Select Active Vendor..." className="flex-1 h-full border border-slate-200 px-3 text-[12px] font-bold text-gray-700 bg-white rounded outline-none shadow-sm cursor-pointer transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" onClick={() => setShowVendorModal(true)} />
-                                            <button onClick={() => setShowVendorModal(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] shadow-md transition-all active:scale-95"><Search size={16} /></button>
-                                        </>
+                                        <div className="relative">
+                                            <input
+                                                type="text"
+                                                readOnly
+                                                value={formData.payee || formData.vendorId}
+                                                className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700 truncate"
+                                                onClick={() => setShowVendorModal(true)}
+                                                placeholder="Select vendor"
+                                            />
+                                            <button onClick={() => setShowVendorModal(true)} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
+                                                <Search size={16} />
+                                            </button>
+                                        </div>
                                     ) : (
-                                        <input type="text" value={formData.payee} onChange={(e) => setFormData({ ...formData, payee: e.target.value })} placeholder="" className="flex-1 h-full border border-slate-200 px-3 text-[12px] font-bold text-gray-700 bg-white rounded outline-none shadow-sm focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 transition-all" />
+                                        <input value={formData.payee} onChange={(e) => setFormData({ ...formData, payee: e.target.value })} type="text" className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700" placeholder="Enter payee name" />
                                     )}
                                 </div>
-                            </div>
-                            <div className="col-span-4 flex items-center gap-2">
-                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0 text-center">A/C Balance</label>
-                                <div className="flex-1 h-8 bg-blue-50/50 border border-blue-100 rounded flex items-center justify-end px-4">
-                                    <span className="text-[14px] font-mono font-black text-[#0285fd]">{balance.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div className="">
+                                        <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Vouch No</label>
+                                        <input value={formData.vouchNo} onChange={(e) => setFormData({ ...formData, vouchNo: e.target.value })} type="text" className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700" />
+                                    </div>
+                                    <div className="">
+                                        <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Bill Amount</label>
+                                        <input type="number" value={formData.billAmount} onChange={(e) => setFormData({ ...formData, billAmount: e.target.value })} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 text-right" />
+                                    </div>
                                 </div>
-                            </div>
-
-                            {/* Row 4: Memo (8) | Bill Amount (4) */}
-                            <div className="col-span-8 flex items-center gap-2">
-                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Memo/Rem.</label>
-                                <input type="text" value={formData.memo} onChange={(e) => setFormData({ ...formData, memo: e.target.value })} className="flex-1 h-8 border border-slate-200 rounded px-3 text-[12px] font-bold text-gray-700 outline-none bg-white shadow-sm focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 transition-all" placeholder="" />
-                            </div>
-                            <div className="col-span-4 flex items-center gap-2">
-                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0 text-center">Bill Amount</label>
-                                <input type="number" value={formData.billAmount} onChange={(e) => setFormData({ ...formData, billAmount: e.target.value })} className="flex-1 h-8 border border-slate-200 px-4 text-[14px] font-mono font-black text-right text-gray-800 outline-none bg-white rounded shadow-sm transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" />
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div className="">
+                                        <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Voucher Amount</label>
+                                        <div className="w-full h-10 border border-blue-200 bg-blue-50/50 px-3 text-[14px] font-bold text-blue-700 text-right flex items-center justify-end rounded-[3px]">
+                                            {totalAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                        </div>
+                                    </div>
+                                    <div className="">
+                                        <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Difference</label>
+                                        <div className={`w-full h-10 border rounded-[3px] px-3 text-[14px] font-bold text-right flex items-center justify-end ${difference === 0 ? 'border-green-200 bg-blue-50/50 text-blue-700' : 'border-red-200 bg-red-50/50 text-red-600'}`}>
+                                            {difference.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    {/* 2. Tabs & Items Table Section */}
-                    <div className="space-y-2">
-                        <div className="flex gap-1">
-                            {['Expenses', 'Items Purchase'].map(tab => (
-                                <button
-                                    key={tab}
-                                    onClick={() => setSelectedTab(tab)}
-                                    className={`px-12 py-3 text-[11px] font-black border-t border-x rounded-t-[5px] transition-all uppercase tracking-widest ${selectedTab === tab ? 'bg-white border-slate-200 text-blue-600 shadow-sm z-10 -mb-[1px]' : 'bg-slate-50 border-transparent text-gray-400 hover:bg-white hover:text-blue-500 border-b border-b-slate-200'}`}
+                    {/* Tabs: Expenses / Items Purchase */}
+                    <div className="mt-4">
+                        <div className="flex items-center gap-3 mb-2 px-2 border-b border-gray-200 pb-2">
+                            <div className="flex gap-4">
+                                <button 
+                                    onClick={() => setSelectedTab('Expenses')}
+                                    className={`text-[13px] font-black uppercase tracking-widest pb-1 border-b-2 transition-all ${selectedTab === 'Expenses' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-400 hover:text-gray-600'}`}
                                 >
-                                    {tab}
+                                    Expenses
                                 </button>
-                            ))}
+                                <button 
+                                    onClick={() => setSelectedTab('Items Purchase')}
+                                    className={`text-[13px] font-black uppercase tracking-widest pb-1 border-b-2 transition-all ${selectedTab === 'Items Purchase' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-400 hover:text-gray-600'}`}
+                                >
+                                    Items Purchase
+                                </button>
+                            </div>
+                            <div className="flex-1 text-right">
+                                <span className="text-[11px] font-bold text-gray-400">
+                                    {selectedTab === 'Expenses' ? 'Expense' : 'Item'} Lines: <span className="text-blue-600">{selectedTab === 'Expenses' ? expenseRows.length : itemRows.length}</span>
+                                </span>
+                            </div>
                         </div>
 
-                        <div className="border border-slate-200 rounded-[5px] shadow-sm bg-white overflow-hidden">
-                            {selectedTab === 'Expenses' ? (
-                                <table className="w-full text-left border-collapse">
-                                    <thead className="bg-slate-50 border-b border-slate-200 text-gray-400 text-[10px] font-black uppercase tracking-widest sticky top-0">
+                        {selectedTab === 'Expenses' ? (
+                            <div className="border border-gray-200 rounded-[3px] bg-white shadow-xl overflow-hidden flex flex-col min-h-[200px]">
+                                <table className="w-full text-sm text-left border-collapse">
+                                    <thead className="bg-slate-50 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-200 leading-10">
                                         <tr>
-                                            <th className="px-4 py-3 w-12 text-center">#</th>
-                                            <th className="px-4 py-3">Expense Portfolio</th>
-                                            <th className="px-4 py-3 w-48">Cost Allocation</th>
-                                            <th className="px-4 py-3 w-32 text-right">Valuation</th>
-                                            <th className="px-4 py-3">Journal Memo</th>
-                                        </tr>
+                                            <th className="px-4 w-[5%]">#</th>
+                                            <th className="px-4 w-[30%]">Expense Account</th>
+                                            <th className="px-4 w-[20%]">Cost Center</th>
+                                            <th className="px-4 w-[15%] text-right">Amount</th>
+                                            <th className="px-4 w-[25%]">Memo</th>
+                                        <th className="text-right px-5 py-3">Action</th></tr>
                                     </thead>
-                                    <tbody className="divide-y divide-slate-100 min-h-[180px]">
+                                    <tbody>
                                         {expenseRows.map((row, idx) => (
-                                            <tr key={row.id} className="group hover:bg-slate-50/50 transition-colors">
-                                                <td className="px-4 py-3 text-center font-mono text-[11px] font-bold text-gray-300 group-hover:text-slate-400">{idx + 1}</td>
-                                                <td className="px-2 py-1">
-                                                    <div className="flex gap-1 items-center h-8">
-                                                        <input type="text" readOnly value={safeExp.find(e => e.code === row.accCode)?.name || ''} className="flex-1 h-full min-w-0 font-mono border border-transparent px-3 text-[11px] font-bold outline-none bg-transparent rounded text-slate-700 truncate cursor-pointer transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 group-hover:border-slate-200 group-hover:bg-white" placeholder="Select Account..." onClick={() => { setExpIndex(idx); setShowExpAccModal(true); }} />
-                                                        <button onClick={() => { setExpIndex(idx); setShowExpAccModal(true); }} className="w-8 h-8 bg-white border border-slate-200 text-gray-400 flex items-center justify-center hover:text-[#00D1FF] hover:border-[#00D1FF] rounded transition-all active:scale-90 opacity-0 group-hover:opacity-100 shrink-0"><Search size={14} /></button>
+                                            <tr key={row.id} className="border-b border-gray-50 text-[12px] font-bold text-gray-700 hover:bg-slate-50/50 transition-colors">
+                                                <td className="px-4 py-2.5 font-mono text-gray-300">{idx + 1}</td>
+                                                <td className="px-2 py-2.5">
+                                                    <div className="flex gap-1 items-center">
+                                                        <input
+                                                            type="text"
+                                                            readOnly
+                                                            value={safeExp.find(e => e.code === row.accCode)?.name || ''}
+                                                            className="flex-1 h-8 border border-gray-300 rounded-[3px] px-2 text-[12px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate"
+                                                            onClick={() => { setExpIndex(idx); setShowExpAccModal(true); }}
+                                                            placeholder="Select account"
+                                                        />
+                                                        <button onClick={() => { setExpIndex(idx); setShowExpAccModal(true); }} className="h-8 w-7 flex items-center justify-center text-gray-400 hover:text-gray-700 bg-transparent border-none cursor-pointer shrink-0">
+                                                            <Search size={14} />
+                                                        </button>
                                                     </div>
                                                 </td>
-                                                <td className="px-2 py-1">
-                                                    <div className="flex gap-1 items-center h-8">
-                                                        <input type="text" readOnly value={safeCC.find(cc => cc.code === row.costCode)?.name || ''} className="flex-1 h-full min-w-0 font-mono border border-transparent px-3 text-[11px] font-bold outline-none bg-transparent rounded text-gray-600 truncate cursor-pointer transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 group-hover:border-slate-200 group-hover:bg-white" placeholder="Alloc..." onClick={() => { setCcSource('line'); setCcIndex(idx); setShowCCModal(true); }} />
-                                                        <button onClick={() => { setCcSource('line'); setCcIndex(idx); setShowCCModal(true); }} className="w-8 h-8 bg-white border border-slate-200 text-gray-400 flex items-center justify-center hover:text-[#00D1FF] hover:border-[#00D1FF] rounded transition-all active:scale-90 opacity-0 group-hover:opacity-100 shrink-0"><Search size={14} /></button>
+                                                <td className="px-2 py-2.5">
+                                                    <div className="flex gap-1 items-center">
+                                                        <input
+                                                            type="text"
+                                                            readOnly
+                                                            value={safeCC.find(cc => cc.code === row.costCode)?.name || ''}
+                                                            className="flex-1 h-8 border border-gray-300 rounded-[3px] px-2 text-[12px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate"
+                                                            onClick={() => { setCcSource('line'); setCcIndex(idx); setShowCCModal(true); }}
+                                                            placeholder="Cost center"
+                                                        />
+                                                        <button onClick={() => { setCcSource('line'); setCcIndex(idx); setShowCCModal(true); }} className="h-8 w-7 flex items-center justify-center text-gray-400 hover:text-gray-700 bg-transparent border-none cursor-pointer shrink-0">
+                                                            <Search size={14} />
+                                                        </button>
                                                     </div>
                                                 </td>
-                                                <td className="px-2 py-1">
-                                                    <input type="number" value={row.amount} onChange={(e) => handleExpenseRowUpdate(row.id, 'amount', e.target.value)} className="w-full h-8 px-3 text-[12px] font-mono font-black text-right outline-none text-gray-800 bg-transparent border border-transparent transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 group-hover:border-slate-200 group-hover:bg-white rounded" />
+                                                <td className="px-2 py-2.5">
+                                                    <input type="number" value={row.amount} onChange={(e) => handleExpenseRowUpdate(row.id, 'amount', e.target.value)} className="w-full h-8 border border-gray-300 rounded-[3px] px-2 text-right text-[12px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 font-mono" />
                                                 </td>
-                                                <td className="px-2 py-1">
-                                                    <input type="text" value={row.memo} onChange={(e) => handleExpenseRowUpdate(row.id, 'memo', e.target.value)} className="w-full h-8 px-3 text-[11px] font-bold outline-none text-gray-500 bg-transparent border border-transparent transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 group-hover:border-slate-200 group-hover:bg-white rounded" placeholder="Optional description..." />
+                                                <td className="px-2 py-2.5">
+                                                    <input type="text" value={row.memo} onChange={(e) => handleExpenseRowUpdate(row.id, 'memo', e.target.value)} className="w-full h-8 border border-gray-300 rounded-[3px] px-2 text-[12px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700" placeholder="Memo" />
                                                 </td>
                                             </tr>
                                         ))}
-                                        <tr className="bg-slate-50/30">
-                                            <td colSpan={5} className="p-0 border-t border-slate-100">
-                                                <button onClick={addExpenseRow} className="w-full py-3 text-blue-600 font-black text-[10px] tracking-[0.2em] hover:bg-slate-50 transition-all flex items-center justify-center gap-2 group border-none bg-transparent">
-                                                    <Plus size={14} /> ATTACH EXPENSE LINE
-                                                </button>
-                                            </td>
-                                        </tr>
+                                        {expenseRows.length === 0 && (
+                                            <tr>
+                                                <td colSpan="5" className="py-12 text-center text-gray-300 font-black italic text-[11px] uppercase tracking-widest">No expense items added.</td>
+                                            </tr>
+                                        )}
                                     </tbody>
                                 </table>
-                            ) : (
-                                <table className="w-full text-left border-collapse">
-                                    <thead className="bg-slate-50 border-b border-slate-200 text-gray-400 text-[10px] font-black uppercase tracking-widest sticky top-0">
+                                <div className="mt-auto border-t border-slate-200 bg-slate-50 p-2">
+                                    <button onClick={addExpenseRow} className="w-full py-2.5 text-[#0285fd] font-bold text-[10px] uppercase tracking-widest hover:bg-blue-50 transition-all flex items-center justify-center gap-2 border border-dashed border-[#0285fd]/30 rounded-[3px] bg-transparent">
+                                        <Plus size={12} /> ADD EXPENSE LINE
+                                    </button>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="border border-gray-200 rounded-[3px] bg-white shadow-xl overflow-hidden flex flex-col min-h-[200px]">
+                                <table className="w-full text-sm text-left border-collapse">
+                                    <thead className="bg-slate-50 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-200 leading-10">
                                         <tr>
-                                            <th className="px-4 py-3 w-12 text-center">#</th>
-                                            <th className="px-4 py-3">Inventory Product</th>
-                                            <th className="px-4 py-3 w-24 text-center">Qty</th>
-                                            <th className="px-4 py-3 w-32 text-right">Unit Cost</th>
-                                            <th className="px-4 py-3 w-32 text-right">Extension</th>
-                                            <th className="px-4 py-3">Distribution Memo</th>
-                                        </tr>
+                                            <th className="px-4 w-[5%]">#</th>
+                                            <th className="px-4 w-[30%]">Item</th>
+                                            <th className="px-4 w-[10%] text-center">Qty</th>
+                                            <th className="px-4 w-[13%] text-right">Unit Cost</th>
+                                            <th className="px-4 w-[13%] text-right">Total</th>
+                                            <th className="px-4 w-[24%]">Memo</th>
+                                        <th className="text-right px-5 py-3">Action</th></tr>
                                     </thead>
-                                    <tbody className="divide-y divide-slate-100 min-h-[180px]">
+                                    <tbody>
                                         {itemRows.map((row, idx) => (
-                                            <tr key={row.id} className="group hover:bg-slate-50/50 transition-colors">
-                                                <td className="px-4 py-3 text-center font-mono text-[11px] font-bold text-gray-300 group-hover:text-slate-400">{idx + 1}</td>
-                                                <td className="px-2 py-1">
-                                                    <div className="flex gap-1 items-center h-8">
-                                                        <input type="text" readOnly value={lookups.products?.find(p => p.code === row.prodCode)?.name || ''} className="flex-1 h-full min-w-0 font-mono border border-transparent px-3 text-[11px] font-bold outline-none bg-transparent rounded text-slate-700 truncate cursor-pointer transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 group-hover:border-slate-200 group-hover:bg-white" placeholder="Search Product..." onClick={() => { setProdIndex(idx); setShowProdModal(true); }} />
-                                                        <button onClick={() => { setProdIndex(idx); setShowProdModal(true); }} className="w-8 h-8 bg-white border border-slate-200 text-gray-400 flex items-center justify-center hover:text-[#00D1FF] hover:border-[#00D1FF] rounded transition-all active:scale-90 opacity-0 group-hover:opacity-100 shrink-0"><Search size={14} /></button>
+                                            <tr key={row.id} className="border-b border-gray-50 text-[12px] font-bold text-gray-700 hover:bg-slate-50/50 transition-colors">
+                                                <td className="px-4 py-2.5 font-mono text-gray-300">{idx + 1}</td>
+                                                <td className="px-2 py-2.5">
+                                                    <div className="flex gap-1 items-center">
+                                                        <input
+                                                            type="text"
+                                                            readOnly
+                                                            value={lookups.products?.find(p => p.code === row.prodCode)?.name || ''}
+                                                            className="flex-1 h-8 border border-gray-300 rounded-[3px] px-2 text-[12px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate"
+                                                            onClick={() => { setProdIndex(idx); setShowProdModal(true); }}
+                                                            placeholder="Select product"
+                                                        />
+                                                        <button onClick={() => { setProdIndex(idx); setShowProdModal(true); }} className="h-8 w-7 flex items-center justify-center text-gray-400 hover:text-gray-700 bg-transparent border-none cursor-pointer shrink-0">
+                                                            <Search size={14} />
+                                                        </button>
                                                     </div>
                                                 </td>
-                                                <td className="px-2 py-1">
-                                                    <input type="number" value={row.qty} onChange={(e) => handleItemRowUpdate(row.id, 'qty', e.target.value)} className="w-full h-8 px-3 text-[11px] font-mono font-bold text-center outline-none text-slate-700 bg-transparent border border-transparent transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 group-hover:border-slate-200 group-hover:bg-white rounded" />
+                                                <td className="px-2 py-2.5">
+                                                    <input type="number" value={row.qty} onChange={(e) => handleItemRowUpdate(row.id, 'qty', e.target.value)} className="w-full h-8 border border-gray-300 rounded-[3px] px-2 text-center text-[12px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 font-mono" />
                                                 </td>
-                                                <td className="px-2 py-1">
-                                                    <input type="number" value={row.cost} onChange={(e) => handleItemRowUpdate(row.id, 'cost', e.target.value)} className="w-full h-8 px-3 text-[11px] font-mono font-bold text-right outline-none text-slate-700 bg-transparent border border-transparent transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 group-hover:border-slate-200 group-hover:bg-white rounded" />
+                                                <td className="px-2 py-2.5">
+                                                    <input type="number" value={row.cost} onChange={(e) => handleItemRowUpdate(row.id, 'cost', e.target.value)} className="w-full h-8 border border-gray-300 rounded-[3px] px-2 text-right text-[12px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 font-mono" />
                                                 </td>
-                                                <td className="px-4 py-3 text-right text-[12px] font-mono font-black text-gray-800">
+                                                <td className="px-4 py-2.5 text-right font-mono font-black text-gray-700 bg-gray-50/30">
                                                     {(Number(row.qty) * Number(row.cost)).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                                 </td>
-                                                <td className="px-2 py-1">
-                                                    <input type="text" value={row.memo} onChange={(e) => handleItemRowUpdate(row.id, 'memo', e.target.value)} className="w-full h-8 px-3 text-[11px] font-bold outline-none text-gray-500 bg-transparent border border-transparent transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 group-hover:border-slate-200 group-hover:bg-white rounded" placeholder="Notes..." />
+                                                <td className="px-2 py-2.5">
+                                                    <input type="text" value={row.memo} onChange={(e) => handleItemRowUpdate(row.id, 'memo', e.target.value)} className="w-full h-8 border border-gray-300 rounded-[3px] px-2 text-[12px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700" placeholder="Notes" />
                                                 </td>
                                             </tr>
                                         ))}
-                                        <tr className="bg-slate-50/30">
-                                            <td colSpan={6} className="p-0 border-t border-slate-100">
-                                                <button onClick={addItemRow} className="w-full py-3 text-blue-600 font-black text-[10px] tracking-[0.2em] hover:bg-slate-50 transition-all flex items-center justify-center gap-2 group border-none bg-transparent">
-                                                    <Plus size={14} /> ATTACH PRODUCT LINE
-                                                </button>
-                                            </td>
-                                        </tr>
+                                        {itemRows.length === 0 && (
+                                            <tr>
+                                                <td colSpan="6" className="py-12 text-center text-gray-300 font-black italic text-[11px] uppercase tracking-widest">No items added.</td>
+                                            </tr>
+                                        )}
                                     </tbody>
                                 </table>
-                            )}
-                        </div>
+                                <div className="mt-auto border-t border-slate-200 bg-slate-50 p-2">
+                                    <button onClick={addItemRow} className="w-full py-2.5 text-[#0285fd] font-bold text-[10px] uppercase tracking-widest hover:bg-blue-50 transition-all flex items-center justify-center gap-2 border border-dashed border-[#0285fd]/30 rounded-[3px] bg-transparent">
+                                        <Plus size={12} /> ADD ITEM LINE
+                                    </button>
+                                </div>
+                            </div>
+                        )}
                     </div>
 
-                    {/* 3. Global Validation Summary Footer */}
-                    <div className="flex justify-between items-center bg-white p-3 border border-slate-200 rounded-[5px] shadow-sm">
-                        <div className="flex items-center gap-8">
-                            <label className="flex items-center gap-3 cursor-pointer group">
-                                <div className="relative flex items-center justify-center">
-                                    <input type="checkbox" className="w-4 h-4 rounded border-slate-300 text-[#00D1FF] focus:ring-[#00D1FF] transition-all" />
-                                </div>
-                                <span className="text-[11px] font-bold text-gray-500 uppercase tracking-tighter group-hover:text-[#00D1FF] transition-colors">Queue for Printing</span>
+                    {/* Validation Summary */}
+                    <div className="mt-4 bg-white p-3 border border-slate-200 rounded-[3px] flex justify-between items-center">
+                        <div className="flex items-center gap-4">
+                            <label className="flex items-center gap-2 cursor-pointer">
+                                <input type="checkbox" className="w-4 h-4 rounded border-slate-300 text-[#0285fd] focus:ring-[#0285fd] transition-all" />
+                                <span className="text-[11px] font-bold text-gray-500 uppercase tracking-tighter">Queue for Printing</span>
                             </label>
                         </div>
-                        <div className="flex items-center gap-6">
-                            <div className="flex items-center gap-3">
-                                 <div className="flex flex-col items-end">
-                                    <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1">Balance Diff.</span>
-                                     <div className={`text-[14px] font-mono leading-none font-black tracking-tighter ${difference === 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
-                                        {difference.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                                     </div>
-                                 </div>
+                        <div className="flex items-center gap-4">
+                            <div className="flex flex-col items-end">
+                                <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1">Balance Diff.</span>
+                                <span className={`text-[14px] font-mono font-black tracking-tighter ${difference === 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
+                                    {difference.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                </span>
                             </div>
-                            <div className="h-8 w-[1px] bg-slate-200" />
-                            <div className="flex items-center gap-3">
-                                 <div className="flex flex-col items-end">
-                                    <span className="text-[9px] font-black text-[#00D1FF] uppercase tracking-widest leading-none mb-1">Total Allocated</span>
-                                     <div className="text-[18px] font-mono leading-none font-black text-[#00D1FF] tracking-tighter flex items-baseline gap-1">
-                                        <span className="text-[11px] opacity-60">LKR</span>
-                                        {totalAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                                     </div>
-                                 </div>
+                            <div className="h-8 w-px bg-slate-200" />
+                            <div className="flex flex-col items-end">
+                                <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1">Total Allocated</span>
+                                <span className="text-[18px] font-mono font-black text-slate-800 tracking-tighter">
+                                    {totalAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                </span>
                             </div>
                         </div>
                     </div>
                 </div>
-            </SimpleModal>
+            </TransactionFormWrapper>
 
             {/* --- MODALS --- */}
 
             {/* Petty Account Search Modal */}
-            <SimpleModal
-                isOpen={showAccModal}
-                onClose={() => setShowAccModal(false)}
-                title="Petty Cash Account Directory"
-                maxWidth="max-w-[650px]"
-            >
-                <div className="space-y-4 font-['Tahoma']">
-                    <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-lg border border-gray-100 mb-2">
-                        <span className="text-[12px] font-bold text-gray-500 uppercase tracking-widest">Global Search Facility</span>
-                        <div className="relative flex-1">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
-                            <input
-                                type="text"
-                                className="w-full h-9 pl-10 pr-4 border border-gray-300 rounded-[5px] outline-none text-sm focus:border-[#0285fd] bg-white shadow-sm"
-                                value={accSearch}
-                                onChange={(e) => setAccSearch(e.target.value)}
-                                autoFocus
-                            />
-                        </div>
+            <SimpleModal isOpen={showAccModal} onClose={() => setShowAccModal(false)} title={`Petty Cash Accounts - ${safePetty.length} Found`}>
+                <div className="flex flex-col h-full font-['Tahoma']">
+                    <div className="flex items-center gap-4 bg-slate-50 p-4 border-b border-gray-100 mb-2">
+                        <span className="text-[12px] font-bold text-gray-500 uppercase tracking-wider">Search Facility</span>
+                        <input type="text" className="w-full h-10 px-4 border border-gray-300 rounded-[3px] outline-none text-sm focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white shadow-sm flex-1" value={accSearch} onChange={(e) => setAccSearch(e.target.value)} />
                     </div>
-
-                    <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm">
-                        <div className="max-h-[300px] overflow-y-auto no-scrollbar">
-                            <table className="w-full text-left">
-                                <thead className="bg-[#f8fafd] sticky top-0 text-[11px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-100">
-                                    <tr>
-                                        <th className="px-5 py-3">Account Code</th>
-                                        <th className="px-5 py-3">Account Title</th>
-                                        <th className="px-5 py-3 text-right">Action</th>
+                    <div className="max-h-[50vh] overflow-y-auto no-scrollbar border border-gray-100 rounded-[5px] shadow-sm">
+                        <table className="w-full text-sm text-left">
+                            <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 z-10 shadow-sm">
+                                <tr>
+                                    <th className="border-b px-5 py-3">Code</th>
+                                    <th className="border-b px-5 py-3">Account Name</th>
+                                    <th className="border-b text-center w-24 px-5 py-3">Select</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-100">
+                                {safePetty.filter(a => a.name?.toLowerCase().includes(accSearch.toLowerCase()) || a.code?.toLowerCase().includes(accSearch.toLowerCase())).map((a, i) => (
+                                    <tr key={i} className="group hover:bg-blue-50/50  transition-all border-b border-gray-50 cursor-pointer group border-b border-gray-50">
+                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{a.code}</td>
+                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{a.name}</td>
+                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">
+                                            <button onClick={() => { setFormData({ ...formData, account: a.code }); setShowAccModal(false); }} className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button>
+                                        </td>
                                     </tr>
-                                </thead>
-                                <tbody className="divide-y divide-gray-50">
-                                    {safePetty.filter(a => a.name?.toLowerCase().includes(accSearch.toLowerCase()) || a.code?.toLowerCase().includes(accSearch.toLowerCase())).map((a, i) => (
-                                        <tr key={i} className="group hover:bg-blue-50/50 cursor-pointer transition-colors" onClick={() => { setFormData({ ...formData, account: a.code }); setShowAccModal(false); }}>
-                                            <td className="px-5 py-3 font-mono text-[11px] font-bold text-[#0285fd]">{a.code}</td>
-                                            <td className="px-5 py-3 text-[11px] font-bold text-gray-600 uppercase  transition-colors group-hover:text-blue-600">{a.name}</td>
-                                            <td className="px-5 py-3 text-right">
-                                                <button className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95">SELECT </button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
+                                ))}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </SimpleModal>
-
-            {/* PettyCash Receipt Modal */}
-            {showReceiptModal && (
-                <PettyCashDetailModal 
-                    docNo={printedDocNo} 
-                    onClose={() => setShowReceiptModal(false)} 
-                />
-            )}
 
             {/* Vendor Search Modal */}
-            <SimpleModal
-                isOpen={showVendorModal}
-                onClose={() => setShowVendorModal(false)}
-                title="Active Vendor Directory"
-                maxWidth="max-w-[650px]"
-            >
-                <div className="space-y-4 font-['Tahoma']">
-                    <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-lg border border-gray-100 mb-2">
-                        <span className="text-[12px] font-bold text-gray-500 uppercase tracking-widest">Vendor Search Facility</span>
-                        <div className="relative flex-1">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
-                            <input
-                                type="text"
-                                className="w-full h-9 pl-10 pr-4 border border-gray-300 rounded-[5px] outline-none text-sm focus:border-[#0285fd] bg-white shadow-sm"
-                                value={vendorSearch}
-                                onChange={(e) => setVendorSearch(e.target.value)}
-                                autoFocus
-                            />
-                        </div>
+            <SimpleModal isOpen={showVendorModal} onClose={() => setShowVendorModal(false)} title={`Vendors - ${safeSuppliers.length} Found`}>
+                <div className="flex flex-col h-full font-['Tahoma']">
+                    <div className="flex items-center gap-4 bg-slate-50 p-4 border-b border-gray-100 mb-2">
+                        <span className="text-[12px] font-bold text-gray-500 uppercase tracking-wider">Search Facility</span>
+                        <input type="text" className="w-full h-10 px-4 border border-gray-300 rounded-[3px] outline-none text-sm focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white shadow-sm flex-1" value={vendorSearch} onChange={(e) => setVendorSearch(e.target.value)} />
                     </div>
-
-                    <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm">
-                        <div className="max-h-[300px] overflow-y-auto no-scrollbar">
-                            <table className="w-full text-left">
-                                <thead className="bg-[#f8fafd] sticky top-0 text-[11px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-100">
-                                    <tr>
-                                        <th className="px-5 py-3">Vendor ID</th>
-                                        <th className="px-5 py-3">Legal Name</th>
-                                        <th className="px-5 py-3 text-right">Action</th>
+                    <div className="max-h-[50vh] overflow-y-auto no-scrollbar border border-gray-100 rounded-[5px] shadow-sm">
+                        <table className="w-full text-sm text-left">
+                            <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 z-10 shadow-sm">
+                                <tr>
+                                    <th className="border-b px-5 py-3">Code</th>
+                                    <th className="border-b px-5 py-3">Vendor Name</th>
+                                    <th className="border-b text-center w-24 px-5 py-3">Select</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-100">
+                                {safeSuppliers.filter(v => v.name?.toLowerCase().includes(vendorSearch.toLowerCase()) || v.code?.toLowerCase().includes(vendorSearch.toLowerCase())).map((v, i) => (
+                                    <tr key={i} className="group hover:bg-blue-50/50  transition-all border-b border-gray-50 cursor-pointer group border-b border-gray-50">
+                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{v.code}</td>
+                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{v.name}</td>
+                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">
+                                            <button onClick={() => { setFormData({ ...formData, vendorId: v.code, payee: v.name }); setShowVendorModal(false); }} className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button>
+                                        </td>
                                     </tr>
-                                </thead>
-                                <tbody className="divide-y divide-gray-50">
-                                    {safeSuppliers.filter(v => v.name?.toLowerCase().includes(vendorSearch.toLowerCase()) || v.code?.toLowerCase().includes(vendorSearch.toLowerCase())).map((v, i) => (
-                                        <tr key={i} className="group hover:bg-blue-50/50 cursor-pointer transition-colors" onClick={() => { setFormData({ ...formData, vendorId: v.code, payee: v.name }); setShowVendorModal(false); }}>
-                                            <td className="px-5 py-3 font-mono text-[13px] font-bold text-[#0285fd]">{v.code}</td>
-                                            <td className="px-5 py-3 text-[12px] font-bold text-gray-600 uppercase  group-hover:text-blue-600 transition-colors">{v.name}</td>
-                                            <td className="px-5 py-3 text-right">
-                                                <button className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95">SELECT VENDOR</button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </SimpleModal>
-
-            {/* Document Search Modal */}
-            <SimpleModal
-                isOpen={showDocSearchModal}
-                onClose={() => setShowDocSearchModal(false)}
-                title="Petty Cash Document History"
-                maxWidth="max-w-[800px]"
-            >
-                <div className="space-y-4 font-['Tahoma']">
-                    <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-lg border border-gray-100 mb-2">
-                        <span className="text-[12px] font-bold text-gray-500 uppercase tracking-widest">Global Archive Search</span>
-                        <div className="relative flex-1">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
-                            <input
-                                type="text"
-                                className="w-full h-9 pl-10 pr-4 border border-gray-300 rounded-[5px] outline-none text-sm focus:border-[#0285fd] bg-white shadow-sm"
-                                value={docSearch}
-                                onChange={(e) => setDocSearch(e.target.value)}
-                                placeholder="Search by Doc No, Payee or Memo..."
-                                autoFocus
-                            />
-                        </div>
-                    </div>
-
-                    <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm">
-                        <div className="max-h-[400px] overflow-y-auto no-scrollbar">
-                            <table className="w-full text-left">
-                                <thead className="bg-[#f8fafd] sticky top-0 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">
-                                    <tr>
-                                        <th className="px-5 py-3">Doc No</th>
-                                        <th className="px-5 py-3">Date</th>
-                                        <th className="px-5 py-3">Payee / Vendor</th>
-                                        <th className="px-5 py-3 text-right">Amount</th>
-                                        <th className="px-5 py-3 text-right">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-gray-50">
-                                    {pastDocs.filter(d => d.docNo?.toLowerCase().includes(docSearch.toLowerCase()) || d.payee?.toLowerCase().includes(docSearch.toLowerCase())).map((d, i) => (
-                                        <tr key={i} className="group hover:bg-blue-50/50 cursor-pointer transition-colors" onClick={() => handleLoadDoc(d.docNo)}>
-                                            <td className="px-5 py-3 font-mono text-[13px] font-black text-[#0285fd]">{d.docNo}</td>
-                                            <td className="px-5 py-3 text-[12px] font-bold text-slate-500">{formatDate(d.date)}</td>
-                                            <td className="px-5 py-3 text-[12px] font-bold text-gray-600 uppercase  transition-colors group-hover:text-blue-600">{d.payee || d.vendorId}</td>
-                                            <td className="px-5 py-3 text-right font-mono text-[13px] font-black text-slate-700">{d.billAmount?.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                                            <td className="px-5 py-3 text-right">
-                                                <button className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95">RETRIEVE</button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
+                                ))}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </SimpleModal>
 
             {/* Cost Center Search Modal */}
-            <SimpleModal
-                isOpen={showCCModal}
-                onClose={() => setShowCCModal(false)}
-                title="Operational Cost Centers"
-                maxWidth="max-w-[650px]"
-            >
-                <div className="space-y-4 font-['Tahoma']">
-                    <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-lg border border-gray-100 mb-2">
-                        <span className="text-[12px] font-bold text-gray-500 uppercase tracking-widest">Search Facility</span>
-                        <div className="relative flex-1">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
-                            <input
-                                type="text"
-                                className="w-full h-9 pl-10 pr-4 border border-gray-300 rounded-[5px] outline-none text-sm focus:border-[#0285fd] bg-white shadow-sm"
-                                value={ccSearch}
-                                onChange={(e) => setCcSearch(e.target.value)}
-                                autoFocus
-                            />
-                        </div>
+            <SimpleModal isOpen={showCCModal} onClose={() => setShowCCModal(false)} title={`Cost Centers - ${safeCC.length} Found`}>
+                <div className="flex flex-col h-full font-['Tahoma']">
+                    <div className="flex items-center gap-4 bg-slate-50 p-4 border-b border-gray-100 mb-2">
+                        <span className="text-[12px] font-bold text-gray-500 uppercase tracking-wider">Search Facility</span>
+                        <input type="text" className="w-full h-10 px-4 border border-gray-300 rounded-[3px] outline-none text-sm focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white shadow-sm flex-1" value={ccSearch} onChange={(e) => setCcSearch(e.target.value)} />
                     </div>
-
-                    <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm">
-                        <div className="max-h-[300px] overflow-y-auto no-scrollbar">
-                            <table className="w-full text-left">
-                                <thead className="bg-[#f8fafd] sticky top-0 text-[11px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-100">
-                                    <tr>
-                                        <th className="px-5 py-3">Code</th>
-                                        <th className="px-5 py-3">Center Name</th>
-                                        <th className="px-5 py-3 text-right">Action</th>
+                    <div className="max-h-[50vh] overflow-y-auto no-scrollbar border border-gray-100 rounded-[5px] shadow-sm">
+                        <table className="w-full text-sm text-left">
+                            <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 z-10 shadow-sm">
+                                <tr>
+                                    <th className="border-b px-5 py-3">Code</th>
+                                    <th className="border-b px-5 py-3">Cost Center</th>
+                                    <th className="border-b text-center w-24 px-5 py-3">Select</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-100">
+                                {safeCC.filter(c => c.name?.toLowerCase().includes(ccSearch.toLowerCase()) || c.code?.toLowerCase().includes(ccSearch.toLowerCase())).map((c, i) => (
+                                    <tr key={i} className="group hover:bg-blue-50/50  transition-all border-b border-gray-50 cursor-pointer group border-b border-gray-50">
+                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{c.code}</td>
+                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{c.name}</td>
+                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">
+                                            <button onClick={() => {
+                                                if (ccSource === 'header') {
+                                                    setFormData({ ...formData, costCenter: c.code });
+                                                } else if (ccIndex !== null) {
+                                                    const newRows = [...expenseRows];
+                                                    newRows[ccIndex].costCode = c.code;
+                                                    setExpenseRows(newRows);
+                                                }
+                                                setShowCCModal(false);
+                                            }} className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button>
+                                        </td>
                                     </tr>
-                                </thead>
-                                <tbody className="divide-y divide-gray-50">
-                                    {safeCC.filter(c => c.name?.toLowerCase().includes(ccSearch.toLowerCase()) || c.code?.toLowerCase().includes(ccSearch.toLowerCase())).map((c, i) => (
-                                        <tr key={i} className="group hover:bg-blue-50/50 cursor-pointer transition-colors" onClick={() => {
-                                            if (ccSource === 'header') {
-                                                setFormData({ ...formData, costCenter: c.code });
-                                            } else if (ccIndex !== null) {
-                                                const newRows = [...expenseRows];
-                                                newRows[ccIndex].costCode = c.code;
-                                                setExpenseRows(newRows);
-                                            }
-                                            setShowCCModal(false);
-                                        }}>
-                                            <td className="px-5 py-3 font-mono text-[13px] font-bold text-[#0285fd]">{c.code}</td>
-                                            <td className="px-5 py-3 text-[12px] font-bold text-gray-700 uppercase  group-hover:text-blue-600 transition-colors">{c.name}</td>
-                                            <td className="px-5 py-3 text-right">
-                                                <button className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95">SELECT CENTER</button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </SimpleModal>
-
-            {/* Product Search Modal */}
-            <SimpleModal
-                isOpen={showProdModal}
-                onClose={() => setShowProdModal(false)}
-                title="Inventory Product Directory"
-                maxWidth="max-w-[700px]"
-            >
-                <div className="space-y-4 font-['Tahoma']">
-                    <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-lg border border-gray-100 mb-2">
-                        <span className="text-[12px] font-bold text-gray-500 uppercase tracking-widest">Master Search</span>
-                        <div className="relative flex-1">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
-                            <input
-                                type="text"
-                                className="w-full h-9 pl-10 pr-4 border border-gray-300 rounded-[5px] outline-none text-sm focus:border-[#0285fd] bg-white shadow-sm"
-                                value={prodSearch}
-                                onChange={(e) => setProdSearch(e.target.value)}
-                                autoFocus
-                            />
-                        </div>
-                    </div>
-
-                    <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm">
-                        <div className="max-h-[350px] overflow-y-auto no-scrollbar">
-                            <table className="w-full text-left">
-                                <thead className="bg-[#f8fafd] sticky top-0 text-[11px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-100">
-                                    <tr>
-                                        <th className="px-5 py-3">Code</th>
-                                        <th className="px-5 py-3">Product Name</th>
-                                        <th className="px-5 py-3 text-right">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-gray-50">
-                                    {(lookups.products || []).filter(p => p.name?.toLowerCase().includes(prodSearch.toLowerCase()) || p.code?.toLowerCase().includes(prodSearch.toLowerCase())).map((p, i) => (
-                                        <tr key={i} className="group hover:bg-blue-50/50 cursor-pointer transition-colors" onClick={() => {
-                                            if (prodIndex !== null) {
-                                                const newRows = [...itemRows];
-                                                newRows[prodIndex].prodCode = p.code;
-                                                setItemRows(newRows);
-                                            }
-                                            setShowProdModal(false);
-                                        }}>
-                                            <td className="px-5 py-3 font-mono text-[13px] font-bold text-[#0285fd]">{p.code}</td>
-                                            <td className="px-5 py-3 text-[13px] font-bold text-gray-700 uppercase italic group-hover:text-blue-600 transition-colors">{p.name}</td>
-                                            <td className="px-5 py-3 text-right">
-                                                <button className="bg-blue-50/50 backdrop-blur-md border border-blue-200 text-[#0078d4] text-[10px] uppercase tracking-wider px-4 py-1.5 rounded-sm font-black hover:bg-blue-100/80 shadow-sm transition-all active:scale-95">SELECT</button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
+                                ))}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </SimpleModal>
 
             {/* Expense Account Search Modal */}
-            <SimpleModal
-                isOpen={showExpAccModal}
-                onClose={() => setShowExpAccModal(false)}
-                title="GL Expense Account Directory"
-                maxWidth="max-w-[650px]"
-            >
-                <div className="space-y-4 font-['Tahoma']">
-                    <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-lg border border-gray-100 mb-2">
-                        <span className="text-[12px] font-bold text-gray-500 uppercase tracking-widest">Search Facility</span>
-                        <div className="relative flex-1">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
-                            <input
-                                type="text"
-                                className="w-full h-9 pl-10 pr-4 border border-gray-300 rounded-[5px] outline-none text-sm focus:border-[#0285fd] bg-white shadow-sm"
-                                value={expAccSearch}
-                                onChange={(e) => setExpAccSearch(e.target.value)}
-                                autoFocus
-                            />
-                        </div>
+            <SimpleModal isOpen={showExpAccModal} onClose={() => setShowExpAccModal(false)} title={`Expense Accounts - ${safeExp.length} Found`}>
+                <div className="flex flex-col h-full font-['Tahoma']">
+                    <div className="flex items-center gap-4 bg-slate-50 p-4 border-b border-gray-100 mb-2">
+                        <span className="text-[12px] font-bold text-gray-500 uppercase tracking-wider">Search Facility</span>
+                        <input type="text" className="w-full h-10 px-4 border border-gray-300 rounded-[3px] outline-none text-sm focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white shadow-sm flex-1" value={expAccSearch} onChange={(e) => setExpAccSearch(e.target.value)} />
                     </div>
-
-                    <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm">
-                        <div className="max-h-[300px] overflow-y-auto no-scrollbar">
-                            <table className="w-full text-left">
-                                <thead className="bg-[#f8fafd] sticky top-0 text-[11px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-100">
-                                    <tr>
-                                        <th className="px-5 py-3">GL Code</th>
-                                        <th className="px-5 py-3">Interaction Title</th>
-                                        <th className="px-5 py-3 text-right">Action</th>
+                    <div className="max-h-[50vh] overflow-y-auto no-scrollbar border border-gray-100 rounded-[5px] shadow-sm">
+                        <table className="w-full text-sm text-left">
+                            <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 z-10 shadow-sm">
+                                <tr>
+                                    <th className="border-b px-5 py-3">Code</th>
+                                    <th className="border-b px-5 py-3">Account Name</th>
+                                    <th className="border-b text-center w-24 px-5 py-3">Select</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-100">
+                                {safeExp.filter(e => e.name?.toLowerCase().includes(expAccSearch.toLowerCase()) || e.code?.toLowerCase().includes(expAccSearch.toLowerCase())).map((e, i) => (
+                                    <tr key={i} className="group hover:bg-blue-50/50  transition-all border-b border-gray-50 cursor-pointer group border-b border-gray-50">
+                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{e.code}</td>
+                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{e.name}</td>
+                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">
+                                            <button onClick={() => {
+                                                if (expIndex !== null) {
+                                                    const newRows = [...expenseRows];
+                                                    newRows[expIndex].accCode = e.code;
+                                                    setExpenseRows(newRows);
+                                                }
+                                                setShowExpAccModal(false);
+                                            }} className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button>
+                                        </td>
                                     </tr>
-                                </thead>
-                                <tbody className="divide-y divide-gray-50">
-                                    {safeExp.filter(e => e.name?.toLowerCase().includes(expAccSearch.toLowerCase()) || e.code?.toLowerCase().includes(expAccSearch.toLowerCase())).map((e, i) => (
-                                        <tr key={i} className="group hover:bg-blue-50/50 cursor-pointer transition-colors" onClick={() => {
-                                            if (expIndex !== null) {
-                                                const newRows = [...expenseRows];
-                                                newRows[expIndex].accCode = e.code;
-                                                setExpenseRows(newRows);
-                                            }
-                                            setShowExpAccModal(false);
-                                        }}>
-                                            <td className="px-5 py-3 font-mono text-[13px] font-bold text-[#0285fd]">{e.code}</td>
-                                            <td className="px-5 py-3 text-[12px] font-bold text-gray-700 uppercase  group-hover:text-blue-600 transition-colors">{e.name}</td>
-                                            <td className="px-5 py-3 text-right">
-                                                <button className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95">SELECT </button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
+                                ))}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </SimpleModal>
+
+            {/* Product Search Modal */}
+            <SimpleModal isOpen={showProdModal} onClose={() => setShowProdModal(false)} title={`Products - ${(lookups.products || []).length} Found`}>
+                <div className="flex flex-col h-full font-['Tahoma']">
+                    <div className="flex items-center gap-4 bg-slate-50 p-4 border-b border-gray-100 mb-2">
+                        <span className="text-[12px] font-bold text-gray-500 uppercase tracking-wider">Search Facility</span>
+                        <input type="text" className="w-full h-10 px-4 border border-gray-300 rounded-[3px] outline-none text-sm focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white shadow-sm flex-1" value={prodSearch} onChange={(e) => setProdSearch(e.target.value)} />
+                    </div>
+                    <div className="max-h-[50vh] overflow-y-auto no-scrollbar border border-gray-100 rounded-[5px] shadow-sm">
+                        <table className="w-full text-sm text-left">
+                            <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 z-10 shadow-sm">
+                                <tr>
+                                    <th className="border-b px-5 py-3">Code</th>
+                                    <th className="border-b px-5 py-3">Product Name</th>
+                                    <th className="border-b text-center w-24 px-5 py-3">Select</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-100">
+                                {(lookups.products || []).filter(p => p.name?.toLowerCase().includes(prodSearch.toLowerCase()) || p.code?.toLowerCase().includes(prodSearch.toLowerCase())).map((p, i) => (
+                                    <tr key={i} className="group hover:bg-blue-50/50  transition-all border-b border-gray-50 cursor-pointer group border-b border-gray-50">
+                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{p.code}</td>
+                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{p.name}</td>
+                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">
+                                            <button onClick={() => {
+                                                if (prodIndex !== null) {
+                                                    const newRows = [...itemRows];
+                                                    newRows[prodIndex].prodCode = p.code;
+                                                    setItemRows(newRows);
+                                                }
+                                                setShowProdModal(false);
+                                            }} className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </SimpleModal>
+
+            {/* Document Search Modal */}
+            <SimpleModal isOpen={showDocSearchModal} onClose={() => setShowDocSearchModal(false)} title={`Saved Drafts - ${pastDocs.length} Found`} maxWidth="max-w-[700px]">
+                <div className="flex flex-col h-full font-['Tahoma']">
+                    <div className="flex items-center gap-4 bg-slate-50 p-4 border-b border-gray-100 mb-2">
+                        <span className="text-[12px] font-bold text-gray-500 uppercase tracking-wider">Search Document / Payee</span>
+                        <input type="text" className="w-full h-10 px-4 border border-gray-300 rounded-[3px] outline-none text-sm focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white shadow-sm flex-1" value={docSearch} onChange={(e) => setDocSearch(e.target.value)} placeholder="Enter Doc No or Payee..." />
+                    </div>
+                    <div className="max-h-[50vh] overflow-y-auto no-scrollbar border border-gray-100 rounded-[5px] shadow-sm">
+                        <table className="w-full text-sm text-left">
+                            <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 z-10 shadow-sm">
+                                <tr>
+                                    <th className="border-b px-5 py-3">Doc No</th>
+                                    <th className="border-b px-5 py-3">Date</th>
+                                    <th className="border-b px-5 py-3">Payee / Vendor</th>
+                                    <th className="border-b text-right px-5 py-3">Amount</th>
+                                    <th className="border-b text-center w-24 px-5 py-3">Select</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-100">
+                                {pastDocs.filter(d => d.docNo?.toLowerCase().includes(docSearch.toLowerCase()) || d.payee?.toLowerCase().includes(docSearch.toLowerCase())).map((d, i) => (
+                                    <tr key={i} className="group hover:bg-blue-50/50  transition-all border-b border-gray-50 cursor-pointer group border-b border-gray-50">
+                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{d.docNo}</td>
+                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{formatDate(d.date)}</td>
+                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{d.payee || d.vendorId}</td>
+                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{d.billAmount?.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">
+                                            <button onClick={() => handleLoadDoc(d.docNo)} className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button>
+                                        </td>
+                                    </tr>
+                                ))}
+                                {pastDocs.length === 0 && (
+                                    <tr>
+                                        <td colSpan="5" className="text-center py-16 text-gray-400 text-[11px] font-bold uppercase tracking-widest">No saved drafts found.</td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </SimpleModal>
+
             {showDateModal && (
                 <CalendarModal
                     isOpen={showDateModal}
                     onClose={() => setShowDateModal(false)}
                     currentDate={formData.date}
-                    onDateChange={(d) => {
-                        setFormData({ ...formData, date: d });
-                        setShowDateModal(false);
-                    }}
-                    title="Select Ledger Posting Date"
+                    onDateChange={(d) => { setFormData({ ...formData, date: d }); setShowDateModal(false); }}
                 />
             )}
 
@@ -937,11 +937,14 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                     isOpen={showDueDateModal}
                     onClose={() => setShowDueDateModal(false)}
                     currentDate={formData.dueDate}
-                    onDateChange={(d) => {
-                        setFormData({ ...formData, dueDate: d });
-                        setShowDueDateModal(false);
-                    }}
-                    title="Select Document Due Date"
+                    onDateChange={(d) => { setFormData({ ...formData, dueDate: d }); setShowDueDateModal(false); }}
+                />
+            )}
+
+            {showReceiptModal && (
+                <PettyCashDetailModal 
+                    docNo={printedDocNo} 
+                    onClose={() => setShowReceiptModal(false)} 
                 />
             )}
 
@@ -961,14 +964,5 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
         </>
     );
 };
-
-const FormRow = ({ label, children, width = "w-24" }) => (
-    <div className="flex items-center min-h-[32px] gap-3">
-        <label className={`${width} shrink-0 text-[12.5px] font-bold text-gray-700 uppercase tracking-tight leading-none`}>{label}</label>
-        {children}
-    </div>
-);
-
-
 
 export default PettyCashBoard;

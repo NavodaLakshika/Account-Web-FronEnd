@@ -99,12 +99,12 @@ const PeriodLockModal = ({ isOpen, onClose }) => {
     const footer = (
         <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-slate-200 rounded-b-xl">
             <div className="flex gap-3">
-                <button onClick={fetchData} disabled={loading || isSaving} className="px-6 py-3 bg-[#00adff] hover:bg-[#0099e6] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] transition-all active:scale-95 flex items-center justify-center gap-2 border-none">
+                <button onClick={fetchData} disabled={loading || isSaving} className="px-6 py-3 bg-white text-[#00adff] border-2 border-[#00adff] hover:bg-blue-50 font-mono font-bold text-sm uppercase tracking-widest rounded-[3px] transition-all active:scale-95 flex items-center justify-center gap-2 border-none">
                     <RotateCcw size={14} /> CLEAR FORM
                 </button>
             </div>
             <div className="flex gap-3">
-                <button onClick={handleSave} disabled={loading || isSaving} className={`px-6 py-3 bg-[#0285fd] hover:bg-[#0073ff] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] shadow-md shadow-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border-none ${isSaving ? 'opacity-50' : ''}`}>
+                <button onClick={handleSave} disabled={loading || isSaving} className={`px-6 py-3 bg-[#0285fd] hover:bg-[#0073ff] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[3px] shadow-md shadow-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border-none ${isSaving ? 'opacity-50' : ''}`}>
                     {isSaving ? <RotateCcw size={14} className="animate-spin" /> : <ShieldCheck size={14} />} SECURE PERIOD
                 </button>
             </div>
@@ -117,7 +117,7 @@ const PeriodLockModal = ({ isOpen, onClose }) => {
                 isOpen={isOpen}
                 onClose={onClose}
                 title="Period Lock Facility"
-                maxWidth="max-w-3xl"
+                maxWidth="max-w-[700px]"
                 footer={footer}
             >
                 <div className="py-2 select-none font-['Tahoma'] space-y-6 text-[12.5px]">
@@ -130,7 +130,7 @@ const PeriodLockModal = ({ isOpen, onClose }) => {
                     </div>
 
                     {/* Date Selection Section */}
-                    <div className="bg-slate-50/50 p-6 border border-slate-100 rounded-[5px] space-y-4">
+                    <div className="bg-slate-50/50 p-6 border border-slate-100 rounded-[3px] space-y-4">
                         <div className="flex items-center justify-between gap-10">
                             <div className="flex items-center gap-8">
                                 {/* Date From */}
@@ -146,7 +146,7 @@ const PeriodLockModal = ({ isOpen, onClose }) => {
                                         />
                                         <button
                                             onClick={() => setShowCalendarFrom(true)}
-                                            className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0 border-none"
+                                            className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0 border-none"
                                         >
                                             <Calendar size={16} />
                                         </button>
@@ -166,7 +166,7 @@ const PeriodLockModal = ({ isOpen, onClose }) => {
                                         />
                                         <button
                                             onClick={() => setShowCalendarTo(true)}
-                                            className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0 border-none"
+                                            className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0 border-none"
                                         >
                                             <Calendar size={16} />
                                         </button>
@@ -175,7 +175,7 @@ const PeriodLockModal = ({ isOpen, onClose }) => {
                             </div>
 
                             {/* All Cost Centers Checkbox */}
-                            <label className="flex items-center gap-3 cursor-pointer group bg-white border border-gray-200 px-4 py-2 rounded-[5px] shadow-sm hover:border-blue-300 transition-all">
+                            <label className="flex items-center gap-3 cursor-pointer group bg-white border border-gray-200 px-4 py-2 rounded-[3px] shadow-sm hover:border-blue-300 transition-all">
                                 <div className="relative w-5 h-5">
                                     <input
                                         type="checkbox"
@@ -183,7 +183,7 @@ const PeriodLockModal = ({ isOpen, onClose }) => {
                                         onChange={handleAllCheckChange}
                                         className="sr-only"
                                     />
-                                    <div className={`absolute inset-0 border-2 rounded-md transition-all flex items-center justify-center ${allCostCenters ? 'bg-blue-600 border-blue-600' : 'bg-white border-gray-300 group-hover:border-blue-400'}`}>
+                                    <div className={`absolute inset-0 border-2 rounded-[3px] transition-all flex items-center justify-center ${allCostCenters ? 'bg-blue-600 border-blue-600' : 'bg-white border-gray-300 group-hover:border-blue-400'}`}>
                                         {allCostCenters && <CheckCircle2 size={14} className="text-white" />}
                                     </div>
                                 </div>
@@ -193,9 +193,9 @@ const PeriodLockModal = ({ isOpen, onClose }) => {
                     </div>
 
                     {/* Cost Centers Grid */}
-                    <div className="border border-gray-300 rounded-[5px] overflow-hidden flex flex-col bg-white shadow-sm relative">
+                    <div className="border border-gray-300 rounded-[3px] overflow-hidden flex flex-col bg-white shadow-sm relative">
                         {/* Table Header */}
-                        <div className="flex bg-[#f8fafc] border-b border-gray-300 select-none font-black text-gray-400 uppercase tracking-widest text-[10.5px]">
+                        <div className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 shadow-sm z-10">
                             <div className="w-16 px-3 py-3 text-center border-r border-gray-200">#</div>
                             <div className="w-20 px-3 py-3 text-center border-r border-gray-200">Select</div>
                             <div className="w-32 px-4 py-3 border-r border-gray-200">Dept Code</div>
@@ -220,13 +220,13 @@ const PeriodLockModal = ({ isOpen, onClose }) => {
                                     onClick={() => handleRowCheckChange(idx)}
                                     className={`flex items-center hover:bg-blue-50/50 cursor-pointer transition-colors group ${cc.isCheck ? 'bg-blue-50/20' : ''}`}
                                 >
-                                    <div className="w-16 px-3 py-2.5 text-center border-r border-gray-100 font-mono text-gray-400 text-[11px]">{idx + 1}</div>
-                                    <div className="w-20 px-3 py-2.5 flex justify-center border-r border-gray-100">
+                                    <div className="w-16 px-3 py-2.5 text-center border-r border-gray-200 font-mono text-gray-400 text-[11px]">{idx + 1}</div>
+                                    <div className="w-20 px-3 py-2.5 flex justify-center border-r border-gray-200">
                                         <div className={`w-4 h-4 border-2 rounded transition-all flex items-center justify-center ${cc.isCheck ? 'bg-[#2bb744] border-[#2bb744]' : 'bg-white border-gray-200 group-hover:border-blue-400'}`}>
                                             {cc.isCheck && <CheckCircle2 size={12} className="text-white" />}
                                         </div>
                                     </div>
-                                    <div className="w-32 px-4 py-2.5 border-r border-gray-100 font-mono font-bold text-[#0078d4] text-[12px]">{cc.costCenterCode}</div>
+                                    <div className="w-32 px-4 py-2.5 border-r border-gray-200 font-mono font-bold text-[#0078d4] text-[12px]">{cc.costCenterCode}</div>
                                     <div className="flex-1 px-4 py-2.5 font-bold text-slate-700 uppercase tracking-wide truncate">{cc.costCenterName}</div>
                                 </div>
                             ))}

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Calendar, RotateCcw, Save, Trash2, Loader2, Plus, X, CheckCircle } from 'lucide-react';
+import { Search, Calendar, RotateCcw, Save, Trash2, Loader2, Plus, X, CheckCircle, Wallet, ChevronDown } from 'lucide-react';
 import SimpleModal from '../components/SimpleModal';
+import TransactionFormWrapper from '../components/TransactionFormWrapper';
 import CalendarModal from '../components/CalendarModal';
 import { pettyCashService } from '../services/pettyCash.service';
 
@@ -14,33 +15,6 @@ const today = () => {
     return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
 };
 
-const SearchModal = ({ isOpen, onClose, title, items, onSelect, searchKey = 'name' }) => {
-    const [q, setQ] = useState('');
-    if (!isOpen) return null;
-    const filtered = items.filter(i => (i.name||'').toLowerCase().includes(q.toLowerCase()) || (i.code||'').toLowerCase().includes(q.toLowerCase()));
-    return (
-        <div className="fixed inset-0 z-[2100] flex items-center justify-center bg-slate-900/30 backdrop-blur-sm" onClick={onClose}>
- <div className="bg-white rounded-sm shadow-2xl w-full max-w-md overflow-hidden" onClick={e=>e.stopPropagation()}>
-                <div className="bg-[#0285fd] px-5 py-3 flex items-center justify-between">
-                    <span className="text-white font-mono font-bold text-xs tracking-widest uppercase">{title}</span>
-                    <button onClick={onClose} className="text-white hover:bg-white/20 p-1 rounded"><X size={28}/></button>
-                </div>
-                <div className="p-3 border-b">
-                    <input autoFocus value={q} onChange={e=>setQ(e.target.value)} placeholder="Search..." className="w-full border border-gray-200 rounded-md px-3 py-1.5 text-sm outline-none focus:border-blue-400"/>
-                </div>
-                <div className="overflow-y-auto max-h-64">
-                    {filtered.map((item,i)=>(
-                        <div key={i} onClick={()=>{onSelect(item);onClose();}} className="flex items-center gap-3 px-4 py-2 hover:bg-blue-50 cursor-pointer border-b border-gray-50 last:border-0">
-                            <span className="text-[11px] font-mono text-blue-600 w-24 shrink-0">{item.code}</span>
-                            <span className="text-[12px] text-gray-700">{item.name}</span>
-                        </div>
-                    ))}
-                    {filtered.length===0 && <div className="text-center text-gray-400 text-sm py-6">No results</div>}
-                </div>
-            </div>
-        </div>
-    );
-};
 
 const PettyCashBoard = ({ isOpen, onClose }) => {
     const { companyCode: company, userName } = getSessionData();
@@ -55,7 +29,6 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
     const [items, setItems] = useState([]);
     const [activeTab, setActiveTab] = useState('expenses');
 
-    // Header form
     const getInitialForm = () => ({
         docNo:'', isVendor:false, vendorId:'', vendorName:'', payee:'',
         location:'', memo:'', date:today(), vouchNo:'', dueDate:today(),
@@ -65,7 +38,6 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
 
     const [form, setForm] = useState(getInitialForm());
 
-    // Expense line form
     const [line, setLine] = useState({ accCode:'', accName:'', amount:'0.00', memo:'', costCode:'', costName:'', idNo:'0' });
     const [itemLine, setItemLine] = useState({ itemId:'', itemName:'', qty:1, cost:'0.00', description:'', custJob:'', idNo:'0' });
     const [vouAmount, setVouAmount] = useState(0);
@@ -81,6 +53,14 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
     const [showItemModal,     setShowItemModal]     = useState(false);
     const [showDocSearch,     setShowDocSearch]     = useState(false);
     const [savedDocs,         setSavedDocs]         = useState([]);
+
+    // Search states for modals
+    const [pettySearch, setPettySearch] = useState('');
+    const [vendorSearch, setVendorSearch] = useState('');
+    const [accSearch, setAccSearch] = useState('');
+    const [ccSearch, setCcSearch] = useState('');
+    const [itemSearch, setItemSearch] = useState('');
+    const [docSearchQuery, setDocSearchQuery] = useState('');
 
     useEffect(() => {
         if (isOpen) { 
@@ -130,7 +110,6 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
             setExpenses(r.lines || []);
             setVouAmount(r.totOut || 0);
             setLine({ accCode:'', accName:'', amount:'0.00', memo:'', costCode:'', costName:'', idNo:'0' });
-            // Save header if first line
             if ((r.lines||[]).length === 1) await saveHeader(r.totOut);
         } catch(e) { showErrorToast('Error: ' + e.message); }
         finally { setLoading(false); }
@@ -162,7 +141,6 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                 Qty: itemLine.qty, Cost: cost * itemLine.qty, VouAmount: vouAmount + (cost * itemLine.qty),
                 Memo: '.', CustJob: itemLine.custJob || '', IdNo: itemLine.idNo,
             };
-            // Note: need pettyCashService.addItem implemented
             const r = await pettyCashService.addItem(userName, payload);
             setItems(r.lines || []);
             setVouAmount(r.totOut || 0);
@@ -193,7 +171,7 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                 Memo: form.memo||'.', Date: form.date, VouchNo: form.vouchNo||'.', DueDate: form.dueDate,
                 RefNo: form.refNo||'.', BillAmount: parseFloat(form.billAmount)||0, CostCenterFrom: form.costCenterFrom,
             });
-        } catch { /* silent – apply is done on final save */ }
+        } catch { /* silent */ }
     };
 
     const handleApply = async () => {
@@ -228,8 +206,7 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
 
     const openDocSearch = async () => {
         const docs = await pettyCashService.searchDocs(company).catch(()=>[]);
-        const mappedDocs = docs.map(d => ({ ...d, code: d.docNo, name: `${d.payee || 'Unknown'} | Date: ${d.date?.split('T')[0] || ''} | Amt: ${parseFloat(d.amount||0).toFixed(2)}` }));
-        setSavedDocs(mappedDocs); setShowDocSearch(true);
+        setSavedDocs(docs || []); setShowDocSearch(true);
     };
 
     const loadDraft = async (d) => {
@@ -252,15 +229,11 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
             }
             setExpenses(data.expenses || []);
             setItems(data.items || []);
-            // calc vouch amount
             const expTotal = (data.expenses||[]).reduce((a,b)=>a+parseFloat(b.amount||0), 0);
             const itemTotal = (data.items||[]).reduce((a,b)=>a+(parseFloat(b.cost||0)), 0);
             setVouAmount(expTotal + itemTotal);
         } catch { showErrorToast('Failed to load draft'); }
     };
-
-    const fmtLabel = 'text-[11.5px] font-bold text-gray-600 w-28 shrink-0 font-mono uppercase tracking-wide';
-    const fmtInput = 'h-8 border border-gray-200 rounded-md px-2.5 text-[12.5px] text-gray-800 outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-100 font-mono bg-white transition-all';
 
     return (
         <>
@@ -272,254 +245,633 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                     }
                 `}
             </style>
-            <SimpleModal isOpen={isOpen} onClose={onClose} title="Petty Cash" maxWidth="max-w-[1050px]"
-            footer={
-                <div className="flex gap-2 w-full justify-end">
-                    <button onClick={handleApply} disabled={loading} className="px-5 h-9 bg-[#22c55e] hover:bg-[#16a34a] text-white text-xs font-bold rounded-lg flex items-center gap-2 transition-all active:scale-95 shadow-md disabled:opacity-50">
-                        {loading ? <Loader2 size={13} className="animate-spin"/> : <CheckCircle size={13}/>} Apply &amp; Save
-                    </button>
-                    <button onClick={handleClear} disabled={loading} className="px-5 h-9 bg-[#0285fd] hover:bg-blue-600 text-white text-xs font-bold rounded-lg flex items-center gap-2 transition-all active:scale-95">
-                        <RotateCcw size={13}/> Clear
-                    </button>
-                </div>
-            }>
-            <div className="space-y-4 text-[12px] font-['Tahoma']">
-
-                {/* ── Header Row ── */}
-                <div className="grid grid-cols-2 gap-4 bg-gray-50 p-4 rounded-xl border border-gray-100">
-                    {/* Doc No */}
-                    <div className="flex items-center gap-2">
-                        <span className={fmtLabel}>Doc No</span>
-                        <input readOnly value={form.docNo} className={`${fmtInput} w-36 bg-blue-50 text-blue-700 font-bold text-center`}/>
-                        <button onClick={openDocSearch} className="w-8 h-8 bg-[#0285fd] text-white rounded-md flex items-center justify-center hover:bg-blue-600 active:scale-95 shadow-sm"><Search size={13}/></button>
+            <TransactionFormWrapper
+                isOpen={isOpen}
+                onClose={onClose}
+                title="Petty Cash"
+                subtitle="Petty Cash Management"
+                icon={Wallet}
+                footer={
+                    <div className="bg-[#fcfcfc] px-6 py-4 w-full flex justify-between items-center border-t border-gray-200 rounded-b-[10px] shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]">
+                        <div className="flex gap-3">
+                            <button type="button" onClick={handleClear} disabled={loading} className="px-6 py-2 border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2">
+                                <RotateCcw size={14} /> CLEAR FORM
+                            </button>
+                        </div>
+                        <div className="flex gap-3">
+                            <button type="button" onClick={handleApply} disabled={loading} className={`px-6 py-2 bg-[#0285fd] hover:bg-[#0073ff] text-white font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                                {loading ? <Loader2 size={14} className="animate-spin" /> : <CheckCircle size={14} />} APPLY &amp; SAVE
+                            </button>
+                        </div>
                     </div>
-                    {/* Balance */}
-                    <div className="flex items-center gap-2">
-                        <span className={fmtLabel}>Balance</span>
-                        <input readOnly value={form.balance} className={`${fmtInput} w-32 text-green-700 font-bold text-right bg-green-50`}/>
+                }
+            >
+                <div className="select-none font-['Tahoma']">
+                    {/* Header Information Section */}
+                    <div className="bg-white p-4 border border-slate-200 rounded-[3px] space-y-4">
+                        <div className="flex items-center justify-between border-b border-slate-200 pb-3 mb-2">
+                            <div className="">
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Doc No</label>
+                                <div className="relative">
+                                    <input
+                                        type="text"
+                                        name="docNo"
+                                        value={form.docNo}
+                                        readOnly
+                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700 truncate"
+                                        onClick={openDocSearch}
+                                    />
+                                    <button onClick={openDocSearch} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
+                                        <Search size={16} />
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div className="">
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Balance</label>
+                                <div className="w-full h-10 border border-green-200 bg-blue-50/50 px-3 text-[14px] font-bold text-blue-700 text-right flex items-center justify-end rounded-[3px] min-w-[140px]">
+                                    {parseFloat(form.balance || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                </div>
+                            </div>
+
+                            <div className="">
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Date</label>
+                                <div className="relative w-full">
+                                    <input 
+                                        type="text" 
+                                        readOnly 
+                                        value={form.date} 
+                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700 truncate" 
+                                        onClick={() => openCal('date')}
+                                    />
+                                    <button onClick={() => openCal('date')} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
+                                        <Calendar size={16} />
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-12 gap-x-6 gap-y-3.5">
+                            {/* Left Column */}
+                            <div className="col-span-6 space-y-3.5">
+                                <div className="">
+                                    <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Petty Cash Account</label>
+                                    <div className="relative">
+                                        <input
+                                            type="text"
+                                            readOnly
+                                            value={safePetty.find(a => a.code === form.pettyAccCode)?.name || ''}
+                                            className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700 truncate"
+                                            onClick={() => setShowPettyModal(true)}
+                                        />
+                                        <button onClick={() => setShowPettyModal(true)} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
+                                            <Search size={16} />
+                                        </button>
+                                    </div>
+                                </div>
+                                <div className="">
+                                    <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Cost Center (From)</label>
+                                    <div className="relative">
+                                        <input
+                                            type="text"
+                                            readOnly
+                                            value={safeCC.find(c => c.code === form.costCenterFrom)?.name || ''}
+                                            className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700"
+                                            onClick={() => setShowCCFromModal(true)}
+                                        />
+                                        <button onClick={() => setShowCCFromModal(true)} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
+                                            <Search size={16} />
+                                        </button>
+                                    </div>
+                                </div>
+                                <div className="">
+                                    <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Location</label>
+                                    <input value={form.location} onChange={e => setForm(f => ({ ...f, location: e.target.value }))} type="text" className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700" />
+                                </div>
+                            </div>
+
+                            {/* Right Column */}
+                            <div className="col-span-6 space-y-3.5">
+                                <div className="">
+                                    <div className="flex items-center justify-between mb-1.5">
+                                        <label className="text-[13px] font-medium text-gray-700">Payee / Vendor</label>
+                                        <label className="flex items-center gap-1.5 cursor-pointer select-none">
+                                            <div onClick={() => setForm(f => ({ ...f, isVendor: !f.isVendor, vendorId: '', vendorName: '', payee: '' }))}
+                                                className={`w-8 h-4 rounded-full transition-colors ${form.isVendor ? 'bg-[#0285fd]' : 'bg-gray-300'} relative cursor-pointer`}>
+                                                <span className={`absolute top-0.5 w-3 h-3 bg-white rounded-full shadow transition-transform ${form.isVendor ? 'translate-x-[17px]' : 'translate-x-0.5'}`} />
+                                            </div>
+                                            <span className="text-[9px] font-bold text-gray-400 uppercase tracking-wider">VENDOR</span>
+                                        </label>
+                                    </div>
+                                    {form.isVendor ? (
+                                        <div className="relative">
+                                            <input
+                                                type="text"
+                                                readOnly
+                                                value={form.vendorName || form.vendorId}
+                                                className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700 truncate"
+                                                onClick={() => setShowVendorModal(true)}
+                                                placeholder="Select vendor"
+                                            />
+                                            <button onClick={() => setShowVendorModal(true)} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
+                                                <Search size={16} />
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        <input value={form.payee} onChange={e => setForm(f => ({ ...f, payee: e.target.value }))} type="text" className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700" placeholder="Enter payee name" />
+                                    )}
+                                </div>
+                                <div className="">
+                                    <label className="block text-[13px] font-medium text-gray-700 mb-1.5">General Memo</label>
+                                    <input value={form.memo} onChange={e => setForm(f => ({ ...f, memo: e.target.value }))} type="text" className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700" />
+                                </div>
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div className="">
+                                        <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Vouch No</label>
+                                        <input value={form.vouchNo} onChange={e => setForm(f => ({ ...f, vouchNo: e.target.value }))} type="text" className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700" />
+                                    </div>
+                                    <div className="">
+                                        <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Ref No</label>
+                                        <input value={form.refNo} onChange={e => setForm(f => ({ ...f, refNo: e.target.value }))} type="text" className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700" />
+                                    </div>
+                                </div>
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div className="">
+                                        <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Bill Amount</label>
+                                        <input type="number" value={form.billAmount} onChange={e => setForm(f => ({ ...f, billAmount: e.target.value }))} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 text-right" />
+                                    </div>
+                                    <div className="">
+                                        <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Difference</label>
+                                        <div className={`w-full h-10 border rounded-[3px] px-3 text-[14px] font-bold text-right flex items-center justify-end ${parseFloat(differ()) !== 0 ? 'border-red-200 bg-red-50/50 text-red-600' : 'border-green-200 bg-blue-50/50 text-blue-700'}`}>
+                                            {differ()}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
-                    {/* Vendor toggle */}
-                    <div className="col-span-2 flex items-center gap-3">
-                        <label className="flex items-center gap-2 cursor-pointer select-none">
-                            <div onClick={()=>setForm(f=>({...f,isVendor:!f.isVendor,vendorId:'',vendorName:'',payee:''}))}
-                                className={`w-10 h-5 rounded-full transition-colors ${form.isVendor?'bg-blue-500':'bg-gray-300'} relative`}>
-                                <span className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${form.isVendor?'translate-x-5':'translate-x-0.5'}`}/>
+                    {/* Tabs: Expenses / Items */}
+                    <div className="mt-4">
+                        <div className="flex items-center gap-3 mb-2 px-2 border-b border-gray-200 pb-2">
+                            <div className="flex gap-4">
+                                <button 
+                                    onClick={() => setActiveTab('expenses')}
+                                    className={`text-[13px] font-black uppercase tracking-widest pb-1 border-b-2 transition-all ${activeTab === 'expenses' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-400 hover:text-gray-600'}`}
+                                >
+                                    Expenses
+                                </button>
+                                <button 
+                                    onClick={() => setActiveTab('items')}
+                                    className={`text-[13px] font-black uppercase tracking-widest pb-1 border-b-2 transition-all ${activeTab === 'items' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-400 hover:text-gray-600'}`}
+                                >
+                                    Items Purchase
+                                </button>
                             </div>
-                            <span className="text-[11.5px] font-bold text-gray-600 font-mono uppercase tracking-wide">Vendor</span>
-                        </label>
-                        {form.isVendor ? (
-                            <div className="flex items-center gap-2 flex-1">
-                                <input readOnly value={form.vendorId} placeholder="ID" className={`${fmtInput} w-24`}/>
-                                <input readOnly value={form.vendorName} placeholder="Vendor name" className={`${fmtInput} flex-1`}/>
-                                <button onClick={()=>setShowVendorModal(true)} className="w-8 h-8 bg-[#0285fd] text-white rounded-md flex items-center justify-center hover:bg-blue-600"><Search size={13}/></button>
+                            <div className="flex-1 text-right">
+                                <span className="text-[11px] font-bold text-gray-400">Voucher Amount: <span className="text-blue-600 font-black">{vouAmount.toFixed(2)}</span></span>
                             </div>
-                        ) : (
-                            <div className="flex items-center gap-2 flex-1">
-                                <span className={fmtLabel}>Payee</span>
-                                <input value={form.payee} onChange={e=>setForm(f=>({...f,payee:e.target.value}))} placeholder="Enter payee name" className={`${fmtInput} flex-1`}/>
-                            </div>
+                        </div>
+
+                        {activeTab === 'expenses' && (
+                            <>
+                                {/* Expense Entry Row */}
+                                <div className="border border-gray-200 rounded-[3px] bg-white shadow-xl overflow-hidden flex flex-col min-h-[200px]">
+                                    <table className="w-full text-sm text-left border-collapse">
+                                        <thead className="bg-slate-50 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-200 leading-10">
+                                            <tr>
+                                                <th className="px-4 w-[30%]">Expense Account</th>
+                                                <th className="px-4 w-[15%] text-right">Amount</th>
+                                                <th className="px-4 w-[20%]">Cost Center</th>
+                                                <th className="px-4 w-[25%]">Memo</th>
+                                                <th className="px-2 w-[5%] text-center">Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {expenses.map((exp, idx) => (
+                                                <tr key={idx} className="border-b border-gray-50 text-[12px] font-bold text-gray-700 hover:bg-slate-50/50 transition-colors">
+                                                    <td className="px-4 py-2.5 font-mono text-blue-700 uppercase">{exp.accName}</td>
+                                                    <td className="px-4 py-2.5 text-right font-mono font-black text-red-600 bg-red-50/10">{parseFloat(exp.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                                                    <td className="px-4 py-2.5 font-mono text-gray-400">{exp.costName || exp.costCode || '---'}</td>
+                                                    <td className="px-4 py-2.5 italic text-gray-400 font-medium">{exp.memo || '---'}</td>
+                                                    <td className="px-2 py-2.5 text-center">
+                                                        <button onClick={() => handleDeleteExpense(exp)} className="text-red-300 hover:text-red-500 bg-red-50 p-1.5 rounded-[3px] transition-all active:scale-95"><Trash2 size={14} /></button>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                            {expenses.length === 0 && (
+                                                <tr>
+                                                    <td colSpan="5" className="py-12 text-center text-gray-300 font-black italic text-[11px] uppercase tracking-widest">No expense items added.</td>
+                                                </tr>
+                                            )}
+                                        </tbody>
+                                    </table>
+
+                                    {/* Add Expense Line Row */}
+                                    <div className="mt-auto border-t border-slate-200 bg-slate-50 p-2 flex gap-3 items-center">
+                                        <div className="flex-[2] relative">
+                                            <input
+                                                type="text"
+                                                readOnly
+                                                value={line.accName || line.accCode}
+                                                className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700"
+                                                onClick={() => setShowAccModal(true)}
+                                                placeholder="Expense Account"
+                                            />
+                                            <button onClick={() => setShowAccModal(true)} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
+                                                <Search size={16} />
+                                            </button>
+                                        </div>
+                                        <div className="flex-1">
+                                            <input type="number" value={line.amount} onChange={e => setLine(l => ({ ...l, amount: e.target.value }))} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 text-right" placeholder="Amount" />
+                                        </div>
+                                        <div className="flex-[1.5] relative">
+                                            <input
+                                                type="text"
+                                                readOnly
+                                                value={line.costName || line.costCode}
+                                                className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700"
+                                                onClick={() => setShowCCModal(true)}
+                                                placeholder="Cost Center"
+                                            />
+                                            <button onClick={() => setShowCCModal(true)} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
+                                                <Search size={16} />
+                                            </button>
+                                        </div>
+                                        <div className="flex-[2] flex gap-2">
+                                            <input value={line.memo} onChange={e => setLine(l => ({ ...l, memo: e.target.value }))} type="text" className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700" placeholder="Memo" />
+                                            <button onClick={handleAddExpense} disabled={loading} className="h-10 px-6 bg-white border border-[#0285fd] text-[#0285fd] font-semibold rounded-[3px] text-[13px] hover:bg-blue-50 transition-all flex items-center justify-center whitespace-nowrap gap-1">
+                                                {loading ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />} ADD
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </>
+                        )}
+
+                        {activeTab === 'items' && (
+                            <>
+                                {/* Items Table */}
+                                <div className="border border-gray-200 rounded-[3px] bg-white shadow-xl overflow-hidden flex flex-col min-h-[200px]">
+                                    <table className="w-full text-sm text-left border-collapse">
+                                        <thead className="bg-slate-50 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-200 leading-10">
+                                            <tr>
+                                                <th className="px-4 w-[5%]">#</th>
+                                                <th className="px-4 w-[30%]">Item</th>
+                                                <th className="px-4 w-[10%] text-center">Qty</th>
+                                                <th className="px-4 w-[13%] text-right">Unit Cost</th>
+                                                <th className="px-4 w-[13%] text-right">Total</th>
+                                                <th className="px-4 w-[24%]">Description</th>
+                                                <th className="px-2 w-[5%] text-center">Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {items.map((itm, idx) => (
+                                                <tr key={idx} className="border-b border-gray-50 text-[12px] font-bold text-gray-700 hover:bg-slate-50/50 transition-colors">
+                                                    <td className="px-4 py-2.5 font-mono text-gray-300">{idx + 1}</td>
+                                                    <td className="px-4 py-2.5 font-mono text-blue-700 uppercase">{itm.itemId}</td>
+                                                    <td className="px-4 py-2.5 text-center font-mono text-gray-600">{itm.qty}</td>
+                                                    <td className="px-4 py-2.5 text-right font-mono text-gray-600">{parseFloat(itm.cost || 0).toFixed(2)}</td>
+                                                    <td className="px-4 py-2.5 text-right font-mono font-black text-red-600 bg-red-50/10">{(parseFloat(itm.cost || 0) * parseInt(itm.qty || 0)).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                                                    <td className="px-4 py-2.5 italic text-gray-400 font-medium">{itm.description || '---'}</td>
+                                                    <td className="px-2 py-2.5 text-center">
+                                                        <button onClick={() => handleDeleteItem(itm)} className="text-red-300 hover:text-red-500 bg-red-50 p-1.5 rounded-[3px] transition-all active:scale-95"><Trash2 size={14} /></button>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                            {items.length === 0 && (
+                                                <tr>
+                                                    <td colSpan="7" className="py-12 text-center text-gray-300 font-black italic text-[11px] uppercase tracking-widest">No items added.</td>
+                                                </tr>
+                                            )}
+                                        </tbody>
+                                    </table>
+
+                                    {/* Add Item Line Row */}
+                                    <div className="mt-auto border-t border-slate-200 bg-slate-50 p-2 flex gap-3 items-center">
+                                        <div className="flex-[2] relative">
+                                            <input
+                                                type="text"
+                                                readOnly
+                                                value={itemLine.itemName || itemLine.itemId}
+                                                className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700"
+                                                onClick={() => setShowItemModal(true)}
+                                                placeholder="Select Item"
+                                            />
+                                            <button onClick={() => setShowItemModal(true)} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
+                                                <Search size={16} />
+                                            </button>
+                                        </div>
+                                        <div className="w-20">
+                                            <input type="number" value={itemLine.qty} onChange={e => setItemLine(l => ({ ...l, qty: e.target.value }))} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 text-center" placeholder="Qty" />
+                                        </div>
+                                        <div className="flex-[1.5]">
+                                            <input type="number" value={itemLine.cost} onChange={e => setItemLine(l => ({ ...l, cost: e.target.value }))} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 text-right" placeholder="Cost" />
+                                        </div>
+                                        <div className="flex-[2] flex gap-2">
+                                            <input value={itemLine.description} onChange={e => setItemLine(l => ({ ...l, description: e.target.value }))} type="text" className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700" placeholder="Description" />
+                                            <button onClick={handleAddItem} disabled={loading} className="h-10 px-6 bg-white border border-[#0285fd] text-[#0285fd] font-semibold rounded-[3px] text-[13px] hover:bg-blue-50 transition-all flex items-center justify-center whitespace-nowrap gap-1">
+                                                {loading ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />} ADD
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </>
                         )}
                     </div>
+                </div>
+            </TransactionFormWrapper>
 
-                    {/* Petty Account */}
-                    <div className="flex items-center gap-2">
-                        <span className={fmtLabel}>Petty Acc</span>
-                        <input readOnly value={form.pettyAccName||form.pettyAccCode} placeholder="Select account" className={`${fmtInput} flex-1`}/>
-                        <button onClick={()=>setShowPettyModal(true)} className="w-8 h-8 bg-[#0285fd] text-white rounded-md flex items-center justify-center hover:bg-blue-600"><Search size={13}/></button>
-                    </div>
-                    {/* Cost Center From */}
-                    <div className="flex items-center gap-2">
-                        <span className={fmtLabel}>CC From</span>
-                        <input readOnly value={safeCC.find(c=>c.code===form.costCenterFrom)?.name||form.costCenterFrom} placeholder="Cost center" className={`${fmtInput} flex-1`}/>
-                        <button onClick={()=>setShowCCFromModal(true)} className="w-8 h-8 bg-[#0285fd] text-white rounded-md flex items-center justify-center hover:bg-blue-600"><Search size={13}/></button>
-                    </div>
+            <CalendarModal isOpen={showCal} onClose={() => setShowCal(false)} onDateSelect={handleDate} initialDate={form[calField]} />
 
-                    {/* Location */}
-                    <div className="flex items-center gap-2">
-                        <span className={fmtLabel}>Location</span>
-                        <input value={form.location} onChange={e=>setForm(f=>({...f,location:e.target.value}))} className={`${fmtInput} flex-1`}/>
+            {/* Petty Account Search Modal */}
+            <SimpleModal isOpen={showPettyModal} onClose={() => setShowPettyModal(false)} title={`Petty Cash Accounts - ${safePetty.length} Found`}>
+                <div className="flex flex-col h-full font-['Tahoma']">
+                    <div className="flex items-center gap-4 bg-slate-50 p-4 border-b border-gray-100 mb-2">
+                        <span className="text-[12px] font-bold text-gray-500 uppercase tracking-wider">Search Facility</span>
+                        <input 
+                            type="text" 
+                            className="w-full h-10 px-4 border border-gray-300 rounded-[3px] outline-none text-sm focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white shadow-sm flex-1" 
+                            value={pettySearch} 
+                            onChange={(e) => setPettySearch(e.target.value)} 
+                        />
                     </div>
-                    {/* Memo */}
-                    <div className="flex items-center gap-2">
-                        <span className={fmtLabel}>Memo</span>
-                        <input value={form.memo} onChange={e=>setForm(f=>({...f,memo:e.target.value}))} className={`${fmtInput} flex-1`}/>
-                    </div>
-
-                    {/* Date */}
-                    <div className="flex items-center gap-2">
-                        <span className={fmtLabel}>Date</span>
-                        <input readOnly value={form.date} className={`${fmtInput} w-32 cursor-pointer`} onClick={()=>openCal('date')}/>
-                        <button onClick={()=>openCal('date')} className="w-8 h-8 bg-slate-100 hover:bg-blue-50 text-gray-500 rounded-md flex items-center justify-center"><Calendar size={13}/></button>
-                    </div>
-                    {/* Vouch No */}
-                    <div className="flex items-center gap-2">
-                        <span className={fmtLabel}>Vouch No</span>
-                        <input value={form.vouchNo} onChange={e=>setForm(f=>({...f,vouchNo:e.target.value}))} className={`${fmtInput} w-36`}/>
-                    </div>
-
-                    {/* Bill Amount */}
-                    <div className="flex items-center gap-2">
-                        <span className={fmtLabel}>Bill Amount</span>
-                        <input type="number" value={form.billAmount} onChange={e=>setForm(f=>({...f,billAmount:e.target.value}))} className={`${fmtInput} w-32 text-right`}/>
-                    </div>
-                    {/* Difference */}
-                    <div className="flex items-center gap-2">
-                        <span className={fmtLabel}>Difference</span>
-                        <input readOnly value={differ()} className={`${fmtInput} w-32 text-right font-bold ${parseFloat(differ())!==0?'text-red-600 bg-red-50':'text-green-700 bg-green-50'}`}/>
-                        <span className={fmtLabel}>Vou Amt</span>
-                        <input readOnly value={vouAmount.toFixed(2)} className={`${fmtInput} w-32 text-right text-blue-700 bg-blue-50`}/>
+                    <div className="max-h-[50vh] overflow-y-auto no-scrollbar border border-gray-100 rounded-[5px] shadow-sm">
+                        <table className="w-full text-sm text-left">
+                            <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 z-10 shadow-sm">
+                                <tr>
+                                    <th className="border-b px-5 py-3">Code</th>
+                                    <th className="border-b px-5 py-3">Account Name</th>
+                                    <th className="border-b text-center w-24 px-5 py-3">Select</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-100">
+                                {safePetty.filter(a => (a.name || '').toLowerCase().includes(pettySearch.toLowerCase()) || (a.code || '').toLowerCase().includes(pettySearch.toLowerCase())).map((a, idx) => (
+                                    <tr key={idx} className="group hover:bg-blue-50/50  transition-all border-b border-gray-50 cursor-pointer group border-b border-gray-50">
+                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{a.code}</td>
+                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{a.name}</td>
+                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">
+                                            <button onClick={() => {
+                                                setForm(f => ({ ...f, pettyAccCode: a.code, pettyAccName: a.name }));
+                                                setShowPettyModal(false);
+                                            }} className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
+            </SimpleModal>
 
-                {/* Tabs */}
-                <div className="flex items-center gap-1 border-b border-gray-200 pt-2">
-                    <button onClick={()=>setActiveTab('expenses')} className={`px-4 py-2 text-xs font-bold font-mono tracking-wide rounded-t-lg transition-colors ${activeTab==='expenses'?'bg-[#0285fd] text-white':'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}>Expenses</button>
-                    <button onClick={()=>setActiveTab('items')} className={`px-4 py-2 text-xs font-bold font-mono tracking-wide rounded-t-lg transition-colors ${activeTab==='items'?'bg-[#0285fd] text-white':'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}>Items Purchase</button>
+            {/* Vendor Search Modal */}
+            <SimpleModal isOpen={showVendorModal} onClose={() => setShowVendorModal(false)} title={`Vendors - ${safeSuppliers.length} Found`}>
+                <div className="flex flex-col h-full font-['Tahoma']">
+                    <div className="flex items-center gap-4 bg-slate-50 p-4 border-b border-gray-100 mb-2">
+                        <span className="text-[12px] font-bold text-gray-500 uppercase tracking-wider">Search Facility</span>
+                        <input 
+                            type="text" 
+                            className="w-full h-10 px-4 border border-gray-300 rounded-[3px] outline-none text-sm focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white shadow-sm flex-1" 
+                            value={vendorSearch} 
+                            onChange={(e) => setVendorSearch(e.target.value)} 
+                        />
+                    </div>
+                    <div className="max-h-[50vh] overflow-y-auto no-scrollbar border border-gray-100 rounded-[5px] shadow-sm">
+                        <table className="w-full text-sm text-left">
+                            <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 z-10 shadow-sm">
+                                <tr>
+                                    <th className="border-b px-5 py-3">Code</th>
+                                    <th className="border-b px-5 py-3">Vendor Name</th>
+                                    <th className="border-b text-center w-24 px-5 py-3">Select</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-100">
+                                {safeSuppliers.filter(v => (v.name || '').toLowerCase().includes(vendorSearch.toLowerCase()) || (v.code || '').toLowerCase().includes(vendorSearch.toLowerCase())).map((v, idx) => (
+                                    <tr key={idx} className="group hover:bg-blue-50/50  transition-all border-b border-gray-50 cursor-pointer group border-b border-gray-50">
+                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{v.code}</td>
+                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{v.name}</td>
+                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">
+                                            <button onClick={() => {
+                                                setForm(f => ({ ...f, vendorId: v.code, vendorName: v.name }));
+                                                setShowVendorModal(false);
+                                            }} className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
+            </SimpleModal>
 
-                {activeTab === 'expenses' && (
-                    <>
-                        {/* ── Expense Line Entry ── */}
-                        <div className="bg-blue-50/40 border border-blue-100 rounded-xl p-3">
-                            <div className="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-2 font-mono">Add Expense Line</div>
-                            <div className="flex flex-wrap gap-2 items-center">
-                                {/* Account */}
-                                <div className="flex items-center gap-1">
-                                    <input readOnly value={line.accName||line.accCode} placeholder="Expense account" className={`${fmtInput} w-44 cursor-pointer`} onClick={()=>setShowAccModal(true)}/>
-                                    <button onClick={()=>setShowAccModal(true)} className="w-7 h-8 bg-[#0285fd] text-white rounded-md flex items-center justify-center hover:bg-blue-600"><Search size={11}/></button>
-                                </div>
-                                {/* Amount */}
-                                <input type="number" value={line.amount} onChange={e=>setLine(l=>({...l,amount:e.target.value}))} placeholder="Amount" className={`${fmtInput} w-28 text-right`}/>
-                                {/* Cost Center */}
-                                <div className="flex items-center gap-1">
-                                    <input readOnly value={line.costName||line.costCode} placeholder="Cost center" className={`${fmtInput} w-36 cursor-pointer`} onClick={()=>setShowCCModal(true)}/>
-                                    <button onClick={()=>setShowCCModal(true)} className="w-7 h-8 bg-[#0285fd] text-white rounded-md flex items-center justify-center hover:bg-blue-600"><Search size={11}/></button>
-                                </div>
-                                {/* Memo */}
-                                <input value={line.memo} onChange={e=>setLine(l=>({...l,memo:e.target.value}))} placeholder="Memo" className={`${fmtInput} flex-1 min-w-28`}/>
-                                {/* Add */}
-                                <button onClick={handleAddExpense} disabled={loading} className="h-8 px-4 bg-[#22c55e] hover:bg-green-600 text-white rounded-md text-[11px] font-bold flex items-center gap-1 active:scale-95 disabled:opacity-50">
-                                    {loading ? <Loader2 size={11} className="animate-spin"/> : <Plus size={11}/>} Add
-                                </button>
-                            </div>
-                        </div>
+            {/* Expense Account Search Modal */}
+            <SimpleModal isOpen={showAccModal} onClose={() => setShowAccModal(false)} title={`Expense Accounts - ${safeAccounts.length} Found`}>
+                <div className="flex flex-col h-full font-['Tahoma']">
+                    <div className="flex items-center gap-4 bg-slate-50 p-4 border-b border-gray-100 mb-2">
+                        <span className="text-[12px] font-bold text-gray-500 uppercase tracking-wider">Search Facility</span>
+                        <input 
+                            type="text" 
+                            className="w-full h-10 px-4 border border-gray-300 rounded-[3px] outline-none text-sm focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white shadow-sm flex-1" 
+                            value={accSearch} 
+                            onChange={(e) => setAccSearch(e.target.value)} 
+                        />
+                    </div>
+                    <div className="max-h-[50vh] overflow-y-auto no-scrollbar border border-gray-100 rounded-[5px] shadow-sm">
+                        <table className="w-full text-sm text-left">
+                            <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 z-10 shadow-sm">
+                                <tr>
+                                    <th className="border-b px-5 py-3">Code</th>
+                                    <th className="border-b px-5 py-3">Account Name</th>
+                                    <th className="border-b text-center w-24 px-5 py-3">Select</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-100">
+                                {safeAccounts.filter(a => (a.name || '').toLowerCase().includes(accSearch.toLowerCase()) || (a.code || '').toLowerCase().includes(accSearch.toLowerCase())).map((a, idx) => (
+                                    <tr key={idx} className="group hover:bg-blue-50/50  transition-all border-b border-gray-50 cursor-pointer group border-b border-gray-50">
+                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{a.code}</td>
+                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{a.name}</td>
+                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">
+                                            <button onClick={() => {
+                                                setLine(l => ({ ...l, accCode: a.code, accName: a.name }));
+                                                setShowAccModal(false);
+                                            }} className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </SimpleModal>
 
-                        {/* ── Expense Lines Grid ── */}
-                        <div className="border border-gray-200 rounded-xl overflow-hidden">
-                            <div className="grid grid-cols-[2fr_1fr_1.5fr_2fr_auto] bg-[#0285fd] text-white text-[10px] font-black font-mono uppercase tracking-widest">
-                                {['Account','Amount','Cost Center','Memo','Del'].map(h=>(
-                                    <div key={h} className="px-3 py-2">{h}</div>
+            {/* Cost Center (Line) Search Modal */}
+            <SimpleModal isOpen={showCCModal} onClose={() => setShowCCModal(false)} title={`Cost Center Directory - ${safeCC.length} Found`}>
+                <div className="flex flex-col h-full font-['Tahoma']">
+                    <div className="flex items-center gap-4 bg-slate-50 p-4 border-b border-gray-100 mb-2">
+                        <span className="text-[12px] font-bold text-gray-500 uppercase tracking-wider">Search Facility</span>
+                        <input 
+                            type="text" 
+                            className="w-full h-10 px-4 border border-gray-300 rounded-[3px] outline-none text-sm focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white shadow-sm flex-1" 
+                            value={ccSearch} 
+                            onChange={(e) => setCcSearch(e.target.value)} 
+                        />
+                    </div>
+                    <div className="max-h-[50vh] overflow-y-auto no-scrollbar border border-gray-100 rounded-[5px] shadow-sm">
+                        <table className="w-full text-sm text-left">
+                            <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 z-10 shadow-sm">
+                                <tr>
+                                    <th className="border-b px-5 py-3">Code</th>
+                                    <th className="border-b px-5 py-3">Cost Center</th>
+                                    <th className="border-b text-center w-24 px-5 py-3">Select</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-100">
+                                {safeCC.filter(c => (c.name || '').toLowerCase().includes(ccSearch.toLowerCase()) || (c.code || '').toLowerCase().includes(ccSearch.toLowerCase())).map((c, idx) => (
+                                    <tr key={idx} className="group hover:bg-blue-50/50  transition-all border-b border-gray-50 cursor-pointer group border-b border-gray-50">
+                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{c.code}</td>
+                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{c.name}</td>
+                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">
+                                            <button onClick={() => {
+                                                setLine(l => ({ ...l, costCode: c.code, costName: c.name }));
+                                                setShowCCModal(false);
+                                            }} className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button>
+                                        </td>
+                                    </tr>
                                 ))}
-                            </div>
-                            <div className="divide-y divide-gray-100 max-h-48 overflow-y-auto">
-                                {expenses.map((exp,i)=>(
-                                    <div key={i} className="grid grid-cols-[2fr_1fr_1.5fr_2fr_auto] items-center hover:bg-blue-50/40 transition-colors">
-                                        <div className="px-3 py-1.5 text-[11.5px] font-mono text-gray-700">{exp.accName}</div>
-                                        <div className="px-3 py-1.5 text-[11.5px] font-mono text-right text-blue-700">{parseFloat(exp.amount||0).toFixed(2)}</div>
-                                        <div className="px-3 py-1.5 text-[11px] text-gray-600">{exp.costName||exp.costCode}</div>
-                                        <div className="px-3 py-1.5 text-[11px] text-gray-500">{exp.memo}</div>
-                                        <div className="px-2">
-                                            <button onClick={()=>handleDeleteExpense(exp)} className="w-6 h-6 flex items-center justify-center text-red-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors">
-                                                <Trash2 size={12}/>
-                                            </button>
-                                        </div>
-                                    </div>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </SimpleModal>
+
+            {/* Cost Center From Modal */}
+            <SimpleModal isOpen={showCCFromModal} onClose={() => setShowCCFromModal(false)} title={`Cost Center Directory - ${safeCC.length} Found`}>
+                <div className="flex flex-col h-full font-['Tahoma']">
+                    <div className="flex items-center gap-4 bg-slate-50 p-4 border-b border-gray-100 mb-2">
+                        <span className="text-[12px] font-bold text-gray-500 uppercase tracking-wider">Search Facility</span>
+                        <input 
+                            type="text" 
+                            className="w-full h-10 px-4 border border-gray-300 rounded-[3px] outline-none text-sm focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white shadow-sm flex-1" 
+                            value={docSearchQuery} 
+                            onChange={(e) => setDocSearchQuery(e.target.value)} 
+                        />
+                    </div>
+                    <div className="max-h-[50vh] overflow-y-auto no-scrollbar border border-gray-100 rounded-[5px] shadow-sm">
+                        <table className="w-full text-sm text-left">
+                            <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 z-10 shadow-sm">
+                                <tr>
+                                    <th className="border-b px-5 py-3">Code</th>
+                                    <th className="border-b px-5 py-3">Cost Center</th>
+                                    <th className="border-b text-center w-24 px-5 py-3">Select</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-100">
+                                {safeCC.filter(c => (c.name || '').toLowerCase().includes(docSearchQuery.toLowerCase()) || (c.code || '').toLowerCase().includes(docSearchQuery.toLowerCase())).map((c, idx) => (
+                                    <tr key={idx} className="group hover:bg-blue-50/50  transition-all border-b border-gray-50 cursor-pointer group border-b border-gray-50">
+                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{c.code}</td>
+                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{c.name}</td>
+                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">
+                                            <button onClick={() => {
+                                                setForm(f => ({ ...f, costCenterFrom: c.code }));
+                                                setShowCCFromModal(false);
+                                            }} className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button>
+                                        </td>
+                                    </tr>
                                 ))}
-                                {expenses.length===0 && (
-                                    <div className="text-center text-gray-400 text-xs py-8 font-mono">No expense lines added</div>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </SimpleModal>
+
+            {/* Item Search Modal */}
+            <SimpleModal isOpen={showItemModal} onClose={() => setShowItemModal(false)} title={`Items - ${(lookups.products || []).length} Found`}>
+                <div className="flex flex-col h-full font-['Tahoma']">
+                    <div className="flex items-center gap-4 bg-slate-50 p-4 border-b border-gray-100 mb-2">
+                        <span className="text-[12px] font-bold text-gray-500 uppercase tracking-wider">Search Facility</span>
+                        <input 
+                            type="text" 
+                            className="w-full h-10 px-4 border border-gray-300 rounded-[3px] outline-none text-sm focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white shadow-sm flex-1" 
+                            value={itemSearch} 
+                            onChange={(e) => setItemSearch(e.target.value)} 
+                        />
+                    </div>
+                    <div className="max-h-[50vh] overflow-y-auto no-scrollbar border border-gray-100 rounded-[5px] shadow-sm">
+                        <table className="w-full text-sm text-left">
+                            <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 z-10 shadow-sm">
+                                <tr>
+                                    <th className="border-b px-5 py-3">Code</th>
+                                    <th className="border-b px-5 py-3">Item Name</th>
+                                    <th className="border-b text-center w-24 px-5 py-3">Select</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-100">
+                                {(lookups.products || []).filter(p => (p.name || '').toLowerCase().includes(itemSearch.toLowerCase()) || (p.code || '').toLowerCase().includes(itemSearch.toLowerCase())).map((p, idx) => (
+                                    <tr key={idx} className="group hover:bg-blue-50/50  transition-all border-b border-gray-50 cursor-pointer group border-b border-gray-50">
+                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{p.code}</td>
+                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{p.name}</td>
+                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">
+                                            <button onClick={() => {
+                                                setItemLine(l => ({ ...l, itemId: p.code, itemName: p.name, cost: p.price || '0.00', description: p.name }));
+                                                setShowItemModal(false);
+                                            }} className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </SimpleModal>
+
+            {/* Saved Drafts Search Modal */}
+            <SimpleModal isOpen={showDocSearch} onClose={() => setShowDocSearch(false)} title={`Saved Drafts - ${savedDocs.length} Found`} maxWidth="max-w-[700px]">
+                <div className="flex flex-col h-full font-['Tahoma']">
+                    <div className="flex items-center gap-4 bg-slate-50 p-4 border-b border-gray-100 mb-2">
+                        <span className="text-[12px] font-bold text-gray-500 uppercase tracking-wider">Search Facility</span>
+                        <input 
+                            type="text" 
+                            className="w-full h-10 px-4 border border-gray-300 rounded-[3px] outline-none text-sm focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white shadow-sm flex-1" 
+                            value={docSearchQuery} 
+                            onChange={(e) => setDocSearchQuery(e.target.value)} 
+                        />
+                    </div>
+                    <div className="max-h-[50vh] overflow-y-auto no-scrollbar border border-gray-100 rounded-[5px] shadow-sm">
+                        <table className="w-full text-sm text-left">
+                            <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 z-10 shadow-sm">
+                                <tr>
+                                    <th className="border-b px-5 py-3">Doc No</th>
+                                    <th className="border-b px-5 py-3">Payee</th>
+                                    <th className="border-b px-5 py-3">Date</th>
+                                    <th className="border-b text-right px-5 py-3">Amount</th>
+                                    <th className="border-b text-center w-24 px-5 py-3">Select</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-100">
+                                {savedDocs.filter(d => 
+                                    (d.docNo?.toLowerCase() || '').includes(docSearchQuery.toLowerCase()) || 
+                                    (d.payee?.toLowerCase() || '').includes(docSearchQuery.toLowerCase())
+                                ).map((d, idx) => (
+                                    <tr key={idx} className="group hover:bg-blue-50/50  transition-all border-b border-gray-50 cursor-pointer group border-b border-gray-50">
+                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{d.docNo}</td>
+                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{d.payee || '---'}</td>
+                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{d.date?.split('T')[0] || ''}</td>
+                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{parseFloat(d.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">
+                                            <button onClick={() => { loadDraft(d); setShowDocSearch(false); }} className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button>
+                                        </td>
+                                    </tr>
+                                ))}
+                                {savedDocs.length === 0 && (
+                                    <tr>
+                                        <td colSpan="5" className="text-center py-16 text-gray-400 text-[11px] font-bold uppercase tracking-widest">No saved drafts found.</td>
+                                    </tr>
                                 )}
-                            </div>
-                        </div>
-                    </>
-                )}
-
-                {activeTab === 'items' && (
-                    <>
-                        {/* ── Item Purchase Entry ── */}
-                        <div className="bg-emerald-50/40 border border-emerald-100 rounded-xl p-3">
-                            <div className="text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-2 font-mono">Add Item Purchase</div>
-                            <div className="flex flex-wrap gap-2 items-center">
-                                {/* Item */}
-                                <div className="flex items-center gap-1">
-                                    <input readOnly value={itemLine.itemName||itemLine.itemId} placeholder="Select Item" className={`${fmtInput} w-44 cursor-pointer`} onClick={()=>setShowItemModal(true)}/>
-                                    <button onClick={()=>setShowItemModal(true)} className="w-7 h-8 bg-[#0285fd] text-white rounded-md flex items-center justify-center hover:bg-blue-600"><Search size={11}/></button>
-                                </div>
-                                {/* Qty */}
-                                <input type="number" value={itemLine.qty} onChange={e=>setItemLine(l=>({...l,qty:e.target.value}))} placeholder="Qty" className={`${fmtInput} w-16 text-center`}/>
-                                {/* Cost */}
-                                <input type="number" value={itemLine.cost} onChange={e=>setItemLine(l=>({...l,cost:e.target.value}))} placeholder="Cost" className={`${fmtInput} w-24 text-right`}/>
-                                {/* Description */}
-                                <input value={itemLine.description} onChange={e=>setItemLine(l=>({...l,description:e.target.value}))} placeholder="Description" className={`${fmtInput} flex-1 min-w-28`}/>
-                                {/* Add */}
-                                <button onClick={handleAddItem} disabled={loading} className="h-8 px-4 bg-[#22c55e] hover:bg-green-600 text-white rounded-md text-[11px] font-bold flex items-center gap-1 active:scale-95 disabled:opacity-50">
-                                    {loading ? <Loader2 size={11} className="animate-spin"/> : <Plus size={11}/>} Add
-                                </button>
-                            </div>
-                        </div>
-
-                        {/* ── Items Grid ── */}
-                        <div className="border border-gray-200 rounded-xl overflow-hidden">
-                            <div className="grid grid-cols-[1fr_2fr_1fr_1.5fr_auto] bg-emerald-600 text-white text-[10px] font-black font-mono uppercase tracking-widest">
-                                {['Item Code','Description','Qty','Cost (Total)','Del'].map(h=>(
-                                    <div key={h} className="px-3 py-2">{h}</div>
-                                ))}
-                            </div>
-                            <div className="divide-y divide-gray-100 max-h-48 overflow-y-auto">
-                                {items.map((itm,i)=>(
-                                    <div key={i} className="grid grid-cols-[1fr_2fr_1fr_1.5fr_auto] items-center hover:bg-emerald-50/40 transition-colors">
-                                        <div className="px-3 py-1.5 text-[11.5px] font-mono text-gray-700">{itm.itemId}</div>
-                                        <div className="px-3 py-1.5 text-[11.5px] font-mono text-gray-600">{itm.description}</div>
-                                        <div className="px-3 py-1.5 text-[11px] text-center text-gray-600">{itm.qty}</div>
-                                        <div className="px-3 py-1.5 text-[11.5px] font-mono text-right text-emerald-700">{parseFloat(itm.cost||0).toFixed(2)}</div>
-                                        <div className="px-2">
-                                            <button onClick={()=>handleDeleteItem(itm)} className="w-6 h-6 flex items-center justify-center text-red-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors">
-                                                <Trash2 size={12}/>
-                                            </button>
-                                        </div>
-                                    </div>
-                                ))}
-                                {items.length===0 && (
-                                    <div className="text-center text-gray-400 text-xs py-8 font-mono">No item lines added</div>
-                                )}
-                            </div>
-                        </div>
-                    </>
-                )}
-
-            </div>
-        </SimpleModal>
-
-        {/* Calendars */}
-        <CalendarModal isOpen={showCal} onClose={()=>setShowCal(false)} onDateSelect={handleDate} initialDate={form[calField]}/>
-
-        {/* Petty Account Modal */}
-        <SearchModal isOpen={showPettyModal} onClose={()=>setShowPettyModal(false)} title="Select Petty Cash Account"
-            items={safePetty} onSelect={a=>setForm(f=>({...f,pettyAccCode:a.code,pettyAccName:a.name}))}/>
-
-        {/* Vendor Modal */}
-        <SearchModal isOpen={showVendorModal} onClose={()=>setShowVendorModal(false)} title="Select Vendor"
-            items={safeSuppliers} onSelect={s=>setForm(f=>({...f,vendorId:s.code,vendorName:s.name}))}/>
-
-        {/* Expense Account Modal */}
-        <SearchModal isOpen={showAccModal} onClose={()=>setShowAccModal(false)} title="Select Expense Account"
-            items={safeAccounts} onSelect={a=>setLine(l=>({...l,accCode:a.code,accName:a.name}))}/>
-
-        {/* Cost Center (line) Modal */}
-        <SearchModal isOpen={showCCModal} onClose={()=>setShowCCModal(false)} title="Select Cost Center"
-            items={safeCC} onSelect={c=>setLine(l=>({...l,costCode:c.code,costName:c.name}))}/>
-
-        {/* Cost Center From (header) Modal */}
-        <SearchModal isOpen={showCCFromModal} onClose={()=>setShowCCFromModal(false)} title="Select Cost Center (From)"
-            items={safeCC} onSelect={c=>setForm(f=>({...f,costCenterFrom:c.code}))}/>
-
-        {/* Item Modal */}
-        <SearchModal isOpen={showItemModal} onClose={()=>setShowItemModal(false)} title="Select Item"
-            items={lookups.products||[]} onSelect={p=>setItemLine(l=>({...l,itemId:p.code,itemName:p.name,cost:p.price,description:p.name}))}/>
-
-        {/* Doc Search */}
-        <SearchModal isOpen={showDocSearch} onClose={()=>setShowDocSearch(false)} title="Saved Drafts"
-            items={savedDocs} onSelect={d => loadDraft(d)}/>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </SimpleModal>
         </>
     );
 };

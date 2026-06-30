@@ -146,10 +146,10 @@ const ChangeBackgroundBoard = ({ isOpen, onClose, currentTopBarColor, onColorSel
                         </div>
 
                         {/* Selected Color Info */}
-                        <div className="bg-white p-4 rounded-lg border border-slate-200 shadow-sm space-y-4">
+                        <div className="bg-white p-4 rounded-[3px] border border-slate-200 shadow-sm space-y-4">
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-12 h-12 rounded-lg shadow-inner border border-slate-200 transition-colors duration-200" style={{ backgroundColor: safeSelectedColor }} />
+                                    <div className="w-12 h-12 rounded-[3px] shadow-inner border border-slate-200 transition-colors duration-200" style={{ backgroundColor: safeSelectedColor }} />
                                     <div>
                                         <h4 className="text-sm font-semibold text-slate-800">Active Color</h4>
                                         <p className="text-xs font-mono text-slate-500 mt-0.5">{safeSelectedColor.toUpperCase()}</p>
@@ -158,7 +158,7 @@ const ChangeBackgroundBoard = ({ isOpen, onClose, currentTopBarColor, onColorSel
 
                                 <button
                                     onClick={() => setSelectedColor(currentTopBarColor || defaultColor)}
-                                    className="w-9 h-9 bg-slate-50 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-all flex items-center justify-center border border-slate-200 shadow-sm"
+                                    className="w-9 h-9 bg-slate-50 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-[3px] transition-all flex items-center justify-center border border-slate-200 shadow-sm"
                                     title="Reset to Current"
                                 >
                                     <RefreshCw size={16} />
@@ -177,7 +177,7 @@ const ChangeBackgroundBoard = ({ isOpen, onClose, currentTopBarColor, onColorSel
                             </div>
                         </div>
 
-                        <div className="bg-blue-50 p-3.5 rounded-lg border border-blue-100 flex items-start gap-2.5">
+                        <div className="bg-blue-50 p-3.5 rounded-[3px] border border-blue-100 flex items-start gap-2.5">
                             <Sparkles size={16} className="text-blue-500 shrink-0 mt-0.5" />
                             <p className="text-xs text-blue-700 leading-relaxed">
                                 The top ribbon color of the dashboard will instantly update to your selection.

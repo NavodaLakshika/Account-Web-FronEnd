@@ -69,7 +69,7 @@ const CalculatorBoard = ({ isOpen, onClose }) => {
             isOpen={isOpen}
             onClose={onClose}
             title="Calculator"
-            maxWidth="max-w-[320px]"
+            maxWidth="max-w-[700px]"
         >
             <div className="p-2 space-y-4">
                 {/* Result Display */}

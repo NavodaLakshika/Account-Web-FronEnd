@@ -13,6 +13,7 @@ import { grnService } from '../services/grn.service';
 import { getSessionData } from '../utils/session';
 import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
 import SalesInvoiceDetailModal from '../components/SalesInvoiceDetailModal';
+import TransactionFormWrapper from '../components/TransactionFormWrapper';
 
 
 const SalesInvoiceBoard = ({ isOpen, onClose }) => {
@@ -345,11 +346,11 @@ const SalesInvoiceBoard = ({ isOpen, onClose }) => {
 
     return (
         <>
-            <SimpleModal
+            <TransactionFormWrapper subtitle="Transaction Management" icon={FileText}
                 isOpen={isOpen}
                 onClose={onClose}
                 title="Sales Invoice"
-                maxWidth="max-w-[1200px]"
+                maxWidth="max-w-[700px]"
                 footer={
                     <div className="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-5 w-full flex justify-between items-center border-t border-blue-100 rounded-b-xl shadow-inner">
                         <div className="flex gap-4">
@@ -364,7 +365,7 @@ const SalesInvoiceBoard = ({ isOpen, onClose }) => {
                             <button onClick={handleSave} className="px-7 h-11 bg-white text-[#0285fd] text-[13px] font-black rounded-[8px] border-2 border-[#0285fd] hover:bg-blue-50 transition-all active:scale-95 flex items-center gap-2.5 shadow-sm">
                                 <Save size={16} strokeWidth={2.5} /> SAVE
                             </button>
-                            <button onClick={handleApply} className="px-7 h-11 bg-[#2bb744] text-white text-[13px] font-black rounded-[8px] shadow-lg shadow-green-200 hover:bg-[#259b3a] hover:-translate-y-0.5 transition-all active:scale-95 flex items-center gap-2.5 border-none">
+                            <button onClick={handleApply} className="px-7 h-11 bg-white text-[#2bb744] border-2 border-[#2bb744] hover:bg-green-50 text-[13px] font-black rounded-[8px] shadow-lg shadow-green-200 hover:bg-[#259b3a] hover:-translate-y-0.5 transition-all active:scale-95 flex items-center gap-2.5 border-none">
                                 <CheckCircle size={16} strokeWidth={2.5} /> APPLY
                             </button>
                         </div>
@@ -373,14 +374,14 @@ const SalesInvoiceBoard = ({ isOpen, onClose }) => {
             >
                 <div className="space-y-4 overflow-y-auto no-scrollbar font-['Tahoma']">
                     {/* Header Section */}
-                    <div className="bg-white p-4 border border-gray-100 rounded-lg shadow-sm space-y-4">
+                    <div className="bg-white p-4 border border-gray-200 rounded-[3px] shadow-sm space-y-4">
                         <div className="grid grid-cols-12 gap-x-6 gap-y-3.5">
                             {/* Row 1 */}
                             <div className="col-span-4 flex items-center gap-2">
                                 <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Document No</label>
                                 <div className="flex-1 flex gap-1 h-8">
-                                    <input type="text" name="docNo" value={formData.docNo} onChange={handleInput} className="flex-1 border border-gray-300 px-3 text-[12px] font-bold text-blue-600 bg-gray-50 rounded-[5px] outline-none focus:border-[#0285fd]" />
-                                    <button onClick={handleSearch} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95">
+                                    <input type="text" name="docNo" value={formData.docNo} onChange={handleInput} className="flex-1 border border-gray-300 px-3 text-[12px] font-bold text-blue-600 bg-gray-50 rounded-[3px] outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd]" />
+                                    <button onClick={handleSearch} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95">
                                         <Search size={16} />
                                     </button>
                                 </div>
@@ -388,8 +389,8 @@ const SalesInvoiceBoard = ({ isOpen, onClose }) => {
                             <div className="col-span-4 flex items-center gap-2">
                                 <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Date</label>
                                 <div className="flex-1 flex gap-1 h-8">
-                                    <input type="text" readOnly value={formData.date} className="flex-1 border border-gray-300 rounded-[5px] px-3 text-[12px] font-bold text-gray-700 bg-white" />
-                                    <button onClick={() => { setDatePickerField('date'); setShowDatePicker(true); }} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] shadow-md active:scale-95">
+                                    <input type="text" readOnly value={formData.date} className="flex-1 border border-gray-300 rounded-[3px] px-3 text-[12px] font-bold text-gray-700 bg-white" />
+                                    <button onClick={() => { setDatePickerField('date'); setShowDatePicker(true); }} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] shadow-md active:scale-95">
                                         <Calendar size={16} />
                                     </button>
                                 </div>
@@ -397,8 +398,8 @@ const SalesInvoiceBoard = ({ isOpen, onClose }) => {
                             <div className="col-span-4 flex items-center gap-2">
                                 <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">S.O. Number</label>
                                 <div className="flex-1 flex gap-1 h-8">
-                                    <input type="text" readOnly value={formData.soNumber} className="flex-1 border border-gray-300 px-3 text-[12px] font-bold text-gray-700 bg-white rounded-[5px]" />
-                                    <button onClick={() => setShowSOSearch(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] shadow-md active:scale-95">
+                                    <input type="text" readOnly value={formData.soNumber} className="flex-1 border border-gray-300 px-3 text-[12px] font-bold text-gray-700 bg-white rounded-[3px]" />
+                                    <button onClick={() => setShowSOSearch(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] shadow-md active:scale-95">
                                         <Search size={16} />
                                     </button>
                                 </div>
@@ -408,8 +409,8 @@ const SalesInvoiceBoard = ({ isOpen, onClose }) => {
                             <div className="col-span-8 flex items-center gap-2">
                                 <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Customer</label>
                                 <div className="flex-1 flex gap-1 h-8">
-                                    <input type="text" readOnly value={lookups.customers.find(c => c.code === formData.customerId)?.name || ''} className="flex-1 border border-gray-300 px-3 text-[12px] font-bold text-red-600 bg-gray-50 rounded-[5px]" />
-                                    <button onClick={() => setShowCustomerSearch(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] shadow-md active:scale-95">
+                                    <input type="text" readOnly value={lookups.customers.find(c => c.code === formData.customerId)?.name || ''} className="flex-1 border border-gray-300 px-3 text-[12px] font-bold text-red-600 bg-gray-50 rounded-[3px]" />
+                                    <button onClick={() => setShowCustomerSearch(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] shadow-md active:scale-95">
                                         <Search size={16} />
                                     </button>
                                 </div>
@@ -417,8 +418,8 @@ const SalesInvoiceBoard = ({ isOpen, onClose }) => {
                             <div className="col-span-4 flex items-center gap-2">
                                 <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Sales Asst.</label>
                                 <div className="flex-1 flex gap-1 h-8">
-                                    <input type="text" readOnly value={formData.salesAssistant} className="flex-1 border border-gray-300 px-3 text-[12px] font-bold text-gray-700 bg-white rounded-[5px]" />
-                                    <button onClick={() => setShowAssistantSearch(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] shadow-md active:scale-95">
+                                    <input type="text" readOnly value={formData.salesAssistant} className="flex-1 border border-gray-300 px-3 text-[12px] font-bold text-gray-700 bg-white rounded-[3px]" />
+                                    <button onClick={() => setShowAssistantSearch(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] shadow-md active:scale-95">
                                         <Search size={16} />
                                     </button>
                                 </div>
@@ -428,8 +429,8 @@ const SalesInvoiceBoard = ({ isOpen, onClose }) => {
                             <div className="col-span-4 flex items-center gap-2">
                                 <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Payment Type</label>
                                 <div className="flex-1 flex gap-1 h-8">
-                                    <input type="text" readOnly value={lookups.paymentMethods.find(m => m.code === formData.payType)?.name || ''} className="flex-1 border border-gray-300 px-3 text-[12px] font-bold text-gray-700 bg-white rounded-[5px]" />
-                                    <button onClick={() => setShowPayMethodSearch(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] shadow-md active:scale-95">
+                                    <input type="text" readOnly value={lookups.paymentMethods.find(m => m.code === formData.payType)?.name || ''} className="flex-1 border border-gray-300 px-3 text-[12px] font-bold text-gray-700 bg-white rounded-[3px]" />
+                                    <button onClick={() => setShowPayMethodSearch(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] shadow-md active:scale-95">
                                         <Search size={16} />
                                     </button>
                                 </div>
@@ -437,27 +438,27 @@ const SalesInvoiceBoard = ({ isOpen, onClose }) => {
                             <div className="col-span-4 flex items-center gap-2">
                                 <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Tax Account</label>
                                 <div className="flex-1 flex gap-1 h-8">
-                                    <input type="text" readOnly value={lookups.taxAccounts.find(a => a.code === formData.taxAccount)?.name || ''} className="flex-1 border border-gray-300 px-3 text-[12px] font-bold text-gray-700 bg-white rounded-[5px]" />
-                                    <button onClick={() => setShowTaxAccSearch(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] shadow-md active:scale-95">
+                                    <input type="text" readOnly value={lookups.taxAccounts.find(a => a.code === formData.taxAccount)?.name || ''} className="flex-1 border border-gray-300 px-3 text-[12px] font-bold text-gray-700 bg-white rounded-[3px]" />
+                                    <button onClick={() => setShowTaxAccSearch(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] shadow-md active:scale-95">
                                         <Search size={16} />
                                     </button>
                                 </div>
                             </div>
                             <div className="col-span-4 flex items-center gap-2">
                                 <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Ref. No</label>
-                                <input type="text" name="reference" value={formData.reference} onChange={handleInput} className="flex-1 h-8 border border-gray-300 rounded-[5px] px-3 text-[12px] font-bold text-gray-700 outline-none focus:border-[#0285fd]" />
+                                <input type="text" name="reference" value={formData.reference} onChange={handleInput} className="flex-1 h-8 border border-gray-300 rounded-[3px] px-3 text-[12px] font-bold text-gray-700 outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd]" />
                             </div>
                             <div className="col-span-4 flex items-center gap-2">
                                 <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Credit Period</label>
-                                <input type="number" name="creditPeriod" value={formData.creditPeriod} onChange={handleInput} className="flex-1 h-8 border border-gray-300 rounded-[5px] px-3 text-[12px] font-bold text-gray-700 outline-none focus:border-[#0285fd]" />
+                                <input type="number" name="creditPeriod" value={formData.creditPeriod} onChange={handleInput} className="flex-1 h-8 border border-gray-300 rounded-[3px] px-3 text-[12px] font-bold text-gray-700 outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd]" />
                             </div>
 
                             {/* Row 4 */}
                             <div className="col-span-4 flex items-center gap-2">
                                 <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Due Date</label>
                                 <div className="flex-1 flex gap-1 h-8">
-                                    <input type="text" readOnly value={formData.dueDate} className="flex-1 border border-gray-300 rounded-[5px] px-3 text-[12px] font-bold text-gray-700 bg-white" />
-                                    <button onClick={() => { setDatePickerField('dueDate'); setShowDatePicker(true); }} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] shadow-md active:scale-95">
+                                    <input type="text" readOnly value={formData.dueDate} className="flex-1 border border-gray-300 rounded-[3px] px-3 text-[12px] font-bold text-gray-700 bg-white" />
+                                    <button onClick={() => { setDatePickerField('dueDate'); setShowDatePicker(true); }} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] shadow-md active:scale-95">
                                         <Calendar size={16} />
                                     </button>
                                 </div>
@@ -466,18 +467,18 @@ const SalesInvoiceBoard = ({ isOpen, onClose }) => {
                     </div>
 
                     {/* Product Grid Section */}
-                    <div className="border border-gray-100 rounded-lg bg-white shadow-sm flex flex-col min-h-[300px] overflow-hidden">
-                        <div className="flex bg-slate-50/80 border-b border-gray-100 text-[10px] font-black text-gray-400 uppercase tracking-widest items-center">
-                            <div className="flex-[3] py-2.5 px-4 border-r border-gray-100 flex items-center justify-between">
+                    <div className="border border-gray-200 rounded-[3px] bg-white shadow-sm flex flex-col min-h-[300px] overflow-hidden">
+                        <div className="flex bg-slate-50/80 border-b border-gray-200 text-[10px] font-black text-gray-400 uppercase tracking-widest items-center">
+                            <div className="flex-[3] py-2.5 px-4 border-r border-gray-200 flex items-center justify-between">
                                 <span>Product Identification</span>
-                                <button onClick={() => setShowAddProductModal(true)} className="w-8 h-7 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] shadow-md active:scale-95">
+                                <button onClick={() => setShowAddProductModal(true)} className="w-8 h-7 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] shadow-md active:scale-95">
                                     <Plus size={14} />
                                 </button>
                             </div>
-                            <div className="w-16 py-2.5 px-3 border-r border-gray-100 text-center">Unit</div>
-                            <div className="w-28 py-2.5 px-3 border-r border-gray-100 text-right">Selling</div>
-                            <div className="w-16 py-2.5 px-3 border-r border-gray-100 text-center">Qty</div>
-                            <div className="w-24 py-2.5 px-3 border-r border-gray-100 text-right">Dis.</div>
+                            <div className="w-16 py-2.5 px-3 border-r border-gray-200 text-center">Unit</div>
+                            <div className="w-28 py-2.5 px-3 border-r border-gray-200 text-right">Selling</div>
+                            <div className="w-16 py-2.5 px-3 border-r border-gray-200 text-center">Qty</div>
+                            <div className="w-24 py-2.5 px-3 border-r border-gray-200 text-right">Dis.</div>
                             <div className="w-32 py-2.5 px-4 text-right">Amount</div>
                             <div className="w-10"></div>
                         </div>
@@ -488,29 +489,29 @@ const SalesInvoiceBoard = ({ isOpen, onClose }) => {
                                     Allocated Items Inventory Empty
                                 </div>
                             ) : products.map((p, idx) => (
-                                <div key={idx} className="flex border-b border-gray-100 text-[11px] font-bold text-slate-700 hover:bg-blue-50/30 items-center transition-colors">
-                                    <div className="flex-[3] py-2 px-4 border-r border-gray-100 truncate">
+                                <div key={idx} className="flex border-b border-gray-200 text-[11px] font-bold text-slate-700 hover:bg-blue-50/30 items-center transition-colors">
+                                    <div className="flex-[3] py-2 px-4 border-r border-gray-200 truncate">
                                         <div className="flex flex-col">
                                             <span className="text-blue-600 font-mono text-[10px]">{p.prodCode}</span>
                                             <span className="truncate">{p.prodName}</span>
                                         </div>
                                     </div>
-                                    <div className="w-16 py-2 px-3 border-r border-gray-100 text-center text-gray-400">{p.unit}</div>
-                                    <div className="w-28 border-r border-gray-100 px-1 py-1">
+                                    <div className="w-16 py-2 px-3 border-r border-gray-200 text-center text-gray-400">{p.unit}</div>
+                                    <div className="w-28 border-r border-gray-200 px-1 py-1">
                                         <input type="text" value={p.price} onChange={(e) => {
                                             const newPrice = e.target.value;
                                             const newAmount = (parseFloat(p.qty) || 0) * (parseFloat(newPrice) || 0) - (parseFloat(p.discount) || 0);
                                             setProducts(products.map((item, i) => i === idx ? { ...item, price: newPrice, amount: newAmount.toFixed(2) } : item));
                                         }} className="w-full h-7 bg-transparent text-right text-[12px] font-mono font-bold text-slate-800 outline-none px-2" />
                                     </div>
-                                    <div className="w-16 border-r border-gray-100 px-1 py-1">
+                                    <div className="w-16 border-r border-gray-200 px-1 py-1">
                                         <input type="text" value={p.qty} onChange={(e) => {
                                             const newQty = e.target.value;
                                             const newAmount = (parseFloat(newQty) || 0) * (parseFloat(p.price) || 0) - (parseFloat(p.discount) || 0);
                                             setProducts(products.map((item, i) => i === idx ? { ...item, qty: newQty, amount: newAmount.toFixed(2) } : item));
                                         }} className="w-full h-7 bg-transparent text-center text-[12px] font-mono font-black text-slate-900 outline-none px-1" />
                                     </div>
-                                    <div className="w-24 border-r border-gray-100 px-1 py-1">
+                                    <div className="w-24 border-r border-gray-200 px-1 py-1">
                                         <input type="text" value={p.discount} onChange={(e) => {
                                             const newDisc = e.target.value;
                                             const newAmount = (parseFloat(p.qty) || 0) * (parseFloat(p.price) || 0) - (parseFloat(newDisc) || 0);
@@ -521,7 +522,7 @@ const SalesInvoiceBoard = ({ isOpen, onClose }) => {
                                         {parseFloat(p.amount).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                     </div>
                                     <div className="w-10 flex justify-center py-1">
-                                        <button onClick={() => removeProduct(idx)} className="text-red-300 hover:text-red-500 transition-all p-1.5 hover:bg-red-50 rounded-[5px]">
+                                        <button onClick={() => removeProduct(idx)} className="text-red-300 hover:text-red-500 transition-all p-1.5 hover:bg-red-50 rounded-[3px]">
                                             <Trash2 size={13} />
                                         </button>
                                     </div>
@@ -534,10 +535,10 @@ const SalesInvoiceBoard = ({ isOpen, onClose }) => {
                     <div className="flex flex-row justify-between items-end gap-x-12">
                         <div className="flex-1 space-y-2">
                             <label className="text-[12.5px] font-bold text-gray-700">Remarks / Narrative</label>
-                            <textarea name="remarks" value={formData.remarks} onChange={handleInput} className="w-full h-[120px] border border-gray-300 rounded-lg p-3 text-[12.5px] font-mono outline-none focus:border-[#0285fd] resize-none shadow-sm bg-gray-50/30" placeholder=""></textarea>
+                            <textarea name="remarks" value={formData.remarks} onChange={handleInput} className="w-full h-[120px] border border-gray-300 rounded-[3px] p-3 text-[12.5px] font-mono outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] resize-none shadow-sm bg-gray-50/30" placeholder=""></textarea>
                         </div>
 
-                        <div className="w-[350px] bg-white border border-gray-100 rounded-lg p-4 space-y-3 shadow-sm">
+                        <div className="w-[350px] bg-white border border-gray-200 rounded-[3px] p-4 space-y-3 shadow-sm">
                             <div className="flex items-center justify-between">
                                 <span className="text-[12px] font-bold text-gray-500 uppercase">Gross Amount</span>
                                 <div className="text-[14px] font-mono font-black text-slate-800">{totals.gross.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
@@ -567,7 +568,7 @@ const SalesInvoiceBoard = ({ isOpen, onClose }) => {
                                 <div className="text-[14px] font-mono font-bold text-slate-700">{totals.nbtAmt.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
                             </div>
                             <div className="h-[1px] bg-gray-100 my-1" />
-                            <div className="flex items-center justify-between bg-blue-50/50 p-2.5 rounded-md border border-blue-100">
+                            <div className="flex items-center justify-between bg-blue-50/50 p-2.5 rounded-[3px] border border-blue-100">
                                 <span className="text-[13px] font-black text-slate-900 uppercase tracking-wider">Net Amount</span>
                                 <div className="text-[20px] font-mono font-black text-blue-700 tabular-nums">
                                     {totals.netAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
@@ -576,7 +577,7 @@ const SalesInvoiceBoard = ({ isOpen, onClose }) => {
                         </div>
                     </div>
                 </div>
-            </SimpleModal>
+            </TransactionFormWrapper>
 
             {/* Lookups Modals */}
             <LookupModal isOpen={showSearchModal} onClose={() => setShowSearchModal(false)} title="Invoice Draft Explorer" items={invoices} onSelect={(item) => { handleSelectInvoice(item.docNo); setShowSearchModal(false); }} />
@@ -587,13 +588,13 @@ const SalesInvoiceBoard = ({ isOpen, onClose }) => {
             <LookupModal isOpen={showSOSearch} onClose={() => setShowSOSearch(false)} title="Sales Order Archive" items={lookups.salesOrders} onSelect={handleSelectSO} />
             
             {/* Product Add Modal */}
-            <SimpleModal isOpen={showAddProductModal} onClose={() => setShowAddProductModal(false)} title="Product Entry Terminal" maxWidth="max-w-[500px]">
+            <SimpleModal isOpen={showAddProductModal} onClose={() => setShowAddProductModal(false)} title="Product Entry Terminal" maxWidth="max-w-[700px]">
                 <div className="space-y-4 font-['Tahoma']">
                     <div className="space-y-1.5">
                         <label className="text-[11px] font-black text-gray-400 uppercase tracking-widest">Product / Service</label>
                         <div className="flex gap-2">
-                            <input type="text" readOnly value={entry.prodName} placeholder="Tap Search to Catalog..." className="flex-1 h-10 border border-gray-300 rounded-[5px] px-4 text-[13px] font-bold text-blue-600 bg-gray-50 outline-none" />
-                            <button onClick={() => setShowProductSearch(true)} className="w-12 h-10 bg-[#0285fd] text-white flex items-center justify-center rounded-[5px] shadow-md active:scale-95">
+                            <input type="text" readOnly value={entry.prodName} placeholder="Tap Search to Catalog..." className="flex-1 h-10 border border-gray-300 rounded-[3px] px-4 text-[13px] font-bold text-blue-600 bg-gray-50 outline-none" />
+                            <button onClick={() => setShowProductSearch(true)} className="w-12 h-10 bg-[#0285fd] text-white flex items-center justify-center rounded-[3px] shadow-md active:scale-95">
                                 <Search size={18} />
                             </button>
                         </div>
@@ -601,15 +602,15 @@ const SalesInvoiceBoard = ({ isOpen, onClose }) => {
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-1.5">
                             <label className="text-[11px] font-black text-gray-400 uppercase tracking-widest">Selling Rate</label>
-                            <input type="text" name="price" value={entry.price} onChange={handleEntryInput} className="w-full h-10 border border-gray-300 rounded-[5px] px-4 text-[13px] font-mono font-bold outline-none focus:border-[#0285fd]" />
+                            <input type="text" name="price" value={entry.price} onChange={handleEntryInput} className="w-full h-10 border border-gray-300 rounded-[3px] px-4 text-[13px] font-mono font-bold outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] shadow-sm bg-white" />
                         </div>
                         <div className="space-y-1.5">
                             <label className="text-[11px] font-black text-gray-400 uppercase tracking-widest">Quantity</label>
-                            <input type="text" ref={qtyRef} name="qty" value={entry.qty} onChange={handleEntryInput} className="w-full h-10 border border-gray-300 rounded-[5px] px-4 text-[13px] font-mono font-bold outline-none focus:border-[#0285fd]" />
+                            <input type="text" ref={qtyRef} name="qty" value={entry.qty} onChange={handleEntryInput} className="w-full h-10 border border-gray-300 rounded-[3px] px-4 text-[13px] font-mono font-bold outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] shadow-sm bg-white" />
                         </div>
                     </div>
                     <div className="pt-4">
-                        <button onClick={addProduct} className="w-full h-12 bg-[#2bb744] text-white text-sm font-black rounded-[5px] shadow-lg shadow-green-100 hover:bg-[#259b3a] transition-all active:scale-[0.98] flex items-center justify-center gap-2">
+                        <button onClick={addProduct} className="w-full h-12 bg-white text-[#2bb744] border-2 border-[#2bb744] hover:bg-green-50 text-sm font-black rounded-[3px] shadow-lg shadow-green-100 hover:bg-[#259b3a] transition-all active:scale-[0.98] flex items-center justify-center gap-2">
                             <Plus size={18} strokeWidth={3} /> ALLOCATE TO INVOICE
                         </button>
                     </div>
@@ -657,17 +658,17 @@ const LookupModal = ({ isOpen, onClose, title, items, onSelect }) => {
     const hasPrice = items && items.length > 0 && items.some(i => i.selling !== undefined || i.sellingPrice !== undefined);
 
     return (
-        <SimpleModal isOpen={isOpen} onClose={onClose} title={title} maxWidth={hasPrice ? "max-w-[800px]" : "max-w-[600px]"}>
+        <TransactionFormWrapper subtitle="Transaction Management" icon={FileText} isOpen={isOpen} onClose={onClose} title={title} maxWidth={hasPrice ? "max-w-[800px]" : "max-w-[600px]"}>
             <div className="space-y-4 font-['Tahoma']">
-                <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-lg border border-gray-100">
+                <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-[3px] border border-gray-200">
                     <div className="relative flex-1">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
-                        <input type="text" placeholder="Search archive..." className="w-full h-9 pl-10 pr-4 border border-gray-300 rounded-[5px] outline-none text-sm focus:border-[#0285fd] bg-white shadow-sm" value={query} onChange={(e) => setQuery(e.target.value)} autoFocus />
+                        <input type="text" placeholder="Search archive..." className="w-full h-9 pl-10 pr-4 border border-gray-300 rounded-[3px] outline-none text-sm focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white shadow-sm" value={query} onChange={(e) => setQuery(e.target.value)} autoFocus />
                     </div>
                 </div>
-                <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm max-h-[400px] overflow-y-auto">
+                <div className="border border-gray-200 rounded-[3px] overflow-hidden shadow-sm max-h-[400px] overflow-y-auto">
                     <table className="w-full text-left">
-                        <thead className="bg-[#f8fafd] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">
+                        <thead className="bg-[#f8fafd] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-200">
                             <tr>
                                 <th className="px-5 py-3">Identifier</th>
                                 <th className="px-5 py-3">Description</th>
@@ -683,14 +684,14 @@ const LookupModal = ({ isOpen, onClose, title, items, onSelect }) => {
                                     <td className="px-5 py-3 font-mono text-[12px] text-gray-600">{item.code || item.Code || item.docNo || item.doc_No || item.Doc_No}</td>
                                     <td className="px-5 py-3 text-[12px] font-bold text-gray-700 uppercase">{item.name || item.Name || item.remarks || item.Remarks || item.vendorId || item.date}</td>
                                     {hasPrice && <td className="px-5 py-3 text-right font-mono text-[12px] font-bold text-blue-600">{parseFloat(item.selling || item.sellingPrice || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>}
-                                    <td className="px-5 py-3 text-right"><button className="bg-[#e49e1b] text-white text-[10px] px-4 py-1.5 rounded-[5px] font-black shadow-md transition-all active:scale-95">SELECT</button></td>
+                                    <td className="px-5 py-3 text-right"><button className="bg-[#e49e1b] text-white text-[10px] px-4 py-1.5 rounded-[3px] font-black shadow-md transition-all active:scale-95">SELECT</button></td>
                                 </tr>
                             ))}
                         </tbody>
                     </table>
                 </div>
             </div>
-        </SimpleModal>
+        </TransactionFormWrapper>
     );
 };
 

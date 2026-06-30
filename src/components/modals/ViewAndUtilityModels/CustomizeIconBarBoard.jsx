@@ -181,7 +181,7 @@ const CustomizeIconBarBoard = ({ isOpen, onClose, onSave }) => {
                             <div className="px-4 py-3 border-b border-slate-100 bg-slate-50/50 flex flex-col gap-3">
                                 <div className="flex items-center justify-between">
                                     <span className="text-sm font-semibold text-slate-700">Available Icons</span>
-                                    <span className="text-xs font-medium text-slate-500 bg-slate-200/50 px-2 py-0.5 rounded-full">{filteredAvailable.length}</span>
+                                    <span className="text-xs font-medium text-slate-500 bg-slate-200/50 px-2 py-0.5 rounded-[3px]">{filteredAvailable.length}</span>
                                 </div>
                                 <div className="relative">
                                     <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
@@ -271,7 +271,7 @@ const CustomizeIconBarBoard = ({ isOpen, onClose, onSave }) => {
                             <div className="px-4 py-3 border-b border-slate-100 bg-slate-50/50 flex flex-col gap-3">
                                 <div className="flex items-center justify-between">
                                     <span className="text-sm font-semibold text-slate-700">Active Icons</span>
-                                    <span className="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-100">{filteredCurrent.length}</span>
+                                    <span className="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-0.5 rounded-[3px] border border-blue-100">{filteredCurrent.length}</span>
                                 </div>
                                 <div className="relative">
                                     <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />

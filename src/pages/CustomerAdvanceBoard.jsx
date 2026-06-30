@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import SimpleModal from '../components/SimpleModal';
 import TransactionFormWrapper from '../components/TransactionFormWrapper';
 import CalendarModal from '../components/CalendarModal';
-import { Search, Calendar, ChevronDown, Check, X, Save, RotateCcw, Loader2, Banknote } from 'lucide-react';
+import { Search, Calendar, X, Save, RotateCcw, Loader2, Banknote } from 'lucide-react';
 import { customerAdvanceService } from '../services/customerAdvance.service';
 
 import { getSessionData } from '../utils/session';
@@ -13,71 +13,45 @@ import TransactionReceiptModal from '../components/modals/TransactionReceiptModa
 const formatDateToDMY = (dateStr) => {
     if (!dateStr) return '';
     const parts = dateStr.split('-');
-    if (parts.length === 3) {
-        return `${parts[2]}/${parts[1]}/${parts[0]}`;
-    }
-    return dateStr;
+    return parts.length === 3 ? `${parts[2]}/${parts[1]}/${parts[0]}` : dateStr;
 };
 
-// Custom Search Modal matching AdvancePayBoard
 const SearchModal = ({ isOpen, onClose, title, items, onSelect, searchPlaceholder = "Search by code or name..." }) => {
     const [query, setQuery] = useState('');
-    const filtered = (items || []).filter(item => 
-        (item.name || '').toLowerCase().includes(query.toLowerCase()) || 
+    const filtered = (items || []).filter(item =>
+        (item.name || '').toLowerCase().includes(query.toLowerCase()) ||
         (item.code || '').toLowerCase().includes(query.toLowerCase())
     );
 
     if (!isOpen) return null;
 
     return (
-        <SimpleModal isOpen={isOpen} onClose={onClose} title={title} maxWidth="max-w-[600px]">
+        <SimpleModal isOpen={isOpen} onClose={onClose} title={title}>
             <div className="space-y-4 font-['Tahoma']">
-                <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-lg border border-gray-100 mb-2">
-                    <span className="text-[12px] font-bold text-gray-500 uppercase tracking-widest shrink-0">Search Facility</span>
+                <div className="flex items-center gap-4 bg-slate-50 p-4 border-b border-gray-100 mb-2">
+                    <span className="text-[12px] font-bold text-gray-500 uppercase tracking-wider shrink-0">Search</span>
                     <div className="relative flex-1">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
-                        <input
-                            type="text"
-                            placeholder={searchPlaceholder}
-                            className="w-full h-9 pl-10 pr-4 border border-gray-300 rounded-[5px] outline-none text-sm focus:border-[#0285fd] bg-white shadow-sm font-sans"
-                            value={query}
-                            onChange={(e) => setQuery(e.target.value)}
-                            autoFocus
-                        />
+                        <input type="text" placeholder={searchPlaceholder}
+                            className="w-full h-10 pl-10 pr-4 border border-gray-300 rounded-[3px] outline-none text-[13px] focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] shadow-sm bg-white"
+                            value={query} onChange={e => setQuery(e.target.value)} autoFocus />
                     </div>
                 </div>
-
-                <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm">
+                <div className="border border-gray-200 rounded-[3px] overflow-hidden shadow-sm">
                     <div className="max-h-[400px] overflow-y-auto no-scrollbar">
                         <table className="w-full text-left">
-                            <thead className="bg-[#f8fafd] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">
-                                <tr>
-                                    <th className="px-5 py-3 w-32">Identifier</th>
-                                    <th className="px-5 py-3">Credential / Name</th>
-                                    <th className="px-5 py-3 text-right">Action</th>
-                                </tr>
+                            <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 shadow-sm z-10">
+                                <tr><th className="w-32 px-5 py-3">Identifier</th><th className=" px-5 py-3">Credential / Name</th><th className="text-right px-5 py-3">Action</th></tr>
                             </thead>
                             <tbody className="divide-y divide-gray-50">
                                 {filtered.length === 0 ? (
-                                    <tr>
-                                        <td colSpan="3" className="py-20 text-center text-gray-300 font-bold uppercase tracking-widest text-[10px]">
-                                            No matching records discovered
-                                        </td>
-                                    </tr>
+                                    <tr><td colSpan="3" className="text-center py-16 text-gray-400 text-[11px] font-bold uppercase tracking-widest">No matching records discovered</td></tr>
                                 ) : filtered.map((item, idx) => (
-                                    <tr 
-                                        key={idx} 
-                                        className="group hover:bg-blue-50/50 cursor-pointer transition-all" 
-                                        onClick={() => { onSelect(item); onClose(); }}
-                                    >
-                                        <td className="px-5 py-3 font-mono text-[12px] text-gray-700">{item.code}</td>
-                                        <td className="px-5 py-3 text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors">
-                                            {item.name}
-                                        </td>
-                                        <td className="px-5 py-3 text-right">
-                                            <button className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95 border-none uppercase">
-                                                SELECT
-                                            </button>
+                                    <tr key={idx} className="group hover:bg-blue-50/50  transition-all cursor-pointer group border-b border-gray-50" onClick={() => { onSelect(item); onClose(); }}>
+                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{item.code}</td>
+                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{item.name}</td>
+                                        <td className="text-right px-5 py-3">
+                                            <button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button>
                                         </td>
                                     </tr>
                                 ))}
@@ -94,7 +68,6 @@ const CustomerAdvanceBoard = ({ isOpen, onClose }) => {
     const [lookups, setLookups] = useState({ customers: [], drAccounts: [], banks: [], payTypes: [] });
     const [loading, setLoading] = useState(false);
 
-    // Form States
     const getInitialFormData = () => ({
         receiptNo: '',
         postDate: new Date().toISOString().split('T')[0],
@@ -114,14 +87,11 @@ const CustomerAdvanceBoard = ({ isOpen, onClose }) => {
     });
 
     const [formData, setFormData] = useState(getInitialFormData());
-
-    // Custom Search Modal States
-    const [activeModal, setActiveModal] = useState(null); // 'customer', 'debitAcc', 'bank', 'payType'
+    const [activeModal, setActiveModal] = useState(null);
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [showChqDatePicker, setShowChqDatePicker] = useState(false);
     const [receiptTx, setReceiptTx] = useState(null);
 
-    // Keyboard Focus References
     const inputRefs = {
         postDate: useRef(null),
         creditAccCode: useRef(null),
@@ -136,45 +106,26 @@ const CustomerAdvanceBoard = ({ isOpen, onClose }) => {
         saveBtn: useRef(null)
     };
 
-    // Keyboard Focus Order Transitions
     const handleKeyDown = (e, currentField) => {
         if (e.key === 'Enter') {
             e.preventDefault();
-            
-            if (currentField === 'creditAccCode') {
-                inputRefs.debitAccCode.current?.focus();
-            } else if (currentField === 'debitAccCode') {
-                inputRefs.payType.current?.focus();
-            } else if (currentField === 'payType') {
-                setActiveModal('payType');
-            } else if (currentField === 'chequeNo') {
-                setShowChqDatePicker(true);
-            } else if (currentField === 'chequeDate') {
-                inputRefs.bank.current?.focus();
-            } else if (currentField === 'bank') {
-                inputRefs.branch.current?.focus();
-            } else if (currentField === 'branch') {
-                inputRefs.amount.current?.focus();
-            } else if (currentField === 'amount') {
-                inputRefs.memo.current?.focus();
-            } else if (currentField === 'memo') {
-                handleSave();
-            }
+            if (currentField === 'creditAccCode') { inputRefs.debitAccCode.current?.focus(); }
+            else if (currentField === 'debitAccCode') { inputRefs.payType.current?.focus(); }
+            else if (currentField === 'payType') { setActiveModal('payType'); }
+            else if (currentField === 'chequeNo') { setShowChqDatePicker(true); }
+            else if (currentField === 'chequeDate') { inputRefs.bank.current?.focus(); }
+            else if (currentField === 'bank') { inputRefs.branch.current?.focus(); }
+            else if (currentField === 'branch') { inputRefs.amount.current?.focus(); }
+            else if (currentField === 'amount') { inputRefs.memo.current?.focus(); }
+            else if (currentField === 'memo') { handleSave(); }
         }
     };
 
-    // Toast Custom Layouts
     useEffect(() => {
         if (isOpen) {
             setFormData(getInitialFormData());
             const { companyCode, userName } = getSessionData();
-
-            setFormData(prev => ({
-                ...prev,
-                company: companyCode,
-                createUser: userName
-            }));
-            
+            setFormData(prev => ({ ...prev, company: companyCode, createUser: userName }));
             fetchLookups(companyCode);
             generateDocNo(companyCode);
         }
@@ -189,29 +140,21 @@ const CustomerAdvanceBoard = ({ isOpen, onClose }) => {
                 banks: (data.banks || []).map(b => ({ code: b, name: b })),
                 payTypes: data.paymentMethods || []
             });
-        } catch (error) {
-            showErrorToast('Failed to load transaction lookups.');
-        }
+        } catch (error) { showErrorToast('Failed to load transaction lookups.'); }
     };
 
     const generateDocNo = async (compCode) => {
         try {
             const data = await customerAdvanceService.generateDocNo(compCode || formData.company);
             setFormData(prev => ({ ...prev, receiptNo: data.docNo }));
-        } catch (error) {
-            console.error('Failed to generate doc number.');
-        }
+        } catch (error) { console.error('Failed to generate doc number.'); }
     };
 
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
-    };
+    const handleInputChange = (e) => { const { name, value } = e.target; setFormData(prev => ({ ...prev, [name]: value })); };
 
     const handlePayTypeChange = (type) => {
         setFormData(prev => ({
-            ...prev,
-            payType: type,
+            ...prev, payType: type,
             chequeNo: type === 'CHEQUE' ? prev.chequeNo : '',
             chequeDate: type === 'CHEQUE' ? prev.chequeDate : prev.postDate,
             bank: type === 'CHEQUE' ? prev.bank : '',
@@ -221,18 +164,9 @@ const CustomerAdvanceBoard = ({ isOpen, onClose }) => {
 
     const handleClear = () => {
         setFormData(prev => ({
-            ...prev,
-            payType: '',
-            chequeNo: '',
-            chequeDate: new Date().toISOString().split('T')[0],
-            bank: '',
-            branch: '',
-            amount: '0.00',
-            debitAccCode: '',
-            debitAccName: '',
-            creditAccCode: '',
-            creditAccName: '',
-            memo: ''
+            ...prev, payType: '', chequeNo: '', chequeDate: new Date().toISOString().split('T')[0],
+            bank: '', branch: '', amount: '0.00',
+            debitAccCode: '', debitAccName: '', creditAccCode: '', creditAccName: '', memo: ''
         }));
         generateDocNo();
     };
@@ -241,21 +175,12 @@ const CustomerAdvanceBoard = ({ isOpen, onClose }) => {
         if (!formData.creditAccCode) return showErrorToast('Please select a customer (credit account).');
         if (!formData.debitAccCode) return showErrorToast('Please select a debit account.');
         if (!formData.amount || parseFloat(formData.amount) <= 0) return showErrorToast('Valid Payment Amount is required.');
-        if (formData.payType === 'CHEQUE') {
-            if (!formData.chequeNo) return showErrorToast('Cheque Number is required.');
-        }
+        if (formData.payType === 'CHEQUE' && !formData.chequeNo) return showErrorToast('Cheque Number is required.');
 
         setLoading(true);
-        const payload = {
-            ...formData,
-            amount: parseFloat(formData.amount) || 0
-        };
-
         try {
-            const resp = await customerAdvanceService.save(payload);
+            const resp = await customerAdvanceService.save({ ...formData, amount: parseFloat(formData.amount) || 0 });
             showSuccessToast(resp.message || `Customer Advance received successfully! Doc ID: ${resp.docNo}`);
-            
-            // Format receipt data
             setReceiptTx({
                 type: 'CUSTOMER ADVANCE RECEIPT',
                 docNo: resp.docNo || formData.receiptNo,
@@ -263,384 +188,207 @@ const CustomerAdvanceBoard = ({ isOpen, onClose }) => {
                 payee: formData.creditAccName,
                 total: parseFloat(formData.amount),
                 details: {
-                    header: {
-                        memo: formData.memo,
-                        customerCode: formData.creditAccCode,
-                        postDate: formData.postDate,
-                        payType: formData.payType,
-                        bank: formData.bank,
-                        branch: formData.branch,
-                        chequeNo: formData.chequeNo,
-                        chequeDate: formData.chequeDate,
-                    },
-                    expenses: [{
-                        accCode: formData.debitAccCode,
-                        amount: parseFloat(formData.amount),
-                        memo: formData.debitAccName
-                    }]
+                    header: { memo: formData.memo, customerCode: formData.creditAccCode, postDate: formData.postDate, payType: formData.payType, bank: formData.bank, branch: formData.branch, chequeNo: formData.chequeNo, chequeDate: formData.chequeDate },
+                    expenses: [{ accCode: formData.debitAccCode, amount: parseFloat(formData.amount), memo: formData.debitAccName }]
                 }
             });
-
             handleClear();
-            // onClose(); // Let user close the modal after seeing the receipt
-        } catch (error) {
-            showErrorToast(error.toString());
-        } finally {
-            setLoading(false);
-        }
+        } catch (error) { showErrorToast(error.toString()); } finally { setLoading(false); }
     };
 
-    // Modal Selection Handlers
-    const handleSelectCustomer = (item) => {
-        setFormData(prev => ({ 
-            ...prev, 
-            creditAccCode: item.code, 
-            creditAccName: item.name 
-        }));
-    };
-
-    const handleSelectDebitAccount = (item) => {
-        setFormData(prev => ({ 
-            ...prev, 
-            debitAccCode: item.code, 
-            debitAccName: item.name 
-        }));
-    };
-
-    const handleSelectBank = (item) => {
-        setFormData(prev => ({ 
-            ...prev, 
-            bank: item.name 
-        }));
-    };
+    const handleSelectCustomer = (item) => { setFormData(prev => ({ ...prev, creditAccCode: item.code, creditAccName: item.name })); };
+    const handleSelectDebitAccount = (item) => { setFormData(prev => ({ ...prev, debitAccCode: item.code, debitAccName: item.name })); };
+    const handleSelectBank = (item) => { setFormData(prev => ({ ...prev, bank: item.name })); };
 
     return (
         <>
-            <style>
-                {`
-                    @keyframes toastProgress {
-                        0% { width: 100%; }
-                        100% { width: 0%; }
-                    }
-                `}
-            </style>
             <TransactionFormWrapper
-                isOpen={isOpen}
-                onClose={onClose}
-                title="Customer Advance Receipt"
-                subtitle="Customer Advances"
-                icon={Banknote}
-                maxWidth="max-w-5xl"
+                isOpen={isOpen} onClose={onClose}
+                title="Customer Advance Receipt" subtitle="Customer Advances" icon={null}
                 footer={
-                    <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-gray-100 rounded-b-xl">
-                        <div>
-                            <button 
-                                onClick={handleClear} 
-                                disabled={loading} 
-                                className="px-6 py-3 bg-[#00adff] hover:bg-[#0099e6] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] transition-all active:scale-95 flex items-center justify-center gap-2 border-none"
-                            >
-                                <RotateCcw size={14} /> Clear Form
-                            </button>
-                        </div>
-                        <div className="flex gap-3">
-                            <button 
-                                onClick={handleSave} 
-                                disabled={loading} 
-                                className={`px-6 py-3 bg-[#2bb744] hover:bg-[#259b3a] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] shadow-md shadow-green-100 transition-all active:scale-95 flex items-center justify-center gap-2 border-none ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
-                            >
-                                {loading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />} 
-                                Save & Apply
-                            </button>                    
-                        </div>
+                    <div className="bg-[#fcfcfc] px-6 py-4 w-full flex justify-between items-center border-t border-gray-200 rounded-b-[10px] shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]">
+                        <button onClick={handleClear} disabled={loading}
+                            className="px-6 py-2 border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2">
+                            <RotateCcw size={14} /> Clear Form
+                        </button>
+                        <button onClick={handleSave} disabled={loading}
+                            className={`px-6 py-2 bg-[#0285fd] hover:bg-[#0073ff] text-white font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                            {loading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
+                            Save &amp; Apply
+                        </button>
                     </div>
                 }
             >
-                <div className="space-y-4 font-['Tahoma']">
-                    {/* Main Entry Panel */}
-                    <div className="bg-white p-5 border border-slate-200 rounded-[5px] shadow-sm space-y-4">
+                <div className="space-y-3 overflow-y-auto no-scrollbar font-['Tahoma']">
+                    <div className="bg-white p-4 border border-slate-200 rounded-[3px] space-y-4">
                         <div className="grid grid-cols-12 gap-x-6 gap-y-3.5">
-                            
                             {/* Doc ID */}
-                            <div className="col-span-4 flex items-center gap-2">
-                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Doc ID</label>
-                                <input 
-                                    type="text" 
-                                    value={formData.receiptNo} 
-                                    readOnly 
-                                    className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-mono font-bold text-slate-700 bg-slate-50 rounded outline-none shadow-sm focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" 
-                                />
+                            <div className="col-span-4">
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Doc ID</label>
+                                <input type="text" value={formData.receiptNo} readOnly
+                                    className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-gray-50 outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 font-mono truncate" />
                             </div>
 
-                            {/* Post Date */}
-                            <div className="col-span-4 flex items-center gap-2">
-                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Rec. Date</label>
-                                <div className="flex-1 flex gap-1 h-8 min-w-0">
-                                    <input 
-                                        type="text" 
-                                        readOnly 
-                                        value={formData.postDate ? formatDateToDMY(formData.postDate) : ''} 
-                                        className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-mono font-bold text-slate-700 bg-slate-50 rounded outline-none shadow-sm cursor-pointer"
+                            {/* Rec. Date */}
+                            <div className="col-span-4">
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Rec. Date</label>
+                                <div className="relative">
+                                    <input type="text" readOnly value={formData.postDate ? formatDateToDMY(formData.postDate) : ''}
                                         onClick={() => setShowDatePicker(true)}
-                                    />
-                                    <button 
-                                        type="button"
-                                        onClick={() => setShowDatePicker(true)} 
-                                        className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0 border-none"
-                                    >
+                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700 truncate" />
+                                    <button onClick={() => setShowDatePicker(true)}
+                                        className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
                                         <Calendar size={16} />
                                     </button>
                                 </div>
                             </div>
 
                             {/* Amount */}
-                            <div className="col-span-4 flex items-center gap-2">
-                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Amount *</label>
-                                <input 
-                                    type="number" 
-                                    ref={inputRefs.amount}
-                                    name="amount" 
-                                    step="0.01"
-                                    value={formData.amount} 
-                                    onChange={handleInputChange} 
-                                    onKeyDown={(e) => handleKeyDown(e, 'amount')}
-                                    className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[14px] text-right font-black text-red-600 bg-slate-50 rounded outline-none shadow-sm focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" 
-                                />
+                            <div className="col-span-4">
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Amount *</label>
+                                <input type="number" ref={inputRefs.amount} name="amount" step="0.01"
+                                    value={formData.amount} onChange={handleInputChange}
+                                    onKeyDown={e => handleKeyDown(e, 'amount')}
+                                    className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] text-right font-black text-gray-800 bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd]" />
                             </div>
 
-                            {/* Customer Selection */}
-                            <div className="col-span-8 flex items-center gap-2">
-                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Customer *</label>
-                                <div className="flex-1 flex gap-1 h-8 min-w-0">
-                                    <input 
-                                        type="text" 
-                                        ref={inputRefs.creditAccCode}
-                                        readOnly 
-                                        value={formData.creditAccCode ? `${formData.creditAccCode} - ${formData.creditAccName}` : ''} 
-                                        className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-mono font-bold text-red-600 bg-slate-50 rounded outline-none shadow-sm cursor-pointer truncate"
+                            {/* Customer (Credit Account) */}
+                            <div className="col-span-8">
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Customer *</label>
+                                <div className="relative">
+                                    <input type="text" ref={inputRefs.creditAccCode} readOnly
+                                        value={formData.creditAccCode ? `${formData.creditAccCode} - ${formData.creditAccName}` : ''}
                                         onClick={() => setActiveModal('customer')}
-                                        onKeyDown={(e) => handleKeyDown(e, 'creditAccCode')}
-                                    />
-                                    <button 
-                                        onClick={() => setActiveModal('customer')} 
-                                        className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0 border-none"
-                                    >
+                                        onKeyDown={e => handleKeyDown(e, 'creditAccCode')}
+                                        placeholder="Select customer..."
+                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 pr-10 cursor-pointer" />
+                                    <button onClick={() => setActiveModal('customer')}
+                                        className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
                                         <Search size={16} />
                                     </button>
                                 </div>
                             </div>
 
-                            {/* Pay Type Selection */}
-                            <div className="col-span-4 flex items-center gap-2">
-                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Pay Type</label>
-                                <div className="flex-1 flex gap-1 h-8 min-w-0">
-                                    <input 
-                                        type="text" 
-                                        ref={inputRefs.payType}
-                                        readOnly 
-                                        value={lookups.payTypes?.find(m => m.code === formData.payType)?.name || formData.payType || ''} 
-                                        className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-mono font-bold text-slate-700 bg-slate-50 rounded outline-none shadow-sm cursor-pointer truncate"
+                            {/* Pay Type */}
+                            <div className="col-span-4">
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Pay Type</label>
+                                <div className="relative">
+                                    <input type="text" ref={inputRefs.payType} readOnly
+                                        value={lookups.payTypes?.find(m => m.code === formData.payType)?.name || formData.payType || ''}
                                         onClick={() => setActiveModal('payType')}
-                                        onKeyDown={(e) => handleKeyDown(e, 'payType')}
-                                    />
-                                    <button 
-                                        onClick={() => setActiveModal('payType')} 
-                                        className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0 border-none"
-                                    >
+                                        onKeyDown={e => handleKeyDown(e, 'payType')}
+                                        placeholder="Select pay type..."
+                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 pr-10 cursor-pointer truncate" />
+                                    <button onClick={() => setActiveModal('payType')}
+                                        className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
                                         <Search size={16} />
                                     </button>
                                 </div>
                             </div>
 
-                            {/* Debit Account Selection */}
-                            <div className="col-span-8 flex items-center gap-2">
-                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Debit Acc *</label>
-                                <div className="flex-1 flex gap-1 h-8 min-w-0">
-                                    <input 
-                                        type="text" 
-                                        ref={inputRefs.debitAccCode}
-                                        readOnly 
-                                        value={formData.debitAccCode ? `${formData.debitAccCode} - ${formData.debitAccName}` : ''} 
-                                        className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-mono font-bold text-slate-700 bg-slate-50 rounded outline-none shadow-sm cursor-pointer truncate"
+                            {/* Debit Account */}
+                            <div className="col-span-8">
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Debit Acc *</label>
+                                <div className="relative">
+                                    <input type="text" ref={inputRefs.debitAccCode} readOnly
+                                        value={formData.debitAccCode ? `${formData.debitAccCode} - ${formData.debitAccName}` : ''}
                                         onClick={() => setActiveModal('debitAcc')}
-                                        onKeyDown={(e) => handleKeyDown(e, 'debitAccCode')}
-                                    />
-                                    <button 
-                                        onClick={() => setActiveModal('debitAcc')} 
-                                        className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0 border-none"
-                                    >
+                                        onKeyDown={e => handleKeyDown(e, 'debitAccCode')}
+                                        placeholder="Select debit account..."
+                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 pr-10 cursor-pointer" />
+                                    <button onClick={() => setActiveModal('debitAcc')}
+                                        className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
                                         <Search size={16} />
                                     </button>
                                 </div>
                             </div>
 
                             {/* Cheque No */}
-                            <div className="col-span-4 flex items-center gap-2">
-                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Chq No</label>
-                                <input 
-                                    type="text" 
-                                    ref={inputRefs.chequeNo}
-                                    name="chequeNo" 
-                                    value={formData.chequeNo} 
-                                    onChange={handleInputChange} 
+                            <div className="col-span-4">
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Chq No</label>
+                                <input type="text" ref={inputRefs.chequeNo} name="chequeNo"
+                                    value={formData.chequeNo} onChange={handleInputChange}
                                     disabled={formData.payType !== 'CHEQUE'}
-                                    onKeyDown={(e) => handleKeyDown(e, 'chequeNo')}
-                                    className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-mono rounded outline-none bg-slate-50 shadow-sm focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 disabled:bg-gray-100 disabled:text-gray-400" 
-                                />
+                                    onKeyDown={e => handleKeyDown(e, 'chequeNo')}
+                                    placeholder="Cheque number"
+                                    className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 disabled:bg-gray-100 disabled:text-gray-400" />
                             </div>
 
                             {/* Bank / Branch */}
-                            <div className="col-span-8 flex items-center gap-2">
-                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Bank / Branch</label>
-                                <div className="flex-1 flex gap-1 h-8 min-w-0">
-                                    <input 
-                                        type="text" 
-                                        ref={inputRefs.bank}
-                                        readOnly 
-                                        value={formData.bank || ''} 
+                            <div className="col-span-8">
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Bank / Branch</label>
+                                <div className="relative">
+                                    <input type="text" ref={inputRefs.bank} readOnly
+                                        value={formData.bank || ''}
                                         disabled={formData.payType !== 'CHEQUE'}
-                                        className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-mono font-bold text-slate-700 bg-slate-50 rounded outline-none shadow-sm cursor-pointer disabled:bg-gray-100 disabled:text-gray-400 truncate"
                                         onClick={() => formData.payType === 'CHEQUE' && setActiveModal('bank')}
-                                        onKeyDown={(e) => handleKeyDown(e, 'bank')}
+                                        onKeyDown={e => handleKeyDown(e, 'bank')}
                                         placeholder="Select Bank"
-                                    />
-                                    <button 
-                                        disabled={formData.payType !== 'CHEQUE'}
-                                        onClick={() => setActiveModal('bank')} 
-                                        className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0 border-none disabled:opacity-50"
-                                    >
+                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 pr-10 cursor-pointer truncate disabled:bg-gray-100 disabled:text-gray-400" />
+                                    <button disabled={formData.payType !== 'CHEQUE'} onClick={() => setActiveModal('bank')}
+                                        className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer disabled:text-gray-300">
                                         <Search size={16} />
                                     </button>
                                 </div>
-                                <input 
-                                    type="text" 
-                                    ref={inputRefs.branch}
-                                    name="branch" 
-                                    value={formData.branch} 
-                                    onChange={handleInputChange} 
+                                <input type="text" ref={inputRefs.branch} name="branch"
+                                    value={formData.branch} onChange={handleInputChange}
                                     disabled={formData.payType !== 'CHEQUE'}
-                                    onKeyDown={(e) => handleKeyDown(e, 'branch')}
+                                    onKeyDown={e => handleKeyDown(e, 'branch')}
                                     placeholder="Branch"
-                                    className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-mono rounded outline-none bg-slate-50 shadow-sm focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 disabled:bg-gray-100 disabled:text-gray-400" 
-                                />
+                                    className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 disabled:bg-gray-100 disabled:text-gray-400 mt-2" />
                             </div>
 
                             {/* Cheque Date */}
-                            <div className="col-span-4 flex items-center gap-2">
-                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Chq Date</label>
-                                <div className="flex-1 flex gap-1 h-8 min-w-0">
-                                    <input 
-                                        type="text" 
-                                        readOnly 
-                                        value={formData.chequeDate ? formatDateToDMY(formData.chequeDate) : ''} 
+                            <div className="col-span-4">
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Chq Date</label>
+                                <div className="relative">
+                                    <input type="text" readOnly value={formData.chequeDate ? formatDateToDMY(formData.chequeDate) : ''}
                                         disabled={formData.payType !== 'CHEQUE'}
-                                        className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-mono font-bold text-slate-700 bg-slate-50 rounded outline-none shadow-sm cursor-pointer disabled:bg-gray-100 disabled:text-gray-400"
                                         onClick={() => formData.payType === 'CHEQUE' && setShowChqDatePicker(true)}
-                                    />
-                                    <button 
-                                        type="button"
-                                        disabled={formData.payType !== 'CHEQUE'}
-                                        onClick={() => setShowChqDatePicker(true)} 
-                                        className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0 border-none disabled:opacity-50"
-                                    >
+                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700 truncate disabled:bg-gray-100 disabled:text-gray-400" />
+                                    <button disabled={formData.payType !== 'CHEQUE'} onClick={() => setShowChqDatePicker(true)}
+                                        className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer disabled:text-gray-300">
                                         <Calendar size={16} />
                                     </button>
                                 </div>
                             </div>
 
                             {/* Memo */}
-                            <div className="col-span-12 flex items-start gap-2 pt-2">
-                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0 pt-1.5">Remarks / Memo</label>
-                                <input 
-                                    type="text" 
-                                    ref={inputRefs.memo}
-                                    name="memo" 
-                                    value={formData.memo} 
-                                    onChange={handleInputChange} 
-                                    onKeyDown={(e) => handleKeyDown(e, 'memo')}
-                                    className="flex-1 min-w-0 h-9 border border-slate-200 px-3 text-[12px] font-mono rounded outline-none bg-slate-50 shadow-sm focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" 
-                                />
+                            <div className="col-span-12">
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Remarks / Memo</label>
+                                <input type="text" ref={inputRefs.memo} name="memo"
+                                    value={formData.memo} onChange={handleInputChange}
+                                    onKeyDown={e => handleKeyDown(e, 'memo')}
+                                    placeholder="Enter remarks..."
+                                    className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700" />
                             </div>
-
                         </div>
                     </div>
                 </div>
             </TransactionFormWrapper>
 
-            {/* Selection Lookups */}
-            <SearchModal 
-                isOpen={activeModal === 'customer'} 
-                onClose={() => setActiveModal(null)} 
-                title="Select Customer (Credit Account)" 
-                items={lookups.customers} 
-                onSelect={handleSelectCustomer} 
-            />
+            <SearchModal isOpen={activeModal === 'customer'} onClose={() => setActiveModal(null)}
+                title="Select Customer (Credit Account)" items={lookups.customers} onSelect={handleSelectCustomer} />
+            <SearchModal isOpen={activeModal === 'debitAcc'} onClose={() => setActiveModal(null)}
+                title="Select Debit Account" items={lookups.drAccounts} onSelect={handleSelectDebitAccount} />
+            <SearchModal isOpen={activeModal === 'bank'} onClose={() => setActiveModal(null)}
+                title="Select Bank" items={lookups.banks} onSelect={handleSelectBank} />
+            <SearchModal isOpen={activeModal === 'payType'} onClose={() => setActiveModal(null)}
+                title="Select Pay Type" items={lookups.payTypes}
+                onSelect={(item) => { handlePayTypeChange(item.code); setTimeout(() => { if (item.code === 'CHEQUE') { inputRefs.chequeNo.current?.focus(); } else { inputRefs.amount.current?.focus(); } }, 100); }} />
 
-            <SearchModal 
-                isOpen={activeModal === 'debitAcc'} 
-                onClose={() => setActiveModal(null)} 
-                title="Select Debit Account" 
-                items={lookups.drAccounts} 
-                onSelect={handleSelectDebitAccount} 
-            />
+            <CalendarModal isOpen={showDatePicker} onClose={() => setShowDatePicker(false)}
+                onDateSelect={(date) => { setFormData(prev => ({ ...prev, postDate: date })); setShowDatePicker(false); }}
+                currentDate={formData.postDate} />
 
-            <SearchModal 
-                isOpen={activeModal === 'bank'} 
-                onClose={() => setActiveModal(null)} 
-                title="Select Bank" 
-                items={lookups.banks} 
-                onSelect={handleSelectBank} 
-            />
+            <CalendarModal isOpen={showChqDatePicker} onClose={() => setShowChqDatePicker(false)}
+                onDateSelect={(date) => { setFormData(prev => ({ ...prev, chequeDate: date })); setShowChqDatePicker(false); setTimeout(() => { inputRefs.bank.current?.focus(); }, 100); }}
+                currentDate={formData.chequeDate} />
 
-            <SearchModal 
-                isOpen={activeModal === 'payType'} 
-                onClose={() => setActiveModal(null)} 
-                title="Select Pay Type" 
-                items={lookups.payTypes} 
-                onSelect={(item) => {
-                    handlePayTypeChange(item.code);
-                    setTimeout(() => {
-                        if (item.code === 'CHEQUE') {
-                            inputRefs.chequeNo.current?.focus();
-                        } else {
-                            inputRefs.amount.current?.focus();
-                        }
-                    }, 100);
-                }} 
-            />
-
-            {/* Date Pickers */}
-            <CalendarModal 
-                isOpen={showDatePicker} 
-                onClose={() => setShowDatePicker(false)} 
-                onSelectDate={(date) => {
-                    setFormData(prev => ({ ...prev, postDate: date }));
-                    setShowDatePicker(false);
-                }} 
-                currentDate={formData.postDate} 
-            />
-
-            <CalendarModal 
-                isOpen={showChqDatePicker} 
-                onClose={() => setShowChqDatePicker(false)} 
-                onSelectDate={(date) => {
-                    setFormData(prev => ({ ...prev, chequeDate: date }));
-                    setShowChqDatePicker(false);
-                    // Focus on next element bank after selecting cheque date
-                    setTimeout(() => {
-                        inputRefs.bank.current?.focus();
-                    }, 100);
-                }} 
-                currentDate={formData.chequeDate} 
-            />
-
-            {/* Receipt Modal */}
             {receiptTx && (
-                <TransactionReceiptModal 
-                    selectedTx={receiptTx} 
-                    onClose={() => {
-                        setReceiptTx(null);
-                        onClose(); // Close the main board when receipt is closed
-                    }} 
+                <TransactionReceiptModal
+                    selectedTx={receiptTx}
+                    onClose={() => { setReceiptTx(null); onClose(); }}
                 />
             )}
         </>

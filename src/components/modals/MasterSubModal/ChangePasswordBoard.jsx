@@ -78,7 +78,7 @@ const ChangePasswordBoard = ({ isOpen, onClose }) => {
                 title="Change Password"
                 subtitle="Update system user account passwords"
                 icon={Key}
-                maxWidth="max-w-[800px]"
+                maxWidth="max-w-[700px]"
                 isEditMode={false}
                 loading={loading}
                 onClear={handleClear}
@@ -87,12 +87,12 @@ const ChangePasswordBoard = ({ isOpen, onClose }) => {
                 customFooter={
                     <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-slate-200 rounded-b-xl">
                         <div className="flex gap-3">
-                            <button onClick={handleClear} className="px-6 py-3 bg-[#00adff] hover:bg-[#0099e6] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] transition-all active:scale-95 flex items-center justify-center gap-2 border-none">
+                            <button onClick={handleClear} className="px-6 py-3 bg-white text-[#00adff] border-2 border-[#00adff] hover:bg-blue-50 font-mono font-bold text-sm uppercase tracking-widest rounded-[3px] transition-all active:scale-95 flex items-center justify-center gap-2 border-none">
                                 <RotateCcw size={14} /> CLEAR FORM
                             </button>
                         </div>
                         <div className="flex gap-3">
-                            <button onClick={handleSave} disabled={loading} className={`px-6 py-3 bg-[#0285fd] hover:bg-[#0073ff] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] shadow-md shadow-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border-none ${loading ? 'opacity-50' : ''}`}>
+                            <button onClick={handleSave} disabled={loading} className={`px-6 py-3 bg-[#0285fd] hover:bg-[#0073ff] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[3px] shadow-md shadow-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border-none ${loading ? 'opacity-50' : ''}`}>
                                 {loading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />} CHANGE PASSWORD
                             </button>
                         </div>

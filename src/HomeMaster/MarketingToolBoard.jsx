@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import SimpleModal from '../components/SimpleModal';
-import { ChevronDown, X, Save, RotateCcw, Target, Percent, TrendingUp, Search, Loader2 } from 'lucide-react';
+import { ChevronDown, X, Save, RotateCcw, Target, Percent, TrendingUp, Search, Loader2 , FileText} from 'lucide-react';
 import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
 import { marketingService } from '../services/marketing.service';
+import TransactionFormWrapper from '../components/TransactionFormWrapper';
 
 const MarketingToolBoard = ({ isOpen, onClose }) => {
     const [selectedTab, setSelectedTab] = useState('Sales Target');
@@ -193,17 +194,17 @@ const MarketingToolBoard = ({ isOpen, onClose }) => {
 
     return (
         <>
-        <SimpleModal
+        <TransactionFormWrapper subtitle="Transaction Management" icon={FileText}
             isOpen={isOpen}
             onClose={onClose}
-            title="Business Intelligence & Marketing Intelligence Tool"
-            maxWidth="max-w-[1000px]"
+            title="Marketing Tool"
+            maxWidth="max-w-[700px]"
             footer={
                 <div className="bg-slate-50 px-6 py-4 w-full flex justify-end gap-3 border-t border-slate-200 rounded-b-xl">
                     <button 
                         onClick={handleSaveConfig} 
                         disabled={loading} 
-                        className={`px-8 h-10 bg-[#2bb744] text-white text-[13px] font-mono font-bold uppercase tracking-widest rounded-[5px] shadow-md shadow-green-100 hover:bg-[#259b3a] transition-all active:scale-95 flex items-center justify-center gap-2 border-none ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        className={`px-8 h-10 bg-white text-[#2bb744] border-2 border-[#2bb744] hover:bg-green-50 text-[13px] font-mono font-bold uppercase tracking-widest rounded-[3px] shadow-md shadow-green-100 hover:bg-[#259b3a] transition-all active:scale-95 flex items-center justify-center gap-2 border-none ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                     >
                         {loading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
                         SAVE CONFIG
@@ -211,7 +212,7 @@ const MarketingToolBoard = ({ isOpen, onClose }) => {
                     <button 
                         onClick={() => handleReset()} 
                         disabled={loading} 
-                        className="px-6 h-10 bg-[#00adff] text-white text-[13px] font-mono font-bold uppercase tracking-widest rounded-[5px] hover:bg-[#0099e6] transition-all active:scale-95 flex items-center justify-center gap-2 border-none shadow-md shadow-blue-100"
+                        className="px-6 h-10 bg-white text-[#00adff] border-2 border-[#00adff] hover:bg-blue-50 text-[13px] font-mono font-bold uppercase tracking-widest rounded-[3px] hover:bg-[#0099e6] transition-all active:scale-95 flex items-center justify-center gap-2 shadow-sm shadow-blue-100"
                     >
                         <RotateCcw size={14} /> RESET FORM
                     </button>
@@ -220,7 +221,7 @@ const MarketingToolBoard = ({ isOpen, onClose }) => {
         >
             <div className="p-1 font-['Tahoma',_sans-serif]">
                 {/* Tab Navigation */}
-                <div className="flex gap-4 mb-6 border-b border-gray-100 pb-2">
+                <div className="flex gap-4 mb-6 border-b border-gray-200 pb-2">
                     <button 
                         onClick={() => setSelectedTab('Sales Target')}
                         className={`px-4 py-2 text-[12.5px] font-black uppercase tracking-widest transition-all rounded-[3px] ${selectedTab === 'Sales Target' ? 'bg-[#e49e1b] text-white shadow-md' : 'text-slate-400 hover:text-slate-600 hover:bg-slate-100'}`}
@@ -236,10 +237,10 @@ const MarketingToolBoard = ({ isOpen, onClose }) => {
                 </div>
 
                 {/* Content Area */}
-                <div className="bg-white/50 backdrop-blur-sm border border-gray-200 rounded-[5px] p-6 shadow-sm min-h-[400px]">
+                <div className="bg-white/50 backdrop-blur-sm border border-gray-200 rounded-[3px] p-6 shadow-sm min-h-[400px]">
                     {selectedTab === 'Sales Target' ? (
                         <div className="space-y-3">
-                            <div className="flex items-center justify-between border-b border-gray-100 pb-4 mb-4">
+                            <div className="flex items-center justify-between border-b border-gray-200 pb-4 mb-4">
                                 <div className="flex items-center gap-3">
                                     <div className="w-2 h-4 bg-[#0285fd] rounded-full" />
                                     <h3 className="text-[15px] font-mono font-black text-slate-800 uppercase tracking-tight">Sales Milestone Definitions</h3>
@@ -256,10 +257,10 @@ const MarketingToolBoard = ({ isOpen, onClose }) => {
 
                             {/* Data Rows */}
                             {salesTargets.map((row, idx) => (
-                                <div key={idx} className="grid grid-cols-12 gap-4 items-center group hover:bg-slate-50/50 p-1.5 rounded-lg transition-colors border border-transparent hover:border-gray-100 shadow-sm mb-1 bg-white">
+                                <div key={idx} className="grid grid-cols-12 gap-4 items-center group hover:bg-slate-50/50 p-1.5 rounded-[3px] transition-colors border border-transparent hover:border-gray-200 shadow-sm mb-1 bg-white">
                                     <div className="col-span-5 flex items-center">
                                         <div className="w-32 font-bold text-slate-700 text-[12.5px] uppercase">Sales Target</div>
-                                        <div className="flex-1 flex items-center justify-center h-9 bg-slate-50 rounded-[5px] border border-gray-200 shadow-inner px-4">
+                                        <div className="flex-1 flex items-center justify-center h-9 bg-slate-50 rounded-[3px] border border-gray-200 shadow-inner px-4">
                                             <span className="text-[12px] font-black text-[#0285fd] uppercase tracking-[0.2em]">{row.period}</span>
                                         </div>
                                     </div>
@@ -269,7 +270,7 @@ const MarketingToolBoard = ({ isOpen, onClose }) => {
                                             placeholder="0.00"
                                             value={row.targetValue}
                                             onChange={(e) => handleSalesTargetChange(idx, 'targetValue', e.target.value)}
-                                            className="w-full h-9 border border-gray-300 rounded-[5px] px-3 font-mono font-black text-slate-800 text-right text-[13px] outline-none shadow-sm bg-white focus:border-[#0285fd] transition-all" 
+                                            className="w-full h-9 border border-gray-300 rounded-[3px] px-3 font-mono font-black text-slate-800 text-right text-[13px] outline-none shadow-sm bg-white focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] transition-all" 
                                         />
                                     </div>
                                     <div className="col-span-2">
@@ -278,14 +279,14 @@ const MarketingToolBoard = ({ isOpen, onClose }) => {
                                             placeholder="0.00"
                                             value={row.forecast}
                                             onChange={(e) => handleSalesTargetChange(idx, 'forecast', e.target.value)}
-                                            className="w-full h-9 border border-gray-300 rounded-[5px] px-3 font-mono font-black text-[#2bb744] text-right text-[13px] outline-none shadow-sm bg-gray-50/50 focus:border-[#2bb744] transition-all" 
+                                            className="w-full h-9 border border-gray-300 rounded-[3px] px-3 font-mono font-black text-[#2bb744] text-right text-[13px] outline-none shadow-sm bg-gray-50/50 focus:border-[#2bb744] transition-all" 
                                         />
                                     </div>
                                     <div className="col-span-2">
                                         <button 
                                             onClick={handleSaveConfig}
                                             disabled={loading}
-                                            className="w-full h-9 bg-[#0285fd] text-white text-[11px] font-black uppercase tracking-widest rounded-[5px] hover:bg-[#0073ff] transition-all active:scale-95 shadow-md flex items-center justify-center gap-1.5 disabled:opacity-50"
+                                            className="w-full h-9 bg-[#0285fd] text-white text-[11px] font-black uppercase tracking-widest rounded-[3px] hover:bg-[#0073ff] transition-all active:scale-95 shadow-md flex items-center justify-center gap-1.5 disabled:opacity-50"
                                         >
                                             {loading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />} COMMIT
                                         </button>
@@ -296,7 +297,7 @@ const MarketingToolBoard = ({ isOpen, onClose }) => {
                     ) : (
                         <div className="space-y-8 animate-in fade-in duration-500 pb-6">
                             {/* Commission Level Header */}
-                            <div className="bg-white p-4 border border-slate-200 rounded-[5px] shadow-sm space-y-4">
+                            <div className="bg-white p-4 border border-slate-200 rounded-[3px] shadow-sm space-y-4">
                                 <div className="grid grid-cols-12 gap-x-10 gap-y-4">
                                     <div className="col-span-12 flex items-center gap-4">
                                         <label className="text-[11px] font-bold text-gray-500 uppercase w-48 shrink-0">Sales Commission Level</label>
@@ -314,7 +315,7 @@ const MarketingToolBoard = ({ isOpen, onClose }) => {
                                                     setShowLevelSearch(true);
                                                     handleLevelSearch();
                                                 }}
-                                                className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0"
+                                                className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0"
                                             >
                                                 <Search size={16} />
                                             </button>
@@ -351,7 +352,7 @@ const MarketingToolBoard = ({ isOpen, onClose }) => {
 
                                     {/* Floor Inputs */}
                                     <div className="space-y-8">
-                                        <div className="text-center text-[11px] font-bold text-gray-500 uppercase h-8 flex items-center justify-center border-b border-gray-100/50 tracking-widest">Low Level</div>
+                                        <div className="text-center text-[11px] font-bold text-gray-500 uppercase h-8 flex items-center justify-center border-b border-gray-200/50 tracking-widest">Low Level</div>
                                         {commissionLevel.tiers.map((t, idx) => (
                                             <div key={idx} className="h-8 flex items-center">
                                                 {idx === commissionLevel.tiers.length - 1 ? (
@@ -383,7 +384,7 @@ const MarketingToolBoard = ({ isOpen, onClose }) => {
 
                                     {/* Cap Inputs (High Level) */}
                                     <div className="space-y-8">
-                                        <div className="text-center text-[11px] font-bold text-gray-500 uppercase h-8 flex items-center justify-center border-b border-gray-100/50 tracking-widest">High Level</div>
+                                        <div className="text-center text-[11px] font-bold text-gray-500 uppercase h-8 flex items-center justify-center border-b border-gray-200/50 tracking-widest">High Level</div>
                                         {commissionLevel.tiers.map((t, idx) => (
                                             <div key={idx} className="h-8 flex items-center">
                                                 {idx === commissionLevel.tiers.length - 1 ? (
@@ -415,7 +416,7 @@ const MarketingToolBoard = ({ isOpen, onClose }) => {
 
                                     {/* Share Inputs */}
                                     <div className="space-y-8">
-                                        <div className="text-center text-[11px] font-bold text-gray-500 uppercase h-8 flex items-center justify-center border-b border-gray-100/50 tracking-widest">% Share</div>
+                                        <div className="text-center text-[11px] font-bold text-gray-500 uppercase h-8 flex items-center justify-center border-b border-gray-200/50 tracking-widest">% Share</div>
                                         {commissionLevel.tiers.map((t, idx) => (
                                             <div key={idx} className="h-8 flex items-center border-b border-slate-200 pb-2">
                                                 <input 
@@ -434,12 +435,12 @@ const MarketingToolBoard = ({ isOpen, onClose }) => {
                     )}
                 </div>
             </div>
-        </SimpleModal>
+        </TransactionFormWrapper>
 
         {/* Level Search Modal */}
-        <SimpleModal isOpen={showLevelSearch} onClose={() => setShowLevelSearch(false)} title="Search Commission Levels" maxWidth="max-w-[600px]">
+        <SimpleModal isOpen={showLevelSearch} onClose={() => setShowLevelSearch(false)} title="Search Commission Levels" maxWidth="max-w-[700px]">
             <div className="flex flex-col h-full font-['Tahoma']">
-                <div className="p-4 bg-slate-50 border-b border-gray-100 flex items-center justify-between mb-2">
+                <div className="flex items-center gap-4 bg-slate-50 p-4 border-b border-gray-100 mb-2">
                     <span className="text-[12px] font-bold text-gray-500 uppercase tracking-wider">Search Facility</span>
                     <div className="flex gap-2">
                         <input 
@@ -449,43 +450,45 @@ const MarketingToolBoard = ({ isOpen, onClose }) => {
                             onChange={(e) => setLevelSearchQuery(e.target.value)}
                             onKeyDown={(e) => { if(e.key === 'Enter') handleLevelSearch(); }}
                             placeholder="Find by Code or Description"
-                            className="h-9 border border-gray-300 px-3 text-sm rounded-[5px] w-72 focus:border-[#0285fd] outline-none shadow-sm"
+                            className="w-full h-10 px-4 border border-gray-300 rounded-[3px] outline-none text-sm focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white shadow-sm flex-1"
                         />
-                        <button onClick={handleLevelSearch} disabled={searching} className="px-4 h-9 bg-[#0285fd] text-white rounded-[5px] font-bold text-[12px] hover:bg-[#0073ff] transition-all flex items-center gap-2 disabled:opacity-50 shadow-md">
+                        <button onClick={handleLevelSearch} disabled={searching} className="px-4 h-9 bg-[#0285fd] text-white rounded-[3px] font-bold text-[12px] hover:bg-[#0073ff] transition-all flex items-center gap-2 disabled:opacity-50 shadow-md">
                             {searching ? <Loader2 size={16} className="animate-spin" /> : 'Search'}
                         </button>
                     </div>
                 </div>
-                <div className="overflow-y-auto max-h-[50vh] custom-scrollbar">
+                <div className="max-h-[50vh] overflow-y-auto no-scrollbar border border-gray-100 rounded-[5px] shadow-sm">
                     <table className="w-full text-sm text-left">
-                        <thead className="bg-[#f8fafc] sticky top-0 text-gray-600 font-bold uppercase text-[11px] tracking-wider z-10 shadow-sm leading-8">
+                        <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 z-10 shadow-sm">
                             <tr>
-                                <th className="px-3 border-b">Level Code</th>
-                                <th className="px-3 border-b">Description</th>
-                                <th className="px-3 border-b text-center w-24">Select</th>
-                            </tr>
+                                <th className="border-b px-5 py-3">Level Code</th>
+                                <th className="border-b px-5 py-3">Description</th>
+                                <th className="border-b text-center w-24 px-5 py-3">Select</th>
+                            <th className="text-right px-5 py-3">Action</th></tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">
                             {searching ? (
-                                <tr><td colSpan="3" className="p-8 text-center text-gray-400 font-bold uppercase tracking-widest"><Loader2 size={24} className="animate-spin inline-block mr-2" /> Searching...</td></tr>
+                                <tr><td colSpan="3" className="text-center py-16 text-gray-400 text-[11px] font-bold uppercase tracking-widest"><Loader2 size={24} className="animate-spin inline-block mr-2" /> Searching...</td></tr>
                             ) : levelSearchResults.length > 0 ? (
                                 levelSearchResults.map((l, idx) => (
-                                    <tr key={idx} className="hover:bg-blue-50/50 transition-colors border-b border-gray-50">
-                                        <td className="p-3 font-mono font-bold text-gray-700">{l.levelCode}</td>
-                                        <td className="p-3 font-mono uppercase text-blue-800">{l.description}</td>
-                                        <td className="p-3 text-center">
+                                    <tr key={idx} className="group hover:bg-blue-50/50  transition-all border-b border-gray-50 cursor-pointer group border-b border-gray-50">
+                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{l.levelCode}</td>
+                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{l.description}</td>
+                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">
                                             <button 
                                                 onClick={() => handleSelectLevel(l.levelCode)}
-                                                className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95"
+                                                className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase"
                                             >
                                                 SELECT
                                             </button>
                                         </td>
-                                    </tr>
+                                    
+                                            <td className="text-right px-5 py-3"><button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button></td>
+                                        </tr>
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan="3" className="p-8 text-center text-gray-400 font-bold italic text-[11px]">No commission levels found.</td>
+                                    <td colSpan="3" className="text-center py-16 text-gray-400 text-[11px] font-bold uppercase tracking-widest">No commission levels found.</td>
                                 </tr>
                             )}
                         </tbody>

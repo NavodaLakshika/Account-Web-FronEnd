@@ -44,12 +44,12 @@ const ClearTempDataModal = ({ isOpen, onClose }) => {
     const footer = (
         <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-slate-200 rounded-b-xl">
             <div className="flex gap-3">
-                <button onClick={() => setOptions({appCache: false, sessionLogs: false, tempRecords: false, auditHistory: false})} disabled={loading} className="px-6 py-3 bg-[#00adff] hover:bg-[#0099e6] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] transition-all active:scale-95 flex items-center justify-center gap-2 border-none">
+                <button onClick={() => setOptions({appCache: false, sessionLogs: false, tempRecords: false, auditHistory: false})} disabled={loading} className="px-6 py-3 bg-white text-[#00adff] border-2 border-[#00adff] hover:bg-blue-50 font-mono font-bold text-sm uppercase tracking-widest rounded-[3px] transition-all active:scale-95 flex items-center justify-center gap-2 border-none">
                     <RotateCcw size={14} /> CLEAR FORM
                 </button>
             </div>
             <div className="flex gap-3">
-                <button onClick={handleProcess} disabled={loading} className={`px-6 py-3 bg-[#0285fd] hover:bg-[#0073ff] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] shadow-md shadow-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border-none ${loading ? 'opacity-50' : ''}`}>
+                <button onClick={handleProcess} disabled={loading} className={`px-6 py-3 bg-[#0285fd] hover:bg-[#0073ff] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[3px] shadow-md shadow-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border-none ${loading ? 'opacity-50' : ''}`}>
                     <Play size={14} /> PROCESS CLEAR
                 </button>
             </div>
@@ -62,7 +62,7 @@ const ClearTempDataModal = ({ isOpen, onClose }) => {
                 isOpen={isOpen}
                 onClose={onClose}
                 title="Clear Temporary Data"
-                maxWidth="max-w-xl"
+                maxWidth="max-w-[700px]"
                 footer={footer}
             >
                 <div className="py-2 select-none font-['Tahoma'] space-y-6 text-[12.5px] mt-2">
@@ -113,7 +113,7 @@ const ClearTempDataModal = ({ isOpen, onClose }) => {
                     </div>
 
                     {/* Warning Box */}
-                    <div className="bg-amber-50 border border-amber-200 p-4 rounded-[5px] flex items-start gap-4">
+                    <div className="bg-amber-50 border border-amber-200 p-4 rounded-[3px] flex items-start gap-4">
                         <ShieldAlert size={20} className="text-amber-600 shrink-0" />
                         <div className="space-y-1">
                             <h4 className="text-[11px] font-black text-amber-700 uppercase tracking-widest">Pre-Cleanup Notice</h4>
@@ -145,10 +145,10 @@ const ClearTempDataModal = ({ isOpen, onClose }) => {
 const OptionRow = ({ icon: Icon, label, description, checked, onChange }) => (
     <button 
         onClick={onChange}
-        className={`w-full flex items-center justify-between p-4 rounded-[8px] border transition-all ${checked ? 'border-blue-200 bg-blue-50/30' : 'border-gray-100 bg-white hover:bg-slate-50'}`}
+        className={`w-full flex items-center justify-between p-4 rounded-[8px] border transition-all ${checked ? 'border-blue-200 bg-blue-50/30' : 'border-gray-200 bg-white hover:bg-slate-50'}`}
     >
         <div className="flex items-center gap-4 text-left">
-            <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${checked ? 'bg-blue-100 text-blue-600' : 'bg-slate-100 text-slate-400'}`}>
+            <div className={`w-10 h-10 rounded-[3px] flex items-center justify-center transition-colors ${checked ? 'bg-blue-100 text-blue-600' : 'bg-slate-100 text-slate-400'}`}>
                 <Icon size={20} />
             </div>
             <div>

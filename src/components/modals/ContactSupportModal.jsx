@@ -19,7 +19,7 @@ const ContactSupportModal = ({ isOpen, onClose }) => {
                     <div className={`relative w-full h-full transition-all duration-700 [transform-style:preserve-3d] ${isFlipped ? '[transform:rotateY(180deg)]' : ''}`}>
 
                         {/* FRONT SIDE (Direct Contact) */}
- <div className="absolute inset-0 w-full h-full bg-white rounded-[5px] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] p-7 [backface-visibility:hidden] flex flex-col justify-center overflow-y-auto custom-scrollbar">
+ <div className="absolute inset-0 w-full h-full bg-white rounded-[3px] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] p-7 [backface-visibility:hidden] flex flex-col justify-center overflow-y-auto custom-scrollbar">
                             <button
                                 onClick={onClose}
                                 className="absolute top-4 right-4 p-2 text-gray-300 hover:text-[#00acee] transition-colors"
@@ -38,7 +38,7 @@ const ContactSupportModal = ({ isOpen, onClose }) => {
                                         href="https://wa.me/94771234567"
                                         target="_blank"
                                         rel="noreferrer"
-                                        className="w-full py-3.5 bg-[#25D366] hover:bg-[#20bd5c] text-white flex items-center justify-center gap-3 rounded-[5px] transition-all active:scale-[0.97] group shadow-lg shadow-green-500/10"
+                                        className="w-full py-3.5 bg-[#25D366] hover:bg-[#20bd5c] text-white flex items-center justify-center gap-3 rounded-[3px] transition-all active:scale-[0.97] group shadow-lg shadow-green-500/10"
                                     >
                                         <MessageCircle size={16} />
                                         <span className="font-bold text-[10px] uppercase tracking-widest">WhatsApp Support</span>
@@ -46,7 +46,7 @@ const ContactSupportModal = ({ isOpen, onClose }) => {
 
                                     <a
                                         href="mailto:it-help@onimta.com"
-                                        className="w-full py-3.5 bg-[#00D1FF] hover:bg-[#00acee] text-white flex items-center justify-center gap-3 rounded-[5px] transition-all active:scale-[0.97] group shadow-lg shadow-cyan-500/10"
+                                        className="w-full py-3.5 bg-[#00D1FF] hover:bg-[#00acee] text-white flex items-center justify-center gap-3 rounded-[3px] transition-all active:scale-[0.97] group shadow-lg shadow-cyan-500/10"
                                     >
                                         <Mail size={16} />
                                         <span className="font-bold text-[10px] uppercase tracking-widest">Email Support Desk</span>
@@ -58,7 +58,7 @@ const ContactSupportModal = ({ isOpen, onClose }) => {
                             <div className="absolute inset-x-0 bottom-0">
                                 <button
                                     onClick={() => setIsFlipped(true)}
-                                    className="w-full h-10 bg-gray-50/80 hover:bg-[#00acee]/10 text-gray-400 hover:text-[#00acee] transition-all flex items-center justify-center gap-2 border-t border-gray-100 group"
+                                    className="w-full h-10 bg-gray-50/80 hover:bg-[#00acee]/10 text-gray-400 hover:text-[#00acee] transition-all flex items-center justify-center gap-2 border-t border-gray-200 group"
                                 >
                                     <Building size={12} className="opacity-40 group-hover:opacity-100" />
                                     <span className="font-black text-[8px] uppercase tracking-[0.3em]">Corporate Profile</span>
@@ -68,7 +68,7 @@ const ContactSupportModal = ({ isOpen, onClose }) => {
                         </div>
 
                         {/* BACK SIDE (Folded-Tab Style) */}
- <div className="absolute inset-0 w-full h-full bg-white rounded-[5px] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] [backface-visibility:hidden] [transform:rotateY(180deg)] flex flex-col overflow-hidden ">
+ <div className="absolute inset-0 w-full h-full bg-white rounded-[3px] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] [backface-visibility:hidden] [transform:rotateY(180deg)] flex flex-col overflow-hidden ">
 
                             {/* Top Content (White Branding Area) */}
                             <div className="flex-grow flex flex-col items-center justify-center relative px-8">

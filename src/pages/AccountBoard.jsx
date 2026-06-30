@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import SimpleModal from '../components/SimpleModal';
-import { Save, RotateCcw, X, ChevronDown, List, AlertCircle, Info, Search, ChevronRight } from 'lucide-react';
+import TransactionFormWrapper from '../components/TransactionFormWrapper';
+import { Save, RotateCcw, X, ChevronDown, List, AlertCircle, Info, Search, ChevronRight, FileText } from 'lucide-react';
 import { accountService } from '../services/account.service';
-
 
 import { getSessionData } from '../utils/session';
 import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
-
 
 const AccountBoard = ({ isOpen, onClose, selectedType, initialData }) => {
     const [loading, setLoading] = useState(false);
@@ -83,8 +82,8 @@ const AccountBoard = ({ isOpen, onClose, selectedType, initialData }) => {
     };
 
     const handleSelectParent = async (parent) => {
-        setFormData(prev => ({ 
-            ...prev, 
+        setFormData(prev => ({
+            ...prev,
             subAccountOfCode: parent.code,
             subAccountOfName: parent.name
         }));
@@ -92,12 +91,10 @@ const AccountBoard = ({ isOpen, onClose, selectedType, initialData }) => {
         setShowParentModal(false);
         setParentSearchQuery('');
 
-        // Generate next ID
         try {
             const nextId = await accountService.getNextId(parent.code);
             setFormData(prev => ({ ...prev, accountId: nextId }));
-            
-            // Load customer accounts for this parent
+
             const customers = await accountService.getCustomerAccounts(parent.code);
             setCustomerAccounts(customers);
         } catch (error) {
@@ -127,163 +124,141 @@ const AccountBoard = ({ isOpen, onClose, selectedType, initialData }) => {
         if (!code) return '';
         const codeVal = parseInt(code);
         if (isNaN(codeVal)) return '';
-        
-        // 10000 - Assets, 20000 - Liabilities, 30000 - Equity
+
         if (codeVal >= 10000 && codeVal < 40000) return 'Balance Sheet';
-        // 40000 - Income, 50000 - COS, 60000 - Expenses
         if (codeVal >= 40000 && codeVal < 70000) return 'Profit & Loss';
         return '';
     };
 
-    // --- PURCHASE ORDER STYLE CONSTANTS ---
-    const labelStyle = "text-[11px] font-bold text-gray-500 uppercase w-36 shrink-0";
-    const inputStyle = "flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-bold text-gray-700 bg-white rounded outline-none transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20";
-    const pickerStyle = "flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-bold text-blue-600 bg-slate-50 rounded outline-none transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 cursor-pointer flex items-center justify-between overflow-hidden";
-    const iconBtnStyle = "w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0";
-
-    const footer = (
-        <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-slate-200 rounded-b-xl">
-            <div className="flex gap-3">
-                <button
-                    onClick={() => setFormData({ ...formData, accountId: '', accountName: '', description: '', note: '' })}
-                    className="px-6 py-3 bg-[#00adff] hover:bg-[#0099e6] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] transition-all active:scale-95 flex items-center justify-center gap-2 border-none"
-                >
-                    <RotateCcw size={14} /> CLEAR
-                </button>
-            </div>
-            <div className="flex gap-3">
-                <button
-                    onClick={handleSave}
-                    disabled={loading}
-                    className="px-8 py-3 bg-[#2bb744] hover:bg-[#259b3a] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] shadow-md shadow-green-100 transition-all active:scale-95 flex items-center justify-center gap-2 border-none disabled:opacity-50"
-                >
-                    {loading ? <RotateCcw className="animate-spin" size={14} /> : <Save size={14} />} SAVE
-                </button>
-            </div>
-        </div>
-    );
-
     return (
         <>
-            <style>
-                {`
-                    @keyframes toastProgress {
-                        0% { width: 100%; }
-                        100% { width: 0%; }
-                    }
-                `}
-            </style>
-            <SimpleModal
+            <style>{`@keyframes toastProgress{0%{width:100%}100%{width:0%}}`}</style>
+            <TransactionFormWrapper subtitle="Account Master" icon={FileText}
                 isOpen={isOpen}
                 onClose={onClose}
                 title="Account Master Configuration — Definition Portal"
-                maxWidth="max-w-[750px]"
-                footer={footer}
+                footer={
+                    <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-slate-200 rounded-b-[5px]">
+                        <button
+                            onClick={() => setFormData({ ...formData, accountId: '', accountName: '', description: '', note: '' })}
+                            className="px-6 py-2 border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center gap-2"
+                        >
+                            <RotateCcw size={14} /> CLEAR
+                        </button>
+                        <button
+                            onClick={handleSave}
+                            disabled={loading}
+                            className={`px-6 py-2 bg-[#0285fd] hover:bg-[#0073ff] text-white font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center gap-2 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        >
+                            {loading ? <RotateCcw className="animate-spin" size={14} /> : <Save size={14} />} SAVE
+                        </button>
+                    </div>
+                }
             >
-                <div className="p-1 space-y-4 font-['Tahoma'] select-none">
-                    {/* Header Section */}
-                    <div className="bg-white p-4 rounded-[5px] border border-slate-200 shadow-sm space-y-4">
-                        <div className="flex items-center gap-4">
-                            <label className={labelStyle}>Primary Category</label>
-                            <div className="flex-1 flex gap-1 h-8">
-                                <div onClick={() => setShowTypeModal(true)} className={pickerStyle}>
-                                    <span className="truncate">{formData.accountType}</span>
+                <div className="space-y-4 overflow-y-auto no-scrollbar">
+                    <div className="bg-white p-4 border border-slate-200 rounded-[3px] space-y-4">
+                        <div className="grid grid-cols-12 gap-x-6 gap-y-3.5">
+                            <div className="col-span-6">
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Primary Category</label>
+                                <div className="relative">
+                                    <input
+                                        type="text" readOnly
+                                        value={formData.accountType}
+                                        onClick={() => setShowTypeModal(true)}
+                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700"
+                                    />
+                                    <button onClick={() => setShowTypeModal(true)} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
+                                        <Search size={16} />
+                                    </button>
                                 </div>
-                                <button onClick={() => setShowTypeModal(true)} className={iconBtnStyle}><Search size={16} /></button>
-                            </div>
-                            <div className={`px-4 h-8 rounded-[5px] flex items-center text-[10px] font-black uppercase tracking-[0.1em] border ${
-                                getReportType(formData.accountId) === 'Balance Sheet' 
-                                ? 'bg-blue-50 text-blue-600 border-blue-100' 
-                                : getReportType(formData.accountId) === 'Profit & Loss'
-                                ? 'bg-green-50 text-green-600 border-green-100'
-                                : 'bg-slate-50 text-slate-400 border-slate-200'
-                            }`}>
-                                {getReportType(formData.accountId) || 'Pending Class'}
-                            </div>
-                        </div>
-
-                        <div className="flex items-center gap-4">
-                            <label className={labelStyle}>Parent Identifier</label>
-                            <div className="flex-1 flex gap-1 h-8">
-                                <div onClick={() => setShowParentModal(true)} className={pickerStyle}>
-                                    <span className="truncate">{formData.subAccountOfName ? `${formData.subAccountOfCode} - ${formData.subAccountOfName}` : ''}</span>
+                                <div className={`mt-1.5 px-3 h-7 rounded-[3px] flex items-center text-[10px] font-bold uppercase tracking-wider border ${
+                                    getReportType(formData.accountId) === 'Balance Sheet'
+                                    ? 'bg-blue-50 text-blue-600 border-blue-100'
+                                    : getReportType(formData.accountId) === 'Profit & Loss'
+                                    ? 'bg-blue-50 text-blue-600 border-green-100'
+                                    : 'bg-gray-50 text-gray-400 border-gray-200'
+                                }`}>
+                                    {getReportType(formData.accountId) || 'Pending Class'}
                                 </div>
-                                <button onClick={() => setShowParentModal(true)} className={iconBtnStyle}><List size={16} /></button>
                             </div>
-                        </div>
 
-                        <div className="flex items-center gap-4">
-                            <label className={labelStyle}>A/C Code & Title</label>
-                            <div className="flex gap-2 flex-1">
+                            <div className="col-span-6">
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Parent Identifier</label>
+                                <div className="relative">
+                                    <input
+                                        type="text" readOnly
+                                        value={formData.subAccountOfName ? `${formData.subAccountOfCode} - ${formData.subAccountOfName}` : ''}
+                                        onClick={() => setShowParentModal(true)}
+                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700 truncate"
+                                        placeholder="Select parent account..."
+                                    />
+                                    <button onClick={() => setShowParentModal(true)} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
+                                        <Search size={16} />
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div className="col-span-6">
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">A/C Code</label>
                                 <input
                                     type="text"
-                                    className="w-32 h-8 border border-slate-200 px-3 text-[12px] font-mono font-black text-blue-600 bg-white rounded outline-none transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20"
+                                    className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700"
                                     value={formData.accountId}
                                     onChange={(e) => setFormData({ ...formData, accountId: e.target.value })}
                                 />
+                            </div>
+
+                            <div className="col-span-6">
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">A/C Title</label>
                                 <input
                                     type="text"
-                                    placeholder=""
-                                    className={inputStyle}
+                                    className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700"
                                     value={formData.accountName}
                                     onChange={(e) => setFormData({ ...formData, accountName: e.target.value })}
                                 />
                             </div>
-                        </div>
 
-                        <div className="flex items-center gap-4">
-                            <div className={labelStyle}></div>
-                            <div className="flex-1 flex items-center gap-8">
-                                <label className="flex items-center gap-2.5 cursor-pointer group">
-                                    <div className={`w-4 h-4 rounded border-2 transition-all flex items-center justify-center ${!formData.inactiveAcc ? 'border-[#2bb744] bg-[#2bb744]' : 'border-gray-300 bg-white group-hover:border-gray-400'}`}>
-                                        {!formData.inactiveAcc && <Save size={8} className="text-white" />}
-                                    </div>
+                            <div className="col-span-12 flex items-center gap-8">
+                                <label className="flex items-center gap-2 cursor-pointer select-none">
                                     <input
                                         type="checkbox"
                                         checked={!formData.inactiveAcc}
                                         onChange={(e) => setFormData({ ...formData, inactiveAcc: !e.target.checked })}
-                                        className="hidden"
+                                        className="w-4 h-4 rounded border-gray-300 text-[#0285fd] focus:ring-[#0285fd]"
                                     />
-                                    <span className="text-[12.5px] font-bold text-gray-600 uppercase tracking-wide">Active in Ledger</span>
+                                    <span className="text-[13px] font-medium text-gray-700">Active in Ledger</span>
                                 </label>
-                                <label className="flex items-center gap-2.5 cursor-pointer group">
-                                    <div className={`w-4 h-4 rounded border-2 transition-all flex items-center justify-center ${formData.editSubAccount ? 'border-[#0285fd] bg-[#0285fd]' : 'border-gray-300 bg-white group-hover:border-gray-400'}`}>
-                                        {formData.editSubAccount && <Save size={8} className="text-white" />}
-                                    </div>
+                                <label className="flex items-center gap-2 cursor-pointer select-none">
                                     <input
                                         type="checkbox"
                                         checked={formData.editSubAccount}
                                         onChange={(e) => setFormData({ ...formData, editSubAccount: e.target.checked })}
-                                        className="hidden"
+                                        className="w-4 h-4 rounded border-gray-300 text-[#0285fd] focus:ring-[#0285fd]"
                                     />
-                                    <span className="text-[12.5px] font-bold text-gray-600 uppercase tracking-wide">Modifier Mode</span>
+                                    <span className="text-[13px] font-medium text-gray-700">Modifier Mode</span>
                                 </label>
                             </div>
                         </div>
                     </div>
 
                     {/* Metadata Section */}
-                    <div className="border border-slate-200 rounded-[5px] overflow-hidden bg-white mt-4">
-                        <div className="bg-slate-50 px-5 py-2.5 border-b border-slate-200 flex items-center gap-2">
-                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Contextual Metadata</span>
-                        </div>
-                        <div className="p-4 space-y-4">
-                            <div className="flex gap-4">
-                                <label className="text-[11px] font-bold text-gray-500 uppercase w-36 pt-1">Description</label>
+                    <div className="bg-white p-4 border border-slate-200 rounded-[3px] space-y-4">
+                        <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Contextual Metadata</div>
+                        <div className="grid grid-cols-12 gap-x-6 gap-y-3.5">
+                            <div className="col-span-6">
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Description</label>
                                 <textarea
                                     rows={2}
-                                    placeholder=""
-                                    className="flex-1 px-3 py-2 border border-slate-200 rounded text-[12px] font-bold text-gray-700 bg-white outline-none transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 resize-none"
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-[3px] text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] resize-none text-gray-700"
                                     value={formData.description}
                                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                                 />
                             </div>
-                            <div className="flex gap-4 items-center">
-                                <label className="text-[11px] font-bold text-gray-500 uppercase w-36">Internal Note</label>
+                            <div className="col-span-6">
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Internal Note</label>
                                 <input
                                     type="text"
-                                    placeholder=""
-                                    className="flex-1 h-8 px-3 border border-slate-200 rounded text-[12px] font-bold text-gray-700 bg-white outline-none transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20"
+                                    className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700"
                                     value={formData.note}
                                     onChange={(e) => setFormData({ ...formData, note: e.target.value })}
                                 />
@@ -292,57 +267,52 @@ const AccountBoard = ({ isOpen, onClose, selectedType, initialData }) => {
                     </div>
 
                     {/* Hierarchy Visualizer */}
-                    <div className="border border-slate-200 rounded-[5px] overflow-hidden bg-white mt-4">
-                        <div className="bg-slate-50 px-5 py-2.5 border-b border-slate-200 flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                                <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Account Hierarchy</span>
-                            </div>
-                            <span className="text-[10px] font-black text-blue-400 uppercase">{customerAccounts.length} Records Found</span>
+                    <div className="border border-slate-200 rounded-[3px] bg-white">
+                        <div className="flex items-center justify-between px-4 py-2 bg-slate-50 border-b border-slate-200">
+                            <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Account Hierarchy</span>
+                            <span className="text-[10px] font-bold text-blue-400 uppercase">{customerAccounts.length} Records Found</span>
                         </div>
-                        <div className="h-[180px] overflow-y-auto no-scrollbar">
-                            <table className="w-full text-left border-collapse">
-                                <thead className="sticky top-0 bg-white border-b border-gray-100 z-10">
+                        <div className="max-h-[180px] overflow-y-auto no-scrollbar">
+                            <table className="w-full text-left">
+                                <thead className="bg-slate-50 sticky top-0 z-10 text-[10px] font-black text-gray-400 uppercase tracking-widest leading-10">
                                     <tr>
-                                        <th className="px-6 py-3 text-[10px] font-black text-gray-400 uppercase tracking-widest border-r border-gray-50 w-[150px]">Reference ID</th>
-                                        <th className="px-6 py-3 text-[10px] font-black text-gray-400 uppercase tracking-widest">Account Nomenclature</th>
-                                    </tr>
+                                        <th className="px-4 border-r border-gray-200">Reference ID</th>
+                                        <th className="px-4">Account Nomenclature</th>
+                                    <th className="text-right px-5 py-3">Action</th></tr>
                                 </thead>
-                                <tbody className="divide-y divide-gray-50">
+                                <tbody className="divide-y divide-gray-100">
                                     {customerAccounts.length > 0 ? (
                                         customerAccounts.map((cust, i) => (
-                                            <tr key={i} className="hover:bg-blue-50/40 transition-colors group">
-                                                <td className="px-6 py-2.5 text-[11px] font-mono font-black text-blue-600 border-r border-gray-50">{cust.sub_Cust_Acc_Code}</td>
-                                                <td className="px-6 py-2.5 text-[12px] font-bold text-slate-700 uppercase">{cust.sub_Cust_Acc_Name}</td>
+                                            <tr key={i} className="hover:bg-gray-50 transition-colors group text-[12px]">
+                                                <td className="px-4 py-2.5 font-mono font-bold text-blue-600 border-r border-gray-200">{cust.sub_Cust_Acc_Code}</td>
+                                                <td className="px-4 py-2.5 font-bold text-slate-700 uppercase">{cust.sub_Cust_Acc_Name}</td>
                                             </tr>
                                         ))
                                     ) : (
-                                        [1, 2, 3, 4].map(i => (
-                                            <tr key={i} className="opacity-10 h-10"><td colSpan={2}></td></tr>
-                                        ))
+                                        <tr><td colSpan="2" className="py-16 text-center text-gray-300 text-[11px] font-bold uppercase tracking-widest">No hierarchy records yet</td></tr>
                                     )}
                                 </tbody>
                             </table>
                         </div>
                     </div>
                 </div>
-            </SimpleModal>
+            </TransactionFormWrapper>
 
-            {/* Lookups - PO Style */}
+            {/* Type Modal */}
             <SimpleModal
                 isOpen={showTypeModal}
                 onClose={() => setShowTypeModal(false)}
                 title="Category Registry Discovery"
-                maxWidth="max-w-[500px]"
             >
-                <div className="space-y-4 font-['Tahoma']">
-                    <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-lg border border-gray-100">
-                        <span className="text-[12px] font-black text-gray-400 uppercase tracking-widest">Search Facility</span>
+                <div className="space-y-4">
+                    <div className="flex items-center gap-4 bg-slate-50 p-4 border-b border-gray-100 mb-2">
+                        <span className="text-[12px] font-bold text-gray-500 uppercase tracking-wider shrink-0">Search</span>
                         <div className="relative flex-1">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
-                            <input 
-                                type="text" 
-                                placeholder="Find nomenclature.." 
-                                className="w-full h-9 pl-10 pr-4 border border-gray-300 rounded-[5px] outline-none text-[12px] font-bold focus:border-[#0285fd] bg-white shadow-sm"
+                            <input
+                                type="text"
+                                placeholder="Find nomenclature..."
+                                className="w-full h-10 pl-10 pr-4 border border-gray-300 rounded-[3px] outline-none text-[13px] focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] shadow-sm bg-white"
                                 value={typeSearchQuery}
                                 onChange={(e) => setTypeSearchQuery(e.target.value)}
                                 autoFocus
@@ -350,43 +320,49 @@ const AccountBoard = ({ isOpen, onClose, selectedType, initialData }) => {
                         </div>
                     </div>
                     <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm">
-                        <table className="w-full text-left">
-                            <thead className="bg-[#f8fafd] text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">
+                        <div className="max-h-[350px] overflow-y-auto no-scrollbar">
+                            <table className="w-full text-left">
+                            <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 shadow-sm z-10">
                                 <tr>
-                                    <th className="px-5 py-3">Code</th>
-                                    <th className="px-5 py-3">Category Title</th>
+                                    <th className=" px-5 py-3">Code</th>
+                                    <th className=" px-5 py-3">Category Title</th>
+                                    <th className="text-right px-5 py-3">Action</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-gray-50">
+                            <tbody className="divide-y divide-gray-100">
                                 {mainAccountTypes
                                     .filter(t => t.main_Acc_Name.toLowerCase().includes(typeSearchQuery.toLowerCase()))
                                     .map((type, i) => (
-                                    <tr key={i} className="group hover:bg-blue-50/50 cursor-pointer transition-colors" onClick={() => handleSelectType(type)}>
-                                        <td className="px-5 py-3 font-mono text-[13px] font-black text-slate-500">{type.main_Acc_Code}</td>
-                                        <td className="px-5 py-3 text-[13px] font-bold text-slate-700 uppercase group-hover:text-blue-600">{type.main_Acc_Name}</td>
+                                    <tr key={i} className="group hover:bg-blue-50/50  transition-all cursor-pointer group border-b border-gray-50" onClick={() => handleSelectType(type)}>
+                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{type.main_Acc_Code}</td>
+                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{type.main_Acc_Name}</td>
+                                        <td className="text-right px-5 py-3">
+                                            <button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">Select</button>
+                                        </td>
                                     </tr>
                                 ))}
                             </tbody>
                         </table>
+                        </div>
                     </div>
                 </div>
             </SimpleModal>
 
+            {/* Parent Modal */}
             <SimpleModal
                 isOpen={showParentModal}
                 onClose={() => setShowParentModal(false)}
                 title="Parent Hierarchy Discovery"
-                maxWidth="max-w-[650px]"
             >
-                <div className="space-y-4 font-['Tahoma']">
-                    <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-lg border border-gray-100">
-                        <span className="text-[12px] font-black text-gray-400 uppercase tracking-widest">Search Facility</span>
+                <div className="space-y-4">
+                    <div className="flex items-center gap-4 bg-slate-50 p-4 border-b border-gray-100 mb-2">
+                        <span className="text-[12px] font-bold text-gray-500 uppercase tracking-wider shrink-0">Search</span>
                         <div className="relative flex-1">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
-                            <input 
-                                type="text" 
-                                placeholder="Scan hierarchy names or codes.." 
-                                className="w-full h-9 pl-10 pr-4 border border-gray-300 rounded-[5px] outline-none text-[12px] font-bold focus:border-[#0285fd] bg-white shadow-sm"
+                            <input
+                                type="text"
+                                placeholder="Search hierarchy names or codes..."
+                                className="w-full h-10 pl-10 pr-4 border border-gray-300 rounded-[3px] outline-none text-[13px] focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] shadow-sm bg-white"
                                 value={parentSearchQuery}
                                 onChange={(e) => setParentSearchQuery(e.target.value)}
                                 autoFocus
@@ -395,29 +371,29 @@ const AccountBoard = ({ isOpen, onClose, selectedType, initialData }) => {
                     </div>
                     <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm">
                         <div className="max-h-[350px] overflow-y-auto no-scrollbar">
-                            <table className="w-full text-left border-separate border-spacing-0">
-                                <thead className="bg-[#f8fafd] text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 sticky top-0 z-10">
+                            <table className="w-full text-left">
+                                <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 shadow-sm z-10">
                                     <tr>
-                                        <th className="px-6 py-4">Reference</th>
-                                        <th className="px-6 py-4">Credential Name</th>
-                                        <th className="px-6 py-4 text-right">Action</th>
+                                        <th className=" px-5 py-3">Reference</th>
+                                        <th className=" px-5 py-3">Credential Name</th>
+                                        <th className="text-right px-5 py-3">Action</th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-gray-50">
+                                <tbody className="divide-y divide-gray-100">
                                     {parentAccounts
                                         .filter(p => p.name.toLowerCase().includes(parentSearchQuery.toLowerCase()) || p.code.toLowerCase().includes(parentSearchQuery.toLowerCase()))
                                         .map((parent, i) => (
-                                        <tr key={i} className="group hover:bg-blue-50/50 cursor-pointer transition-all" onClick={() => handleSelectParent(parent)}>
-                                            <td className="px-6 py-3 font-mono text-[13px] font-black text-blue-600">{parent.code}</td>
-                                            <td className="px-6 py-3 text-[13px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors">{parent.name}</td>
-                                            <td className="px-6 py-3 text-right">
-                                                <button className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95 uppercase">Select</button>
+                                        <tr key={i} className="group hover:bg-blue-50/50  transition-all cursor-pointer group border-b border-gray-50" onClick={() => handleSelectParent(parent)}>
+                                            <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{parent.code}</td>
+                                            <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{parent.name}</td>
+                                            <td className="text-right px-5 py-3">
+                                                <button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">Select</button>
                                             </td>
                                         </tr>
                                     ))}
                                     {parentAccounts.length === 0 && (
                                         <tr>
-                                            <td colSpan="3" className="text-center py-20 text-slate-300 text-[10px] font-black uppercase tracking-[0.3em] ">No branches detected for this class</td>
+                                            <td colSpan="3" className="text-center py-16 text-gray-400 text-[11px] font-bold uppercase tracking-widest">No branches detected for this class</td>
                                         </tr>
                                     )}
                                 </tbody>

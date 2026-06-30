@@ -112,7 +112,7 @@ const EmployeeMessageDropdown = ({ allEmployees = [], onClose }) => {
         <div className="flex items-center gap-1">
             <button
                 onClick={(e) => handleWhatsApp(e, emp)}
-                className={`p-2 rounded-lg transition-colors ${getPhone(emp) ? 'text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-500/10' : 'text-slate-300 cursor-not-allowed'}`}
+                className={`p-2 rounded-[3px] transition-colors ${getPhone(emp) ? 'text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-500/10' : 'text-slate-300 cursor-not-allowed'}`}
                 title={getPhone(emp) ? 'Open WhatsApp' : 'No phone number'}
                 disabled={!getPhone(emp)}
             >
@@ -120,7 +120,7 @@ const EmployeeMessageDropdown = ({ allEmployees = [], onClose }) => {
             </button>
             <button
                 onClick={(e) => { e.stopPropagation(); setSelectedEmp(emp); setView('sms'); }}
-                className={`p-2 rounded-lg transition-colors ${getPhone(emp) ? 'text-orange-600 hover:bg-orange-50 dark:hover:bg-orange-500/10' : 'text-slate-300 cursor-not-allowed'}`}
+                className={`p-2 rounded-[3px] transition-colors ${getPhone(emp) ? 'text-orange-600 hover:bg-orange-50 dark:hover:bg-orange-500/10' : 'text-slate-300 cursor-not-allowed'}`}
                 title={getPhone(emp) ? 'Send SMS' : 'No phone number'}
                 disabled={!getPhone(emp)}
             >
@@ -136,7 +136,7 @@ const EmployeeMessageDropdown = ({ allEmployees = [], onClose }) => {
             <div className="absolute right-0 mt-2 w-96 bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200">
                 <div className="flex flex-col h-[420px]">
                     <div className="p-4 border-b border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 flex items-center gap-3">
-                        <button onClick={() => { setView('list'); setSelectedEmp(null); }} className="p-1 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg text-slate-500">
+                        <button onClick={() => { setView('list'); setSelectedEmp(null); }} className="p-1 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-[3px] text-slate-500">
                             <ArrowLeft size={18} />
                         </button>
                         <div className="flex-1">
@@ -158,13 +158,13 @@ const EmployeeMessageDropdown = ({ allEmployees = [], onClose }) => {
                             onChange={e => setSmsText(e.target.value)}
                             placeholder="Type your SMS message..."
                             maxLength={160}
-                            className="w-full bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl p-3 text-sm focus:outline-none focus:border-orange-400 focus:ring-1 focus:ring-orange-400 resize-none h-24 mb-2 text-slate-900 dark:text-white"
+                            className="w-full bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-[3px] p-3 text-sm focus:outline-none focus:border-orange-400 focus:ring-1 focus:ring-orange-400 resize-none h-24 mb-2 text-slate-900 dark:text-white"
                         />
                         <p className="text-right text-xs text-slate-400 mb-3">{smsText.length}/160</p>
                         <button
                             onClick={handleSendSms}
                             disabled={!smsText.trim() || sendingSms}
-                            className="w-full flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 disabled:opacity-50 text-white py-2.5 rounded-xl font-bold text-sm transition-colors"
+                            className="w-full flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 disabled:opacity-50 text-white py-2.5 rounded-[3px] font-bold text-sm transition-colors"
                         >
                             {sendingSms ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
                             {sendingSms ? 'Sending...' : 'Send SMS'}
@@ -181,7 +181,7 @@ const EmployeeMessageDropdown = ({ allEmployees = [], onClose }) => {
                 <div className="flex flex-col h-[420px]">
                     <div className="p-4 border-b border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                            <button onClick={() => setView('list')} className="p-1 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg text-slate-500">
+                            <button onClick={() => setView('list')} className="p-1 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-[3px] text-slate-500">
                                 <ArrowLeft size={18} />
                             </button>
                             <h3 className="font-bold text-slate-900 dark:text-white text-sm">Message Logs</h3>
@@ -197,7 +197,7 @@ const EmployeeMessageDropdown = ({ allEmployees = [], onClose }) => {
                             <div className="text-center text-slate-400 text-sm mt-16">No message logs yet.</div>
                         ) : (
                             messageLogs.map((log, idx) => (
-                                <div key={log.id || idx} className="p-3 border border-slate-100 dark:border-slate-700 rounded-xl mb-2 bg-slate-50/50 dark:bg-slate-700/30">
+                                <div key={log.id || idx} className="p-3 border border-slate-100 dark:border-slate-700 rounded-[3px] mb-2 bg-slate-50/50 dark:bg-slate-700/30">
                                     <div className="flex items-center justify-between mb-2">
                                         <div className="flex items-center gap-2">
                                             <CheckCircle size={14} className="text-emerald-500" />
@@ -231,7 +231,7 @@ const EmployeeMessageDropdown = ({ allEmployees = [], onClose }) => {
                         <div className="flex items-center gap-1">
                             <button
                                 onClick={openLogs}
-                                className="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition-colors"
+                                className="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-[3px] transition-colors"
                                 title="Message Logs"
                             >
                                 <History size={16} />
@@ -246,7 +246,7 @@ const EmployeeMessageDropdown = ({ allEmployees = [], onClose }) => {
                             placeholder="Search by name, code or phone..."
                             value={search}
                             onChange={e => setSearch(e.target.value)}
-                            className="w-full pl-9 pr-4 py-2 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-sm focus:outline-none focus:border-[#00acee] focus:ring-1 focus:ring-[#00acee] text-slate-900 dark:text-white"
+                            className="w-full pl-9 pr-4 py-2 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-[3px] text-sm focus:outline-none focus:border-[#00acee] focus:ring-1 focus:ring-[#00acee] text-slate-900 dark:text-white"
                         />
                     </div>
                 </div>
@@ -257,7 +257,7 @@ const EmployeeMessageDropdown = ({ allEmployees = [], onClose }) => {
                         filtered.map((emp, idx) => (
                             <div
                                 key={emp.empCode || emp.emp_Code || emp.id || idx}
-                                className="flex items-center justify-between p-2.5 hover:bg-slate-50 dark:hover:bg-slate-700/50 rounded-xl transition-colors group"
+                                className="flex items-center justify-between p-2.5 hover:bg-slate-50 dark:hover:bg-slate-700/50 rounded-[3px] transition-colors group"
                             >
                                 <div className="flex items-center gap-3 flex-1 min-w-0">
                                     <div className="w-9 h-9 rounded-full bg-[#00acee]/10 text-[#00acee] flex items-center justify-center font-bold text-sm shrink-0">

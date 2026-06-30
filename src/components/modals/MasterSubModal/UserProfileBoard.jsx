@@ -89,7 +89,7 @@ const UserProfileBoard = ({ isOpen, onClose }) => {
                 onClose={onClose}
                 title="User Profile Maintenance"
                 icon={User}
-                maxWidth="max-w-[800px]"
+                maxWidth="max-w-[700px]"
                 isEditMode={isEditing}
                 loading={saving}
                 onClear={handleClear}
@@ -97,15 +97,15 @@ const UserProfileBoard = ({ isOpen, onClose }) => {
                 onDelete={handleDelete}
                 customFooter={
                     <div className="flex items-center justify-end gap-3 w-full">
-                        <button onClick={handleClear} className="px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-500 font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] transition-all active:scale-95 flex items-center justify-center gap-2 border-none">
+                        <button onClick={handleClear} className="px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-500 font-mono font-bold text-sm uppercase tracking-widest rounded-[3px] transition-all active:scale-95 flex items-center justify-center gap-2 border-none">
                             <RotateCcw size={14} /> CLEAR FORM
                         </button>
                         {isEditing && (
-                            <button onClick={handleDelete} disabled={!isEditing || deleting} className="px-6 py-3 bg-red-500 hover:bg-red-600 text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] transition-all active:scale-95 flex items-center justify-center gap-2 border-none disabled:opacity-50 shadow-md shadow-red-100">
+                            <button onClick={handleDelete} disabled={!isEditing || deleting} className="px-6 py-3 bg-red-500 hover:bg-red-600 text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[3px] transition-all active:scale-95 flex items-center justify-center gap-2 border-none disabled:opacity-50 shadow-md shadow-red-100">
                                 {deleting ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />} DELETE
                             </button>
                         )}
-                        <button onClick={handleSave} disabled={saving} className={`px-6 py-3 text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] transition-all active:scale-95 flex items-center justify-center gap-2 border-none disabled:opacity-50 shadow-md ${isEditing ? 'bg-[#00adff] hover:bg-[#0099e6] shadow-blue-100' : 'bg-[#2bb744] hover:bg-[#259b3a] shadow-green-100'}`}>
+                        <button onClick={handleSave} disabled={saving} className={`px-6 py-3 text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[3px] transition-all active:scale-95 flex items-center justify-center gap-2 border-none disabled:opacity-50 shadow-md ${isEditing ? 'bg-[#00adff] hover:bg-[#0099e6] shadow-blue-100' : 'bg-[#2bb744] hover:bg-[#259b3a] shadow-green-100'}`}>
                             {saving ? <Loader2 size={14} className="animate-spin" /> : (isEditing ? <Save size={14} /> : <Save size={14} />)}
                             {isEditing ? 'UPDATE' : 'ADD USER'}
                         </button>
@@ -115,7 +115,7 @@ const UserProfileBoard = ({ isOpen, onClose }) => {
                 <MasterFieldRow label="User Code" colSpan="col-span-6">
                     <div className="flex-1 flex gap-1 min-w-0 items-center">
                         <div className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-sm font-mono font-bold text-[#0285fd] bg-slate-50 rounded outline-none flex items-center">{fetching ? 'LOADING...' : (emp_Code || '')}</div>
-                        <button onClick={() => setShowSearchModal(true)} className="w-8 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0"><Search size={14} /></button>
+                        <button onClick={() => setShowSearchModal(true)} className="w-8 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0"><Search size={14} /></button>
                     </div>
                 </MasterFieldRow>
                 <MasterFieldRow label="User Name" colSpan="col-span-6">
@@ -124,28 +124,28 @@ const UserProfileBoard = ({ isOpen, onClose }) => {
                 <MasterFieldRow label="Password" colSpan="col-span-6">
                     <div className="flex-1 flex gap-1 min-w-0 items-center">
                         <input type={showPassword ? "text" : "password"} value={pass_Word} onChange={(e) => setPass_Word(e.target.value)} className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-sm font-mono font-bold text-slate-700 bg-slate-50 rounded outline-none focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 transition-all" placeholder="Enter password" />
-                        <button onClick={() => setShowPassword(!showPassword)} className="w-8 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">{showPassword ? <EyeOff size={14} /> : <Eye size={14} />}</button>
+                        <button onClick={() => setShowPassword(!showPassword)} className="w-8 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0">{showPassword ? <EyeOff size={14} /> : <Eye size={14} />}</button>
                     </div>
                 </MasterFieldRow>
                 <MasterFieldRow label="Confirm Pwd" colSpan="col-span-6">
-                    <input type={showPassword ? "text" : "password"} value={conpass_Word} onChange={(e) => setConpass_Word(e.target.value)} className={`flex-1 min-w-0 h-8 border border-slate-200 px-3 text-sm font-mono font-bold text-slate-700 bg-slate-50 rounded outline-none focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 transition-all ${conpass_Word && pass_Word === conpass_Word ? 'border-green-400 bg-green-50/20' : ''}`} placeholder="Confirm password" />
+                    <input type={showPassword ? "text" : "password"} value={conpass_Word} onChange={(e) => setConpass_Word(e.target.value)} className={`flex-1 min-w-0 h-8 border border-slate-200 px-3 text-sm font-mono font-bold text-slate-700 bg-slate-50 rounded outline-none focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 transition-all ${conpass_Word && pass_Word === conpass_Word ? 'border-green-400 bg-blue-50/20' : ''}`} placeholder="Confirm password" />
                 </MasterFieldRow>
                 <MasterFieldRow label="Member Group" colSpan="col-span-6">
                     <div className="flex-1 flex gap-1 min-w-0 items-center">
                         <input type="text" value={member_Id} readOnly className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-sm font-mono font-bold text-gray-700 bg-slate-50 rounded outline-none cursor-default" />
-                        <button onClick={() => setShowGroupModal(true)} className="w-8 h-8 bg-[#e49e1b] text-white flex items-center justify-center hover:bg-[#cb9b34] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0"><Users size={14} /></button>
+                        <button onClick={() => setShowGroupModal(true)} className="w-8 h-8 bg-[#e49e1b] text-white flex items-center justify-center hover:bg-[#cb9b34] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0"><Users size={14} /></button>
                     </div>
                 </MasterFieldRow>
                 <MasterFieldRow label="Expiry Date" colSpan="col-span-6">
                     <div className="flex-1 flex gap-1 min-w-0 items-center">
                         <input type="text" value={exp_Date} readOnly onClick={() => setShowCalendar(true)} className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-sm font-mono font-bold text-gray-700 bg-slate-50 rounded outline-none cursor-pointer transition-all" placeholder="Select date..." />
-                        <button onClick={() => setShowCalendar(true)} className="w-8 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0"><Calendar size={14} /></button>
+                        <button onClick={() => setShowCalendar(true)} className="w-8 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0"><Calendar size={14} /></button>
                     </div>
                 </MasterFieldRow>
 
                 <div className="col-span-12 mt-4">
                     <div className="text-[11px] font-bold text-gray-500 uppercase mb-3">Account Options</div>
-                    <div className="bg-white border border-slate-200 rounded-[5px] p-4 space-y-3">
+                    <div className="bg-white border border-slate-200 rounded-[3px] p-4 space-y-3">
                         <label className="flex items-center gap-3 cursor-pointer h-8">
                             <input type="checkbox" checked={must_Change === '1'} onChange={(e) => setMust_Change(e.target.checked ? '1' : '0')} className="w-4 h-4 rounded border-gray-300 text-[#0285fd] focus:ring-[#00D1FF]" />
                             <span className="text-[12px] font-bold text-slate-600 select-none">Must Change Password Next Login</span>
@@ -159,7 +159,7 @@ const UserProfileBoard = ({ isOpen, onClose }) => {
                             <span className="text-[12px] font-bold text-red-600 select-none">Account Disabled</span>
                         </label>
                         <div className="pt-2 border-t border-slate-200">
-                            <button onClick={() => setShowCostCenterAuth(true)} disabled={!emp_Code} className="w-full h-9 bg-[#0285fd] text-white text-[10px] font-mono font-bold rounded-[5px] hover:bg-[#0073ff] shadow-sm transition-all active:scale-95 flex items-center justify-center uppercase tracking-widest gap-2 disabled:opacity-40">
+                            <button onClick={() => setShowCostCenterAuth(true)} disabled={!emp_Code} className="w-full h-9 bg-[#0285fd] text-white text-[10px] font-mono font-bold rounded-[3px] hover:bg-[#0073ff] shadow-sm transition-all active:scale-95 flex items-center justify-center uppercase tracking-widest gap-2 disabled:opacity-40">
                                 <ShieldCheck size={14} /> Cost Center Authentication
                             </button>
                         </div>
@@ -181,8 +181,8 @@ const UserProfileBoard = ({ isOpen, onClose }) => {
                             <h3 className="text-lg font-black text-slate-800 mb-2 uppercase tracking-wider">Confirm Deletion</h3>
                             <p className="text-slate-500 text-[12px] font-medium leading-relaxed mb-8">Are you sure you want to delete user <span className="font-bold text-slate-800 uppercase">"{emp_Name || emp_Code}"</span>?<br />This action is permanent and cannot be undone.</p>
                             <div className="flex gap-3">
-                                <button onClick={() => setShowDeleteConfirm(false)} disabled={deleting} className="flex-1 h-11 bg-slate-100 text-slate-600 text-[11px] font-black rounded-xl hover:bg-slate-200 transition-all uppercase tracking-widest disabled:opacity-50">Cancel</button>
-                                <button onClick={confirmDelete} disabled={deleting} className="flex-1 h-11 bg-red-500 text-white text-[11px] font-black rounded-xl hover:bg-red-600 shadow-lg shadow-red-200 transition-all flex items-center justify-center gap-2 uppercase tracking-widest disabled:opacity-50">{deleting ? <Loader2 size={16} className="animate-spin" /> : 'Delete Now'}</button>
+                                <button onClick={() => setShowDeleteConfirm(false)} disabled={deleting} className="flex-1 h-11 bg-slate-100 text-slate-600 text-[11px] font-black rounded-[3px] hover:bg-slate-200 transition-all uppercase tracking-widest disabled:opacity-50">Cancel</button>
+                                <button onClick={confirmDelete} disabled={deleting} className="flex-1 h-11 bg-red-500 text-white text-[11px] font-black rounded-[3px] hover:bg-red-600 shadow-lg shadow-red-200 transition-all flex items-center justify-center gap-2 uppercase tracking-widest disabled:opacity-50">{deleting ? <Loader2 size={16} className="animate-spin" /> : 'Delete Now'}</button>
                             </div>
                         </div>
                         <div className="bg-slate-50 py-3 border-t border-slate-100"><span className="text-[9px] text-slate-400 font-black uppercase tracking-[0.2em] block text-center">Security Verification Required</span></div>

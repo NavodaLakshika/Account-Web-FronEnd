@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import SimpleModal from '../components/SimpleModal';
 import ConfirmModal from '../components/modals/ConfirmModal';
-import { Search, CheckCircle, RotateCcw, FileUp, FileDown, Trash2, X } from 'lucide-react';
+import { Search, CheckCircle, RotateCcw, FileUp, FileDown, Trash2, X , FileText} from 'lucide-react';
 import * as XLSX from 'xlsx';
 import { grnService } from '../services/grn.service';
 import { getSessionData } from '../utils/session';
 import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
 import { reportService } from '../services/report.service';
+import TransactionFormWrapper from '../components/TransactionFormWrapper';
 
 const BulkGRNBoard = ({ isOpen, onClose }) => {
     const [lookups, setLookups] = useState({ suppliers: [], products: [], pos: [], paymentMethods: [] });
@@ -272,21 +273,21 @@ const BulkGRNBoard = ({ isOpen, onClose }) => {
 
     return (
         <>
-        <SimpleModal
+        <TransactionFormWrapper subtitle="Transaction Management" icon={FileText}
             isOpen={isOpen}
             onClose={onClose}
-            title="Bulk Good Received Note (Bulk GRN)"
-            maxWidth="max-w-[1200px]"
+            title="Bulk GRN"
+            maxWidth="max-w-[700px]"
             footer={
-                <div className="bg-slate-50 px-6 py-3 w-full flex justify-between items-center border-t border-gray-100 rounded-b-xl">
-                    <button onClick={handleClear} className="px-6 h-10 bg-[#00adff] text-white text-sm font-black rounded-[5px] hover:bg-[#0099e6] transition-all active:scale-95 flex items-center gap-2 border-none">
+                <div className="bg-slate-50 px-6 py-3 w-full flex justify-between items-center border-t border-gray-200 rounded-b-xl">
+                    <button onClick={handleClear} className="px-6 h-10 bg-white text-[#00adff] border-2 border-[#00adff] hover:bg-blue-50 text-sm font-black rounded-[3px] hover:bg-[#0099e6] transition-all active:scale-95 flex items-center gap-2 border-none">
                         <RotateCcw size={14} /> CLEAR ALL
                     </button>
                     <div className="flex gap-3">
-                        <button onClick={handleSave} disabled={isSaving || isApplying || groupedGrns.length === 0} className="px-6 h-10 bg-slate-600 text-white text-sm font-black rounded-[5px] shadow-md shadow-slate-100 hover:bg-slate-700 transition-all active:scale-95 flex items-center gap-2 border-none disabled:opacity-50">
+                        <button onClick={handleSave} disabled={isSaving || isApplying || groupedGrns.length === 0} className="px-6 h-10 bg-slate-600 text-white text-sm font-black rounded-[3px] shadow-md shadow-slate-100 hover:bg-slate-700 transition-all active:scale-95 flex items-center gap-2 disabled:opacity-50">
                             {isSaving ? <Search className="animate-spin" size={14} /> : <FileDown size={14} />} SAVE ALL ({groupedGrns.length})
                         </button>
-                        <button onClick={handleApply} disabled={isSaving || isApplying || groupedGrns.length === 0} className="px-6 h-10 bg-[#2bb744] text-white text-sm font-black rounded-[5px] shadow-md shadow-green-100 hover:bg-[#259b3a] transition-all active:scale-95 flex items-center gap-2 border-none disabled:opacity-50">
+                        <button onClick={handleApply} disabled={isSaving || isApplying || groupedGrns.length === 0} className="px-6 h-10 bg-white text-[#2bb744] border-2 border-[#2bb744] hover:bg-green-50 text-sm font-black rounded-[3px] shadow-md shadow-green-100 hover:bg-[#259b3a] transition-all active:scale-95 flex items-center gap-2 disabled:opacity-50">
                             {isApplying ? <Search className="animate-spin" size={14} /> : <CheckCircle size={14} />} APPLY ALL ({groupedGrns.length})
                         </button>
                     </div>
@@ -300,21 +301,21 @@ const BulkGRNBoard = ({ isOpen, onClose }) => {
                         Total GRNs to Process: <span className="text-blue-600">{groupedGrns.length}</span>
                     </div>
                     <div className="flex gap-2">
-                        <button onClick={downloadExcelTemplate} className="h-8 px-4 bg-white text-emerald-600 border-2 border-emerald-500 text-[10px] font-black rounded-[5px] hover:bg-emerald-50 transition-all flex items-center gap-2 uppercase active:scale-95 shadow-sm">
+                        <button onClick={downloadExcelTemplate} className="h-8 px-4 bg-white text-emerald-600 border-2 border-emerald-500 text-[10px] font-black rounded-[3px] hover:bg-emerald-50 transition-all flex items-center gap-2 uppercase active:scale-95 shadow-sm">
                             <FileDown size={14} /> BULK TEMPLATE
                         </button>
-                        <button onClick={() => excelInputRef.current?.click()} className="h-8 px-4 bg-white text-blue-600 border-2 border-blue-500 text-[10px] font-black rounded-[5px] hover:bg-blue-50 transition-all flex items-center gap-2 uppercase active:scale-95 shadow-sm">
+                        <button onClick={() => excelInputRef.current?.click()} className="h-8 px-4 bg-white text-blue-600 border-2 border-blue-500 text-[10px] font-black rounded-[3px] hover:bg-blue-50 transition-all flex items-center gap-2 uppercase active:scale-95 shadow-sm">
                             <FileUp size={14} /> LOAD BULK EXCEL
                         </button>
                     </div>
                 </div>
 
-                <div className="border border-gray-100 rounded-lg bg-white shadow-sm flex flex-col min-h-[400px] overflow-hidden">
-                    <div className="flex bg-slate-50/80 border-b border-gray-100 text-[10px] font-black text-gray-400 uppercase tracking-widest items-center">
-                        <div className="flex-[1.5] py-2.5 px-4 border-r border-gray-100">Supplier</div>
-                        <div className="w-32 py-2.5 px-3 border-r border-gray-100 text-center">Inv No</div>
-                        <div className="w-32 py-2.5 px-3 border-r border-gray-100 text-center">PO No</div>
-                        <div className="w-24 py-2.5 px-3 border-r border-gray-100 text-center">Items</div>
+                <div className="border border-gray-200 rounded-[3px] bg-white shadow-sm flex flex-col min-h-[400px] overflow-hidden">
+                    <div className="flex bg-slate-50/80 border-b border-gray-200 text-[10px] font-black text-gray-400 uppercase tracking-widest items-center">
+                        <div className="flex-[1.5] py-2.5 px-4 border-r border-gray-200">Supplier</div>
+                        <div className="w-32 py-2.5 px-3 border-r border-gray-200 text-center">Inv No</div>
+                        <div className="w-32 py-2.5 px-3 border-r border-gray-200 text-center">PO No</div>
+                        <div className="w-24 py-2.5 px-3 border-r border-gray-200 text-center">Items</div>
                         <div className="w-32 py-2.5 px-4 text-right">Total Amount</div>
                         <div className="w-12"></div>
                     </div>
@@ -328,23 +329,23 @@ const BulkGRNBoard = ({ isOpen, onClose }) => {
                             const totalAmount = g.products.reduce((sum, p) => sum + (parseFloat(p.amount) || 0), 0);
                             
                             return (
-                                <div key={g.id} className="flex border-b border-gray-100 text-[11px] font-bold text-slate-700 hover:bg-blue-50/30 items-center transition-colors group">
-                                    <div className="flex-[1.5] py-2 px-4 border-r border-gray-100 truncate">
+                                <div key={g.id} className="flex border-b border-gray-200 text-[11px] font-bold text-slate-700 hover:bg-blue-50/30 items-center transition-colors group">
+                                    <div className="flex-[1.5] py-2 px-4 border-r border-gray-200 truncate">
                                         <div className="flex flex-col">
                                             <span className="text-blue-600 font-mono text-[10px]">{g.suppCode}</span>
                                             <span className="truncate">{supplierName}</span>
                                         </div>
                                     </div>
-                                    <div className="w-32 py-2 px-3 border-r border-gray-100 text-center font-mono">{g.suppInv || '-'}</div>
-                                    <div className="w-32 py-2 px-3 border-r border-gray-100 text-center font-mono text-gray-500">{g.poNo || '-'}</div>
-                                    <div className="w-24 py-2 px-3 border-r border-gray-100 text-center bg-white group-hover:bg-transparent">
-                                        <span className="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full">{g.products.length} Items</span>
+                                    <div className="w-32 py-2 px-3 border-r border-gray-200 text-center font-mono">{g.suppInv || '-'}</div>
+                                    <div className="w-32 py-2 px-3 border-r border-gray-200 text-center font-mono text-gray-500">{g.poNo || '-'}</div>
+                                    <div className="w-24 py-2 px-3 border-r border-gray-200 text-center bg-white group-hover:bg-transparent">
+                                        <span className="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-[3px]">{g.products.length} Items</span>
                                     </div>
                                     <div className="w-32 py-1.5 px-4 text-right font-mono font-black text-slate-800">
                                         {totalAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                     </div>
                                     <div className="w-12 flex justify-center py-1">
-                                        <button onClick={() => removeGroup(g.id)} className="text-red-300 hover:text-red-500 transition-all p-1.5 hover:bg-red-50 rounded-[5px]">
+                                        <button onClick={() => removeGroup(g.id)} className="text-red-300 hover:text-red-500 transition-all p-1.5 hover:bg-red-50 rounded-[3px]">
                                             <Trash2 size={14} />
                                         </button>
                                     </div>
@@ -356,7 +357,7 @@ const BulkGRNBoard = ({ isOpen, onClose }) => {
             </div>
             
             <ConfirmModal isOpen={showConfirmModal} onClose={() => setShowConfirmModal(false)} onConfirm={confirmApply} title="Bulk Apply GRNs" message={`Are you sure you want to apply ${groupedGrns.length} GRN documents? This action cannot be undone.`} loading={isApplying} confirmText="Apply All GRNs" />
-        </SimpleModal>
+        </TransactionFormWrapper>
         </>
     );
 };

@@ -190,26 +190,26 @@ const VendorBoard = ({ isOpen, onClose }) => {
             <button 
                 onClick={handleSave}
                 disabled={loading}
-                className={`px-6 py-3 bg-[#2bb744] hover:bg-[#259b3a] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] shadow-md shadow-green-100 transition-all active:scale-95 flex items-center justify-center gap-2 border-none ${loading ? 'opacity-50' : ''}`}
+                className={`px-6 py-2 bg-[#0285fd] hover:bg-[#0073ff] text-white font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
                 {loading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />} {isEditMode ? 'UPDATE' : 'SAVE'}
             </button>
             <button 
                 onClick={handleDelete}
                 disabled={!isEditMode || loading}
-                className={`px-6 py-3 bg-[#ff3b30] hover:bg-[#e03127] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] shadow-md shadow-red-100 transition-all active:scale-95 flex items-center justify-center gap-2 border-none ${(!isEditMode || loading) ? 'opacity-50' : ''}`}
+                className={`px-6 py-3 bg-white text-[#ff3b30] border-2 border-[#ff3b30] hover:bg-red-50 font-mono font-bold text-sm uppercase tracking-widest rounded-[3px] shadow-md shadow-red-100 transition-all active:scale-95 flex items-center justify-center gap-2 border-none ${(!isEditMode || loading) ? 'opacity-50' : ''}`}
             >
                 <Trash2 size={14} /> DELETE
             </button>
             <button 
                 onClick={handleClear}
-                className="px-6 py-3 bg-[#00adff] hover:bg-[#0099e6] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] transition-all active:scale-95 flex items-center justify-center gap-2 border-none"
+                className="px-6 py-2 border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2"
             >
                 <RotateCcw size={14} /> CLEAR
             </button>
             <button 
                 onClick={onClose} 
-                className="px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-500 font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] transition-all active:scale-95 flex items-center justify-center gap-2 border-none"
+                className="px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-500 font-mono font-bold text-sm uppercase tracking-widest rounded-[3px] transition-all active:scale-95 flex items-center justify-center gap-2 border-none"
             >
                 <X size={28} /> EXIT
             </button>
@@ -222,14 +222,13 @@ const VendorBoard = ({ isOpen, onClose }) => {
                 isOpen={isOpen}
                 onClose={onClose}
                 title="Supplier Master File"
-                maxWidth="max-w-4xl"
                 footer={footer}
             >
                 <div className="space-y-4">
                     {/* ID and Name */}
-                    <div className="bg-white p-4 border border-slate-200 rounded-[5px] space-y-3">
+                    <div className="bg-white p-4 border border-slate-200 rounded-[3px] space-y-3">
                         <div className="grid grid-cols-12 gap-3 items-center">
-                            <label className="col-span-3 text-[11px] font-bold text-gray-500 uppercase">Supplier ID / Name</label>
+                            <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Supplier ID / Name</label>
                             <div className="col-span-3">
                                 <input 
                                     type="text" 
@@ -238,7 +237,7 @@ const VendorBoard = ({ isOpen, onClose }) => {
                                     onChange={handleInputChange}
                                     placeholder="AUTO"
                                     readOnly={isEditMode}
-                                    className="w-full h-8 border border-slate-200 px-2 text-sm font-mono font-bold focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 outline-none rounded bg-slate-50 transition-all"
+                                    className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700 truncate shadow-sm"
                                 />
                             </div>
                             <div className="col-span-12 md:col-span-5 relative">
@@ -248,12 +247,12 @@ const VendorBoard = ({ isOpen, onClose }) => {
                                     value={formData.Supplier_Name}
                                     onChange={handleInputChange}
                                     placeholder="Enter Supplier Name"
-                                    className="w-full h-8 border border-slate-200 px-2 text-sm outline-none rounded bg-slate-50 transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20"
+                                    className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 shadow-sm"
                                 />
                             </div>
                             <button 
                                 onClick={openSearch}
-                                className="col-span-1 w-8 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 border-none"
+                                className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer"
                             >
                                 <Search size={16} />
                             </button>
@@ -265,42 +264,42 @@ const VendorBoard = ({ isOpen, onClose }) => {
                                 name="Destibution_Name"
                                 value={formData.Destibution_Name}
                                 onChange={handleInputChange}
-                                className="flex-1 h-8 border border-slate-200 px-2 text-sm outline-none rounded bg-slate-50 transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" 
+                                className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 shadow-sm" 
                             />
                         </FormRow>
 
                         <FormRow label="Address 1">
-                            <input type="text" name="Address1" value={formData.Address1} onChange={handleInputChange} className="flex-1 h-8 border border-slate-200 px-2 text-sm rounded bg-slate-50 transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" />
+                            <input type="text" name="Address1" value={formData.Address1} onChange={handleInputChange} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 shadow-sm" />
                         </FormRow>
                         <FormRow label="Address 2">
-                            <input type="text" name="Address2" value={formData.Address2} onChange={handleInputChange} className="flex-1 h-8 border border-slate-200 px-2 text-sm rounded bg-slate-50 transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" />
+                            <input type="text" name="Address2" value={formData.Address2} onChange={handleInputChange} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 shadow-sm" />
                         </FormRow>
 
                         <div className="grid grid-cols-2 gap-4">
                             <FormRow label="Phone Number">
-                                <input type="text" name="Phone" value={formData.Phone} onChange={handleInputChange} className="flex-1 h-8 border border-slate-200 px-2 text-sm rounded bg-slate-50 transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" />
+                                <input type="text" name="Phone" value={formData.Phone} onChange={handleInputChange} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 shadow-sm" />
                             </FormRow>
-                            <div className="flex items-center gap-2">
-                                <label className="text-[11px] font-bold text-gray-500 uppercase w-20 text-center">Fax</label>
-                                <input type="text" name="Fax" value={formData.Fax} onChange={handleInputChange} className="flex-1 h-8 border border-slate-200 px-2 text-sm rounded bg-slate-50 transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" />
+                            <div className="">
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Fax</label>
+                                <input type="text" name="Fax" value={formData.Fax} onChange={handleInputChange} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 shadow-sm" />
                             </div>
                         </div>
 
                         <FormRow label="E-Mail Address">
-                            <input type="email" name="Email" value={formData.Email} onChange={handleInputChange} className="flex-1 h-8 border border-slate-200 px-2 text-sm rounded bg-slate-50 transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" />
+                            <input type="email" name="Email" value={formData.Email} onChange={handleInputChange} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 shadow-sm" />
                         </FormRow>
 
                         <FormRow label="Web Site">
-                            <input type="text" name="Web" value={formData.Web} onChange={handleInputChange} className="flex-1 h-8 border border-slate-200 px-2 text-sm rounded bg-slate-50 transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" />
+                            <input type="text" name="Web" value={formData.Web} onChange={handleInputChange} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 shadow-sm" />
                         </FormRow>
 
                         <div className="grid grid-cols-2 gap-4">
                             <FormRow label="Contact Person">
-                                <input type="text" name="Contact_Person" value={formData.Contact_Person} onChange={handleInputChange} className="flex-1 h-8 border border-slate-200 px-2 text-sm rounded bg-slate-50 transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" />
+                                <input type="text" name="Contact_Person" value={formData.Contact_Person} onChange={handleInputChange} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 shadow-sm" />
                             </FormRow>
-                            <div className="flex items-center gap-2">
-                                <label className="text-[11px] font-bold text-gray-500 uppercase w-32 text-center">Credit Period</label>
-                                <input type="number" name="Credit_Period" value={formData.Credit_Period} onChange={handleInputChange} className="w-20 h-8 border border-slate-200 px-2 text-sm rounded bg-slate-50 transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" />
+                            <div className="">
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Credit Period</label>
+                                <input type="number" name="Credit_Period" value={formData.Credit_Period} onChange={handleInputChange} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 shadow-sm" />
                                 <span className="text-sm font-mono font-bold text-slate-600">Days</span>
                             </div>
                         </div>
@@ -310,7 +309,7 @@ const VendorBoard = ({ isOpen, onClose }) => {
                                 name="Vend_Typ" 
                                 value={formData.Vend_Typ} 
                                 onChange={handleInputChange}
-                                className="flex-1 h-8 border border-slate-200 px-2 text-sm bg-slate-50 rounded outline-none transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20"
+                                className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 cursor-pointer shadow-sm"
                             >
                                 <option value="">Select Type</option>
                                 {vendorTypes.map(t => <option key={t} value={t}>{t}</option>)}
@@ -338,17 +337,17 @@ const VendorBoard = ({ isOpen, onClose }) => {
 
                         <div className="grid grid-cols-2 gap-4">
                             <FormRow label="Branch">
-                                <input type="text" name="Brunch" value={formData.Brunch} onChange={handleInputChange} className="flex-1 h-8 border border-slate-200 px-2 text-sm rounded bg-slate-50 transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" />
+                                <input type="text" name="Brunch" value={formData.Brunch} onChange={handleInputChange} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 shadow-sm" />
                             </FormRow>
-                            <div className="flex items-center gap-2">
-                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 text-center">A/C No</label>
-                                <input type="text" name="AC_Number" value={formData.AC_Number} onChange={handleInputChange} className="flex-1 h-8 border border-slate-200 px-2 text-sm rounded bg-slate-50 transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" />
+                            <div className="">
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">A/C No</label>
+                                <input type="text" name="AC_Number" value={formData.AC_Number} onChange={handleInputChange} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 shadow-sm" />
                             </div>
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">
                             <FormRow label="VAT Reg. No">
-                                <input type="text" name="VAT_Number" value={formData.VAT_Number} onChange={handleInputChange} className="flex-1 h-8 border border-slate-200 px-2 text-sm rounded bg-slate-50 transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" />
+                                <input type="text" name="VAT_Number" value={formData.VAT_Number} onChange={handleInputChange} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 shadow-sm" />
                             </FormRow>
                             <div className="flex items-center gap-2 justify-center">
                                 <input 
@@ -359,7 +358,7 @@ const VendorBoard = ({ isOpen, onClose }) => {
                                     onChange={handleInputChange} 
                                     className="w-4 h-4 border-slate-300 rounded text-blue-600 focus:ring-[#00D1FF]"
                                 />
-                                <label htmlFor="locked-v" className="text-[11px] font-bold text-gray-500 uppercase">Supplier is Inactive</label>
+                                <label htmlFor="locked-v" className="block text-[13px] font-medium text-gray-700 mb-1.5">Supplier is Inactive</label>
                             </div>
                         </div>
                     </div>
@@ -370,14 +369,14 @@ const VendorBoard = ({ isOpen, onClose }) => {
             {showSearchModal && (
                 <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4">
                     <div className="absolute inset-0 bg-slate-900/30 backdrop-blur-sm" onClick={() => setShowSearchModal(false)} />
- <div className="relative w-full max-w-2xl bg-white shadow-2xl rounded-[5px] overflow-hidden flex flex-col max-h-[80vh]">
+ <div className="relative w-full max-w-2xl bg-white shadow-2xl rounded-[3px] overflow-hidden flex flex-col max-h-[80vh]">
                         <div className="px-6 py-3.5 border-b border-slate-200 flex justify-between items-center bg-white">
                             <h3 className="text-[15px] font-mono font-bold text-slate-800 uppercase tracking-widest">Search Suppliers</h3>
                             <div className="flex gap-2 items-center">
                                 <input 
                                     type="text" 
                                     placeholder="Name or ID..."
-                                    className="h-8 border border-slate-200 px-3 text-sm bg-slate-50 rounded outline-none focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 transition-all w-64"
+                                    className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700"
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                 />
@@ -409,7 +408,7 @@ const VendorBoard = ({ isOpen, onClose }) => {
                                             <td className="p-3 border-b border-slate-100 text-center">
                                                 <button 
                                                     onClick={() => selectSupplier(s.code || s.Code)}
-                                                    className="bg-[#e49e1b] text-white text-[9px] px-4 py-1.5 rounded-[5px] font-mono font-bold uppercase tracking-widest hover:bg-[#cb9b34] transition-all active:scale-95"
+                                                    className="bg-[#e49e1b] text-white text-[9px] px-4 py-1.5 rounded-[3px] font-mono font-bold uppercase tracking-widest hover:bg-[#cb9b34] transition-all active:scale-95"
                                                 >
                                                     Select
                                                 </button>
@@ -432,8 +431,8 @@ const VendorBoard = ({ isOpen, onClose }) => {
 };
 
 const FormRow = ({ label, children }) => (
-    <div className="flex items-center gap-3">
-        <label className="text-[11px] font-bold text-gray-500 uppercase w-32 shrink-0">{label}</label>
+    <div className="">
+        <label className="block text-[13px] font-medium text-gray-700 mb-1.5">{label}</label>
         {children}
     </div>
 );

@@ -30,7 +30,7 @@ const TransactionTypeLookupModal = ({ isOpen, onClose, onSelect }) => {
             isOpen={isOpen}
             onClose={onClose}
             title="SELECT TRANSACTION TYPE"
-            maxWidth="max-w-md"
+            maxWidth="max-w-[700px]"
         >
             <div className="py-2 select-none font-['Tahoma']">
                 {/* Search Header */}
@@ -40,7 +40,7 @@ const TransactionTypeLookupModal = ({ isOpen, onClose, onSelect }) => {
                         placeholder="Search type or code..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full h-10 pl-10 pr-4 border border-gray-300 rounded-[5px] outline-none focus:border-blue-400 font-bold text-[13px] shadow-sm"
+                        className="w-full h-10 pl-10 pr-4 border border-gray-300 rounded-[3px] outline-none focus:border-blue-400 font-bold text-[13px] shadow-sm"
                         autoFocus
                     />
                     <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -53,7 +53,7 @@ const TransactionTypeLookupModal = ({ isOpen, onClose, onSelect }) => {
                 </div>
 
                 {/* List Content */}
-                <div className="max-h-[300px] overflow-y-auto border border-gray-100 rounded-b-[5px] no-scrollbar">
+                <div className="max-h-[300px] overflow-y-auto border border-gray-200 rounded-b-[5px] no-scrollbar">
                     {loading ? (
                         <div className="py-10 flex items-center justify-center gap-2 text-slate-400">
                             <Loader2 size={16} className="animate-spin" />
@@ -64,7 +64,7 @@ const TransactionTypeLookupModal = ({ isOpen, onClose, onSelect }) => {
                             <button
                                 key={idx}
                                 onClick={() => onSelect(type.Tr_Type || type.name)}
-                                className="w-full grid grid-cols-12 gap-2 px-4 py-3 items-center hover:bg-blue-50 transition-colors border-b border-gray-50 last:border-none group text-left"
+                                className="w-full grid grid-cols-12 gap-2 px-4 py-3 items-center hover:bg-blue-50/50 transition-all border-b border-gray-50 last:border-none group text-left cursor-pointer group border-b border-gray-50"
                             >
                                 <div className="col-span-3 font-bold text-[13px] text-[#0078d4] group-hover:scale-105 transition-transform">{type.Iid || type.code}</div>
                                 <div className="col-span-8 font-bold text-[13px] text-slate-700">{type.Tr_Type || type.name}</div>
@@ -81,7 +81,7 @@ const TransactionTypeLookupModal = ({ isOpen, onClose, onSelect }) => {
                 </div>
 
                 {/* Footer Info */}
-                <div className="mt-4 pt-3 border-t border-gray-100 flex items-center gap-2 text-slate-400">
+                <div className="mt-4 pt-3 border-t border-gray-200 flex items-center gap-2 text-slate-400">
                     <ListChecks size={14} className="text-blue-400" />
                     <span className="text-[10px] font-bold uppercase tracking-widest italic">Double click to select and return to report</span>
                 </div>

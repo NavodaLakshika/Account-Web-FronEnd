@@ -13,11 +13,11 @@ import {
     X
 } from 'lucide-react';
 import { stockBalanceService } from '../../../services/stockBalance.service';
-
 import { DotLottiePlayer } from '@dotlottie/react-player';
 import { getSessionData } from '../../../utils/session';
 import CalendarModal from '../../CalendarModal';
 import ConfirmModal from '../ConfirmModal';
+
 import { showSuccessToast, showErrorToast } from '../../../utils/toastUtils';
 
 
@@ -43,9 +43,11 @@ const StockBalanceUpdateModal = ({ isOpen, onClose }) => {
             const session = getSessionData();
             const data = await stockBalanceService.loadStock(session.userName, stockDate, session.companyCode);
             setItems(data);
-            setStatusMessage('READY');
+            setStatusMessage(data.length > 0 ? 'READY' : 'NO DATA');
+            if (data.length === 0) showErrorToast('No cost centers found for this user/date.');
         } catch (error) {
-            showErrorToast('Failed to load stock data.');
+            const msg = error.response?.data?.message || error.response?.data || error.message || 'Failed to load stock data.';
+            showErrorToast(msg);
             setStatusMessage('OFFLINE');
         } finally {
             setLoading(false);
@@ -116,17 +118,17 @@ const StockBalanceUpdateModal = ({ isOpen, onClose }) => {
                 isOpen={isOpen}
                 onClose={onClose}
                 title="Stock Balance Update"
-                maxWidth="max-w-[750px]"
+                maxWidth="max-w-[700px]"
                 showHeaderClose={true}
                 footer={
                     <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-slate-200 rounded-b-xl">
                         <div className="flex gap-3">
-                            <button onClick={handleClear} disabled={loading} className="px-6 py-3 bg-[#00adff] hover:bg-[#0099e6] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] transition-all active:scale-95 flex items-center justify-center gap-2 border-none">
+                            <button onClick={handleClear} disabled={loading} className="px-6 py-3 bg-white text-[#00adff] border-2 border-[#00adff] hover:bg-blue-50 font-mono font-bold text-sm uppercase tracking-widest rounded-[3px] transition-all active:scale-95 flex items-center justify-center gap-2 border-none">
                                 <RotateCcw size={14} /> CLEAR
                             </button>
                         </div>
                         <div className="flex gap-3">
-                            <button onClick={handleSaveClick} disabled={loading} className={`px-6 py-3 bg-[#2bb744] hover:bg-[#259b3a] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] shadow-md shadow-green-100 transition-all active:scale-95 flex items-center justify-center gap-2 border-none ${loading ? 'opacity-50' : ''}`}>
+                            <button onClick={handleSaveClick} disabled={loading} className={`px-6 py-3 bg-white text-[#2bb744] border-2 border-[#2bb744] hover:bg-green-50 font-mono font-bold text-sm uppercase tracking-widest rounded-[3px] shadow-md shadow-green-100 transition-all active:scale-95 flex items-center justify-center gap-2 border-none ${loading ? 'opacity-50' : ''}`}>
                                 <CheckCircle size={14} /> SAVE & APPLY
                             </button>
                         </div>
@@ -135,17 +137,15 @@ const StockBalanceUpdateModal = ({ isOpen, onClose }) => {
             >
                 <div className="space-y-4 overflow-y-auto no-scrollbar font-['Tahoma']">
                     {/* Header Controls */}
-                    <div className="bg-slate-50/50 p-4 border border-slate-200 rounded-[5px] relative overflow-hidden">
-                        {loading && (
-                            <div className="absolute inset-0 bg-white/60 backdrop-blur-[2px] z-[60] flex flex-col items-center justify-center rounded-lg animate-in fade-in duration-300">
+                    <div className="bg-slate-50/50 p-4 border border-slate-200 rounded-[3px] relative overflow-hidden">
+                        {/* {loading && (
+                            <div className="absolute inset-0 bg-white/80 backdrop-blur-[2px] z-[60] flex flex-col items-center justify-center rounded-[3px] animate-in fade-in duration-300">
                                 <div className="w-24 h-24">
                                     <DotLottiePlayer src="/lottiefile/Loading animation blue.lottie" autoplay loop />
                                 </div>
-                                <span className="text-[11px] font-black text-[#00adff] uppercase tracking-[0.2em] animate-pulse -mt-4">
-                                    {statusMessage}
-                                </span>
+                                <span className="text-[11px] font-black text-[#00adff] uppercase tracking-[0.2em] animate-pulse -mt-2">{statusMessage}</span>
                             </div>
-                        )}
+                        )} */}
                         
                         <div className="grid grid-cols-12 gap-x-6 gap-y-3.5 relative z-10">
                             <div className="col-span-8 flex items-center gap-2">
@@ -160,7 +160,7 @@ const StockBalanceUpdateModal = ({ isOpen, onClose }) => {
                                     />
                                     <button
                                         onClick={() => setShowCalendar(true)}
-                                        className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0"
+                                        className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0"
                                     >
                                         <CalendarIcon size={16} />
                                     </button>
@@ -170,7 +170,7 @@ const StockBalanceUpdateModal = ({ isOpen, onClose }) => {
                                 <button 
                                     onClick={handleLoad}
                                     disabled={loading}
-                                    className="h-8 px-6 bg-[#0285fd] text-white font-mono font-bold text-xs uppercase tracking-widest rounded-[5px] hover:bg-[#0073ff] transition-all shadow-md active:scale-95 flex items-center gap-2"
+                                    className="h-8 px-6 bg-[#0285fd] text-white font-mono font-bold text-xs uppercase tracking-widest rounded-[3px] hover:bg-[#0073ff] transition-all shadow-md active:scale-95 flex items-center gap-2"
                                 >
                                     <Search size={14} /> Load
                                 </button>
@@ -179,9 +179,9 @@ const StockBalanceUpdateModal = ({ isOpen, onClose }) => {
                     </div>
 
                     {/* Data Table */}
-                    <div className="border border-gray-300 rounded-[5px] overflow-hidden flex flex-col min-h-[350px] bg-white shadow-inner">
+                    <div className="border border-gray-300 rounded-[3px] overflow-hidden flex flex-col min-h-[350px] bg-white shadow-inner">
                         {/* Table header */}
-                        <div className="flex bg-slate-50/80 border-b border-gray-300 text-[10px] font-black text-gray-400 uppercase tracking-widest items-center">
+                        <div className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 shadow-sm z-10">
                             <div className="w-32 py-2.5 px-4 border-r border-gray-200 text-center uppercase tracking-wider text-[11px]">CC Code</div>
                             <div className="flex-1 py-2.5 px-4 border-r border-gray-200 uppercase tracking-wider text-[11px]">Cost Center Description</div>
                             <div className="w-40 py-2.5 px-4 text-right uppercase tracking-wider text-[11px]">Stock Value</div>
@@ -190,14 +190,14 @@ const StockBalanceUpdateModal = ({ isOpen, onClose }) => {
                         <div className="flex-1 bg-slate-50/30 relative overflow-y-auto max-h-[380px] no-scrollbar custom-scrollbar divide-y divide-gray-100">
                             {items.length > 0 ? (
                                 items.map((item, index) => (
-                                    <div key={index} className="flex border-b border-gray-100 text-[11px] font-bold text-slate-700 hover:bg-blue-50/30 items-center transition-colors group bg-white">
-                                        <div className="w-32 py-2.5 px-4 border-r border-gray-100 text-center text-blue-600 font-mono">
+                                    <div key={index} className="flex border-b border-gray-200 text-[11px] font-bold text-slate-700 hover:bg-blue-50/50/30 items-center transition-all group bg-white cursor-pointer group border-b border-gray-50">
+                                        <div className="w-32 py-2.5 px-4 border-r border-gray-200 text-center text-blue-600 font-mono">
                                             {item.costCenterCode}
                                         </div>
-                                        <div className="flex-1 py-2.5 px-4 border-r border-gray-100 uppercase truncate">
+                                        <div className="flex-1 py-2.5 px-4 border-r border-gray-200 uppercase truncate">
                                             {item.costCenterName}
                                         </div>
-                                        <div className="w-40 border-r border-gray-100 px-1 py-1 bg-white group-hover:bg-transparent">
+                                        <div className="w-40 border-r border-gray-200 px-1 py-1 bg-white group-hover:bg-transparent">
                                             <input 
                                                 type="number"
                                                 value={item.stock}

@@ -10,6 +10,7 @@ import { expensesService } from '../services/expenses.service';
 import { supplierService } from '../services/supplier.service';
 import { getSessionData } from '../utils/session';
 import { showErrorToast } from '../utils/toastUtils';
+import TransactionFormWrapper from '../components/TransactionFormWrapper';
 
 
 const ExpensesDashboardBoard = ({ 
@@ -168,11 +169,10 @@ const ExpensesDashboardBoard = ({
   };
 
   return (
-    <SimpleModal
+    <TransactionFormWrapper subtitle="Transaction Management" icon={FileText}
       isOpen={isOpen}
       onClose={onClose}
-      title="Expenses & Spend Intelligence Center"
-      maxWidth="max-w-[1200px]"
+      title="Expenses Dashboard"
     >
       <div className="flex flex-col gap-6 select-none font-['Plus_Jakarta_Sans'] text-slate-800">
         
@@ -188,11 +188,11 @@ const ExpensesDashboardBoard = ({
           <div className="flex flex-wrap items-center gap-2">
             {/* Quick Actions Dropdown */}
             <div className="relative group">
-              <button className="flex items-center gap-2 px-4 h-9 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all font-bold text-xs shadow-sm shadow-blue-500/10">
+              <button className="flex items-center gap-2 px-4 h-9 bg-blue-600 text-white rounded-[3px] hover:bg-blue-700 transition-all font-bold text-xs shadow-sm shadow-blue-500/10">
                 <Plus size={14} /> New Transaction
                 <ChevronDown size={12} />
               </button>
-              <div className="absolute right-0 top-full mt-1 w-48 bg-white border border-slate-100 rounded-lg shadow-xl py-1 hidden group-hover:block z-50 animate-in fade-in duration-200">
+              <div className="absolute right-0 top-full mt-1 w-48 bg-white border border-slate-100 rounded-[3px] shadow-xl py-1 hidden group-hover:block z-50 animate-in fade-in duration-200">
                 <button onClick={() => { onEnterBill(); }} className="w-full text-left px-4 py-2 hover:bg-slate-50 flex items-center gap-2 text-xs font-bold text-slate-700">
                   <FileText size={14} className="text-blue-500" /> Enter Bill
                 </button>
@@ -209,12 +209,12 @@ const ExpensesDashboardBoard = ({
             </div>
 
             {/* Date Range Selector */}
-            <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-lg">
+            <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-[3px]">
               {['all', '30days', 'thismonth', 'thisquarter', 'thisyear'].map((range) => (
                 <button
                   key={range}
                   onClick={() => setDateRange(range)}
-                  className={`px-3 py-1.5 text-[10px] font-bold rounded-md uppercase tracking-wider transition-all ${
+                  className={`px-3 py-1.5 text-[10px] font-bold rounded-[3px] uppercase tracking-wider transition-all ${
                     dateRange === range 
                       ? 'bg-white text-blue-600 shadow-sm' 
                       : 'text-slate-500 hover:text-slate-800'
@@ -229,7 +229,7 @@ const ExpensesDashboardBoard = ({
             <button 
               onClick={fetchDashboardData}
               disabled={loading}
-              className="p-2 border border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-500 rounded-lg transition-all active:scale-95 disabled:opacity-50 shrink-0"
+              className="border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-500 rounded-[3px] transition-all active:scale-95 disabled:opacity-50 shrink-0 px-5 py-3"
               title="Refresh Data"
             >
               <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
@@ -240,7 +240,7 @@ const ExpensesDashboardBoard = ({
         {/* Metric Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
           {/* Card 1: Total Expenses */}
-          <div className="relative overflow-hidden bg-gradient-to-br from-emerald-500 to-emerald-600 text-white p-6 rounded-xl shadow-lg border border-white/10 group hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col">
+          <div className="relative overflow-hidden bg-gradient-to-br from-emerald-500 to-emerald-600 text-white p-6 rounded-[3px] shadow-lg border border-white/10 group hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col">
             <div className="absolute -right-4 -bottom-4 p-8 opacity-10 transform group-hover:scale-110 group-hover:rotate-12 transition-all duration-500">
               <DollarSign size={120} />
             </div>
@@ -267,7 +267,7 @@ const ExpensesDashboardBoard = ({
           </div>
 
           {/* Card 2: Open Payables */}
-          <div className="relative overflow-hidden bg-gradient-to-br from-amber-500 to-orange-500 text-white p-6 rounded-xl shadow-lg border border-white/10 group hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col">
+          <div className="relative overflow-hidden bg-gradient-to-br from-amber-500 to-orange-500 text-white p-6 rounded-[3px] shadow-lg border border-white/10 group hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col">
             <div className="absolute -right-4 -bottom-4 p-8 opacity-10 transform group-hover:scale-110 group-hover:-rotate-12 transition-all duration-500">
               <FileText size={120} />
             </div>
@@ -297,7 +297,7 @@ const ExpensesDashboardBoard = ({
           </div>
 
           {/* Card 3: Overdue Liabilities */}
-          <div className="relative overflow-hidden bg-gradient-to-br from-rose-500 to-red-600 text-white p-6 rounded-xl shadow-lg border border-white/10 group hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col">
+          <div className="relative overflow-hidden bg-gradient-to-br from-rose-500 to-red-600 text-white p-6 rounded-[3px] shadow-lg border border-white/10 group hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col">
             <div className="absolute -right-4 -bottom-4 p-8 opacity-10 transform group-hover:scale-110 group-hover:rotate-12 transition-all duration-500">
               <AlertCircle size={120} />
             </div>
@@ -383,7 +383,7 @@ const ExpensesDashboardBoard = ({
                                 <span className="text-slate-400 font-sans ml-2 text-[10px]">({cat.percentage}%)</span>
                               </span>
                             </div>
-                            <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+                            <div className="w-full h-2 bg-slate-100 rounded-[3px] overflow-hidden">
                               <div 
                                 className={`h-full rounded-full transition-all duration-1000 ${getCategoryColor(idx)}`} 
                                 style={{ width: `${cat.percentage}%` }}
@@ -403,7 +403,7 @@ const ExpensesDashboardBoard = ({
 
                     <div className="divide-y divide-slate-100 overflow-y-auto max-h-[360px] pr-2 no-scrollbar">
                       {data.recentTransactions.slice(0, 10).map((tx, idx) => (
-                        <div key={idx} onClick={() => setSelectedTx(tx)} className="py-3 flex items-center justify-between hover:bg-slate-100/50 px-2 rounded-lg cursor-pointer transition-colors group">
+                        <div key={idx} onClick={() => setSelectedTx(tx)} className="py-3 flex items-center justify-between hover:bg-slate-100/50 px-2 rounded-[3px] cursor-pointer transition-colors group">
                           <div className="flex flex-col gap-0.5">
                             <span className="text-xs font-bold text-slate-700 truncate max-w-[220px]">{tx.payee || 'Direct Expense'}</span>
                             <div className="flex items-center gap-2 text-[10px] text-slate-400 font-semibold">
@@ -416,7 +416,7 @@ const ExpensesDashboardBoard = ({
                             <span className="text-xs font-black text-slate-900">
                               LKR {tx.total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                             </span>
-                            <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider ${
+                            <span className={`text-[9px] font-bold px-2 py-0.5 rounded-[3px] uppercase tracking-wider ${
                               tx.status === 'Paid' 
                                 ? 'bg-emerald-50 text-emerald-600' 
                                 : tx.status === 'Overdue' 
@@ -450,7 +450,7 @@ const ExpensesDashboardBoard = ({
                         placeholder="Search document no, vendor, account..."
                         value={txSearch}
                         onChange={(e) => setTxSearch(e.target.value)}
-                        className="w-full pl-9 pr-4 h-9 border border-slate-200 rounded-lg text-xs font-semibold focus:border-blue-500 focus:outline-none bg-white shadow-sm transition-all"
+                        className="w-full pl-9 pr-4 h-9 border border-slate-200 rounded-[3px] text-xs font-semibold focus:border-blue-500 focus:outline-none bg-white shadow-sm transition-all"
                       />
                     </div>
 
@@ -460,7 +460,7 @@ const ExpensesDashboardBoard = ({
                         <select 
                           value={txTypeFilter}
                           onChange={(e) => setTxTypeFilter(e.target.value)}
-                          className="h-9 px-2 border border-slate-200 rounded-lg text-xs font-bold text-slate-700 bg-white focus:outline-none shadow-sm"
+                          className="h-9 px-2 border border-slate-200 rounded-[3px] text-xs font-bold text-slate-700 bg-white focus:outline-none shadow-sm"
                         >
                           <option value="all">All Types</option>
                           <option value="bill">Bills</option>
@@ -475,7 +475,7 @@ const ExpensesDashboardBoard = ({
                         <select 
                           value={txStatusFilter}
                           onChange={(e) => setTxStatusFilter(e.target.value)}
-                          className="h-9 px-2 border border-slate-200 rounded-lg text-xs font-bold text-slate-700 bg-white focus:outline-none shadow-sm"
+                          className="h-9 px-2 border border-slate-200 rounded-[3px] text-xs font-bold text-slate-700 bg-white focus:outline-none shadow-sm"
                         >
                           <option value="all">All Statuses</option>
                           <option value="paid">Paid</option>
@@ -498,7 +498,7 @@ const ExpensesDashboardBoard = ({
                           <th className="px-6 w-[20%]">Category</th>
                           <th className="px-6 w-[12%] text-right">Amount</th>
                           <th className="px-6 w-[9%] text-center">Status</th>
-                        </tr>
+                        <th className="text-right px-5 py-3">Action</th></tr>
                       </thead>
                       <tbody className="divide-y divide-slate-100 text-xs font-bold text-slate-700">
                         {getFilteredTransactions().map((tx, idx) => (
@@ -516,7 +516,7 @@ const ExpensesDashboardBoard = ({
                               {tx.total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                             </td>
                             <td className="py-3 px-6 text-center">
-                              <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider ${
+                              <span className={`text-[9px] font-bold px-2 py-0.5 rounded-[3px] uppercase tracking-wider ${
                                 tx.status === 'Paid' 
                                   ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' 
                                   : tx.status === 'Overdue' 
@@ -553,7 +553,7 @@ const ExpensesDashboardBoard = ({
                         placeholder="Search vendor directory..."
                         value={vendorSearch}
                         onChange={(e) => setVendorSearch(e.target.value)}
-                        className="w-full pl-9 pr-4 h-9 border border-slate-200 rounded-lg text-xs font-semibold focus:border-blue-500 focus:outline-none bg-white shadow-sm transition-all"
+                        className="w-full pl-9 pr-4 h-9 border border-slate-200 rounded-[3px] text-xs font-semibold focus:border-blue-500 focus:outline-none bg-white shadow-sm transition-all"
                       />
                     </div>
                   </div>
@@ -567,7 +567,7 @@ const ExpensesDashboardBoard = ({
                           <th className="px-6 w-[15%] text-center">Transactions</th>
                           <th className="px-6 w-[20%] text-right">Total Spent</th>
                           <th className="px-6 w-[20%] text-right">Outstanding (AP)</th>
-                        </tr>
+                        <th className="text-right px-5 py-3">Action</th></tr>
                       </thead>
                       <tbody className="divide-y divide-slate-100 text-xs font-bold text-slate-700">
                         {getVendorSummary().map((v, idx) => (
@@ -609,7 +609,7 @@ const ExpensesDashboardBoard = ({
         onClose={() => setSelectedTx(null)} 
       />
 
-    </SimpleModal>
+    </TransactionFormWrapper>
   );
 };
 

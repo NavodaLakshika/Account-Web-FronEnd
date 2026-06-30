@@ -28,7 +28,7 @@ const SurveySettingsModal = ({ isOpen, onClose }) => {
     };
 
     const footer = (
-        <div className="bg-slate-50 px-6 py-4 w-full flex justify-end gap-3 border-t border-gray-100 rounded-b-xl">
+        <div className="bg-slate-50 px-6 py-4 w-full flex justify-end gap-3 border-t border-gray-200 rounded-b-xl">
             <button 
                 onClick={onClose}
                 className="px-6 h-9 bg-white text-slate-600 border border-slate-200 text-[12px] font-bold rounded shadow-sm hover:bg-slate-50 transition-all flex items-center justify-center gap-2"
@@ -37,7 +37,7 @@ const SurveySettingsModal = ({ isOpen, onClose }) => {
             </button>
             <button 
                 onClick={handleSave}
-                className="px-6 h-9 bg-[#2ca01c] text-white text-[12px] font-bold rounded shadow-sm hover:bg-[#207a15] transition-all flex items-center justify-center gap-2"
+                className="px-6 h-9 bg-[#0285fd] text-white text-[12px] font-bold rounded shadow-sm hover:bg-[#207a15] transition-all flex items-center justify-center gap-2"
             >
                 <Save size={15} /> SAVE SETTINGS
             </button>
@@ -55,7 +55,7 @@ const SurveySettingsModal = ({ isOpen, onClose }) => {
             <div className="p-6 font-['Plus_Jakarta_Sans'] bg-white space-y-8">
                 
                 {/* Header Description */}
-                <div className="bg-blue-50/50 border border-blue-100 p-4 rounded-xl flex items-start gap-3">
+                <div className="bg-blue-50/50 border border-blue-100 p-4 rounded-[3px] flex items-start gap-3">
                     <Settings2 className="text-blue-500 mt-0.5 shrink-0" size={20} />
                     <div>
                         <h4 className="text-[14px] font-bold text-slate-800">Automate your customer feedback</h4>
@@ -69,13 +69,13 @@ const SurveySettingsModal = ({ isOpen, onClose }) => {
                         <Bell size={14} className="text-slate-400" /> Delivery Channels
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <label className={`flex items-start gap-3 p-4 border rounded-xl cursor-pointer transition-all ${settings.enableEmailSurveys ? 'border-[#2ca01c] bg-green-50/30' : 'border-slate-200 hover:border-slate-300'}`}>
+                        <label className={`flex items-start gap-3 p-4 border rounded-[3px] cursor-pointer transition-all ${settings.enableEmailSurveys ? 'border-[#0285fd] bg-blue-50/30' : 'border-slate-200 hover:border-slate-300'}`}>
                             <input 
                                 type="checkbox" 
                                 name="enableEmailSurveys"
                                 checked={settings.enableEmailSurveys}
                                 onChange={handleChange}
-                                className="mt-1 w-4 h-4 text-[#2ca01c] rounded border-slate-300 focus:ring-[#2ca01c]"
+                                className="mt-1 w-4 h-4 text-[#0285fd] rounded border-slate-300 focus:ring-[#0285fd]"
                             />
                             <div>
                                 <div className="flex items-center gap-1.5 text-[14px] font-bold text-slate-800">
@@ -85,13 +85,13 @@ const SurveySettingsModal = ({ isOpen, onClose }) => {
                             </div>
                         </label>
 
-                        <label className={`flex items-start gap-3 p-4 border rounded-xl cursor-pointer transition-all ${settings.enableSmsSurveys ? 'border-[#2ca01c] bg-green-50/30' : 'border-slate-200 hover:border-slate-300'}`}>
+                        <label className={`flex items-start gap-3 p-4 border rounded-[3px] cursor-pointer transition-all ${settings.enableSmsSurveys ? 'border-[#0285fd] bg-blue-50/30' : 'border-slate-200 hover:border-slate-300'}`}>
                             <input 
                                 type="checkbox" 
                                 name="enableSmsSurveys"
                                 checked={settings.enableSmsSurveys}
                                 onChange={handleChange}
-                                className="mt-1 w-4 h-4 text-[#2ca01c] rounded border-slate-300 focus:ring-[#2ca01c]"
+                                className="mt-1 w-4 h-4 text-[#0285fd] rounded border-slate-300 focus:ring-[#0285fd]"
                             />
                             <div>
                                 <div className="flex items-center gap-1.5 text-[14px] font-bold text-slate-800">
@@ -108,7 +108,7 @@ const SurveySettingsModal = ({ isOpen, onClose }) => {
                     <h3 className="text-[13px] font-extrabold text-slate-800 uppercase tracking-wider flex items-center gap-2">
                         <Star size={14} className="text-slate-400" /> Timing & Triggers
                     </h3>
-                    <div className="bg-slate-50 border border-slate-200 p-5 rounded-xl space-y-5">
+                    <div className="bg-slate-50 border border-slate-200 p-5 rounded-[3px] space-y-5">
                         
                         <label className="flex items-center gap-3 cursor-pointer">
                             <input 
@@ -116,7 +116,7 @@ const SurveySettingsModal = ({ isOpen, onClose }) => {
                                 name="sendAfterInvoicePaid"
                                 checked={settings.sendAfterInvoicePaid}
                                 onChange={handleChange}
-                                className="w-4 h-4 text-[#2ca01c] rounded border-slate-300 focus:ring-[#2ca01c]"
+                                className="w-4 h-4 text-[#0285fd] rounded border-slate-300 focus:ring-[#0285fd]"
                             />
                             <span className="text-[13px] font-semibold text-slate-700">Send survey automatically when an invoice is fully paid</span>
                         </label>
@@ -171,7 +171,7 @@ const SurveySettingsModal = ({ isOpen, onClose }) => {
                                 name="emailSubject"
                                 value={settings.emailSubject}
                                 onChange={handleChange}
-                                className="w-full border border-slate-300 rounded-lg px-4 py-2.5 text-[13px] text-slate-800 focus:border-blue-500 outline-none transition-colors"
+                                className="w-full border border-slate-300 rounded-[3px] px-4 py-2.5 text-[13px] text-slate-800 focus:border-blue-500 outline-none transition-colors"
                             />
                         </div>
                         <div>
@@ -181,7 +181,7 @@ const SurveySettingsModal = ({ isOpen, onClose }) => {
                                 value={settings.customMessage}
                                 onChange={handleChange}
                                 rows="3"
-                                className="w-full border border-slate-300 rounded-lg px-4 py-2.5 text-[13px] text-slate-800 focus:border-blue-500 outline-none transition-colors resize-none"
+                                className="w-full border border-slate-300 rounded-[3px] px-4 py-2.5 text-[13px] text-slate-800 focus:border-blue-500 outline-none transition-colors resize-none"
                             />
                         </div>
                     </div>

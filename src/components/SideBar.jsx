@@ -8,7 +8,7 @@ const SidebarButton = ({ icon: Icon, color, label, onClick, badge }) => (
         onClick={onClick}
         className="group relative flex flex-col items-center gap-1.5"
     >
-        <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-sm border border-slate-200/60 hover:border-[#4f83ff]/30 hover:shadow-md hover:-translate-y-0.5 active:scale-95 transition-all duration-200">
+        <div className="w-12 h-12 bg-white rounded-[3px] flex items-center justify-center shadow-sm border border-slate-200/60 hover:border-[#4f83ff]/30 hover:shadow-md hover:-translate-y-0.5 active:scale-95 transition-all duration-200">
             <Icon size={20} className={`${color} group-hover:scale-110 transition-transform`} />
             {badge && (
                 <div className="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[9px] font-black w-5 h-5 rounded-full flex items-center justify-center border-2 border-white shadow-md">
@@ -51,7 +51,7 @@ const SideBar = ({ isOpen, onClose, onOpenCalculator, onOpenReminder, onOpenWord
                 <div className="flex flex-col items-center gap-4">
                     <span className="text-[7px] font-black text-slate-300 uppercase tracking-[0.2em]">Office</span>
                     <SidebarButton icon={FileText} color="text-blue-600" label="Word" onClick={onOpenWord} />
-                    <SidebarButton icon={FileSpreadsheet} color="text-green-600" label="Excel" onClick={onOpenExcel} />
+                    <SidebarButton icon={FileSpreadsheet} color="text-blue-600" label="Excel" onClick={onOpenExcel} />
                     <SidebarButton icon={Mail} color="text-[#0285fd]" label="Email" badge="3" onClick={onOpenEmail} />
                 </div>
 
@@ -79,16 +79,16 @@ const SideBar = ({ isOpen, onClose, onOpenCalculator, onOpenReminder, onOpenWord
             {/* Bottom Actions */}
             <div className="px-3 py-4 border-t border-slate-100 flex flex-col items-center gap-3 shrink-0 bg-slate-50/50">
                 <div className="flex gap-3">
-                    <button className="w-9 h-9 rounded-lg bg-white border border-slate-200/60 flex items-center justify-center text-slate-400 hover:text-[#4f83ff] hover:border-[#4f83ff]/30 hover:shadow-sm transition-all active:scale-90">
+                    <button className="w-9 h-9 rounded-[3px] bg-white border border-slate-200/60 flex items-center justify-center text-slate-400 hover:text-[#4f83ff] hover:border-[#4f83ff]/30 hover:shadow-sm transition-all active:scale-90">
                         <ShieldCheck size={16} />
                     </button>
-                    <button className="w-9 h-9 rounded-lg bg-white border border-slate-200/60 flex items-center justify-center text-slate-400 hover:text-[#4f83ff] hover:border-[#4f83ff]/30 hover:shadow-sm transition-all active:scale-90">
+                    <button className="w-9 h-9 rounded-[3px] bg-white border border-slate-200/60 flex items-center justify-center text-slate-400 hover:text-[#4f83ff] hover:border-[#4f83ff]/30 hover:shadow-sm transition-all active:scale-90">
                         <Settings size={16} />
                     </button>
                 </div>
                 <button
                     onClick={onClose}
-                    className="w-9 h-9 rounded-lg bg-white border border-red-100 flex items-center justify-center text-red-400 hover:bg-red-50 hover:text-red-500 hover:border-red-200 transition-all active:scale-90 group"
+                    className="w-9 h-9 rounded-[3px] bg-white border border-red-100 flex items-center justify-center text-red-400 hover:bg-red-50 hover:text-red-500 hover:border-red-200 transition-all active:scale-90 group"
                     title="Close Panel"
                 >
                     <Power size={16} className="group-hover:rotate-12 transition-transform" />

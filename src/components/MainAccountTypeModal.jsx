@@ -47,7 +47,7 @@ const MainAccountTypeModal = ({ isOpen, onClose, onSelect }) => {
             isOpen={isOpen}
             onClose={onClose}
             title="SELECT ACCOUNT CATEGORY"
-            maxWidth="max-w-md"
+            maxWidth="max-w-[700px]"
         >
             <div className="p-4 space-y-4 font-['Tahoma']">
                 <div className="relative">
@@ -55,14 +55,14 @@ const MainAccountTypeModal = ({ isOpen, onClose, onSelect }) => {
                     <input
                         type="text"
                         placeholder="Search categories.."
-                        className="w-full pl-10 pr-4 h-10 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                        className="w-full h-10 pl-10 pr-4 border border-gray-300 rounded-[3px] outline-none text-[13px] focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] shadow-sm bg-white"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         autoFocus
                     />
                 </div>
 
-                <div className="max-h-[300px] overflow-y-auto custom-scrollbar border border-gray-100 rounded-lg">
+                <div className="max-h-[300px] overflow-y-auto custom-scrollbar border border-gray-200 rounded-[3px]">
                     {loading ? (
                         <div className="flex flex-col items-center justify-center py-12 text-gray-400">
                             <Loader2 className="animate-spin mb-2" size={24} />
@@ -77,10 +77,10 @@ const MainAccountTypeModal = ({ isOpen, onClose, onSelect }) => {
                                         onSelect(type);
                                         onClose();
                                     }}
-                                    className="w-full px-4 py-3 flex items-center justify-between hover:bg-blue-50 transition-colors group text-left"
+                                    className="w-full px-4 py-3 flex items-center justify-between hover:bg-blue-50/50 transition-all group text-left cursor-pointer group border-b border-gray-50"
                                 >
                                     <div className="flex items-center gap-3">
-                                        <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600 group-hover:bg-blue-100 transition-colors">
+                                        <div className="w-8 h-8 rounded-[3px] bg-blue-50 flex items-center justify-center text-blue-600 group-hover:bg-blue-100 transition-colors">
                                             <FileText size={16} />
                                         </div>
                                         <div>

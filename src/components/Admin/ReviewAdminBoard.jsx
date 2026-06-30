@@ -66,7 +66,7 @@ const ReviewAdminBoard = ({ isOpen, onClose, inlineView }) => {
                         <p className="text-slate-500 dark:text-slate-400 text-xs mt-1">Manage feedback and ratings submitted by employees.</p>
                     </div>
                     <div className="flex items-center gap-4">
-                        <div className="flex items-center gap-3 bg-slate-50 dark:bg-slate-700/50 px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-600">
+                        <div className="flex items-center gap-3 bg-slate-50 dark:bg-slate-700/50 px-4 py-2 rounded-[3px] border border-slate-200 dark:border-slate-600">
                             <div className="flex items-center gap-1.5">
                                 <Star className="w-4 h-4 text-yellow-500 fill-current" />
                                 <span className="text-lg font-black text-slate-900 dark:text-white">{averageRating}</span>
@@ -106,7 +106,7 @@ const ReviewAdminBoard = ({ isOpen, onClose, inlineView }) => {
                                         <Loader2 className="w-8 h-8 animate-spin mx-auto mb-3 text-blue-500" />
                                         Loading reviews...
                                     </td>
-                                </tr>
+                                <th className="text-right px-5 py-3">Action</th></tr>
                             ) : reviews.map(review => (
                                 <tr key={review.id} className="border-b border-slate-50 dark:border-slate-700 hover:bg-slate-50/80 dark:hover:bg-slate-700/50 transition-colors">
                                     <td className="py-4 px-6">
@@ -132,7 +132,7 @@ const ReviewAdminBoard = ({ isOpen, onClose, inlineView }) => {
                                         {new Date(review.createdAt).toLocaleDateString()}
                                     </td>
                                     <td className="py-4 px-6">
-                                        <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                                        <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-[3px] text-[10px] font-bold uppercase tracking-wider ${
                                             review.status === 'Approved' ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' :
                                             review.status === 'Hidden' ? 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-400' :
                                             'bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400'
@@ -148,7 +148,7 @@ const ReviewAdminBoard = ({ isOpen, onClose, inlineView }) => {
                                             {review.status !== 'Approved' && (
                                                 <button 
                                                     onClick={() => handleUpdateStatus(review.id, 'Approved')}
-                                                    className="p-2 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 rounded-lg transition-colors"
+                                                    className="p-2 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 rounded-[3px] transition-colors"
                                                     title="Approve"
                                                 >
                                                     <CheckCircle className="w-4 h-4" />
@@ -157,7 +157,7 @@ const ReviewAdminBoard = ({ isOpen, onClose, inlineView }) => {
                                             {review.status !== 'Hidden' && (
                                                 <button 
                                                     onClick={() => handleUpdateStatus(review.id, 'Hidden')}
-                                                    className="p-2 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
+                                                    className="p-2 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-[3px] transition-colors"
                                                     title="Hide"
                                                 >
                                                     <EyeOff className="w-4 h-4" />
@@ -165,7 +165,7 @@ const ReviewAdminBoard = ({ isOpen, onClose, inlineView }) => {
                                             )}
                                             <button 
                                                 onClick={() => handleDelete(review.id)}
-                                                className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors"
+                                                className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-[3px] transition-colors"
                                                 title="Delete"
                                             >
                                                 <Trash2 className="w-4 h-4" />

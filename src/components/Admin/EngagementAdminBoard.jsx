@@ -384,7 +384,7 @@ const EngagementAdminBoard = () => {
                                             <td colSpan="6" className="py-8 text-center text-slate-400">
                                                 <Loader2 className="w-6 h-6 animate-spin mx-auto" />
                                             </td>
-                                        </tr>
+                                        <th className="text-right px-5 py-3">Action</th></tr>
                                     ) : filteredReviews.map(review => (
                                         <tr key={review.id} className="border-b border-slate-50 hover:bg-slate-50/80 transition-colors">
                                             <td className="py-3.5 px-6">
@@ -492,7 +492,7 @@ const EngagementAdminBoard = () => {
                                                     type="text"
                                                     value={title}
                                                     onChange={e => setTitle(e.target.value)}
-                                                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100 text-sm transition-all"
+                                                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-[3px] focus:outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100 text-sm transition-all"
                                                     placeholder="e.g. Merit Plus Finance"
                                                     maxLength={40}
                                                 />
@@ -504,7 +504,7 @@ const EngagementAdminBoard = () => {
                                                 <textarea
                                                     value={desc}
                                                     onChange={e => setDesc(e.target.value)}
-                                                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100 text-sm transition-all resize-none h-24"
+                                                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-[3px] focus:outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100 text-sm transition-all resize-none h-24"
                                                     placeholder="Brief description of the promotion..."
                                                     maxLength={100}
                                                 />
@@ -515,7 +515,7 @@ const EngagementAdminBoard = () => {
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
                                             <div>
                                                 <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">Icon</label>
-                                                <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto p-2 bg-slate-50 rounded-xl border border-slate-200">
+                                                <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto p-2 bg-slate-50 rounded-[3px] border border-slate-200">
                                                     {AVAILABLE_ICONS.map(iconOpt => {
                                                         const IconCmp = iconOpt.component;
                                                         return (
@@ -523,7 +523,7 @@ const EngagementAdminBoard = () => {
                                                                 key={iconOpt.name}
                                                                 type="button"
                                                                 onClick={() => setIconName(iconOpt.name)}
-                                                                className={`p-2 rounded-lg border transition-all ${iconName === iconOpt.name ? 'border-orange-500 bg-white text-orange-600 ring-2 ring-orange-200 shadow-sm' : 'border-slate-200 bg-white text-slate-500 hover:bg-slate-100 hover:border-slate-300'}`}
+                                                                className={`p-2 rounded-[3px] border transition-all ${iconName === iconOpt.name ? 'border-orange-500 bg-white text-orange-600 ring-2 ring-orange-200 shadow-sm' : 'border-slate-200 bg-white text-slate-500 hover:bg-slate-100 hover:border-slate-300'}`}
                                                                 title={iconOpt.name}
                                                             >
                                                                 <IconCmp size={18} />
@@ -535,7 +535,7 @@ const EngagementAdminBoard = () => {
                                             
                                             <div>
                                                 <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">Accent Color</label>
-                                                <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 h-full flex flex-col justify-center">
+                                                <div className="p-3 bg-slate-50 rounded-[3px] border border-slate-200 h-full flex flex-col justify-center">
                                                     <div className="flex flex-wrap gap-2 items-center mb-3">
                                                         {AVAILABLE_COLORS.slice(0, 12).map(c => (
                                                             <button
@@ -592,7 +592,7 @@ const EngagementAdminBoard = () => {
                                                     const isSelected = popupLocations.includes(loc);
                                                     return (
                                                         <label key={loc}
-                                                            className={`flex items-center gap-2 px-2.5 py-2 rounded-lg border cursor-pointer transition-all duration-200 ${
+                                                            className={`flex items-center gap-2 px-2.5 py-2 rounded-[3px] border cursor-pointer transition-all duration-200 ${
                                                                 isSelected
                                                                     ? 'bg-orange-50 border-orange-400 text-orange-700 shadow-sm'
                                                                     : 'bg-white border-slate-200 text-slate-600 hover:border-slate-300 hover:bg-slate-50'
@@ -627,7 +627,7 @@ const EngagementAdminBoard = () => {
                                                     const isSelected = popupPlacement === opt.id;
                                                     return (
                                                         <button key={opt.id} type="button" onClick={() => setPopupPlacement(opt.id)}
-                                                            className={`flex flex-col items-center gap-0.5 px-2 py-2 rounded-lg border-2 transition-all duration-200 ${
+                                                            className={`flex flex-col items-center gap-0.5 px-2 py-2 rounded-[3px] border-2 transition-all duration-200 ${
                                                                 isSelected
                                                                     ? 'border-orange-400 bg-orange-50 text-orange-700 shadow-sm'
                                                                     : 'border-slate-200 bg-white text-slate-500 hover:border-slate-300 hover:bg-slate-50'
@@ -715,7 +715,7 @@ const EngagementAdminBoard = () => {
                                                     <td colSpan="5" className="py-8 text-center text-slate-400">
                                                         <Loader2 className="w-6 h-6 animate-spin mx-auto" />
                                                     </td>
-                                                </tr>
+                                                <th className="text-right px-5 py-3">Action</th></tr>
                                             ) : filteredAds.length > 0 ? filteredAds.map(ad => {
                                                 const iconOpt = AVAILABLE_ICONS.find(i => i.name === ad.iconName) || AVAILABLE_ICONS[3];
                                                 const IconCmp = iconOpt.component;

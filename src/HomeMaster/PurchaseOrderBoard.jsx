@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import SimpleModal from '../components/SimpleModal';
 import ConfirmModal from '../components/modals/ConfirmModal';
-import { Search, Calendar, ChevronDown, CheckCircle, Trash2, Printer, X, Save, RotateCcw, ChevronLeft, ChevronRight, Plus, Lock, Unlock } from 'lucide-react';
+import { Search, Calendar, ChevronDown, CheckCircle, Trash2, Printer, X, Save, RotateCcw, ChevronLeft, ChevronRight, Plus, Lock, Unlock , FileText} from 'lucide-react';
 import CalendarModal from '../components/CalendarModal';
 import { purchOrderService } from '../services/purchOrder.service';
 import { paymentMethodService } from '../services/paymentMethod.service';
@@ -10,6 +10,7 @@ import { paymentMethodService } from '../services/paymentMethod.service';
 import FeatureLockedModal from '../components/modals/FeatureLockedModal';
 import { getSessionData } from '../utils/session';
 import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
+import TransactionFormWrapper from '../components/TransactionFormWrapper';
 
 
 const PurchaseOrderBoard = ({ isOpen, onClose }) => {
@@ -385,23 +386,23 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
                     }
                 `}
             </style>
-            <SimpleModal
+            <TransactionFormWrapper subtitle="Transaction Management" icon={FileText}
                 isOpen={isOpen}
                 onClose={onClose}
                 title="Purchase Order"
-                maxWidth="max-w-[1050px]"
+                maxWidth="max-w-[700px]"
                 footer={
                     <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-slate-200 rounded-b-xl">
                         <div className="flex gap-3">
                             <button
                                 onClick={handleDelete}
-                                className="px-6 py-3 bg-[#ff3b30] hover:bg-[#e03127] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] shadow-md shadow-red-100 transition-all active:scale-95 flex items-center justify-center gap-2 border-none"
+                                className="px-6 py-3 bg-white text-[#ff3b30] border-2 border-[#ff3b30] hover:bg-red-50 font-mono font-bold text-sm uppercase tracking-widest rounded-[3px] shadow-md shadow-red-100 transition-all active:scale-95 flex items-center justify-center gap-2 border-none"
                             >
                                 <Trash2 size={14} /> DELETE DOC
                             </button>
                              <button
                                 onClick={handleClear}
-                                className="px-6 py-3 bg-[#00adff] hover:bg-[#0099e6] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] transition-all active:scale-95 flex items-center justify-center gap-2 border-none"
+                                className="px-6 py-3 bg-white text-[#00adff] border-2 border-[#00adff] hover:bg-blue-50 font-mono font-bold text-sm uppercase tracking-widest rounded-[3px] transition-all active:scale-95 flex items-center justify-center gap-2 border-none"
                             >
                                 <RotateCcw size={14} /> CLEAR FORM
                             </button>
@@ -409,13 +410,13 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
                         <div className="flex gap-3">
                             <button
                                 onClick={handleSave}
-                                className="px-6 py-3 bg-white text-[#0285fd] font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] border-2 border-[#0285fd] hover:bg-blue-50 transition-all active:scale-95 flex items-center justify-center gap-2"
+                                className="px-6 py-3 bg-white text-[#0285fd] font-mono font-bold text-sm uppercase tracking-widest rounded-[3px] border-2 border-[#0285fd] hover:bg-blue-50 transition-all active:scale-95 flex items-center justify-center gap-2"
                             >
                                 <Save size={14} /> SAVE DRAFT
                             </button>
                             <button
                                 onClick={handleApply}
-                                className="px-6 py-3 bg-[#2bb744] hover:bg-[#259b3a] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] shadow-md shadow-green-100 transition-all active:scale-95 flex items-center justify-center gap-2 border-none"
+                                className="px-6 py-3 bg-white text-[#2bb744] border-2 border-[#2bb744] hover:bg-green-50 font-mono font-bold text-sm uppercase tracking-widest rounded-[3px] shadow-md shadow-green-100 transition-all active:scale-95 flex items-center justify-center gap-2 border-none"
                             >
                                 <CheckCircle size={14} /> SAVE & APPLY
                             </button>
@@ -424,14 +425,14 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
                 }
             >
                 <div className="space-y-4 overflow-y-auto no-scrollbar font-['Tahoma']">
-                    <div className="bg-white p-4 border border-slate-200 rounded-[5px] space-y-4">
+                    <div className="bg-white p-4 border border-slate-200 rounded-[3px] space-y-4">
                         <div className="grid grid-cols-12 gap-x-6 gap-y-3.5">
                             {/* PO Number - Column 1 */}
                             <div className="col-span-4 flex items-center gap-2">
                                 <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Document ID</label>
                                 <div className="flex-1 flex gap-1 h-8 min-w-0">
                                         <input type="text" name="docNo" value={formData.docNo} onChange={handleInput} onKeyDown={(e) => e.key === 'Enter' && handleSelectOrder(formData.docNo)} className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-bold text-blue-600 bg-slate-50 rounded outline-none transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" />
-                                    <button onClick={handleSearch} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
+                                    <button onClick={handleSearch} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0">
                                         <Search size={16} />
                                     </button>
                                 </div>
@@ -450,7 +451,7 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
                                     />
                                     <button
                                         onClick={() => { setDatePickerField('postDate'); setShowDatePicker(true); }}
-                                        className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0"
+                                        className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0"
                                     >
                                         <Calendar size={16} />
                                     </button>
@@ -470,7 +471,7 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
                                     />
                                     <button
                                         onClick={() => { setDatePickerField('expectedDate'); setShowDatePicker(true); }}
-                                        className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0"
+                                        className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0"
                                     >
                                         <Calendar size={16} />
                                     </button>
@@ -488,7 +489,7 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
                                         className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-bold text-red-600 bg-slate-50 rounded outline-none cursor-pointer transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20"
                                         onClick={() => setShowSupplierSearch(true)}
                                     />
-                                    <button onClick={() => setShowSupplierSearch(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
+                                    <button onClick={() => setShowSupplierSearch(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0">
                                         <Search size={16} />
                                     </button>
                                 </div>
@@ -505,7 +506,7 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
                                         className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-bold text-gray-700 bg-slate-50 rounded outline-none cursor-pointer transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20"
                                         onClick={() => setShowPayMethodSearch(true)}
                                     />
-                                    <button onClick={() => setShowPayMethodSearch(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
+                                    <button onClick={() => setShowPayMethodSearch(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0">
                                         <Search size={16} />
                                     </button>
                                 </div>
@@ -525,14 +526,14 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
                         </div>
                     </div>
 
-                    <div className="border border-slate-200 rounded-[5px] bg-white flex flex-col min-h-[250px] overflow-hidden">
+                    <div className="border border-slate-200 rounded-[3px] bg-white flex flex-col min-h-[250px] overflow-hidden">
                         {/* Table header */}
                         <div className="flex bg-slate-50/80 border-b border-slate-200 text-[10px] font-mono font-bold text-gray-400 uppercase tracking-widest items-center">
                             <div className="flex-[2.5] py-2.5 px-4 border-r border-slate-200 truncate flex items-center justify-between">
                                 <span>Item Selection Portfolio</span>
                                 <button
                                     onClick={handleOpenAddProduct}
-                                    className="w-8 h-7 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0"
+                                    className="w-8 h-7 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0"
                                     title="Add Product"
                                 ><Plus size={14} /></button>
                             </div>
@@ -589,7 +590,7 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
                                         {parseFloat(p.amount).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                     </div>
                                     <div className="w-10 flex justify-center py-1">
-                                        <button onClick={() => removeProduct(idx)} className="text-red-300 hover:text-red-500 transition-all p-1.5 hover:bg-red-50 rounded-[5px]">
+                                        <button onClick={() => removeProduct(idx)} className="text-red-300 hover:text-red-500 transition-all p-1.5 hover:bg-red-50 rounded-[3px]">
                                             <Trash2 size={13} />
                                         </button>
                                     </div>
@@ -601,10 +602,10 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
                     <div className="flex flex-row justify-between items-end gap-x-12">
                         <div className="flex-1 space-y-2">
                             <label className="text-[12.5px] font-bold text-gray-700">Internal Remarks & Comments</label>
-                            <textarea name="comment" value={formData.comment} onChange={handleInput} className="w-full h-[100px] border border-slate-200 rounded-[5px] p-3 text-[12.5px] font-mono outline-none resize-none bg-slate-50 transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" placeholder=""></textarea>
+                            <textarea name="comment" value={formData.comment} onChange={handleInput} className="w-full h-[100px] border border-slate-200 rounded-[3px] p-3 text-[12.5px] font-mono outline-none resize-none bg-slate-50 transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" placeholder=""></textarea>
                         </div>
 
-                        <div className="w-[320px] bg-white border border-slate-200 rounded-[5px] p-4 space-y-3">
+                        <div className="w-[320px] bg-white border border-slate-200 rounded-[3px] p-4 space-y-3">
                             <div className="flex items-center justify-between">
                                 <span className="text-slate-500 font-mono font-bold text-[10px] uppercase tracking-widest">Portfolio Total</span>
                                 <div className="text-[15px] font-mono font-black text-slate-800">
@@ -620,7 +621,7 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
                                 <input type="text" name="taxPer" value={formData.taxPer} onChange={handleInput} className="w-24 h-7 bg-slate-50 border border-slate-200 px-2 text-right text-[13px] font-mono font-bold rounded outline-none transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" />
                             </div>
                             <div className="h-[1px] bg-slate-200 my-1" />
-                            <div className="flex items-center justify-between bg-slate-50 p-2 rounded-md">
+                            <div className="flex items-center justify-between bg-slate-50 p-2 rounded-[3px]">
                                 <span className="text-[13px] font-black text-slate-900 uppercase">Net Liability</span>
                                 <div className="text-[18px] font-mono font-black text-blue-700 tracking-tighter">
                                     {totals.netAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
@@ -629,7 +630,7 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
                         </div>
                     </div>
                 </div>
-            </SimpleModal>
+            </TransactionFormWrapper>
 
             {/* Existing PO Picker Modal */}
             <SimpleModal
@@ -639,36 +640,38 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
                 maxWidth="max-w-[700px]"
             >
                 <div className="space-y-4 font-['Tahoma']">
-                    <div className="flex items-center gap-4 p-3 rounded-[5px] border border-slate-200 bg-white mb-2">
+                    <div className="flex items-center gap-4 p-3 rounded-[3px] border border-slate-200 bg-white mb-2">
                         <span className="text-[12px] font-bold text-gray-500 uppercase tracking-widest">Global Archive Search</span>
                         <div className="relative flex-1">
                              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
-                             <input type="text" placeholder="Filter by document id or creation date..." className="w-full h-9 pl-10 pr-4 border border-slate-200 rounded outline-none text-sm bg-slate-50 transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" />
+                             <input type="text" placeholder="Filter by document id or creation date..." className="w-full h-10 pl-10 pr-4 border border-gray-300 rounded-[3px] outline-none text-[13px] focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] shadow-sm bg-white" />
                         </div>
                     </div>
 
-                    <div className="border border-slate-200 rounded-[5px] overflow-hidden shadow-sm">
+                    <div className="border border-slate-200 rounded-[3px] overflow-hidden shadow-sm">
                         <table className="w-full text-left">
-                            <thead className="bg-slate-50/80 text-[10px] font-mono font-bold text-gray-400 uppercase tracking-widest border-b border-slate-200">
+                            <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 shadow-sm z-10">
                                 <tr>
-                                    <th className="px-5 py-3">Reference ID</th>
-                                    <th className="px-5 py-3">Ledger Posting Date</th>
-                                    <th className="px-5 py-3 text-right">Interaction</th>
-                                </tr>
+                                    <th className=" px-5 py-3">Reference ID</th>
+                                    <th className=" px-5 py-3">Ledger Posting Date</th>
+                                    <th className="text-right px-5 py-3">Interaction</th>
+                                <th className="text-right px-5 py-3">Action</th></tr>
                             </thead>
                             <tbody className="divide-y divide-slate-100">
                                 {orders.length === 0 ? (
                                     <tr>
-                                        <td colSpan="3" className="text-center py-10 text-gray-300 text-[12px] font-bold uppercase tracking-widest">Archive is currently empty</td>
+                                        <td colSpan="3" className="text-center py-16 text-gray-400 text-[11px] font-bold uppercase tracking-widest">Archive is currently empty</td>
                                     </tr>
                                 ) : orders.map((order, i) => (
-                                    <tr key={i} className="group hover:bg-blue-50/50 cursor-pointer transition-colors" onClick={() => handleSelectOrder(order.docNo)}>
-                                        <td className="px-5 py-3 font-mono text-[13px] font-mono text-gray-600 ">{order.docNo}</td>
-                                        <td className="px-5 py-3 text-[13px] font-mono text-gray-600 ">{order.date?.split('T')[0]}</td>
-                                        <td className="px-5 py-3 text-right">
-                                             <button className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95">RETRIEVE</button>
+                                    <tr key={i} className="group hover:bg-blue-50/50  transition-all cursor-pointer group border-b border-gray-50" onClick={() => handleSelectOrder(order.docNo)}>
+                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{order.docNo}</td>
+                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{order.date?.split('T')[0]}</td>
+                                        <td className="text-right px-5 py-3">
+                                             <button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">RETRIEVE</button>
                                         </td>
-                                    </tr>
+                                    
+                                            <td className="text-right px-5 py-3"><button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button></td>
+                                        </tr>
                                 ))}
                             </tbody>
                         </table>
@@ -684,48 +687,50 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
                     setPayMethodSearchQuery('');
                 }}
                 title="Payment Method Lookup"
-                maxWidth="max-w-[450px]"
+                maxWidth="max-w-[700px]"
             >
                 <div className="space-y-4 font-['Tahoma']">
-                    <div className="flex items-center gap-4 p-3 rounded-[5px] border border-slate-200 bg-white mb-2">
+                    <div className="flex items-center gap-4 p-3 rounded-[3px] border border-slate-200 bg-white mb-2">
                         <span className="text-[12px] font-bold text-gray-500 uppercase tracking-widest">Search Facility</span>
                         <div className="relative flex-1">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
                             <input
                                 type="text"
                                 placeholder="Filter payment methods..."
-                                className="w-full h-9 pl-10 pr-4 border border-slate-200 rounded outline-none text-sm bg-slate-50 transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20"
+                                className="w-full h-10 pl-10 pr-4 border border-gray-300 rounded-[3px] outline-none text-[13px] focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] shadow-sm bg-white"
                                 value={payMethodSearchQuery}
                                 onChange={(e) => setPayMethodSearchQuery(e.target.value)}
                                 autoFocus
                             />
                         </div>
                     </div>
-                    <div className="border border-slate-200 rounded-[5px] overflow-hidden shadow-sm">
+                    <div className="border border-slate-200 rounded-[3px] overflow-hidden shadow-sm">
                         <div className="max-h-[300px] overflow-y-auto no-scrollbar">
                             <table className="w-full text-left">
-                                <thead className="bg-slate-50/80 sticky top-0 text-[10px] font-mono font-bold text-gray-400 uppercase tracking-widest border-b border-slate-200">
+                                <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 shadow-sm z-10">
                                     <tr>
-                                        <th className="px-5 py-3">Code</th>
-                                        <th className="px-5 py-3">Method Title</th>
-                                    </tr>
+                                        <th className=" px-5 py-3">Code</th>
+                                        <th className=" px-5 py-3">Method Title</th>
+                                    <th className="text-right px-5 py-3">Action</th></tr>
                                 </thead>
                                 <tbody className="divide-y divide-slate-100">
                                     {(lookups.paymentMethods || [])
                                         .filter(m => !payMethodSearchQuery || m.name.toLowerCase().includes(payMethodSearchQuery.toLowerCase()) || m.code.toLowerCase().includes(payMethodSearchQuery.toLowerCase()))
                                         .map(m => (
-                                            <tr key={m.code} className="group hover:bg-blue-50/50 cursor-pointer transition-colors" onClick={() => {
+                                            <tr key={m.code} className="group hover:bg-blue-50/50  transition-all cursor-pointer group border-b border-gray-50" onClick={() => {
                                                 setFormData(prev => ({ ...prev, payType: m.code }));
                                                 setShowPayMethodSearch(false);
                                                 setPayMethodSearchQuery('');
                                             }}>
-                                                <td className="px-5 py-3 font-mono text-[12px] font-mono text-gray-700">{m.code}</td>
-                                                <td className="px-5 py-3 text-[12px] font-mono text-gray-700 uppercase group-hover:text-blue-600">{m.name}</td>
-                                            </tr>
+                                                <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{m.code}</td>
+                                                <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{m.name}</td>
+                                            
+                                            <td className="text-right px-5 py-3"><button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button></td>
+                                        </tr>
                                         ))}
                                     {(lookups.paymentMethods || []).length === 0 && (
                                         <tr>
-                                            <td colSpan="2" className="text-center py-6 text-gray-300 text-[12px] font-bold uppercase tracking-widest">No methods found</td>
+                                            <td colSpan="2" className="text-center py-16 text-gray-400 text-[11px] font-bold uppercase tracking-widest">No methods found</td>
                                         </tr>
                                     )}
                                 </tbody>
@@ -740,42 +745,42 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
                 isOpen={showSupplierSearch}
                 onClose={() => setShowSupplierSearch(false)}
                 title="Supplier Directory Lookup"
-                maxWidth="max-w-[600px]"
+                maxWidth="max-w-[700px]"
             >
                 <div className="space-y-4 font-['Tahoma']">
-                    <div className="flex items-center gap-4 p-3 rounded-[5px] border border-slate-200 bg-white mb-2">
+                    <div className="flex items-center gap-4 p-3 rounded-[3px] border border-slate-200 bg-white mb-2">
                         <span className="text-[12px] font-bold text-gray-500 uppercase tracking-widest">Search Facility</span>
                         <div className="relative flex-1">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
                             <input
                                 type="text"
                                 placeholder="Find supplier by legal name or code..."
-                                className="w-full h-9 pl-10 pr-4 border border-slate-200 rounded outline-none text-sm bg-slate-50 transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20"
+                                className="w-full h-10 pl-10 pr-4 border border-gray-300 rounded-[3px] outline-none text-[13px] focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] shadow-sm bg-white"
                                 value={supplierSearchQuery}
                                 onChange={(e) => setSupplierSearchQuery(e.target.value)}
                                 autoFocus
                             />
                         </div>
                     </div>
-                    <div className="border border-slate-200 rounded-[5px] overflow-hidden shadow-sm">
+                    <div className="border border-slate-200 rounded-[3px] overflow-hidden shadow-sm">
                         <div className="max-h-[400px] overflow-y-auto no-scrollbar">
                             <table className="w-full text-left">
-                                <thead className="bg-slate-50/80 sticky top-0 text-[10px] font-mono font-bold text-gray-400 uppercase tracking-widest border-b border-slate-200">
+                                <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 shadow-sm z-10">
                                     <tr>
-                                        <th className="px-5 py-3">Code</th>
-                                        <th className="px-5 py-3">Credential / Supplier Name</th>
-                                        <th className="px-5 py-3 text-right">Action</th>
+                                        <th className=" px-5 py-3">Code</th>
+                                        <th className=" px-5 py-3">Credential / Supplier Name</th>
+                                        <th className="text-right px-5 py-3">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-slate-100">
                                     {lookups.suppliers
                                         .filter(s => s.name.toLowerCase().includes(supplierSearchQuery.toLowerCase()) || s.code.toLowerCase().includes(supplierSearchQuery.toLowerCase()))
                                         .map(s => (
-                                            <tr key={s.code} className="group hover:bg-blue-50/50 cursor-pointer transition-all" onClick={() => handleSelectSupplier(s)}>
-                                                <td className="px-5 py-3 font-mono text-[12px] font-mono text-gray-700">{s.code}</td>
-                                                <td className="px-5 py-3 text-[12px] font-mono text-gray-700 uppercase group-hover:text-blue-600 transition-colors">{s.name}</td>
-                                                <td className="px-5 py-3 text-right">
-                                                    <button className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95">SELECT</button>
+                                            <tr key={s.code} className="group hover:bg-blue-50/50  transition-all cursor-pointer group border-b border-gray-50" onClick={() => handleSelectSupplier(s)}>
+                                                <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{s.code}</td>
+                                                <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{s.name}</td>
+                                                <td className="text-right px-5 py-3">
+                                                    <button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button>
                                                 </td>
                                             </tr>
                                         ))}
@@ -788,16 +793,16 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
 
             {/* Product Search Modal */}
             {/* ── Add Product Modal ──────────────────────────────────── */}
-            <SimpleModal isOpen={showAddProductModal} onClose={() => { setShowAddProductModal(false); setProductSearchQuery(''); }} title="Inventory Acquisition Portal" maxWidth="max-w-[650px]">
+            <SimpleModal isOpen={showAddProductModal} onClose={() => { setShowAddProductModal(false); setProductSearchQuery(''); }} title="Inventory Acquisition Portal" maxWidth="max-w-[700px]">
                 <div className="space-y-4 px-1 font-['Tahoma']">
-                    <div className="flex items-center justify-between gap-4 bg-slate-50/80 p-3 rounded-xl border border-gray-100 mb-2">
+                    <div className="flex items-center justify-between gap-4 bg-slate-50/80 p-3 rounded-[3px] border border-gray-200 mb-2">
                         <div className="flex items-center gap-3 flex-1">
                             <div className="relative flex-1 max-w-[400px]">
                                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
                                 <input
                                     type="text"
                                     placeholder="Search Inventory.."
-                                    className="w-full h-10 pl-10 pr-4 border border-gray-200 rounded-lg outline-none text-sm focus:border-blue-500 focus:ring-4 focus:ring-blue-50 transition-all bg-white shadow-sm font-medium"
+                                    className="w-full h-10 pl-10 pr-4 border border-gray-300 rounded-[3px] outline-none text-[13px] focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] shadow-sm bg-white"
                                     value={productSearchQuery}
                                     onChange={async (e) => {
                                         const val = e.target.value; setProductSearchQuery(val);
@@ -810,22 +815,22 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
                         </div>
                         <button 
                             onClick={() => setShowProductMaster(true)}
-                            className="h-10 px-5 bg-[#2bb744] text-white text-[12px] font-black rounded-lg hover:bg-[#259b3a] transition-all flex items-center gap-2 border-none shadow-md shadow-green-100 active:scale-95 whitespace-nowrap"
+                            className="h-10 px-5 bg-white text-[#2bb744] border-2 border-[#2bb744] hover:bg-green-50 text-[12px] font-black rounded-[3px] hover:bg-[#259b3a] transition-all flex items-center gap-2 shadow-sm shadow-green-100 active:scale-95 whitespace-nowrap"
                         >
                             <Plus size={14} /> CREATE NEW ITEM
                         </button>
                     </div>
 
                     {/* Product Selection List */}
-                    <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm">
+                    <div className="border border-gray-200 rounded-[3px] overflow-hidden shadow-sm">
                         <div className="max-h-[450px] overflow-y-auto no-scrollbar">
                             <table className="w-full text-left border-separate border-spacing-0">
-                                <thead className="bg-[#f8fafd] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 z-10">
+                                <thead className="bg-[#f8fafd] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-200 z-10">
                                     <tr>
-                                        <th className="px-6 py-4">Code</th>
-                                        <th className="px-6 py-4">Item Description</th>
-                                        <th className="px-6 py-4 text-right">Base Price</th>
-                                    </tr>
+                                        <th className=" px-5 py-3">Code</th>
+                                        <th className=" px-5 py-3">Item Description</th>
+                                        <th className="text-right px-5 py-3">Base Price</th>
+                                    <th className="text-right px-5 py-3">Action</th></tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-50">
                                     {(lookups.products || []).map(p => (
@@ -845,13 +850,13 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
                                                 entry.prodCode === p.code ? 'bg-blue-50/80' : ''
                                             }`}
                                         >
-                                            <td className="px-6 py-4 font-mono text-[13px] font-bold text-blue-600">{p.code}</td>
-                                            <td className="px-6 py-4">
+                                            <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{p.code}</td>
+                                            <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">
                                                 <div className="text-[13px] font-bold text-gray-700 uppercase group-hover:text-blue-600 transition-colors leading-snug line-clamp-2 max-w-[320px]">
                                                     {p.name}
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-4 text-right font-mono font-black text-gray-500">
+                                            <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">
                                                 <span className="text-[10px] text-gray-300 mr-1">Rs.</span>
                                                 {parseFloat(p.price || 0).toFixed(2)}
                                             </td>
@@ -869,16 +874,16 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
                 isOpen={showProductQtyModal}
                 onClose={() => setShowProductQtyModal(false)}
                 title="Line Item Configuration"
-                maxWidth="max-w-[450px]"
+                maxWidth="max-w-[700px]"
             >
                 <div className="space-y-6 px-1 py-2 font-['Tahoma']">
-                    <div className="bg-slate-50/50 p-5 rounded-xl border border-slate-100 flex flex-col items-center text-center">
+                    <div className="bg-slate-50/50 p-5 rounded-[3px] border border-slate-100 flex flex-col items-center text-center">
                         <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1.5">Active Selection</span>
                         <h3 className="text-[18px] font-black text-slate-700 uppercase leading-[1.2] tracking-tight max-w-[90%] break-words">
                             {entry.prodName}
                         </h3>
                         <div className="flex items-center gap-2 mt-2">
-                            <span className="text-[11px] font-mono font-bold text-blue-500 bg-white px-3 py-0.5 rounded-md shadow-sm border border-slate-100">{entry.prodCode}</span>
+                            <span className="text-[11px] font-mono font-bold text-blue-500 bg-white px-3 py-0.5 rounded-[3px] shadow-sm border border-slate-100">{entry.prodCode}</span>
                             <span className="text-[10px] font-black text-slate-300 uppercase">Product Code</span>
                         </div>
                     </div>
@@ -894,7 +899,7 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
                                 name="purchasePrice" 
                                 value={entry.purchasePrice} 
                                 onChange={handleEntryInput}
-                                className="w-full h-12 border border-gray-300 px-5 text-right text-[16px] font-mono font-black rounded-xl outline-none focus:border-[#0285fd] focus:ring-4 focus:ring-blue-50 transition-all bg-white" 
+                                className="w-full h-12 border border-gray-300 px-5 text-right text-[16px] font-mono font-black rounded-[3px] outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] focus:ring-4 focus:ring-blue-50 transition-all bg-white" 
                             />
                         </div>
                         <div className="space-y-2">
@@ -905,13 +910,13 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
                                 value={entry.qty} 
                                 onChange={handleEntryInput}
                                 onKeyDown={e => { if (e.key === 'Enter') { addProduct(); setShowProductQtyModal(false); setShowAddProductModal(false); setProductSearchQuery(''); } }}
-                                className="w-full h-12 border border-[#0285fd] px-5 text-center text-[18px] font-mono font-black rounded-xl outline-none bg-blue-50/20 focus:ring-4 focus:ring-blue-100 transition-all shadow-inner" 
+                                className="w-full h-12 border border-[#0285fd] px-5 text-center text-[18px] font-mono font-black rounded-[3px] outline-none bg-blue-50/20 focus:ring-4 focus:ring-blue-100 transition-all shadow-inner" 
                                 autoFocus 
                             />
                         </div>
                     </div>
 
-                    <div className="pt-6 border-t border-gray-100 flex items-center justify-between">
+                    <div className="pt-6 border-t border-gray-200 flex items-center justify-between">
                         <div className="flex flex-col">
                             <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Total Amount</span>
                             <div className="flex items-baseline gap-1.5 mt-0.5">
@@ -923,7 +928,7 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
                         </div>
                         <button
                             onClick={() => { addProduct(); setShowProductQtyModal(false); setShowAddProductModal(false); setProductSearchQuery(''); }}
-                            className="h-11 px-8 bg-[#0285fd] text-white text-[13px] font-bold rounded-lg hover:bg-[#0073ff] transition-all active:scale-95 flex items-center gap-2 border-none"
+                            className="h-11 px-8 bg-[#0285fd] text-white text-[13px] font-bold rounded-[3px] hover:bg-[#0073ff] transition-all active:scale-95 flex items-center gap-2 border-none"
                         >
                             <Plus size={16} /> ADD TO LIST
                         </button>
@@ -942,14 +947,14 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
                 maxWidth="max-w-[700px]"
             >
                 <div className="space-y-4 font-['Tahoma']">
-                    <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-lg border border-gray-100 mb-2">
+                    <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-[3px] border border-gray-200 mb-2">
                         <span className="text-[12px] font-bold text-gray-500 uppercase tracking-widest">Search Facility</span>
                         <div className="relative flex-1">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
                             <input
                                 type="text"
                                 placeholder="Scan items by generic title or reference code..."
-                                className="w-full h-9 pl-10 pr-4 border border-gray-300 rounded-[5px] outline-none text-sm focus:border-[#0285fd] bg-white shadow-sm"
+                                className="w-full h-10 pl-10 pr-4 border border-gray-300 rounded-[3px] outline-none text-[13px] focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] shadow-sm bg-white"
                                 value={productSearchQuery}
                                 onChange={async (e) => {
                                     const val = e.target.value;
@@ -968,25 +973,25 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
                             />
                         </div>
                     </div>
-                    <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm">
+                    <div className="border border-gray-200 rounded-[3px] overflow-hidden shadow-sm">
                         <div className="max-h-[400px] overflow-y-auto no-scrollbar">
                             <table className="w-full text-left">
-                                <thead className="bg-[#f8fafd] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">
+                                <thead className="bg-[#f8fafd] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-200">
                                     <tr>
-                                        <th className="px-5 py-3">Code</th>
-                                        <th className="px-5 py-3">Acquisition Title</th>
-                                        <th className="px-5 py-3 text-right">Acq. Price</th>
-                                        <th className="px-5 py-3 text-right">Action</th>
+                                        <th className=" px-5 py-3">Code</th>
+                                        <th className=" px-5 py-3">Acquisition Title</th>
+                                        <th className="text-right px-5 py-3">Acq. Price</th>
+                                        <th className="text-right px-5 py-3">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-50">
                                     {(lookups.products || []).map(p => (
-                                        <tr key={p.code} className="group hover:bg-blue-50/50 cursor-pointer transition-all" onClick={() => handleSelectProduct(p)}>
-                                            <td className="px-5 py-3 font-mono text-[12px] font-bold text-blue-600">{p.code}</td>
-                                            <td className="px-5 py-3 text-[13px] font-bold text-gray-700 uppercase group-hover:text-blue-600 transition-colors">{p.name}</td>
-                                            <td className="px-5 py-3 text-right font-mono font-black text-gray-400">{p.price?.toFixed(2)}</td>
-                                            <td className="px-5 py-3 text-right">
-                                                 <button className="bg-[#0285fd] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#0073ff] shadow-md transition-all active:scale-95">SELECT</button>
+                                        <tr key={p.code} className="group hover:bg-blue-50/50  transition-all cursor-pointer group border-b border-gray-50" onClick={() => handleSelectProduct(p)}>
+                                            <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{p.code}</td>
+                                            <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{p.name}</td>
+                                            <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{p.price?.toFixed(2)}</td>
+                                            <td className="text-right px-5 py-3">
+                                                 <button className="bg-[#0285fd] text-white text-[10px] px-5 py-2 rounded-[3px] font-black hover:bg-[#0073ff] shadow-md transition-all active:scale-95">SELECT</button>
                                             </td>
                                         </tr>
                                     ))}
@@ -1036,11 +1041,11 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
                 isOpen={showProductMaster}
                 onClose={() => setShowProductMaster(false)}
                 title="Product Master Creation"
-                maxWidth="max-w-[500px]"
+                maxWidth="max-w-[700px]"
                 footer={
-                    <div className="bg-slate-50 px-6 py-4 w-full flex justify-end gap-3 border-t border-gray-100 rounded-b-xl">
-                        <button onClick={() => setShowProductMaster(false)} className="px-6 h-9 bg-white text-gray-500 text-[13px] font-bold rounded-[5px] border border-gray-300 hover:bg-gray-50 transition-all active:scale-95">CANCEL</button>
-                        <button onClick={handleCreateProduct} disabled={isCreatingProduct} className="px-8 h-9 bg-[#2bb744] text-white text-[13px] font-bold rounded-[5px] shadow-md shadow-green-50 hover:bg-[#259b3a] transition-all active:scale-95 flex items-center gap-2 border-none">
+                    <div className="bg-slate-50 px-6 py-4 w-full flex justify-end gap-3 border-t border-gray-200 rounded-b-xl">
+                        <button onClick={() => setShowProductMaster(false)} className="px-6 h-9 bg-white text-gray-500 text-[13px] font-bold rounded-[3px] border border-gray-300 hover:bg-blue-50/50 transition-all active:scale-95 cursor-pointer group border-b border-gray-50">CANCEL</button>
+                        <button onClick={handleCreateProduct} disabled={isCreatingProduct} className="px-8 h-9 bg-white text-[#2bb744] border-2 border-[#2bb744] hover:bg-green-50 text-[13px] font-bold rounded-[3px] shadow-md shadow-green-50 hover:bg-[#259b3a] transition-all active:scale-95 flex items-center gap-2 border-none">
                             {isCreatingProduct ? 'CREATING...' : 'CREATE PRODUCT'}
                         </button>
                     </div>
@@ -1050,32 +1055,32 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-1">
                             <label className="text-[12px] font-bold text-gray-600">Product Code</label>
-                            <input type="text" value={productMasterData.code} onChange={e => setProductMasterData({...productMasterData, code: e.target.value})} className="w-full h-9 border border-gray-300 rounded-[5px] px-3 text-[13px] outline-none focus:border-[#0285fd] bg-white font-mono uppercase" placeholder="" />
+                            <input type="text" value={productMasterData.code} onChange={e => setProductMasterData({...productMasterData, code: e.target.value})} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[13px] outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white font-mono uppercase shadow-sm" placeholder="" />
                         </div>
                         <div className="space-y-1">
                             <label className="text-[12px] font-bold text-gray-600">Unit of Measure</label>
-                            <input type="text" value={productMasterData.unit} onChange={e => setProductMasterData({...productMasterData, unit: e.target.value})} className="w-full h-9 border border-gray-300 rounded-[5px] px-3 text-[13px] outline-none focus:border-[#0285fd] bg-white" placeholder="Nos" />
+                            <input type="text" value={productMasterData.unit} onChange={e => setProductMasterData({...productMasterData, unit: e.target.value})} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[13px] outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white shadow-sm" placeholder="Nos" />
                         </div>
                     </div>
                     <div className="space-y-1">
                         <label className="text-[12px] font-bold text-gray-600">Product Description</label>
-                        <input type="text" value={productMasterData.name} onChange={e => setProductMasterData({...productMasterData, name: e.target.value})} className="w-full h-9 border border-gray-300 rounded-[5px] px-3 text-[13px] outline-none focus:border-[#0285fd] bg-white uppercase" placeholder="" />
+                        <input type="text" value={productMasterData.name} onChange={e => setProductMasterData({...productMasterData, name: e.target.value})} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[13px] outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white uppercase shadow-sm" placeholder="" />
                     </div>
                     <div className="grid grid-cols-3 gap-4">
                         <div className="space-y-1">
                             <label className="text-[11px] font-bold text-gray-600">Purchase Price</label>
-                            <input type="text" value={productMasterData.purchasePrice} onChange={e => setProductMasterData({...productMasterData, purchasePrice: e.target.value})} className="w-full h-9 border border-gray-300 rounded-[5px] px-3 text-right text-[13px] font-mono outline-none focus:border-[#0285fd] bg-white" placeholder="0.00" />
+                            <input type="text" value={productMasterData.purchasePrice} onChange={e => setProductMasterData({...productMasterData, purchasePrice: e.target.value})} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-right text-[13px] font-mono outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white shadow-sm" placeholder="0.00" />
                         </div>
                         <div className="space-y-1">
                             <label className="text-[11px] font-bold text-gray-600">Selling Price</label>
-                            <input type="text" value={productMasterData.sellingPrice} onChange={e => setProductMasterData({...productMasterData, sellingPrice: e.target.value})} className="w-full h-9 border border-gray-300 rounded-[5px] px-3 text-right text-[13px] font-mono outline-none focus:border-[#0285fd] bg-white" placeholder="0.00" />
+                            <input type="text" value={productMasterData.sellingPrice} onChange={e => setProductMasterData({...productMasterData, sellingPrice: e.target.value})} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-right text-[13px] font-mono outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white shadow-sm" placeholder="0.00" />
                         </div>
                         <div className="space-y-1">
                             <label className="text-[11px] font-bold text-gray-600">Pack Size</label>
-                            <input type="text" value={productMasterData.packSize} onChange={e => setProductMasterData({...productMasterData, packSize: e.target.value})} className="w-full h-9 border border-gray-300 rounded-[5px] px-3 text-center text-[13px] font-mono outline-none focus:border-[#0285fd] bg-white" placeholder="1" />
+                            <input type="text" value={productMasterData.packSize} onChange={e => setProductMasterData({...productMasterData, packSize: e.target.value})} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-center text-[13px] font-mono outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white shadow-sm" placeholder="1" />
                         </div>
                     </div>
-                    <div className="bg-blue-50/50 p-3 rounded-lg border border-blue-100">
+                    <div className="bg-blue-50/50 p-3 rounded-[3px] border border-blue-100">
                         <p className="text-[10px] text-blue-600 font-bold uppercase tracking-tight text-center">Default Category (1) and Department (1) will be assigned.</p>
                     </div>
                 </div>

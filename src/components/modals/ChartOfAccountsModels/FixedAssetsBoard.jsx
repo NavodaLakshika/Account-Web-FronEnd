@@ -224,19 +224,19 @@ const FixedAssetsBoard = ({ isOpen, onClose }) => {
             <SimpleModal
                 isOpen={isOpen}
                 onClose={onClose}
-                title="New Fixed Assets Item"
-                maxWidth="max-w-4xl"
+                title="Fixed Assets"
+                maxWidth="max-w-[700px]"
                 footer={
                     <div className="bg-slate-50 px-6 py-4 w-full flex justify-end gap-4 border-t border-slate-200 mt-1 rounded-b-[5px]">
                         <button 
                             onClick={handleSave} 
                             disabled={loading} 
-                            className={`px-8 h-10 text-white font-mono font-bold text-[13px] uppercase tracking-widest rounded-[5px] transition-all active:scale-95 flex items-center justify-center gap-2 border-none disabled:opacity-50 shadow-md bg-[#2bb744] hover:bg-[#259b3a] shadow-green-100 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            className={`px-8 h-10 text-white font-mono font-bold text-[13px] uppercase tracking-widest rounded-[3px] transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-50 shadow-md bg-[#2bb744] hover:bg-[#259b3a] shadow-green-100 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                         >
                             {loading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />} 
                             {isEditMode ? 'UPDATE' : 'SAVE'}
                         </button>
-                        <button onClick={handleClear} className="px-8 h-10 bg-[#00adff] hover:bg-[#0099e6] text-white font-mono font-bold text-[13px] uppercase tracking-widest rounded-[5px] shadow-md shadow-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border-none disabled:opacity-50">
+                        <button onClick={handleClear} className="px-8 h-10 bg-white text-[#00adff] border-2 border-[#00adff] hover:bg-blue-50 font-mono font-bold text-[13px] uppercase tracking-widest rounded-[3px] shadow-md shadow-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-50">
                             <RotateCcw size={14} /> CLEAR
                         </button>
                     </div>
@@ -244,7 +244,7 @@ const FixedAssetsBoard = ({ isOpen, onClose }) => {
             >
                 <div className="py-2 select-none font-['Tahoma'] space-y-4">
                     {/* Info Header */}
-                    <div className="bg-[#f0f9ff] border border-[#bae6fd] p-3 rounded-[5px] shadow-sm">
+                    <div className="bg-[#f0f9ff] border border-[#bae6fd] p-3 rounded-[3px] shadow-sm">
                         <p className="text-[12px] font-bold text-[#0369a1] text-center leading-relaxed ">
                             Use for property you purchase, track, and may eventually sell. Fixed assets are
                             long-lived assets, such as land, buildings, furniture, equipment, and vehicles.
@@ -252,7 +252,7 @@ const FixedAssetsBoard = ({ isOpen, onClose }) => {
                     </div>
 
                     {/* Top Section */}
-                    <div className="bg-white p-4 border border-slate-200 rounded-[5px] space-y-4">
+                    <div className="bg-white p-4 border border-slate-200 rounded-[3px] space-y-4">
                         <div className="flex items-center gap-2">
                             <label className="text-[11px] font-bold text-gray-500 w-[140px] shrink-0 uppercase tracking-widest">Asset Number / Name</label>
                             <div className="flex flex-1 gap-2">
@@ -286,7 +286,7 @@ const FixedAssetsBoard = ({ isOpen, onClose }) => {
                     {/* Middle Grid */}
                     <div className="grid grid-cols-2 gap-4">
                         {/* Purchase Information */}
- <div className=" rounded-[5px] p-4 relative pt-6 bg-white shadow-sm">
+ <div className=" rounded-[3px] p-4 relative pt-6 bg-white shadow-sm">
                             <span className="absolute -top-3 left-3 bg-white px-2 py-0.5 border border-slate-200 rounded text-[10px] font-bold text-[#0285fd] uppercase tracking-widest shadow-sm">Purchase Information</span>
                             <div className="space-y-4">
                                 <div>
@@ -337,7 +337,7 @@ const FixedAssetsBoard = ({ isOpen, onClose }) => {
                         </div>
 
                         {/* Sales Information */}
- <div className=" rounded-[5px] p-4 relative pt-6 bg-white shadow-sm">
+ <div className=" rounded-[3px] p-4 relative pt-6 bg-white shadow-sm">
                             <span className="absolute -top-3 left-3 bg-white px-2 py-0.5 border border-slate-200 rounded text-[10px] font-bold text-red-500 uppercase tracking-widest shadow-sm">Sales Information</span>
                             <div className="space-y-4">
                                 <div>
@@ -384,7 +384,7 @@ const FixedAssetsBoard = ({ isOpen, onClose }) => {
                     </div>
 
                     {/* Asset Detailed Information */}
- <div className=" rounded-[5px] p-4 relative pt-6 bg-white shadow-sm">
+ <div className=" rounded-[3px] p-4 relative pt-6 bg-white shadow-sm">
                         <span className="absolute -top-3 left-3 bg-white px-3 py-0.5 border border-slate-200 rounded text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
                              Detailed Info
                         </span>
@@ -434,7 +434,7 @@ const FixedAssetsBoard = ({ isOpen, onClose }) => {
                     <div className="absolute inset-0 bg-slate-900/30 backdrop-blur-sm" onClick={() => setShowSearchModal(false)} />
  <div className="relative w-full max-w-3xl bg-white shadow-2xl rounded-sm overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
                         {/* Header */}
-                        <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-100 select-none relative overflow-hidden">
+                        <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-200 select-none relative overflow-hidden">
                             {/* System Color Left Accent */}
                             <div 
                                 className="absolute left-0 top-0 bottom-0 w-1.5 transition-colors duration-500" 
@@ -454,7 +454,7 @@ const FixedAssetsBoard = ({ isOpen, onClose }) => {
                         </div>
 
                         {/* Search Input Area */}
-                        <div className="p-3 bg-slate-50 border-b border-gray-100 flex items-center justify-between">
+                        <div className="p-3 bg-slate-50 border-b border-gray-200 flex items-center justify-between">
                             <div className="flex items-center gap-2">
                                 <Search size={14} className="text-gray-400" />
                                 <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest text-center">Search Facility</span>
@@ -462,14 +462,14 @@ const FixedAssetsBoard = ({ isOpen, onClose }) => {
                             <input 
                                 type="text" 
                                 placeholder="Find by Asset Name or ID..." 
-                                className="h-9 border border-slate-200 px-3 text-xs rounded-md w-72 focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 outline-none shadow-sm transition-all" 
+                                className="h-9 border border-slate-200 px-3 text-xs rounded-[3px] w-72 focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 outline-none shadow-sm transition-all" 
                                 value={searchQuery} 
                                 onChange={(e) => setSearchQuery(e.target.value)} 
                             />
                         </div>
 
                         {/* Results List */}
-                        <div className="border border-gray-100 overflow-hidden bg-white">
+                        <div className="border border-gray-200 overflow-hidden bg-white">
                             <div className="max-h-[400px] overflow-y-auto custom-scrollbar">
                                 <table className="w-full text-left border-collapse">
                                     <thead className="bg-[#f8fafd] text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-slate-200 sticky top-0 z-10">
@@ -489,7 +489,7 @@ const FixedAssetsBoard = ({ isOpen, onClose }) => {
                                                 <td className="px-5 py-3 font-mono text-[13px] text-gray-600">{asset.assets_Code}</td>
                                                 <td className="px-5 py-3 text-[13px] font-mono text-gray-600 uppercase font-bold group-hover:text-blue-600 transition-colors">{asset.assets_Name}</td>
                                                 <td className="px-5 py-3 text-right">
-                                                    <button className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95 uppercase tracking-widest border-none">SELECT</button>
+                                                    <button className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[3px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95 uppercase tracking-widest border-none">SELECT</button>
                                                 </td>
                                             </tr>
                                         ))}
@@ -516,7 +516,7 @@ const FixedAssetsBoard = ({ isOpen, onClose }) => {
                     <div className="absolute inset-0 bg-slate-900/30 backdrop-blur-sm" onClick={() => setShowAccountSearch(false)} />
  <div className="relative w-full max-w-2xl bg-white shadow-2xl rounded-sm overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
                         {/* Header */}
-                        <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-100 select-none relative overflow-hidden">
+                        <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-200 select-none relative overflow-hidden">
                             {/* System Color Left Accent */}
                             <div 
                                 className="absolute left-0 top-0 bottom-0 w-1.5 transition-colors duration-500" 
@@ -536,7 +536,7 @@ const FixedAssetsBoard = ({ isOpen, onClose }) => {
                         </div>
 
                         {/* Search Input Area */}
-                        <div className="p-3 bg-slate-50 border-b border-gray-100 flex items-center justify-between">
+                        <div className="p-3 bg-slate-50 border-b border-gray-200 flex items-center justify-between">
                             <div className="flex items-center gap-2">
                                 <Search size={14} className="text-gray-400" />
                                 <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest text-center">Search Facility</span>
@@ -544,14 +544,14 @@ const FixedAssetsBoard = ({ isOpen, onClose }) => {
                             <input 
                                 type="text" 
                                 placeholder="Find by Account Name or Code..." 
-                                className="h-9 border border-slate-200 px-3 text-xs rounded-md w-72 focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 outline-none shadow-sm transition-all" 
+                                className="h-9 border border-slate-200 px-3 text-xs rounded-[3px] w-72 focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 outline-none shadow-sm transition-all" 
                                 value={accSearchQuery} 
                                 onChange={(e) => setAccSearchQuery(e.target.value)} 
                             />
                         </div>
 
                         {/* Results List */}
-                        <div className="border border-gray-100 overflow-hidden bg-white">
+                        <div className="border border-gray-200 overflow-hidden bg-white">
                             <div className="max-h-[400px] overflow-y-auto custom-scrollbar">
                                 <table className="w-full text-left border-collapse">
                                     <thead className="bg-[#f8fafd] text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-slate-200 sticky top-0 z-10">
@@ -571,7 +571,7 @@ const FixedAssetsBoard = ({ isOpen, onClose }) => {
                                                 <td className="px-5 py-3 font-mono text-[13px] text-gray-600">{acc.code}</td>
                                                 <td className="px-5 py-3 text-[13px] font-mono text-gray-600 uppercase font-bold group-hover:text-blue-600 transition-colors">{acc.name}</td>
                                                 <td className="px-5 py-3 text-right">
-                                                    <button className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95 uppercase tracking-widest border-none">SELECT</button>
+                                                    <button className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[3px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95 uppercase tracking-widest border-none">SELECT</button>
                                                 </td>
                                             </tr>
                                         ))}

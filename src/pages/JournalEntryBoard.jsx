@@ -14,69 +14,60 @@ import { getSessionData } from '../utils/session';
 
 import * as XLSX from 'xlsx';
 import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
-
-
+import TransactionFormWrapper from '../components/TransactionFormWrapper';
 
 const SearchModal = ({ isOpen, onClose, title, items, onSelect, searchPlaceholder = "Find record by legal name or code..." }) => {
     const [query, setQuery] = useState('');
-    const filtered = (items || []).filter(item => 
-        item.name?.toLowerCase().includes(query.toLowerCase()) || 
+    const filtered = (items || []).filter(item =>
+        item.name?.toLowerCase().includes(query.toLowerCase()) ||
         item.code?.toLowerCase().includes(query.toLowerCase())
     );
 
     if (!isOpen) return null;
 
     return (
-        <SimpleModal isOpen={isOpen} onClose={onClose} title={title} maxWidth="max-w-[600px]">
-            <div className="space-y-4 font-['Tahoma']">
-                {/* Search Facility Wrapper */}
-                <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-lg border border-gray-100 mb-2">
-                    <span className="text-[12px] font-bold text-gray-500 uppercase tracking-widest shrink-0">Search Facility</span>
-                    <div className="relative flex-1">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
+        <SimpleModal isOpen={isOpen} onClose={onClose} title={title}>
+            <div className="space-y-4">
+                <div className="p-4 bg-slate-50 border-b border-gray-200">
+                    <div className="relative">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
                         <input
                             type="text"
                             placeholder={searchPlaceholder}
-                            className="w-full h-9 pl-10 pr-4 border border-gray-300 rounded-[5px] outline-none text-sm focus:border-[#0285fd] bg-white shadow-sm"
+                            className="w-full h-10 pl-10 pr-4 border border-gray-300 rounded-[3px] outline-none text-[13px] focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] shadow-sm bg-white"
                             value={query}
                             onChange={(e) => setQuery(e.target.value)}
                             autoFocus
                         />
                     </div>
                 </div>
-
-                {/* Table Section */}
                 <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm">
                     <div className="max-h-[400px] overflow-y-auto no-scrollbar">
                         <table className="w-full text-left">
-                            <thead className="bg-[#f8fafd] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">
+                            <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 shadow-sm z-10">
                                 <tr>
-                                    <th className="px-5 py-3 w-32">Identifier</th>
-                                    <th className="px-5 py-3">Credential / Name</th>
-                                    <th className="px-5 py-3 text-right">Action</th>
+                                    <th className=" px-5 py-3">Code</th>
+                                    <th className=" px-5 py-3">Name</th>
+                                    <th className="text-right px-5 py-3">Action</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-gray-50">
+                            <tbody className="divide-y divide-gray-100">
                                 {filtered.length === 0 ? (
                                     <tr>
-                                        <td colSpan="3" className="py-20 text-center text-gray-300 font-bold uppercase tracking-widest text-[10px]">
-                                            No matching records discovered
+                                        <td colSpan="3" className="text-center py-16 text-gray-400 text-[11px] font-bold uppercase tracking-widest">
+                                            No matching records found
                                         </td>
                                     </tr>
                                 ) : filtered.map((item, idx) => (
-                                    <tr 
-                                        key={idx} 
-                                        className="group hover:bg-blue-50/50 cursor-pointer transition-all" 
+                                    <tr
+                                        key={idx}
+                                        className="group hover:bg-blue-50/50  transition-all cursor-pointer group border-b border-gray-50"
                                         onClick={() => { onSelect(item); onClose(); }}
                                     >
-                                        <td className="px-5 py-3 font-mono text-[12px] text-gray-700">{item.code}</td>
-                                        <td className="px-5 py-3 text-[12px] font-mono text-gray-700 uppercase group-hover:text-blue-600 transition-colors">
-                                            {item.name}
-                                        </td>
-                                        <td className="px-5 py-3 text-right">
-                                            <button className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95 border-none uppercase">
-                                                SELECT
-                                            </button>
+                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{item.code}</td>
+                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{item.name}</td>
+                                        <td className="text-right px-5 py-3">
+                                            <button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button>
                                         </td>
                                     </tr>
                                 ))}
@@ -122,7 +113,7 @@ const JournalEntryBoard = ({ isOpen, onClose, onComplete }) => {
         memo: '',
         vendId: '',
         vendName: '',
-        drMode: true    // true = Debit active, false = Credit active
+        drMode: true
     });
 
     const [selectedDateRange, setSelectedDateRange] = useState({ code: '11', name: 'Today' });
@@ -160,7 +151,6 @@ const JournalEntryBoard = ({ isOpen, onClose, onComplete }) => {
             });
 
             const docs = await journalService.generateDocNo(compCode);
-            console.log("Journal Docs Response:", docs);
 
             if (!docs.docNo) {
                 showErrorToast("System failed to generate a Journal Number. Please check database registry.");
@@ -174,7 +164,6 @@ const JournalEntryBoard = ({ isOpen, onClose, onComplete }) => {
                 lastEntryNo: docs.nextEntry ? (parseInt(docs.nextEntry) - 1).toString() : prev.lastEntryNo
             }));
 
-            // Default cost center if only one
             if (lks.costCenters.length === 1) {
                 setCurrentLine(prev => ({
                     ...prev,
@@ -197,7 +186,6 @@ const JournalEntryBoard = ({ isOpen, onClose, onComplete }) => {
 
     const handleDateRangeSelect = (item) => {
         setSelectedDateRange(item);
-        // In a real app, this would trigger a re-fetch with the date filter
         loadHistory();
     };
 
@@ -278,50 +266,42 @@ const JournalEntryBoard = ({ isOpen, onClose, onComplete }) => {
         }));
     };
 
-    // ── Excel Template Download ──────────────────────────────────────
     const fileInputRef = useRef(null);
 
     const handleDownloadTemplate = useCallback(() => {
         const wb = XLSX.utils.book_new();
 
-        // ── Sheet 1: Journal Entry Template (input sheet) ──────────────
         const entryHeaders = [['Account Code', 'Account Name', 'Cost Center', 'Debit', 'Credit', 'Memo']];
         const emptyRows = Array.from({ length: 20 }, () => ['', '', '', 0, 0, '']);
         const entryData = [...entryHeaders, ...emptyRows];
         const wsEntry = XLSX.utils.aoa_to_sheet(entryData);
 
-        // Column widths
         wsEntry['!cols'] = [
-            { wch: 16 }, // Account Code
-            { wch: 35 }, // Account Name
-            { wch: 22 }, // Cost Center
-            { wch: 14 }, // Debit
-            { wch: 14 }, // Credit
-            { wch: 35 }, // Memo
+            { wch: 16 },
+            { wch: 35 },
+            { wch: 22 },
+            { wch: 14 },
+            { wch: 14 },
+            { wch: 35 },
         ];
         XLSX.utils.book_append_sheet(wb, wsEntry, 'Journal_Entries');
 
-        // ── Sheet 2: Account Directory (reference) ──────────────────────
         const accHeaders = [['Account Code', 'Account Name']];
         const accRows = (lookups.accounts || []).map(a => [a.code, a.name]);
         const wsAcc = XLSX.utils.aoa_to_sheet([...accHeaders, ...accRows]);
         wsAcc['!cols'] = [{ wch: 18 }, { wch: 45 }];
         XLSX.utils.book_append_sheet(wb, wsAcc, 'Account_Directory');
 
-        // ── Sheet 3: Cost Centers (reference) ───────────────────────────
         const ccHeaders = [['Cost Center Code', 'Cost Center Name']];
         const ccRows = (lookups.costCenters || []).map(c => [c.code, c.name]);
         const wsCC = XLSX.utils.aoa_to_sheet([...ccHeaders, ...ccRows]);
         wsCC['!cols'] = [{ wch: 18 }, { wch: 35 }];
         XLSX.utils.book_append_sheet(wb, wsCC, 'Cost_Centers');
 
-        // Save and download
         XLSX.writeFile(wb, `JNL_Template_${header.docNo}.xlsx`);
         showSuccessToast(`Template downloaded with ${lookups.accounts.length} accounts & ${lookups.costCenters.length} cost centers. See reference sheets inside.`);
     }, [lookups.accounts, lookups.costCenters, header.docNo]);
 
-
-    // ── Load Excel / CSV ─────────────────────────────────────────────
     const [isLoadingExcel, setIsLoadingExcel] = useState(false);
 
     const handleLoadExcel = useCallback(async (e) => {
@@ -335,11 +315,9 @@ const JournalEntryBoard = ({ isOpen, onClose, onComplete }) => {
 
         setIsLoadingExcel(true);
         try {
-            // ── Parse the file ──────────────────────────────────────────
             const buffer = await file.arrayBuffer();
             const workbook = XLSX.read(buffer, { type: 'array' });
 
-            // Always use the FIRST sheet (Journal_Entries in our template)
             const sheetName = workbook.SheetNames[0];
             const worksheet = workbook.Sheets[sheetName];
             const rows = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: '' });
@@ -348,144 +326,154 @@ const JournalEntryBoard = ({ isOpen, onClose, onComplete }) => {
                 return showErrorToast('File has no data rows. Fill in the Journal_Entries sheet and try again.');
             }
 
-            // ── Parse rows with carry-forward account logic ───────────────
-            // If a row has debit/credit/memo but no account, it inherits
-            // the account from the last row that had one (like Excel fill-down).
-            const dataRows = [];
-            let lastAccId = '';
-            let lastAccName = '';
-            let lastCostCenterInput = '';
+            const headers = rows[0];
+            const accCodeIdx = headers.findIndex(h => /account.*code|code/i.test(String(h)));
+            const accNameIdx = headers.findIndex(h => /account.*name|name/i.test(String(h)));
+            const costCenterIdx = headers.findIndex(h => /cost.*center|strategic|unit/i.test(String(h)));
+            const debitIdx = headers.findIndex(h => /debit|dr/i.test(String(h)));
+            const creditIdx = headers.findIndex(h => /credit|cr/i.test(String(h)));
+            const memoIdx = headers.findIndex(h => /memo|narrative|notes/i.test(String(h)));
 
-            for (let i = 1; i < rows.length; i++) {
-                const cols = rows[i];
-                const rawAccId   = String(cols[0] || '').trim();
-                const rawAccName = String(cols[1] || '').trim();
-                const rawCC      = String(cols[2] || '').trim();
-                const debit      = parseFloat(cols[3]) || 0;
-                const credit     = parseFloat(cols[4]) || 0;
-                const memo       = String(cols[5] || '').trim();
-
-                // Completely blank row — stop processing (end of data)
-                if (!rawAccId && !rawAccName && debit === 0 && credit === 0 && !memo) continue;
-
-                // Update carry-forward values when a new account is provided
-                if (rawAccId)   lastAccId = rawAccId;
-                if (rawAccName) lastAccName = rawAccName;
-                if (rawCC)      lastCostCenterInput = rawCC;
-
-                // Use carried-forward account if current row has none
-                const accId   = lastAccId;
-                const accName = lastAccName;
-                const costCenterInput = lastCostCenterInput;
-
-                // Skip if still no account available (nothing to carry forward yet)
-                if (!accId || !accName) continue;
-
-                dataRows.push({ accId, accName, costCenterInput, debit, credit, memo });
-            }
-
+            const dataRows = rows.slice(1).filter(row => row[accCodeIdx] || row[accNameIdx]);
             if (dataRows.length === 0) {
-                return showErrorToast('No valid rows found. Ensure at least the first data row has Account Code and Account Name.');
+                return showErrorToast('No valid data rows found. Ensure the file has account codes or names in the first column.');
             }
 
+            const successLines = [];
+            const errorLines = [];
 
-            // ── Clear existing temp entries FIRST (C# DELETE equivalent) ──
-            await journalService.clearTemp(header.docNo, companyCode);
-            setTempEntries([]);
+            for (let i = 0; i < dataRows.length; i++) {
+                const row = dataRows[i];
+                const rawAccCode = String(row[accCodeIdx] || '').trim();
+                const rawAccName = String(row[accNameIdx] || '').trim();
+                const rawCC = String(row[costCenterIdx] || '').trim();
+                const rawDebit = parseFloat(row[debitIdx]) || 0;
+                const rawCredit = parseFloat(row[creditIdx]) || 0;
+                const rawMemo = String(row[memoIdx] || '').trim();
 
-            // ── Load each validated row ─────────────────────────────────
-            let lastEntries = [];
-            for (const row of dataRows) {
-                const { accId, accName: excelAccName, costCenterInput, debit, credit, memo } = row;
+                let accCode = rawAccCode;
+                let accName = rawAccName;
 
-                // Look up the real account name from the DB lookup by account code
-                const accMatch = lookups.accounts.find(
-                    a => a.code?.toString().trim().toLowerCase() === accId.toLowerCase()
-                );
-                const accName = accMatch?.name || excelAccName;
+                if (!accCode && accName) {
+                    const match = lookups.accounts.find(a => a.name.toLowerCase() === accName.toLowerCase());
+                    if (match) accCode = match.code;
+                }
 
-                // Resolve cost center: exact code → exact name → numeric-padded match → first
-                const ccMatch = lookups.costCenters.find(
-                    c => c.code?.toLowerCase() === costCenterInput.toLowerCase() ||
-                         c.name?.toLowerCase() === costCenterInput.toLowerCase() ||
-                         // Handle "2" matching "002" — strip leading zeros for comparison
-                         c.code?.replace(/^0+/, '') === costCenterInput.replace(/^0+/, '')
-                );
-                const costCenter = ccMatch?.code || (lookups.costCenters[0]?.code || '');
-                const costCenterName = ccMatch?.name || (lookups.costCenters[0]?.name || costCenterInput);
+                if (!accCode && !accName) {
+                    errorLines.push(`Row ${i + 1}: No account identifier`);
+                    continue;
+                }
 
-                const res = await journalService.addTempEntry({
-                    accId, accName, costCenter, costCenterName,
-                    debit, credit, memo,
-                    vendId: '', vendName: '',
+                if (!accName && accCode) {
+                    const match = lookups.accounts.find(a => a.code === accCode);
+                    if (match) accName = match.name;
+                }
+
+                let costCenterCode = rawCC;
+                let costCenterName = rawCC;
+                if (rawCC) {
+                    const ccMatch = lookups.costCenters.find(c => c.code === rawCC || c.name === rawCC);
+                    if (ccMatch) {
+                        costCenterCode = ccMatch.code;
+                        costCenterName = ccMatch.name;
+                    }
+                }
+
+                const payload = {
+                    accId: accCode,
+                    accName: accName,
+                    costCenter: costCenterCode,
+                    costCenterName: costCenterName,
+                    debit: rawDebit,
+                    credit: rawCredit,
+                    memo: rawMemo,
+                    vendId: '',
+                    vendName: '',
                     docNo: header.docNo,
                     entryNo: header.entryNo,
                     date: header.date,
                     company: companyCode,
                     createUser: currentUser,
-                    type: '',
                     drNote: header.debitNote,
-                    idNo: 0, reconcileDate: '', reconcileDocNo: '', tempIdNo: 0, balance: 0
-                });
-                lastEntries = res;
+                    type: '', idNo: 0, reconcileDate: '', reconcileDocNo: '', tempIdNo: 0, balance: 0
+                };
+
+                try {
+                    const res = await journalService.addTempEntry(payload);
+                    if (res && Array.isArray(res)) {
+                        successLines.push(res);
+                    }
+                } catch (err) {
+                    errorLines.push(`Row ${i + 1}: ${err.message || 'API error'}`);
+                }
             }
 
+            if (successLines.length > 0) {
+                const latest = successLines[successLines.length - 1];
+                setTempEntries(Array.isArray(latest) ? latest : []);
+                showSuccessToast(`${successLines.length} line(s) imported.${errorLines.length > 0 ? ` ${errorLines.length} error(s).` : ''}`);
+            } else if (errorLines.length > 0) {
+                showErrorToast(`Import failed: ${errorLines[0]}`);
+            } else {
+                showErrorToast('No lines could be imported. Check file format.');
+            }
 
-            setTempEntries(lastEntries);
-            showSuccessToast(`${dataRows.length} row(s) loaded from Excel successfully.`);
-
-        } catch (err) {
-            showErrorToast(`Failed to load file: ${err.message}`);
+            resetLine();
+        } catch (error) {
+            showErrorToast(`File read error: ${error.message}`);
         } finally {
             setIsLoadingExcel(false);
         }
-    }, [header, companyCode, currentUser, lookups.costCenters]);
+    }, [header, companyCode, currentUser, lookups]);
 
     const handleLoadEditJournal = async (journalObj) => {
         try {
             setLoading(true);
-            const res = await journalService.loadForEdit({
+            setHeader(prev => ({ ...prev, editSaved: true }));
+            const data = await journalService.loadForEdit({
                 docNo: journalObj.docNo,
-                entryNo: header.entryNo,
                 company: companyCode,
-                user: currentUser
+                createUser: currentUser
             });
-            
-            setTempEntries(res);
             setHeader(prev => ({
                 ...prev,
-                docNo: journalObj.docNo,
-                date: journalObj.date ? journalObj.date.split('T')[0] : prev.date
+                docNo: data.docNo || journalObj.docNo,
+                entryNo: data.entryNo || '',
+                date: data.date || journalObj.date,
+                lastEntryNo: data.lastEntryNo || prev.lastEntryNo
             }));
-            
-            showSuccessToast(`Journal ${journalObj.docNo} loaded for editing`);
+            setTempEntries(data.entries || data.lines || []);
+            showSuccessToast(`Loaded journal ${journalObj.docNo} for editing`);
             setActiveModal(null);
-        } catch (err) {
-            showErrorToast(`Failed to load journal: ${err.message || err}`);
+        } catch (error) {
+            showErrorToast("Failed to load journal for editing");
         } finally {
             setLoading(false);
         }
     };
 
     const handleSave = async () => {
-        if (tempEntries.length === 0) return showErrorToast("No entries to save.");
+        if (tempEntries.length === 0) return showErrorToast("No lines to save.");
         if (totalDebit !== totalCredit) return showErrorToast("Journal is not balanced!");
 
         try {
             setLoading(true);
-            const res = await journalService.applyJournal({
+            await journalService.applyJournal({
                 docNo: header.docNo,
-                date: header.date,
                 entryNo: header.entryNo,
+                date: header.date,
                 company: companyCode,
                 createUser: currentUser,
-                reclUpdate: header.reconcileUpdate
+                editSaved: header.editSaved,
+                debitNote: header.debitNote
             });
-            showSuccessToast(`Successfully Saved as ${res.orgDocNo}`);
-            if (onComplete) onComplete(res);
+            showSuccessToast('Journal entry saved successfully!');
+            setHeader(getInitialHeader());
+            setTempEntries([]);
+            if (onComplete) onComplete();
             onClose();
         } catch (error) {
-            showErrorToast(error.toString());
+            showErrorToast(error.message || 'Failed to save journal entry');
         } finally {
             setLoading(false);
         }
@@ -497,37 +485,29 @@ const JournalEntryBoard = ({ isOpen, onClose, onComplete }) => {
 
     return (
         <>
-            <style>
-                {`
-                    @keyframes toastProgress {
-                        0% { width: 100%; }
-                        100% { width: 0%; }
-                    }
-                `}
-            </style>
-            <SimpleModal
+            <style>{`@keyframes toastProgress{0%{width:100%}100%{width:0%}}`}</style>
+            <TransactionFormWrapper subtitle="Transaction Management" icon={FileText}
                 isOpen={isOpen}
                 onClose={onClose}
-                title="General Journal Entries"
-                maxWidth="max-w-[1100px]"
+                title="Journal Entry"
                 footer={
                     <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-slate-200 rounded-b-[5px]">
                         <div className="flex gap-4">
                             <button
                                 onClick={async () => {
-                                    if(header.docNo) {
+                                    if (header.docNo) {
                                         await journalService.clearTemp(header.docNo, companyCode);
                                     }
-                                    setTempEntries([]); 
-                                    resetLine(); 
+                                    setTempEntries([]);
+                                    resetLine();
                                 }}
-                                className="px-6 h-10 bg-[#00adff] text-white text-[13px] font-mono font-bold tracking-widest uppercase rounded-[5px] hover:bg-[#0099e6] transition-all flex items-center gap-2 border-none active:scale-95 shadow-md shadow-blue-100"
+                                className="px-6 py-2 border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center gap-2"
                             >
                                 <RotateCcw size={14} /> CLEAR
                             </button>
                             <button
                                 onClick={() => setActiveModal('history')}
-                                className="px-6 h-10 bg-white text-blue-600 border border-blue-200 text-[13px] font-mono font-bold tracking-widest uppercase rounded-[5px] hover:bg-blue-50 transition-all active:scale-95 flex items-center gap-2"
+                                className="px-6 py-2 border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center gap-2"
                             >
                                 <History size={14} /> JOURNAL
                             </button>
@@ -536,7 +516,7 @@ const JournalEntryBoard = ({ isOpen, onClose, onComplete }) => {
                             <button
                                 onClick={handleSave}
                                 disabled={loading || tempEntries.length === 0 || totalDebit !== totalCredit}
-                                className={`px-10 h-10 bg-[#2bb744] text-white text-[13px] font-mono font-bold tracking-widest uppercase rounded-[5px] shadow-md shadow-green-100 hover:bg-[#259b3a] transition-all flex items-center gap-2 active:scale-95 border-none ${loading || tempEntries.length === 0 || totalDebit !== totalCredit ? 'opacity-50 grayscale cursor-not-allowed' : ''}`}
+                                className={`px-6 py-2 bg-[#0285fd] hover:bg-[#0073ff] text-white font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center gap-2 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                             >
                                 {loading ? <Loader2 size={14} className="animate-spin" /> : <CheckCircle2 size={14} />} APPLY
                             </button>
@@ -544,22 +524,22 @@ const JournalEntryBoard = ({ isOpen, onClose, onComplete }) => {
                     </div>
                 }
             >
-                <div className="space-y-4 font-['Tahoma'] p-0.5 overflow-y-auto no-scrollbar">
+                <div className="space-y-4 overflow-y-auto no-scrollbar">
 
-                    {/* Excel Utilities & Mode Selection - Unified Top Bar */}
-                    <div className="flex items-center justify-between px-1">
-                        <div className="flex items-center gap-4">
+                    {/* Excel Utilities & Mode Selection */}
+                    <div className="flex items-center justify-between">
+                        <div>
                             <label className="flex items-center gap-2 cursor-pointer group">
                                 <input
                                     type="checkbox"
                                     checked={header.editSaved}
                                     onChange={e => setHeader(prev => ({ ...prev, editSaved: e.target.checked }))}
-                                    className="w-4 h-4 rounded text-[#00D1FF] focus:ring-[#00D1FF] border-slate-300 transition-all cursor-pointer"
+                                    className="w-4 h-4 rounded border-gray-300 text-[#0285fd] focus:ring-[#0285fd] cursor-pointer"
                                 />
-                                <span className="text-[11px] font-bold uppercase tracking-widest text-gray-500 group-hover:text-[#00D1FF] transition-colors">Edit Mode</span>
+                                <span className="text-[11px] font-bold uppercase tracking-widest text-gray-500 group-hover:text-[#0285fd] transition-colors">Edit Mode</span>
                             </label>
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex gap-2">
                             <input
                                 ref={fileInputRef}
                                 type="file"
@@ -569,14 +549,14 @@ const JournalEntryBoard = ({ isOpen, onClose, onComplete }) => {
                             />
                             <button
                                 onClick={handleDownloadTemplate}
-                                className="h-8 px-4 bg-white text-emerald-600 border border-emerald-500 text-[10px] font-black rounded-[5px] hover:bg-emerald-50 transition-all flex items-center gap-2 uppercase active:scale-95 shadow-sm"
+                                className="h-8 px-4 bg-white text-emerald-600 border border-emerald-500 text-[10px] font-bold rounded-[3px] hover:bg-emerald-50 transition-all flex items-center gap-2 uppercase shadow-sm"
                             >
                                 <FileDown size={14} /> TEMPLATE
                             </button>
                             <button
                                 onClick={() => fileInputRef.current?.click()}
                                 disabled={isLoadingExcel}
-                                className="h-8 px-4 bg-white text-blue-600 border border-blue-500 text-[10px] font-black rounded-[5px] hover:bg-blue-50 transition-all flex items-center gap-2 uppercase active:scale-95 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="h-8 px-4 bg-white text-blue-600 border border-blue-500 text-[10px] font-bold rounded-[3px] hover:bg-blue-50 transition-all flex items-center gap-2 uppercase shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 {isLoadingExcel ? <Loader2 size={14} className="animate-spin" /> : <FileUp size={14} />}
                                 {isLoadingExcel ? 'LOADING...' : 'LOAD EXCEL'}
@@ -584,51 +564,46 @@ const JournalEntryBoard = ({ isOpen, onClose, onComplete }) => {
                         </div>
                     </div>
 
-                    {/* Document Header - PO Board Style */}
-                    <div className="bg-white p-4 border border-slate-200 rounded-[5px] shadow-sm">
+                    {/* Document Header */}
+                    <div className="bg-white p-4 border border-slate-200 rounded-[3px] space-y-4">
                         <div className="grid grid-cols-12 gap-x-6 gap-y-3.5">
 
-                            {/* Entry No */}
-                            <div className="col-span-3 flex items-center gap-2">
-                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Entry No</label>
+                            <div className="col-span-3">
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Entry No</label>
                                 <input
                                     type="text"
                                     value={header.entryNo}
                                     onChange={e => setHeader({ ...header, entryNo: e.target.value })}
-                                    className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-bold text-blue-600 bg-slate-50 rounded outline-none transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 shadow-sm"
+                                    className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700"
                                 />
                             </div>
 
-                            {/* Post Date */}
-                            <div className="col-span-3 flex items-center gap-2">
-                                <label className="text-[11px] font-bold text-gray-500 uppercase shrink-0">Post Date</label>
-                                <div className="flex-1 flex gap-1 h-8 min-w-0">
+                            <div className="col-span-3">
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Post Date</label>
+                                <div className="relative">
                                     <input
-                                        type="text"
-                                        readOnly
+                                        type="text" readOnly
                                         value={header.date}
                                         onClick={() => setShowDatePicker(true)}
-                                        className="flex-1 min-w-28 h-full border border-slate-200 rounded px-3 text-[12px] outline-none bg-white text-gray-700 font-bold cursor-pointer transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 shadow-sm"
+                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700"
                                     />
-                                    <button onClick={() => setShowDatePicker(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
+                                    <button onClick={() => setShowDatePicker(true)} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
                                         <Calendar size={16} />
                                     </button>
                                 </div>
                             </div>
 
-                            {/* Last Entry */}
-                            <div className="col-span-3 flex items-center gap-2">
-                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Last Entry</label>
-                                <div className="flex-1 h-8 bg-red-50/50 border border-red-100 rounded-[5px] flex items-center justify-center font-mono text-[13px] font-black text-red-500 shadow-inner">
+                            <div className="col-span-3">
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Last Entry</label>
+                                <div className="w-full h-10 border border-gray-300 rounded-[3px] px-3 flex items-center bg-red-50/50 border-red-200 text-[14px] font-bold font-mono text-red-500">
                                     {String(header.lastEntryNo || '0').padStart(5, '0')}
                                 </div>
                             </div>
 
-                            {/* System Doc */}
-                            <div className="col-span-3 flex items-center gap-2">
-                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">System Doc</label>
+                            <div className="col-span-3">
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">System Doc</label>
                                 {header.editSaved ? (
-                                    <div className="flex-1 flex gap-1 h-8 min-w-0">
+                                    <div className="relative">
                                         <input
                                             type="text"
                                             value={header.docNo}
@@ -637,14 +612,14 @@ const JournalEntryBoard = ({ isOpen, onClose, onComplete }) => {
                                                 if (e.key === 'Enter') handleLoadEditJournal({ docNo: header.docNo });
                                             }}
                                             placeholder="Doc No"
-                                            className="flex-1 min-w-0 h-full border border-slate-200 px-3 text-[12px] font-bold text-blue-600 bg-white rounded outline-none transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 shadow-sm"
+                                            className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] pr-10 text-gray-700"
                                         />
-                                        <button onClick={() => setActiveModal('history')} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
+                                        <button onClick={() => setActiveModal('history')} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
                                             <Search size={16} />
                                         </button>
                                     </div>
                                 ) : (
-                                    <div className="flex-1 h-8 border border-slate-200 px-3 text-[11px] font-mono font-bold text-blue-500 bg-slate-50 rounded-[5px] flex items-center overflow-hidden shadow-sm">
+                                    <div className="w-full h-10 border border-gray-300 rounded-[3px] px-3 flex items-center text-[14px] font-bold font-mono text-blue-600">
                                         <span className="truncate">{header.docNo}</span>
                                     </div>
                                 )}
@@ -652,119 +627,111 @@ const JournalEntryBoard = ({ isOpen, onClose, onComplete }) => {
                         </div>
                     </div>
 
-                    {/* Line Entry Section - PO Board Style */}
-                    <div className="bg-white p-4 border border-slate-200 rounded-[5px] shadow-sm">
+                    {/* Line Entry Section */}
+                    <div className="bg-white p-4 border border-slate-200 rounded-[3px] space-y-4">
                         <div className="grid grid-cols-12 gap-x-6 gap-y-3.5">
 
-                            {/* Ledger Account */}
-                            <div className="col-span-8 flex items-center gap-2">
-                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Ledger Account</label>
-                                <div className="flex-1 flex gap-1 h-8 min-w-0">
+                            <div className="col-span-8">
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Ledger Account</label>
+                                <div className="relative">
                                     <input
-                                        type="text"
-                                        readOnly
+                                        type="text" readOnly
                                         value={currentLine.accName}
-                                        placeholder=""
                                         onClick={() => setActiveModal('account')}
-                                        className="flex-1 min-w-0 h-full border border-slate-200 px-3 text-[12px] font-bold text-blue-600 bg-white rounded outline-none transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 shadow-sm cursor-pointer"
+                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700 truncate"
                                     />
-                                    <button onClick={() => setActiveModal('account')} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
+                                    <button onClick={() => setActiveModal('account')} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
                                         <Search size={16} />
                                     </button>
                                 </div>
                             </div>
 
-                            {/* Strategic Unit */}
-                            <div className="col-span-4 flex items-center gap-2">
-                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Strategic Unit</label>
-                                <div className="flex-1 flex gap-1 h-8 min-w-0">
+                            <div className="col-span-4">
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Strategic Unit</label>
+                                <div className="relative">
                                     <input
-                                        type="text"
-                                        readOnly
+                                        type="text" readOnly
                                         value={currentLine.costCenterName}
-                                        placeholder=""
                                         onClick={() => setActiveModal('costCenter')}
-                                        className="flex-1 min-w-0 h-full border border-slate-200 px-3 text-[12px] font-bold text-gray-700 bg-white rounded outline-none transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 shadow-sm cursor-pointer"
+                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700 truncate"
                                     />
-                                    <button onClick={() => setActiveModal('costCenter')} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
+                                    <button onClick={() => setActiveModal('costCenter')} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
                                         <Search size={16} />
                                     </button>
                                 </div>
                             </div>
 
-                            {/* Brief Memo - full width */}
-                            <div className="col-span-12 flex items-center gap-2">
-                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Brief Memo</label>
+                            <div className="col-span-12">
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Brief Memo</label>
                                 <input
                                     type="text"
                                     value={currentLine.memo}
                                     onChange={e => setCurrentLine({ ...currentLine, memo: e.target.value })}
-                                    placeholder=""
-                                    className="flex-1 min-w-0 h-8 border border-slate-200 rounded px-3 text-[12px] font-bold text-gray-700 outline-none transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 bg-white shadow-sm"
+                                    className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700"
                                 />
                             </div>
 
                             {/* Financials & Action */}
                             <div className="col-span-12 flex items-center justify-between border-t border-slate-100 pt-3">
                                 <div className="flex gap-5">
-                                    <div className="flex items-center gap-2">
-                                        <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Debit (DR)</label>
-                                        <div className="relative w-36">
+                                    <div>
+                                        <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Debit (DR)</label>
+                                        <div className="relative w-40">
                                             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-[10px]">Rs.</span>
                                             <input
                                                 type="number" step="0.01"
                                                 value={currentLine.debit}
                                                 disabled={!currentLine.drMode}
                                                 onChange={e => setCurrentLine({ ...currentLine, debit: e.target.value })}
-                                                className={`w-full h-8 border rounded pl-9 pr-3 text-[13px] font-black outline-none text-right shadow-sm transition-colors focus:ring-2 focus:ring-[#00D1FF]/20
+                                                className={`w-full h-10 border rounded-[3px] pl-9 pr-3 text-[14px] font-bold outline-none text-right
                                                     ${currentLine.drMode
-                                                        ? 'border-[#00D1FF] bg-white text-blue-600 focus:border-[#00D1FF]'
-                                                        : 'border-slate-200 bg-slate-50 text-gray-300 cursor-not-allowed'}`}
+                                                        ? 'border-gray-300 bg-white text-blue-600 focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd]'
+                                                        : 'border-gray-300 bg-gray-50 text-gray-300 cursor-not-allowed'}`}
                                             />
                                         </div>
                                     </div>
-                                    <div className="flex items-center gap-2">
-                                        <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Credit (CR)</label>
-                                        <div className="relative w-36">
+                                    <div>
+                                        <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Credit (CR)</label>
+                                        <div className="relative w-40">
                                             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-[10px]">Rs.</span>
                                             <input
                                                 type="number" step="0.01"
                                                 value={currentLine.credit}
                                                 disabled={currentLine.drMode}
                                                 onChange={e => setCurrentLine({ ...currentLine, credit: e.target.value })}
-                                                className={`w-full h-8 border rounded pl-9 pr-3 text-[13px] font-black outline-none text-right shadow-sm transition-colors focus:ring-2 focus:ring-red-400/20
+                                                className={`w-full h-10 border rounded-[3px] pl-9 pr-3 text-[14px] font-bold outline-none text-right
                                                     ${!currentLine.drMode
-                                                        ? 'border-red-400 bg-white text-red-600 focus:border-red-400'
-                                                        : 'border-slate-200 bg-slate-50 text-gray-300 cursor-not-allowed'}`}
+                                                        ? 'border-red-400 bg-white text-red-600 focus:border-red-400 focus:ring-1 focus:ring-red-400/30'
+                                                        : 'border-gray-300 bg-gray-50 text-gray-300 cursor-not-allowed'}`}
                                             />
                                         </div>
                                     </div>
                                 </div>
 
                                 <div className="flex items-center gap-3">
-                                    <div className="flex bg-slate-50 border border-slate-200 rounded-[5px] h-8 items-center px-3 gap-4 shadow-sm">
+                                    <div className="flex bg-gray-50 border border-gray-300 rounded-[3px] h-10 items-center px-3 gap-4">
                                         <label className="flex items-center gap-1.5 cursor-pointer group">
                                             <input
                                                 type="radio" name="drCrToggle"
                                                 checked={currentLine.drMode}
                                                 onChange={() => setCurrentLine({ ...currentLine, drMode: true, credit: '0.00' })}
-                                                className="w-3.5 h-3.5 text-[#00D1FF] focus:ring-[#00D1FF] border-slate-300 cursor-pointer"
+                                                className="w-3.5 h-3.5 text-[#0285fd] focus:ring-[#0285fd] border-gray-300 cursor-pointer"
                                             />
-                                            <span className={`text-[10px] font-black uppercase transition-colors group-hover:text-blue-500 ${currentLine.drMode ? 'text-[#00D1FF]' : 'text-gray-400'}`}>DR</span>
+                                            <span className={`text-[10px] font-bold uppercase transition-colors ${currentLine.drMode ? 'text-[#0285fd]' : 'text-gray-400'}`}>DR</span>
                                         </label>
                                         <label className="flex items-center gap-1.5 cursor-pointer group">
                                             <input
                                                 type="radio" name="drCrToggle"
                                                 checked={!currentLine.drMode}
                                                 onChange={() => setCurrentLine({ ...currentLine, drMode: false, debit: '0.00' })}
-                                                className="w-3.5 h-3.5 text-red-500 focus:ring-red-500 border-slate-300 cursor-pointer"
+                                                className="w-3.5 h-3.5 text-red-500 focus:ring-red-500 border-gray-300 cursor-pointer"
                                             />
-                                            <span className={`text-[10px] font-black uppercase transition-colors group-hover:text-red-400 ${!currentLine.drMode ? 'text-red-500' : 'text-gray-400'}`}>CR</span>
+                                            <span className={`text-[10px] font-bold uppercase transition-colors ${!currentLine.drMode ? 'text-red-500' : 'text-gray-400'}`}>CR</span>
                                         </label>
                                     </div>
                                     <button
                                         onClick={handleAddLine}
-                                        className="px-8 h-8 bg-[#0285fd] text-white text-[11px] font-black uppercase tracking-widest rounded-[5px] shadow-md shadow-blue-100 hover:bg-blue-600 transition-all flex items-center gap-2 active:scale-95 border-none"
+                                        className="h-10 px-6 bg-[#0285fd] text-white text-[13px] font-semibold rounded-[3px] shadow-sm hover:bg-[#0073ff] transition-all flex items-center gap-2"
                                     >
                                         <Plus size={16} strokeWidth={3} /> ADD RECORD
                                     </button>
@@ -773,44 +740,39 @@ const JournalEntryBoard = ({ isOpen, onClose, onComplete }) => {
                         </div>
                     </div>
 
-                    {/* Journal Grid Table - Controlled Height */}
-                    <div className="border border-slate-200 rounded-[5px] bg-white shadow-sm flex flex-col overflow-hidden">
-                        <div className="flex bg-slate-50 border-b border-slate-200 text-[10px] font-black text-gray-400 uppercase tracking-widest items-center sticky top-0 z-10">
-                            <div className="w-12 py-3 px-3 text-center">No</div>
-                            <div className="flex-1 py-3 px-4">Account Descriptor</div>
-                            <div className="w-32 py-3 px-4">Cost Center</div>
-                            <div className="w-36 py-3 px-4 text-right">Debit</div>
-                            <div className="w-36 py-3 px-4 text-right">Credit</div>
-                            <div className="flex-1 py-3 px-4">Narrative</div>
+                    {/* Journal Grid Table */}
+                    <div className="border border-slate-200 rounded-[3px] bg-white flex flex-col overflow-hidden">
+                        <div className="flex bg-slate-50 border-b border-slate-200 text-[10px] font-black text-gray-400 uppercase tracking-widest leading-10 items-center">
+                            <div className="w-12 px-3 text-center">No</div>
+                            <div className="flex-1 px-4">Account Descriptor</div>
+                            <div className="w-32 px-4">Cost Center</div>
+                            <div className="w-36 px-4 text-right">Debit</div>
+                            <div className="w-36 px-4 text-right">Credit</div>
+                            <div className="flex-1 px-4">Narrative</div>
                             <div className="w-9"></div>
                         </div>
                         <div className="bg-white overflow-y-auto max-h-[160px] divide-y divide-slate-100 no-scrollbar">
                             {tempEntries.length === 0 ? (
                                 <div className="h-20 flex items-center justify-center text-gray-300">
-                                    <span className="text-[11px] font-bold uppercase tracking-widest ">Queue is Empty</span>
+                                    <span className="text-[11px] font-bold uppercase tracking-widest">Queue is Empty</span>
                                 </div>
                             ) : tempEntries.map((entry, idx) => (
-                                <div key={idx} className="flex text-[11px] font-bold text-slate-700 hover:bg-slate-50 items-center transition-colors group">
-                                    <div className="w-12 py-2 px-3 text-center font-mono text-gray-400">{idx + 1}</div>
-                                    <div className="flex-1 py-2 px-4">
-                                        <div className="flex items-center gap-2">
-                                            <span className="text-blue-600 font-mono text-[10px]">{entry.acc_Id}</span>
-                                            <span className="truncate text-gray-700 group-hover:text-blue-600 transition-colors">{entry.acc_Name}</span>
-                                        </div>
+                                <div key={idx} className="flex text-[12px] hover:bg-gray-50 items-center transition-colors group">
+                                    <div className="w-12 px-3 py-2 text-center font-mono text-gray-400">{idx + 1}</div>
+                                    <div className="flex-1 px-4 py-2">
+                                        <span className="text-blue-600 font-mono text-[10px] font-bold">{entry.acc_Id} </span>
+                                        <span className="text-gray-700 group-hover:text-blue-600 transition-colors">{entry.acc_Name}</span>
                                     </div>
-                                    <div className="w-32 py-2 px-4 text-gray-400 truncate">{entry.costCenter}</div>
-                                    <div className="w-36 py-2 px-4 text-right font-mono font-black text-slate-800">
+                                    <div className="w-32 px-4 py-2 text-gray-400 truncate text-[11px]">{entry.costCenter}</div>
+                                    <div className="w-36 px-4 py-2 text-right font-mono font-bold text-slate-800">
                                         {entry.debit > 0 ? entry.debit.toLocaleString(undefined, { minimumFractionDigits: 2 }) : '-'}
                                     </div>
-                                    <div className="w-36 py-2 px-4 text-right font-mono font-black text-slate-800">
+                                    <div className="w-36 px-4 py-2 text-right font-mono font-bold text-slate-800">
                                         {entry.credit > 0 ? entry.credit.toLocaleString(undefined, { minimumFractionDigits: 2 }) : '-'}
                                     </div>
-                                    <div className="flex-1 py-2 px-4 truncate text-gray-500 font-mono text-[10px]">{entry.memo}</div>
+                                    <div className="flex-1 px-4 py-2 truncate text-gray-500 text-[11px]">{entry.memo}</div>
                                     <div className="w-9 flex justify-center">
-                                        <button
-                                            onClick={() => handleDeleteClick(entry)}
-                                            className="text-red-300 hover:text-red-500 p-1"
-                                        >
+                                        <button onClick={() => handleDeleteClick(entry)} className="text-red-300 hover:text-red-500 p-1">
                                             <Trash2 size={12} />
                                         </button>
                                     </div>
@@ -819,33 +781,30 @@ const JournalEntryBoard = ({ isOpen, onClose, onComplete }) => {
                         </div>
                     </div>
 
-                    {/* Summary & History Section - Compact Side-by-Side feel */}
-                    <div className="flex flex-col gap-3">
-                        <div className="flex justify-end pt-2">
-                            <div className="w-[420px] bg-white border border-slate-200 rounded-[5px] p-3.5 space-y-2.5 shadow-sm">
-                                <div className="flex items-center justify-between text-[11px] font-bold text-gray-500 uppercase tracking-tight">
-                                    <span>Aggregated Journal Totals</span>
-                                    <div className="flex gap-4 font-mono">
-                                        <span className="text-blue-600">DR: {totalDebit.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
-                                        <span className="text-red-600">CR: {totalCredit.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
-                                    </div>
-                                </div>
-                                <div className={`flex items-center justify-between px-3 py-2.5 rounded-[5px] border-2 transition-all ${difference === 0 ? 'bg-green-50/50 border-green-300 text-green-700' : 'bg-amber-50/50 border-amber-300 text-amber-700'}`}>
-                                    <span className="text-[12px] font-black uppercase tracking-widest">{difference === 0 ? 'BALANCED' : 'UNBALANCED'}</span>
-                                    <div className={`text-[20px] font-mono font-black ${difference === 0 ? 'text-green-600' : 'text-amber-600'}`}>Rs. {difference.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
+                    {/* Summary */}
+                    <div className="bg-white border border-slate-200 rounded-[3px] p-4">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-4">
+                                <span className="text-[13px] font-medium text-gray-700">Aggregated Journal Totals</span>
+                                <div className="flex gap-3 font-mono text-[13px] font-bold">
+                                    <span className="text-blue-600">DR: {totalDebit.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                                    <span className="text-red-600">CR: {totalCredit.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                                 </div>
                             </div>
+                            <div className={`flex items-center gap-4 px-4 py-2 rounded-[3px] border-2 transition-all ${difference === 0 ? 'bg-blue-50/50  text-blue-700' : 'bg-amber-50/50 border-amber-300 text-amber-700'}`}>
+                                <span className="text-[11px] font-bold uppercase tracking-widest">{difference === 0 ? 'BALANCED' : 'UNBALANCED'}</span>
+                                <div className={`text-[18px] font-mono font-bold ${difference === 0 ? 'text-blue-600' : 'text-amber-600'}`}>Rs. {difference.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
+                            </div>
                         </div>
-
                     </div>
                 </div>
-            </SimpleModal>
+            </TransactionFormWrapper>
 
             {/* History Modal */}
             {activeModal === 'history' && (
-                <HistoryArchiveModal 
-                    history={history} 
-                    onClose={() => setActiveModal(null)} 
+                <HistoryArchiveModal
+                    history={history}
+                    onClose={() => setActiveModal(null)}
                     onSelectDateRange={() => setActiveModal('dateRange')}
                     selectedDateRange={selectedDateRange}
                     isEditMode={header.editSaved}
@@ -898,7 +857,6 @@ const HistoryArchiveModal = ({ history, onClose, onSelectDateRange, selectedDate
     const [search, setSearch] = useState('');
     const [selectedJournal, setSelectedJournal] = useState(null);
 
-    // Group history by docNo
     const groupedHistory = useMemo(() => {
         const groups = {};
         history.forEach(item => {
@@ -919,7 +877,7 @@ const HistoryArchiveModal = ({ history, onClose, onSelectDateRange, selectedDate
         return Object.values(groups).sort((a, b) => b.docNo.localeCompare(a.docNo));
     }, [history]);
 
-    const filtered = groupedHistory.filter(h => 
+    const filtered = groupedHistory.filter(h =>
         h.docNo.toLowerCase().includes(search.toLowerCase()) ||
         h.memo?.toLowerCase().includes(search.toLowerCase()) ||
         h.lines.some(l => l.accName.toLowerCase().includes(search.toLowerCase()))
@@ -927,84 +885,74 @@ const HistoryArchiveModal = ({ history, onClose, onSelectDateRange, selectedDate
 
     return (
         <>
-            <SimpleModal
-                isOpen={true}
-                onClose={onClose}
-                title="HISTORICAL JOURNAL ARCHIVE"
-                maxWidth="max-w-5xl"
-                zoom={1}
-            >
-                <div className="space-y-4 font-['Tahoma']">
-                    {/* Search Facility Wrapper */}
-                    <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-lg border border-gray-100 mb-2">
-                        <span className="text-[12px] font-bold text-gray-500 uppercase tracking-widest shrink-0">Search Facility</span>
-                        <div className="relative flex-1">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
+            <SimpleModal isOpen={true} onClose={onClose} title="Historical Journal Archive">
+                <div className="space-y-4">
+                    <div className="p-4 bg-slate-50 border-b border-gray-200">
+                        <div className="relative">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
                             <input
                                 type="text"
                                 placeholder="Find journal by document number, account or narrative..."
-                                className="w-full h-9 pl-10 pr-4 border border-gray-300 rounded-[5px] outline-none text-sm focus:border-[#0285fd] bg-white shadow-sm"
+                                className="w-full h-10 pl-10 pr-4 border border-gray-300 rounded-[3px] outline-none text-[13px] focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] shadow-sm bg-white"
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
                                 autoFocus
                             />
                         </div>
                     </div>
-
-                    {/* Directory Table */}
                     <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm">
                         <div className="max-h-[450px] overflow-y-auto no-scrollbar">
                             <table className="w-full text-left">
-                                <thead className="bg-[#f8fafd] sticky top-0 z-20 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">
+                                <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 shadow-sm z-10">
                                     <tr>
-                                        <th className="px-5 py-3 w-40">Journal No</th>
-                                        <th className="px-5 py-3 w-32 text-center">Post Date</th>
-                                        <th className="px-5 py-3">General Narrative</th>
-                                        <th className="px-5 py-3 text-right w-40">Total Value</th>
-                                        <th className="px-5 py-3 text-center w-24">Entries</th>
-                                        <th className="px-5 py-3 text-right">Action</th>
+                                        <th className=" px-5 py-3">Journal No</th>
+                                        <th className="text-center px-5 py-3">Post Date</th>
+                                        <th className=" px-5 py-3">General Narrative</th>
+                                        <th className="text-right px-5 py-3">Total Value</th>
+                                        <th className="text-center px-5 py-3">Entries</th>
+                                        <th className="text-right px-5 py-3">Action</th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-gray-50">
+                                <tbody className="divide-y divide-gray-100">
                                     {filtered.length === 0 ? (
                                         <tr>
-                                            <td colSpan="6" className="py-24 text-center">
+                                            <td colSpan="6" className="text-center py-16 text-gray-400 text-[11px] font-bold uppercase tracking-widest">
                                                 <div className="flex flex-col items-center gap-4 opacity-30">
                                                     <FileText size={56} strokeWidth={1} className="text-slate-300" />
-                                                    <span className="text-[14px] font-black text-slate-400 uppercase tracking-[3px] italic">Archive Directory Empty</span>
+                                                    <span className="text-[14px] font-bold text-slate-400 uppercase tracking-[3px] italic">Archive Directory Empty</span>
                                                 </div>
                                             </td>
                                         </tr>
                                     ) : filtered.map((h, i) => (
-                                        <tr 
-                                            key={i} 
-                                            className="hover:bg-blue-50/50 transition-all cursor-pointer group"
+                                        <tr
+                                            key={i}
+                                            className="hover:bg-blue-50/50 transition-all  group cursor-pointer group border-b border-gray-50"
                                             onClick={() => setSelectedJournal(h)}
                                         >
-                                            <td className="px-5 py-4 font-mono text-[12px] text-blue-600 font-bold">{h.docNo}</td>
-                                            <td className="px-5 py-4 text-center text-[12px] font-mono text-gray-500">{h.date}</td>
-                                            <td className="px-5 py-4">
+                                            <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{h.docNo}</td>
+                                            <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{h.date}</td>
+                                            <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">
                                                 <div className="text-[11px] font-bold text-slate-800 uppercase group-hover:text-blue-700 transition-colors truncate max-w-xs">{h.memo || 'General Ledger Entry'}</div>
                                                 <div className="text-[10px] font-bold text-slate-400 mt-0.5 italic">Consolidated View</div>
                                             </td>
-                                            <td className="px-5 py-4 text-right font-mono text-[13px] font-black text-emerald-600 whitespace-nowrap">
+                                            <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">
                                                 Rs. {h.totalDebit.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                             </td>
-                                            <td className="px-5 py-4 text-center">
-                                                <span className="bg-slate-100 text-slate-500 text-[10px] font-black px-2 py-1 rounded-full">{h.lines.length} Lines</span>
+                                            <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">
+                                                <span className="bg-slate-100 text-slate-500 text-[10px] font-bold px-2 py-1 rounded-[3px]">{h.lines.length} Lines</span>
                                             </td>
-                                            <td className="px-5 py-4 text-right">
+                                            <td className="text-right px-5 py-3">
                                                 {isEditMode ? (
-                                                    <button 
+                                                    <button
                                                         onClick={(e) => { e.stopPropagation(); onEdit(h); }}
-                                                        className="bg-[#2bb744] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#259b3a] shadow-md transition-all active:scale-95 border-none uppercase tracking-widest"
+                                                        className="bg-[#0285fd] text-white text-[10px] px-4 py-1.5 rounded font-bold hover:bg-[#0073ff] transition-all uppercase"
                                                     >
                                                         EDIT
                                                     </button>
                                                 ) : (
-                                                    <button 
+                                                    <button
                                                         onClick={(e) => { e.stopPropagation(); setSelectedJournal(h); }}
-                                                        className="bg-[#0285fd] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#0073ff] shadow-md transition-all active:scale-95 border-none uppercase tracking-widest"
+                                                        className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase"
                                                     >
                                                         DETAILS
                                                     </button>
@@ -1019,11 +967,10 @@ const HistoryArchiveModal = ({ history, onClose, onSelectDateRange, selectedDate
                 </div>
             </SimpleModal>
 
-            {/* Details Modal */}
             {selectedJournal && (
-                <JournalDetailsModal 
-                    journal={selectedJournal} 
-                    onClose={() => setSelectedJournal(null)} 
+                <JournalDetailsModal
+                    journal={selectedJournal}
+                    onClose={() => setSelectedJournal(null)}
                 />
             )}
         </>
@@ -1032,68 +979,62 @@ const HistoryArchiveModal = ({ history, onClose, onSelectDateRange, selectedDate
 
 const JournalDetailsModal = ({ journal, onClose }) => {
     return (
-        <SimpleModal
-            isOpen={true}
-            onClose={onClose}
-            title={`JOURNAL DETAILS - ${journal.docNo}`}
-            maxWidth="max-w-4xl"
-            zoom={1.05}
-        >
-            <div className="space-y-6 font-['Tahoma'] p-1">
+        <SimpleModal isOpen={true} onClose={onClose} title={`Journal Details - ${journal.docNo}`}>
+            <div className="space-y-4 p-1">
                 {/* Header Summary */}
-                <div className="grid grid-cols-3 gap-4 bg-slate-50 p-4 rounded-xl border border-gray-100 shadow-inner">
+                <div className="grid grid-cols-3 gap-4 bg-slate-50 p-4 rounded-[3px] border border-gray-200">
                     <div className="space-y-1">
-                        <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Document No</span>
-                        <div className="text-[14px] font-black text-blue-600 font-mono tracking-tighter">{journal.docNo}</div>
+                        <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Document No</span>
+                        <div className="text-[14px] font-bold text-blue-600 font-mono">{journal.docNo}</div>
                     </div>
                     <div className="space-y-1 border-x border-gray-200 px-4">
-                        <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Post Date</span>
-                        <div className="text-[14px] font-black text-slate-700">{journal.date}</div>
+                        <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Post Date</span>
+                        <div className="text-[14px] font-bold text-slate-700">{journal.date}</div>
                     </div>
                     <div className="space-y-1 pl-4">
-                        <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Journal Status</span>
+                        <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Journal Status</span>
                         <div className="flex items-center gap-2">
-                            <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.3)]" />
-                            <span className="text-[11px] font-black text-emerald-600 uppercase tracking-widest">Post Confirmed</span>
+                            <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                            <span className="text-[11px] font-bold text-emerald-600 uppercase tracking-widest">Post Confirmed</span>
                         </div>
                     </div>
                 </div>
 
                 {/* Details Table */}
-                <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm bg-white">
+                <div className="border border-gray-200 rounded-[3px] overflow-hidden">
                     <table className="w-full text-left">
-                        <thead className="bg-[#f8fafd] text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">
+                        <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 shadow-sm z-10">
                             <tr>
-                                <th className="px-5 py-3">Account Descriptor</th>
-                                <th className="px-5 py-3">Narrative / Memo</th>
-                                <th className="px-5 py-3 text-right w-32">Debit (DR)</th>
-                                <th className="px-5 py-3 text-right w-32">Credit (CR)</th>
-                            </tr>
+                                <th className=" px-5 py-3">Account Descriptor</th>
+                                <th className=" px-5 py-3">Narrative / Memo</th>
+                                <th className="text-right px-5 py-3">Debit (DR)</th>
+                                <th className="text-right px-5 py-3">Credit (CR)</th>
+                            <th className="text-right px-5 py-3">Action</th></tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-50">
+                        <tbody className="divide-y divide-gray-100">
                             {journal.lines.map((line, idx) => (
-                                <tr key={idx} className="hover:bg-slate-50/50 transition-colors">
-                                    <td className="px-5 py-3">
+                                <tr key={idx} className="hover:bg-blue-50/50 transition-all cursor-pointer group border-b border-gray-50">
+                                    <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">
                                         <div className="text-[11px] font-bold text-slate-800 uppercase">{line.accName}</div>
                                         <div className="text-[10px] font-mono text-blue-500 mt-0.5">{line.accId}</div>
                                     </td>
-                                    <td className="px-5 py-3 text-[10px] text-slate-500 font-bold italic">{line.memo || '-'}</td>
-                                    <td className="px-5 py-3 text-right font-mono text-[12px] font-black text-slate-800">
+                                    <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{line.memo || '-'}</td>
+                                    <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">
                                         {line.debit > 0 ? line.debit.toLocaleString(undefined, { minimumFractionDigits: 2 }) : '-'}
                                     </td>
-                                    <td className="px-5 py-3 text-right font-mono text-[12px] font-black text-red-600">
+                                    <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">
                                         {line.credit > 0 ? line.credit.toLocaleString(undefined, { minimumFractionDigits: 2 }) : '-'}
                                     </td>
                                 </tr>
                             ))}
                         </tbody>
-                        <tfoot className="bg-slate-50/50 border-t-2 border-gray-100">
+                        <tfoot className="bg-slate-50/50 border-t-2 border-gray-200">
                             <tr>
-                                <td colSpan="2" className="px-5 py-3 text-[11px] font-black text-slate-600 uppercase tracking-widest text-right italic">Balance check verified</td>
-                                <td className="px-5 py-3 text-right font-mono text-[13px] font-black text-slate-800 bg-white border-x border-gray-100 shadow-sm">
+                                <td colSpan="2" className="text-center py-16 text-gray-400 text-[11px] font-bold uppercase tracking-widest">Balance check verified</td>
+                                <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">
                                     {journal.totalDebit.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                 </td>
-                                <td className="px-5 py-3 text-right font-mono text-[13px] font-black text-red-600 bg-white shadow-sm">
+                                <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">
                                     {journal.totalCredit.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                 </td>
                             </tr>
@@ -1101,11 +1042,10 @@ const JournalDetailsModal = ({ journal, onClose }) => {
                     </table>
                 </div>
 
-                {/* Footer Controls */}
                 <div className="flex justify-end pt-2">
                     <button
                         onClick={onClose}
-                        className="px-10 h-10 bg-slate-800 text-white text-[12px] font-black rounded-[5px] hover:bg-black transition-all active:scale-95 uppercase tracking-widest shadow-lg shadow-slate-200"
+                        className="px-6 py-2 bg-[#0285fd] text-white font-semibold rounded-[3px] shadow-sm text-[13px] hover:bg-[#0073ff] transition-all uppercase"
                     >
                         DONE
                     </button>

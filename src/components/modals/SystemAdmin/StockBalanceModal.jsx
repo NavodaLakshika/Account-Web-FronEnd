@@ -108,14 +108,14 @@ const StockBalanceModal = ({ isOpen, onClose }) => {
                 isOpen={isOpen}
                 onClose={() => !loading && onClose()}
                 title="Stock Balance Update"
-                maxWidth="max-w-[650px]"
+                maxWidth="max-w-[700px]"
                 showHeaderClose={!loading}
                 footer={
-                    <div className="bg-slate-50 px-5 py-3 w-full flex justify-between items-center border-t border-gray-100 rounded-b-xl font-['Tahoma']">
+                    <div className="bg-slate-50 px-5 py-3 w-full flex justify-between items-center border-t border-gray-200 rounded-b-xl font-['Tahoma']">
                         <button
                             onClick={handleClear}
                             disabled={loading}
-                            className="px-4 h-8 bg-[#00adff] text-white text-[12px] font-black rounded-[4px] hover:bg-[#0099e6] transition-all active:scale-95 flex items-center gap-2 border-none shadow-sm disabled:opacity-50"
+                            className="px-4 h-8 bg-white text-[#00adff] border-2 border-[#00adff] hover:bg-blue-50 text-[12px] font-black rounded-[4px] hover:bg-[#0099e6] transition-all active:scale-95 flex items-center gap-2 border-none shadow-sm disabled:opacity-50"
                         >
                             <RotateCcw size={12} /> CLEAR
                         </button>
@@ -123,7 +123,7 @@ const StockBalanceModal = ({ isOpen, onClose }) => {
                             <button
                                 onClick={onClose}
                                 disabled={loading}
-                                className="px-4 h-8 bg-white border-2 border-gray-200 text-gray-500 text-[12px] font-black rounded-[4px] hover:bg-gray-50 transition-all active:scale-95 shadow-sm disabled:opacity-50"
+                                className="px-4 h-8 bg-white border-2 border-gray-200 text-gray-500 text-[12px] font-black rounded-[4px] hover:bg-blue-50/50 transition-all active:scale-95 shadow-sm disabled:opacity-50 cursor-pointer group border-b border-gray-50"
                             >
                                 CLOSE
                             </button>
@@ -141,7 +141,7 @@ const StockBalanceModal = ({ isOpen, onClose }) => {
                 <div className="relative space-y-4 font-['Tahoma'] select-none">
                     {/* Loading Overlay */}
                     {loading && (
-                        <div className="absolute inset-0 -m-1 bg-white/80 backdrop-blur-[2px] z-[60] flex flex-col items-center justify-center rounded-xl animate-in fade-in duration-300">
+                        <div className="absolute inset-0 -m-1 bg-white/80 backdrop-blur-[2px] z-[60] flex flex-col items-center justify-center rounded-[3px] animate-in fade-in duration-300">
                             <div className="w-28 h-28">
                                 <DotLottiePlayer 
                                     src="/lottiefile/Loading animation blue.lottie" 
@@ -158,7 +158,7 @@ const StockBalanceModal = ({ isOpen, onClose }) => {
                     )}
 
                     {/* Header Controls */}
-                    <div className="flex items-center gap-4 bg-gray-50 p-4 rounded-lg border border-gray-100 shadow-sm">
+                    <div className="flex items-center gap-4 bg-gray-50 p-4 rounded-[3px] border border-gray-200 shadow-sm">
                         <div className="flex items-center gap-3">
                             <label className="text-[12px] font-bold text-gray-700 uppercase tracking-wider">Stock Date:</label>
                             <div className="relative">
@@ -173,7 +173,7 @@ const StockBalanceModal = ({ isOpen, onClose }) => {
                         <button 
                             onClick={handleLoad}
                             disabled={loading}
-                            className="h-9 px-4 bg-white border border-gray-300 text-gray-700 text-[11px] font-black rounded-[4px] hover:bg-gray-50 transition-all active:scale-95 flex items-center gap-2 shadow-sm uppercase tracking-widest"
+                            className="h-9 px-4 bg-white border border-gray-300 text-gray-700 text-[11px] font-black rounded-[4px] hover:bg-blue-50/50 transition-all active:scale-95 flex items-center gap-2 shadow-sm uppercase tracking-widest cursor-pointer group border-b border-gray-50"
                         >
                             <RefreshCw size={14} className={loading ? 'animate-spin' : ''} /> Load Cost Centers
                         </button>
@@ -186,27 +186,27 @@ const StockBalanceModal = ({ isOpen, onClose }) => {
                     </div>
 
                     {/* Data Table */}
-                    <div className="border border-gray-100 rounded-lg overflow-hidden bg-white shadow-sm">
+                    <div className="border border-gray-200 rounded-[3px] overflow-hidden bg-white shadow-sm">
                         <div className="max-h-[350px] overflow-y-auto no-scrollbar">
                             <table className="w-full text-left border-collapse">
                                 <thead className="sticky top-0 z-10">
                                     <tr className="bg-slate-900 text-white">
-                                        <th className="px-4 py-3 text-[10px] font-black uppercase tracking-widest border-r border-slate-800 w-32 text-center">CC Code</th>
-                                        <th className="px-4 py-3 text-[10px] font-black uppercase tracking-widest border-r border-slate-800">Cost Center Name</th>
-                                        <th className="px-4 py-3 text-[10px] font-black uppercase tracking-widest w-32 text-center">Stock Balance</th>
+                                        <th className="text-[10px] font-black uppercase tracking-widest border-r border-slate-800 w-32 text-center px-5 py-3">CC Code</th>
+                                        <th className="text-[10px] font-black uppercase tracking-widest border-r border-slate-800 px-5 py-3">Cost Center Name</th>
+                                        <th className="text-[10px] font-black uppercase tracking-widest w-32 text-center px-5 py-3">Stock Balance</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-100">
                                     {items.length > 0 ? (
                                         items.map((item, index) => (
-                                            <tr key={index} className="hover:bg-blue-50/30 transition-colors group">
-                                                <td className="px-4 py-2.5 text-[11px] font-bold text-gray-500 text-center bg-gray-50 group-hover:bg-blue-50/50">
+                                            <tr key={index} className="hover:bg-blue-50/50/30 transition-all group cursor-pointer group border-b border-gray-50">
+                                                <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">
                                                     {item.costCenterCode}
                                                 </td>
-                                                <td className="px-4 py-2.5 text-[12px] font-bold text-slate-700">
+                                                <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">
                                                     {item.costCenterName}
                                                 </td>
-                                                <td className="px-4 py-2.5">
+                                                <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">
                                                     <input 
                                                         type="number"
                                                         value={item.stock}
@@ -218,13 +218,13 @@ const StockBalanceModal = ({ isOpen, onClose }) => {
                                         ))
                                     ) : (
                                         <tr>
-                                            <td colSpan="3" className="px-4 py-20 text-center">
+                                            <td colSpan="3" className="text-center py-16 text-gray-400 text-[11px] font-bold uppercase tracking-widest">
                                                 <div className="flex flex-col items-center gap-2 opacity-30">
                                                     <Database size={40} />
                                                     <span className="text-[11px] font-black uppercase tracking-[0.3em]">No Data Loaded</span>
                                                 </div>
                                             </td>
-                                        </tr>
+                                        <th className="text-right px-5 py-3">Action</th></tr>
                                     )}
                                 </tbody>
                             </table>

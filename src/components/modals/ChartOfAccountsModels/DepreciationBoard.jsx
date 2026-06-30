@@ -132,19 +132,19 @@ const DepreciationBoard = ({ isOpen, onClose }) => {
             <SimpleModal
                 isOpen={isOpen}
                 onClose={onClose}
-                title="Assets Depreciation Rate Registry"
-                maxWidth="max-w-[550px]"
+                title="Depreciation Rate"
+                maxWidth="max-w-[700px]"
                 footer={
                     <div className="bg-slate-50 px-6 py-4 w-full flex justify-end gap-4 border-t border-slate-200 mt-1 rounded-b-[5px]">
                         <button 
                             onClick={handleSave} 
                             disabled={loading} 
-                            className={`px-8 h-10 text-white font-mono font-bold text-[13px] uppercase tracking-widest rounded-[5px] transition-all active:scale-95 flex items-center justify-center gap-2 border-none disabled:opacity-50 shadow-md bg-[#2bb744] hover:bg-[#259b3a] shadow-green-100 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            className={`px-8 h-10 text-white font-mono font-bold text-[13px] uppercase tracking-widest rounded-[3px] transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-50 shadow-md bg-[#2bb744] hover:bg-[#259b3a] shadow-green-100 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                         >
                             {loading ? <Loader2 size={14} className="animate-spin" /> : (isEditMode ? <Edit size={14} /> : <Save size={14} />)} 
                             {isEditMode ? 'UPDATE' : 'SAVE'}
                         </button>
-                        <button onClick={handleClear} className="px-8 h-10 bg-[#00adff] hover:bg-[#0099e6] text-white font-mono font-bold text-[13px] uppercase tracking-widest rounded-[5px] shadow-md shadow-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border-none disabled:opacity-50">
+                        <button onClick={handleClear} className="px-8 h-10 bg-white text-[#00adff] border-2 border-[#00adff] hover:bg-blue-50 font-mono font-bold text-[13px] uppercase tracking-widest rounded-[3px] shadow-md shadow-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-50">
                             <RotateCcw size={14} /> CLEAR
                         </button>
                     </div>
@@ -152,7 +152,7 @@ const DepreciationBoard = ({ isOpen, onClose }) => {
             >
                 <div className="select-none font-['Tahoma'] space-y-4 p-2">
                     {/* Info Header */}
-                    <div className="bg-[#f0f9ff] border border-[#bae6fd] p-3 rounded-[5px] shadow-sm transition-all">
+                    <div className="bg-[#f0f9ff] border border-[#bae6fd] p-3 rounded-[3px] shadow-sm transition-all">
                         <p className="text-[11px] font-bold text-[#0369a1] text-center leading-relaxed">
                             Depreciation is a decline in value, especially the reduction in the value of<br />
                             a fixed asset charge as an expense when calculation profit and loss.
@@ -160,7 +160,7 @@ const DepreciationBoard = ({ isOpen, onClose }) => {
                     </div>
 
                     {/* Input Section */}
- <div className="bg-white p-4 rounded-[5px] space-y-4 shadow-sm border-l-4 border-l-[#0078d4]">
+ <div className="bg-white p-4 rounded-[3px] space-y-4 shadow-sm border-l-4 border-l-[#0078d4]">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="space-y-1.5">
                                 <label className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">Asset Account</label>
@@ -207,18 +207,18 @@ const DepreciationBoard = ({ isOpen, onClose }) => {
                     </div>
 
                     {/* Table Section */}
- <div className=" rounded-[5px] overflow-hidden shadow-sm bg-white">
+ <div className=" rounded-[3px] overflow-hidden shadow-sm bg-white">
                         <div className="bg-slate-50 px-4 py-2.5 border-b border-slate-200 flex justify-between items-center">
                             <span className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">Registered Depreciation Rates</span>
-                            <span className="text-[10px] font-bold text-[#0285fd] bg-blue-50 px-2 py-0.5 border border-blue-100 rounded-[5px] shadow-sm">{rateList.length} Records</span>
+                            <span className="text-[10px] font-bold text-[#0285fd] bg-blue-50 px-2 py-0.5 border border-blue-100 rounded-[3px] shadow-sm">{rateList.length} Records</span>
                         </div>
                         <div className="max-h-[300px] overflow-y-auto custom-scrollbar">
                             <table className="w-full text-left border-collapse">
                                 <thead className="sticky top-0 bg-white z-10 shadow-sm">
                                     <tr className="bg-slate-50 border-b border-slate-200">
-                                        <th className="px-4 py-2 text-[10px] font-bold text-gray-500 uppercase tracking-widest w-32">Account Code</th>
-                                        <th className="px-4 py-2 text-[10px] font-bold text-gray-500 uppercase tracking-widest">Asset Description</th>
-                                        <th className="px-4 py-2 text-[10px] font-bold text-gray-500 uppercase tracking-widest text-right w-24">Rate (%)</th>
+                                        <th className="text-[10px] font-bold text-gray-500 uppercase tracking-widest w-32 px-5 py-3">Account Code</th>
+                                        <th className="text-[10px] font-bold text-gray-500 uppercase tracking-widest px-5 py-3">Asset Description</th>
+                                        <th className="text-[10px] font-bold text-gray-500 uppercase tracking-widest text-right w-24 px-5 py-3">Rate (%)</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -228,17 +228,17 @@ const DepreciationBoard = ({ isOpen, onClose }) => {
                                             onClick={() => handleRowClick(rate)}
                                             className="border-b border-slate-100 hover:bg-slate-50 cursor-pointer transition-colors group"
                                         >
-                                            <td className="px-4 py-2 text-[11px] font-bold text-[#0285fd] font-mono">{rate.accCode}</td>
-                                            <td className="px-4 py-2 text-[11px] font-bold text-gray-700 uppercase group-hover:text-blue-600 transition-colors">{rate.accountName}</td>
-                                            <td className="px-4 py-2 text-[11px] font-black text-orange-500 text-right">{rate.depRate.toFixed(1)}%</td>
+                                            <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{rate.accCode}</td>
+                                            <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{rate.accountName}</td>
+                                            <td className="text-[11px] font-black text-orange-500 text-right px-5 py-3">{rate.depRate.toFixed(1)}%</td>
                                         </tr>
                                     ))}
                                     {rateList.length === 0 && (
                                         <tr>
-                                            <td colSpan="3" className="px-4 py-10 text-center text-gray-400 font-bold text-[11px] italic uppercase tracking-widest">
+                                            <td colSpan="3" className="text-center py-16 text-gray-400 text-[11px] font-bold uppercase tracking-widest">
                                                 No depreciation rates defined yet.
                                             </td>
-                                        </tr>
+                                        <th className="text-right px-5 py-3">Action</th></tr>
                                     )}
                                 </tbody>
                             </table>
@@ -253,7 +253,7 @@ const DepreciationBoard = ({ isOpen, onClose }) => {
                     <div className="absolute inset-0 bg-slate-900/30 backdrop-blur-sm" onClick={() => setShowAccountSearch(false)} />
  <div className="relative w-full max-w-2xl bg-white shadow-2xl rounded-sm overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
                         {/* Header */}
-                        <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-100 select-none relative overflow-hidden">
+                        <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-200 select-none relative overflow-hidden">
                             <div className="absolute left-0 top-0 bottom-0 w-1.5 transition-colors duration-500" style={{ backgroundColor: localStorage.getItem('topBarColor') || '#0285fd' }} />
                             <div className="flex items-center gap-2">
                                 <Search size={16} className="text-[#0078d4]" />
@@ -263,7 +263,7 @@ const DepreciationBoard = ({ isOpen, onClose }) => {
                                 <X size={28} strokeWidth={1.5} className="group-hover:scale-110 transition-transform" />
                             </button>
                         </div>
-                        <div className="p-3 bg-slate-50 border-b border-gray-100 flex items-center justify-between">
+                        <div className="p-3 bg-slate-50 border-b border-gray-200 flex items-center justify-between">
                             <div className="flex items-center gap-2">
                                 <Search size={14} className="text-gray-400" />
                                 <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Search Facility</span>
@@ -271,12 +271,12 @@ const DepreciationBoard = ({ isOpen, onClose }) => {
                             <input 
                                 type="text" 
                                 placeholder="Find by Account Name or Code..." 
-                                className="h-9 border border-slate-200 px-3 text-xs rounded-md w-72 focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 outline-none shadow-sm transition-all" 
+                                className="h-9 border border-slate-200 px-3 text-xs rounded-[3px] w-72 focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 outline-none shadow-sm transition-all" 
                                 value={accSearchQuery} 
                                 onChange={(e) => setAccSearchQuery(e.target.value)} 
                             />
                         </div>
-                        <div className="border border-gray-100 overflow-hidden bg-white">
+                        <div className="border border-gray-200 overflow-hidden bg-white">
                             <div className="max-h-[400px] overflow-y-auto custom-scrollbar">
                                 <table className="w-full text-left border-collapse">
                                     <thead className="bg-[#f8fafd] text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-slate-200 sticky top-0 z-10">
@@ -299,7 +299,7 @@ const DepreciationBoard = ({ isOpen, onClose }) => {
                                                 <td className="px-5 py-3 font-mono text-[13px] text-gray-600">{acc.code}</td>
                                                 <td className="px-5 py-3 text-[13px] font-mono text-gray-600 uppercase font-bold group-hover:text-blue-600 transition-colors">{acc.name}</td>
                                                 <td className="px-5 py-3 text-right">
-                                                    <button className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95 uppercase tracking-widest border-none">SELECT</button>
+                                                    <button className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[3px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95 uppercase tracking-widest border-none">SELECT</button>
                                                 </td>
                                             </tr>
                                         ))}

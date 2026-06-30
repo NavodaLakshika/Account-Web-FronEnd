@@ -21,6 +21,10 @@ export const backupService = {
         const response = await api.get('/backup/browse', { params: { path } });
         return response.data;
     },
+    createDirectory: async (data) => {
+        const response = await api.post('/backup/create-directory', data);
+        return response.data;
+    },
     getDefaultPath: async () => {
         const response = await api.get('/backup/default-path');
         return response.data;

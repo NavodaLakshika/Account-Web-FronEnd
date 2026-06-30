@@ -133,18 +133,18 @@ const FixedExpensesBoard = ({ isOpen, onClose }) => {
                 isOpen={isOpen}
                 onClose={onClose}
                 title="Fixed Expenses Entry"
-                maxWidth="max-w-[850px]"
+                maxWidth="max-w-[700px]"
                 footer={
                     <div className="bg-slate-50 px-6 py-4 w-full flex justify-end gap-4 border-t border-slate-200 mt-1 rounded-b-[5px]">
                         <button 
                             onClick={handleSave} 
                             disabled={loading} 
-                            className={`px-8 h-10 text-white font-mono font-bold text-[13px] uppercase tracking-widest rounded-[5px] transition-all active:scale-95 flex items-center justify-center gap-2 border-none disabled:opacity-50 shadow-md bg-[#2bb744] hover:bg-[#259b3a] shadow-green-100 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            className={`px-8 h-10 text-white font-mono font-bold text-[13px] uppercase tracking-widest rounded-[3px] transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-50 shadow-md bg-[#2bb744] hover:bg-[#259b3a] shadow-green-100 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                         >
                             {loading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />} 
                             SAVE
                         </button>
-                        <button onClick={handleClear} className="px-8 h-10 bg-[#00adff] hover:bg-[#0099e6] text-white font-mono font-bold text-[13px] uppercase tracking-widest rounded-[5px] shadow-md shadow-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border-none disabled:opacity-50">
+                        <button onClick={handleClear} className="px-8 h-10 bg-white text-[#00adff] border-2 border-[#00adff] hover:bg-blue-50 font-mono font-bold text-[13px] uppercase tracking-widest rounded-[3px] shadow-md shadow-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-50">
                             <RotateCcw size={14} /> CLEAR
                         </button>
                     </div>
@@ -152,7 +152,7 @@ const FixedExpensesBoard = ({ isOpen, onClose }) => {
             >
                 <div className="select-none font-['Tahoma'] space-y-4 p-2">
                     {/* Main Form */}
- <div className="bg-white p-6 rounded-[5px] space-y-5 shadow-sm border-l-4 border-l-[#ff3b30]">
+ <div className="bg-white p-6 rounded-[3px] space-y-5 shadow-sm border-l-4 border-l-[#ff3b30]">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-5">
                             {/* Account Selection */}
                             <div className="space-y-1.5">
@@ -173,7 +173,7 @@ const FixedExpensesBoard = ({ isOpen, onClose }) => {
                                     </div>
                                     <button 
                                         onClick={() => setShowAccSearch(true)} 
-                                        className="w-9 h-8 bg-[#ff3b30] text-white flex items-center justify-center hover:bg-[#e03127] rounded transition-all shadow-sm active:scale-95 shrink-0 border-none"
+                                        className="w-9 h-8 bg-white text-[#ff3b30] border-2 border-[#ff3b30] hover:bg-red-50 flex items-center justify-center hover:bg-[#e03127] rounded transition-all shadow-sm active:scale-95 shrink-0 border-none"
                                     >
                                         <Search size={14} />
                                     </button>
@@ -262,43 +262,43 @@ const FixedExpensesBoard = ({ isOpen, onClose }) => {
                     </div>
 
                     {/* Data List */}
- <div className=" rounded-[5px] overflow-hidden shadow-sm bg-white">
+ <div className=" rounded-[3px] overflow-hidden shadow-sm bg-white">
                         <div className="bg-slate-50 px-4 py-2.5 border-b border-slate-200 flex justify-between items-center">
                             <span className="text-[11px] font-bold text-[#ff3b30] uppercase tracking-widest flex items-center gap-2">
                                 <PlusCircle size={14} /> Recent Fixed Expense Entries
                             </span>
-                            <span className="text-[10px] font-bold text-[#0285fd] bg-blue-50 px-2 py-0.5 border border-blue-100 rounded-[5px] shadow-sm">{expenseList.length} Entries Found</span>
+                            <span className="text-[10px] font-bold text-[#0285fd] bg-blue-50 px-2 py-0.5 border border-blue-100 rounded-[3px] shadow-sm">{expenseList.length} Entries Found</span>
                         </div>
                         <div className="max-h-[250px] overflow-y-auto custom-scrollbar">
                             <table className="w-full text-left border-collapse">
                                 <thead className="sticky top-0 bg-white z-10 shadow-sm">
                                     <tr className="bg-slate-50 border-b border-slate-200">
-                                        <th className="px-4 py-2 text-[10px] font-bold text-gray-500 uppercase tracking-widest">Expense Source</th>
-                                        <th className="px-4 py-2 text-[10px] font-bold text-gray-500 uppercase tracking-widest">Vendor</th>
-                                        <th className="px-4 py-2 text-[10px] font-bold text-gray-500 uppercase tracking-widest text-center">Date</th>
-                                        <th className="px-4 py-2 text-[10px] font-bold text-gray-500 uppercase tracking-widest text-right">Amount</th>
+                                        <th className="text-[10px] font-bold text-gray-500 uppercase tracking-widest px-5 py-3">Expense Source</th>
+                                        <th className="text-[10px] font-bold text-gray-500 uppercase tracking-widest px-5 py-3">Vendor</th>
+                                        <th className="text-[10px] font-bold text-gray-500 uppercase tracking-widest text-center px-5 py-3">Date</th>
+                                        <th className="text-[10px] font-bold text-gray-500 uppercase tracking-widest text-right px-5 py-3">Amount</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {expenseList.map((item, idx) => (
                                         <tr key={idx} className="border-b border-slate-100 hover:bg-slate-50 transition-colors group">
-                                            <td className="px-4 py-2">
+                                            <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">
                                                 <div className="text-[10px] font-bold text-[#ff3b30] font-mono mb-0.5">{item.accCode}</div>
                                                 <div className="text-[11px] font-bold text-gray-700 uppercase leading-tight group-hover:text-[#ff3b30] transition-colors">{item.expenseAccount}</div>
                                             </td>
-                                            <td className="px-4 py-2 text-[11px] font-bold text-gray-600 uppercase">{item.vendor}</td>
-                                            <td className="px-4 py-2 text-[11px] font-bold text-gray-500 text-center">{item.debitDate}</td>
-                                            <td className="px-4 py-2 text-[12px] font-black text-red-500 text-right">
+                                            <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{item.vendor}</td>
+                                            <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{item.debitDate}</td>
+                                            <td className="text-[12px] font-black text-red-500 text-right px-5 py-3">
                                                 {parseFloat(item.amount).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                             </td>
                                         </tr>
                                     ))}
                                     {expenseList.length === 0 && (
                                         <tr>
-                                            <td colSpan="4" className="px-4 py-12 text-center text-gray-400 text-[11px] font-bold uppercase tracking-widest italic">
+                                            <td colSpan="4" className="text-center py-16 text-gray-400 text-[11px] font-bold uppercase tracking-widest">
                                                 No fixed expense records found for this company.
                                             </td>
-                                        </tr>
+                                        <th className="text-right px-5 py-3">Action</th></tr>
                                     )}
                                 </tbody>
                             </table>
@@ -312,7 +312,7 @@ const FixedExpensesBoard = ({ isOpen, onClose }) => {
                 <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4 font-['Tahoma']">
                     <div className="absolute inset-0 bg-slate-900/30 backdrop-blur-sm" onClick={() => setShowAccSearch(false)} />
  <div className="relative w-full max-w-2xl bg-white shadow-2xl rounded-sm overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
-                        <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-100 select-none relative overflow-hidden">
+                        <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-200 select-none relative overflow-hidden">
                             <div className="absolute left-0 top-0 bottom-0 w-1.5 transition-colors duration-500" style={{ backgroundColor: '#ff3b30' }} />
                             <div className="flex items-center gap-2">
                                 <Search size={16} className="text-[#ff3b30]" />
@@ -322,7 +322,7 @@ const FixedExpensesBoard = ({ isOpen, onClose }) => {
                                 <X size={28} strokeWidth={1.5} className="group-hover:scale-110 transition-transform" />
                             </button>
                         </div>
-                        <div className="p-3 bg-slate-50 border-b border-gray-100 flex items-center justify-between">
+                        <div className="p-3 bg-slate-50 border-b border-gray-200 flex items-center justify-between">
                             <div className="flex items-center gap-2">
                                 <Search size={14} className="text-gray-400" />
                                 <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Search Facility</span>
@@ -330,12 +330,12 @@ const FixedExpensesBoard = ({ isOpen, onClose }) => {
                             <input 
                                 type="text" 
                                 placeholder="FIND BY NAME OR CODE..." 
-                                className="h-9 border border-slate-200 px-3 text-xs rounded-md w-72 focus:border-[#ff3b30] focus:ring-2 focus:ring-[#ff3b30]/20 outline-none shadow-sm transition-all uppercase" 
+                                className="h-9 border border-slate-200 px-3 text-xs rounded-[3px] w-72 focus:border-[#ff3b30] focus:ring-2 focus:ring-[#ff3b30]/20 outline-none shadow-sm transition-all uppercase" 
                                 value={searchTerm} 
                                 onChange={(e) => setSearchTerm(e.target.value)} 
                             />
                         </div>
-                        <div className="border border-gray-100 overflow-hidden bg-white">
+                        <div className="border border-gray-200 overflow-hidden bg-white">
                             <div className="max-h-[400px] overflow-y-auto custom-scrollbar">
                                 <table className="w-full text-left border-collapse">
                                     <thead className="bg-slate-50 sticky top-0 text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-slate-200 z-10">
@@ -375,7 +375,7 @@ const FixedExpensesBoard = ({ isOpen, onClose }) => {
                 <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4 font-['Tahoma']">
                     <div className="absolute inset-0 bg-slate-900/30 backdrop-blur-sm" onClick={() => setShowPayTypeSearch(false)} />
  <div className="relative w-full max-w-sm bg-white shadow-2xl rounded-sm overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
-                        <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-100 select-none relative overflow-hidden">
+                        <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-200 select-none relative overflow-hidden">
                             <div className="absolute left-0 top-0 bottom-0 w-1.5 transition-colors duration-500" style={{ backgroundColor: localStorage.getItem('topBarColor') || '#0285fd' }} />
                             <div className="flex items-center gap-2">
                                 <Search size={16} className="text-[#0078d4]" />
@@ -390,7 +390,7 @@ const FixedExpensesBoard = ({ isOpen, onClose }) => {
                                 <button 
                                     key={idx} 
                                     onClick={() => handlePayTypeSelect(pay)}
-                                    className="w-full px-4 py-3 text-[12px] font-bold text-gray-700 hover:bg-slate-50 border border-slate-200 rounded-lg transition-all text-left flex justify-between items-center group shadow-sm"
+                                    className="w-full px-4 py-3 text-[12px] font-bold text-gray-700 hover:bg-slate-50 border border-slate-200 rounded-[3px] transition-all text-left flex justify-between items-center group shadow-sm"
                                 >
                                     <span className="uppercase tracking-widest">{pay.name}</span>
                                     <PlusCircle size={16} className="text-gray-300 group-hover:text-[#0285fd] transition-colors" />

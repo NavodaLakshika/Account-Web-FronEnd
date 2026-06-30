@@ -101,7 +101,7 @@ const CostCenterBoard = ({ isOpen, onClose }) => {
                 title="Cost Center Profile"
                 subtitle="Manage cost center codes & details"
                 icon={Target}
-                maxWidth="max-w-2xl"
+                maxWidth="max-w-[700px]"
                 isEditMode={isEditMode}
                 loading={loading}
                 onClear={handleClear}

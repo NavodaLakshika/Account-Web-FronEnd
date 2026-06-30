@@ -1,0 +1,295 @@
+import React, { useState, useEffect, useRef } from 'react';
+import SimpleModal from '../components/SimpleModal';
+import TransactionFormWrapper from '../components/TransactionFormWrapper';
+import ConfirmModal from '../components/modals/ConfirmModal';
+import { Search, FileUp, FileDown, Trash2, RotateCcw, FileText, CheckCircle, Loader2, Save } from 'lucide-react';
+import * as XLSX from 'xlsx';
+import { grnService } from '../services/grn.service';
+import { getSessionData } from '../utils/session';
+import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
+
+const BulkGRNBoard = ({ isOpen, onClose }) => {
+    const [lookups, setLookups] = useState({ suppliers: [], products: [], pos: [], paymentMethods: [] });
+    const [isApplying, setIsApplying] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
+    const [showConfirmModal, setShowConfirmModal] = useState(false);
+    const [groupedGrns, setGroupedGrns] = useState([]);
+    const excelInputRef = useRef(null);
+
+    const getInitialFormDataTemplate = () => ({
+        grnDate: new Date().toISOString().split('T')[0],
+        expectedDate: new Date().toISOString().split('T')[0],
+        company: '',
+        createUser: ''
+    });
+
+    const [formDataTemplate, setFormDataTemplate] = useState(getInitialFormDataTemplate());
+
+    useEffect(() => {
+        if (isOpen) {
+            setFormDataTemplate(getInitialFormDataTemplate());
+            const { companyCode: initCompany, userName: initUser } = getSessionData();
+            setFormDataTemplate(prev => ({ ...prev, company: initCompany, createUser: initUser }));
+            fetchLookups(initCompany);
+        }
+    }, [isOpen]);
+
+    const fetchLookups = async (company) => {
+        try {
+            const data = await grnService.getLookups(company);
+            setLookups(data);
+        } catch (error) {
+            showErrorToast('Failed to load lookups.');
+        }
+    };
+
+    const downloadExcelTemplate = async () => {
+        try {
+            const template = [{
+                'Supplier Code': '', 'Supplier Invoice': '', 'PO Number': '', 'Payment Method': '', 'Comment': '',
+                'Product Code': '', 'Product Name': '', 'Unit': '', 'Pack Size': '', 'Category': '', 'Department': '',
+                'Available Stock': '', 'Purchase Price': '', 'Selling Price': '', 'Qty': '', 'Free Qty': ''
+            }];
+            const ws = XLSX.utils.json_to_sheet(template);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Bulk_GRN_Template");
+            XLSX.writeFile(wb, "Bulk_GRN_Template.xlsx");
+            showSuccessToast("Bulk Template Downloaded!");
+        } catch (error) {
+            showErrorToast("Failed to generate template.");
+        }
+    };
+
+    const handleExcelUpload = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (evt) => {
+            try {
+                const bstr = evt.target.result;
+                const wb = XLSX.read(bstr, { type: 'binary' });
+                const wsname = wb.SheetNames[0];
+                const ws = wb.Sheets[wsname];
+                const data = XLSX.utils.sheet_to_json(ws);
+
+                if (data.length === 0) return showErrorToast("Excel file is empty.");
+
+                let skipCount = 0;
+                const groups = {};
+
+                data.forEach((row) => {
+                    const suppCode = (row['Supplier Code'] || row['Supplier'] || '').toString().trim();
+                    const pCode = (row['Product Code'] || row['prodCode'] || row['Item Code'] || '').toString().trim();
+                    if (!suppCode || !pCode) { skipCount++; return; }
+
+                    const invNo = (row['Supplier Invoice'] || row['Inv No'] || '').toString().trim();
+                    const payType = (row['Payment Method'] || row['Pay Type'] || 'Cash').toString().trim();
+                    const comment = (row['Comment'] || row['Remarks'] || '').toString().trim();
+                    const poNo = (row['PO Number'] || row['PO No'] || '').toString().trim();
+                    const key = `${suppCode}_${invNo}`;
+
+                    if (!groups[key]) {
+                        groups[key] = {
+                            id: Math.random().toString(36).substr(2, 9),
+                            suppCode, suppInv: invNo, payType, comment, poNo, products: []
+                        };
+                    }
+
+                    const pName = row['Product Name'] || row['prodName'] || row['Item Name'] || '';
+                    const prod = lookups.products.find(p => p.code?.trim().toUpperCase() === pCode.toUpperCase());
+                    const qty = parseFloat(row['Qty'] || row['Quantity'] || 0);
+                    const free = parseFloat(row['Free Qty'] || row['Free'] || 0);
+                    const cost = parseFloat(row['Purchase Price'] || row['Cost Price'] || row['Cost'] || (prod ? prod.price : 0));
+                    const selling = parseFloat(row['Selling Price'] || row['Selling'] || (prod ? prod.sellingPrice : 0));
+
+                    groups[key].products.push({
+                        prodCode: pCode, prodName: prod ? prod.name : (pName || 'Unknown Product'),
+                        unit: prod ? prod.unit : 'Nos', packSize: prod ? prod.packSize : 1,
+                        qty: qty.toString(), free: free.toString(),
+                        cost: cost.toFixed(2), selling: selling.toFixed(2), amount: (qty * cost).toFixed(2)
+                    });
+                });
+
+                const parsedGroups = Object.values(groups);
+                if (parsedGroups.length > 0) {
+                    setGroupedGrns(prev => [...prev, ...parsedGroups]);
+                    showSuccessToast(`Successfully grouped ${parsedGroups.length} GRNs from Excel.`);
+                } else {
+                    showErrorToast("Could not parse any valid GRN groups.");
+                }
+                if (skipCount > 0) showErrorToast(`Skipped ${skipCount} rows due to missing Supplier or Product Code.`);
+            } catch (err) {
+                showErrorToast("Failed to parse Excel file.");
+                console.error(err);
+            }
+        };
+        reader.readAsBinaryString(file);
+        e.target.value = null;
+    };
+
+    const handleClear = () => {
+        setGroupedGrns([]);
+    };
+
+    const removeGroup = (id) => {
+        setGroupedGrns(groupedGrns.filter(g => g.id !== id));
+    };
+
+    const handleApply = () => {
+        if (groupedGrns.length === 0) return showErrorToast('No GRNs to apply.');
+        setShowConfirmModal(true);
+    };
+
+    const confirmApply = async () => {
+        setIsApplying(true);
+        const payload = groupedGrns.map(group => {
+            const sumTotal = group.products.reduce((acc, p) => acc + (parseFloat(p.amount) || 0), 0);
+            const sumQty = group.products.reduce((acc, p) => acc + (parseFloat(p.qty) || 0), 0);
+            const sumFree = group.products.reduce((acc, p) => acc + (parseFloat(p.free) || 0), 0);
+            return {
+                docNo: '', grnDate: formDataTemplate.grnDate, expectedDate: formDataTemplate.expectedDate,
+                suppCode: group.suppCode, poNo: group.poNo, payType: group.payType, suppInv: group.suppInv,
+                invAmount: sumTotal.toString(), consignmentBasis: false, acceptOtherSupp: false,
+                comment: group.comment, company: formDataTemplate.company, createUser: formDataTemplate.createUser,
+                taxPer: '0', nbtPer: '0', discPer: '0', adjType: '', adjAmt: '0.00',
+                total: sumTotal, totQty: sumQty, totFree: sumFree, taxAmt: 0, nbtAmnt: 0, discount: 0, netAmount: sumTotal,
+                products: group.products.map((p, i) => ({ ...p, lnNo: i + 1, qty: parseFloat(p.qty) || 0,
+                    free: parseFloat(p.free) || 0, cost: parseFloat(p.cost) || 0, selling: parseFloat(p.selling) || 0,
+                    amount: parseFloat(p.amount) || 0
+                }))
+            };
+        });
+        try {
+            await grnService.bulkApply(payload);
+            showSuccessToast(`Successfully applied ${payload.length} GRNs.`);
+            handleClear();
+            setShowConfirmModal(false);
+        } catch (error) {
+            showErrorToast(error.toString());
+        } finally {
+            setIsApplying(false);
+        }
+    };
+
+    const handleSave = async () => {
+        setIsSaving(true);
+        const payload = groupedGrns.map(group => {
+            const sumTotal = group.products.reduce((acc, p) => acc + (parseFloat(p.amount) || 0), 0);
+            const sumQty = group.products.reduce((acc, p) => acc + (parseFloat(p.qty) || 0), 0);
+            const sumFree = group.products.reduce((acc, p) => acc + (parseFloat(p.free) || 0), 0);
+            return {
+                company: formDataTemplate.company, createUser: formDataTemplate.createUser,
+                vendorId: group.suppCode, suppInvNo: group.suppInv || '', poNo: group.poNo || '-NO-',
+                postDate: formDataTemplate.grnDate, expectedDate: formDataTemplate.expectedDate,
+                payType: group.payType || 'Cash', comment: group.comment || '',
+                total: sumTotal, totQty: sumQty, totFree: sumFree, taxAmt: 0, nbtAmnt: 0, discount: 0, netAmount: sumTotal,
+                products: group.products.map((p, i) => ({ ...p, lnNo: i + 1, qty: parseFloat(p.qty) || 0,
+                    free: parseFloat(p.free) || 0, cost: parseFloat(p.cost) || 0, selling: parseFloat(p.selling) || 0,
+                    amount: parseFloat(p.amount) || 0
+                }))
+            };
+        });
+        try {
+            await grnService.bulkSave(payload);
+            showSuccessToast(`Successfully saved ${payload.length} GRNs as drafts.`);
+            handleClear();
+        } catch (error) {
+            showErrorToast(error.toString());
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
+    return (
+        <>
+            <style>{`@keyframes toastProgress { 0% { width: 100%; } 100% { width: 0%; } }`}</style>
+            <TransactionFormWrapper subtitle="Transaction Management" icon={FileText}
+                isOpen={isOpen} onClose={onClose}
+                title="Bulk GRN"
+                footer={
+                    <div className="bg-[#fcfcfc] px-6 py-4 w-full flex justify-between items-center border-t border-gray-200 rounded-b-[10px] shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]">
+                        <button type="button" onClick={handleClear} disabled={groupedGrns.length === 0} className="px-6 py-2 border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2 disabled:opacity-50">
+                            <RotateCcw size={14} /> CLEAR ALL
+                        </button>
+                        <div className="flex gap-3">
+                            <button type="button" onClick={handleSave} disabled={isSaving || isApplying || groupedGrns.length === 0} className="px-6 py-2 border-2 border-[#0285fd] text-[#0285fd] bg-white hover:bg-blue-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2 disabled:opacity-50">
+                                {isSaving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />} SAVE ALL ({groupedGrns.length})
+                            </button>
+                            <button type="button" onClick={handleApply} disabled={isSaving || isApplying || groupedGrns.length === 0} className={`px-6 py-2 bg-[#0285fd] hover:bg-[#0073ff] text-white font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2 ${(isSaving || isApplying || groupedGrns.length === 0) ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                                {isApplying ? <Loader2 size={14} className="animate-spin" /> : <CheckCircle size={14} />} APPLY ALL ({groupedGrns.length})
+                            </button>
+                        </div>
+                    </div>
+                }
+            >
+                <input type="file" ref={excelInputRef} onChange={handleExcelUpload} accept=".xlsx, .xls, .csv" className="hidden" />
+                <div className="space-y-3 overflow-y-auto no-scrollbar font-['Tahoma']">
+                    <div className="flex items-center justify-between mb-1 px-1">
+                        <div className="text-sm font-bold text-gray-600">
+                            Total GRNs to Process: <span className="text-[#0285fd]">{groupedGrns.length}</span>
+                        </div>
+                        <div className="flex gap-2">
+                            <button onClick={downloadExcelTemplate} className="h-8 px-4 bg-white border-2 border-emerald-500 text-emerald-600 text-[10px] font-black rounded-[3px] hover:bg-emerald-50 transition-all flex items-center gap-2 uppercase active:scale-95 shadow-sm">
+                                <FileDown size={14} /> BULK TEMPLATE
+                            </button>
+                            <button onClick={() => excelInputRef.current?.click()} className="h-8 px-4 bg-white border-2 border-blue-500 text-blue-600 text-[10px] font-black rounded-[3px] hover:bg-blue-50 transition-all flex items-center gap-2 uppercase active:scale-95 shadow-sm">
+                                <FileUp size={14} /> LOAD BULK EXCEL
+                            </button>
+                        </div>
+                    </div>
+
+                    <div className="border border-slate-200 rounded-[3px] bg-white overflow-hidden">
+                        <div className="bg-slate-50 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-200 leading-10">
+                            <div className="flex items-center">
+                                <div className="flex-[1.5] px-4 border-r border-gray-200">Supplier</div>
+                                <div className="w-32 px-3 border-r border-gray-200 text-center">Inv No</div>
+                                <div className="w-32 px-3 border-r border-gray-200 text-center">PO No</div>
+                                <div className="w-24 px-3 border-r border-gray-200 text-center">Items</div>
+                                <div className="w-32 px-4 text-right">Total Amount</div>
+                                <div className="w-12"></div>
+                            </div>
+                        </div>
+                        <div className="bg-white overflow-y-auto max-h-[400px] divide-y divide-gray-50">
+                            {groupedGrns.length === 0 ? (
+                                <div className="h-48 flex items-center justify-center text-gray-300 text-[11px] font-bold uppercase tracking-widest italic">
+                                    Load Excel file to preview Bulk GRNs
+                                </div>
+                            ) : groupedGrns.map((g) => {
+                                const supplierName = lookups.suppliers.find(s => s.code?.trim().toUpperCase() === g.suppCode.trim().toUpperCase())?.name || g.suppCode;
+                                const totalAmount = g.products.reduce((sum, p) => sum + (parseFloat(p.amount) || 0), 0);
+                                return (
+                                    <div key={g.id} className="flex items-center border-b border-gray-50 text-[12px] font-bold text-gray-700 hover:bg-slate-50/30 transition-colors group">
+                                        <div className="flex-[1.5] py-2.5 px-4 border-r border-gray-200 truncate">
+                                            <div className="flex flex-col">
+                                                <span className="text-blue-600 font-mono text-[10px]">{g.suppCode}</span>
+                                                <span className="truncate">{supplierName}</span>
+                                            </div>
+                                        </div>
+                                        <div className="w-32 py-2.5 px-3 border-r border-gray-200 text-center font-mono">{g.suppInv || '-'}</div>
+                                        <div className="w-32 py-2.5 px-3 border-r border-gray-200 text-center font-mono text-gray-500">{g.poNo || '-'}</div>
+                                        <div className="w-24 py-2.5 px-3 border-r border-gray-200 text-center">
+                                            <span className="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-[3px] text-[10px]">{g.products.length} Items</span>
+                                        </div>
+                                        <div className="w-32 py-2.5 px-4 text-right font-mono font-black">
+                                            {totalAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                        </div>
+                                        <div className="w-12 flex justify-center py-1">
+                                            <button onClick={() => removeGroup(g.id)} className="text-red-300 hover:text-red-500 transition-all p-1.5 hover:bg-red-50 rounded-full">
+                                                <Trash2 size={14} />
+                                            </button>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                </div>
+            </TransactionFormWrapper>
+
+            <ConfirmModal isOpen={showConfirmModal} onClose={() => setShowConfirmModal(false)} onConfirm={confirmApply} title="Bulk Apply GRNs" message={`Are you sure you want to apply ${groupedGrns.length} GRN documents? This action cannot be undone.`} loading={isApplying} confirmText="Apply All GRNs" />
+        </>
+    );
+};
+
+export default BulkGRNBoard;

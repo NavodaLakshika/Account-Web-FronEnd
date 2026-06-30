@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SystemLoader from '../components/SystemLoader';
 import toast from 'react-hot-toast';
-import { DotLottiePlayer } from '@dotlottie/react-player';
 import { showSuccessToast } from '../utils/toastUtils';
 import api from '../services/api';
 import {
@@ -276,7 +275,7 @@ const SuperAdminDashboard = () => {
                 api.get('/SuperAdmin/pending-resets').catch(() => ({ data: [] })),
                 api.get('/SuperAdmin/companies').catch(() => ({ data: [] })),
                 api.get('/SuperAdmin/employees').catch(() => ({ data: [] })),
-                api.get('/SuperAdmin/modules').catch(() => ({ data: [] })),
+                api.get('/SuperAdmin/module-usage').catch(() => ({ data: [] })),
                 api.get('/UserGroup/all').catch(() => ({ data: [] }))
             ]);
             setHierarchy(hierarchyRes.data || []);
@@ -840,7 +839,7 @@ const SuperAdminDashboard = () => {
                                 placeholder="Search employees or companies..."
                                 value={searchTerm}
                                 onChange={e => setSearchTerm(e.target.value)}
-                                className="w-full pl-9 pr-4 py-1.5 bg-slate-50 hover:bg-white rounded-[10px]  text-[13px] font-medium text-slate-800 placeholder-slate-400 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#0078d4]/30 focus:border-[#0078d4]/50 rounded-[12px] transition-all"
+                                className="w-full pl-9 pr-4 py-1.5 bg-slate-50 hover:bg-white rounded-[3px]  text-[13px] font-medium text-slate-800 placeholder-slate-400 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#0078d4]/30 focus:border-[#0078d4]/50 rounded-[12px] transition-all"
                             />
                         </div>
 
@@ -880,7 +879,7 @@ const SuperAdminDashboard = () => {
                                 </button>
 
                                 {showResets && (
-                                    <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-slate-800 shadow-[0_8px_30px_rgb(0,0,0,0.12)] dark:border-slate-700 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200 border border-gray-100">
+                                    <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-slate-800 shadow-[0_8px_30px_rgb(0,0,0,0.12)] dark:border-slate-700 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200 border border-gray-200">
                                         <div className="p-4 border-b border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 flex items-center justify-between">
                                             <h3 className="font-bold text-slate-900 dark:text-white text-[13px]">Password Recovery Alerts</h3>
                                             <span className="bg-red-100 dark:bg-red-500/20 text-red-600 dark:text-red-400 text-[10px] font-bold px-2 py-1 ">{pendingResets.length}</span>

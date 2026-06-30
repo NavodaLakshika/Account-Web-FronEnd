@@ -1,18 +1,64 @@
 import React, { useState, useEffect } from 'react';
 import SimpleModal from '../components/SimpleModal';
-import CalendarModal from '../components/CalendarModal';
-import { Search, X, RotateCcw, Loader2, History, ShieldCheck, Key, FileSearch, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Search, RotateCcw, Loader2, FileText, ShieldCheck } from 'lucide-react';
 import { reversalEntryService } from '../services/reversalEntry.service';
 import { getSessionData } from '../utils/session';
 import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
+import TransactionFormWrapper from '../components/TransactionFormWrapper';
 
+const SearchModal = ({ isOpen, onClose, title, items, onSelect, searchPlaceholder = "Search by code or name..." }) => {
+    const [query, setQuery] = useState('');
+    const filtered = (items || []).filter(item =>
+        (item.name || '').toLowerCase().includes(query.toLowerCase()) ||
+        (item.code || '').toLowerCase().includes(query.toLowerCase())
+    );
+
+    if (!isOpen) return null;
+
+    return (
+        <SimpleModal isOpen={isOpen} onClose={onClose} title={title}>
+            <div className="space-y-4 font-['Tahoma']">
+                <div className="flex items-center gap-4 bg-slate-50 p-4 border-b border-gray-100 mb-2">
+                    <span className="text-[12px] font-bold text-gray-500 uppercase tracking-wider shrink-0">Search</span>
+                    <div className="relative flex-1">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
+                        <input type="text" placeholder={searchPlaceholder}
+                            className="w-full h-10 pl-10 pr-4 border border-gray-300 rounded-[3px] outline-none text-[13px] focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] shadow-sm bg-white"
+                            value={query} onChange={e => setQuery(e.target.value)} autoFocus />
+                    </div>
+                </div>
+                <div className="border border-gray-200 rounded-[3px] overflow-hidden shadow-sm">
+                    <div className="max-h-[400px] overflow-y-auto no-scrollbar">
+                        <table className="w-full text-left">
+                            <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 shadow-sm z-10">
+                                <tr><th className="w-32 px-5 py-3">Identifier</th><th className=" px-5 py-3">Credential / Name</th><th className="text-right px-5 py-3">Action</th></tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-50">
+                                {filtered.length === 0 ? (
+                                    <tr><td colSpan="3" className="text-center py-16 text-gray-400 text-[11px] font-bold uppercase tracking-widest">No matching records discovered</td></tr>
+                                ) : filtered.map((item, idx) => (
+                                    <tr key={idx} className="group hover:bg-blue-50/50  transition-all cursor-pointer group border-b border-gray-50" onClick={() => { onSelect(item); onClose(); }}>
+                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{item.code}</td>
+                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{item.name}</td>
+                                        <td className="text-right px-5 py-3">
+                                            <button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </SimpleModal>
+    );
+};
 
 const ReversalEntryBoard = ({ isOpen, onClose }) => {
     const { companyCode, userName } = getSessionData();
     const [loading, setLoading] = useState(false);
     const [lookups, setLookups] = useState({ transactionTypes: [], users: [] });
-    
-    // Form States
+
     const getInitialFormData = () => ({
         transactionType: '',
         transactionTypeName: '',
@@ -28,10 +74,7 @@ const ReversalEntryBoard = ({ isOpen, onClose }) => {
 
     const [formData, setFormData] = useState(getInitialFormData());
 
-    const [activeModal, setActiveModal] = useState(null); // 'type', 'user'
-    const [searchTerm, setSearchTerm] = useState('');
-    const [showDatePicker, setShowDatePicker] = useState(false);
-    const [datePickerField, setDatePickerField] = useState('date');
+    const [activeModal, setActiveModal] = useState(null);
 
     useEffect(() => {
         if (isOpen) {
@@ -97,16 +140,14 @@ const ReversalEntryBoard = ({ isOpen, onClose }) => {
 
     const handleView = async () => {
         if (!formData.voucherNo && !formData.documentNo) {
-             showErrorToast("Provide a Document No or Voucher No to view.");
-             return;
+            showErrorToast("Provide a Document No or Voucher No to view.");
+            return;
         }
         try {
             setLoading(true);
             const response = await reversalEntryService.view(formData.voucherNo || formData.documentNo, formData.transactionType);
             const data = response.data || response;
             showSuccessToast(data.message || "Transaction details loaded.");
-            
-            // Auto-fill reason with transaction details if available
             if (data.total !== undefined) {
                 setFormData(prev => ({
                     ...prev,
@@ -120,40 +161,27 @@ const ReversalEntryBoard = ({ isOpen, onClose }) => {
         }
     };
 
-    const filteredLookup = () => {
-        if (activeModal === 'type') return lookups.transactionTypes.filter(t => (t.name || '').toLowerCase().includes(searchTerm.toLowerCase()) || (t.code || '').toLowerCase().includes(searchTerm.toLowerCase()));
-        if (activeModal === 'user') return lookups.users.filter(u => (u.name || '').toLowerCase().includes(searchTerm.toLowerCase()) || (u.code || '').toLowerCase().includes(searchTerm.toLowerCase()));
-        return [];
-    };
-
     return (
         <>
-            <style>
-                {`
-                    @keyframes toastProgress {
-                        0% { width: 100%; }
-                        100% { width: 0%; }
-                    }
-                `}
-            </style>
-            <SimpleModal
+            <TransactionFormWrapper subtitle="Reversal Entry" icon={null}
                 isOpen={isOpen}
                 onClose={onClose}
-                title="Reversal Entry Form"
-                maxWidth="max-w-[600px]"
+                title="Reversal Entry"
                 footer={
-                    <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-slate-200 rounded-b-xl">
+                    <div className="bg-[#fcfcfc] px-6 py-4 w-full flex justify-between items-center border-t border-gray-200 rounded-b-[10px] shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]">
+                        <button onClick={handleClear} disabled={loading}
+                            className="px-6 py-2 border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2">
+                            <RotateCcw size={14} /> Clear Form
+                        </button>
                         <div className="flex gap-3">
-                            <button onClick={handleClear} disabled={loading} className="px-6 h-10 bg-white text-gray-600 border border-gray-200 text-[13px] font-mono font-bold tracking-widest uppercase rounded-[5px] hover:bg-gray-50 transition-all active:scale-95 flex items-center justify-center gap-2 shadow-sm">
-                                <RotateCcw size={14} /> CLEAR FORM
+                            <button onClick={handleView} disabled={loading}
+                                className="px-6 py-2 border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2">
+                                <FileText size={14} /> View
                             </button>
-                        </div>
-                        <div className="flex gap-3">
-                            <button onClick={handleView} disabled={loading} className="px-6 h-10 bg-white text-blue-600 border border-blue-200 text-[13px] font-mono font-bold tracking-widest uppercase rounded-[5px] hover:bg-blue-50 transition-all flex items-center justify-center gap-2 shadow-sm">
-                                <FileSearch size={14} /> VIEW
-                            </button>
-                            <button onClick={handleApply} disabled={loading} className={`px-8 h-10 text-[13px] font-mono font-bold tracking-widest uppercase rounded-[5px] shadow-md transition-all active:scale-95 flex items-center gap-2 border-none bg-[#0285fd] hover:bg-[#0073ff] text-white shadow-blue-500/20 ${loading ? 'opacity-50' : ''}`}>
-                                {loading ? <Loader2 size={16} className="animate-spin" /> : <CheckCircle2 size={16} />} APPLY
+                            <button onClick={handleApply} disabled={loading}
+                                className={`px-6 py-2 bg-[#0285fd] hover:bg-[#0073ff] text-white font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                                {loading ? <Loader2 size={14} className="animate-spin" /> : <FileText size={14} />}
+                                Apply
                             </button>
                         </div>
                     </div>
@@ -161,155 +189,103 @@ const ReversalEntryBoard = ({ isOpen, onClose }) => {
             >
                 <div className="space-y-4 font-['Tahoma']">
                     {/* Main Form Section */}
-                    <div className="bg-white p-4 border border-slate-200 rounded-[5px] relative overflow-hidden space-y-4">
-                        <div className="grid grid-cols-12 gap-x-6 gap-y-3.5 relative z-10">
-                            {/* Transaction Type - Full Width */}
-                            <div className="col-span-12 flex items-center gap-2">
-                                <label className="text-[11px] font-bold text-gray-500 uppercase w-32 shrink-0">Transaction Type</label>
-                                <div className="flex-1 max-w-[400px] flex gap-1 h-8 min-w-0">
-                                    <input 
-                                        type="text" 
-                                        readOnly 
-                                        value={formData.transactionTypeName ? `${formData.transactionType} - ${formData.transactionTypeName}` : ''} 
-                                        className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-bold text-gray-700 bg-slate-50 rounded outline-none cursor-pointer transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" 
-                                        onClick={() => { setActiveModal('type'); setSearchTerm(''); }}
-                                    />
-                                    <button onClick={() => { setActiveModal('type'); setSearchTerm(''); }} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
+                    <div className="bg-white p-4 border border-slate-200 rounded-[3px] space-y-4">
+                        <div className="grid grid-cols-12 gap-x-6 gap-y-3.5">
+                            {/* Transaction Type */}
+                            <div className="col-span-12">
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Transaction Type</label>
+                                <div className="relative max-w-[400px]">
+                                    <input type="text" readOnly
+                                        value={formData.transactionTypeName ? `${formData.transactionType} - ${formData.transactionTypeName}` : ''}
+                                        placeholder="Select transaction type..."
+                                        onClick={() => setActiveModal('type')}
+                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700 truncate" />
+                                    <button onClick={() => setActiveModal('type')}
+                                        className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
                                         <Search size={16} />
                                     </button>
                                 </div>
                             </div>
 
-                            {/* Reference Numbers - Stacked vertically */}
-                            <div className="col-span-12 flex items-center gap-2">
-                                <label className="text-[11px] font-bold text-gray-500 uppercase w-32 shrink-0">Voucher No</label>
-                                <div className="flex-1 max-w-[400px]">
-                                    <input name="voucherNo" value={formData.voucherNo} onChange={handleInputChange} type="text" className="w-full h-8 border border-slate-200 rounded px-3 text-[12px] font-mono outline-none bg-slate-50 text-gray-700 transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" />
-                                </div>
+                            {/* Voucher No */}
+                            <div className="col-span-4">
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Voucher No</label>
+                                <input name="voucherNo" value={formData.voucherNo} onChange={handleInputChange} type="text"
+                                    className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700" />
                             </div>
 
-                            <div className="col-span-12 flex items-center gap-2">
-                                <label className="text-[11px] font-bold text-gray-500 uppercase w-32 shrink-0">Document No.</label>
-                                <div className="flex-1 max-w-[400px]">
-                                    <input name="documentNo" value={formData.documentNo} onChange={handleInputChange} type="text" className="w-full h-8 border border-slate-200 rounded px-3 text-[12px] font-mono outline-none bg-slate-50 text-gray-700 transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" />
-                                </div>
+                            {/* Document No */}
+                            <div className="col-span-4">
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Document No.</label>
+                                <input name="documentNo" value={formData.documentNo} onChange={handleInputChange} type="text"
+                                    className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700" />
                             </div>
 
-                            <div className="col-span-12 flex items-center gap-2">
-                                <label className="text-[11px] font-bold text-gray-500 uppercase w-32 shrink-0">Cheque No</label>
-                                <div className="flex-1 max-w-[400px]">
-                                    <input name="chequeNo" value={formData.chequeNo} onChange={handleInputChange} type="text" className="w-full h-8 border border-slate-200 rounded px-3 text-[12px] font-mono outline-none bg-slate-50 text-gray-700 transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" />
-                                </div>
+                            {/* Cheque No */}
+                            <div className="col-span-4">
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Cheque No</label>
+                                <input name="chequeNo" value={formData.chequeNo} onChange={handleInputChange} type="text"
+                                    className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700" />
                             </div>
 
-                            <div className="col-span-12 flex items-start gap-2 pt-2">
-                                <label className="text-[11px] font-bold text-gray-500 uppercase w-32 shrink-0 mt-2">Reason</label>
-                                <div className="flex-1 max-w-[400px]">
-                                    <textarea name="reason" value={formData.reason} onChange={handleInputChange} className="w-full h-24 border border-slate-200 rounded px-3 py-2 font-mono text-[12px] outline-none bg-slate-50 text-gray-700 transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 resize-none italic" />
-                                </div>
+                            {/* Reason */}
+                            <div className="col-span-12">
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Reason</label>
+                                <textarea name="reason" value={formData.reason} onChange={handleInputChange}
+                                    className="w-full h-24 border border-gray-300 rounded-[3px] px-3 py-2 text-[13px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 resize-none italic" />
                             </div>
                         </div>
                     </div>
 
                     {/* Authorization Section */}
-                    <div className="bg-slate-50 p-4 border border-slate-200 rounded-[5px] border-l-4 border-l-[#0285fd]">
-                        <div className="flex items-center gap-2 mb-4 ml-1">
+                    <div className="bg-white p-4 border border-slate-200 rounded-[3px] border-l-4 border-l-[#0285fd] space-y-4">
+                        <div className="flex items-center gap-2">
                             <ShieldCheck size={16} className="text-[#0285fd]" />
-                            <h3 className="text-[10px] font-mono font-bold uppercase text-slate-500 tracking-widest">Mandatory Authorization</h3>
+                            <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Mandatory Authorization</h3>
                         </div>
-                        
+
                         <div className="grid grid-cols-12 gap-x-6 gap-y-3.5">
-                            <div className="col-span-12 flex items-center gap-2">
-                                <label className="text-[11px] font-bold text-gray-500 uppercase w-32 shrink-0">User Name</label>
-                                <div className="flex-1 max-w-[400px] flex gap-1 h-8 min-w-0">
-                                    <input 
-                                        type="text" 
-                                        readOnly 
-                                        value={formData.authUsername} 
-                                        className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-bold text-gray-700 bg-white rounded outline-none cursor-pointer transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" 
-                                        onClick={() => { setActiveModal('user'); setSearchTerm(''); }}
-                                    />
-                                    <button onClick={() => { setActiveModal('user'); setSearchTerm(''); }} className="w-10 h-8 bg-slate-800 text-white flex items-center justify-center hover:bg-slate-700 rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
+                            <div className="col-span-6">
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">User Name</label>
+                                <div className="relative max-w-[400px]">
+                                    <input type="text" readOnly
+                                        value={formData.authUsername}
+                                        placeholder="Select authorized user..."
+                                        onClick={() => setActiveModal('user')}
+                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700 truncate" />
+                                    <button onClick={() => setActiveModal('user')}
+                                        className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
                                         <Search size={16} />
                                     </button>
                                 </div>
                             </div>
-                            <div className="col-span-12 flex items-center gap-2">
-                                <label className="text-[11px] font-bold text-gray-500 uppercase w-32 shrink-0">Password</label>
-                                <div className="flex-1 max-w-[400px] relative h-8 min-w-0">
-                                    <input 
-                                        name="authPassword" 
-                                        type="password" 
-                                        value={formData.authPassword} 
-                                        onChange={handleInputChange} 
-                                        className="w-full h-8 border border-slate-200 pl-8 pr-3 text-[12px] font-mono rounded outline-none bg-white transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" 
-                                    />
-                                    <Key size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400" />
-                                </div>
+                            <div className="col-span-6">
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Password</label>
+                                <input name="authPassword" type="password" value={formData.authPassword} onChange={handleInputChange}
+                                    className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700" />
                             </div>
                         </div>
                     </div>
                 </div>
-            </SimpleModal>
+            </TransactionFormWrapper>
 
-            <SimpleModal
-                isOpen={!!activeModal}
+            <SearchModal
+                isOpen={activeModal === 'type'}
                 onClose={() => setActiveModal(null)}
-                title={`Lookup Directory`}
-                maxWidth="max-w-[600px]"
-            >
-                <div className="space-y-4 font-['Tahoma']">
-                    <div className="flex items-center gap-4 p-3 rounded-[5px] border border-slate-200 bg-white mb-2">
-                        <span className="text-[12px] font-bold text-gray-500 uppercase tracking-widest">Search Facility</span>
-                        <div className="relative flex-1">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
-                            <input
-                                type="text"
-                                placeholder={`Find ${activeModal === 'type' ? 'Transaction Types' : 'Authorized Users'} by code or name...`}
-                                className="w-full h-9 pl-10 pr-4 border border-slate-200 rounded outline-none text-sm bg-slate-50 transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20"
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                autoFocus
-                            />
-                        </div>
-                    </div>
-                    <div className="border border-slate-200 rounded-[5px] overflow-hidden shadow-sm">
-                        <div className="max-h-[400px] overflow-y-auto no-scrollbar">
-                            <table className="w-full text-left">
-                                <thead className="bg-slate-50/80 sticky top-0 text-[10px] font-mono font-bold text-gray-400 uppercase tracking-widest border-b border-slate-200">
-                                    <tr>
-                                        <th className="px-5 py-3">Code</th>
-                                        <th className="px-5 py-3">Record Name</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-slate-100">
-                                    {filteredLookup().map((item, idx) => (
-                                        <tr key={idx} className="group hover:bg-blue-50/50 cursor-pointer transition-colors" onClick={() => {
-                                            if (activeModal === 'type') {
-                                                setFormData(prev => ({ ...prev, transactionType: item.code, transactionTypeName: item.name }));
-                                            } else {
-                                                setFormData(prev => ({ ...prev, authUsername: item.name }));
-                                            }
-                                            setActiveModal(null);
-                                        }}>
-                                            <td className="px-5 py-3 font-mono text-[12px] font-mono text-gray-700">{item.code}</td>
-                                            <td className="px-5 py-3 text-[12px] font-mono text-gray-700 uppercase group-hover:text-blue-600">{item.name}</td>
-                                        </tr>
-                                    ))}
-                                    {filteredLookup().length === 0 && (
-                                        <tr>
-                                            <td colSpan="2" className="text-center py-6 text-gray-300 text-[12px] font-bold uppercase tracking-widest">No records found</td>
-                                        </tr>
-                                    )}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </SimpleModal>
+                title="Select Transaction Type"
+                items={lookups.transactionTypes}
+                onSelect={(item) => setFormData(prev => ({ ...prev, transactionType: item.code, transactionTypeName: item.name }))}
+            />
+
+            <SearchModal
+                isOpen={activeModal === 'user'}
+                onClose={() => setActiveModal(null)}
+                title="Select Authorized User"
+                items={lookups.users}
+                onSelect={(item) => setFormData(prev => ({ ...prev, authUsername: item.name }))}
+            />
         </>
     );
 };
-
 
 export default ReversalEntryBoard;

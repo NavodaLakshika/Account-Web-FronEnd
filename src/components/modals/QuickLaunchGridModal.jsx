@@ -24,7 +24,7 @@ const QuickLaunchGridModal = ({ isOpen, onClose, items, onSearch, onAIClick }) =
         aria-hidden
       />
 
-      <div className="relative w-full max-w-[960px] max-h-[90vh] overflow-hidden rounded-[10px] shadow-2xl border border-white/80 bg-gradient-to-br from-slate-100 via-slate-50 to-sky-100/90 flex flex-col">
+      <div className="relative w-full max-w-[960px] max-h-[90vh] overflow-hidden rounded-[3px] shadow-2xl border border-white/80 bg-gradient-to-br from-slate-100 via-slate-50 to-sky-100/90 flex flex-col">
         {/* Top bar */}
         <div className="flex items-start justify-between gap-3  px-5 pt-5 pb-2 shrink-0">
           <p className="text-[11px] font-bold uppercase tracking-widest text-slate-400 pt-1 ">

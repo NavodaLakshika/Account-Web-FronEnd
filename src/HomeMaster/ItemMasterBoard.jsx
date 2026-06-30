@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import SimpleModal from '../components/SimpleModal';
-import { Search, Plus, Save, RotateCcw, X, Trash2, Calendar, CheckCircle, Image as ImageIcon, Camera } from 'lucide-react';
+import { Search, Plus, Save, RotateCcw, X, Trash2, Calendar, CheckCircle, Image as ImageIcon, Camera , FileText} from 'lucide-react';
 
 import { productService } from '../services/product.service';
 import { getSessionData } from '../utils/session';
 import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
+import TransactionFormWrapper from '../components/TransactionFormWrapper';
 
 
 const ItemMasterBoard = ({ isOpen, onClose }) => {
@@ -263,28 +264,28 @@ const ItemMasterBoard = ({ isOpen, onClose }) => {
 
     return (
         <>
-            <SimpleModal isOpen={isOpen} onClose={onClose} title="Item Master Database" maxWidth="max-w-[1050px]"
+            <TransactionFormWrapper subtitle="Transaction Management" icon={FileText} isOpen={isOpen} onClose={onClose} title="Item Master" maxWidth="max-w-[700px]"
                 footer={
-                    <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-gray-100 rounded-b-xl">
+                    <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-gray-200 rounded-b-xl">
                         <div className="flex gap-3">
-                            <button onClick={handleDelete} className="px-6 h-10 bg-[#ff3b30] text-white text-sm font-black rounded-[5px] shadow-md shadow-red-100 hover:bg-[#e03127] transition-all active:scale-95 flex items-center gap-2 border-none"><Trash2 size={14} /> DELETE ITEM</button>
-                            <button onClick={handleClear} className="px-6 h-10 bg-[#00adff] text-white text-sm font-black rounded-[5px] hover:bg-[#0099e6] transition-all active:scale-95 flex items-center gap-2 border-none"><RotateCcw size={14} /> CLEAR FORM</button>
+                            <button onClick={handleDelete} className="px-6 h-10 bg-white text-[#ff3b30] border-2 border-[#ff3b30] hover:bg-red-50 text-sm font-black rounded-[3px] shadow-md shadow-red-100 hover:bg-[#e03127] transition-all active:scale-95 flex items-center gap-2 border-none"><Trash2 size={14} /> DELETE ITEM</button>
+                            <button onClick={handleClear} className="px-6 h-10 bg-white text-[#00adff] border-2 border-[#00adff] hover:bg-blue-50 text-sm font-black rounded-[3px] hover:bg-[#0099e6] transition-all active:scale-95 flex items-center gap-2 border-none"><RotateCcw size={14} /> CLEAR FORM</button>
                         </div>
                         <div className="flex gap-3">
-                            <button onClick={handleSave} disabled={isSaving} className="px-10 h-10 bg-[#2bb744] text-white text-sm font-black rounded-[5px] shadow-md shadow-green-100 hover:bg-[#259b3a] transition-all active:scale-95 flex items-center gap-2 border-none disabled:opacity-50">{isSaving ? 'SAVING...' : <><Save size={14} /> SAVE RECORD</>}</button>
+                            <button onClick={handleSave} disabled={isSaving} className="px-10 h-10 bg-white text-[#2bb744] border-2 border-[#2bb744] hover:bg-green-50 text-sm font-black rounded-[3px] shadow-md shadow-green-100 hover:bg-[#259b3a] transition-all active:scale-95 flex items-center gap-2 disabled:opacity-50">{isSaving ? 'SAVING...' : <><Save size={14} /> SAVE RECORD</>}</button>
                         </div>
                     </div>
                 }
             >
                 <div className="flex gap-6 font-['Tahoma']">
-                    <div className="flex-1 bg-white p-5 border border-gray-100 rounded-lg shadow-sm space-y-4">
+                    <div className="flex-1 bg-white p-5 border border-gray-200 rounded-[3px] shadow-sm space-y-4">
                         <div className="grid grid-cols-2 gap-x-8 gap-y-3">
                             <div className="flex items-center gap-2 col-span-2">
                                 <label className="text-[12.5px] font-bold text-gray-700 w-28 shrink-0">Item ID & Title</label>
                                 <div className="flex-1 flex gap-1 h-8 min-w-0">
-                                    <input name="code" value={formData.code} onChange={handleInput} className="w-[138px] min-w-0 h-8 border border-gray-300 rounded-[5px] px-3 font-mono text-[12px] font-black text-[#0285fd] bg-blue-50/20 outline-none shadow-sm focus:border-[#0285fd]" placeholder="ID" />
-                                    <button onClick={() => setShowSearchModal(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0"><Search size={16}/></button>
-                                    <input name="prodName" value={formData.prodName} onChange={handleInput} className="flex ml-7 w-[300px] min-w-0 h-8 border border-gray-300 rounded-[5px] px-3 font-mono text-[12px] font-bold text-gray-800 outline-none shadow-sm focus:border-[#0285fd]" placeholder="Enter Product Name..." />
+                                    <input name="code" value={formData.code} onChange={handleInput} className="w-[138px] min-w-0 h-8 border border-gray-300 rounded-[3px] px-3 font-mono text-[12px] font-black text-[#0285fd] bg-blue-50/20 outline-none shadow-sm focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd]" placeholder="ID" />
+                                    <button onClick={() => setShowSearchModal(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0"><Search size={16}/></button>
+                                    <input name="prodName" value={formData.prodName} onChange={handleInput} className="flex ml-7 w-[300px] min-w-0 h-8 border border-gray-300 rounded-[3px] px-3 font-mono text-[12px] font-bold text-gray-800 outline-none shadow-sm focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd]" placeholder="Enter Product Name..." />
                              </div>
                             </div>
                             <ModalField label="Category Group" value={formData.categoryCode} displayValue={lookups.categories.find(c => c.code === formData.categoryCode)?.name} onClick={() => setActiveLookup({ title: 'Select Category', field: 'categoryCode', data: lookups.categories })}  />
@@ -321,7 +322,7 @@ const ItemMasterBoard = ({ isOpen, onClose }) => {
                                 </label>
                             </div>
                             
-                            <div className="col-span-2 my-2 border-t border-gray-100" />
+                            <div className="col-span-2 my-2 border-t border-gray-200" />
                             
                             <InputField label="Last Purch Qty" value={formData.lastPurchQty} readOnly alignment="text-right" />
 
@@ -339,41 +340,41 @@ const ItemMasterBoard = ({ isOpen, onClose }) => {
                     </div>
 
                     <div className="w-[300px] flex flex-col gap-4">
-                        <div className="w-full aspect-square bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center text-gray-400 overflow-hidden relative group">
+                        <div className="w-full aspect-square bg-gray-50 border-2 border-dashed border-gray-300 rounded-[3px] flex flex-col items-center justify-center text-gray-400 overflow-hidden relative group">
                             {productImage ? <img src={productImage} alt="Product" className="w-full h-full object-cover" /> : <><ImageIcon size={48} strokeWidth={1} /><span className="text-xs mt-2 uppercase font-bold tracking-wider text-center">No Product Image</span></>}
                             <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                                 <button onClick={() => fileInputRef.current?.click()} className="p-3 bg-white rounded-full text-blue-600 hover:scale-110 transition-transform shadow-lg"><Camera size={20}/></button>
                             </div>
                         </div>
                         <input type="file" ref={fileInputRef} onChange={handleImageChange} className="hidden" accept="image/*" />
-                        <div className="bg-slate-50 p-4 rounded-lg border border-slate-200">
+                        <div className="bg-slate-50 p-4 rounded-[3px] border border-slate-200">
                             <h4 className="text-[11px] font-bold text-slate-800 uppercase mb-2">Live Statistics</h4>
                             <div className="space-y-2">
-                                <div className="flex justify-between items-center text-[11px]"><span className="text-slate-600 font-medium">Margin</span><span className="font-bold text-green-600">{(( (formData.sellingPrice - formData.purchasePrice) / (formData.sellingPrice || 1) ) * 100).toFixed(2)}%</span></div>
-                                <div className="h-1 bg-slate-200 rounded-full overflow-hidden"><div className="h-full bg-green-500" style={{ width: `${Math.min(100, Math.max(0, ((formData.sellingPrice - formData.purchasePrice) / (formData.sellingPrice || 1)) * 100))}%` }}></div></div>
+                                <div className="flex justify-between items-center text-[11px]"><span className="text-slate-600 font-medium">Margin</span><span className="font-bold text-blue-600">{(( (formData.sellingPrice - formData.purchasePrice) / (formData.sellingPrice || 1) ) * 100).toFixed(2)}%</span></div>
+                                <div className="h-1 bg-slate-200 rounded-full overflow-hidden"><div className="h-full bg-blue-500" style={{ width: `${Math.min(100, Math.max(0, ((formData.sellingPrice - formData.purchasePrice) / (formData.sellingPrice || 1)) * 100))}%` }}></div></div>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 {activeLookup && (
-                    <SimpleModal isOpen={!!activeLookup} onClose={() => setActiveLookup(null)} title={`${activeLookup.title} Directory`} maxWidth="max-w-[500px]">
+                    <SimpleModal isOpen={!!activeLookup} onClose={() => setActiveLookup(null)} title={`${activeLookup.title} Directory`} maxWidth="max-w-[700px]">
                         <div className="space-y-4 font-['Tahoma']">
-                            <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-lg border border-gray-100 mb-2">
+                            <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-[3px] border border-gray-200 mb-2">
                                 <span className="text-[12px] font-bold text-gray-500 uppercase tracking-widest">Directory Search</span>
                                 <div className="relative flex-1">
                                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
-                                    <input type="text" autoFocus placeholder="Filter records..." className="w-full h-9 pl-10 pr-4 border border-gray-300 rounded-[5px] outline-none text-sm focus:border-[#0285fd] bg-white shadow-sm" value={lookupQuery} onChange={(e) => setLookupQuery(e.target.value)} />
+                                    <input type="text" autoFocus placeholder="Filter records..." className="w-full h-10 pl-10 pr-4 border border-gray-300 rounded-[3px] outline-none text-[13px] focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] shadow-sm bg-white" value={lookupQuery} onChange={(e) => setLookupQuery(e.target.value)} />
                                 </div>
                             </div>
-                            <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm">
+                            <div className="border border-gray-200 rounded-[3px] overflow-hidden shadow-sm">
                                 <div className="max-h-[350px] overflow-y-auto no-scrollbar">
                                     <table className="w-full text-left">
-                                        <thead className="bg-[#f8fafd] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">
+                                        <thead className="bg-[#f8fafd] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-200">
                                             <tr>
-                                                <th className="px-5 py-3">Reference Code</th>
-                                                <th className="px-5 py-3">Detailed Description</th>
-                                                <th className="px-5 py-3 text-right">Action</th>
+                                                <th className=" px-5 py-3">Reference Code</th>
+                                                <th className=" px-5 py-3">Detailed Description</th>
+                                                <th className="text-right px-5 py-3">Action</th>
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-gray-50">
@@ -381,18 +382,18 @@ const ItemMasterBoard = ({ isOpen, onClose }) => {
                                                 item.name?.toLowerCase().includes(lookupQuery.toLowerCase()) || 
                                                 item.code?.toLowerCase().includes(lookupQuery.toLowerCase())
                                             ).map((item, idx) => (
-                                                <tr key={idx} className="group hover:bg-blue-50/50 cursor-pointer transition-colors" onClick={() => handleInputPick(activeLookup.field, item)}>
-                                                    <td className="px-5 py-3 font-mono text-[12px] font-bold text-gray-700">{item.code}</td>
-                                                    <td className="px-5 py-3 text-[12px] font-mono font-bold text-gray-700 uppercase group-hover:text-blue-600 transition-colors">{item.name}</td>
-                                                    <td className="px-5 py-3 text-right">
-                                                        <button className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95">SELECT</button>
+                                                <tr key={idx} className="group hover:bg-blue-50/50  transition-all cursor-pointer group border-b border-gray-50" onClick={() => handleInputPick(activeLookup.field, item)}>
+                                                    <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{item.code}</td>
+                                                    <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{item.name}</td>
+                                                    <td className="text-right px-5 py-3">
+                                                        <button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button>
                                                     </td>
                                                 </tr>
                                             ))}
                                             {activeLookup.data.filter(item => 
                                                 item.name?.toLowerCase().includes(lookupQuery.toLowerCase()) || 
                                                 item.code?.toLowerCase().includes(lookupQuery.toLowerCase())
-                                            ).length === 0 && <tr><td colSpan="3" className="py-10 text-center text-gray-300 font-bold uppercase tracking-widest">No matching records found</td></tr>}
+                                            ).length === 0 && <tr><td colSpan="3" className="text-center py-16 text-gray-400 text-[11px] font-bold uppercase tracking-widest">No matching records found</td></tr>}
                                         </tbody>
                                     </table>
                                 </div>
@@ -404,37 +405,37 @@ const ItemMasterBoard = ({ isOpen, onClose }) => {
                 {showSearchModal && (
                     <SimpleModal isOpen={showSearchModal} onClose={() => setShowSearchModal(false)} title="Global Reference Database" maxWidth="max-w-[700px]">
                         <div className="space-y-4 font-['Tahoma']">
-                            <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-lg border border-gray-100 mb-2">
+                            <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-[3px] border border-gray-200 mb-2">
                                 <span className="text-[12px] font-bold text-gray-500 uppercase tracking-widest">Master Search</span>
                                 <div className="relative flex-1">
                                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
-                                    <input type="text" autoFocus placeholder="Enter item code, name, or properties..." className="w-full h-9 pl-10 pr-4 border border-gray-300 rounded-[5px] outline-none text-sm focus:border-[#0285fd] bg-white shadow-sm" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleMainSearch()} />
+                                    <input type="text" autoFocus placeholder="Enter item code, name, or properties..." className="w-full h-10 pl-10 pr-4 border border-gray-300 rounded-[3px] outline-none text-[13px] focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] shadow-sm bg-white" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleMainSearch()} />
                                 </div>
-                                <button onClick={handleMainSearch} className="px-8 h-9 bg-[#0285fd] text-white rounded-[5px] font-black hover:bg-[#0073ff] transition-all active:scale-95 shadow-md text-xs tracking-widest uppercase">Perform Query</button>
+                                <button onClick={handleMainSearch} className="px-8 h-9 bg-[#0285fd] text-white rounded-[3px] font-black hover:bg-[#0073ff] transition-all active:scale-95 shadow-md text-xs tracking-widest uppercase">Perform Query</button>
                             </div>
-                            <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm">
+                            <div className="border border-gray-200 rounded-[3px] overflow-hidden shadow-sm">
                                 <div className="max-h-[400px] overflow-y-auto no-scrollbar">
                                     <table className="w-full text-left">
-                                        <thead className="bg-[#f8fafd] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">
+                                        <thead className="bg-[#f8fafd] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-200">
                                             <tr>
-                                                <th className="px-5 py-3">Item Code</th>
-                                                <th className="px-5 py-3">Technical Title</th>
-                                                <th className="px-5 py-3 text-right">Standard M.R.P</th>
-                                                <th className="px-5 py-3 text-right">Action</th>
+                                                <th className=" px-5 py-3">Item Code</th>
+                                                <th className=" px-5 py-3">Technical Title</th>
+                                                <th className="text-right px-5 py-3">Standard M.R.P</th>
+                                                <th className="text-right px-5 py-3">Action</th>
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-gray-50">
                                             {searchResults.map((item, idx) => (
-                                                <tr key={idx} className="group hover:bg-blue-50/50 cursor-pointer transition-colors" onClick={() => handleSelectResult(item)}>
-                                                    <td className="px-5 py-3 font-mono text-[12px] font-bold text-gray-700">{item.code}</td>
-                                                    <td className="px-5 py-3 text-[12px] font-mono font-bold text-gray-700 uppercase group-hover:text-blue-600 transition-colors">{item.prod_Name}</td>
-                                                    <td className="px-5 py-3 text-right font-mono font-black text-gray-600">Rs. {(item.selling_Price || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                                                    <td className="px-5 py-3 text-right">
-                                                        <button className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95">RETRIEVE ITEM</button>
+                                                <tr key={idx} className="group hover:bg-blue-50/50  transition-all cursor-pointer group border-b border-gray-50" onClick={() => handleSelectResult(item)}>
+                                                    <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{item.code}</td>
+                                                    <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{item.prod_Name}</td>
+                                                    <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">Rs. {(item.selling_Price || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                                                    <td className="text-right px-5 py-3">
+                                                        <button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">RETRIEVE ITEM</button>
                                                     </td>
                                                 </tr>
                                             ))}
-                                            {searchResults.length === 0 && <tr className="h-32"><td colSpan="4" className="text-center text-gray-300 font-bold uppercase tracking-widest">{searchQuery ? `No records found matching "${searchQuery}"` : "Initialize a query to view results"}</td></tr>}
+                                            {searchResults.length === 0 && <tr className="h-32"><td colSpan="4" className="text-center py-16 text-gray-400 text-[11px] font-bold uppercase tracking-widest">{searchQuery ? `No records found matching "${searchQuery}"` : "Initialize a query to view results"}</td></tr>}
                                         </tbody>
                                     </table>
                                 </div>
@@ -442,7 +443,7 @@ const ItemMasterBoard = ({ isOpen, onClose }) => {
                         </div>
                     </SimpleModal>
                 )}
-            </SimpleModal>
+            </TransactionFormWrapper>
         </>
     );
 };
@@ -464,7 +465,7 @@ const InputField = ({ label, name, value, onChange, type = "text", readOnly = fa
                 readOnly={readOnly}
                 autoComplete="off"
                 spellCheck="false"
-                className={`flex-1 min-w-0 h-8 border ${readOnly ? 'border-transparent bg-transparent text-gray-500' : 'border-gray-300 bg-white text-gray-700 focus:border-[#0285fd] hover:border-gray-400 shadow-sm'} font-mono font-bold rounded-[5px] px-3 text-[12px] ${alignment} outline-none transition-colors`} 
+                className={`flex-1 min-w-0 h-8 border ${readOnly ? 'border-transparent bg-transparent text-gray-500' : 'border-gray-300 bg-white text-gray-700 focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] hover:border-gray-400 shadow-sm'} font-mono font-bold rounded-[3px] px-3 text-[12px] ${alignment} outline-none transition-colors`} 
             />
         </div>
     );
@@ -478,12 +479,12 @@ const ModalField = ({ label, value, placeholder, onClick, displayValue }) => (
                 type="text" 
                 readOnly 
                 value={displayValue || value || placeholder || ''} 
-                className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-mono font-bold text-gray-600 bg-gray-50 rounded-[5px] outline-none shadow-sm cursor-pointer hover:border-gray-400 transition-colors truncate" 
+                className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-mono font-bold text-gray-600 bg-gray-50 rounded-[3px] outline-none shadow-sm cursor-pointer hover:border-gray-400 transition-colors truncate" 
                 onClick={onClick} 
             />
             <button 
                 onClick={onClick} 
-                className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0"
+                className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0"
             >
                 <Search size={16}/>
             </button>

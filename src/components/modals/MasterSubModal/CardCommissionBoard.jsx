@@ -70,10 +70,10 @@ const CardCommissionBoard = ({ isOpen, onClose }) => {
             <MasterFormWrapper
                 isOpen={isOpen}
                 onClose={onClose}
-                title="Card Sale Commission Rate"
+                title="Commission Rate"
                 subtitle="Configure bank card commission percentages"
                 icon={CreditCard}
-                maxWidth="max-w-2xl"
+                maxWidth="max-w-[700px]"
                 isEditMode={false}
                 loading={loading}
                 onClear={handleClear}
@@ -133,8 +133,8 @@ const CardCommissionBoard = ({ isOpen, onClose }) => {
                                 <br />This will update the rate to <span className="font-bold text-slate-800">{formData.Rate}%</span>.
                             </p>
                             <div className="flex gap-3">
-                                <button onClick={() => setShowSaveConfirm(false)} disabled={loading} className="flex-1 h-11 bg-slate-100 text-slate-600 text-[11px] font-black rounded-xl hover:bg-slate-200 transition-all uppercase tracking-widest disabled:opacity-50">Cancel</button>
-                                <button onClick={confirmSave} disabled={loading} className="flex-1 h-11 bg-emerald-500 text-white text-[11px] font-black rounded-xl hover:bg-emerald-600 shadow-lg shadow-emerald-200 transition-all flex items-center justify-center gap-2 uppercase tracking-widest disabled:opacity-50">{loading ? <Loader2 size={16} className="animate-spin" /> : 'Save Record'}</button>
+                                <button onClick={() => setShowSaveConfirm(false)} disabled={loading} className="flex-1 h-11 bg-slate-100 text-slate-600 text-[11px] font-black rounded-[3px] hover:bg-slate-200 transition-all uppercase tracking-widest disabled:opacity-50">Cancel</button>
+                                <button onClick={confirmSave} disabled={loading} className="flex-1 h-11 bg-emerald-500 text-white text-[11px] font-black rounded-[3px] hover:bg-emerald-600 shadow-lg shadow-emerald-200 transition-all flex items-center justify-center gap-2 uppercase tracking-widest disabled:opacity-50">{loading ? <Loader2 size={16} className="animate-spin" /> : 'Save Record'}</button>
                             </div>
                         </div>
                         <div className="bg-slate-50 py-3 border-t border-slate-100"><span className="text-[9px] text-slate-400 font-black uppercase tracking-[0.2em] block text-center">Transaction Integrity Guaranteed</span></div>

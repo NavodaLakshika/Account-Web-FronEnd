@@ -99,18 +99,18 @@ const CostCenterAuthModal = ({ isOpen, onClose, empCode, empName, userRole }) =>
             title={`Cost Center Access Matrix: ${empName || 'New User'} (${userRole})`}
             maxWidth="max-w-[95%] w-[1200px]"
             footer={
-                <div className="bg-slate-50 px-6 py-4 w-full flex justify-end gap-3 border-t border-gray-100 rounded-b-xl">
-                    <button onClick={onClose} className="px-10 h-10 bg-[#50af60] text-white text-[13px] font-bold rounded-[5px] shadow-md shadow-green-100 hover:bg-[#24db4e] transition-all active:scale-95 flex items-center justify-center gap-2">
+                <div className="bg-slate-50 px-6 py-4 w-full flex justify-end gap-3 border-t border-gray-200 rounded-b-xl">
+                    <button onClick={onClose} className="px-10 h-10 bg-[#50af60] text-white text-[13px] font-bold rounded-[3px] shadow-md shadow-green-100 hover:bg-[#24db4e] transition-all active:scale-95 flex items-center justify-center gap-2">
                         <Save size={16} /> Finish & Apply
                     </button>
-                    <button onClick={onClose} className="px-10 h-10 bg-[#00adff] text-white text-[13px] font-bold rounded-[5px] hover:bg-[#0099e6] shadow-md shadow-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2">
+                    <button onClick={onClose} className="px-10 h-10 bg-white text-[#00adff] border-2 border-[#00adff] hover:bg-blue-50 text-[13px] font-bold rounded-[3px] hover:bg-[#0099e6] shadow-md shadow-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2">
                         <X size={16} /> Cancel
                     </button>
                 </div>
             }
         >
             <div className="p-1 space-y-4 font-['Tahoma']">
-                <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-lg border border-gray-100 mb-2">
+                <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-[3px] border border-gray-200 mb-2">
                     <div className="flex items-center gap-2">
                         <Search size={14} className="text-gray-400" />
                         <span className="text-[10px] font-[900] text-gray-500 uppercase tracking-[0.2em]">Find Transaction</span>
@@ -119,19 +119,19 @@ const CostCenterAuthModal = ({ isOpen, onClose, empCode, empName, userRole }) =>
                         <input
                             type="text"
                             placeholder="Filter transactions..."
-                            className="w-full h-9 border border-gray-300 px-3 text-xs rounded-md focus:border-[#0285fd] outline-none shadow-sm bg-white"
+                            className="w-full h-10 border border-gray-300 px-3 text-xs rounded-[3px] focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] outline-none shadow-sm bg-white"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
                     </div>
                 </div>
 
-                <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm bg-white">
+                <div className="border border-gray-200 rounded-[3px] overflow-hidden shadow-sm bg-white">
                     <div className="overflow-x-auto">
                         <table className="w-full border-collapse">
                             <thead>
-                                <tr className="bg-[#f8fafd] border-b border-gray-100">
-                                    <th className="sticky left-0 bg-[#f8fafd] z-10 p-3 text-left text-[10px] font-[900] text-gray-400 uppercase tracking-[0.15em] border-r border-gray-100 min-w-[250px]">
+                                <tr className="bg-[#f8fafd] border-b border-gray-200">
+                                    <th className="sticky left-0 bg-[#f8fafd] z-10 text-left text-[10px] font-[900] text-gray-400 uppercase tracking-[0.15em] border-r border-gray-200 min-w-[250px] px-5 py-3">
                                         Transaction / Menu Item
                                     </th>
                                     {costCenters.map((cc, i) => (
@@ -149,14 +149,14 @@ const CostCenterAuthModal = ({ isOpen, onClose, empCode, empName, userRole }) =>
                                             <Loader2 size={32} className="animate-spin text-blue-500 mx-auto mb-2" />
                                             <span className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">Building Matrix...</span>
                                         </td>
-                                    </tr>
+                                    <th className="text-right px-5 py-3">Action</th></tr>
                                 ) : filteredTransactions.length > 0 ? (
                                     filteredTransactions.map((trans, ti) => {
                                         const mName = (trans.menuName || trans.MenuName || 'UNKNOWN').toString().trim();
                                         const mId = (trans.menuId || trans.MenuId || '').toString().trim();
                                         return (
-                                            <tr key={ti} className="hover:bg-blue-50/20 transition-all group">
-                                                <td className="sticky left-0 bg-white group-hover:bg-blue-50/50 z-10 p-3 text-[12px] font-bold text-slate-700 uppercase border-r border-gray-50 group-hover:text-blue-600 transition-colors">
+                                            <tr key={ti} className="hover:bg-blue-50/50/20 transition-all group cursor-pointer group border-b border-gray-50">
+                                                <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">
                                                     {mName}
                                                     <div className="text-[8px] opacity-40 font-normal group-hover:text-blue-400">ID: {mId}</div>
                                                 </td>
@@ -164,10 +164,10 @@ const CostCenterAuthModal = ({ isOpen, onClose, empCode, empName, userRole }) =>
                                                     const ccCode = (cc.costCenterCode || cc.CostCenterCode || '').toString().trim();
                                                     const checked = isChecked(mId, ccCode);
                                                     return (
-                                                        <td key={ci} className="p-2 text-center">
+                                                        <td key={ci} className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">
                                                             <button
                                                                 onClick={() => handleToggle(mId, ccCode)}
-                                                                className={`p-2 rounded-md transition-all duration-200 ${
+                                                                className={`p-2 rounded-[3px] transition-all duration-200 ${
                                                                     checked 
                                                                     ? 'text-emerald-500 bg-emerald-50 shadow-sm border border-emerald-100' 
                                                                     : 'text-slate-200 hover:text-slate-300'

@@ -27,7 +27,7 @@ const TransactionLogReportModal = ({ isOpen, onClose }) => {
     };
 
     const footer = (
-        <div className="w-full flex justify-end border-t border-gray-100 rounded-b-xl font-['Tahoma']">
+        <div className="w-full flex justify-end border-t border-gray-200 rounded-b-xl font-['Tahoma']">
             <button
                 onClick={handleDisplay}
                 disabled={loading}
@@ -44,7 +44,7 @@ const TransactionLogReportModal = ({ isOpen, onClose }) => {
                 isOpen={isOpen}
                 onClose={onClose}
                 title="Transaction Log Report"
-                maxWidth="max-w-[500px]"
+                maxWidth="max-w-[700px]"
                 footer={footer}
             >
                 <div className="py-1 select-none font-['Tahoma'] space-y-3 text-[11px] mt-1">

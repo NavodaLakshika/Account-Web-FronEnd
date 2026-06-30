@@ -150,7 +150,7 @@ const ReportPrintModal = ({ isOpen, onClose, companyName, title, subtitle, data 
                                     {col.header}
                                 </th>
                             ))}
-                        </tr>
+                        <th className="text-right px-5 py-3">Action</th></tr>
                     </thead>
                     <tbody>
                         {data.length === 0 ? (
@@ -232,7 +232,7 @@ const ReportPrintModal = ({ isOpen, onClose, companyName, title, subtitle, data 
                             <h2 className="text-xl font-bold text-gray-900">Print or save as PDF</h2>
                             <p className="text-[13px] text-gray-500 mt-1">Click <strong>Print</strong> to open the browser print dialog. Choose "Save as PDF" as destination to download.</p>
                         </div>
-                        <button onClick={onClose} className="p-1 hover:bg-gray-100 rounded-md transition-colors text-gray-500">
+                        <button onClick={onClose} className="p-1 hover:bg-gray-100 rounded-[3px] transition-colors text-gray-500">
                             <X size={20} />
                         </button>
                     </div>
@@ -610,7 +610,7 @@ const ReportPrintModal = ({ isOpen, onClose, companyName, title, subtitle, data 
                             <div className="flex justify-end mt-2">
                                 <button 
                                     onClick={() => setShowDocProps(false)}
-                                    className="px-6 py-1.5 bg-[#8ab4f8] hover:bg-[#aecbfa] text-[#202124] rounded-full font-medium transition-colors"
+                                    className="px-6 py-1.5 bg-[#8ab4f8] hover:bg-[#aecbfa] text-[#202124] rounded-[3px] font-medium transition-colors"
                                 >
                                     Close
                                 </button>
