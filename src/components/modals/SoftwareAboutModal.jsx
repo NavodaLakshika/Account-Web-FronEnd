@@ -14,7 +14,7 @@ const SoftwareAboutModal = ({ isOpen, onClose }) => {
 
             {/* Horizontal Banner Style Modal - Ultra Simple & Professional */}
             <div 
-                className={`fixed top-4 left-1/2 -translate-x-1/2 w-[85%] max-w-[1100px] h-[200px] bg-white/95 backdrop-blur-[40px] z-[1200] rounded-[2px] border border-gray-100 transition-all duration-1000 ease-[cubic-bezier(0.19,1,0.22,1)] ${
+                className={`fixed top-4 left-1/2 -translate-x-1/2 w-[85%] max-w-[1100px] h-[200px] bg-white/95 backdrop-blur-[40px] z-[1200] rounded-[2px] border border-gray-200 transition-all duration-1000 ease-[cubic-bezier(0.19,1,0.22,1)] ${
                     isOpen ? 'translate-y-0 opacity-100 shadow-[0_30px_60px_rgba(0,0,0,0.1)]' : '-translate-y-[calc(100%+100px)] opacity-0 pointer-events-none'
                 }`}
                 style={{ fontFamily: "'Tahoma', sans-serif" }}
@@ -23,7 +23,7 @@ const SoftwareAboutModal = ({ isOpen, onClose }) => {
                 {isOpen && (
                     <button 
                         onClick={onClose}
-                        className="absolute bottom-[-16px] left-1/2 -translate-x-1/2 w-28 h-6 bg-gradient-to-b from-white to-gray-50 shadow-[0_8px_20px_rgba(0,0,0,0.08)] rounded-[2px] flex items-center justify-center gap-2 text-gray-400 hover:text-[#0078d4] transition-all hover:scale-105 active:scale-95 z-[1220] border-x border-b border-gray-100 border-t-2 border-[#0078d4] group animate-in fade-in zoom-in duration-500 delay-300"
+                        className="absolute bottom-[-16px] left-1/2 -translate-x-1/2 w-28 h-6 bg-gradient-to-b from-white to-gray-50 shadow-[0_8px_20px_rgba(0,0,0,0.08)] rounded-[2px] flex items-center justify-center gap-2 text-gray-400 hover:text-[#0078d4] transition-all hover:scale-105 active:scale-95 z-[1220] border-x border-b border-gray-200 border-t-2 border-[#0078d4] group animate-in fade-in zoom-in duration-500 delay-300"
                     >
                         <span className="text-[8px] font-mono font-black tracking-[0.2em] uppercase opacity-60 group-hover:opacity-100 transition-opacity">Minimize</span>
                         <ChevronUp size={12} strokeWidth={4} className="group-hover:-translate-y-0.5 transition-transform" />

@@ -190,9 +190,9 @@ const FirstTimeGuide = ({ isOpen, onClose, user }) => {
                 className="absolute z-[3010] transition-all duration-500 ease-out pointer-events-auto animate-in fade-in zoom-in-95" 
                 style={{ top: tooltipTop, left: tooltipLeft }}
             >
-                <div className="relative bg-white rounded-[5px] shadow-[0_12px_40px_rgba(0,0,0,0.12)] border border-slate-200 p-6 min-w-[340px] max-w-[380px]">
+                <div className="relative bg-white rounded-[3px] shadow-[0_12px_40px_rgba(0,0,0,0.12)] border border-slate-200 p-6 min-w-[340px] max-w-[380px]">
                     <h3 className="text-[17px] font-bold text-slate-900 mb-2 flex items-center gap-3">
-                        {/* <div className="w-8 h-8 rounded-[10px] bg-blue-50 border border-blue-100 flex items-center justify-center shrink-0">
+                        {/* <div className="w-8 h-8 rounded-[3px] bg-blue-50 border border-blue-100 flex items-center justify-center shrink-0">
                             <Sparkles size={16} className="text-blue-600" strokeWidth={2.5} />
                         </div> */}
                         {step.title}
@@ -214,7 +214,7 @@ const FirstTimeGuide = ({ isOpen, onClose, user }) => {
                                     <ChevronLeft size={16} strokeWidth={2.5} className="-ml-0.5" />
                                 </button>
                             )}
-                            <button onClick={handleNext} className="h-8 px-5 flex items-center justify-center gap-1.5 rounded-[10px] bg-blue-600 text-white hover:bg-blue-700 text-[13px] font-bold transition-all active:scale-95 cursor-pointer pointer-events-auto shadow-sm">
+                            <button onClick={handleNext} className="h-8 px-5 flex items-center justify-center gap-1.5 rounded-[3px] bg-blue-600 text-white hover:bg-blue-700 text-[13px] font-bold transition-all active:scale-95 cursor-pointer pointer-events-auto shadow-sm">
                                 {isLast ? 'Done' : 'Next'}
                                 {!isLast && <ChevronRight size={16} strokeWidth={2.5} className="-mr-1" />}
                             </button>

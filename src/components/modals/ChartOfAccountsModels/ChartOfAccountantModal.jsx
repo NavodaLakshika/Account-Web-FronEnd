@@ -27,7 +27,7 @@ const ChartOfAccountantModal = ({ isOpen, onClose, onCreateNewAccount, onOpenFix
  <div className="relative w-full max-w-sm bg-white rounded-sm shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
                     
                     {/* Header */}
-                    <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-100 select-none relative overflow-hidden">
+                    <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-200 select-none relative overflow-hidden">
                         {/* System Color Left Accent */}
                         <div 
                             className="absolute left-0 top-0 bottom-0 w-1.5 transition-colors duration-500" 
@@ -59,7 +59,7 @@ const ChartOfAccountantModal = ({ isOpen, onClose, onCreateNewAccount, onOpenFix
                             <button
                                 key={idx}
                                 onClick={item.onClick}
-                                className="w-full flex items-center justify-between px-4 py-3 rounded-lg hover:bg-slate-50 group transition-all relative overflow-hidden text-left border border-transparent hover:border-slate-200"
+                                className="w-full flex items-center justify-between px-4 py-3 rounded-[3px] hover:bg-slate-50 group transition-all relative overflow-hidden text-left border border-transparent hover:border-slate-200"
                             >
                                 {/* Hover Indicator Bar */}
                                 <div 

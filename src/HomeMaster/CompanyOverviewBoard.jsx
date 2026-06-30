@@ -198,7 +198,7 @@ const CompanyOverviewBoard = ({ company, onClose, onTransactionDeleted }) => {
                     </div>
                     <div className="flex items-center gap-2 bg-slate-50 p-1 ">
                         {['Week', 'Month', 'Year'].map(t => (
-                            <button key={t} className={`px-4 py-1.5 text-xs font-bold rounded-md transition-colors ${t === 'Week' ? 'bg-white text-[#0078d4] shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}>
+                            <button key={t} className={`px-4 py-1.5 text-xs font-bold rounded-[3px] transition-colors ${t === 'Week' ? 'bg-white text-[#0078d4] shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}>
                                 {t}
                             </button>
                         ))}
@@ -320,14 +320,14 @@ const CompanyOverviewBoard = ({ company, onClose, onTransactionDeleted }) => {
                                 <th className="py-4 px-6 text-xs font-bold tracking-wider uppercase text-slate-400">Date</th>
                                 <th className="py-4 px-6 text-xs font-bold tracking-wider uppercase text-slate-400 text-right">Amount</th>
                                 <th className="py-4 px-6 text-xs font-bold tracking-wider uppercase text-slate-400 text-center">Actions</th>
-                            </tr>
+                            <th className="text-right px-5 py-3">Action</th></tr>
                         </thead>
                         <tbody>
                             {filteredTransactions.map(tx => (
                                 <tr key={tx.docNo} className="border-b border-slate-50 hover:bg-blue-50/30 transition-colors group">
                                     <td className="py-4 px-6 font-mono text-sm text-slate-900 font-bold">{tx.docNo}</td>
                                     <td className="py-4 px-6">
-                                        <span className={`px-2.5 py-1 text-xs font-bold uppercase tracking-wider rounded-md ${
+                                        <span className={`px-2.5 py-1 text-xs font-bold uppercase tracking-wider rounded-[3px] ${
                                             tx.payType === 'Cash' ? 'bg-emerald-100 text-emerald-700' :
                                             tx.payType === 'Credit' ? 'bg-blue-100 text-blue-700' :
                                             'bg-slate-100 text-slate-700'

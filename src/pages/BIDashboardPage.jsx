@@ -12,16 +12,16 @@ import WriteChequeBoard from './WriteChequeBoard';
 import PettyCashBoard from '../HomeMaster/PettyCashBoard';
 import JournalEntryBoard from './JournalEntryBoard';
 import MakeDepositBoard from './MakeDepositBoard';
-import PurchaseOrderBoard from '../HomeMaster/PurchaseOrderBoard';
-import GRNBoard from '../HomeMaster/GRNBoard';
-import BulkGRNBoard from '../HomeMaster/BulkGRNBoard';
-import SalesOrderBoard from '../HomeMaster/SalesOrderBoard';
-import SalesReceiptBoard from '../HomeMaster/SalesReceiptBoard';
-import ReceivePaymentBoard from '../HomeMaster/ReceivePaymentBoard';
+import PurchaseOrderBoard from './PurchaseOrderBoard';
+import GRNBoard from './GRNBoard';
+import BulkGRNBoard from './BulkGRNBoard';
+import SalesOrderBoard from './SalesOrderBoard';
+import SalesReceiptBoard from './SalesReceiptBoard';
+import ReceivePaymentBoard from './ReceivePaymentBoard';
 import EstimateBoard from './EstimateBoard';
-import SalesInvoiceBoard from '../HomeMaster/SalesInvoiceBoard';
-import ChequeRegisterBoard from '../HomeMaster/ChequeRegisterBoard';
-import MarketingToolBoard from '../HomeMaster/MarketingToolBoard';
+import SalesInvoiceBoard from './SalesInvoiceBoard';
+import ChequeRegisterBoard from './ChequeRegisterBoard';
+import MarketingToolBoard from './MarketingToolBoard';
 import SupplierMasterBoard from '../components/modals/MasterSubModal/SupplierMasterBoard';
 import CustomerMasterBoard from '../components/modals/MasterSubModal/CustomerMasterBoard';
 import AccountBalanceBoard from '../HomeMaster/AccountBalanceBoard';
@@ -125,7 +125,7 @@ const BIDashboardPage = () => {
     };
 
     return (
-        <div className="h-screen w-screen overflow-hidden flex flex-col bg-[#f8fafc]">
+        <div className="h-screen w-screen overflow-hidden flex flex-col bg-slate-50">
             {/* Subscription Banner */}
             {showSubscriptionBanner && (
                 <div className="bg-[#0078d4] text-white text-[13px] h-9 flex-shrink-0 flex justify-center items-center gap-2 relative z-50 transition-all animate-in slide-in-from-top duration-300">

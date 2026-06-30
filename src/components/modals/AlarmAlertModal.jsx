@@ -52,7 +52,7 @@ const AlarmAlertModal = ({ isOpen, onClose, task, onComplete }) => {
                                 if (onComplete) onComplete(task);
                                 onClose();
                             }}
-                            className="h-[26px] px-4 bg-white text-[#FF003C] text-[11px] font-extrabold rounded-md shadow-sm hover:bg-slate-50 transition-all active:scale-95 flex items-center justify-center tracking-widest"
+                            className="h-[26px] px-4 bg-white text-[#FF003C] text-[11px] font-extrabold rounded-[3px] shadow-sm hover:bg-slate-50 transition-all active:scale-95 flex items-center justify-center tracking-widest"
                         >
                             <Check size={14} className="mr-1.5" strokeWidth={3} />
                             MARK DONE
@@ -60,7 +60,7 @@ const AlarmAlertModal = ({ isOpen, onClose, task, onComplete }) => {
                         
                         <button 
                             onClick={onClose}
-                            className="h-[26px] px-3 border border-white/40 text-white text-[11px] font-extrabold rounded-md hover:bg-white/20 transition-all active:scale-95 flex items-center justify-center tracking-widest"
+                            className="h-[26px] px-3 border border-white/40 text-white text-[11px] font-extrabold rounded-[3px] hover:bg-white/20 transition-all active:scale-95 flex items-center justify-center tracking-widest"
                         >
                             <X size={14} className="mr-1" strokeWidth={3} />
                             DISMISS

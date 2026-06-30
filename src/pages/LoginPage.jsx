@@ -101,7 +101,7 @@ const LoginPage = () => {
             <p className="text-blue-100 mb-6 opacity-90 text-xs uppercase tracking-[0.2em] font-bold">New to the system?</p>
             <Link
               to="/register"
-              className="inline-block border-2 border-white px-12 py-3 rounded-full font-bold hover:bg-white hover:text-[#2b5797] transition-all duration-300 shadow-lg active:scale-95"
+              className="inline-block border-2 border-white px-12 py-3 rounded-[3px] font-bold hover:bg-white hover:text-[#2b5797] transition-all duration-300 shadow-lg active:scale-95"
             >
               Register Now
             </Link>
@@ -110,7 +110,7 @@ const LoginPage = () => {
 
         {/* Right Pane - Login Form (Accounting Clean) */}
         <div className="w-full md:w-1/2 flex flex-col items-center justify-center p-8 md:p-16 bg-white">
-          <div className="w-full max-w-sm animate-slide-left">
+          <div className="w-full animate-slide-left">
             <div className="mb-10 block md:hidden text-center">
               <img src="/onimta_logo.png" alt="Onimta Logo" className="w-16 h-16 object-contain mx-auto" />
             </div>
@@ -177,7 +177,7 @@ const LoginPage = () => {
               <span className="text-[10px] text-slate-400 font-black uppercase tracking-[0.3em] block mb-6">Secured by Onimta Cloud</span>
               <div className="flex justify-center gap-4">
                 {[Chrome, Facebook, Github].map((Icon, i) => (
-                  <button key={i} className="p-3 bg-white border border-slate-100 rounded-xl hover:shadow-lg hover:border-blue-100 transition-all text-slate-400 hover:text-[#2b5797]">
+                  <button key={i} className="p-3 bg-white border border-slate-100 rounded-[3px] hover:shadow-lg hover:border-blue-100 transition-all text-slate-400 hover:text-[#2b5797]">
                     <Icon className="w-5 h-5" />
                   </button>
                 ))}

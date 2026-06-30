@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { 
     Building2, 
     Loader2, 
@@ -7,7 +8,7 @@ import {
     PlusCircle
 } from 'lucide-react';
 import { authService } from '../../services/auth.service';
-import { showErrorToast, showPendingToast } from '../../utils/toastUtils';
+import { showErrorToast } from '../../utils/toastUtils';
 import ContactSupportModal from './ContactSupportModal';
 import CreateCompanyModal from './CreateCompanyModal';
 
@@ -18,6 +19,7 @@ const CompanySelectModal = ({ isOpen, onClose, onSelect, user }) => {
     const [fetching, setFetching] = useState(true);
     const [companies, setCompanies] = useState([]);
     const [selectedCompanyId, setSelectedCompanyId] = useState(null);
+    const [connectingCompany, setConnectingCompany] = useState(null);
     const [showSupport, setShowSupport] = useState(false);
     const [showCreateCompany, setShowCreateCompany] = useState(false);
 
@@ -60,13 +62,13 @@ const CompanySelectModal = ({ isOpen, onClose, onSelect, user }) => {
         setLoading(true);
         try {
             await authService.openCompany(userName, selected.id);
-            showPendingToast(`Connecting to ${selected.name}...`, "Initializing workspace");
-            
+            setConnectingCompany(selected.name);
+
             const audio = new Audio(SUCCESS_SOUND_URL);
             audio.volume = 0.5;
             audio.play().catch(e => console.error("Audio play failed:", e));
 
-            onSelect();
+            setTimeout(() => onSelect(), 1500);
         } catch (err) {
             showErrorToast(typeof err === 'object' ? (err.message || "Error opening company") : err);
         } finally {
@@ -77,6 +79,7 @@ const CompanySelectModal = ({ isOpen, onClose, onSelect, user }) => {
     if (!isOpen) return null;
 
     return (
+        <>
         <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center p-4 font-['Arial']">
             {/* Clean, frosted glass overlay */}
             <div className="absolute inset-0 bg-slate-800/40 backdrop-blur-sm" />
@@ -191,6 +194,24 @@ const CompanySelectModal = ({ isOpen, onClose, onSelect, user }) => {
                 }}
             />
         </div>
+
+            {/* Full-page Connecting Overlay */}
+            {connectingCompany && (
+                <div className="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-slate-800/60 backdrop-blur-sm animate-in fade-in duration-300">
+                    <div className="w-full max-w-md mx-auto px-8 text-center">
+                        <div className="flex flex-col items-center gap-4">
+                            <Loader2 size={36} className="text-white animate-spin" />
+                            <h3 className="text-white text-xl font-bold font-sans tracking-wide">
+                                Connecting to {connectingCompany}...
+                            </h3>
+                            <p className="text-white/70 text-sm font-sans">
+                                Initializing workspace
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </>
     );
 };
 

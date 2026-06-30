@@ -117,7 +117,7 @@ const ToDoListBoard = ({ isOpen, onClose }) => {
                             {/* Add Task View */}
                             <div className="flex items-center gap-5 mb-8 px-2 select-none">
                                 <div className="relative">
-                                    <div className="w-14 h-14 bg-red-500 rounded-lg flex items-center justify-center shadow-inner">
+                                    <div className="w-14 h-14 bg-red-500 rounded-[3px] flex items-center justify-center shadow-inner">
                                         <ClipboardList size={32} className="text-white" strokeWidth={1.5} />
                                     </div>
                                     <div className="absolute -bottom-2 -right-2 bg-white rounded-full p-1 shadow-sm border border-slate-100">
@@ -130,13 +130,13 @@ const ToDoListBoard = ({ isOpen, onClose }) => {
                                 </div>
                             </div>
 
-                            <div className="space-y-5 bg-white p-5 rounded-lg border border-slate-200 shadow-sm">
+                            <div className="space-y-5 bg-white p-5 rounded-[3px] border border-slate-200 shadow-sm">
                                 <div>
                                     <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Task Description</label>
                                     <textarea 
                                         value={description}
                                         onChange={(e) => setDescription(e.target.value)}
-                                        className="w-full h-28 p-3 text-sm resize-none border border-slate-200 rounded-md focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 transition-all text-slate-700 placeholder:text-slate-400 font-medium"
+                                        className="w-full h-28 p-3 text-sm resize-none border border-slate-200 rounded-[3px] focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 transition-all text-slate-700 placeholder:text-slate-400 font-medium"
                                         placeholder="What needs to be done?"
                                     />
                                 </div>
@@ -144,7 +144,7 @@ const ToDoListBoard = ({ isOpen, onClose }) => {
                                 <div className="flex gap-4">
                                     <div className="flex-1">
                                         <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Date</label>
-                                        <div className="flex items-center border border-slate-200 rounded-md overflow-hidden focus-within:border-blue-400 focus-within:ring-1 focus-within:ring-blue-400 transition-all bg-white">
+                                        <div className="flex items-center border border-slate-200 rounded-[3px] overflow-hidden focus-within:border-blue-400 focus-within:ring-1 focus-within:ring-blue-400 transition-all bg-white">
                                             <input 
                                                 type="text" 
                                                 readOnly
@@ -162,7 +162,7 @@ const ToDoListBoard = ({ isOpen, onClose }) => {
                                     </div>
                                     <div className="flex-1">
                                         <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Time</label>
-                                        <div className="flex items-center border border-slate-200 rounded-md overflow-hidden px-3 gap-2 focus-within:border-blue-400 focus-within:ring-1 focus-within:ring-blue-400 transition-all bg-white cursor-pointer hover:bg-slate-50">
+                                        <div className="flex items-center border border-slate-200 rounded-[3px] overflow-hidden px-3 gap-2 focus-within:border-blue-400 focus-within:ring-1 focus-within:ring-blue-400 transition-all bg-white cursor-pointer hover:bg-slate-50">
                                             <Clock size={16} className="text-slate-400 shrink-0" />
                                             <input 
                                                 type="time" 
@@ -180,7 +180,7 @@ const ToDoListBoard = ({ isOpen, onClose }) => {
                         <>
                             {/* All Tasks View */}
                             <div className="flex items-center gap-4 mb-6 px-2 select-none">
-                                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                                <div className="w-12 h-12 bg-blue-100 rounded-[3px] flex items-center justify-center">
                                     <LayoutList size={24} className="text-blue-600" />
                                 </div>
                                 <div>
@@ -189,7 +189,7 @@ const ToDoListBoard = ({ isOpen, onClose }) => {
                                 </div>
                             </div>
 
-                            <div className="bg-white border border-slate-200 rounded-lg shadow-sm overflow-hidden min-h-[300px] flex flex-col">
+                            <div className="bg-white border border-slate-200 rounded-[3px] shadow-sm overflow-hidden min-h-[300px] flex flex-col">
                                 {tasks.length === 0 ? (
                                     <div className="flex-1 flex flex-col items-center justify-center p-8 text-slate-400">
                                         <CheckCircle2 size={48} strokeWidth={1} className="mb-4 opacity-20" />
@@ -233,7 +233,7 @@ const ToDoListBoard = ({ isOpen, onClose }) => {
                                                     </div>
                                                     <button
                                                         onClick={() => deleteTask(task)}
-                                                        className="w-8 h-8 rounded-md text-slate-300 hover:text-red-500 hover:bg-red-50 flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 shrink-0"
+                                                        className="w-8 h-8 rounded-[3px] text-slate-300 hover:text-red-500 hover:bg-red-50 flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 shrink-0"
                                                     >
                                                         <Trash2 size={16} />
                                                     </button>

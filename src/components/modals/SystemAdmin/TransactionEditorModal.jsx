@@ -189,14 +189,14 @@ const TransactionEditorModal = ({ isOpen, onClose }) => {
                 <button 
                     onClick={handleSave}
                     disabled={loading}
-                    className="h-10 px-6 bg-[#28a745] text-white text-[11px] font-black rounded-[5px] uppercase tracking-widest hover:bg-[#218838] shadow-md shadow-green-100 transition-all active:scale-95 flex items-center gap-2 disabled:opacity-50"
+                    className="h-10 px-6 bg-[#28a745] text-white text-[11px] font-black rounded-[3px] uppercase tracking-widest hover:bg-[#218838] shadow-md shadow-green-100 transition-all active:scale-95 flex items-center gap-2 disabled:opacity-50"
                 >
                     {loading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} strokeWidth={3} />}
                     Save
                 </button>
                 <button 
                     onClick={handleClear}
-                    className="h-10 px-6 bg-[#0285fd] text-white text-[11px] font-black rounded-[5px] uppercase tracking-widest hover:bg-[#0073ff] shadow-md shadow-blue-100 transition-all active:scale-95 flex items-center gap-2"
+                    className="h-10 px-6 bg-[#0285fd] text-white text-[11px] font-black rounded-[3px] uppercase tracking-widest hover:bg-[#0073ff] shadow-md shadow-blue-100 transition-all active:scale-95 flex items-center gap-2"
                 >
                     <Eraser size={14} strokeWidth={3} />
                     Clear
@@ -211,7 +211,7 @@ const TransactionEditorModal = ({ isOpen, onClose }) => {
                 isOpen={isOpen}
                 onClose={onClose}
                 title="TRANSACTION EDITOR"
-                maxWidth="max-w-[1100px]"
+                maxWidth="max-w-[700px]"
                 footer={footer}
             >
                 <div className="p-6 font-['Tahoma'] select-none">
@@ -225,9 +225,9 @@ const TransactionEditorModal = ({ isOpen, onClose }) => {
                                     value={transType}
                                     readOnly
                                     onClick={() => setShowLookup('transType')}
-                                    className="flex-grow h-9 border border-slate-200 px-3 bg-white rounded-[5px] outline-none font-bold text-slate-700 text-[12px] cursor-pointer"
+                                    className="flex-grow h-9 border border-slate-200 px-3 bg-white rounded-[3px] outline-none font-bold text-slate-700 text-[12px] cursor-pointer"
                                 />
-                                <button onClick={() => setShowLookup('transType')} className="w-9 h-9 bg-[#0285fd] text-white flex items-center justify-center rounded-[5px] hover:bg-[#0073ff] shadow-md transition-all active:scale-90">
+                                <button onClick={() => setShowLookup('transType')} className="w-9 h-9 bg-[#0285fd] text-white flex items-center justify-center rounded-[3px] hover:bg-[#0073ff] shadow-md transition-all active:scale-90">
                                     <Search size={14} strokeWidth={3}/>
                                 </button>
                             </div>
@@ -240,9 +240,9 @@ const TransactionEditorModal = ({ isOpen, onClose }) => {
                                     type="text" 
                                     value={docNo}
                                     onChange={(e) => setDocNo(e.target.value)}
-                                    className="flex-grow h-9 border border-slate-200 px-3 bg-white rounded-[5px] outline-none font-bold text-slate-700 text-[12px] focus:border-[#0285fd]"
+                                    className="flex-grow h-9 border border-slate-200 px-3 bg-white rounded-[3px] outline-none font-bold text-slate-700 text-[12px] focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd]"
                                 />
-                                <button onClick={handleLoad} className="px-3 bg-[#e49e1b] text-white rounded-[5px] font-bold text-[10px] uppercase tracking-tighter hover:bg-[#cb9b34] transition-all">Load</button>
+                                <button onClick={handleLoad} className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">Load</button>
                             </div>
                         </div>
 
@@ -254,11 +254,11 @@ const TransactionEditorModal = ({ isOpen, onClose }) => {
                                     value={transDate} 
                                     readOnly 
                                     onClick={() => setShowCalendar('trans')}
-                                    className="flex-grow h-9 border border-slate-200 px-3 bg-white rounded-[5px] outline-none font-bold text-slate-700 text-[12px] cursor-pointer"
+                                    className="flex-grow h-9 border border-slate-200 px-3 bg-white rounded-[3px] outline-none font-bold text-slate-700 text-[12px] cursor-pointer"
                                 />
                                 <button 
                                     onClick={() => setShowCalendar('trans')}
-                                    className="w-9 h-9 bg-[#0285fd] text-white flex items-center justify-center rounded-[5px] hover:bg-[#0073ff] shadow-md transition-all active:scale-90 shrink-0"
+                                    className="w-9 h-9 bg-[#0285fd] text-white flex items-center justify-center rounded-[3px] hover:bg-[#0073ff] shadow-md transition-all active:scale-90 shrink-0"
                                 >
                                     <CalendarIcon size={16} strokeWidth={3} />
                                 </button>
@@ -271,14 +271,14 @@ const TransactionEditorModal = ({ isOpen, onClose }) => {
                                 type="text" 
                                 value={amount}
                                 onChange={(e) => setAmount(e.target.value)}
-                                className="w-full h-9 border border-slate-200 px-3 bg-slate-50 rounded-[5px] outline-none font-black text-[#0285fd] text-[14px] font-mono text-right"
+                                className="w-full h-9 border border-slate-200 px-3 bg-slate-50 rounded-[3px] outline-none font-black text-[#0285fd] text-[14px] font-mono text-right"
                             />
                         </div>
                     </div>
 
                     {/* Middle Section: Vendor/Payee and Cheque */}
                     <div className="grid grid-cols-12 gap-6 mb-6">
-                        <div className="col-span-6 space-y-4 bg-slate-50/50 p-4 border border-slate-100 rounded-xl">
+                        <div className="col-span-6 space-y-4 bg-slate-50/50 p-4 border border-slate-100 rounded-[3px]">
                             <div className="space-y-1.5">
                                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Vendor / Entity</label>
                                 <div className="flex gap-1.5">
@@ -286,15 +286,15 @@ const TransactionEditorModal = ({ isOpen, onClose }) => {
                                         type="text" 
                                         value={vendor.code} 
                                         readOnly 
-                                        className="w-24 h-9 border border-slate-200 px-3 bg-white rounded-[5px] outline-none font-bold text-slate-600 text-[12px]" 
+                                        className="w-24 h-9 border border-slate-200 px-3 bg-white rounded-[3px] outline-none font-bold text-slate-600 text-[12px]" 
                                     />
                                     <input 
                                         type="text" 
                                         value={vendor.name} 
                                         readOnly 
-                                        className="flex-grow h-9 border border-slate-200 px-3 bg-white rounded-[5px] outline-none font-bold text-slate-600 text-[12px]" 
+                                        className="flex-grow h-9 border border-slate-200 px-3 bg-white rounded-[3px] outline-none font-bold text-slate-600 text-[12px]" 
                                     />
-                                    <button onClick={() => setShowLookup('vendor')} className="w-9 h-9 bg-[#0285fd] text-white flex items-center justify-center rounded-[5px] hover:bg-[#0073ff] shadow-sm"><Search size={14}/></button>
+                                    <button onClick={() => setShowLookup('vendor')} className="w-9 h-9 bg-[#0285fd] text-white flex items-center justify-center rounded-[3px] hover:bg-[#0073ff] shadow-sm"><Search size={14}/></button>
                                 </div>
                             </div>
                             <div className="space-y-1.5">
@@ -303,7 +303,7 @@ const TransactionEditorModal = ({ isOpen, onClose }) => {
                                     type="text" 
                                     value={payee}
                                     onChange={(e) => setPayee(e.target.value)}
-                                    className="w-full h-9 border border-slate-200 px-3 bg-white rounded-[5px] outline-none font-bold text-slate-700 text-[12px]"
+                                    className="w-full h-9 border border-slate-200 px-3 bg-white rounded-[3px] outline-none font-bold text-slate-700 text-[12px]"
                                 />
                             </div>
                             <div className="space-y-1.5">
@@ -311,12 +311,12 @@ const TransactionEditorModal = ({ isOpen, onClose }) => {
                                 <textarea 
                                     value={memo}
                                     onChange={(e) => setMemo(e.target.value)}
-                                    className="w-full h-20 border border-slate-200 p-3 bg-white rounded-[5px] outline-none font-medium text-slate-600 text-[12px] resize-none focus:border-[#0285fd]"
+                                    className="w-full h-20 border border-slate-200 p-3 bg-white rounded-[3px] outline-none font-medium text-slate-600 text-[12px] resize-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd]"
                                 />
                             </div>
                         </div>
 
-                        <div className="col-span-6 space-y-4 bg-slate-50/50 p-4 border border-slate-100 rounded-xl">
+                        <div className="col-span-6 space-y-4 bg-slate-50/50 p-4 border border-slate-100 rounded-[3px]">
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-1.5">
                                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Cheque Date</label>
@@ -326,11 +326,11 @@ const TransactionEditorModal = ({ isOpen, onClose }) => {
                                             value={chequeDate} 
                                             readOnly 
                                             onClick={() => setShowCalendar('cheque')}
-                                            className="flex-grow h-9 border border-slate-200 px-3 bg-white rounded-[5px] outline-none font-bold text-slate-700 text-[12px] cursor-pointer"
+                                            className="flex-grow h-9 border border-slate-200 px-3 bg-white rounded-[3px] outline-none font-bold text-slate-700 text-[12px] cursor-pointer"
                                         />
                                         <button 
                                             onClick={() => setShowCalendar('cheque')}
-                                            className="w-9 h-9 bg-[#0285fd] text-white flex items-center justify-center rounded-[5px] hover:bg-[#0073ff] shadow-md transition-all active:scale-90 shrink-0"
+                                            className="w-9 h-9 bg-[#0285fd] text-white flex items-center justify-center rounded-[3px] hover:bg-[#0073ff] shadow-md transition-all active:scale-90 shrink-0"
                                         >
                                             <CalendarIcon size={16} strokeWidth={3} />
                                         </button>
@@ -342,7 +342,7 @@ const TransactionEditorModal = ({ isOpen, onClose }) => {
                                         type="text" 
                                         value={chequeNo}
                                         onChange={(e) => setChequeNo(e.target.value)}
-                                        className="w-full h-9 border border-slate-200 px-3 bg-white rounded-[5px] outline-none font-bold text-slate-700 text-[12px]"
+                                        className="w-full h-9 border border-slate-200 px-3 bg-white rounded-[3px] outline-none font-bold text-slate-700 text-[12px]"
                                     />
                                 </div>
                             </div>
@@ -353,15 +353,15 @@ const TransactionEditorModal = ({ isOpen, onClose }) => {
                                         type="text" 
                                         value={paymentAcc.code} 
                                         readOnly 
-                                        className="w-24 h-9 border border-slate-200 px-3 bg-white rounded-[5px] outline-none font-bold text-slate-600 text-[12px]" 
+                                        className="w-24 h-9 border border-slate-200 px-3 bg-white rounded-[3px] outline-none font-bold text-slate-600 text-[12px]" 
                                     />
                                     <input 
                                         type="text" 
                                         value={paymentAcc.name} 
                                         readOnly 
-                                        className="flex-grow h-9 border border-slate-200 px-3 bg-white rounded-[5px] outline-none font-bold text-slate-600 text-[12px]" 
+                                        className="flex-grow h-9 border border-slate-200 px-3 bg-white rounded-[3px] outline-none font-bold text-slate-600 text-[12px]" 
                                     />
-                                    <button onClick={() => setShowLookup('acc')} className="w-9 h-9 bg-[#0285fd] text-white flex items-center justify-center rounded-[5px] hover:bg-[#0073ff] shadow-sm"><Search size={14}/></button>
+                                    <button onClick={() => setShowLookup('acc')} className="w-9 h-9 bg-[#0285fd] text-white flex items-center justify-center rounded-[3px] hover:bg-[#0073ff] shadow-sm"><Search size={14}/></button>
                                 </div>
                             </div>
                             <div className="space-y-1.5">
@@ -370,31 +370,31 @@ const TransactionEditorModal = ({ isOpen, onClose }) => {
                                     type="text" 
                                     value={depositor}
                                     onChange={(e) => setDepositor(e.target.value)}
-                                    className="w-full h-9 border border-slate-200 px-3 bg-white rounded-[5px] outline-none font-bold text-slate-700 text-[12px]"
+                                    className="w-full h-9 border border-slate-200 px-3 bg-white rounded-[3px] outline-none font-bold text-slate-700 text-[12px]"
                                 />
                             </div>
                         </div>
                     </div>
 
                     {/* Table Section */}
-                    <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm mb-6">
+                    <div className="bg-white border border-slate-200 rounded-[3px] overflow-hidden shadow-sm mb-6">
                         <table className="w-full border-collapse">
                             <thead>
                                 <tr className="bg-[#f8fafd] border-b border-slate-200">
-                                    <th className="px-4 py-3 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Expense Account</th>
-                                    <th className="px-4 py-3 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Cost Center</th>
-                                    <th className="px-4 py-3 text-right text-[10px] font-black text-slate-400 uppercase tracking-widest">Amount</th>
-                                    <th className="px-4 py-3 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Memo</th>
-                                    <th className="px-4 py-3 w-[50px]"></th>
+                                    <th className="text-left text-[10px] font-black text-slate-400 uppercase tracking-widest px-5 py-3">Expense Account</th>
+                                    <th className="text-left text-[10px] font-black text-slate-400 uppercase tracking-widest px-5 py-3">Cost Center</th>
+                                    <th className="text-right text-[10px] font-black text-slate-400 uppercase tracking-widest px-5 py-3">Amount</th>
+                                    <th className="text-left text-[10px] font-black text-slate-400 uppercase tracking-widest px-5 py-3">Memo</th>
+                                    <th className="w-[50px] px-5 py-3"></th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-100">
                                 {rows.length === 0 ? (
                                     <tr>
-                                        <td colSpan="5" className="px-4 py-12 text-center text-slate-300 font-bold uppercase text-[10px] tracking-widest italic opacity-60">
+                                        <td colSpan="5" className="text-center py-16 text-gray-400 text-[11px] font-bold uppercase tracking-widest">
                                             No transaction lines available. Add a line below.
                                         </td>
-                                    </tr>
+                                    <th className="text-right px-5 py-3">Action</th></tr>
                                 ) : (
                                     rows.map((row, idx) => (
                                         <tr 
@@ -402,11 +402,11 @@ const TransactionEditorModal = ({ isOpen, onClose }) => {
                                             onClick={() => setCurrentRow(row)}
                                             className="hover:bg-slate-50/50 transition-colors cursor-pointer"
                                         >
-                                            <td className="px-4 py-2.5 text-[12px] font-bold text-slate-700">{row.expAcc}</td>
-                                            <td className="px-4 py-2.5 text-[11px] font-semibold text-slate-500 uppercase">{row.costCenter}</td>
-                                            <td className="px-4 py-2.5 text-[12px] font-black text-[#0285fd] font-mono text-right">{parseFloat(row.amount).toFixed(2)}</td>
-                                            <td className="px-4 py-2.5 text-[12px] text-slate-500 italic">{row.memo}</td>
-                                            <td className="px-4 py-2.5 text-right">
+                                            <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{row.expAcc}</td>
+                                            <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{row.costCenter}</td>
+                                            <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{parseFloat(row.amount).toFixed(2)}</td>
+                                            <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{row.memo}</td>
+                                            <td className="text-right px-5 py-3">
                                                 <button className="text-slate-300 hover:text-red-500 transition-colors"><Trash2 size={14}/></button>
                                             </td>
                                         </tr>
@@ -417,7 +417,7 @@ const TransactionEditorModal = ({ isOpen, onClose }) => {
                     </div>
 
                     {/* Entry Row */}
-                    <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 grid grid-cols-12 gap-3 items-end">
+                    <div className="bg-slate-50 border border-slate-200 rounded-[3px] p-4 grid grid-cols-12 gap-3 items-end">
                         <div className="col-span-3 space-y-1.5">
                             <label className="text-[9px] font-black text-slate-400 uppercase tracking-wider">Exp Account</label>
                             <div className="flex gap-1">

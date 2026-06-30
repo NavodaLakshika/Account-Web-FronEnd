@@ -200,26 +200,26 @@ const CustomerBoard = ({ isOpen, onClose }) => {
         <>
             <button
                 onClick={handleClear}
-                className="px-6 h-10 bg-slate-100 text-slate-600 text-sm font-bold rounded-md hover:bg-slate-200 transition-all active:scale-95 flex items-center gap-2 border-none"
+                className="px-6 h-10 bg-slate-100 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-200 transition-all active:scale-95 flex items-center gap-2 border-none"
             >
                 <RotateCcw size={14} className="text-[#0078d4]" /> Clear
             </button>
             <button
                 onClick={handleDelete}
                 disabled={!isEditMode || loading}
-                className={`px-6 h-10 bg-red-50 text-red-600 text-sm font-bold rounded-md hover:bg-red-100 transition-all active:scale-95 flex items-center gap-2 border border-red-100 ${(!isEditMode || loading) ? 'opacity-50 cursor-not-allowed' : ''}`}
+                className={`px-6 h-10 bg-red-50 text-red-600 text-sm font-bold rounded-[3px] hover:bg-red-100 transition-all active:scale-95 flex items-center gap-2 border border-red-100 ${(!isEditMode || loading) ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
                 <Trash2 size={14} /> Delete
             </button>
             <button
                 onClick={handleSave}
                 disabled={loading}
-                className={`px-6 h-10 bg-[#0078d4] text-white text-sm font-bold rounded-md shadow-md shadow-blue-200 hover:bg-[#005a9e] transition-all active:scale-95 flex items-center gap-2 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                className={`px-6 h-10 bg-[#0078d4] text-white text-sm font-bold rounded-[3px] shadow-md shadow-blue-200 hover:bg-[#005a9e] transition-all active:scale-95 flex items-center gap-2 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
                 {loading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
                 {isEditMode ? 'Update' : 'Save'}
             </button>
-            <button onClick={onClose} className="px-6 h-10 bg-slate-100 text-slate-600 text-sm font-bold rounded-md hover:bg-slate-200 transition-all active:scale-95 flex items-center gap-2 border-none">
+            <button onClick={onClose} className="px-6 h-10 bg-slate-100 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-200 transition-all active:scale-95 flex items-center gap-2 border-none">
                 <X size={28} /> Exit
             </button>
         </>
@@ -231,7 +231,6 @@ const CustomerBoard = ({ isOpen, onClose }) => {
                 isOpen={isOpen}
                 onClose={onClose}
                 title="Customer Information"
-                maxWidth="max-w-4xl"
                 footer={footer}
             >
                 <div className="space-y-4">
@@ -253,7 +252,7 @@ const CustomerBoard = ({ isOpen, onClose }) => {
                                     onClick={openSearch}
                                     className="w-8 h-8 bg-gray-100 border border-gray-300 flex items-center justify-center hover:bg-gray-200"
                                 >
-                                    <Search size={14} />
+                                    <Search size={18} />
                                 </button>
                             </div>
                         </div>
@@ -312,7 +311,7 @@ const CustomerBoard = ({ isOpen, onClose }) => {
                                         <input type="number" name="Credit_Limit" value={formData.Credit_Limit} onChange={handleInputChange} className="flex-1 h-7 border border-gray-300 px-2 text-sm text-right" />
                                     </FormRow>
                                     <FormRow label="Credit Period">
-                                        <div className="flex items-center gap-2 flex-1">
+                                        <div className="flex-1">
                                             <input type="number" name="Credit_Period" value={formData.Credit_Period} onChange={handleInputChange} className="w-20 h-7 border border-gray-300 px-2 text-sm" />
                                             <span className="text-xs text-gray-500">Days</span>
                                         </div>
@@ -426,46 +425,47 @@ const CustomerBoard = ({ isOpen, onClose }) => {
                 <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4">
                     <div className="absolute inset-0 bg-slate-900/30 backdrop-blur-sm" onClick={() => setShowSearchModal(false)} />
  <div className="relative w-full max-w-2xl bg-white shadow-2xl rounded-sm overflow-hidden flex flex-col max-h-[80vh]">
-                        <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50 font-['Plus_Jakarta_Sans']">
-                            <h3 className="text-lg font-bold text-slate-800 tracking-tight">Search Customers</h3>
-                            <div className="flex gap-4">
+                        <div className="flex items-center gap-4 bg-slate-50 p-4 border-b border-gray-100 mb-2 font-['Plus_Jakarta_Sans']">
+                            <span className="text-[12px] font-bold text-gray-500 uppercase tracking-wider shrink-0">Search</span>
+                            <div className="relative flex-1">
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
                                 <input
                                     type="text"
                                     placeholder="Search by name or code..."
-                                    className="h-9 border border-gray-300 px-3 text-sm rounded-md w-64 focus:border-blue-500 outline-none shadow-sm"
+                                    className="w-full h-10 pl-10 pr-4 border border-gray-300 rounded-[3px] outline-none text-[13px] focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] shadow-sm bg-white"
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                     autoFocus
                                 />
-                                <button 
-                                    onClick={() => setShowSearchModal(false)} 
-                                    className="w-9 h-8 flex items-center justify-center bg-red-50 hover:bg-red-100 text-red-600 rounded-[8px] transition-all active:scale-90 outline-none border-none group"
-                                    title="Close"
-                                >
-                                    <X size={28} strokeWidth={1.5} className="group-hover:scale-110 transition-transform" />
-                                </button>
                             </div>
+                            <button 
+                                onClick={() => setShowSearchModal(false)} 
+                                className="w-9 h-8 flex items-center justify-center bg-red-50 hover:bg-red-100 text-red-600 rounded-[8px] transition-all active:scale-90 outline-none border-none group shrink-0"
+                                title="Close"
+                            >
+                                <X size={28} strokeWidth={1.5} className="group-hover:scale-110 transition-transform" />
+                            </button>
                         </div>
                         <div className="overflow-y-auto p-2">
                             <table className="w-full text-sm text-left">
-                                <thead className="bg-gray-100 sticky top-0">
+                                <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 shadow-sm z-10">
                                     <tr>
-                                        <th className="p-2 border">Code</th>
-                                        <th className="p-2 border">Name</th>
-                                        <th className="p-2 border w-20">Action</th>
+                                        <th className="px-5 py-3">Code</th>
+                                        <th className="px-5 py-3">Name</th>
+                                        <th className="px-5 py-3 text-right w-24">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {customersList
                                         .filter(c => (c.cust_Name || c.Cust_Name)?.toLowerCase().includes(searchQuery.toLowerCase()) || (c.code || c.Code)?.toLowerCase().includes(searchQuery.toLowerCase()))
                                         .map(c => (
-                                            <tr key={c.code || c.Code} className="hover:bg-blue-50">
-                                                <td className="p-2 border font-mono">{c.code || c.Code}</td>
-                                                <td className="p-2 border">{c.cust_Name || c.Cust_Name}</td>
-                                                <td className="p-2 border">
+                                            <tr key={c.code || c.Code} className="group hover:bg-blue-50/50 transition-all cursor-pointer border-b border-gray-50">
+                                                <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{c.code || c.Code}</td>
+                                                <td className="px-5 py-3">{c.cust_Name || c.Cust_Name}</td>
+                                                <td className="px-5 py-3">
                                                     <button
                                                         onClick={() => selectCustomer(c.code || c.Code)}
-                                                        className="w-full bg-blue-600 text-white text-xs py-1 rounded hover:bg-blue-700"
+                                                        className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase"
                                                     >
                                                         Select
                                                     </button>

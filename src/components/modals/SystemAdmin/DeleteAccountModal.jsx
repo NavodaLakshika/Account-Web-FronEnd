@@ -41,14 +41,14 @@ const LookupSearchModal = ({ isOpen, onClose, onSelect, title, data, searchPlace
             maxWidth="max-w-[700px]"
         >
             <div className="space-y-4 font-['Tahoma']">
-                <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-lg border border-gray-100 mb-2">
+                <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-[3px] border border-gray-200 mb-2">
                     <span className="text-[12px] font-bold text-gray-500 uppercase tracking-widest">{searchTitle || 'Search Facility'}</span>
                     <div className="relative flex-1">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
                         <input
                             type="text"
                             placeholder={searchPlaceholder}
-                            className="w-full h-9 pl-10 pr-4 border border-gray-300 rounded-[5px] outline-none text-sm focus:border-[#0285fd] bg-white shadow-sm font-bold text-slate-700"
+                            className="w-full h-10 pl-10 pr-4 border border-gray-300 rounded-[3px] outline-none text-[13px] focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] shadow-sm bg-white"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                             autoFocus
@@ -56,39 +56,41 @@ const LookupSearchModal = ({ isOpen, onClose, onSelect, title, data, searchPlace
                     </div>
                 </div>
 
-                <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm">
+                <div className="border border-gray-200 rounded-[3px] overflow-hidden shadow-sm">
                     <div className="max-h-[300px] overflow-y-auto no-scrollbar">
                         <table className="w-full text-left">
-                            <thead className="bg-[#f8fafd] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">
+                            <thead className="bg-[#f8fafd] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-200">
                                 <tr>
-                                    <th className="px-5 py-3">{idLabel}</th>
-                                    <th className="px-5 py-3">{nameLabel}</th>
-                                    <th className="px-5 py-3 text-right">ACTION</th>
-                                </tr>
+                                    <th className=" px-5 py-3">{idLabel}</th>
+                                    <th className=" px-5 py-3">{nameLabel}</th>
+                                    <th className="text-right px-5 py-3">ACTION</th>
+                                <th className="text-right px-5 py-3">Action</th></tr>
                             </thead>
                             <tbody className="divide-y divide-gray-50">
                                 {filteredData.length > 0 ? (
                                     filteredData.map((item) => (
                                         <tr 
                                             key={item.code} 
-                                            className="group hover:bg-blue-50/50 cursor-pointer transition-colors"
+                                            className="group hover:bg-blue-50/50  transition-all cursor-pointer group border-b border-gray-50"
                                             onClick={() => {
                                                 onSelect(item);
                                                 onClose();
                                             }}
                                         >
-                                            <td className="px-5 py-3 font-mono text-[13px] text-gray-600">{item.code}</td>
-                                            <td className="px-5 py-3 text-[13px] font-mono text-gray-600 uppercase">{item.name}</td>
-                                            <td className="px-5 py-3 text-right">
-                                                <button className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95 uppercase tracking-widest ml-auto">
+                                            <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{item.code}</td>
+                                            <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{item.name}</td>
+                                            <td className="text-right px-5 py-3">
+                                                <button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">
                                                     SELECT
                                                 </button>
                                             </td>
+                                        
+                                            <td className="text-right px-5 py-3"><button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button></td>
                                         </tr>
                                     ))
                                 ) : (
                                     <tr>
-                                        <td colSpan="3" className="text-center py-10 text-gray-300 text-[12px] font-bold uppercase tracking-widest">No records found</td>
+                                        <td colSpan="3" className="text-center py-16 text-gray-400 text-[11px] font-bold uppercase tracking-widest">No records found</td>
                                     </tr>
                                 )}
                             </tbody>
@@ -258,20 +260,20 @@ const DeleteAccountModal = ({ isOpen, onClose }) => {
                 isOpen={isOpen}
                 onClose={onClose}
                 title="Delete Account"
-                maxWidth="max-w-[500px]"
+                maxWidth="max-w-[700px]"
                 footer={
                     <div className="bg-slate-50 px-6 py-4 w-full flex justify-center items-center gap-3 border-t border-slate-200 rounded-b-xl">
-                        <button onClick={handleDeleteClick} disabled={loading} className={`px-6 py-3 bg-[#ff3b30] hover:bg-[#e03127] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] shadow-md shadow-red-100 transition-all active:scale-95 flex items-center justify-center gap-2 border-none ${loading ? 'opacity-50' : ''}`}>
+                        <button onClick={handleDeleteClick} disabled={loading} className={`px-6 py-3 bg-white text-[#ff3b30] border-2 border-[#ff3b30] hover:bg-red-50 font-mono font-bold text-sm uppercase tracking-widest rounded-[3px] shadow-md shadow-red-100 transition-all active:scale-95 flex items-center justify-center gap-2 border-none ${loading ? 'opacity-50' : ''}`}>
                             <Trash2 size={14} /> DELETE
                         </button>
-                        <button onClick={handleClear} disabled={loading} className="px-6 py-3 bg-[#00adff] hover:bg-[#0099e6] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] transition-all active:scale-95 flex items-center justify-center gap-2 border-none">
+                        <button onClick={handleClear} disabled={loading} className="px-6 py-3 bg-white text-[#00adff] border-2 border-[#00adff] hover:bg-blue-50 font-mono font-bold text-sm uppercase tracking-widest rounded-[3px] transition-all active:scale-95 flex items-center justify-center gap-2 border-none">
                             <RotateCcw size={14} /> CLEAR
                         </button>
                     </div>
                 }
             >
                 <div className="space-y-4 font-['Tahoma']">
-                    <div className="bg-slate-50/50 p-6 border border-slate-200 rounded-[5px] relative overflow-hidden space-y-6">
+                    <div className="bg-slate-50/50 p-6 border border-slate-200 rounded-[3px] relative overflow-hidden space-y-6">
                         <div className="grid grid-cols-12 gap-y-5 relative z-10">
                             
                             {/* Account Row */}
@@ -282,7 +284,7 @@ const DeleteAccountModal = ({ isOpen, onClose }) => {
                                         type="text"
                                         readOnly
                                         value={selectedAccount.code || ''}
-                                        className="w-24 h-8 border border-slate-200 px-3 text-[12px] font-bold text-gray-700 bg-white rounded-[5px] outline-none cursor-pointer transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20"
+                                        className="w-24 h-8 border border-slate-200 px-3 text-[12px] font-bold text-gray-700 bg-white rounded-[3px] outline-none cursor-pointer transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20"
                                         onClick={() => setShowAccountSearch(true)}
                                         placeholder=""
                                     />
@@ -290,11 +292,11 @@ const DeleteAccountModal = ({ isOpen, onClose }) => {
                                         type="text"
                                         readOnly
                                         value={selectedAccount.name || ''}
-                                        className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-bold text-gray-700 bg-white rounded-[5px] outline-none cursor-pointer truncate transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20"
+                                        className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-bold text-gray-700 bg-white rounded-[3px] outline-none cursor-pointer truncate transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20"
                                         onClick={() => setShowAccountSearch(true)}
                                         placeholder=" "
                                     />
-                                    <button onClick={() => setShowAccountSearch(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
+                                    <button onClick={() => setShowAccountSearch(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0">
                                         <Search size={16} />
                                     </button>
                                 </div>
@@ -308,11 +310,11 @@ const DeleteAccountModal = ({ isOpen, onClose }) => {
                                         type="text"
                                         readOnly
                                         value={selectedUser.name || ''}
-                                        className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-bold text-gray-700 bg-white rounded-[5px] outline-none cursor-pointer truncate transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20"
+                                        className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-bold text-gray-700 bg-white rounded-[3px] outline-none cursor-pointer truncate transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20"
                                         onClick={() => setShowUserSearch(true)}
                                         placeholder=""
                                     />
-                                    <button onClick={() => setShowUserSearch(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
+                                    <button onClick={() => setShowUserSearch(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0">
                                         <Search size={16} />
                                     </button>
                                 </div>
@@ -327,7 +329,7 @@ const DeleteAccountModal = ({ isOpen, onClose }) => {
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
                                         placeholder="••••••••"
-                                        className="w-full h-8 border border-slate-200 px-3 pr-10 text-[12px] font-bold text-slate-700 bg-white rounded-[5px] outline-none shadow-sm transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20"
+                                        className="w-full h-8 border border-slate-200 px-3 pr-10 text-[12px] font-bold text-slate-700 bg-white rounded-[3px] outline-none shadow-sm transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20"
                                     />
                                     <button
                                         type="button"

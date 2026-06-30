@@ -82,13 +82,11 @@ const NewAccountBoard = ({ isOpen, onClose }) => {
             isOpen={isOpen}
             onClose={onClose}
             title="CREATE NEW ACCOUNT"
-            maxWidth="max-w-[700px]"
         >
-            <div className="py-1 select-none font-tahoma flex flex-col">
-                {/* Header Subtitle */}
-                <div className="border-b border-gray-100 pb-2 mb-6 flex items-center gap-2">
+            <div className="py-1 select-none flex flex-col">
+                <div className="border-b border-gray-200 pb-2 mb-6 flex items-center gap-2">
                     <PlusCircle size={14} className="text-[#0285fd]" />
-                    <h2 className="text-[12px] font-bold text-blue-700 uppercase tracking-tight">
+                    <h2 className="text-[12px] font-bold text-gray-600 uppercase tracking-tight">
                        Select One Account Type and Click Create
                     </h2>
                 </div>
@@ -96,8 +94,8 @@ const NewAccountBoard = ({ isOpen, onClose }) => {
                 <div className="flex gap-8 px-1">
                     {/* Left Column: Radio Options */}
                     <div className="w-[240px] space-y-4">
-                        <div className="p-5 border border-gray-100 bg-white rounded-lg shadow-sm">
-                            <p className="text-[9px] font-bold text-slate-300 uppercase tracking-widest mb-4 border-b border-slate-50 pb-1">Categories</p>
+                        <div className="p-5 border border-gray-200 bg-white rounded-[3px] shadow-sm">
+                            <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-4 border-b border-gray-50 pb-1">Categories</p>
                             <div className="space-y-3.5">
                                 {['Income', 'Cost of Sales', 'Expenses', 'Assets', 'Liabilities', 'Equity'].map(type => (
                                     <RadioButton
@@ -110,7 +108,7 @@ const NewAccountBoard = ({ isOpen, onClose }) => {
                             </div>
                         </div>
 
-                        <div className="p-5 border border-gray-100 bg-white rounded-lg shadow-sm">
+                        <div className="p-5 border border-gray-200 bg-white rounded-[3px] shadow-sm">
                             <RadioButton
                                 label="Other Account Types"
                                 checked={selectedType === 'Other'}
@@ -120,40 +118,40 @@ const NewAccountBoard = ({ isOpen, onClose }) => {
                     </div>
 
                     {/* Right Column: Information Pane */}
-                    <div 
+                    <div
                         key={selectedType}
-                        className="flex-1 border border-blue-50 p-6 bg-white rounded-xl shadow-[0_10px_30px_rgba(2,133,253,0.03)] flex flex-col"
+                        className="flex-1 border border-gray-200 p-6 bg-white rounded-[3px] flex flex-col"
                     >
-                        <div className="text-center mb-6 border-b border-blue-50 pb-4">
-                            <h3 className="text-[16px] font-bold text-blue-900 uppercase">{currentDetails.title}</h3>
+                        <div className="text-center mb-6 border-b border-gray-200 pb-4">
+                            <h3 className="text-[16px] font-bold text-gray-800 uppercase">{currentDetails.title}</h3>
                         </div>
 
                         <div className="space-y-6 flex-grow">
                             <div className="space-y-2">
-                                <p className="text-[9px] font-bold text-slate-300 uppercase tracking-widest">Description</p>
-                                <p className="text-[12px] text-slate-500 font-bold leading-relaxed">
+                                <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Description</p>
+                                <p className="text-[12px] text-gray-500 font-bold leading-relaxed">
                                     {currentDetails.description}
                                 </p>
                             </div>
 
-                            <div className="p-4 bg-slate-50 rounded-lg border border-gray-100">
+                            <div className="p-4 bg-gray-50 rounded-[3px] border border-gray-200">
                                 <div className="flex items-center gap-2 mb-1.5">
-                                    <HelpCircle size={12} className="text-blue-500" />
-                                    <p className="text-[9px] font-bold text-blue-500 uppercase">Professional Tip</p>
+                                    <HelpCircle size={12} className="text-[#0285fd]" />
+                                    <p className="text-[9px] font-bold text-[#0285fd] uppercase">Professional Tip</p>
                                 </div>
-                                <p className="text-[12px] text-blue-800 font-bold leading-normal">
+                                <p className="text-[12px] text-gray-700 font-bold leading-normal">
                                     {currentDetails.tip}
                                 </p>
                             </div>
 
                             {currentDetails.examples.length > 0 && (
                                 <div className="space-y-3">
-                                    <p className="text-[9px] font-bold text-slate-300 uppercase tracking-widest">Sub-Groups</p>
+                                    <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Sub-Groups</p>
                                     <div className="grid grid-cols-1 gap-2 ml-1">
                                         {currentDetails.examples.map((ex, i) => (
                                             <div key={i} className="flex gap-3 items-center">
                                                 <div className="w-2 h-2 rounded-full bg-[#0285fd] shrink-0"></div>
-                                                <span className="text-[12px] text-slate-600 font-bold uppercase">{ex}</span>
+                                                <span className="text-[12px] text-gray-600 font-bold uppercase">{ex}</span>
                                             </div>
                                         ))}
                                     </div>
@@ -163,13 +161,12 @@ const NewAccountBoard = ({ isOpen, onClose }) => {
                     </div>
                 </div>
 
-                {/* Bottom Action Area */}
                 <div className="mt-8 flex justify-end">
                     <button
-                        className="px-10 h-11 bg-[#2bb744] text-white text-[14px] font-black rounded-[5px] hover:bg-[#259b3a] transition-all active:scale-95 flex items-center gap-2 border-none uppercase font-tahoma shadow-sm"
+                        className="px-6 py-2 bg-[#0285fd] hover:bg-[#0073ff] text-white font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center gap-2"
                         onClick={handleCreateClick}
                     >
-                        Create
+                        <ChevronRight size={14} /> Create
                     </button>
                 </div>
             </div>
@@ -179,10 +176,10 @@ const NewAccountBoard = ({ isOpen, onClose }) => {
 
 const RadioButton = ({ label, checked, onChange }) => (
     <div className="flex items-center gap-3.5 group cursor-pointer" onClick={onChange}>
-        <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${checked ? 'border-[#0285fd] bg-white' : 'border-gray-200 bg-white group-hover:border-gray-300'}`}>
-            {checked && <div className="w-3.5 h-3.5 rounded-full bg-[#0285fd]" />}
+        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${checked ? 'border-[#0285fd]' : 'border-gray-300 bg-white group-hover:border-gray-400'}`}>
+            {checked && <div className="w-2.5 h-2.5 rounded-full bg-[#0285fd]" />}
         </div>
-        <span className={`text-[12.5px] cursor-pointer transition-colors uppercase font-bold tracking-tight ${checked ? 'text-slate-800' : 'text-slate-400 group-hover:text-slate-600'}`}>
+        <span className={`text-[12.5px] cursor-pointer transition-colors uppercase font-bold tracking-tight ${checked ? 'text-gray-800' : 'text-gray-400 group-hover:text-gray-600'}`}>
             {label}
         </span>
     </div>

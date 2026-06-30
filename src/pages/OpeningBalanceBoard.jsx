@@ -1,19 +1,67 @@
 import React, { useState, useEffect } from 'react';
 import SimpleModal from '../components/SimpleModal';
-import { Search, Calendar, ChevronDown, Check, X, Save, RotateCcw, Loader2, RefreshCw, Layers, UserCircle, Briefcase } from 'lucide-react';
+import { Search, Calendar, Check, Save, RotateCcw, Loader2 } from 'lucide-react';
 import { openingBalanceService } from '../services/openingBalance.service';
 
 import { getSessionData } from '../utils/session';
 import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
 import CalendarModal from '../components/CalendarModal';
 import OpeningBalanceDetailModal from '../components/OpeningBalanceDetailModal';
+import TransactionFormWrapper from '../components/TransactionFormWrapper';
 
+const SearchModal = ({ isOpen, onClose, title, items, onSelect, searchPlaceholder = "Search by code or name..." }) => {
+    const [query, setQuery] = useState('');
+    const filtered = (items || []).filter(item =>
+        (item.name || '').toLowerCase().includes(query.toLowerCase()) ||
+        (item.code || '').toLowerCase().includes(query.toLowerCase())
+    );
+
+    if (!isOpen) return null;
+
+    return (
+        <SimpleModal isOpen={isOpen} onClose={onClose} title={title}>
+            <div className="space-y-4 font-['Tahoma']">
+                <div className="flex items-center gap-4 bg-slate-50 p-4 border-b border-gray-100 mb-2">
+                    <span className="text-[12px] font-bold text-gray-500 uppercase tracking-wider shrink-0">Search</span>
+                    <div className="relative flex-1">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
+                        <input type="text" placeholder={searchPlaceholder}
+                            className="w-full h-10 pl-10 pr-4 border border-gray-300 rounded-[3px] outline-none text-[13px] focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] shadow-sm bg-white"
+                            value={query} onChange={e => setQuery(e.target.value)} autoFocus />
+                    </div>
+                </div>
+                <div className="border border-gray-200 rounded-[3px] overflow-hidden shadow-sm">
+                    <div className="max-h-[400px] overflow-y-auto no-scrollbar">
+                        <table className="w-full text-left">
+                            <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 shadow-sm z-10">
+                                <tr><th className="w-32 px-5 py-3">Identifier</th><th className=" px-5 py-3">Credential / Name</th><th className="text-right px-5 py-3">Action</th></tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-50">
+                                {filtered.length === 0 ? (
+                                    <tr><td colSpan="3" className="text-center py-16 text-gray-400 text-[11px] font-bold uppercase tracking-widest">No matching records discovered</td></tr>
+                                ) : filtered.map((item, idx) => (
+                                    <tr key={idx} className="group hover:bg-blue-50/50  transition-all cursor-pointer group border-b border-gray-50" onClick={() => { onSelect(item); onClose(); }}>
+                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{item.code}</td>
+                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{item.name}</td>
+                                        <td className="text-right px-5 py-3">
+                                            <button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </SimpleModal>
+    );
+};
 
 const OpeningBalanceBoard = ({ isOpen, onClose }) => {
-    const [activeTab, setActiveTab] = useState('Vendor'); // 'Vendor', 'Customer', 'Account'
+    const [activeTab, setActiveTab] = useState('Vendor');
     const [loading, setLoading] = useState(false);
     const [lookups, setLookups] = useState({ apAccounts: [], arAccounts: [], glAccounts: [], costCenters: [], vendors: [], customers: [] });
-    
+
     const getInitialFormData = () => ({
         docNo: '',
         date: new Date().toISOString().split('T')[0],
@@ -35,8 +83,7 @@ const OpeningBalanceBoard = ({ isOpen, onClose }) => {
 
     const [formData, setFormData] = useState(getInitialFormData());
 
-    const [activeModal, setActiveModal] = useState(null); // 'account', 'cc', 'entity'
-    const [searchTerm, setSearchTerm] = useState('');
+    const [activeModal, setActiveModal] = useState(null);
     const [showDateModal, setShowDateModal] = useState(false);
     const [showBalanceDateModal, setShowBalanceDateModal] = useState(false);
     const [showReceipt, setShowReceipt] = useState(false);
@@ -118,176 +165,183 @@ const OpeningBalanceBoard = ({ isOpen, onClose }) => {
         }
     };
 
-    const filteredLookup = () => {
-        if (activeModal === 'account') {
-            const list = activeTab === 'Vendor' ? lookups.apAccounts : activeTab === 'Customer' ? lookups.arAccounts : lookups.glAccounts;
-            return list.filter(a => (a.name || '').toLowerCase().includes(searchTerm.toLowerCase()) || (a.code || '').toLowerCase().includes(searchTerm.toLowerCase()));
-        }
-        if (activeModal === 'cc') return lookups.costCenters.filter(c => (c.name || '').toLowerCase().includes(searchTerm.toLowerCase()) || (c.code || '').toLowerCase().includes(searchTerm.toLowerCase()));
-        if (activeModal === 'entity') {
-            const list = activeTab === 'Vendor' ? lookups.vendors : lookups.customers;
-            return list.filter(e => (e.name || '').toLowerCase().includes(searchTerm.toLowerCase()) || (e.code || '').toLowerCase().includes(searchTerm.toLowerCase()));
-        }
-        return [];
+    const getAccountItems = () => {
+        if (activeTab === 'Vendor') return lookups.apAccounts;
+        if (activeTab === 'Customer') return lookups.arAccounts;
+        return lookups.glAccounts;
+    };
+
+    const getEntityItems = () => {
+        if (activeTab === 'Vendor') return lookups.vendors;
+        return lookups.customers;
     };
 
     return (
         <>
-            <SimpleModal
+            <TransactionFormWrapper subtitle="Opening Balances" icon={null}
                 isOpen={isOpen}
                 onClose={onClose}
                 title="Opening Balance"
-                maxWidth="max-w-[1000px]"
                 footer={
-                    <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-gray-100 rounded-b-xl gap-3">
-                        <div className="flex gap-3">
-                            <span className="text-[20px] font-black italic text-[#0285fd]/30 tracking-tighter select-none"></span>
-                        </div>
-                        <div className="flex gap-3">
-                            <button onClick={handleClear} disabled={loading} className="px-6 h-10 bg-[#00adff] text-white text-sm font-bold rounded-[5px] hover:bg-[#0099e6] transition-all active:scale-95 flex items-center gap-2 border-none disabled:opacity-50">
-                                <RefreshCw size={14} /> CLEAR FORM
-                            </button>
-                            <button onClick={handleSave} disabled={loading} className="px-6 h-10 bg-[#2bb744] text-white text-sm font-bold rounded-[5px] shadow-md shadow-green-100 hover:bg-[#259b3a] transition-all active:scale-95 flex items-center gap-2 border-none disabled:opacity-50">
-                                {loading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />} SAVE
-                            </button>
-                        </div>
+                    <div className="bg-[#fcfcfc] px-6 py-4 w-full flex justify-between items-center border-t border-gray-200 rounded-b-[10px] shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]">
+                        <button onClick={handleClear} disabled={loading}
+                            className="px-6 py-2 border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2">
+                            <RotateCcw size={14} /> Clear Form
+                        </button>
+                        <button onClick={handleSave} disabled={loading}
+                            className={`px-6 py-2 bg-[#0285fd] hover:bg-[#0073ff] text-white font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                            {loading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
+                            Save &amp; Apply
+                        </button>
                     </div>
                 }
             >
                 {/* Tabs */}
                 <div className="mt-[-1rem] mb-6 flex border-b border-gray-200">
                     {[
-                        { id: 'Vendor', icon: Briefcase, label: 'Vendor' },
-                        { id: 'Customer', icon: UserCircle, label: 'Customer Center' },
-                        { id: 'Account', icon: Layers, label: 'Account' }
+                        { id: 'Vendor', label: 'Vendor' },
+                        { id: 'Customer', label: 'Customer Center' },
+                        { id: 'Account', label: 'Account' }
                     ].map(tab => (
                         <button
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id)}
-                            className={`px-8 py-3 text-[12px] uppercase tracking-widest font-bold flex items-center gap-2.5 transition-all relative ${activeTab === tab.id ? 'text-[#00adff]' : 'text-gray-400 hover:text-gray-600'}`}
+                            className={`px-8 py-3 text-[12px] uppercase tracking-widest font-bold flex items-center gap-2.5 transition-all relative ${activeTab === tab.id ? 'text-[#0285fd]' : 'text-gray-400 hover:text-gray-600'}`}
                         >
-                            <tab.icon size={16} />
                             {tab.label}
-                            {activeTab === tab.id && <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-[#00adff] animate-in slide-in-from-left duration-300" />}
+                            {activeTab === tab.id && <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-[#0285fd] animate-in slide-in-from-left duration-300" />}
                         </button>
                     ))}
                 </div>
 
                 <div className="space-y-4">
- <div className="bg-white p-6 rounded-[5px] shadow-sm space-y-6">
-                        
-                        <div className="grid grid-cols-12 gap-x-12 gap-y-4">
+                    <div className="bg-white p-4 border border-slate-200 rounded-[3px] space-y-4">
+                        <div className="grid grid-cols-12 gap-x-6 gap-y-3.5">
                             {/* Row 1 */}
-                            <div className="col-span-12 lg:col-span-7 space-y-3">
-                                <div className="flex items-center gap-3">
-                                    <label className="text-[11px] font-bold text-gray-500 uppercase tracking-widest w-24 shrink-0">Doc No</label>
-                                    <input type="text" value={formData.docNo} readOnly className="flex-1 h-8 border border-[#00adff]/30 px-3 text-[12px] font-bold text-[#00adff] bg-blue-50/20 rounded-[5px] outline-none tracking-widest" />
+                            {/* Doc No */}
+                            <div className="col-span-4">
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Doc ID</label>
+                                <input type="text" value={formData.docNo} readOnly
+                                    className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-gray-50 outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 font-mono truncate" />
+                            </div>
+
+                            {/* Date */}
+                            <div className="col-span-4">
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Date</label>
+                                <div className="relative">
+                                    <input type="text" readOnly value={formData.date}
+                                        onClick={() => setShowDateModal(true)}
+                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700 truncate" />
+                                    <button onClick={() => setShowDateModal(true)}
+                                        className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
+                                        <Calendar size={16} />
+                                    </button>
                                 </div>
-                                <div className="flex items-center gap-3">
-                                    <label className="text-[11px] font-bold text-gray-500 w-24 shrink-0 uppercase tracking-widest">{activeTab === 'Vendor' ? 'A/P Account' : activeTab === 'Customer' ? 'A/R Account' : 'G/L Account'}</label>
-                                    <div className="flex-1 flex gap-1">
-                                        <input 
-                                            type="text" 
-                                            readOnly 
-                                            value={formData.accountName ? `${formData.accountCode} - ${formData.accountName}` : ''} 
-                                            placeholder={`Select ${activeTab} Account...`} 
-                                            className="flex-1 h-8 border border-slate-200 px-3 text-[12px] font-bold text-slate-700 rounded-[5px] bg-slate-50 outline-none" 
-                                        />
-                                        <button onClick={() => { setActiveModal('account'); setSearchTerm(''); }} className="w-10 h-8 bg-[#0285fd] hover:bg-[#0073ff] text-white rounded-[5px] flex items-center justify-center transition-all active:scale-95 shadow-sm border-none">
+                            </div>
+
+                            {/* Pay. Balance */}
+                            <div className="col-span-4">
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Pay. Balance</label>
+                                <input name="payBalance" value={formData.payBalance} onChange={handleInputChange} type="number" step="0.01"
+                                    className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 text-right" placeholder="0.00" />
+                            </div>
+
+                            {/* Account */}
+                            <div className="col-span-8">
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">{activeTab === 'Vendor' ? 'A/P Account' : activeTab === 'Customer' ? 'A/R Account' : 'G/L Account'}</label>
+                                <div className="relative">
+                                    <input type="text" readOnly
+                                        value={formData.accountName ? `${formData.accountCode} - ${formData.accountName}` : ''}
+                                        placeholder={`Select ${activeTab} Account...`}
+                                        onClick={() => setActiveModal('account')}
+                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700 truncate" />
+                                    <button onClick={() => setActiveModal('account')}
+                                        className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
+                                        <Search size={16} />
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Cost Center */}
+                            <div className="col-span-4">
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Cost Center</label>
+                                <div className="relative">
+                                    <input type="text" readOnly
+                                        value={formData.costCenter ? lookups.costCenters.find(c => c.code === formData.costCenter)?.name || formData.costCenter : ''}
+                                        placeholder="Select cost center..."
+                                        onClick={() => setActiveModal('cc')}
+                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700 truncate" />
+                                    <button onClick={() => setActiveModal('cc')}
+                                        className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
+                                        <Search size={16} />
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Entity Select */}
+                            {activeTab !== 'Account' && (
+                                <div className="col-span-8">
+                                    <label className="block text-[13px] font-medium text-gray-700 mb-1.5">{activeTab}</label>
+                                    <div className="relative">
+                                        <input type="text" readOnly
+                                            value={formData.entityName ? `${formData.entityId} - ${formData.entityName}` : ''}
+                                            placeholder={`Click search to select ${activeTab.toLowerCase()}...`}
+                                            onClick={() => setActiveModal('entity')}
+                                            className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700 truncate" />
+                                        <button onClick={() => setActiveModal('entity')}
+                                            className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
                                             <Search size={16} />
                                         </button>
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-3">
-                                    <label className="text-[11px] font-bold text-gray-500 uppercase tracking-widest w-24 shrink-0">Cost Center</label>
-                                    <div className="flex-1 flex gap-1">
-                                        <input 
-                                            type="text" 
-                                            readOnly 
-                                            value={formData.costCenter ? lookups.costCenters.find(c => c.code === formData.costCenter)?.name || formData.costCenter : ''} 
-                                            className="flex-1 h-8 border border-slate-200 px-3 text-[12px] font-bold text-slate-700 rounded-[5px] bg-slate-50 outline-none" 
-                                        />
-                                        <button onClick={() => { setActiveModal('cc'); setSearchTerm(''); }} className="w-10 h-8 bg-[#0285fd] hover:bg-[#0073ff] text-white rounded-[5px] flex items-center justify-center transition-all active:scale-95 shadow-sm border-none">
-                                            <Search size={16} />
-                                        </button>
-                                    </div>
-                                </div>
+                            )}
+
+                            {/* Address */}
+                            <div className={activeTab !== 'Account' ? 'col-span-4' : 'col-span-8'}>
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Address</label>
+                                <input name="address" value={formData.address} onChange={handleInputChange} type="text"
+                                    className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700" />
                             </div>
 
-                            <div className="col-span-12 lg:col-span-5 space-y-3">
-                                <div className="flex items-center gap-3">
-                                    <label className="text-[11px] font-bold text-gray-500 uppercase tracking-widest w-32 shrink-0">Date</label>
-                                    <div className="flex-1 flex gap-1 h-8 min-w-0">
-                                        <input type="text" readOnly value={formData.date} onClick={() => setShowDateModal(true)} className="flex-1 min-w-0 h-8 border border-gray-300 rounded-[5px] px-3 text-[12px] outline-none bg-white text-gray-700 font-bold cursor-pointer shadow-sm" />
-                                        <button onClick={() => setShowDateModal(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
-                                            <Calendar size={16} />
-                                        </button>
-                                    </div>
-                                </div>
-                                <div className="flex items-center gap-3">
-                                    <label className="text-[11px] font-bold text-gray-500 uppercase tracking-widest w-32 shrink-0">Pay. Balance</label>
-                                    <input name="payBalance" value={formData.payBalance} onChange={handleInputChange} type="number" step="0.01" className="flex-1 h-8 border-b border-slate-200 px-3 text-[14px] font-bold text-right text-slate-700 bg-slate-50 outline-none focus:border-b-[#00D1FF] transition-all" placeholder="0.00" />
-                                </div>
+                            {/* Memo */}
+                            <div className="col-span-8">
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Memo</label>
+                                <input name="memo" value={formData.memo} onChange={handleInputChange} type="text"
+                                    className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700" placeholder="Opening balance remarks..." />
                             </div>
-                        </div>
 
-                        {/* Entity Select Row */}
-                        {activeTab !== 'Account' && (
-                            <div className="grid grid-cols-12 gap-x-12 items-center">
-                                <div className="col-span-12 lg:col-span-12 flex items-center gap-3">
-                                    <label className="text-[11px] font-bold text-gray-500 uppercase tracking-widest w-24 shrink-0">{activeTab}</label>
-                                    <div className="flex-1 flex gap-1">
-                                        <input 
-                                            type="text" 
-                                            readOnly 
-                                            value={formData.entityName ? `${formData.entityId} - ${formData.entityName}` : ''} 
-                                            placeholder={`Click search to select ${activeTab.toLowerCase()}...`} 
-                                            className="flex-1 h-8 border border-slate-200 rounded-[5px] px-3 text-[12px] font-bold text-slate-700 bg-white outline-none shadow-sm placeholder-slate-400" 
-                                        />
-                                        <button onClick={() => { setActiveModal('entity'); setSearchTerm(''); }} className="w-10 h-8 bg-[#0285fd] hover:bg-[#0073ff] text-white rounded-[5px] flex items-center justify-center transition-all active:scale-95 shadow-sm border-none">
-                                            <Search size={16} />
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-
-                        <div className="flex items-center gap-3">
-                            <label className="text-[11px] font-bold text-gray-500 uppercase tracking-widest w-24 shrink-0">Address</label>
-                            <input name="address" value={formData.address} onChange={handleInputChange} type="text" className="flex-1 h-8 border border-slate-200 rounded-[5px] px-3 text-[12px] font-bold text-slate-700 bg-white outline-none focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 transition-all shadow-sm" />
-                        </div>
-
-                        <div className="grid grid-cols-12 gap-x-12 items-start pt-2">
-                             <div className="col-span-12 lg:col-span-7 flex items-center gap-3">
-                                <label className="text-[11px] font-bold text-gray-500 uppercase tracking-widest w-24 shrink-0">Memo</label>
-                                <input name="memo" value={formData.memo} onChange={handleInputChange} type="text" className="flex-1 h-8 border border-slate-200 rounded-[5px] px-3 text-[12px] font-bold text-slate-700 bg-white outline-none focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 transition-all shadow-sm" placeholder="Opening balance remarks..." />
-                            </div>
-                            <div className="col-span-12 lg:col-span-5 flex items-center gap-3">
-                                <label className="text-[11px] font-bold text-gray-500 uppercase tracking-widest w-32 shrink-0">Curr. Bal</label>
-                                <div className="flex-1 h-8 flex items-center justify-end px-3 bg-red-50 text-[14px] font-black text-red-600 rounded-[5px] border border-red-100 shadow-sm">
+                            {/* Curr. Bal */}
+                            <div className="col-span-4">
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Curr. Bal</label>
+                                <div className="w-full h-10 flex items-center justify-end px-3 bg-red-50 text-[14px] font-black text-red-600 rounded-[3px] border border-red-100">
                                     Rs. {formData.currentBalance.toLocaleString()}
                                 </div>
                             </div>
-                        </div>
 
-                        <div className="grid grid-cols-12 gap-x-12 items-center pt-2">
-                             <div className="col-span-12 lg:col-span-7 flex items-center gap-3">
-                                <label className="text-[11px] font-bold text-gray-500 uppercase tracking-widest w-24 shrink-0">O.P. Balance</label>
-                                <div className="flex-1 flex items-center gap-6">
-                                    <input name="openingBalance" value={formData.openingBalance} onChange={handleInputChange} type="number" step="0.01" className="w-[180px] h-9 border-b-2 border-[#00adff] px-2 text-[18px] text-right font-black text-slate-800 bg-blue-50/20 outline-none" placeholder="0.00" />
+                            {/* O.P. Balance */}
+                            <div className="col-span-8">
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">O.P. Balance</label>
+                                <div className="flex items-center gap-6">
+                                    <input name="openingBalance" value={formData.openingBalance} onChange={handleInputChange} type="number" step="0.01"
+                                        className="w-[200px] h-10 border border-gray-300 rounded-[3px] px-3 text-[16px] text-right font-black text-gray-800 bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd]" placeholder="0.00" />
                                     <div className="flex items-center gap-2 cursor-pointer select-none" onClick={() => setFormData(prev => ({ ...prev, isDebit: !prev.isDebit }))}>
-                                        <div className={`w-4 h-4 rounded border flex items-center justify-center transition-all ${formData.isDebit ? 'bg-[#00adff] border-[#00adff]' : 'bg-white border-slate-300'}`}>
+                                        <div className={`w-4 h-4 rounded border flex items-center justify-center transition-all ${formData.isDebit ? 'bg-[#0285fd] border-[#0285fd]' : 'bg-white border-gray-300'}`}>
                                             {formData.isDebit && <Check size={10} className="text-white" strokeWidth={4} />}
                                         </div>
-                                        <span className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">Debit Balance</span>
+                                        <span className="text-[13px] font-medium text-gray-700">Debit Balance</span>
                                     </div>
                                 </div>
                             </div>
-                            <div className="col-span-12 lg:col-span-5 flex items-center gap-3">
-                                <label className="text-[11px] font-bold text-gray-500 uppercase tracking-widest w-32 shrink-0">Balance as at</label>
-                                <div className="flex-1 flex gap-1 h-8 min-w-0">
-                                    <input type="text" readOnly value={formData.balanceAsAt} onClick={() => setShowBalanceDateModal(true)} className="flex-1 min-w-0 h-8 border border-gray-300 rounded-[5px] px-3 text-[12px] outline-none bg-white text-gray-700 font-bold cursor-pointer shadow-sm" />
-                                    <button onClick={() => setShowBalanceDateModal(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
+
+                            {/* Balance as at */}
+                            <div className="col-span-4">
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Balance as at</label>
+                                <div className="relative">
+                                    <input type="text" readOnly value={formData.balanceAsAt}
+                                        onClick={() => setShowBalanceDateModal(true)}
+                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700 truncate" />
+                                    <button onClick={() => setShowBalanceDateModal(true)}
+                                        className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
                                         <Calendar size={16} />
                                     </button>
                                 </div>
@@ -295,58 +349,52 @@ const OpeningBalanceBoard = ({ isOpen, onClose }) => {
                         </div>
                     </div>
                 </div>
-            </SimpleModal>
+            </TransactionFormWrapper>
 
-            {/* Search Modal */}
-            <SimpleModal isOpen={activeModal !== null} onClose={() => setActiveModal(null)} title={activeModal === 'account' ? 'Search Accounts' : activeModal === 'cc' ? 'Search Cost Centers' : `Search ${activeTab}s`} maxWidth="max-w-[650px]">
-                <div className="space-y-4 font-['Tahoma']">
-                    <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-lg border border-gray-100 mb-2">
-                        <Search className="text-gray-400" size={15} />
-                        <input type="text" className="w-full h-9 border border-gray-300 rounded-[5px] outline-none px-3 text-sm focus:border-[#0285fd] bg-white shadow-sm" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} autoFocus placeholder="Search..." />
-                    </div>
-                    
-                    <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm max-h-[300px] overflow-y-auto no-scrollbar">
-                        <table className="w-full text-left">
-                            <thead className="bg-[#f8fafd] sticky top-0 text-[11px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-100">
-                                <tr>
-                                    <th className="px-5 py-3">Code</th>
-                                    <th className="px-5 py-3">Name</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-50">
-                                {filteredLookup().map((item, idx) => (
-                                    <tr key={idx} className="group hover:bg-blue-50/50 cursor-pointer" onClick={() => {
-                                        if (activeModal === 'account') {
-                                            setFormData(prev => ({ ...prev, accountCode: item.code, accountName: item.name }));
-                                        } else if (activeModal === 'cc') {
-                                            setFormData(prev => ({ ...prev, costCenter: item.code }));
-                                        } else {
-                                            setFormData(prev => ({ ...prev, entityId: item.code, entityName: item.name, address: item.address || '' }));
-                                        }
-                                        setActiveModal(null);
-                                    }}>
-                                        <td className="px-5 py-3 font-mono text-[13px] font-bold text-[#0285fd]">{item.code}</td>
-                                        <td className="px-5 py-3 text-[13px] font-bold text-gray-600 uppercase group-hover:text-blue-600">{item.name}</td>
-                                    </tr>
-                                ))}
-                                {filteredLookup().length === 0 && (
-                                    <tr><td colSpan="2" className="p-8 text-center text-gray-400 font-medium italic text-[12px]">No results found for "{searchTerm}"</td></tr>
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </SimpleModal>
-            {/* Modals */}
-            {showDateModal && (
-                <CalendarModal isOpen={showDateModal} onClose={() => setShowDateModal(false)} currentDate={formData.date} onDateChange={(d) => { setFormData({ ...formData, date: d }); setShowDateModal(false); }} title="Select Date" />
+            <SearchModal
+                isOpen={activeModal === 'account'}
+                onClose={() => setActiveModal(null)}
+                title={`Select ${activeTab === 'Vendor' ? 'A/P' : activeTab === 'Customer' ? 'A/R' : 'G/L'} Account`}
+                items={getAccountItems()}
+                onSelect={(item) => { setFormData(prev => ({ ...prev, accountCode: item.code, accountName: item.name })); }}
+            />
+
+            <SearchModal
+                isOpen={activeModal === 'cc'}
+                onClose={() => setActiveModal(null)}
+                title="Select Cost Center"
+                items={lookups.costCenters}
+                onSelect={(item) => { setFormData(prev => ({ ...prev, costCenter: item.code })); }}
+            />
+
+            {activeTab !== 'Account' && (
+                <SearchModal
+                    isOpen={activeModal === 'entity'}
+                    onClose={() => setActiveModal(null)}
+                    title={`Select ${activeTab}`}
+                    items={getEntityItems()}
+                    onSelect={(item) => { setFormData(prev => ({ ...prev, entityId: item.code, entityName: item.name, address: item.address || '' })); }}
+                />
             )}
-            {showBalanceDateModal && (
-                <CalendarModal isOpen={showBalanceDateModal} onClose={() => setShowBalanceDateModal(false)} currentDate={formData.balanceAsAt} onDateChange={(d) => { setFormData({ ...formData, balanceAsAt: d }); setShowBalanceDateModal(false); }} title="Select Balance As At Date" />
-            )}
-            
+
+            <CalendarModal
+                isOpen={showDateModal}
+                onClose={() => setShowDateModal(false)}
+                currentDate={formData.date}
+                onDateChange={(d) => { setFormData({ ...formData, date: d }); setShowDateModal(false); }}
+                title="Select Date"
+            />
+
+            <CalendarModal
+                isOpen={showBalanceDateModal}
+                onClose={() => setShowBalanceDateModal(false)}
+                currentDate={formData.balanceAsAt}
+                onDateChange={(d) => { setFormData({ ...formData, balanceAsAt: d }); setShowBalanceDateModal(false); }}
+                title="Select Balance As At Date"
+            />
+
             {showReceipt && (
-                <OpeningBalanceDetailModal 
+                <OpeningBalanceDetailModal
                     docNo={receiptData?.docNo}
                     preloadedData={receiptData}
                     onClose={() => {

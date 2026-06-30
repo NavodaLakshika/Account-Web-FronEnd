@@ -113,25 +113,25 @@ const CardCommissionBoard = ({ isOpen, onClose }) => {
                 isOpen={isOpen}
                 onClose={onClose}
                 title="Card Sale Commission Setup"
-                maxWidth="max-w-[650px]"
+                maxWidth="max-w-[700px]"
                 footer={
                     <div className="bg-slate-50 px-6 py-4 w-full flex justify-end gap-4 border-t border-slate-200 mt-1 rounded-b-[5px]">
                         <button 
                             onClick={handleSave} 
                             disabled={loading} 
-                            className={`px-8 h-10 text-white font-mono font-bold text-[13px] uppercase tracking-widest rounded-[5px] transition-all active:scale-95 flex items-center justify-center gap-2 border-none disabled:opacity-50 shadow-md bg-[#2bb744] hover:bg-[#259b3a] shadow-green-100 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            className={`px-8 h-10 text-white font-mono font-bold text-[13px] uppercase tracking-widest rounded-[3px] transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-50 shadow-md bg-[#2bb744] hover:bg-[#259b3a] shadow-green-100 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                         >
                             {loading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />} 
                             SAVE
                         </button>
-                        <button onClick={handleClear} className="px-8 h-10 bg-[#00adff] hover:bg-[#0099e6] text-white font-mono font-bold text-[13px] uppercase tracking-widest rounded-[5px] shadow-md shadow-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border-none disabled:opacity-50">
+                        <button onClick={handleClear} className="px-8 h-10 bg-white text-[#00adff] border-2 border-[#00adff] hover:bg-blue-50 font-mono font-bold text-[13px] uppercase tracking-widest rounded-[3px] shadow-md shadow-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-50">
                             <RotateCcw size={14} /> CLEAR
                         </button>
                     </div>
                 }
             >
                 <div className="select-none font-['Tahoma'] space-y-4 p-2">
- <div className="bg-white p-6 rounded-[5px] space-y-6 shadow-sm border-l-4 border-l-[#e49e1b]">
+ <div className="bg-white p-6 rounded-[3px] space-y-6 shadow-sm border-l-4 border-l-[#e49e1b]">
                         <div className="space-y-5">
                             {/* Bank Selection */}
                             <div className="space-y-1.5">
@@ -220,7 +220,7 @@ const CardCommissionBoard = ({ isOpen, onClose }) => {
                 <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4 font-['Tahoma']">
                     <div className="absolute inset-0 bg-slate-900/30 backdrop-blur-sm" onClick={() => setShowBankSearch(false)} />
  <div className="relative w-full max-w-xl bg-white shadow-2xl rounded-sm overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
-                        <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-100 select-none relative overflow-hidden">
+                        <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-200 select-none relative overflow-hidden">
                             <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#e49e1b]" />
                             <div className="flex items-center gap-2">
                                 <Search size={16} className="text-[#e49e1b]" />
@@ -230,7 +230,7 @@ const CardCommissionBoard = ({ isOpen, onClose }) => {
                                 <X size={28} strokeWidth={1.5} className="group-hover:scale-110 transition-transform" />
                             </button>
                         </div>
-                        <div className="p-3 bg-slate-50 border-b border-gray-100 flex items-center justify-between">
+                        <div className="p-3 bg-slate-50 border-b border-gray-200 flex items-center justify-between">
                             <div className="flex items-center gap-2">
                                 <Search size={14} className="text-gray-400" />
                                 <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Search Facility</span>
@@ -238,7 +238,7 @@ const CardCommissionBoard = ({ isOpen, onClose }) => {
                             <input 
                                 type="text" 
                                 placeholder="SEARCH BANK..." 
-                                className="h-9 border border-slate-200 px-3 text-xs rounded-md w-72 focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 outline-none shadow-sm transition-all uppercase" 
+                                className="h-9 border border-slate-200 px-3 text-xs rounded-[3px] w-72 focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 outline-none shadow-sm transition-all uppercase" 
                                 value={bankSearchTerm} 
                                 onChange={(e) => setBankSearchTerm(e.target.value)} 
                             />
@@ -285,7 +285,7 @@ const CardCommissionBoard = ({ isOpen, onClose }) => {
                 <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4 font-['Tahoma']">
                     <div className="absolute inset-0 bg-slate-900/30 backdrop-blur-sm" onClick={() => setShowCardSearch(false)} />
  <div className="relative w-full max-w-sm bg-white shadow-2xl rounded-sm overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
-                        <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-100 select-none relative overflow-hidden">
+                        <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-200 select-none relative overflow-hidden">
                             <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#e49e1b]" />
                             <div className="flex items-center gap-2">
                                 <Search size={16} className="text-[#e49e1b]" />
@@ -295,11 +295,11 @@ const CardCommissionBoard = ({ isOpen, onClose }) => {
                                 <X size={28} strokeWidth={1.5} className="group-hover:scale-110 transition-transform" />
                             </button>
                         </div>
-                        <div className="p-3 bg-slate-50 border-b border-gray-100">
+                        <div className="p-3 bg-slate-50 border-b border-gray-200">
                             <input 
                                 type="text" 
                                 placeholder="FILTER CARDS..." 
-                                className="h-9 border border-slate-200 px-3 text-xs rounded-md w-full focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 outline-none shadow-sm transition-all uppercase" 
+                                className="h-9 border border-slate-200 px-3 text-xs rounded-[3px] w-full focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 outline-none shadow-sm transition-all uppercase" 
                                 value={cardSearchTerm} 
                                 onChange={(e) => setCardSearchTerm(e.target.value)} 
                             />
@@ -311,7 +311,7 @@ const CardCommissionBoard = ({ isOpen, onClose }) => {
                                 <button 
                                     key={idx} 
                                     onClick={() => handleCardSelect(card)}
-                                    className="w-full px-4 py-3 text-[12px] font-bold text-gray-700 hover:bg-slate-50 border border-slate-200 rounded-lg transition-all text-left flex justify-between items-center group shadow-sm"
+                                    className="w-full px-4 py-3 text-[12px] font-bold text-gray-700 hover:bg-slate-50 border border-slate-200 rounded-[3px] transition-all text-left flex justify-between items-center group shadow-sm"
                                 >
                                     <span className="uppercase tracking-widest">{card.name}</span>
                                     <PlusCircle size={16} className="text-gray-300 group-hover:text-[#e49e1b] transition-colors" />

@@ -154,7 +154,7 @@ const CalendarModal = ({ isOpen, onClose, onDateSelect, onDateChange, initialDat
                         ))}
                     </div>
 
-                    <div className="mt-6 pt-4 border-t border-gray-100 flex justify-between items-center px-2">
+                    <div className="mt-6 pt-4 border-t border-gray-200 flex justify-between items-center px-2">
                         <div className="flex items-center gap-2 text-[12px] font-mono text-slate-300 uppercase tracking-widest"> Onimta IT Solutions
                         </div>
                         <button 

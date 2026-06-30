@@ -9,11 +9,12 @@ import {
   Calendar as CalendarIcon,
   X,
   CheckCircle
-} from "lucide-react";
+, FileText} from "lucide-react";
 import { reminderService } from "../services/reminder.service";
 import ConfirmModal from "../components/modals/ConfirmModal";
 
 import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
+import TransactionFormWrapper from '../components/TransactionFormWrapper';
 
 
 const ReminderListBoard = ({ isOpen, onClose, onEditTask }) => {
@@ -72,16 +73,16 @@ const ReminderListBoard = ({ isOpen, onClose, onEditTask }) => {
   );
 
   return (
-    <SimpleModal
+    <TransactionFormWrapper subtitle="Transaction Management" icon={FileText}
       isOpen={isOpen}
       onClose={onClose}
-      title="All Reminders & Tasks"
-      maxWidth="max-w-[1000px]"
+      title="Reminders"
+      maxWidth="max-w-[700px]"
       footer={
         <div className="flex items-center justify-end w-full px-6 h-16 bg-slate-50 border-t border-slate-200">
           <button 
             onClick={onClose}
-            className="px-8 h-10 bg-[#0078d4] text-white text-sm font-bold rounded-md hover:bg-blue-600 transition-all active:scale-95 flex items-center gap-2"
+            className="px-8 h-10 bg-[#0078d4] text-white text-sm font-bold rounded-[3px] hover:bg-blue-600 transition-all active:scale-95 flex items-center gap-2"
           >
             <X size={16} /> Close Report
           </button>
@@ -107,13 +108,13 @@ const ReminderListBoard = ({ isOpen, onClose, onEditTask }) => {
                 placeholder="Search tasks, dates..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full h-10 pl-10 pr-4 bg-white border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/20 outline-none transition-all shadow-sm"
+                className="w-full h-10 pl-10 pr-4 bg-white border border-slate-200 rounded-[3px] text-sm focus:ring-2 focus:ring-blue-500/20 outline-none transition-all shadow-sm"
               />
            </div>
            
            <button 
              onClick={fetchTasks}
-             className="p-2.5 h-10 w-10 flex items-center justify-center bg-white border border-slate-200 rounded-lg text-slate-500 hover:text-[#0078d4] hover:border-blue-200 transition-all shadow-sm"
+             className="p-2.5 h-10 w-10 flex items-center justify-center bg-white border border-slate-200 rounded-[3px] text-slate-500 hover:text-[#0078d4] hover:border-blue-200 transition-all shadow-sm"
            >
              <RefreshCcw size={18} className={(loading && !deleteConfirm.show) ? "animate-spin" : ""} />
            </button>
@@ -129,7 +130,7 @@ const ReminderListBoard = ({ isOpen, onClose, onEditTask }) => {
                 <th className="px-4 py-3 text-[11px] font-black text-slate-400 uppercase tracking-widest text-left w-32 border-l border-slate-200">Time</th>
                 <th className="px-4 py-3 text-[11px] font-black text-slate-400 uppercase tracking-widest text-left border-l border-slate-200">Task Details</th>
                 <th className="px-4 py-3 text-[11px] font-black text-slate-400 uppercase tracking-widest text-center w-32 border-l border-slate-200">Actions</th>
-              </tr>
+              <th className="text-right px-5 py-3">Action</th></tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
               {loading && !deleteConfirm.show ? (
@@ -171,14 +172,14 @@ const ReminderListBoard = ({ isOpen, onClose, onEditTask }) => {
                     <div className="flex items-center justify-center gap-2">
                        <button 
                          onClick={() => onEditTask(r)}
-                         className="p-2 text-blue-500 hover:bg-blue-50 rounded-lg transition-all"
+                         className="p-2 text-blue-500 hover:bg-blue-50 rounded-[3px] transition-all"
                          title="Edit Task"
                        >
                          <Edit3 size={16} />
                        </button>
                        <button 
                          onClick={() => setDeleteConfirm({ show: true, id: r.id_No || r.Id_No })}
-                         className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-all"
+                         className="p-2 text-red-500 hover:bg-red-50 rounded-[3px] transition-all"
                          title="Delete Task"
                        >
                          <Trash2 size={16} />
@@ -186,7 +187,7 @@ const ReminderListBoard = ({ isOpen, onClose, onEditTask }) => {
                        {(r.expire || r.Expire) === 'F' && (
                          <button 
                            onClick={() => handleToggleExpire(r.id_No || r.Id_No, r.expire || r.Expire)}
-                           className="p-2 text-green-500 hover:bg-green-50 rounded-lg transition-all"
+                           className="p-2 text-green-500 hover:bg-blue-50 rounded-[3px] transition-all"
                            title="Mark Complete"
                          >
                            <CheckCircle size={16} />
@@ -210,7 +211,7 @@ const ReminderListBoard = ({ isOpen, onClose, onEditTask }) => {
         variant="danger"
         loading={loading}
       />
-    </SimpleModal>
+    </TransactionFormWrapper>
   );
 };
 

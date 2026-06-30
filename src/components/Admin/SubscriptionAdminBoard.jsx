@@ -157,7 +157,7 @@ const SubscriptionAdminBoard = () => {
                   <td colSpan="6" className="py-8 text-center text-slate-400">
                     <Loader2 className="w-6 h-6 animate-spin mx-auto" />
                   </td>
-                </tr>
+                <th className="text-right px-5 py-3">Action</th></tr>
               ) : filteredUsers.map(user => (
                 <tr key={user.emp_Code} className="border-b border-slate-50 hover:bg-slate-50/80 transition-colors">
                   <td className="py-3.5 px-6 font-mono text-[13px] text-slate-900 font-bold">{user.emp_Code}</td>
@@ -224,7 +224,7 @@ const SubscriptionAdminBoard = () => {
                     {plans.map((plan) => (
  <div key={plan.id} className="bg-white rounded-sm border-t-4 border-t-[#f97316] shadow-sm p-6 flex flex-col relative transition-shadow hover:shadow-md">
                             {!plan.isActive && (
-                                <div className="absolute top-4 right-4 bg-red-100 text-red-600 text-[10px] font-bold px-2 py-1 rounded-md uppercase">
+                                <div className="absolute top-4 right-4 bg-red-100 text-red-600 text-[10px] font-bold px-2 py-1 rounded-[3px] uppercase">
                                     Inactive
                                 </div>
                             )}
@@ -251,13 +251,13 @@ const SubscriptionAdminBoard = () => {
                                         setEditingPlan(plan);
                                         setShowPlanEditor(true);
                                     }}
-                                    className="flex-1 flex items-center justify-center gap-2 bg-orange-50 hover:bg-orange-100 text-[#ea580c] py-2 rounded-lg text-sm font-bold transition-all"
+                                    className="flex-1 flex items-center justify-center gap-2 bg-orange-50 hover:bg-orange-100 text-[#ea580c] py-2 rounded-[3px] text-sm font-bold transition-all"
                                 >
                                     <Edit className="w-4 h-4" /> Edit
                                 </button>
                                 <button 
                                     onClick={() => handleDeletePlan(plan.id)}
-                                    className="flex-none p-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg transition-all"
+                                    className="flex-none p-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-[3px] transition-all"
                                 >
                                     <Trash2 className="w-5 h-5" />
                                 </button>
@@ -309,7 +309,7 @@ const SubscriptionAdminBoard = () => {
                       key={status}
                       type="button"
                       onClick={() => setNewStatus(status)}
-                      className={`flex-1 py-2 text-[13px] font-bold rounded-[10px] transition-all duration-300 ${
+                      className={`flex-1 py-2 text-[13px] font-bold rounded-[3px] transition-all duration-300 ${
                         newStatus === status 
                           ? status === 'Trial' ? 'bg-blue-500 text-white shadow-[0_2px_10px_rgba(59,130,246,0.3)]'
                             : status === 'Active' ? 'bg-emerald-500 text-white shadow-[0_2px_10px_rgba(16,185,129,0.3)]'

@@ -156,7 +156,7 @@ const CompanyUsersModal = ({ isOpen, onClose }) => {
     return (
         <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 font-['Tahoma']">
             <div className="absolute inset-0 bg-slate-900/30 backdrop-blur-sm" onClick={onClose} />
- <div className="relative w-full max-w-[900px] bg-white shadow-2xl rounded-[5px] overflow-hidden flex flex-col animate-in slide-in-from-bottom-10 fade-in duration-400">
+ <div className="relative w-full max-w-[900px] bg-white shadow-2xl rounded-[3px] overflow-hidden flex flex-col animate-in slide-in-from-bottom-10 fade-in duration-400">
                 
                 {/* Custom Header similar to original but refined */}
                 <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-slate-200 select-none">
@@ -168,7 +168,7 @@ const CompanyUsersModal = ({ isOpen, onClose }) => {
                     </div>
                     <button 
                         onClick={onClose} 
-                        className="w-8 h-8 flex items-center justify-center bg-red-50 hover:bg-red-100 text-red-500 rounded-[5px] transition-all outline-none border-none group"
+                        className="w-8 h-8 flex items-center justify-center bg-red-50 hover:bg-red-100 text-red-500 rounded-[3px] transition-all outline-none border-none group"
                         title="Close"
                     >
                         <X size={28} className="group-hover:scale-110 transition-transform" />
@@ -181,12 +181,12 @@ const CompanyUsersModal = ({ isOpen, onClose }) => {
                         {!showAddForm ? (
                             <button
                                 onClick={() => setShowAddForm(true)}
-                                className="px-6 h-8 bg-[#00adff] hover:bg-[#0099e6] text-white font-mono text-[11px] font-bold rounded-[5px] transition-all active:scale-95 flex items-center justify-center gap-2 border-none uppercase tracking-widest"
+                                className="px-6 h-8 bg-white text-[#00adff] border-2 border-[#00adff] hover:bg-blue-50 font-mono text-[11px] font-bold rounded-[3px] transition-all active:scale-95 flex items-center justify-center gap-2 border-none uppercase tracking-widest"
                             >
                                 <UserPlus size={14} /> ADD NEW EMPLOYEE USER
                             </button>
                         ) : (
-                            <div className="bg-[#f8fafd] border border-blue-100/50 rounded-[5px] p-5 shadow-sm relative overflow-hidden animate-in slide-in-from-top-2">
+                            <div className="bg-[#f8fafd] border border-blue-100/50 rounded-[3px] p-5 shadow-sm relative overflow-hidden animate-in slide-in-from-top-2">
                                 <div className="flex items-center justify-between pb-3 mb-3 border-b border-blue-100 relative z-10">
                                     <div className="flex items-center gap-2 text-[#0285fd]">
                                         <Shield size={16} />
@@ -223,7 +223,7 @@ const CompanyUsersModal = ({ isOpen, onClose }) => {
                                         <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">User Role *</label>
                                         <div className="flex gap-1 h-8">
                                             <input type="text" readOnly value={roleOptions.find(o => o.id === roleId)?.name || 'Select Role'} onClick={() => setShowRoleModal(true)} className="flex-1 h-8 border border-slate-200 px-3 text-[12px] font-bold text-[#0285fd] bg-white rounded-[3px] outline-none cursor-pointer focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 transition-all uppercase" />
-                                            <button type="button" onClick={() => setShowRoleModal(true)} className="w-10 h-8 bg-[#00adff] text-white flex items-center justify-center hover:bg-[#0099e6] rounded-[3px] transition-all active:scale-95 border-none">
+                                            <button type="button" onClick={() => setShowRoleModal(true)} className="w-10 h-8 bg-white text-[#00adff] border-2 border-[#00adff] hover:bg-blue-50 flex items-center justify-center hover:bg-[#0099e6] rounded-[3px] transition-all active:scale-95 border-none">
                                                 <Search size={14} />
                                             </button>
                                         </div>
@@ -309,7 +309,7 @@ const CompanyUsersModal = ({ isOpen, onClose }) => {
             {showRoleModal && (
                 <div className="fixed inset-0 z-[1010] flex items-center justify-center p-4">
                     <div className="absolute inset-0 bg-slate-900/30 backdrop-blur-sm" onClick={() => setShowRoleModal(false)} />
- <div className="relative w-full max-w-[500px] bg-white shadow-2xl rounded-[5px] overflow-hidden flex flex-col animate-in zoom-in-95">
+ <div className="relative w-full max-w-[500px] bg-white shadow-2xl rounded-[3px] overflow-hidden flex flex-col animate-in zoom-in-95">
                         <div className="bg-[#f8fafd] px-4 py-3 flex justify-between items-center border-b border-slate-200">
                             <span className="text-[12px] font-black text-slate-600 uppercase tracking-widest">Select User Role</span>
                             <button onClick={() => setShowRoleModal(false)} className="text-slate-400 hover:text-red-500"><X size={28}/></button>

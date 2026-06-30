@@ -1,13 +1,14 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import SimpleModal from '../components/SimpleModal';
 import ConfirmModal from '../components/modals/ConfirmModal';
-import { Search, Calendar, RefreshCw, X, Save, Loader2, Trash2, CheckCircle, RotateCcw, Plus } from 'lucide-react';
+import { Search, Calendar, RefreshCw, X, Save, Loader2, Trash2, CheckCircle, RotateCcw, Plus , FileText} from 'lucide-react';
 import { salesReceiptService } from '../services/salesReceipt.service';
 
 
 import CalendarModal from '../components/CalendarModal';
 import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
 import SalesReceiptDetailModal from '../components/SalesReceiptDetailModal';
+import TransactionFormWrapper from '../components/TransactionFormWrapper';
 
 
 const SalesReceiptBoard = ({ isOpen, onClose }) => {
@@ -267,23 +268,23 @@ const SalesReceiptBoard = ({ isOpen, onClose }) => {
                     .no-scrollbar::-webkit-scrollbar { display: none; }
                 `}
             </style>
-            <SimpleModal
+            <TransactionFormWrapper subtitle="Transaction Management" icon={FileText}
                 isOpen={isOpen}
                 onClose={onClose}
                 title="Create Sales Receipt"
-                maxWidth="max-w-[1050px]"
+                maxWidth="max-w-[700px]"
                 footer={
-                    <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-gray-100 rounded-b-xl">
+                    <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-gray-200 rounded-b-xl">
                         <div className="flex gap-3">
                             <button
                                 onClick={handleDelete}
-                                className="px-6 h-10 bg-[#ff3b30] text-white text-sm font-black rounded-[5px] shadow-md shadow-red-100 hover:bg-[#e03127] transition-all active:scale-95 flex items-center gap-2 border-none"
+                                className="px-6 h-10 bg-white text-[#ff3b30] border-2 border-[#ff3b30] hover:bg-red-50 text-sm font-black rounded-[3px] shadow-md shadow-red-100 hover:bg-[#e03127] transition-all active:scale-95 flex items-center gap-2 border-none"
                             >
                                 <Trash2 size={14} /> DELETE DOC
                             </button>
                             <button
                                 onClick={handleClear}
-                                className="px-6 h-10 bg-[#00adff] text-white text-sm font-black rounded-[5px] hover:bg-[#0099e6] transition-all active:scale-95 flex items-center gap-2 border-none"
+                                className="px-6 h-10 bg-white text-[#00adff] border-2 border-[#00adff] hover:bg-blue-50 text-sm font-black rounded-[3px] hover:bg-[#0099e6] transition-all active:scale-95 flex items-center gap-2 border-none"
                             >
                                 <RotateCcw size={14} /> CLEAR FORM
                             </button>
@@ -292,7 +293,7 @@ const SalesReceiptBoard = ({ isOpen, onClose }) => {
                             <button
                                 onClick={handleSaveDraft}
                                 disabled={isSaving || isApplying}
-                                className="px-6 h-10 bg-white text-[#0285fd] text-sm font-black rounded-[5px] border-2 border-[#0285fd] hover:bg-blue-50 transition-all active:scale-95 flex items-center gap-2 disabled:opacity-50"
+                                className="px-6 h-10 bg-white text-[#0285fd] text-sm font-black rounded-[3px] border-2 border-[#0285fd] hover:bg-blue-50 transition-all active:scale-95 flex items-center gap-2 disabled:opacity-50"
                             >
                                 {isSaving ? <Loader2 className="animate-spin" size={16} /> : <Save size={16} />} 
                                 SAVE
@@ -300,7 +301,7 @@ const SalesReceiptBoard = ({ isOpen, onClose }) => {
                             <button
                                 onClick={() => setShowConfirmModal(true)}
                                 disabled={isApplying || rows.length === 0}
-                                className={`px-8 h-10 ${isApplying || rows.length === 0 ? 'bg-gray-300' : 'bg-[#2bb744] shadow-md shadow-green-100 hover:bg-[#259b3a]'} text-white text-sm font-black rounded-[5px] transition-all active:scale-95 flex items-center gap-2 border-none`}
+                                className={`px-8 h-10 ${isApplying || rows.length === 0 ? 'bg-gray-300' : 'bg-[#2bb744] shadow-md shadow-green-100 hover:bg-[#259b3a]'} text-white text-sm font-black rounded-[3px] transition-all active:scale-95 flex items-center gap-2 border-none`}
                             >
                                 {isApplying ? <Loader2 className="animate-spin" size={16} /> : <CheckCircle size={16} />} 
                                 APPLY
@@ -311,15 +312,15 @@ const SalesReceiptBoard = ({ isOpen, onClose }) => {
             >
                 <div className="space-y-4 overflow-y-auto no-scrollbar font-['Tahoma']">
                     {/* Header Section */}
-                    <div className="bg-white p-4 border border-gray-100 rounded-lg shadow-sm space-y-4">
+                    <div className="bg-white p-4 border border-gray-200 rounded-[3px] shadow-sm space-y-4">
                         <div className="grid grid-cols-12 gap-x-6 gap-y-3.5">
                             
                             {/* Document ID */}
                             <div className="col-span-4 flex items-center gap-2">
                                 <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Document ID</label>
                                 <div className="flex-1 flex gap-1 h-8 min-w-0">
-                                    <input type="text" value={formData.docNo} onChange={(e) => setFormData(p => ({ ...p, docNo: e.target.value }))} className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-blue-600 bg-gray-50 rounded-[5px] outline-none shadow-sm" />
-                                    <button onClick={handleSearch} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
+                                    <input type="text" value={formData.docNo} onChange={(e) => setFormData(p => ({ ...p, docNo: e.target.value }))} className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-blue-600 bg-gray-50 rounded-[3px] outline-none shadow-sm" />
+                                    <button onClick={handleSearch} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0">
                                         <Search size={16} />
                                     </button>
                                 </div>
@@ -334,9 +335,9 @@ const SalesReceiptBoard = ({ isOpen, onClose }) => {
                                         readOnly 
                                         placeholder="Select customer..." 
                                         value={formData.customerName ? `${formData.customerId} - ${formData.customerName}` : ''}
-                                        className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-red-600 bg-gray-50 rounded-[5px] outline-none shadow-sm cursor-pointer" 
+                                        className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-red-600 bg-gray-50 rounded-[3px] outline-none shadow-sm cursor-pointer" 
                                     />
-                                    <button className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
+                                    <button className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0">
                                         <Search size={16} />
                                     </button>
                                 </div>
@@ -346,8 +347,8 @@ const SalesReceiptBoard = ({ isOpen, onClose }) => {
                             <div className="col-span-4 flex items-center gap-2">
                                 <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Post Date</label>
                                 <div className="flex-1 flex gap-1 h-8 min-w-0" onClick={() => setShowCalendar(true)}>
-                                    <input type="text" readOnly value={formData.date} className="flex-1 min-w-0 h-8 border border-gray-300 rounded-[5px] px-3 text-[12px] outline-none bg-white text-gray-700 font-bold cursor-pointer shadow-sm" />
-                                    <button className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
+                                    <input type="text" readOnly value={formData.date} className="flex-1 min-w-0 h-8 border border-gray-300 rounded-[3px] px-3 text-[12px] outline-none bg-white text-gray-700 font-bold cursor-pointer shadow-sm" />
+                                    <button className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0">
                                         <Calendar size={16} />
                                     </button>
                                 </div>
@@ -360,7 +361,7 @@ const SalesReceiptBoard = ({ isOpen, onClose }) => {
                                     type="text" 
                                     value={formData.reference}
                                     onChange={(e) => setFormData(p => ({ ...p, reference: e.target.value }))}
-                                    className="flex-1 min-w-0 h-8 border border-gray-300 rounded-[5px] px-3 font-mono text-[12px] outline-none bg-white text-gray-700 shadow-sm focus:border-[#0285fd]" 
+                                    className="flex-1 min-w-0 h-8 border border-gray-300 rounded-[3px] px-3 font-mono text-[12px] outline-none bg-white text-gray-700 shadow-sm focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd]" 
                                 />
                             </div>
 
@@ -371,7 +372,7 @@ const SalesReceiptBoard = ({ isOpen, onClose }) => {
                                     type="text" 
                                     value={formData.subject}
                                     onChange={(e) => setFormData(p => ({ ...p, subject: e.target.value }))}
-                                    className="flex-1 min-w-0 h-8 border border-gray-300 rounded-[5px] px-3 font-mono text-[12px] outline-none bg-white text-gray-700 shadow-sm focus:border-[#0285fd]" 
+                                    className="flex-1 min-w-0 h-8 border border-gray-300 rounded-[3px] px-3 font-mono text-[12px] outline-none bg-white text-gray-700 shadow-sm focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd]" 
                                 />
                             </div>
 
@@ -379,18 +380,18 @@ const SalesReceiptBoard = ({ isOpen, onClose }) => {
                     </div>
 
                     {/* Table Section */}
-                    <div className="border border-gray-100 rounded-lg bg-white shadow-sm flex flex-col min-h-[250px] overflow-hidden">
+                    <div className="border border-gray-200 rounded-[3px] bg-white shadow-sm flex flex-col min-h-[250px] overflow-hidden">
                         {/* Table header */}
-                        <div className="flex bg-slate-50/80 border-b border-gray-100 text-[10px] font-black text-gray-400 uppercase tracking-widest items-center">
-                            <div className="flex-[2.5] py-2.5 px-4 border-r border-gray-100 flex items-center justify-between">
+                        <div className="flex bg-slate-50/80 border-b border-gray-200 text-[10px] font-black text-gray-400 uppercase tracking-widest items-center">
+                            <div className="flex-[2.5] py-2.5 px-4 border-r border-gray-200 flex items-center justify-between">
                                 <span>Item Selection Portfolio</span>
                                 <button
                                     onClick={() => setShowProdLookup(true)}
-                                    className="w-8 h-7 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0"
+                                    className="w-8 h-7 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0"
                                 ><Plus size={14} /></button>
                             </div>
-                            <div className="w-32 py-2.5 px-4 border-r border-gray-100 text-right">Unit Rate</div>
-                            <div className="w-24 py-2.5 px-4 border-r border-gray-100 text-center">Usage</div>
+                            <div className="w-32 py-2.5 px-4 border-r border-gray-200 text-right">Unit Rate</div>
+                            <div className="w-24 py-2.5 px-4 border-r border-gray-200 text-center">Usage</div>
                             <div className="w-36 py-2.5 px-4 text-right">Extended Net</div>
                             <div className="w-10"></div>
                         </div>
@@ -402,22 +403,22 @@ const SalesReceiptBoard = ({ isOpen, onClose }) => {
                                     No items allocated to this document
                                 </div>
                             ) : rows.map((row, idx) => (
-                                <div key={idx} className="flex border-b border-gray-100 text-[11px] font-bold text-slate-700 hover:bg-blue-50/30 items-center transition-colors group">
-                                    <div className="flex-[2.5] py-2 px-4 border-r border-gray-100 truncate flex flex-col">
+                                <div key={idx} className="flex border-b border-gray-200 text-[11px] font-bold text-slate-700 hover:bg-blue-50/30 items-center transition-colors group">
+                                    <div className="flex-[2.5] py-2 px-4 border-r border-gray-200 truncate flex flex-col">
                                         <span className="text-blue-600 font-mono text-[10px]">{row.prodCode}</span>
                                         <span className="truncate">{row.prodName}</span>
                                     </div>
-                                    <div className="w-32 py-2 px-4 border-r border-gray-100 text-right text-slate-500 font-mono">
+                                    <div className="w-32 py-2 px-4 border-r border-gray-200 text-right text-slate-500 font-mono">
                                         {parseFloat(row.sellingPrice).toFixed(2)}
                                     </div>
-                                    <div className="w-24 py-2 px-4 border-r border-gray-100 text-center font-mono font-black text-slate-900">
+                                    <div className="w-24 py-2 px-4 border-r border-gray-200 text-center font-mono font-black text-slate-900">
                                         {row.qty}
                                     </div>
                                     <div className="w-36 py-2 px-4 text-right font-mono font-black text-slate-800">
                                         {parseFloat(row.amount).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                     </div>
                                     <div className="w-10 flex justify-center">
-                                        <button onClick={() => setRows(prev => prev.filter((_, i) => i !== idx))} className="text-red-300 hover:text-red-500 transition-all p-1.5 hover:bg-red-50 rounded-[5px] group-hover:opacity-100 opacity-0">
+                                        <button onClick={() => setRows(prev => prev.filter((_, i) => i !== idx))} className="text-red-300 hover:text-red-500 transition-all p-1.5 hover:bg-red-50 rounded-[3px] group-hover:opacity-100 opacity-0">
                                             <Trash2 size={13} />
                                         </button>
                                     </div>
@@ -433,13 +434,13 @@ const SalesReceiptBoard = ({ isOpen, onClose }) => {
                             <textarea 
                                 value={formData.comment}
                                 onChange={(e) => setFormData(p => ({ ...p, comment: e.target.value }))}
-                                className="w-full h-[80px] border border-gray-300 rounded-lg p-3 text-[12.5px] font-mono outline-none focus:border-[#0285fd] resize-none shadow-sm bg-gray-50/30" 
+                                className="w-full h-[80px] border border-gray-300 rounded-[3px] p-3 text-[12.5px] font-mono outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] resize-none shadow-sm bg-gray-50/30" 
                                 placeholder="Type any additional information here..."
                             ></textarea>
                         </div>
 
-                        <div className="w-[320px] bg-white border border-gray-100 rounded-lg p-4 space-y-3 shadow-sm">
-                            <div className="flex flex-col gap-1 items-end bg-slate-50 p-3 rounded-md border border-slate-100">
+                        <div className="w-[320px] bg-white border border-gray-200 rounded-[3px] p-4 space-y-3 shadow-sm">
+                            <div className="flex flex-col gap-1 items-end bg-slate-50 p-3 rounded-[3px] border border-slate-100">
                                 <span className="text-[11px] font-black text-gray-400 uppercase tracking-[0.2em]">Net Liability Total</span>
                                 <div className="text-[26px] font-mono font-black text-blue-700 leading-none tracking-tighter">
                                     LKR {totalAmount}
@@ -459,35 +460,37 @@ const SalesReceiptBoard = ({ isOpen, onClose }) => {
                     maxWidth="max-w-[700px]"
                 >
                     <div className="space-y-4 font-['Tahoma']">
-                        <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-lg border border-gray-100 mb-2">
+                        <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-[3px] border border-gray-200 mb-2">
                             <span className="text-[12px] font-bold text-gray-500 uppercase tracking-widest">Global Archive Search</span>
                             <div className="relative flex-1">
                                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
-                                <input type="text" placeholder="Filter by document id or creation date..." className="w-full h-9 pl-10 pr-4 border border-gray-300 rounded-[5px] outline-none text-sm focus:border-[#0285fd] bg-white shadow-sm" />
+                                <input type="text" placeholder="Filter by document id or creation date..." className="w-full h-10 pl-10 pr-4 border border-gray-300 rounded-[3px] outline-none text-[13px] focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] shadow-sm bg-white" />
                             </div>
                         </div>
 
-                        <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm">
+                        <div className="border border-gray-200 rounded-[3px] overflow-hidden shadow-sm">
                             <table className="w-full text-left">
-                                <thead className="bg-[#f8fafd] text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">
+                                <thead className="bg-[#f8fafd] text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-200">
                                     <tr>
-                                        <th className="px-5 py-3">Reference ID</th>
-                                        <th className="px-5 py-3">Ledger Posting Date</th>
-                                        <th className="px-5 py-3 text-right">Interaction</th>
-                                    </tr>
+                                        <th className=" px-5 py-3">Reference ID</th>
+                                        <th className=" px-5 py-3">Ledger Posting Date</th>
+                                        <th className="text-right px-5 py-3">Interaction</th>
+                                    <th className="text-right px-5 py-3">Action</th></tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-50">
                                     {existingDocs.length === 0 ? (
                                         <tr>
-                                            <td colSpan="3" className="text-center py-10 text-gray-300 text-[12px] font-bold uppercase tracking-widest">Archive is currently empty</td>
+                                            <td colSpan="3" className="text-center py-16 text-gray-400 text-[11px] font-bold uppercase tracking-widest">Archive is currently empty</td>
                                         </tr>
                                     ) : existingDocs.map((doc, i) => (
-                                        <tr key={i} className="group hover:bg-blue-50/50 cursor-pointer transition-colors" onClick={() => handleSelectJob(doc.docNo)}>
-                                            <td className="px-5 py-3 font-mono text-[13px] font-mono text-gray-600 ">{doc.docNo}</td>
-                                            <td className="px-5 py-3 text-[13px] font-mono text-gray-600 ">{doc.date?.split('T')[0]}</td>
-                                            <td className="px-5 py-3 text-right">
-                                                <button className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95">RETRIEVE</button>
+                                        <tr key={i} className="group hover:bg-blue-50/50  transition-all cursor-pointer group border-b border-gray-50" onClick={() => handleSelectJob(doc.docNo)}>
+                                            <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{doc.docNo}</td>
+                                            <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{doc.date?.split('T')[0]}</td>
+                                            <td className="text-right px-5 py-3">
+                                                <button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">RETRIEVE</button>
                                             </td>
+                                        
+                                            <td className="text-right px-5 py-3"><button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button></td>
                                         </tr>
                                     ))}
                                 </tbody>
@@ -501,10 +504,10 @@ const SalesReceiptBoard = ({ isOpen, onClose }) => {
                     isOpen={showCustLookup}
                     onClose={() => setShowCustLookup(false)}
                     title="Customer Directory Lookup"
-                    maxWidth="max-w-[600px]"
+                    maxWidth="max-w-[700px]"
                 >
                     <div className="space-y-4 font-['Tahoma']">
-                        <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-lg border border-gray-100 mb-2">
+                        <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-[3px] border border-gray-200 mb-2">
                             <span className="text-[12px] font-bold text-gray-500 uppercase tracking-widest">Search Facility</span>
                             <div className="relative flex-1">
                                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
@@ -512,33 +515,33 @@ const SalesReceiptBoard = ({ isOpen, onClose }) => {
                                     autoFocus
                                     type="text"
                                     placeholder="Find customer by legal name or code..."
-                                    className="w-full h-9 pl-10 pr-4 border border-gray-300 rounded-[5px] outline-none text-sm focus:border-[#0285fd] bg-white shadow-sm"
+                                    className="w-full h-10 pl-10 pr-4 border border-gray-300 rounded-[3px] outline-none text-[13px] focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] shadow-sm bg-white"
                                     value={custSearch}
                                     onChange={(e) => setCustSearch(e.target.value)}
                                 />
                             </div>
                         </div>
-                        <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm">
+                        <div className="border border-gray-200 rounded-[3px] overflow-hidden shadow-sm">
                             <div className="max-h-[400px] overflow-y-auto no-scrollbar">
                                 <table className="w-full text-left">
-                                    <thead className="bg-[#f8fafd] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">
+                                    <thead className="bg-[#f8fafd] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-200">
                                         <tr>
-                                            <th className="px-5 py-3">Code</th>
-                                            <th className="px-5 py-3">Customer Portfolio Name</th>
-                                            <th className="px-5 py-3 text-right">Action</th>
+                                            <th className=" px-5 py-3">Code</th>
+                                            <th className=" px-5 py-3">Customer Portfolio Name</th>
+                                            <th className="text-right px-5 py-3">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-gray-50">
                                         {filteredCustomers.map(c => (
-                                            <tr key={c.code} className="group hover:bg-blue-50/50 cursor-pointer transition-all" onClick={() => {
+                                            <tr key={c.code} className="group hover:bg-blue-50/50  transition-all cursor-pointer group border-b border-gray-50" onClick={() => {
                                                 setFormData(p => ({ ...p, customerId: c.code, customerName: c.name }));
                                                 setShowCustLookup(false);
                                                 setCustSearch('');
                                             }}>
-                                                <td className="px-5 py-3 font-mono text-[12px] font-mono text-gray-700">{c.code}</td>
-                                                <td className="px-5 py-3 text-[12px] font-mono text-gray-700 uppercase group-hover:text-blue-600 transition-colors">{c.name}</td>
-                                                <td className="px-5 py-3 text-right">
-                                                    <button className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95">SELECT</button>
+                                                <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{c.code}</td>
+                                                <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{c.name}</td>
+                                                <td className="text-right px-5 py-3">
+                                                    <button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button>
                                                 </td>
                                             </tr>
                                         ))}
@@ -557,7 +560,7 @@ const SalesReceiptBoard = ({ isOpen, onClose }) => {
                     maxWidth="max-w-[700px]"
                 >
                     <div className="space-y-4 font-['Tahoma']">
-                        <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-lg border border-gray-100 mb-2">
+                        <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-[3px] border border-gray-200 mb-2">
                             <span className="text-[12px] font-bold text-gray-500 uppercase tracking-widest">Search Facility</span>
                             <div className="relative flex-1">
                                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
@@ -565,26 +568,26 @@ const SalesReceiptBoard = ({ isOpen, onClose }) => {
                                     autoFocus
                                     type="text"
                                     placeholder="Scan items by generic title or reference code..."
-                                    className="w-full h-9 pl-10 pr-4 border border-gray-300 rounded-[5px] outline-none text-sm focus:border-[#0285fd] bg-white shadow-sm"
+                                    className="w-full h-10 pl-10 pr-4 border border-gray-300 rounded-[3px] outline-none text-[13px] focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] shadow-sm bg-white"
                                     value={prodSearch}
                                     onChange={(e) => setProdSearch(e.target.value)}
                                 />
                             </div>
                         </div>
-                        <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm">
+                        <div className="border border-gray-200 rounded-[3px] overflow-hidden shadow-sm">
                             <div className="max-h-[400px] overflow-y-auto no-scrollbar">
                                 <table className="w-full text-left">
-                                    <thead className="bg-[#f8fafd] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">
+                                    <thead className="bg-[#f8fafd] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-200">
                                         <tr>
-                                            <th className="px-5 py-3">Code</th>
-                                            <th className="px-5 py-3">Item Description</th>
-                                            <th className="px-5 py-3 text-right">Selling Price</th>
-                                            <th className="px-5 py-3 text-right">Action</th>
+                                            <th className=" px-5 py-3">Code</th>
+                                            <th className=" px-5 py-3">Item Description</th>
+                                            <th className="text-right px-5 py-3">Selling Price</th>
+                                            <th className="text-right px-5 py-3">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-gray-50">
                                         {filteredProducts.map(p => (
-                                            <tr key={p.code} className="group hover:bg-blue-50/50 cursor-pointer transition-all" onClick={() => {
+                                            <tr key={p.code} className="group hover:bg-blue-50/50  transition-all cursor-pointer group border-b border-gray-50" onClick={() => {
                                                 setEntry({
                                                     prodCode: p.code,
                                                     prodName: p.name,
@@ -594,11 +597,11 @@ const SalesReceiptBoard = ({ isOpen, onClose }) => {
                                                 });
                                                 setShowQtyModal(true);
                                             }}>
-                                                <td className="px-5 py-3 font-mono text-[12px] font-bold text-blue-600">{p.code}</td>
-                                                <td className="px-5 py-3 text-[13px] font-bold text-gray-700 uppercase group-hover:text-blue-600 transition-colors">{p.name}</td>
-                                                <td className="px-5 py-3 text-right font-mono font-black text-gray-400">{p.sellingPrice?.toFixed(2)}</td>
-                                                <td className="px-5 py-3 text-right">
-                                                    <button className="bg-[#0285fd] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#0073ff] shadow-md transition-all active:scale-95">SELECT</button>
+                                                <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{p.code}</td>
+                                                <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{p.name}</td>
+                                                <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{p.sellingPrice?.toFixed(2)}</td>
+                                                <td className="text-right px-5 py-3">
+                                                    <button className="bg-[#0285fd] text-white text-[10px] px-5 py-2 rounded-[3px] font-black hover:bg-[#0073ff] shadow-md transition-all active:scale-95">SELECT</button>
                                                 </td>
                                             </tr>
                                         ))}
@@ -614,16 +617,16 @@ const SalesReceiptBoard = ({ isOpen, onClose }) => {
                     isOpen={showQtyModal}
                     onClose={() => setShowQtyModal(false)}
                     title="Line Item Configuration"
-                    maxWidth="max-w-[450px]"
+                    maxWidth="max-w-[700px]"
                 >
                     <div className="space-y-6 px-1 py-2 font-['Tahoma']">
-                        <div className="bg-slate-50/50 p-5 rounded-xl border border-slate-100 flex flex-col items-center text-center">
+                        <div className="bg-slate-50/50 p-5 rounded-[3px] border border-slate-100 flex flex-col items-center text-center">
                             <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1.5">Active Selection</span>
                             <h3 className="text-[18px] font-black text-slate-700 uppercase leading-[1.2] tracking-tight max-w-[90%] break-words">
                                 {entry.prodName}
                             </h3>
                             <div className="flex items-center gap-2 mt-2">
-                                <span className="text-[11px] font-mono font-bold text-blue-500 bg-white px-3 py-0.5 rounded-md shadow-sm border border-slate-100">{entry.prodCode}</span>
+                                <span className="text-[11px] font-mono font-bold text-blue-500 bg-white px-3 py-0.5 rounded-[3px] shadow-sm border border-slate-100">{entry.prodCode}</span>
                                 <span className="text-[10px] font-black text-slate-300 uppercase">Product Code</span>
                             </div>
                         </div>
@@ -641,7 +644,7 @@ const SalesReceiptBoard = ({ isOpen, onClose }) => {
                                         const p = e.target.value;
                                         setEntry(prev => ({ ...prev, sellingPrice: p, amount: (parseFloat(prev.qty || 0) * parseFloat(p || 0)).toFixed(2) }));
                                     }}
-                                    className="w-full h-12 border border-gray-300 px-5 text-right text-[16px] font-mono font-black rounded-xl outline-none focus:border-[#0285fd] focus:ring-4 focus:ring-blue-50 transition-all bg-white" 
+                                    className="w-full h-12 border border-gray-300 px-5 text-right text-[16px] font-mono font-black rounded-[3px] outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] focus:ring-4 focus:ring-blue-50 transition-all bg-white" 
                                 />
                             </div>
                             <div className="space-y-2">
@@ -655,13 +658,13 @@ const SalesReceiptBoard = ({ isOpen, onClose }) => {
                                         setEntry(prev => ({ ...prev, qty: q, amount: (parseFloat(q || 0) * parseFloat(prev.sellingPrice || 0)).toFixed(2) }));
                                     }}
                                     onKeyDown={e => { if (e.key === 'Enter') handleSaveLine(); }}
-                                    className="w-full h-12 border border-[#0285fd] px-5 text-center text-[18px] font-mono font-black rounded-xl outline-none bg-blue-50/20 focus:ring-4 focus:ring-blue-100 transition-all shadow-inner" 
+                                    className="w-full h-12 border border-[#0285fd] px-5 text-center text-[18px] font-mono font-black rounded-[3px] outline-none bg-blue-50/20 focus:ring-4 focus:ring-blue-100 transition-all shadow-inner" 
                                     autoFocus 
                                 />
                             </div>
                         </div>
 
-                        <div className="pt-6 border-t border-gray-100 flex items-center justify-between">
+                        <div className="pt-6 border-t border-gray-200 flex items-center justify-between">
                             <div className="flex flex-col">
                                 <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Line Item Total</span>
                                 <div className="flex items-baseline gap-1.5 mt-0.5">
@@ -673,7 +676,7 @@ const SalesReceiptBoard = ({ isOpen, onClose }) => {
                             </div>
                             <button
                                 onClick={handleSaveLine}
-                                className="h-11 px-8 bg-[#0285fd] text-white text-[13px] font-bold rounded-lg hover:bg-[#0073ff] transition-all active:scale-95 flex items-center gap-2 border-none"
+                                className="h-11 px-8 bg-[#0285fd] text-white text-[13px] font-bold rounded-[3px] hover:bg-[#0073ff] transition-all active:scale-95 flex items-center gap-2 border-none"
                             >
                                 <Plus size={16} /> ADD TO LIST
                             </button>
@@ -711,7 +714,7 @@ const SalesReceiptBoard = ({ isOpen, onClose }) => {
                     />
                 )}
 
-            </SimpleModal>
+            </TransactionFormWrapper>
         </>
     );
 };

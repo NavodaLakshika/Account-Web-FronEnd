@@ -32,6 +32,11 @@ export const getSessionData = () => {
         companyCode = companyMap[companyCode];
     }
 
+    let parsedCompany = null;
+    if (companyData) {
+        try { parsedCompany = JSON.parse(companyData); } catch(e) {}
+    }
+
     if (userData) {
         try {
             const parsed = JSON.parse(userData);
@@ -39,9 +44,10 @@ export const getSessionData = () => {
         } catch (e) { }
     }
 
-    return { companyCode, companyName, userName };
+    return { companyCode, companyName, userName, companyDetails: parsedCompany };
 };
 
 export const getCompanyCode = () => getSessionData().companyCode;
 export const getCompanyName = () => getSessionData().companyName;
 export const getUserName = () => getSessionData().userName;
+export const getCompanyDetails = () => getSessionData().companyDetails;

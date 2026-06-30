@@ -58,6 +58,7 @@ import {
 import { expensesService } from '../services/expenses.service';
 import { biDashboardService } from '../services/biDashboard.service';
 import { supplierService } from '../services/supplier.service';
+import SimpleModal from './../components/SimpleModal';
 import { getSessionData } from '../utils/session';
 import { DotLottiePlayer } from '@dotlottie/react-player';
 import '@dotlottie/react-player/dist/index.css';
@@ -65,7 +66,7 @@ import '@dotlottie/react-player/dist/index.css';
 
 
 const TABS = [
-  { id: 'accounting', label: 'Accounting', icon: BookOpen, iconBg: '#2ca01c' },
+  { id: 'accounting', label: 'Accounting', icon: BookOpen, iconBg: '#0285fd' },
   { id: 'expenses', label: 'Expenses & Pay Bills', icon: Receipt, iconBg: '#34d399' },
   { id: 'sales', label: 'Sales & Get Paid', icon: BarChart2, iconBg: '#10b981' },
   { id: 'customers', label: 'Customer Hub', icon: Shapes, iconBg: '#059669' },
@@ -373,7 +374,7 @@ const ShowAllActionsPanel = ({ isOpen, onClose, favActions, onSave }) => {
                 {items.map(item => {
                   const isFav = selected.includes(item.id);
                   return (
-                    <div key={item.id} className="flex items-center gap-3">
+                    <div key={item.id} className="">
                       <button onClick={() => toggle(item.id)} className="shrink-0 flex items-center justify-center">
                         {isFav ? (
                           <Star size={18} fill="#0078d4" className="text-[#0078d4]" />
@@ -391,7 +392,7 @@ const ShowAllActionsPanel = ({ isOpen, onClose, favActions, onSave }) => {
         </div>
 
         <div className="bg-[#f4f5f8] p-4 flex items-center justify-between shrink-0">
-          <button onClick={onClose} className="text-[14px] font-bold text-[#2ca01c] hover:underline px-4 py-2">
+          <button onClick={onClose} className="text-[14px] font-bold text-[#0285fd] hover:underline px-4 py-2">
             Cancel
           </button>
           <button
@@ -400,8 +401,8 @@ const ShowAllActionsPanel = ({ isOpen, onClose, favActions, onSave }) => {
               onSave(selected);
               onClose();
             }}
-            className={`font-bold text-[14px] px-6 py-2 rounded-md shadow-sm transition-colors ${hasChanges
-              ? 'bg-[#2ca01c] hover:bg-[#207a15] text-white'
+            className={`font-bold text-[14px] px-6 py-2 rounded-[3px] shadow-sm transition-colors ${hasChanges
+              ? 'bg-[#0285fd] hover:bg-[#207a15] text-white'
               : 'bg-[#8dc790] text-white cursor-not-allowed'
               }`}
           >
@@ -480,7 +481,7 @@ const VideoTutorialsModal = ({ isOpen, initialVideoId, onClose }) => {
         <X size={28} />
       </button>
 
-      <div className="relative w-full max-w-5xl bg-[#111827] rounded-xl shadow-2xl overflow-hidden ring-1 ring-white/10 flex flex-col md:flex-row h-[85vh] max-h-[700px]">
+      <div className="relative w-full max-w-5xl bg-[#111827] rounded-[3px] shadow-2xl overflow-hidden ring-1 ring-white/10 flex flex-col md:flex-row h-[85vh] max-h-[700px]">
         {/* Left: Player */}
         <div className="flex-1 bg-black flex flex-col relative min-h-0">
           <div className="flex-1 w-full h-full min-h-0">
@@ -510,7 +511,7 @@ const VideoTutorialsModal = ({ isOpen, initialVideoId, onClose }) => {
                 <button
                   key={video.id}
                   onClick={() => setActiveId(video.id)}
-                  className={`w-full flex items-start gap-3 p-2 rounded-lg text-left transition-colors ${isActive ? 'bg-[#374151]' : 'hover:bg-[#1f2937]'
+                  className={`w-full flex items-start gap-3 p-2 rounded-[3px] text-left transition-colors ${isActive ? 'bg-[#374151]' : 'hover:bg-[#1f2937]'
                     }`}
                 >
                   <div className="relative w-24 sm:w-28 aspect-video bg-black rounded shrink-0 overflow-hidden">
@@ -589,13 +590,13 @@ const AddWidgetsPanel = ({ isOpen, onClose, initialSelected, onSave }) => {
           </div>
         </div>
         <div className="bg-[#f4f5f8] p-4 flex items-center justify-between shrink-0">
-          <div className="flex items-center gap-1">
-            <button onClick={onClose} className="text-[14px] font-bold text-[#2ca01c] hover:underline px-3 py-2">
+          <div className="">
+            <button onClick={onClose} className="text-[14px] font-bold text-[#0285fd] hover:underline px-3 py-2">
               Cancel
             </button>
             <button
               onClick={() => setSelected(DEFAULT_WIDGETS)}
-              className="text-[13px] font-bold text-[#6b6c72] hover:text-[#393a3d] hover:bg-[#eceef1] rounded-md px-3 py-2 transition-colors"
+              className="text-[13px] font-bold text-[#6b6c72] hover:text-[#393a3d] hover:bg-[#eceef1] rounded-[3px] px-3 py-2 transition-colors"
             >
               Reset to default
             </button>
@@ -606,8 +607,8 @@ const AddWidgetsPanel = ({ isOpen, onClose, initialSelected, onSave }) => {
               onSave(selected);
               onClose();
             }}
-            className={`font-bold text-[14px] px-6 py-2 rounded-md shadow-sm transition-colors ${hasChanges
-              ? 'bg-[#2ca01c] hover:bg-[#207a15] text-white'
+            className={`font-bold text-[14px] px-6 py-2 rounded-[3px] shadow-sm transition-colors ${hasChanges
+              ? 'bg-[#0285fd] hover:bg-[#207a15] text-white'
               : 'bg-[#8dc790] text-white cursor-not-allowed'
               }`}
           >
@@ -627,7 +628,7 @@ const EditWrapper = ({
 
   return (
     <div
-      className={`group relative rounded-lg ring-[2.5px] ring-[#108a00] z-10 transition-all duration-200 bg-white ${className} ${isDragged ? 'opacity-40 scale-95 z-50 ring-offset-2 shadow-xl' : ''} ${isHovered && !isDragged ? 'ring-[#0078d4] ring-[3px] scale-[1.02] shadow-xl' : ''}`}
+      className={`group relative rounded-[3px] ring-[2.5px] ring-[#108a00] z-10 transition-all duration-200 bg-white ${className} ${isDragged ? 'opacity-40 scale-95 z-50 ring-offset-2 shadow-xl' : ''} ${isHovered && !isDragged ? 'ring-[#0078d4] ring-[3px] scale-[1.02] shadow-xl' : ''}`}
       style={{ order }}
       draggable={true}
       onDragStart={(e) => onDragStart && onDragStart(e, id)}
@@ -682,7 +683,7 @@ const EditWrapper = ({
 
 /** Clean widget style */
 const WidgetShell = ({ title, subtitle, children, footerButtonLabel, onFooterButton, onHide }) => (
-  <div className="group relative bg-white border border-slate-200 rounded-lg shadow-sm flex flex-col min-h-[200px] h-full overflow-hidden transition-all duration-300 hover:shadow-md">
+  <div className="group relative bg-white border border-slate-200 rounded-[3px] shadow-sm flex flex-col h-[380px] overflow-hidden transition-all duration-300 hover:shadow-md">
     <div className="p-6 flex-1 flex flex-col min-h-0 relative z-10">
       <div className="flex justify-between items-start gap-2 mb-2">
         <span className="text-[12px] font-bold uppercase tracking-wider text-[#6b6c72]">
@@ -705,7 +706,7 @@ const WidgetShell = ({ title, subtitle, children, footerButtonLabel, onFooterBut
         <button
           type="button"
           onClick={onFooterButton}
-          className="w-full h-11 rounded-md border border-slate-200 bg-white text-[12.5px] font-bold text-slate-600 hover:bg-slate-50 transition-colors flex items-center justify-center"
+          className="w-full h-11 rounded-[3px] border border-slate-200 bg-white text-[12.5px] font-bold text-slate-600 hover:bg-slate-50 transition-colors flex items-center justify-center"
         >
           {footerButtonLabel}
         </button>
@@ -720,7 +721,7 @@ const HeaderIconBtn = ({ children, label, onClick }) => (
     title={label}
     aria-label={label}
     onClick={onClick}
-    className="w-9 h-9 flex items-center justify-center rounded-xl text-slate-500 hover:text-slate-800 hover:bg-slate-100/80 active:scale-95 transition-all shrink-0"
+    className="w-9 h-9 flex items-center justify-center rounded-[3px] text-slate-500 hover:text-slate-800 hover:bg-slate-100/80 active:scale-95 transition-all shrink-0"
   >
     {children}
   </button>
@@ -763,7 +764,7 @@ const SmartSuggestionsHelpModal = ({ isOpen, onClose }) => {
           </div>
         </div>
         <div className="bg-[#f4f5f8] p-4 flex justify-end">
-          <button onClick={onClose} className="px-5 py-2 rounded-lg bg-[#2ca01c] hover:bg-[#207a15] text-white text-[13px] font-bold transition-colors shadow-sm">
+          <button onClick={onClose} className="px-5 py-2 rounded-[3px] bg-[#0285fd] hover:bg-[#207a15] text-white text-[13px] font-bold transition-colors shadow-sm">
             Got it
           </button>
         </div>
@@ -825,9 +826,32 @@ const DEFAULT_WIDGETS = {
 
 const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, isInline = false }) => {
   const [activeTab, setActiveTab] = useState('expenses');
+  const [showSubscriptionBanner, setShowSubscriptionBanner] = useState(true);
+  const [showAdBlockAlert, setShowAdBlockAlert] = useState(false);
   const [activeGroup, setActiveGroup] = useState('Purchases');
   const [isCustomising, setIsCustomising] = useState(false);
   const [isAddWidgetsOpen, setIsAddWidgetsOpen] = useState(false);
+  const [isPrivacyMode, setIsPrivacyMode] = useState(false);
+
+  const adBlockTimeoutRef = useRef(null);
+
+  const handleBlockAds = () => {
+      setShowSubscriptionBanner(false);
+      setShowAdBlockAlert(false);
+
+      if (adBlockTimeoutRef.current) {
+          clearTimeout(adBlockTimeoutRef.current);
+      }
+
+      adBlockTimeoutRef.current = setTimeout(() => {
+          setShowSubscriptionBanner(true);
+      }, 30 * 60 * 1000);
+  };
+
+  const handleAllowAds = () => {
+      setShowAdBlockAlert(false);
+  };
+
   const [bankPage, setBankPage] = useState(0);
   const [selectedWidgets, setSelectedWidgets] = useState(() => {
     const saved = localStorage.getItem('onimta_gtd_widgets_v4');
@@ -850,7 +874,6 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
   const [draggedWidget, setDraggedWidget] = useState(null);
   const [hoveredWidget, setHoveredWidget] = useState(null);
 
-  const [isPrivacyMode, setIsPrivacyMode] = useState(false);
   const [isShowAllActionsOpen, setIsShowAllActionsOpen] = useState(false);
   const [videoOpen, setVideoOpen] = useState(null);
   const [isSmartSuggestionsHelpOpen, setIsSmartSuggestionsHelpOpen] = useState(false);
@@ -1118,10 +1141,10 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
   return (
     <div className={`${isInline ? 'relative w-full h-full' : 'fixed inset-0 z-[9999]'} flex flex-col font-['Plus_Jakarta_Sans'] text-slate-700 bg-[#f4f5f8] overflow-hidden animate-in fade-in duration-300 mt-0 relative`}>
       {/* Top Banner */}
-      {!isInline && (
-        <div className="w-full bg-[#3b82f6] text-white text-center py-2 text-[12px] font-medium">
+      {!isInline && showSubscriptionBanner && (
+        <div className="w-full bg-[#3b82f6] text-white text-center py-2 text-[12px] font-medium relative z-50">
           Save 50% for 3 months. <a href="#" className="underline font-bold ml-1">Subscribe now</a>
-          <button onClick={onClose} className="absolute right-4 top-2 text-white/80 hover:text-white">
+          <button onClick={() => setShowAdBlockAlert(true)} className="absolute right-4 top-2 text-white/80 hover:text-white">
             <X size={16} />
           </button>
         </div>
@@ -1164,7 +1187,7 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
               <button
                 type="button"
                 onClick={() => runAction('header_search')}
-                className="w-full max-w-[620px] flex items-center gap-2.5 h-9 px-4 rounded-full bg-slate-100/60 border border-slate-200/50 hover:bg-slate-100 hover:border-slate-300 text-left transition-all duration-200 focus:outline-none"
+                className="w-full max-w-[620px] flex items-center gap-2.5 h-9 px-4 rounded-[3px] bg-slate-100/60 border border-slate-200/50 hover:bg-slate-100 hover:border-slate-300 text-left transition-all duration-200 focus:outline-none"
               >
                 <Search size={15} className="text-slate-500 shrink-0" strokeWidth={2.5} />
                 <span className="text-[12.5px] text-slate-400 truncate">
@@ -1178,7 +1201,7 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
               <button
                 type="button"
                 onClick={() => runAction('header_subscribe')}
-                className="hidden sm:flex items-center justify-center h-7 px-3.5 rounded-full bg-[#0078d4] text-white text-[11px] font-bold hover:bg-[#005a9e] shadow-sm hover:shadow-[0_2px_8px_rgba(0,120,212,0.3)] transition-all mr-1 group overflow-hidden relative"
+                className="hidden sm:flex items-center justify-center h-7 px-3.5 rounded-[3px] bg-[#0078d4] text-white text-[11px] font-bold hover:bg-[#005a9e] shadow-sm hover:shadow-[0_2px_8px_rgba(0,120,212,0.3)] transition-all mr-1 group overflow-hidden relative"
               >
                 <span className="relative z-10">Subscribe now</span>
                 <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
@@ -1234,13 +1257,13 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
                   </button>
                   <button
                     onClick={() => setIsAddWidgetsOpen(true)}
-                    className="border border-[#2ca01c] text-[#2ca01c] px-3 py-1.5 rounded hover:bg-[#f4f5f8] transition-colors"
+                    className="border border-[#0285fd] text-[#0285fd] px-3 py-1.5 rounded hover:bg-[#f4f5f8] transition-colors"
                   >
                     Add or remove widgets
                   </button>
                   <button
                     onClick={() => setIsCustomising(false)}
-                    className="bg-[#2ca01c] text-white px-4 py-1.5 rounded hover:bg-[#207a15] transition-colors"
+                    className="bg-[#0285fd] text-white px-4 py-1.5 rounded hover:bg-[#207a15] transition-colors"
                   >
                     Save
                   </button>
@@ -1296,9 +1319,9 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
                           {/* Custom AI Asterisk animated */}
                           <div className="relative flex items-center justify-center w-[18px] h-[18px] group-hover:rotate-180 transition-transform duration-1000 ease-[cubic-bezier(0.34,1.56,0.64,1)] shrink-0">
                             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[3px] h-full bg-gradient-to-b from-[#3b82f6] to-[#1e1b4b] rounded-full"></div>
-                            <div className="absolute top-1/2 left-0 -translate-y-1/2 w-full h-[3px] bg-gradient-to-r from-[#60a5fa] to-[#4338ca] rounded-full"></div>
-                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-[3px] bg-gradient-to-r from-[#93c5fd] to-[#312e81] rounded-full rotate-45"></div>
-                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-[3px] bg-gradient-to-r from-[#bfdbfe] to-[#3730a3] rounded-full -rotate-45"></div>
+                            <div className="absolute top-1/2 left-0 -translate-y-1/2 w-full h-[3px] bg-gradient-to-r from-[#60a5fa] to-[#4338ca] rounded-[3px]"></div>
+                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-[3px] bg-gradient-to-r from-[#93c5fd] to-[#312e81] rounded-[3px] rotate-45"></div>
+                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-[3px] bg-gradient-to-r from-[#bfdbfe] to-[#3730a3] rounded-[3px] -rotate-45"></div>
                           </div>
 
                           {/* Animated Shimmering Text */}
@@ -1324,9 +1347,9 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
           </div>
 
           {isCustomising && (
-            <div className="bg-[#eceef1] rounded-md py-3 px-4 mb-4 flex flex-col sm:flex-row items-center justify-center gap-3 min-h-[56px] transition-all">
+            <div className="bg-[#eceef1] rounded-[3px] py-3 px-4 mb-4 flex flex-col sm:flex-row items-center justify-center gap-3 min-h-[56px] transition-all">
               {feedbackState ? (
-                <div className="flex items-center gap-2 text-[#2ca01c]">
+                <div className="flex items-center gap-2 text-[#0285fd]">
                   <Check size={16} strokeWidth={3} />
                   <span className="text-[12px] font-bold">Thanks for your feedback!</span>
                 </div>
@@ -1336,7 +1359,7 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
                   <div className="flex gap-1.5">
                     <button
                       onClick={() => setFeedbackState('up')}
-                      className="w-8 h-8 rounded-full border border-[#d4d7dc] bg-white flex items-center justify-center hover:bg-green-50 hover:text-[#2ca01c] hover:border-[#2ca01c] text-[#393a3d] transition-all duration-200"
+                      className="w-8 h-8 rounded-full border border-[#d4d7dc] bg-white flex items-center justify-center hover:bg-blue-50 hover:text-[#0285fd] hover:border-[#0285fd] text-[#393a3d] transition-all duration-200"
                       title="Yes, they are useful"
                     >
                       <ThumbsUp size={14} />
@@ -1412,7 +1435,7 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
                                   <span className="group-hover:hidden">LKR 0</span>
                                   <span className="hidden group-hover:inline">{formatLkr(displayVal).replace('LKR', 'LKR ')}</span>
                                 </div>
-                                <div className="flex items-center gap-3">
+                                <div className="">
                                   <div className="text-[12px] font-semibold text-slate-500 w-[60px] shrink-0">{bar.label}</div>
                                   <div className="flex-1 h-3 flex items-center">
                                     <style>{`
@@ -1482,7 +1505,7 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
                                 const name = cat.categoryName || cat.CategoryName || cat.name || cat.Name || '';
                                 const color = ['#60a5fa', '#a78bfa', '#10b981', '#f59e0b', '#ec4899'][i % 5];
                                 return (
-                                  <div key={i} className="flex items-center gap-2">
+                                  <div key={i} className="">
                                     <div
                                       className="w-2.5 h-2.5 rounded-full shrink-0 transition-colors duration-500 bg-[#e5e7eb] group-hover:bg-[var(--hover-color)]"
                                       style={{ '--hover-color': color }}
@@ -1505,7 +1528,7 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
                   {selectedWidgets.add_widgets && (
                     <DraggableWidget id="add_widgets" grabbers={['left', 'right']} className="md:col-span-1 xl:col-span-1 h-full">
                       <div
-                        className="bg-white rounded-lg min-h-[240px] flex flex-col h-full overflow-hidden cursor-pointer hover:bg-slate-50 transition-colors border-2 border-dashed border-[#eceef1]"
+                        className="bg-white rounded-[3px] flex flex-col h-[380px] overflow-hidden cursor-pointer hover:bg-slate-50 transition-colors border-2 border-dashed border-[#eceef1]"
                         onClick={() => setIsAddWidgetsOpen(true)}
                       >
                         <div className="flex flex-col items-center justify-center flex-1 py-8">
@@ -1549,7 +1572,7 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
                           return (
                             <div className="flex flex-col gap-5 mt-2">
                               {displayedBanks.map((b, i) => (
-                                <div key={i} className="flex items-center gap-4">
+                                <div key={i} className="">
                                   <div className="w-9 h-9 rounded-full bg-white border border-[#eceef1] flex items-center justify-center shrink-0 p-1">
                                     {b.logo ? (
                                       <img src={b.logo} alt="" className="w-full h-full object-contain" />
@@ -1638,7 +1661,7 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
                         <div className="flex flex-col gap-6 mt-1">
                           {/* Unpaid */}
                           <div className="flex flex-col gap-1.5">
-                            <div className="flex items-center gap-2">
+                            <div className="">
                               <span className="text-[13px] font-bold text-[#393a3d]">{formatLkr(invoiceSummary.totalUnpaid).replace('LKR', 'LKR ')} Unpaid</span>
                               <span className="text-[11px] text-[#6b6c72]">Last 365 days</span>
                             </div>
@@ -1660,7 +1683,7 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
 
                           {/* Paid */}
                           <div className="flex flex-col gap-1.5">
-                            <div className="flex items-center gap-2">
+                            <div className="">
                               <span className="text-[13px] font-bold text-[#393a3d]">{formatLkr(invoiceSummary.totalPaid).replace('LKR', 'LKR ')} Paid</span>
                               <span className="text-[11px] text-[#6b6c72]">Last 30 days</span>
                             </div>
@@ -1676,7 +1699,7 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
                             </div>
                             <div className="flex h-[18px] w-full mt-1 overflow-hidden gap-[1px]">
                               <div className="h-full bg-[#53c351] rounded-l-[2px]" style={{ width: invoiceSummary.totalPaid > 0 ? `${(invoiceSummary.totalNotDeposited / invoiceSummary.totalPaid) * 100}%` : '50%' }} />
-                              <div className="h-full bg-[#2ca01c] rounded-r-[2px]" style={{ width: invoiceSummary.totalPaid > 0 ? `${(invoiceSummary.totalDeposited / invoiceSummary.totalPaid) * 100}%` : '50%' }} />
+                              <div className="h-full bg-[#0285fd] rounded-r-[2px]" style={{ width: invoiceSummary.totalPaid > 0 ? `${(invoiceSummary.totalDeposited / invoiceSummary.totalPaid) * 100}%` : '50%' }} />
                             </div>
                           </div>
                         </div>
@@ -1881,7 +1904,7 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
                             {(biData?.lowStock?.length || 0) === 0 && (
                               <tr>
                                 <td className="py-2 text-[#8d9096]" colSpan={3}>No low stock items</td>
-                              </tr>
+                              <th className="text-right px-5 py-3">Action</th></tr>
                             )}
                           </tbody>
                         </table>
@@ -1929,14 +1952,14 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
                         <div className="text-[20px] font-bold text-[#393a3d] mb-4">{formatLkr(biData?.accountsPayable?.total || 0)}</div>
                         <div className="flex items-center gap-6 mt-4">
                           <div className="relative w-[70px] h-[70px] rounded-full border-[12px] shrink-0" style={{
-                            borderColor: (biData?.accountsPayable?.total || 0) > 0 ? '#2ca01c' : '#d4d7dc'
+                            borderColor: (biData?.accountsPayable?.total || 0) > 0 ? '#0285fd' : '#d4d7dc'
                           }} />
                           <div className="text-[11px] space-y-1.5 text-[#393a3d]">
-                            <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-[#2ca01c]" />Current: {formatLkr(biData?.accountsPayable?.current || 0)}</div>
-                            <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-[#0078d4]" />1 - 30: {formatLkr(biData?.accountsPayable?.aging1_30 || 0)}</div>
-                            <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-[#7c3aed]" />31 - 60: {formatLkr(biData?.accountsPayable?.aging31_60 || 0)}</div>
-                            <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-[#0d9488]" />61 - 90: {formatLkr(biData?.accountsPayable?.aging61_90 || 0)}</div>
-                            <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-[#e33e07]" />91 and over: {formatLkr(biData?.accountsPayable?.aging91Plus || 0)}</div>
+                            <div className=""><div className="w-2 h-2 rounded-full bg-[#0285fd]" />Current: {formatLkr(biData?.accountsPayable?.current || 0)}</div>
+                            <div className=""><div className="w-2 h-2 rounded-full bg-[#0078d4]" />1 - 30: {formatLkr(biData?.accountsPayable?.aging1_30 || 0)}</div>
+                            <div className=""><div className="w-2 h-2 rounded-full bg-[#7c3aed]" />31 - 60: {formatLkr(biData?.accountsPayable?.aging31_60 || 0)}</div>
+                            <div className=""><div className="w-2 h-2 rounded-full bg-[#0d9488]" />61 - 90: {formatLkr(biData?.accountsPayable?.aging61_90 || 0)}</div>
+                            <div className=""><div className="w-2 h-2 rounded-full bg-[#e33e07]" />91 and over: {formatLkr(biData?.accountsPayable?.aging91Plus || 0)}</div>
                           </div>
                         </div>
                       </WidgetShell>
@@ -1951,14 +1974,14 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
                         <div className="text-[20px] font-bold text-[#393a3d] mb-4">{formatLkr(biData?.accountsReceivable?.total || 0)}</div>
                         <div className="flex items-center gap-6 mt-4">
                           <div className="relative w-[70px] h-[70px] rounded-full border-[12px] shrink-0" style={{
-                            borderColor: (biData?.accountsReceivable?.total || 0) > 0 ? '#2ca01c' : '#d4d7dc'
+                            borderColor: (biData?.accountsReceivable?.total || 0) > 0 ? '#0285fd' : '#d4d7dc'
                           }} />
                           <div className="text-[11px] space-y-1.5 text-[#393a3d]">
-                            <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-[#2ca01c]" />Current: {formatLkr(biData?.accountsReceivable?.current || 0)}</div>
-                            <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-[#0078d4]" />1 - 30: {formatLkr(biData?.accountsReceivable?.aging1_30 || 0)}</div>
-                            <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-[#7c3aed]" />31 - 60: {formatLkr(biData?.accountsReceivable?.aging31_60 || 0)}</div>
-                            <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-[#0d9488]" />61 - 90: {formatLkr(biData?.accountsReceivable?.aging61_90 || 0)}</div>
-                            <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-[#e33e07]" />91 and over: {formatLkr(biData?.accountsReceivable?.aging91Plus || 0)}</div>
+                            <div className=""><div className="w-2 h-2 rounded-full bg-[#0285fd]" />Current: {formatLkr(biData?.accountsReceivable?.current || 0)}</div>
+                            <div className=""><div className="w-2 h-2 rounded-full bg-[#0078d4]" />1 - 30: {formatLkr(biData?.accountsReceivable?.aging1_30 || 0)}</div>
+                            <div className=""><div className="w-2 h-2 rounded-full bg-[#7c3aed]" />31 - 60: {formatLkr(biData?.accountsReceivable?.aging31_60 || 0)}</div>
+                            <div className=""><div className="w-2 h-2 rounded-full bg-[#0d9488]" />61 - 90: {formatLkr(biData?.accountsReceivable?.aging61_90 || 0)}</div>
+                            <div className=""><div className="w-2 h-2 rounded-full bg-[#e33e07]" />91 and over: {formatLkr(biData?.accountsReceivable?.aging91Plus || 0)}</div>
                           </div>
                         </div>
                       </WidgetShell>
@@ -1993,7 +2016,7 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
                             {(biData?.salesOrders?.length || 0) === 0 && (
                               <tr>
                                 <td className="py-2 text-[#8d9096]" colSpan={3}>No open sales orders</td>
-                              </tr>
+                              <th className="text-right px-5 py-3">Action</th></tr>
                             )}
                           </tbody>
                         </table>
@@ -2028,7 +2051,7 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
                       <WidgetShell title="Reviews" onHide={() => setWidgetToHide('reviews')}>
                         {biData?.reviews?.reviewCount > 0 ? (
                           <div className="mt-4 space-y-4">
-                            <div className="flex items-center gap-3">
+                            <div className="">
                               <span className="text-[28px] font-extrabold text-slate-800">{biData.reviews.avgRating}</span>
                               <div className="flex items-center gap-0.5">
                                 {[1, 2, 3, 4, 5].map(s => (
@@ -2190,7 +2213,7 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
               <div className="flex items-center justify-center gap-4">
                 <button
                   onClick={() => setWidgetToHide(null)}
-                  className="px-6 py-2 rounded-full border-2 border-[#0078d4] text-[#0078d4] font-bold text-[14px] hover:bg-blue-50 transition-colors min-w-[100px]"
+                  className="px-6 py-2 rounded-[3px] border-2 border-[#0078d4] text-[#0078d4] font-bold text-[14px] hover:bg-blue-50 transition-colors min-w-[100px]"
                 >
                   Cancel
                 </button>
@@ -2199,7 +2222,7 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
                     setSelectedWidgets(prev => ({ ...prev, [widgetToHide]: false }));
                     setWidgetToHide(null);
                   }}
-                  className="px-6 py-2 rounded-full border-2 border-[#0078d4] bg-[#0078d4] text-white font-bold text-[14px] hover:bg-[#005a9e] transition-colors min-w-[100px]"
+                  className="px-6 py-2 rounded-[3px] border-2 border-[#0078d4] bg-[#0078d4] text-white font-bold text-[14px] hover:bg-[#005a9e] transition-colors min-w-[100px]"
                 >
                   Hide
                 </button>
@@ -2208,6 +2231,40 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
           </div>
         </div>
       )}
+
+      {/* Ad Block Alert Modal */}
+      <SimpleModal
+          isOpen={showAdBlockAlert}
+          onClose={() => setShowAdBlockAlert(false)}
+          title="Advertisement Settings"
+          maxWidth="max-w-[450px]"
+          footer={
+              <div className="bg-slate-50 px-6 py-4 w-full flex justify-end items-center border-t border-slate-200 rounded-b-xl gap-3">
+                  <button
+                      onClick={handleAllowAds}
+                      className="px-6 py-2.5 bg-white text-slate-700 border border-slate-300 hover:bg-slate-50 font-bold text-[12px] uppercase tracking-widest rounded-[3px] transition-all active:scale-95"
+                  >
+                      Keep Banner
+                  </button>
+                  <button
+                      onClick={handleBlockAds}
+                      className="px-6 py-2.5 bg-[#de212d] hover:bg-[#c91823] text-white font-bold text-[12px] uppercase tracking-widest rounded-[3px] shadow-sm transition-all active:scale-95"
+                  >
+                      Block for 30m
+                  </button>
+              </div>
+          }
+      >
+          <div className="p-6 flex flex-col items-center text-center gap-4">
+              <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center border-4 border-white shadow-sm mb-2">
+                  <X size={32} className="text-[#de212d]" />
+              </div>
+              <h2 className="text-[16px] font-extrabold text-slate-800 tracking-tight">Hide Subscription Banner?</h2>
+              <p className="text-[13px] font-medium text-slate-500 leading-relaxed max-w-[350px]">
+                  Would you like to block the top subscription banner? If blocked, it will stay hidden and auto-reload after <strong>30 minutes</strong>.
+              </p>
+          </div>
+      </SimpleModal>
     </div>
   );
 };

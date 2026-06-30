@@ -36,7 +36,7 @@ const OfficeDocumentModal = ({ isOpen, onClose }) => {
 
                 <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-white">
                     <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-xl bg-[#4f83ff]/10 flex items-center justify-center">
+                        <div className="w-9 h-9 rounded-[3px] bg-[#4f83ff]/10 flex items-center justify-center">
                             <Files size={16} className="text-[#4f83ff]" />
                         </div>
                         <div>
@@ -44,7 +44,7 @@ const OfficeDocumentModal = ({ isOpen, onClose }) => {
                             <p className="text-[10px] text-slate-400 font-medium tracking-wider">Create New Documents</p>
                         </div>
                     </div>
-                    <button onClick={onClose} className="w-9 h-9 rounded-xl bg-red-50 hover:bg-red-100 flex items-center justify-center transition-all active:scale-90">
+                    <button onClick={onClose} className="w-9 h-9 rounded-[3px] bg-red-50 hover:bg-red-100 flex items-center justify-center transition-all active:scale-90">
                         <X size={28} strokeWidth={1.5} className="text-red-600" />
                     </button>
                 </div>
@@ -56,7 +56,7 @@ const OfficeDocumentModal = ({ isOpen, onClose }) => {
                             <button
                                 key={idx}
                                 onClick={item.onClick}
-                                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-50 transition-all text-left group border border-transparent hover:border-slate-100 hover:shadow-sm"
+                                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-[3px] hover:bg-slate-50 transition-all text-left group border border-transparent hover:border-slate-100 hover:shadow-sm"
                             >
  <div className="w-9 h-9 rounded-sm bg-white flex items-center justify-center shadow-sm group-hover:border-[#4f83ff]/20 group-hover:bg-[#4f83ff]/5 transition-all shrink-0">
                                     <Icon size={16} className={`${item.color} group-hover:text-[#4f83ff] transition-colors`} />

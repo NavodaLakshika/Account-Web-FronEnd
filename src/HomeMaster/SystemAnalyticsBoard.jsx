@@ -115,7 +115,7 @@ const SystemAnalyticsBoard = ({ allEmployees = [], allCompanies = [], hierarchy 
                 <div className="flex items-center gap-3">
                     <button
                         onClick={() => navigate('/report/system-analytics')}
-                        className="px-4 py-2.5 bg-white border border-slate-200 hover:border-emerald-500 hover:text-emerald-500 text-slate-600 text-xs font-bold uppercase tracking-wider rounded-xl shadow-sm transition-all flex items-center gap-2"
+                        className="px-4 py-2.5 bg-white border border-slate-200 hover:border-emerald-500 hover:text-emerald-500 text-slate-600 text-xs font-bold uppercase tracking-wider rounded-[3px] shadow-sm transition-all flex items-center gap-2"
                     >
                         <Download size={14} />
                         Export Report
@@ -123,7 +123,7 @@ const SystemAnalyticsBoard = ({ allEmployees = [], allCompanies = [], hierarchy 
                     <button
                         onClick={fetchLogs}
                         disabled={loading}
-                        className="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold rounded-xl shadow-md transition-all active:scale-95 flex items-center gap-2 disabled:opacity-70"
+                        className="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold rounded-[3px] shadow-md transition-all active:scale-95 flex items-center gap-2 disabled:opacity-70"
                     >
                         {loading ? <Loader2 size={14} className="animate-spin" /> : null}
                         Refresh Data
@@ -217,7 +217,7 @@ const SystemAnalyticsBoard = ({ allEmployees = [], allCompanies = [], hierarchy 
                                 placeholder="Search logs..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                className="w-full pl-9 pr-4 py-2 border border-slate-200 bg-white rounded-xl text-sm outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all"
+                                className="w-full pl-9 pr-4 py-2 border border-slate-200 bg-white rounded-[3px] text-sm outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all"
                             />
                         </div>
                     </div>
@@ -261,7 +261,7 @@ const SystemAnalyticsBoard = ({ allEmployees = [], allCompanies = [], hierarchy 
                                         </td>
                                         <td className="py-3 px-6">
                                             <div className="flex justify-center">
-                                                <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full border text-[10px] font-bold uppercase tracking-wider ${getStatusStyle(log.status)}`}>
+                                                <div className={`flex items-center gap-1.5 px-3 py-1 rounded-[3px] border text-[10px] font-bold uppercase tracking-wider ${getStatusStyle(log.status)}`}>
                                                     {getStatusIcon(log.status)}
                                                     {log.status || 'Success'}
                                                 </div>

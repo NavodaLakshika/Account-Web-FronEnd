@@ -69,11 +69,11 @@ const TransactionModal = ({ isOpen, onClose, onOpenEnterBill, onOpenPayBill, onO
                 <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={onClose} />
 
  <div className="relative w-full max-w-sm bg-white rounded-sm shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
-                    <div className="bg-white px-5 py-3.5 flex items-center justify-between border-b border-gray-100 select-none relative overflow-hidden">
+                    <div className="bg-white px-5 py-3.5 flex items-center justify-between border-b border-gray-200 select-none relative overflow-hidden">
                         <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#0285fd]" />
 
                         <div className="flex items-center gap-2.5 pl-2">
-                            <div className="w-7 h-7 rounded-lg bg-slate-100 flex items-center justify-center">
+                            <div className="w-7 h-7 rounded-[3px] bg-slate-100 flex items-center justify-center">
                                 <ArrowRightLeft size={13} className="text-[#0285fd]" />
                             </div>
                             <div className="flex flex-col">
@@ -86,8 +86,8 @@ const TransactionModal = ({ isOpen, onClose, onOpenEnterBill, onOpenPayBill, onO
                         </button>
                     </div>
 
-                    <div className="px-3 py-2 bg-white border-b border-gray-100">
-                        <div className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg border border-gray-200 bg-white">
+                    <div className="px-3 py-2 bg-white border-b border-gray-200">
+                        <div className="flex items-center gap-2 px-2.5 py-1.5 rounded-[3px] border border-gray-200 bg-white">
                             <Search size={12} className="text-slate-400 shrink-0" />
                             <input
                                 type="text"
@@ -123,7 +123,7 @@ const TransactionModal = ({ isOpen, onClose, onOpenEnterBill, onOpenPayBill, onO
                                             <button
                                                 key={idx}
                                                 onClick={() => openModal(item.modal)}
-                                                className="group w-full flex items-center justify-between px-4 py-2.5 rounded-xl hover:bg-slate-50 transition-all relative overflow-hidden text-left border-none"
+                                                className="group w-full flex items-center justify-between px-4 py-2.5 rounded-[3px] hover:bg-slate-50 transition-all relative overflow-hidden text-left border-none"
                                             >
                                                 <div className="absolute left-0 top-0 bottom-0 w-1 opacity-0 group-hover:opacity-100 transition-all duration-300 bg-[#0285fd]" />
 
@@ -145,7 +145,7 @@ const TransactionModal = ({ isOpen, onClose, onOpenEnterBill, onOpenPayBill, onO
                         )}
                     </div>
 
-                    <div className="px-4 py-2 bg-white border-t border-gray-100 flex items-center justify-between">
+                    <div className="px-4 py-2 bg-white border-t border-gray-200 flex items-center justify-between">
                         <span className="text-[8px] font-bold text-slate-400 uppercase tracking-wider">
                             {totalModules} Modules
                         </span>

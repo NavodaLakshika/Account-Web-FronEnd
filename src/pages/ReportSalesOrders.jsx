@@ -42,14 +42,14 @@ const ReportSalesOrders = () => {
       {loading ? (
         <div className="text-center text-gray-500">Loading orders...</div>
       ) : (
-        <div className="overflow-x-auto rounded-lg shadow-sm bg-white">
+        <div className="overflow-x-auto rounded-[3px] shadow-sm bg-white">
           <table className="w-full text-sm border-collapse">
             <thead className="bg-gray-100 text-left text-gray-600 uppercase tracking-wider">
               <tr>
                 <th className="px-4 py-2">Document No</th>
                 <th className="px-4 py-2">Date</th>
                 <th className="px-4 py-2 text-center">Status</th>
-              </tr>
+              <th className="text-right px-5 py-3">Action</th></tr>
             </thead>
             <tbody>
               {orders.length === 0 ? (
@@ -66,7 +66,7 @@ const ReportSalesOrders = () => {
                     <td className="px-4 py-2 font-mono text-blue-600 font-medium">{o.docNo}</td>
                     <td className="px-4 py-2 text-gray-700">{o.date?.split('T')[0]}</td>
                     <td className="px-4 py-2 text-center">
-                      <span className={`px-2 py-0.5 rounded-full text-xs font-semibold uppercase ${o.status === 'Applied' ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'}`}>
+                      <span className={`px-2 py-0.5 rounded-[3px] text-xs font-semibold uppercase ${o.status === 'Applied' ? 'bg-blue-100 text-blue-700' : 'bg-orange-100 text-orange-700'}`}>
                         {o.status || 'Draft'}
                       </span>
                     </td>

@@ -105,8 +105,11 @@ const AIChatbotBoard = ({ isOpen, onClose, position = 'center' }) => {
             });
 
             if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error?.message || "Failed to fetch response from AI API");
+                const errorData = await response.json().catch(() => ({}));
+                const isRateLimit = response.status === 429 || (errorData.error?.message || '').includes('rate limit');
+                throw new Error(isRateLimit
+                    ? 'AI service is temporarily busy. Please wait a moment and try again.'
+                    : (errorData.error?.message || 'Failed to fetch response from AI API'));
             }
 
             const data = await response.json();
@@ -130,7 +133,7 @@ const AIChatbotBoard = ({ isOpen, onClose, position = 'center' }) => {
             console.error("AI API Error:", error);
             const errorResponse = {
                 id: Date.now() + 1,
-                text: `API Error: ${error.message}. If this is not an OpenAI key, you may need to specify the correct API endpoint (e.g. DeepSeek, Anthropic, or custom).`,
+                text: error.message || 'AI service is temporarily unavailable. Please try again later.',
                 sender: 'ai',
                 timestamp: new Date()
             };
@@ -257,12 +260,12 @@ const AIChatbotBoard = ({ isOpen, onClose, position = 'center' }) => {
                 <div className="flex items-center gap-3">
                     <button 
                         onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-                        className="p-1.5 hover:bg-slate-100 text-slate-500 rounded-md transition-colors mr-2 hidden md:block"
+                        className="p-1.5 hover:bg-slate-100 text-slate-500 rounded-[3px] transition-colors mr-2 hidden md:block"
                         title={sidebarCollapsed ? "Show sidebar" : "Hide sidebar"}
                     >
                         {sidebarCollapsed ? <PanelLeft size={20} /> : <PanelLeftClose size={20} />}
                     </button>
-                    <div className="w-6 h-6 flex items-center justify-center">
+                    <div className="w-6 h-6 flex items-center justify-center shrink-0">
                         <AIAsterisk size={24} isThinking={true} />
                     </div>
                     <h2 className="text-[15px] font-semibold text-slate-800 flex items-center gap-2">
@@ -277,7 +280,7 @@ const AIChatbotBoard = ({ isOpen, onClose, position = 'center' }) => {
                     <div className="relative">
                         <button 
                             onClick={() => setShowMenu(!showMenu)}
-                            className="p-1.5 hover:bg-slate-100 text-slate-500 rounded-md transition-colors"
+                            className="p-1.5 hover:bg-slate-100 text-slate-500 rounded-[3px] transition-colors"
                         >
                             <MoreVertical size={20} />
                         </button>
@@ -285,7 +288,7 @@ const AIChatbotBoard = ({ isOpen, onClose, position = 'center' }) => {
                         {showMenu && (
                             <>
                                 <div className="fixed inset-0 z-10" onClick={() => setShowMenu(false)}></div>
-                                <div className="absolute top-[110%] right-0 mt-1 w-56 bg-white rounded-xl shadow-xl border border-slate-100 py-1.5 z-20">
+                                <div className="absolute top-[110%] right-0 mt-1 w-56 bg-white rounded-[3px] shadow-xl border border-slate-100 py-1.5 z-20">
                                     <button onClick={handleNewSession} className="w-full text-left px-4 py-2.5 text-[13px] text-slate-700 hover:bg-slate-50 flex items-center gap-3 font-medium">
                                         <Edit size={16} /> New chat
                                     </button>
@@ -300,7 +303,7 @@ const AIChatbotBoard = ({ isOpen, onClose, position = 'center' }) => {
                     {isInlineRight && (
                         <button 
                             onClick={() => setChatSize(prev => prev === 'standard' ? 'wide' : 'standard')}
-                            className="p-1.5 hover:bg-slate-100 text-slate-500 rounded-md transition-colors"
+                            className="p-1.5 hover:bg-slate-100 text-slate-500 rounded-[3px] transition-colors"
                             title={chatSize === 'standard' ? "Wide view" : "Standard view"}
                         >
                             {chatSize === 'wide' ? <Minimize2 size={18} /> : <Maximize2 size={18} />}
@@ -309,7 +312,7 @@ const AIChatbotBoard = ({ isOpen, onClose, position = 'center' }) => {
                     
                     <button 
                         onClick={onClose}
-                        className="p-1.5 hover:bg-slate-100 text-slate-500 rounded-md transition-colors ml-1"
+                        className="p-1.5 hover:bg-slate-100 text-slate-500 rounded-[3px] transition-colors ml-1"
                     >
                         <X size={20} />
                     </button>
@@ -324,7 +327,7 @@ const AIChatbotBoard = ({ isOpen, onClose, position = 'center' }) => {
                     <div className="w-[260px] border-r border-slate-100 flex flex-col shrink-0 animate-in slide-in-from-left-4 duration-300">
                         <div className="p-4">
                             <button 
-                                className="w-full flex items-center gap-3 px-4 py-2.5 text-[14px] text-slate-700 font-medium hover:bg-slate-50 rounded-xl transition-colors"
+                                className="w-full flex items-center gap-3 px-4 py-2.5 text-[14px] text-slate-700 font-medium hover:bg-slate-50 rounded-[3px] transition-colors"
                                 onClick={handleNewSession}
                             >
                                 <Edit size={18} className="text-slate-500" /> New chat
@@ -333,11 +336,11 @@ const AIChatbotBoard = ({ isOpen, onClose, position = 'center' }) => {
                         
                         <div className="px-4 py-2 flex-1 overflow-y-auto">
                             <div className="text-[12px] font-bold text-slate-400 uppercase tracking-wider flex items-center justify-between mb-3 px-2">
-                                <div className="flex items-center gap-2"><Clock size={14} /> Recent</div>
+                                <div className=""><Clock size={14} /> Recent</div>
                             </div>
                             
                             {history.length === 0 ? (
-                                <div className="px-2 py-2 text-[13px] text-slate-500 bg-slate-50/50 rounded-lg border border-slate-100">
+                                <div className="px-2 py-2 text-[13px] text-slate-500 bg-slate-50/50 rounded-[3px] border border-slate-100">
                                     No conversations yet
                                 </div>
                             ) : (
@@ -351,7 +354,7 @@ const AIChatbotBoard = ({ isOpen, onClose, position = 'center' }) => {
                                                     setActiveHistoryId(item.id);
                                                 }
                                             }}
-                                            className={`w-full text-left px-3 py-2 text-[13px] rounded-lg transition-colors truncate ${activeHistoryId === item.id ? 'bg-indigo-50 text-indigo-700 font-medium' : 'text-slate-600 hover:bg-slate-50'}`}
+                                            className={`w-full text-left px-3 py-2 text-[13px] rounded-[3px] transition-colors truncate ${activeHistoryId === item.id ? 'bg-indigo-50 text-indigo-700 font-medium' : 'text-slate-600 hover:bg-slate-50'}`}
                                         >
                                             {item.title}
                                         </button>
@@ -376,7 +379,7 @@ const AIChatbotBoard = ({ isOpen, onClose, position = 'center' }) => {
 
                                 <div className="flex flex-col">
                                     {suggestions.map((item, idx) => (
-                                        <div key={idx} className="border-b border-slate-100 py-6 first:pt-0 hover:bg-slate-50/50 transition-colors cursor-pointer group rounded-xl px-2 -mx-2" onClick={() => handleSuggestionClick(item.action)}>
+                                        <div key={idx} className="border-b border-slate-100 py-6 first:pt-0 hover:bg-slate-50/50 transition-colors cursor-pointer group rounded-[3px] px-2 -mx-2" onClick={() => handleSuggestionClick(item.action)}>
                                             <p className="text-[13px] text-slate-600 mb-2 leading-relaxed">
                                                 {item.title}
                                             </p>
@@ -398,10 +401,10 @@ const AIChatbotBoard = ({ isOpen, onClose, position = 'center' }) => {
                                                     {msg.file && (
                                                         <div className="mb-3">
                                                             {msg.file.isImage ? (
-                                                                <img src={msg.file.url} alt="upload" className="max-w-full rounded-lg border border-slate-200 shadow-sm" />
+                                                                <img src={msg.file.url} alt="upload" className="max-w-full rounded-[3px] border border-slate-200 shadow-sm" />
                                                             ) : (
-                                                                <div className="flex items-center gap-3 p-3 bg-white border border-slate-200 rounded-lg">
-                                                                    <div className="p-2 bg-indigo-50 text-indigo-500 rounded-lg">
+                                                                <div className="flex items-center gap-3 p-3 bg-white border border-slate-200 rounded-[3px]">
+                                                                    <div className="p-2 bg-indigo-50 text-indigo-500 rounded-[3px]">
                                                                         <File size={20} />
                                                                     </div>
                                                                     <div className="flex-1 min-w-0 text-left">
@@ -432,28 +435,28 @@ const AIChatbotBoard = ({ isOpen, onClose, position = 'center' }) => {
                                                     <div className="flex items-center gap-2 mt-2">
                                                         <button 
                                                             onClick={() => handleCopy(msg.text, idx)}
-                                                            className="flex items-center gap-1.5 px-2.5 py-1.5 text-[12px] font-medium text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
+                                                            className="flex items-center gap-1.5 px-2.5 py-1.5 text-[12px] font-medium text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-[3px] transition-colors"
                                                             title="Copy to clipboard"
                                                         >
                                                             {copiedIndex === idx ? <Check size={14} className="text-green-500" /> : <Copy size={14} />} {copiedIndex === idx ? 'Copied' : 'Copy'}
                                                         </button>
                                                         <button 
                                                             onClick={() => handleReaction(idx, 'like')}
-                                                            className={`p-1.5 rounded-lg transition-colors ${reactions[idx] === 'like' ? 'text-indigo-600 bg-indigo-50' : 'text-slate-400 hover:text-slate-600 hover:bg-slate-100'}`}
+                                                            className={`p-1.5 rounded-[3px] transition-colors ${reactions[idx] === 'like' ? 'text-indigo-600 bg-indigo-50' : 'text-slate-400 hover:text-slate-600 hover:bg-slate-100'}`}
                                                             title="Helpful"
                                                         >
                                                             <ThumbsUp size={16} className={reactions[idx] === 'like' ? 'fill-indigo-600' : ''} />
                                                         </button>
                                                         <button 
                                                             onClick={() => handleReaction(idx, 'dislike')}
-                                                            className={`p-1.5 rounded-lg transition-colors ${reactions[idx] === 'dislike' ? 'text-red-600 bg-red-50' : 'text-slate-400 hover:text-slate-600 hover:bg-slate-100'}`}
+                                                            className={`p-1.5 rounded-[3px] transition-colors ${reactions[idx] === 'dislike' ? 'text-red-600 bg-red-50' : 'text-slate-400 hover:text-slate-600 hover:bg-slate-100'}`}
                                                             title="Not helpful"
                                                         >
                                                             <ThumbsDown size={16} className={reactions[idx] === 'dislike' ? 'fill-red-600' : ''} />
                                                         </button>
                                                         <button 
                                                             onClick={() => handleDownload(msg.text, idx)}
-                                                            className="flex items-center gap-1.5 px-2.5 py-1.5 text-[12px] font-medium text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors ml-auto"
+                                                            className="flex items-center gap-1.5 px-2.5 py-1.5 text-[12px] font-medium text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-[3px] transition-colors ml-auto"
                                                             title="Download response"
                                                         >
                                                             <Download size={14} /> Download
@@ -463,10 +466,10 @@ const AIChatbotBoard = ({ isOpen, onClose, position = 'center' }) => {
                                                     {/* Suggested follow-ups (show only on last message) */}
                                                     {idx === messages.length - 1 && (
                                                         <div className="flex flex-col items-start gap-2 mt-4 pt-4 border-t border-slate-100/50 w-full">
-                                                            <button className="px-4 py-1.5 border border-[#0077c5] text-[#0077c5] text-[13px] font-medium rounded-full hover:bg-blue-50 transition-colors" onClick={() => handleSuggestionClick("Show me how to connect my bank account")}>
+                                                            <button className="px-4 py-1.5 border border-[#0077c5] text-[#0077c5] text-[13px] font-medium rounded-[3px] hover:bg-blue-50 transition-colors" onClick={() => handleSuggestionClick("Show me how to connect my bank account")}>
                                                                 Show me how to connect my bank account
                                                             </button>
-                                                            <button className="px-4 py-1.5 border border-[#0077c5] text-[#0077c5] text-[13px] font-medium rounded-full hover:bg-blue-50 transition-colors" onClick={() => handleSuggestionClick("Guide me to create my first invoice")}>
+                                                            <button className="px-4 py-1.5 border border-[#0077c5] text-[#0077c5] text-[13px] font-medium rounded-[3px] hover:bg-blue-50 transition-colors" onClick={() => handleSuggestionClick("Guide me to create my first invoice")}>
                                                                 Guide me to create my first invoice
                                                             </button>
                                                         </div>
@@ -492,9 +495,9 @@ const AIChatbotBoard = ({ isOpen, onClose, position = 'center' }) => {
                     {/* Input Area */}
                     <div className="p-4 md:p-6 bg-white shrink-0 relative">
                         {attachedFile && (
-                            <div className="absolute bottom-[100%] left-6 right-6 mb-2 max-w-[700px] mx-auto flex items-center justify-between p-2.5 bg-white border border-slate-200 shadow-sm rounded-xl animate-in slide-in-from-bottom-2 fade-in z-10">
+                            <div className="absolute bottom-[100%] left-6 right-6 mb-2 max-w-[700px] mx-auto flex items-center justify-between p-2.5 bg-white border border-slate-200 shadow-sm rounded-[3px] animate-in slide-in-from-bottom-2 fade-in z-10">
                                 <div className="flex items-center gap-3 min-w-0">
-                                    <div className="w-10 h-10 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-500 overflow-hidden border border-indigo-100">
+                                    <div className="w-10 h-10 rounded-[3px] bg-indigo-50 flex items-center justify-center text-indigo-500 overflow-hidden border border-indigo-100">
                                         {attachedFile.isImage ? <img src={attachedFile.url} className="w-full h-full object-cover" /> : <File size={18} />}
                                     </div>
                                     <div className="min-w-0">
@@ -537,15 +540,15 @@ const AIChatbotBoard = ({ isOpen, onClose, position = 'center' }) => {
                                     <button 
                                         type="button" 
                                         onClick={() => fileInputRef.current.click()}
-                                        className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-xl transition-colors"
+                                        className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-[3px] transition-colors"
                                     >
                                         <Plus size={20} />
                                     </button>
-                                    <div className="flex items-center gap-2">
+                                    <div className="">
                                         <button 
                                             type="button"
                                             onClick={() => setIsRecording(!isRecording)}
-                                            className={`p-2 rounded-xl transition-colors ${isRecording ? 'bg-red-500 text-white animate-bounce' : 'text-slate-400 hover:text-slate-600 hover:bg-slate-100'}`}
+                                            className={`p-2 rounded-[3px] transition-colors ${isRecording ? 'bg-red-500 text-white animate-bounce' : 'text-slate-400 hover:text-slate-600 hover:bg-slate-100'}`}
                                             title="Voice Input"
                                         >
                                             <Mic size={20} />
@@ -554,14 +557,14 @@ const AIChatbotBoard = ({ isOpen, onClose, position = 'center' }) => {
                                             <button 
                                                 type="button"
                                                 onClick={handleStopGeneration}
-                                                className="px-4 py-1.5 bg-red-500 text-white text-[13px] font-bold rounded-xl hover:bg-red-600 transition-colors animate-in fade-in zoom-in-95 flex items-center gap-1"
+                                                className="px-6 py-2 border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2"
                                             >
                                                 <Square size={12} fill="currentColor" /> Stop
                                             </button>
                                         ) : (inputValue.trim() || attachedFile) ? (
                                             <button 
                                                 type="submit"
-                                                className="px-4 py-1.5 bg-indigo-600 text-white text-[13px] font-bold rounded-xl hover:bg-indigo-700 transition-colors animate-in fade-in zoom-in-95"
+                                                className="px-4 py-1.5 bg-indigo-600 text-white text-[13px] font-bold rounded-[3px] hover:bg-indigo-700 transition-colors animate-in fade-in zoom-in-95"
                                             >
                                                 Send
                                             </button>

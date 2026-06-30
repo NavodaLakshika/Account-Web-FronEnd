@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import SimpleModal from '../components/SimpleModal';
 import CalendarModal from '../components/CalendarModal';
-import { Search, Calendar, ChevronDown, Database, User, Truck, Hash, FileSearch, Trash2, RotateCcw, Download, X, Loader2, ListFilter, LayoutGrid, ChevronRight, Activity } from 'lucide-react';
+import { Search, Calendar, ChevronDown, Database, User, Truck, Hash, FileSearch, Trash2, RotateCcw, Download, X, Loader2, ListFilter, LayoutGrid, ChevronRight, Activity , FileText} from 'lucide-react';
 import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
+import TransactionFormWrapper from '../components/TransactionFormWrapper';
 
 
 const SearchBoard = ({ isOpen, onClose }) => {
@@ -94,17 +95,16 @@ const SearchBoard = ({ isOpen, onClose }) => {
 
     return (
         <>
-        <SimpleModal 
+        <TransactionFormWrapper subtitle="Transaction Management" icon={FileText} 
             isOpen={isOpen} 
             onClose={onClose} 
-            title="Archive Retrieval & Intelligent Search"
-            maxWidth="max-w-[1200px]"
+            title="Search Archive"
             footer={
-                <div className="bg-slate-50 px-6 py-4 w-full flex justify-end gap-3 border-t border-gray-100 rounded-b-xl">
-                    <button onClick={handleReset} className="px-6 h-10 bg-[#00adff] text-white text-sm font-bold rounded-[5px] hover:bg-[#0099e6] transition-all active:scale-95 flex items-center gap-2 border-none">
+                <div className="bg-slate-50 px-6 py-4 w-full flex justify-end gap-3 border-t border-gray-200 rounded-b-xl">
+                    <button onClick={handleReset} className="px-6 py-2 border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2">
                         <RotateCcw size={14} /> CLEAR SEARCH
                     </button>
-                    <button className="px-6 h-10 bg-indigo-50/50 backdrop-blur-md border border-indigo-200 text-indigo-700 text-sm font-bold rounded-[5px] shadow-sm hover:bg-indigo-100/80 transition-all active:scale-95 flex items-center gap-2">
+                    <button className="px-6 h-10 bg-indigo-50/50 backdrop-blur-md border border-indigo-200 text-indigo-700 text-sm font-bold rounded-[3px] shadow-sm hover:bg-indigo-100/80 transition-all active:scale-95 flex items-center gap-2">
                         <Download size={14} /> EXPORT RESULTS
                     </button>
                 </div>
@@ -128,21 +128,21 @@ const SearchBoard = ({ isOpen, onClose }) => {
                             </div>
                             <FormRow label="Stream">
                                 <div className="flex-1 flex gap-1 items-center">
-                                    <div className="flex-1 bg-slate-50 border border-gray-200 px-3 py-1 rounded-[5px] cursor-pointer hover:border-blue-300 transition-all" onClick={() => openModal('stream', 'Search Transaction Streams')}>
+                                    <div className="flex-1 bg-slate-50 border border-gray-200 px-3 py-1 rounded-[3px] cursor-pointer hover:border-blue-300 transition-all" onClick={() => openModal('stream', 'Search Transaction Streams')}>
                                         <div className="flex flex-col">
                                             <span className="text-[8px] font-black text-[#0078d4] leading-none mb-0.5">{formData.streamCode}</span>
                                             <span className="text-[11px] font-bold text-slate-600 truncate">{formData.streamName}</span>
                                         </div>
                                     </div>
-                                    <button onClick={() => openModal('stream', 'Search Streams')} className="w-8 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-90">
-                                        <Search size={14} />
+                                    <button onClick={() => openModal('stream', 'Search Streams')} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
+                                        <Search size={18} />
                                     </button>
                                 </div>
                             </FormRow>
                             <FormRow label="Doc ID">
                                 <div className="flex-1 relative">
                                     <Hash size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-300" />
-                                    <input type="text" value={formData.docId} onChange={(e) => setFormData({...formData, docId: e.target.value})} className="w-full h-8 border border-gray-200 pl-9 pr-3 text-[12px] font-bold text-slate-600 bg-slate-50 rounded-[5px] outline-none focus:border-blue-300" />
+                                    <input type="text" value={formData.docId} onChange={(e) => setFormData({...formData, docId: e.target.value})} className="w-full h-8 border border-gray-200 pl-9 pr-3 text-[12px] font-bold text-slate-600 bg-slate-50 rounded-[3px] outline-none focus:border-blue-300" />
                                 </div>
                             </FormRow>
                         </div>
@@ -166,25 +166,25 @@ const SearchBoard = ({ isOpen, onClose }) => {
                                 </label>
                             </div>
                             <div className="flex gap-1 items-center">
-                                <div className="flex-1 flex gap-1 items-center bg-slate-50 border border-gray-200 p-1.5 rounded-[5px] group cursor-pointer hover:border-blue-300 transition-all" onClick={() => openModal('entity', `Search ${entityType} Archives`)}>
-                                    <div className="w-20 bg-white border border-gray-100 rounded px-2 py-1 flex items-center justify-center">
+                                <div className="flex-1 flex gap-1 items-center bg-slate-50 border border-gray-200 p-1.5 rounded-[3px] group cursor-pointer hover:border-blue-300 transition-all" onClick={() => openModal('entity', `Search ${entityType} Archives`)}>
+                                    <div className="w-20 bg-white border border-gray-200 rounded px-2 py-1 flex items-center justify-center">
                                         <span className="text-[10px] font-black text-slate-400 tabular-nums leading-none tracking-tighter">{formData.entityCode}</span>
                                     </div>
                                     <div className="flex-1 px-2">
                                         <span className="text-[12px] font-bold text-slate-600 truncate block">{formData.entityName}</span>
                                     </div>
                                 </div>
-                                <button onClick={() => openModal('entity', 'Search Entity')} className="w-10 h-10 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-90">
+                                <button onClick={() => openModal('entity', 'Search Entity')} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
                                     <Search size={18} />
                                 </button>
                             </div>
                             <div className="grid grid-cols-2 gap-6">
                                 <FormRow label="Valuation">
-                                    <input type="number" value={formData.valuation} onChange={(e) => setFormData({...formData, valuation: e.target.value})} className="flex-1 h-8 border border-gray-200 px-3 text-right text-[12px] font-black text-[#0078d4] bg-slate-50 rounded-[5px] outline-none tabular-nums" />
+                                    <input type="number" value={formData.valuation} onChange={(e) => setFormData({...formData, valuation: e.target.value})} className="flex-1 h-8 border border-gray-200 px-3 text-right text-[12px] font-black text-[#0078d4] bg-slate-50 rounded-[3px] outline-none tabular-nums" />
                                 </FormRow>
                                 <FormRow label="Unit">
                                     <div className="flex-1 flex gap-1 items-center" onClick={() => openModal('unit', 'Search Operational Units')}>
-                                        <div className="flex-1 bg-slate-100 h-8 px-3 rounded-[5px] flex items-center text-[11px] font-bold text-slate-500 cursor-pointer hover:bg-blue-50 transition-colors">
+                                        <div className="flex-1 bg-slate-100 h-8 px-3 rounded-[3px] flex items-center text-[11px] font-bold text-slate-500 cursor-pointer hover:bg-blue-50 transition-colors">
                                             {formData.unitCode}
                                         </div>
                                     </div>
@@ -202,10 +202,10 @@ const SearchBoard = ({ isOpen, onClose }) => {
                                         type="text"
                                         readOnly
                                         value={formData.startDate}
-                                        className="flex-1 px-3 text-[12px] border border-gray-200 bg-white rounded-[5px] outline-none text-slate-700 font-bold shadow-sm"
+                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700 truncate"
                                     />
-                                    <button onClick={() => setShowCalendarStart(true)} className="w-10 h-10 bg-white border border-gray-300 text-[#0285fd] flex items-center justify-center hover:bg-blue-50 rounded-[5px] transition-all shadow-sm active:scale-90">
-                                        <Calendar size={14} />
+                                    <button onClick={() => setShowCalendarStart(true)} className="w-10 h-10 bg-white border border-gray-300 text-[#0285fd] flex items-center justify-center hover:bg-blue-50 rounded-[3px] transition-all shadow-sm active:scale-90">
+                                        <Calendar size={18} />
                                     </button>
                                 </div>
                                 </div>
@@ -216,15 +216,15 @@ const SearchBoard = ({ isOpen, onClose }) => {
                                         type="text"
                                         readOnly
                                         value={formData.endDate}
-                                        className="flex-1 px-3 text-[12px] border border-gray-200 bg-white rounded-[5px] outline-none text-slate-700 font-bold shadow-sm"
+                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700 truncate"
                                     />
-                                    <button onClick={() => setShowCalendarEnd(true)} className="w-10 h-10 bg-white border border-gray-300 text-[#0285fd] flex items-center justify-center hover:bg-blue-50 rounded-[5px] transition-all shadow-sm active:scale-90">
-                                        <Calendar size={14} />
+                                    <button onClick={() => setShowCalendarEnd(true)} className="w-10 h-10 bg-white border border-gray-300 text-[#0285fd] flex items-center justify-center hover:bg-blue-50 rounded-[3px] transition-all shadow-sm active:scale-90">
+                                        <Calendar size={18} />
                                     </button>
                                 </div>
                                 </div>
                             </div>
-                            <button onClick={runSearch} disabled={loading} className={`w-full h-12 bg-slate-900 text-white text-[11px] font-black uppercase tracking-[0.2em] rounded-[5px] hover:bg-slate-800 shadow-xl transition-all active:scale-[0.98] flex items-center justify-center gap-3 mt-4 ${loading ? 'opacity-50' : ''}`}>
+                            <button onClick={runSearch} disabled={loading} className={`px-6 py-2 bg-[#0285fd] hover:bg-[#0073ff] text-white font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}>
                                 {loading ? <Loader2 size={18} className="animate-spin text-blue-400" /> : <FileSearch size={18} className="text-blue-400" />} 
                                 Execute Archive Query
                             </button>
@@ -235,17 +235,17 @@ const SearchBoard = ({ isOpen, onClose }) => {
                 {/* Results Table */}
  <div className=" rounded-sm shadow-lg bg-white overflow-hidden">
                     <div className="bg-[#f8fafd] px-8 py-4 border-b border-gray-200 flex justify-between items-center">
-                        <div className="flex items-center gap-3">
+                        <div className="">
                             <LayoutGrid size={18} className="text-[#0078d4]" />
                             <span className="text-[11px] font-black text-slate-600 uppercase tracking-[0.2em]">Retrieved Transaction Records</span>
                         </div>
  <div className="bg-white px-4 py-1.5 rounded-sm shadow-sm flex items-center gap-4 text-[11px] font-black">
-                            <div className="flex items-center gap-2">
+                            <div className="">
                                 <span className="text-slate-400 uppercase tracking-tighter">Total Hits</span>
                                 <span className="text-[#0078d4] tabular-nums">1,245</span>
                             </div>
                             <div className="w-[1px] h-3 bg-slate-200" />
-                            <div className="flex items-center gap-2">
+                            <div className="">
                                 <span className="text-slate-400 uppercase tracking-tighter">Agg. Value</span>
                                 <span className="text-slate-700 tabular-nums">920,450.00</span>
                             </div>
@@ -256,13 +256,13 @@ const SearchBoard = ({ isOpen, onClose }) => {
                         <table className="w-full text-[11px] whitespace-nowrap border-collapse">
                             <thead className="bg-slate-50/50 text-slate-400 font-black uppercase tracking-widest text-[9px]">
                                 <tr>
-                                    <th className="py-5 px-8 text-left border-b border-gray-100">Chronology</th>
-                                    <th className="py-5 px-8 text-left border-b border-gray-100">Document Artifact</th>
-                                    <th className="py-5 px-8 text-left border-b border-gray-100">Counterpart Detail</th>
-                                    <th className="py-5 px-8 text-left border-b border-gray-100">Audit Reference</th>
-                                    <th className="py-5 px-8 text-left border-b border-gray-100">Instrument</th>
-                                    <th className="py-5 px-8 text-right border-b border-gray-100">Net Valuation</th>
-                                </tr>
+                                    <th className="py-5 px-8 text-left border-b border-gray-200">Chronology</th>
+                                    <th className="py-5 px-8 text-left border-b border-gray-200">Document Artifact</th>
+                                    <th className="py-5 px-8 text-left border-b border-gray-200">Counterpart Detail</th>
+                                    <th className="py-5 px-8 text-left border-b border-gray-200">Audit Reference</th>
+                                    <th className="py-5 px-8 text-left border-b border-gray-200">Instrument</th>
+                                    <th className="py-5 px-8 text-right border-b border-gray-200">Net Valuation</th>
+                                <th className="text-right px-5 py-3">Action</th></tr>
                             </thead>
                             <tbody className="divide-y divide-gray-50">
                                 <tr className="hover:bg-blue-50/30 transition-all cursor-pointer group">
@@ -290,7 +290,7 @@ const SearchBoard = ({ isOpen, onClose }) => {
                     </div>
                 </div>
             </div>
-        </SimpleModal>
+        </TransactionFormWrapper>
 
         {/* --- MODALS --- */}
         {modalConfig.show && (
@@ -331,12 +331,12 @@ const SearchModal = ({ title, query, setQuery, onClose, data, columns, onSelect 
     <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4">
         <div className="absolute inset-0 bg-slate-500/30 backdrop-blur-[2px]" onClick={onClose} />
  <div className="relative w-full max-w-2xl bg-white shadow-2xl rounded-sm overflow-hidden flex flex-col max-h-[85vh] font-['Tahoma']">
-            <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-slate-50/50">
+            <div className="p-4 border-b border-gray-200 flex justify-between items-center bg-slate-50/50">
                 <h3 className="text-base font-black text-slate-800 tracking-tight uppercase tracking-[0.05em]">{title}</h3>
                 <div className="flex gap-4">
                     <div className="relative">
                         <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                        <input type="text" placeholder="Search..." className="h-9 border border-gray-200 pl-9 pr-3 text-sm rounded-lg w-64 focus:border-blue-500 outline-none shadow-sm transition-all" value={query} onChange={(e) => setQuery(e.target.value)} autoFocus />
+                        <input type="text" placeholder="Search..." className="h-9 border border-gray-200 pl-9 pr-3 text-sm rounded-[3px] w-64 focus:border-blue-500 outline-none shadow-sm transition-all" value={query} onChange={(e) => setQuery(e.target.value)} autoFocus />
                     </div>
                     <button onClick={onClose} className="w-8 h-8 flex items-center justify-center hover:bg-white text-slate-400 hover:text-red-500 transition-all rounded-full border border-transparent hover:border-gray-200"><X size={28} /></button>
                 </div>

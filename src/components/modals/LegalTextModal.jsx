@@ -25,7 +25,7 @@ const LegalTextModal = ({ isOpen, onClose, title, content, type }) => {
             <div className="relative w-[90%] max-w-2xl bg-white rounded- shadow-2xl flex flex-col max-h-[85vh] animate-in zoom-in-95 duration-200">
                 
                 {/* Header */}
-                <div className="flex items-center justify-between p-6 border-b border-gray-100">
+                <div className="flex items-center justify-between p-6 border-b border-gray-200">
                     <div className="flex items-center gap-3">
                         <h2 className="text-2xl font-bold text-slate-800 tracking-tight">{title}</h2>
                     </div>
@@ -43,10 +43,10 @@ const LegalTextModal = ({ isOpen, onClose, title, content, type }) => {
                 </div>
 
                 {/* Footer */}
-                <div className="p-6 border-t border-gray-100 bg-gray-50/50 rounded-b-xl flex justify-end">
+                <div className="p-6 border-t border-gray-200 bg-gray-50/50 rounded-b-xl flex justify-end">
                     <button
                         onClick={onClose}
-                        className="px-6 py-2.5 bg-[#0078d4] text-white text-sm font-bold rounded-lg hover:bg-[#006abc] transition-colors shadow-sm active:scale-95"
+                        className="px-6 py-2.5 bg-[#0078d4] text-white text-sm font-bold rounded-[3px] hover:bg-[#006abc] transition-colors shadow-sm active:scale-95"
                     >
                         I Understand
                     </button>

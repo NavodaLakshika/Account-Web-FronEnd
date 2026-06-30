@@ -42,7 +42,7 @@ const ReportBillPayments = () => {
       {loading ? (
         <div className="text-center text-gray-500">Loading payments...</div>
       ) : (
-        <div className="overflow-x-auto rounded-lg shadow-sm bg-white">
+        <div className="overflow-x-auto rounded-[3px] shadow-sm bg-white">
           <table className="w-full text-sm border-collapse">
             <thead className="bg-gray-100 text-left text-gray-600 uppercase tracking-wider">
               <tr>
@@ -52,7 +52,7 @@ const ReportBillPayments = () => {
                 <th className="px-4 py-2">Amount</th>
                 <th className="px-4 py-2">Pay Type</th>
                 <th className="px-4 py-2">Pay Date</th>
-              </tr>
+              <th className="text-right px-5 py-3">Action</th></tr>
             </thead>
             <tbody>
               {payments.map((p) => (

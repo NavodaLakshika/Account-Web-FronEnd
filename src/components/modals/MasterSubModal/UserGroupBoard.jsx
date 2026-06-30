@@ -38,20 +38,20 @@ const UserGroupBoard = ({ isOpen, onClose, onGroupCreated }) => {
             isOpen={isOpen}
             onClose={onClose}
             title="Create User Group"
-            maxWidth="max-w-xl"
+            maxWidth="max-w-[700px]"
             footer={
-                <div className="bg-slate-50 px-6 py-4 w-full flex justify-end gap-3 border-t border-gray-100 rounded-b-xl">
+                <div className="bg-slate-50 px-6 py-4 w-full flex justify-end gap-3 border-t border-gray-200 rounded-b-xl">
                     <button 
                         onClick={handleSave} 
                         disabled={saving} 
-                        className="px-8 h-10 bg-[#50af60] text-white text-[13px] font-bold rounded-[5px] shadow-md shadow-green-100 hover:bg-[#24db4e] transition-all active:scale-95 flex items-center justify-center gap-2"
+                        className="px-8 h-10 bg-[#50af60] text-white text-[13px] font-bold rounded-[3px] shadow-md shadow-green-100 hover:bg-[#24db4e] transition-all active:scale-95 flex items-center justify-center gap-2"
                     >
                         {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
                         Save Group
                     </button>
                     <button 
                         onClick={handleClear} 
-                        className="px-8 h-10 bg-[#00adff] text-white text-[13px] font-bold rounded-[5px] hover:bg-[#0099e6] shadow-md shadow-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2"
+                        className="px-8 h-10 bg-white text-[#00adff] border-2 border-[#00adff] hover:bg-blue-50 text-[13px] font-bold rounded-[3px] hover:bg-[#0099e6] shadow-md shadow-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2"
                     >
                         <RotateCcw size={16} /> Clear
                     </button>
@@ -70,7 +70,7 @@ const UserGroupBoard = ({ isOpen, onClose, onGroupCreated }) => {
                                 type="text" 
                                 value={group_Name} 
                                 onChange={(e) => setGroup_Name(e.target.value)} 
-                                className="w-full h-8 border border-gray-300 pl-10 pr-3 bg-white rounded-[5px] outline-none focus:border-blue-400 font-bold uppercase shadow-sm"
+                                className="w-full h-8 border border-gray-300 pl-10 pr-3 bg-white rounded-[3px] outline-none focus:border-blue-400 font-bold uppercase shadow-sm"
                                 placeholder="E.G. FINANCE TEAM"
                             />
                         </div>
@@ -87,7 +87,7 @@ const UserGroupBoard = ({ isOpen, onClose, onGroupCreated }) => {
                             <textarea 
                                 value={description} 
                                 onChange={(e) => setDescription(e.target.value)} 
-                                className="w-full h-24 border border-gray-300 pl-10 pr-3 py-2 bg-white rounded-[5px] outline-none focus:border-blue-400 font-bold uppercase shadow-sm resize-none"
+                                className="w-full h-24 border border-gray-300 pl-10 pr-3 py-2 bg-white rounded-[3px] outline-none focus:border-blue-400 font-bold uppercase shadow-sm resize-none"
                                 placeholder="ENTER GROUP DESCRIPTION..."
                             />
                         </div>

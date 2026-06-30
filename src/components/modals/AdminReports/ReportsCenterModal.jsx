@@ -87,11 +87,11 @@ const ReportsCenterModal = ({ isOpen, onClose, onSelectReport, empCode, companyC
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
             <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={onClose} />
 
-            <div className="relative w-full max-w-[1300px] h-[85vh] bg-gray-50 rounded-xl shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
+            <div className="relative w-full max-w-[1300px] h-[85vh] bg-gray-50 rounded-[3px] shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
                 {/* Header */}
                 <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-200 select-none shrink-0">
                     <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center">
+                        <div className="w-12 h-12 rounded-[3px] bg-blue-50 border border-blue-100 flex items-center justify-center">
                             <BarChart3 size={24} className="text-blue-600" />
                         </div>
                         <div className="flex flex-col">
@@ -100,7 +100,7 @@ const ReportsCenterModal = ({ isOpen, onClose, onSelectReport, empCode, companyC
                         </div>
                     </div>
                     <div className="flex items-center gap-6">
-                        <div className="flex items-center gap-2 px-3 py-2 rounded-lg border border-gray-300 bg-gray-50 shadow-inner w-80">
+                        <div className="flex items-center gap-2 px-3 py-2 rounded-[3px] border border-gray-300 bg-gray-50 shadow-inner w-80">
                             <Search size={18} className="text-gray-400 shrink-0" />
                             <input
                                 type="text"
@@ -110,7 +110,7 @@ const ReportsCenterModal = ({ isOpen, onClose, onSelectReport, empCode, companyC
                                 className="w-full text-[14px] font-medium text-gray-800 bg-transparent outline-none placeholder:text-gray-400"
                             />
                         </div>
-                        <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-500 hover:text-red-600">
+                        <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-[3px] transition-colors text-gray-500 hover:text-red-600">
                             <X size={26} />
                         </button>
                     </div>
@@ -132,14 +132,14 @@ const ReportsCenterModal = ({ isOpen, onClose, onSelectReport, empCode, companyC
                             {filteredGroups.map((group, gi) => {
                                 const Icon = group.icon;
                                 return (
-                                    <div key={gi} className="break-inside-avoid mb-6 bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden flex flex-col">
-                                        <div className="px-4 py-3 bg-slate-50 border-b border-gray-100 flex items-center gap-3">
-                                            <div className="w-8 h-8 rounded-lg bg-white border border-gray-200 shadow-sm flex items-center justify-center">
+                                    <div key={gi} className="break-inside-avoid mb-6 bg-white border border-gray-200 rounded-[3px] shadow-sm overflow-hidden flex flex-col">
+                                        <div className="px-4 py-3 bg-slate-50 border-b border-gray-200 flex items-center gap-3">
+                                            <div className="w-8 h-8 rounded-[3px] bg-white border border-gray-200 shadow-sm flex items-center justify-center">
                                                 <Icon size={16} className="text-gray-600" />
                                             </div>
                                             <span className="text-[14px] font-bold text-gray-900">{group.title}</span>
                                             <div className="flex-1" />
-                                            <span className="text-[11px] font-bold text-blue-600 bg-blue-50 border border-blue-100 px-2 py-0.5 rounded-full">{group.items.length}</span>
+                                            <span className="text-[11px] font-bold text-blue-600 bg-blue-50 border border-blue-100 px-2 py-0.5 rounded-[3px]">{group.items.length}</span>
                                         </div>
                                         <div className="flex flex-col py-2">
                                             {group.items.map((item, idx) => {

@@ -31,7 +31,7 @@ const PaymentMethodModal = ({ isOpen, onClose, selectedPlan }) => {
                 <div className="p-6 border-b border-slate-100 flex items-center justify-between">
                     <button 
                         onClick={() => onClose(false)}
-                        className="flex items-center gap-2 text-slate-500 hover:text-slate-800 font-bold text-sm bg-slate-50 border border-slate-200 px-4 py-2 rounded-full transition-all"
+                        className="flex items-center gap-2 text-slate-500 hover:text-slate-800 font-bold text-sm bg-slate-50 border border-slate-200 px-4 py-2 rounded-[3px] transition-all"
                     >
                         <ArrowLeft className="w-4 h-4" />
                         Back to Plans
@@ -53,7 +53,7 @@ const PaymentMethodModal = ({ isOpen, onClose, selectedPlan }) => {
                                 <div 
                                     key={method.id}
                                     onClick={() => setSelectedMethod(method.id)}
-                                    className={`p-4 rounded-xl border-2 cursor-pointer transition-all flex items-center gap-4 ${
+                                    className={`p-4 rounded-[3px] border-2 cursor-pointer transition-all flex items-center gap-4 ${
                                         isSelected 
                                             ? 'border-[#0388cc] bg-blue-50/50 shadow-sm' 
                                             : 'border-slate-200 bg-white hover:border-slate-300'
@@ -96,7 +96,7 @@ const PaymentMethodModal = ({ isOpen, onClose, selectedPlan }) => {
                             <button 
                                 onClick={handleProcessPayment}
                                 disabled={isProcessing}
-                                className="w-full py-3 bg-[#0388cc] hover:bg-[#026b9c] text-white rounded-xl font-bold transition-all shadow-md flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+                                className="w-full py-3 bg-[#0388cc] hover:bg-[#026b9c] text-white rounded-[3px] font-bold transition-all shadow-md flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
                             >
                                 {isProcessing ? (
                                     <>Processing...</>

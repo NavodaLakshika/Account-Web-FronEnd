@@ -6,16 +6,13 @@ import {
     Save, 
     Trash2, 
     Loader2, 
-    Landmark,
-    ChevronRight,
-    ChevronDown,
-    X,
-    Plus,
-    Package,
-    Receipt,
-    CheckCircle
+    CheckCircle,
+    PenTool,
+    DollarSign,
+    ChevronDown
 } from 'lucide-react';
 import SimpleModal from '../components/SimpleModal';
+import TransactionFormWrapper from '../components/TransactionFormWrapper';
 import CalendarModal from '../components/CalendarModal';
 import ConfirmModal from '../components/modals/ConfirmModal';
 import { writeChequeService } from '../services/writeCheque.service';
@@ -39,25 +36,23 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
     const [showSearchModal, setShowSearchModal] = useState(false);
     const [showCalendar, setShowCalendar] = useState(false);
     const [calendarField, setCalendarField] = useState(null);
-    const [ccSource, setCcSource] = useState('header'); // header or line
+    const [ccSource, setCcSource] = useState('header');
     const [ccIndex, setCcIndex] = useState(0);
     const [accIndex, setAccIndex] = useState(0);
     const [itemIndex, setItemIndex] = useState(0);
     const [showVoidConfirm, setShowVoidConfirm] = useState(false);
 
     // Search States
-    const [savedDocs, setSavedDocs] = useState([]);
-    const [docSearchQuery, setDocSearchQuery] = useState('');
-
-    // Search States
     const [bankSearch, setBankSearch] = useState('');
     const [ccSearch, setCcSearch] = useState('');
     const [accSearch, setAccSearch] = useState('');
     const [itemSearch, setItemSearch] = useState('');
+    const [savedDocs, setSavedDocs] = useState([]);
+    const [docSearchQuery, setDocSearchQuery] = useState('');
 
     const getInitialFormData = () => ({
         docId: '',
-        date: new Date().toLocaleDateString('en-GB'), // DD/MM/YYYY
+        date: new Date().toLocaleDateString('en-GB'),
         bankAcc: '',
         costCenter: '',
         endorsement: 'A/C PAYEE ONLY',
@@ -69,7 +64,8 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
         chqDate: new Date().toLocaleDateString('en-GB'),
         isChqNoManual: false,
         totalAmount: 0,
-        bankBalance: 0
+        bankBalance: 0,
+        company: ''
     });
 
     const [formData, setFormData] = useState(getInitialFormData());
@@ -142,7 +138,6 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
 
         setLoading(true);
         try {
-            // 1. Save Expenses
             for (const exp of expenses) {
                 if (!exp.accCode) continue;
                 await writeChequeService.tempSaveExpense({
@@ -163,7 +158,6 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
                 });
             }
 
-            // 2. Save Items
             for (const item of items) {
                 if (!item.itemCode) continue;
                 await writeChequeService.tempSaveItem({
@@ -182,7 +176,6 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
                 });
             }
 
-            // 3. Save Header
             await writeChequeService.saveHeader({
                 DocNo: formData.docId,
                 BankCode: formData.bankAcc,
@@ -197,7 +190,6 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
                 Payee: formData.payeeName
             });
 
-            // 4. Apply
             const result = await writeChequeService.apply({
                 DocNo: formData.docId,
                 Company: formData.company,
@@ -226,7 +218,6 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
 
         setLoading(true);
         try {
-            // 1. Save Expenses
             for (const exp of expenses) {
                 if (!exp.accCode) continue;
                 await writeChequeService.tempSaveExpense({
@@ -247,7 +238,6 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
                 });
             }
 
-            // 2. Save Items
             for (const item of items) {
                 if (!item.itemCode) continue;
                 await writeChequeService.tempSaveItem({
@@ -266,7 +256,6 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
                 });
             }
 
-            // 3. Save Header
             await writeChequeService.saveHeader({
                 DocNo: formData.docId,
                 BankCode: formData.bankAcc,
@@ -340,7 +329,6 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
                 totalAmount: header.totalAmount
             }));
 
-            // Map loaded expenses to the UI structure
             setExpenses((loadedExpenses || []).map(exp => ({
                 accCode: exp.accCode,
                 accName: exp.accName,
@@ -349,7 +337,6 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
                 costCenter: exp.costCenter
             })));
 
-            // Map loaded items to the UI structure
             setItems((loadedItems || []).map(item => ({
                 itemCode: item.itemCode,
                 description: item.description,
@@ -394,767 +381,815 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
                     }
                 `}
             </style>
-        <SimpleModal
-            isOpen={isOpen}
-            onClose={onClose}
-            title="Write Cheque Portfolio"
-            maxWidth="max-w-[1150px]"
-            footer={
-                <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-slate-200 rounded-b-xl">
-                    <div className="flex gap-3">
-                         <button onClick={() => setShowVoidConfirm(true)} className="px-6 h-10 bg-[#ff3b30] text-white text-[13px] font-mono font-bold uppercase tracking-widest rounded-[5px] shadow-md shadow-red-100 hover:bg-[#e03127] transition-all active:scale-95 flex items-center gap-2 border-none">
-                            <Trash2 size={14} /> VOID 
-                        </button>
-                        <button onClick={handleClear} className="px-6 h-10 bg-[#00adff] text-white text-[13px] font-mono font-bold uppercase tracking-widest rounded-[5px] hover:bg-[#0099e6] transition-all active:scale-95 flex items-center gap-2 border-none shadow-md shadow-blue-100">
-                            <RotateCcw size={14} /> CLEAR 
-                        </button>
-                        <button onClick={handleOpenSearch} className="px-6 h-10 bg-[#8b5cf6] text-white text-[13px] font-mono font-bold uppercase tracking-widest rounded-[5px] shadow-md shadow-purple-100 hover:bg-[#7c3aed] transition-all active:scale-95 flex items-center gap-2 border-none">
-                            <Search size={14} /> SEARCH 
-                        </button>
-                    </div>
-                    <div className="flex gap-3">
-                        <button onClick={handleSaveDraft} disabled={loading} className="px-6 h-10 bg-white text-[#0285fd] text-[13px] font-mono font-bold uppercase tracking-widest rounded-[5px] border-2 border-[#0285fd] hover:bg-blue-50 transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-50">
-                            {loading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />} 
-                             SAVE DRAFT
-                        </button>
-                        <button onClick={handleCommit} disabled={loading} className="px-8 h-10 bg-[#2bb744] text-white text-[13px] font-mono font-bold uppercase tracking-widest rounded-[5px] shadow-md shadow-green-100 hover:bg-[#259b3a] transition-all active:scale-95 flex items-center justify-center gap-2 border-none disabled:opacity-50">
-                            {loading ? <Loader2 size={14} className="animate-spin" /> : <CheckCircle size={14} />} 
-                             APPLY
-                        </button>
-                    </div>
-                </div>
-            }
-        >
-            <div className="space-y-4 overflow-y-auto no-scrollbar font-['Tahoma'] select-none">
-                <div className="bg-white p-4 border border-slate-200 rounded-[5px] shadow-sm space-y-4">
-                    <div className="grid grid-cols-12 gap-x-6 gap-y-4">
-                        {/* Row 1: Doc ID & Date */}
-                        <div className="col-span-6 flex items-center gap-2">
-                            <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Document ID</label>
-                            <div className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-bold text-blue-600 bg-white flex items-center rounded transition-all focus-within:border-[#00D1FF] focus-within:ring-2 focus-within:ring-[#00D1FF]/20">
-                                {formData.docId}
-                            </div>
+            <TransactionFormWrapper
+                isOpen={isOpen}
+                onClose={onClose}
+                title="Write Cheque Portfolio"
+                subtitle="Write Cheque"
+                icon={PenTool}
+                footer={
+                    <div className="bg-[#fcfcfc] px-6 py-4 w-full flex justify-between items-center border-t border-gray-200 rounded-b-[10px] shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]">
+                        <div className="flex gap-3">
+                            <button onClick={() => setShowVoidConfirm(true)} className="px-6 py-2 border border-red-300 text-red-600 bg-white hover:bg-red-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2">
+                                <Trash2 size={14} /> VOID
+                            </button>
+                            <button onClick={handleClear} className="px-6 py-2 border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2">
+                                <RotateCcw size={14} /> CLEAR
+                            </button>
+                            <button onClick={handleOpenSearch} className="px-6 py-2 border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2">
+                                <Search size={14} /> SEARCH
+                            </button>
                         </div>
-
-                        <div className="col-span-6 flex items-center gap-2">
-                            <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Dispatch Date</label>
-                            <div className="flex-1 flex gap-1 h-8 min-w-0">
-                                <input 
-                                    type="text" 
-                                    readOnly 
-                                    value={formData.date} 
-                                    className="flex-1 px-3 text-[12px] border border-slate-200 rounded outline-none text-gray-700 font-mono font-bold bg-white text-center cursor-pointer transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20"
-                                    onClick={() => openCalendar('date')}
-                                />
-                                <button onClick={() => openCalendar('date')} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center rounded-[5px] transition-all shadow-md active:scale-95 shrink-0 hover:bg-[#0073ff]">
-                                    <Calendar size={16} />
-                                </button>
-                            </div>
+                        <div className="flex gap-3">
+                            <button onClick={handleSaveDraft} disabled={loading} className="px-6 py-2 border border-[#0285fd] text-[#0285fd] bg-white hover:bg-blue-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2">
+                                {loading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />} SAVE DRAFT
+                            </button>
+                            <button onClick={handleCommit} disabled={loading} className={`px-6 py-2 bg-[#0285fd] hover:bg-[#0073ff] text-white font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                                {loading ? <Loader2 size={14} className="animate-spin" /> : <CheckCircle size={14} />} APPLY
+                            </button>
                         </div>
-
-                        {/* Row 2: Settlement Bank */}
-                        <div className="col-span-12 flex items-center gap-2">
-                            <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Settlement Bank</label>
-                            <div className="flex-1 flex gap-1 items-center h-8">
-                                <div className="flex-1 relative flex items-center h-full">
-                                    <Landmark size={14} className="absolute left-3 text-gray-400" />
+                    </div>
+                }
+            >
+                <div className="select-none font-['Tahoma']">
+                    {/* Header Information Section */}
+                    <div className="bg-white p-4 border border-slate-200 rounded-[3px] space-y-4">
+                        <div className="flex items-center justify-between border-b border-slate-200 pb-3 mb-2">
+                            <div className="">
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Document ID</label>
+                                <div className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-gray-50 flex items-center text-gray-700 font-mono font-bold">
+                                    {formData.docId}
+                                </div>
+                            </div>
+                            <div className="">
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Dispatch Date</label>
+                                <div className="relative w-full">
                                     <input 
                                         type="text" 
                                         readOnly 
-                                        value={lookups.banks.find(b => b.code === formData.bankAcc)?.name || ''} 
-                                        className="w-full h-full border border-slate-200 pl-9 pr-3 text-[12px] font-bold text-slate-800 bg-white outline-none rounded truncate cursor-pointer transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20"
-                                        onClick={() => setShowBankModal(true)}
+                                        value={formData.date} 
+                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700 truncate"
+                                        onClick={() => openCalendar('date')}
                                     />
-                                </div>
-                                <button onClick={() => setShowBankModal(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
-                                    <Search size={16} />
-                                </button>
-                                {formData.bankAcc && (
-                                    <div className="px-3 h-8 bg-blue-50 flex flex-col justify-center rounded border border-blue-100 min-w-[120px] ml-1">
-                                        <span className="text-[8px] font-black text-blue-400 uppercase leading-none">Bank Balance</span>
-                                        <span className="text-[12px] font-mono font-black text-blue-700">{formData.bankBalance.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-
-                        {/* Row 3: Cost Center & Endorsement */}
-                        <div className="col-span-6 flex items-center gap-2">
-                            <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Cost Center</label>
-                            <div className="flex-1 flex gap-1 items-center h-8">
-                                <input 
-                                    type="text" 
-                                    readOnly 
-                                    value={lookups.costCenters.find(cc => cc.costCenterCode === formData.costCenter)?.costCenterName || ''} 
-                                    className="flex-1 min-w-0 h-full border border-slate-200 px-3 text-[12px] font-bold text-gray-700 bg-white outline-none rounded truncate cursor-pointer transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20"
-                                    onClick={() => { setCcSource('header'); setShowCCModal(true); }}
-                                />
-                                <button onClick={() => { setCcSource('header'); setShowCCModal(true); }} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
-                                    <Search size={16} />
-                                </button>
-                            </div>
-                        </div>
-
-                        <div className="col-span-6 flex items-center gap-2">
-                            <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Endorsement</label>
-                            <div className="flex-1 flex gap-1 items-center h-8">
-                                <input 
-                                    type="text" 
-                                    readOnly 
-                                    value={formData.endorsement} 
-                                    className="flex-1 min-w-0 h-full border border-slate-200 px-3 text-[12px] font-bold bg-white text-gray-700 outline-none rounded shadow-sm cursor-pointer transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20"
-                                    onClick={() => setShowEndorsementModal(true)}
-                                />
-                                <button onClick={() => setShowEndorsementModal(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
-                                    <Search size={16} />
-                                </button>
-                            </div>
-                        </div>
-
-                        {/* Row 4: Pay to Order */}
-                        <div className="col-span-12 flex items-center gap-2">
-                            <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Pay to order</label>
-                            <div className="flex-1 flex gap-1 h-8">
-                                <input type="text" className="w-24 h-full font-mono border border-slate-200 px-3 text-[12px] bg-slate-50 text-slate-600 font-bold rounded" value={formData.payeeId} readOnly />
-                                <input type="text" className="flex-1 h-full font-bold border border-slate-200 px-3 text-[12px] text-slate-800 bg-white transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 outline-none rounded" value={formData.payeeName} onChange={(e) => setFormData({...formData, payeeName: e.target.value})} />
-                                <div className="flex h-full shadow-sm ml-1 gap-1">
-                                    <button onClick={() => setShowPayeeModal(true)} title="Search Payees" className="w-10 h-full bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded transition-all active:scale-95">
-                                        <Search size={14} />
-                                    </button>
-                                    <button onClick={() => setShowVendorModal(true)} title="Search Vendors" className="w-10 h-full bg-[#2bb744] text-white flex items-center justify-center hover:bg-[#259b3a] rounded transition-all active:scale-95">
-                                        <Plus size={14} />
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Row 5: Postal Address */}
-                        <div className="col-span-12 flex items-start gap-2">
-                            <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0 mt-1.5">Postal Address</label>
-                            <textarea className="flex-1 h-20 border border-slate-200 p-3 text-[12px] font-bold text-gray-700 resize-none transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 outline-none rounded-[5px] bg-white font-mono" value={formData.address} onChange={(e) => setFormData({...formData, address: e.target.value})}></textarea>
-                        </div>
-                    </div>
-                </div>
-
-                {/* 2. Cheque Specifics & Financial Summary */}
-                <div className="grid grid-cols-12 gap-x-6 items-stretch">
-                    <div className="col-span-7 bg-white border border-slate-200 p-4 rounded-[5px] shadow-sm space-y-4">
-                        <div className="flex items-center justify-between border-b border-slate-200 pb-2.5">
-                             <div className="flex items-center gap-2.5">
-                                <div className="h-3.5 w-1 bg-blue-500 rounded-full"></div>
-                                <span className="text-[11px] font-black text-gray-500 uppercase tracking-widest">Bank Submission Details</span>
-                             </div>
-                             <label className="flex items-center gap-2.5 cursor-pointer group">
-                                <input type="checkbox" className="w-4 h-4 border-slate-300 rounded text-[#00D1FF] focus:ring-[#00D1FF] transition-all" checked={formData.isElectronic} onChange={(e) => setFormData({...formData, isElectronic: e.target.checked})} />
-                                <span className="text-[11px] font-bold text-gray-400 uppercase tracking-tight group-hover:text-[#00D1FF]">Electronic Pay</span>
-                            </label>
-                        </div>
-                        
-                        <div className="grid grid-cols-12 gap-y-3 items-center">
-                            {/* Cheque No Section */}
-                            <div className="col-span-12 xl:col-span-6 flex items-center gap-2">
-                                <label className="text-[11px] font-black text-gray-400 uppercase w-20 shrink-0">Cheque No</label>
-                                <div className="flex-1 flex items-center gap-2 h-8 min-w-0">
-                                    <input type="checkbox" className="w-4 h-4 rounded border-slate-300 text-[#00D1FF] shrink-0 focus:ring-[#00D1FF]" checked={formData.isChqNoManual} onChange={(e) => setFormData({...formData, isChqNoManual: e.target.checked})} />
-                                    <input type="text" className="flex-1 min-w-0 h-full border border-slate-200 px-3 text-[13px] font-bold text-gray-800 tracking-wider transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 outline-none rounded bg-white" value={formData.chqNo} onChange={(e) => setFormData({...formData, chqNo: e.target.value})} />
-                                </div>
-                            </div>
-
-                            {/* Chq Date Section */}
-                            <div className="col-span-12 xl:col-span-6 flex items-center gap-2 xl:pl-6">
-                                <label className="text-[11px] font-black text-gray-400 uppercase w-20 shrink-0 xl:text-right">Chq Date</label>
-                                <div className="flex-1 flex gap-1 h-8 min-w-0">
-                                    <input 
-                                        type="text" 
-                                        readOnly 
-                                        value={formData.chqDate} 
-                                        className="flex-1 min-w-0 px-3 text-[12px] border border-slate-200 rounded outline-none text-slate-700 font-bold bg-white text-center cursor-pointer transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" 
-                                        onClick={() => openCalendar('chqDate')}
-                                    />
-                                    <button onClick={() => openCalendar('chqDate')} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center rounded-[5px] transition-all shadow-md active:scale-95 shrink-0 hover:bg-[#0073ff]">
+                                    <button onClick={() => openCalendar('date')} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
                                         <Calendar size={16} />
                                     </button>
                                 </div>
                             </div>
                         </div>
+
+                        <div className="grid grid-cols-12 gap-x-6 gap-y-3.5">
+                            {/* Left Column */}
+                            <div className="col-span-6 space-y-3.5">
+                                <div className="">
+                                    <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Settlement Bank</label>
+                                    <div className="relative">
+                                        <input 
+                                            type="text" 
+                                            readOnly 
+                                            value={lookups.banks.find(b => b.code === formData.bankAcc)?.name || ''} 
+                                            className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700 truncate"
+                                            onClick={() => setShowBankModal(true)}
+                                        />
+                                        <button onClick={() => setShowBankModal(true)} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
+                                            <Search size={16} />
+                                        </button>
+                                    </div>
+                                    {formData.bankAcc && (
+                                        <div className="mt-1.5 px-3 h-8 bg-blue-50 flex items-center justify-between rounded-[3px] border border-blue-100">
+                                            <span className="text-[10px] font-bold text-blue-500 uppercase tracking-wider">Bank Balance</span>
+                                            <span className="text-[13px] font-mono font-black text-blue-700">{formData.bankBalance.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="">
+                                    <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Cost Center</label>
+                                    <div className="relative">
+                                        <input 
+                                            type="text" 
+                                            readOnly 
+                                            value={lookups.costCenters.find(cc => cc.costCenterCode === formData.costCenter)?.costCenterName || ''} 
+                                            className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700"
+                                            onClick={() => { setCcSource('header'); setShowCCModal(true); }}
+                                        />
+                                        <button onClick={() => { setCcSource('header'); setShowCCModal(true); }} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
+                                            <Search size={16} />
+                                        </button>
+                                    </div>
+                                </div>
+                                <div className="">
+                                    <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Endorsement</label>
+                                    <div className="relative">
+                                        <input 
+                                            type="text" 
+                                            readOnly 
+                                            value={formData.endorsement} 
+                                            className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700"
+                                            onClick={() => setShowEndorsementModal(true)}
+                                        />
+                                        <button onClick={() => setShowEndorsementModal(true)} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
+                                            <ChevronDown size={16} />
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Right Column */}
+                            <div className="col-span-6 space-y-3.5">
+                                <div className="">
+                                    <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Pay to Order</label>
+                                    <div className="flex gap-2">
+                                        <div className="relative flex-1">
+                                            <input 
+                                                type="text" 
+                                                readOnly 
+                                                value={formData.payeeId} 
+                                                className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 cursor-pointer"
+                                                onClick={() => setShowPayeeModal(true)}
+                                                placeholder="Payee ID"
+                                            />
+                                            <button onClick={() => setShowPayeeModal(true)} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
+                                                <Search size={16} />
+                                            </button>
+                                        </div>
+                                        <div className="relative flex-1">
+                                            <input 
+                                                type="text" 
+                                                value={formData.payeeName} 
+                                                onChange={(e) => setFormData({...formData, payeeName: e.target.value})}
+                                                className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700"
+                                                placeholder="Payee Name"
+                                            />
+                                        </div>
+                                        <button onClick={() => setShowVendorModal(true)} className="h-10 px-4 bg-white border border-[#0285fd] text-[#0285fd] font-semibold rounded-[3px] text-[13px] hover:bg-blue-50 transition-all flex items-center justify-center whitespace-nowrap gap-1">
+                                            <Save size={14} /> VENDOR
+                                        </button>
+                                    </div>
+                                </div>
+                                <div className="">
+                                    <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Postal Address</label>
+                                    <textarea 
+                                        className="w-full h-[82px] border border-gray-300 rounded-[3px] px-3 py-2 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 resize-none" 
+                                        value={formData.address} 
+                                        onChange={(e) => setFormData({...formData, address: e.target.value})}
+                                        placeholder="Enter postal address..."
+                                    />
+                                </div>
+                                <div className="">
+                                    <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Total Payable Amount</label>
+                                    <div className="w-full h-10 border border-red-200 bg-red-50/50 px-3 text-[14px] font-bold text-red-600 text-right flex items-center justify-end rounded-[3px]">
+                                        {calculateTotal().toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
-                    <div className="col-span-5 bg-blue-50/20 p-4 rounded-[5px] border border-dashed border-blue-200 flex flex-col justify-center relative overflow-hidden group">
-                         <div className="absolute top-0 right-0 p-1 opacity-10 group-hover:opacity-20 transition-opacity">
-                            <Receipt size={80} className="-rotate-12 text-blue-600" />
-                         </div>
-                         <div className="text-right z-10">
-                            <label className="text-[10px] font-black text-blue-400 uppercase block mb-1 tracking-wider">Total Payable Disbursement</label>
-                            <div className="text-[32px] font-black text-slate-900 tracking-tighter tabular-nums flex items-baseline justify-end gap-1 leading-none">
+                    {/* Cheque Specifics Section */}
+                    <div className="mt-4 grid grid-cols-12 gap-x-6">
+                        <div className="col-span-7 bg-white p-4 border border-slate-200 rounded-[3px] space-y-4">
+                            <div className="flex items-center justify-between border-b border-slate-200 pb-3 mb-2">
+                                <h4 className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">Bank Submission Details</h4>
+                                <label className="flex items-center gap-2 cursor-pointer">
+                                    <input 
+                                        type="checkbox" 
+                                        className="w-4 h-4 rounded border-slate-300 text-[#0285fd] focus:ring-[#0285fd] transition-all" 
+                                        checked={formData.isElectronic} 
+                                        onChange={(e) => setFormData({...formData, isElectronic: e.target.checked})} 
+                                    />
+                                    <span className="text-[11px] font-medium text-gray-600">Electronic Pay</span>
+                                </label>
+                            </div>
+                            <div className="grid grid-cols-2 gap-x-6 gap-y-3.5">
+                                <div className="">
+                                    <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Cheque No</label>
+                                    <div className="flex gap-2 items-center">
+                                        <input 
+                                            type="checkbox" 
+                                            className="w-4 h-4 rounded border-slate-300 text-[#0285fd] focus:ring-[#0285fd] shrink-0" 
+                                            checked={formData.isChqNoManual} 
+                                            onChange={(e) => setFormData({...formData, isChqNoManual: e.target.checked})} 
+                                            title="Manual entry"
+                                        />
+                                        <input 
+                                            type="text" 
+                                            className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700" 
+                                            value={formData.chqNo} 
+                                            onChange={(e) => setFormData({...formData, chqNo: e.target.value})} 
+                                        />
+                                    </div>
+                                </div>
+                                <div className="">
+                                    <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Cheque Date</label>
+                                    <div className="relative">
+                                        <input 
+                                            type="text" 
+                                            readOnly 
+                                            value={formData.chqDate} 
+                                            className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700 truncate" 
+                                            onClick={() => openCalendar('chqDate')}
+                                        />
+                                        <button onClick={() => openCalendar('chqDate')} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
+                                            <Calendar size={16} />
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="col-span-5 bg-blue-50/20 p-4 border border-dashed border-blue-200 rounded-[3px] flex flex-col justify-center">
+                            <span className="text-[10px] font-black text-blue-400 uppercase block mb-1 tracking-wider text-right">Total Payable Disbursement</span>
+                            <div className="text-[32px] font-black text-slate-900 tracking-tighter tabular-nums text-right leading-none">
                                 {calculateTotal().toLocaleString(undefined, { minimumFractionDigits: 2 })}
                             </div>
                         </div>
                     </div>
-                </div>
 
-                {/* 3. Expenses/Items Portfolio Ledger Table */}
-                <div className="bg-white border border-slate-200 rounded-[5px] shadow-sm overflow-hidden flex flex-col min-h-[250px]">
-                    <div className="flex items-center justify-between bg-slate-50 px-4 py-2 border-b border-slate-200">
-                        <div className="flex gap-1">
-                            {[
-                                { id: 'Expenses', icon: Receipt },
-                                { id: 'Items', icon: Package }
-                            ].map((tab) => (
-                                <button
-                                    key={tab.id}
-                                    onClick={() => setSelectedTab(tab.id)}
-                                    className={`px-4 py-1.5 text-[11px] font-black uppercase tracking-widest transition-all rounded flex items-center gap-2 ${selectedTab === tab.id ? 'bg-white text-blue-600 shadow-sm border border-slate-200' : 'text-gray-400 hover:text-gray-600'}`}
+                    {/* Expenses/Items Portfolio Ledger Table */}
+                    <div className="mt-4">
+                        <div className="flex items-center gap-3 mb-2 px-2 border-b border-gray-200 pb-2">
+                            <div className="flex gap-4">
+                                <button 
+                                    onClick={() => setSelectedTab('Expenses')}
+                                    className={`text-[13px] font-black uppercase tracking-widest pb-1 border-b-2 transition-all ${selectedTab === 'Expenses' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-400 hover:text-gray-600'}`}
                                 >
-                                    <tab.icon size={12} />
-                                    {tab.id}
+                                    Expenses
                                 </button>
-                            ))}
+                                <button 
+                                    onClick={() => setSelectedTab('Items')}
+                                    className={`text-[13px] font-black uppercase tracking-widest pb-1 border-b-2 transition-all ${selectedTab === 'Items' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-400 hover:text-gray-600'}`}
+                                >
+                                    Items
+                                </button>
+                            </div>
                         </div>
-                        <div className="flex items-center gap-2">
-                             <div className="h-2 w-2 rounded-full bg-blue-500 animate-pulse"></div>
-                             <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">Live Allocation Grid</span>
-                        </div>
-                    </div>
 
-                    <div className="overflow-x-auto flex-1">
-                        {selectedTab === 'Expenses' ? (
-                            <table className="w-full text-left border-collapse">
-                                <thead>
-                                    <tr className="bg-slate-50 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-slate-200">
-                                        <th className="px-4 py-3 w-12 text-center">#</th>
-                                        <th className="px-4 py-3 w-[35%]">Ledger Selection</th>
-                                        <th className="px-4 py-3 w-[25%]">Allocation CC</th>
-                                        <th className="px-4 py-3 w-40 text-right">Net Value</th>
-                                        <th className="px-4 py-3">Memo / Internal Transcript</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-slate-100">
-                                    {expenses.map((line, idx) => (
-                                        <tr key={idx} className="group hover:bg-slate-50/50 transition-colors">
-                                            <td className="px-4 py-2 text-center font-mono text-[11px] text-gray-300 font-bold group-hover:text-slate-400 transition-colors">{idx + 1}</td>
-                                            <td className="px-2 py-1">
-                                                <div className="flex gap-1 items-center h-8">
-                                                    <input 
-                                                        type="text" 
-                                                        readOnly 
-                                                        value={lookups.accounts.find(a => a.code === line.accCode)?.name || ''} 
-                                                        className="flex-1 min-w-0 h-full font-mono border border-transparent px-3 text-[11px] font-bold bg-transparent text-slate-700 rounded outline-none truncate transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 group-hover:border-slate-200 group-hover:bg-white cursor-pointer" 
-                                                        onClick={() => { setAccIndex(idx); setShowAccModal(true); }}
-                                                    />
-                                                    <button onClick={() => { setAccIndex(idx); setShowAccModal(true); }} className="w-8 h-8 bg-white border border-slate-200 text-gray-400 flex items-center justify-center hover:text-[#00D1FF] hover:border-[#00D1FF] rounded transition-all active:scale-90 opacity-0 group-hover:opacity-100 shrink-0">
-                                                        <Search size={14} />
-                                                    </button>
-                                                </div>
-                                            </td>
-                                            <td className="px-2 py-1">
-                                                <div className="flex gap-1 items-center h-8">
-                                                    <input 
-                                                        type="text" 
-                                                        readOnly 
-                                                        value={lookups.costCenters.find(cc => cc.costCenterCode === line.costCenter)?.costCenterName || ''} 
-                                                        className="flex-1 min-w-0 h-full font-mono border border-transparent px-3 text-[11px] font-bold bg-transparent text-gray-600 rounded outline-none truncate transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 group-hover:border-slate-200 group-hover:bg-white cursor-pointer" 
-                                                        onClick={() => { setCcSource('line'); setCcIndex(idx); setShowCCModal(true); }}
-                                                    />
-                                                    <button onClick={() => { setCcSource('line'); setCcIndex(idx); setShowCCModal(true); }} className="w-8 h-8 bg-white border border-slate-200 text-gray-400 flex items-center justify-center hover:text-[#00D1FF] hover:border-[#00D1FF] rounded transition-all active:scale-90 opacity-0 group-hover:opacity-100 shrink-0">
-                                                        <Search size={14} />
-                                                    </button>
-                                                </div>
-                                            </td>
-                                            <td className="px-2 py-1">
-                                                <input type="text" className="w-full h-8 font-mono border border-transparent px-3 text-right text-[12px] font-black text-gray-800 bg-transparent rounded outline-none transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 group-hover:border-slate-200 group-hover:bg-white" value={line.amount} onChange={(e) => {
-                                                    const newExp = [...expenses];
-                                                    newExp[idx].amount = e.target.value;
-                                                    setExpenses(newExp);
-                                                }} />
-                                            </td>
-                                            <td className="px-2 py-1">
-                                                <input type="text" className="w-full h-8 font-mono border border-transparent px-3 text-[11px] text-gray-500 bg-transparent rounded outline-none transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 group-hover:border-slate-200 group-hover:bg-white" value={line.memo} onChange={(e) => {
-                                                    const newExp = [...expenses];
-                                                    newExp[idx].memo = e.target.value;
-                                                    setExpenses(newExp);
-                                                }} />
-                                            </td>
-                                        </tr>
-                                    ))}
-                                    <tr className="bg-slate-50/30">
-                                        <td colSpan="5" className="p-0 border-t border-slate-100">
-                                            <button onClick={() => setExpenses([...expenses, { accCode: '', costCenter: '', amount: '0.00', memo: '' }])} className="w-full py-3 text-blue-600 font-black text-[10px] tracking-[0.2em] hover:bg-slate-50 transition-all flex items-center justify-center gap-2 group border-none bg-transparent">
-                                                <Plus size={14} /> ATTACH EXPENSE LINE
-                                            </button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        ) : (
-                            <table className="w-full text-left border-collapse">
-                                <thead>
-                                    <tr className="bg-slate-50 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-slate-200">
-                                        <th className="px-4 py-3 w-12 text-center">#</th>
-                                        <th className="px-4 py-3 w-[40%]">Item Description</th>
-                                        <th className="px-4 py-3 w-24 text-center">Qty</th>
-                                        <th className="px-4 py-3 w-32 text-right">Unit Cost</th>
-                                        <th className="px-4 py-3 w-40 text-right">Sub Total</th>
-                                        <th className="px-4 py-3">Memo</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-slate-100">
-                                    {items.map((line, idx) => (
-                                        <tr key={idx} className="group hover:bg-slate-50/50 transition-colors">
-                                            <td className="px-4 py-2 text-center font-mono text-[11px] text-gray-300 font-bold group-hover:text-slate-400 transition-colors">{idx + 1}</td>
-                                            <td className="px-2 py-1">
-                                                <div className="flex gap-1 items-center h-8">
-                                                    <input 
-                                                        type="text" 
-                                                        readOnly 
-                                                        value={lookups.products.find(p => p.code === line.itemCode)?.prod_Name || ''} 
-                                                        className="flex-1 min-w-0 h-full font-mono border border-transparent px-3 text-[11px] font-bold bg-transparent text-slate-700 rounded outline-none truncate transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 group-hover:border-slate-200 group-hover:bg-white cursor-pointer" 
-                                                        onClick={() => { setItemIndex(idx); setShowItemModal(true); }}
-                                                    />
-                                                    <button onClick={() => { setItemIndex(idx); setShowItemModal(true); }} className="w-8 h-8 bg-white border border-slate-200 text-gray-400 flex items-center justify-center hover:text-[#00D1FF] hover:border-[#00D1FF] rounded transition-all active:scale-90 opacity-0 group-hover:opacity-100 shrink-0">
-                                                        <Search size={14} />
-                                                    </button>
-                                                </div>
-                                            </td>
-                                            <td className="px-2 py-1">
-                                                <input type="number" className="w-full h-8 font-mono border border-transparent px-2 text-center text-[11px] font-bold bg-transparent rounded outline-none transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 group-hover:border-slate-200 group-hover:bg-white" value={line.qty} onChange={(e) => {
-                                                    const newItems = [...items];
-                                                    newItems[idx].qty = e.target.value;
-                                                    setItems(newItems);
-                                                }} />
-                                            </td>
-                                            <td className="px-2 py-1">
-                                                <input type="text" className="w-full h-8 font-mono border border-transparent px-2 text-right text-[11px] font-bold bg-transparent rounded outline-none transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 group-hover:border-slate-200 group-hover:bg-white" value={line.cost} onChange={(e) => {
-                                                    const newItems = [...items];
-                                                    newItems[idx].cost = e.target.value;
-                                                    setItems(newItems);
-                                                }} />
-                                            </td>
-                                            <td className="px-4 py-2 text-right font-mono text-[12px] font-black text-slate-700">
-                                                {( (parseFloat(line.cost) || 0) * (parseInt(line.qty) || 0) ).toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                                            </td>
-                                            <td className="px-2 py-1">
-                                                <input type="text" className="w-full h-8 font-mono border border-transparent px-3 text-[11px] text-gray-500 bg-transparent rounded outline-none transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 group-hover:border-slate-200 group-hover:bg-white" value={line.description} onChange={(e) => {
-                                                    const newItems = [...items];
-                                                    newItems[idx].description = e.target.value;
-                                                    setItems(newItems);
-                                                }} />
-                                            </td>
-                                        </tr>
-                                    ))}
-                                    <tr className="bg-slate-50/30">
-                                        <td colSpan="6" className="p-0 border-t border-slate-100">
-                                            <button onClick={() => setItems([...items, { itemCode: '', description: '', qty: '1', cost: '0.00' }])} className="w-full py-3 text-blue-600 font-black text-[10px] tracking-[0.2em] hover:bg-slate-50 transition-all flex items-center justify-center gap-2 group border-none bg-transparent">
-                                                <Plus size={14} /> ATTACH ITEM LINE
-                                            </button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        )}
-                    </div>
-                </div>
-
-                {/* 4. Global Validation Summary Footer */}
-                <div className="flex justify-between items-center bg-white p-3 border border-slate-200 rounded-[5px] shadow-sm">
-                    <div className="flex items-center gap-8">
-                        <div className="flex items-center gap-3">
-                             <div className="flex flex-col">
-                                <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1">Accounting Delta</span>
-                                 <div className="text-[18px] font-mono leading-none font-black text-slate-800 tracking-tighter">
-                                    {calculateTotal().toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                                 </div>
-                             </div>
-                        </div>
-                        <div className="h-8 w-[1px] bg-slate-200" />
-                        <div className="flex items-center gap-3">
-                            <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-sm shadow-emerald-200"></div>
-                            <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">Entry Validated</span>
-                        </div>
-                    </div>
-                    <div className="flex items-center gap-4">
-                        <div className="h-6 w-[1px] bg-slate-200" />
-                        <button onClick={handleClear} className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-all active:scale-90 border-none bg-transparent">
-                            <RotateCcw size={16} />
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </SimpleModal>
-
-        {/* --- Lookups --- */}
-
-        <SimpleModal
-            isOpen={showBankModal}
-            onClose={() => setShowBankModal(false)}
-            title="Search Payment Origin Ledgers"
-            maxWidth="max-w-2xl"
-        >
-            <div className="space-y-4 font-['Tahoma']">
-                <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-lg border border-gray-100 mb-2">
-                    <Search size={14} className="text-gray-400" />
-                    <input 
-                        type="text" 
-                        placeholder="Find ledger account by name..." 
-                        className="h-9 border-none bg-transparent text-sm w-full focus:outline-none" 
-                        value={bankSearch} 
-                        onChange={(e) => setBankSearch(e.target.value)} 
-                    />
-                </div>
-                <div className="max-h-[400px] overflow-y-auto custom-scrollbar">
-                    <table className="w-full text-left">
-                        <thead className="sticky top-0 bg-white text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">
-                            <tr>
-                                <th className="px-4 py-3">Code</th>
-                                <th className="px-4 py-3">Ledger Name</th>
-                                <th className="px-4 py-3 text-right">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-50">
-                            {lookups.banks.filter(b => b.name.toLowerCase().includes(bankSearch.toLowerCase())).map((b, idx) => (
-                                <tr key={idx} className="group hover:bg-blue-50/50 cursor-pointer" onClick={() => {
-                                    setFormData({...formData, bankAcc: b.code});
-                                    fetchBankBalance(b.code);
-                                    setShowBankModal(false);
-                                }}>
-                                    <td className="px-4 py-3 font-mono text-[12px] text-gray-400">{b.code}</td>
-                                    <td className="px-4 py-3 font-bold text-[13px] text-gray-700 uppercase group-hover:text-blue-600 transition-colors">{b.name}</td>
-                                    <td className="px-4 py-3 text-right">
-                                        <button className="bg-[#0285fd] text-white text-[10px] uppercase px-3 py-1.5 rounded-[5px] font-bold shadow-sm border-none">SELECT</button>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </SimpleModal>
-
-        <SimpleModal
-            isOpen={showCCModal}
-            onClose={() => setShowCCModal(false)}
-            title="Search Portfolio Cost Centers"
-            maxWidth="max-w-2xl"
-        >
-            <div className="space-y-4 font-['Tahoma']">
-                <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-lg border border-gray-100 mb-2">
-                    <Search size={14} className="text-gray-400" />
-                    <input 
-                        type="text" 
-                        placeholder="Find cost center..." 
-                        className="h-9 border-none bg-transparent text-sm w-full focus:outline-none" 
-                        value={ccSearch} 
-                        onChange={(e) => setCcSearch(e.target.value)} 
-                    />
-                </div>
-                <div className="max-h-[400px] overflow-y-auto custom-scrollbar">
-                    <table className="w-full text-left">
-                        <thead className="sticky top-0 bg-white text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">
-                            <tr>
-                                <th className="px-4 py-3">Code</th>
-                                <th className="px-4 py-3">Center Description</th>
-                                <th className="px-4 py-3 text-right">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-50">
-                            {lookups.costCenters.filter(c => c.costCenterName.toLowerCase().includes(ccSearch.toLowerCase())).map((c, idx) => (
-                                <tr key={idx} className="group hover:bg-blue-50/50 cursor-pointer" onClick={() => {
-                                    if (ccSource === 'header') {
-                                        setFormData({...formData, costCenter: c.costCenterCode});
-                                    } else {
-                                        const newExp = [...expenses];
-                                        newExp[ccIndex].costCenter = c.costCenterCode;
-                                        setExpenses(newExp);
-                                    }
-                                    setShowCCModal(false);
-                                }}>
-                                    <td className="px-4 py-3 font-mono text-[12px] text-gray-400">{c.costCenterCode}</td>
-                                    <td className="px-4 py-3 font-bold text-[13px] text-gray-700 uppercase group-hover:text-blue-600 transition-colors">{c.costCenterName}</td>
-                                    <td className="px-4 py-3 text-right">
-                                        <button className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95">SELECT</button>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </SimpleModal>
-
-        <SimpleModal
-            isOpen={showEndorsementModal}
-            onClose={() => setShowEndorsementModal(false)}
-            title="Select Crossing Type"
-            maxWidth="max-w-md"
-        >
-            <div className="p-1 space-y-1 font-['Tahoma']">
-                {lookups.endorsements.map((type, idx) => (
-                    <button 
-                        key={idx} 
-                        onClick={() => {
-                            setFormData(prev => ({ ...prev, endorsement: type }));
-                            setShowEndorsementModal(false);
-                        }}
-                        className="w-full text-left px-5 py-3.5 text-[13px] font-black text-slate-700 hover:bg-blue-50 hover:text-blue-600 rounded-xl transition-all flex items-center justify-between group uppercase tracking-tight border-none bg-transparent"
-                    >
-                        {type}
-                        <ChevronRight size={14} className="opacity-0 group-hover:opacity-100 transition-all text-blue-400" />
-                    </button>
-                ))}
-            </div>
-        </SimpleModal>
-
-        <SimpleModal
-            isOpen={showAccModal}
-            onClose={() => setShowAccModal(false)}
-            title="Search Ledger Accounts"
-            maxWidth="max-w-2xl"
-        >
-            <div className="space-y-4 font-['Tahoma']">
-                <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-lg border border-gray-100 mb-2">
-                    <Search size={14} className="text-gray-400" />
-                    <input 
-                        type="text" 
-                        placeholder="Filter accounts by name or code..." 
-                        className="h-9 border-none bg-transparent text-sm w-full focus:outline-none" 
-                        value={accSearch} 
-                        onChange={(e) => setAccSearch(e.target.value)} 
-                    />
-                </div>
-                <div className="max-h-[400px] overflow-y-auto custom-scrollbar">
-                    <table className="w-full text-left">
-                        <thead className="sticky top-0 bg-white text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">
-                            <tr>
-                                <th className="px-4 py-3">Code</th>
-                                <th className="px-4 py-3">Account Name</th>
-                                <th className="px-4 py-3 text-right">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-50">
-                            {lookups.accounts.filter(a => a.name.toLowerCase().includes(accSearch.toLowerCase()) || a.code.includes(accSearch)).map((a, idx) => (
-                                <tr key={idx} className="group hover:bg-blue-50/50 cursor-pointer" onClick={() => {
-                                    const newExp = [...expenses];
-                                    newExp[accIndex].accCode = a.code;
-                                    setExpenses(newExp);
-                                    setShowAccModal(false);
-                                }}>
-                                    <td className="px-4 py-3 font-mono text-[12px] text-gray-400">{a.code}</td>
-                                    <td className="px-4 py-3 font-bold text-[13px] text-gray-700 uppercase group-hover:text-blue-600 transition-colors">{a.name}</td>
-                                    <td className="px-4 py-3 text-right">
-                                        <button className="bg-[#0285fd] text-white text-[10px] px-4 py-1.5 rounded-[5px] font-black shadow-md border-none">SELECT</button>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </SimpleModal>
-
-        <SimpleModal
-            isOpen={showItemModal}
-            onClose={() => setShowItemModal(false)}
-            title="Search Inventory Products"
-            maxWidth="max-w-2xl"
-        >
-            <div className="space-y-4 font-['Tahoma']">
-                <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-lg border border-gray-100 mb-2">
-                    <Search size={14} className="text-gray-400" />
-                    <input 
-                        type="text" 
-                        placeholder="Filter products..." 
-                        className="h-9 border-none bg-transparent text-sm w-full focus:outline-none" 
-                        value={itemSearch} 
-                        onChange={(e) => setItemSearch(e.target.value)} 
-                    />
-                </div>
-                <div className="max-h-[400px] overflow-y-auto custom-scrollbar">
-                    <table className="w-full text-left">
-                        <thead className="sticky top-0 bg-white text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">
-                            <tr>
-                                <th className="px-4 py-3">Code</th>
-                                <th className="px-4 py-3">Product Name</th>
-                                <th className="px-4 py-3 text-right">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-50">
-                            {lookups.products.filter(p => p.prod_Name.toLowerCase().includes(itemSearch.toLowerCase()) || p.code.includes(itemSearch)).map((p, idx) => (
-                                <tr key={idx} className="group hover:bg-blue-50/50 cursor-pointer" onClick={() => {
-                                    const newItems = [...items];
-                                    newItems[itemIndex].itemCode = p.code;
-                                    newItems[itemIndex].description = p.prod_Name;
-                                    setItems(newItems);
-                                    setShowItemModal(false);
-                                }}>
-                                    <td className="px-4 py-3 font-mono text-[12px] text-gray-400">{p.code}</td>
-                                    <td className="px-4 py-3 font-bold text-[13px] text-gray-700 uppercase group-hover:text-blue-600 transition-colors">{p.prod_Name}</td>
-                                    <td className="px-4 py-3 text-right">
-                                        <button className="bg-[#0285fd] text-white text-[10px] px-4 py-1.5 rounded-[5px] font-black shadow-md border-none">SELECT</button>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </SimpleModal>
-
-        <SimpleModal
-            isOpen={showPayeeModal}
-            onClose={() => setShowPayeeModal(false)}
-            title="Search Historical Payees"
-            maxWidth="max-w-2xl"
-        >
-            <div className="space-y-4 font-['Tahoma']">
-                <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-lg border border-gray-100 mb-2">
-                    <Search size={14} className="text-gray-400" />
-                    <input 
-                        type="text" 
-                        placeholder="Filter payees..." 
-                        className="h-9 border-none bg-transparent text-sm w-full focus:outline-none" 
-                        value={formData.payeeName}
-                        onChange={(e) => setFormData({...formData, payeeName: e.target.value})} 
-                    />
-                </div>
-                <div className="max-h-[400px] overflow-y-auto custom-scrollbar">
-                    <table className="w-full text-left">
-                        <thead className="sticky top-0 bg-white text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">
-                            <tr>
-                                <th className="px-4 py-3">Payee Name</th>
-                                <th className="px-4 py-3 text-right">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-50">
-                            {lookups.customers.filter(c => c.name.toLowerCase().includes((formData.payeeName || '').toLowerCase())).map((c, idx) => (
-                                <tr key={idx} className="group hover:bg-blue-50/50 cursor-pointer" onClick={() => {
-                                    setFormData({...formData, payeeId: c.code, payeeName: c.name});
-                                    setShowPayeeModal(false);
-                                }}>
-                                    <td className="px-4 py-3 font-bold text-[13px] text-gray-700 uppercase group-hover:text-blue-600 transition-colors">{c.name}</td>
-                                    <td className="px-4 py-3 text-right">
-                                        <button className="bg-[#0285fd] text-white text-[10px] px-4 py-1.5 rounded-[5px] font-black shadow-md border-none">SELECT</button>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </SimpleModal>
-
-        <SimpleModal
-            isOpen={showVendorModal}
-            onClose={() => setShowVendorModal(false)}
-            title="Select Supplier / Vendor"
-            maxWidth="max-w-2xl"
-        >
-            <div className="space-y-4 font-['Tahoma']">
-                <div className="max-h-[400px] overflow-y-auto custom-scrollbar">
-                    <table className="w-full text-left">
-                        <thead className="sticky top-0 bg-white text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">
-                            <tr>
-                                <th className="px-4 py-3">Code</th>
-                                <th className="px-4 py-3">Supplier Name</th>
-                                <th className="px-4 py-3 text-right">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-50">
-                            {lookups.vendors.map((v, idx) => (
-                                <tr key={idx} className="group hover:bg-blue-50/50 cursor-pointer" onClick={() => {
-                                    setFormData({...formData, payeeId: v.id, payeeName: v.name, address: v.address});
-                                    setShowVendorModal(false);
-                                }}>
-                                    <td className="px-4 py-3 font-mono text-[12px] text-gray-400">{v.id}</td>
-                                    <td className="px-4 py-3 font-bold text-[13px] text-gray-700 uppercase group-hover:text-blue-600 transition-colors">{v.name}</td>
-                                    <td className="px-4 py-3 text-right">
-                                        <button className="bg-[#2bb744] text-white text-[10px] px-4 py-1.5 rounded-[5px] font-black hover:bg-[#259b3a] shadow-md transition-all border-none">SELECT</button>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </SimpleModal>
-
-        <SimpleModal
-            isOpen={showSearchModal}
-            onClose={() => setShowSearchModal(false)}
-            title="Search Saved Cheques"
-            maxWidth="max-w-4xl"
-        >
-            <div className="space-y-4 font-['Tahoma']">
-                <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
-                    <input 
-                        type="text" 
-                        placeholder="Search by Document Number or Payee..."
-                        value={docSearchQuery}
-                        onChange={(e) => setDocSearchQuery(e.target.value)}
-                        className="w-full pl-9 pr-4 py-2 border-2 border-gray-100 rounded-lg focus:border-blue-500 focus:outline-none transition-all text-[13px] bg-gray-50/50"
-                    />
-                </div>
-                <div className="max-h-[400px] overflow-y-auto custom-scrollbar">
-                    <table className="w-full text-left">
-                        <thead className="sticky top-0 bg-white text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">
-                            <tr>
-                                <th className="px-4 py-3">Doc No</th>
-                                <th className="px-4 py-3">Date</th>
-                                <th className="px-4 py-3">Payee</th>
-                                <th className="px-4 py-3">Bank Code</th>
-                                <th className="px-4 py-3 text-right">Amount</th>
-                                <th className="px-4 py-3 text-right">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-50">
-                            {savedDocs.filter(d => 
-                                (d.docNo?.toLowerCase() || '').includes(docSearchQuery.toLowerCase()) || 
-                                (d.payee?.toLowerCase() || '').includes(docSearchQuery.toLowerCase())
-                            ).map((d, idx) => (
-                                <tr key={idx} className="group hover:bg-blue-50/50 cursor-pointer" onClick={() => handleLoadDoc(d.docNo)}>
-                                    <td className="px-4 py-3 font-mono text-[12px] font-bold text-[#0285fd]">{d.docNo}</td>
-                                    <td className="px-4 py-3 text-[12px] text-gray-500">{new Date(d.date).toLocaleDateString('en-GB')}</td>
-                                    <td className="px-4 py-3 font-bold text-[13px] text-gray-700">{d.payee}</td>
-                                    <td className="px-4 py-3 text-[12px] text-gray-500">{d.bankCode}</td>
-                                    <td className="px-4 py-3 text-right font-mono font-bold text-[13px]">
-                                        {d.amount?.toLocaleString('en-US', {minimumFractionDigits:2})}
-                                    </td>
-                                    <td className="px-4 py-3 text-right">
-                                        <button className="bg-[#2bb744] text-white text-[10px] px-4 py-1.5 rounded-[5px] font-black hover:bg-[#259b3a] shadow-md transition-all border-none">LOAD</button>
-                                    </td>
-                                </tr>
-                            ))}
-                            {savedDocs.length === 0 && (
-                                <tr>
-                                    <td colSpan="6" className="text-center py-8 text-gray-400 text-sm">No saved documents found</td>
-                                </tr>
+                        <div className="border border-gray-200 rounded-[3px] bg-white shadow-xl overflow-hidden flex flex-col min-h-[250px]">
+                            {selectedTab === 'Expenses' ? (
+                                <>
+                                    <table className="w-full text-sm text-left border-collapse">
+                                        <thead className="bg-slate-50 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-200 leading-10">
+                                            <tr>
+                                                <th className="px-4 w-[5%]">#</th>
+                                                <th className="px-4 w-[30%]">Ledger Selection</th>
+                                                <th className="px-4 w-[20%]">Allocation CC</th>
+                                                <th className="px-4 w-[15%] text-right">Net Value</th>
+                                                <th className="px-4 w-[25%]">Memo</th>
+                                            <th className="text-right px-5 py-3">Action</th></tr>
+                                        </thead>
+                                        <tbody>
+                                            {expenses.map((line, idx) => (
+                                                <tr key={idx} className="border-b border-gray-50 text-[12px] font-bold text-gray-700 hover:bg-slate-50/50 transition-colors">
+                                                    <td className="px-4 py-2.5 font-mono text-gray-300">{idx + 1}</td>
+                                                    <td className="px-2 py-2.5">
+                                                        <div className="flex gap-1 items-center">
+                                                            <input 
+                                                                type="text" 
+                                                                readOnly 
+                                                                value={lookups.accounts.find(a => a.code === line.accCode)?.name || ''} 
+                                                                className="flex-1 h-8 border border-gray-300 rounded-[3px] px-2 text-[12px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate" 
+                                                                onClick={() => { setAccIndex(idx); setShowAccModal(true); }}
+                                                                placeholder="Select account"
+                                                            />
+                                                            <button onClick={() => { setAccIndex(idx); setShowAccModal(true); }} className="h-8 w-7 flex items-center justify-center text-gray-400 hover:text-gray-700 bg-transparent border-none cursor-pointer shrink-0">
+                                                                <Search size={14} />
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                    <td className="px-2 py-2.5">
+                                                        <div className="flex gap-1 items-center">
+                                                            <input 
+                                                                type="text" 
+                                                                readOnly 
+                                                                value={lookups.costCenters.find(cc => cc.costCenterCode === line.costCenter)?.costCenterName || ''} 
+                                                                className="flex-1 h-8 border border-gray-300 rounded-[3px] px-2 text-[12px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate" 
+                                                                onClick={() => { setCcSource('line'); setCcIndex(idx); setShowCCModal(true); }}
+                                                                placeholder="Cost center"
+                                                            />
+                                                            <button onClick={() => { setCcSource('line'); setCcIndex(idx); setShowCCModal(true); }} className="h-8 w-7 flex items-center justify-center text-gray-400 hover:text-gray-700 bg-transparent border-none cursor-pointer shrink-0">
+                                                                <Search size={14} />
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                    <td className="px-2 py-2.5">
+                                                        <input 
+                                                            type="text" 
+                                                            className="w-full h-8 border border-gray-300 rounded-[3px] px-2 text-right text-[12px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 font-mono" 
+                                                            value={line.amount} 
+                                                            onChange={(e) => {
+                                                                const newExp = [...expenses];
+                                                                newExp[idx].amount = e.target.value;
+                                                                setExpenses(newExp);
+                                                            }} 
+                                                        />
+                                                    </td>
+                                                    <td className="px-2 py-2.5">
+                                                        <input 
+                                                            type="text" 
+                                                            className="w-full h-8 border border-gray-300 rounded-[3px] px-2 text-[12px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700" 
+                                                            value={line.memo} 
+                                                            onChange={(e) => {
+                                                                const newExp = [...expenses];
+                                                                newExp[idx].memo = e.target.value;
+                                                                setExpenses(newExp);
+                                                            }} 
+                                                            placeholder="Memo"
+                                                        />
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                            {expenses.length === 0 && (
+                                                <tr>
+                                                    <td colSpan="5" className="py-12 text-center text-gray-300 font-black italic text-[11px] uppercase tracking-widest">No expense items added.</td>
+                                                </tr>
+                                            )}
+                                        </tbody>
+                                    </table>
+                                    <div className="mt-auto border-t border-slate-200 bg-slate-50 p-2">
+                                        <button 
+                                            onClick={() => setExpenses([...expenses, { accCode: '', costCenter: '', amount: '0.00', memo: '' }])} 
+                                            className="w-full py-2.5 text-[#0285fd] font-bold text-[10px] uppercase tracking-widest hover:bg-blue-50 transition-all flex items-center justify-center gap-2 border border-dashed border-[#0285fd]/30 rounded-[3px] bg-transparent"
+                                        >
+                                            <Save size={12} /> ADD EXPENSE LINE
+                                        </button>
+                                    </div>
+                                </>
+                            ) : (
+                                <>
+                                    <table className="w-full text-sm text-left border-collapse">
+                                        <thead className="bg-slate-50 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-200 leading-10">
+                                            <tr>
+                                                <th className="px-4 w-[5%]">#</th>
+                                                <th className="px-4 w-[35%]">Item Description</th>
+                                                <th className="px-4 w-[12%] text-center">Qty</th>
+                                                <th className="px-4 w-[15%] text-right">Unit Cost</th>
+                                                <th className="px-4 w-[15%] text-right">Sub Total</th>
+                                                <th className="px-4 w-[18%]">Memo</th>
+                                            <th className="text-right px-5 py-3">Action</th></tr>
+                                        </thead>
+                                        <tbody>
+                                            {items.map((line, idx) => (
+                                                <tr key={idx} className="border-b border-gray-50 text-[12px] font-bold text-gray-700 hover:bg-slate-50/50 transition-colors">
+                                                    <td className="px-4 py-2.5 font-mono text-gray-300">{idx + 1}</td>
+                                                    <td className="px-2 py-2.5">
+                                                        <div className="flex gap-1 items-center">
+                                                            <input 
+                                                                type="text" 
+                                                                readOnly 
+                                                                value={lookups.products.find(p => p.code === line.itemCode)?.prod_Name || ''} 
+                                                                className="flex-1 h-8 border border-gray-300 rounded-[3px] px-2 text-[12px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate" 
+                                                                onClick={() => { setItemIndex(idx); setShowItemModal(true); }}
+                                                                placeholder="Select item"
+                                                            />
+                                                            <button onClick={() => { setItemIndex(idx); setShowItemModal(true); }} className="h-8 w-7 flex items-center justify-center text-gray-400 hover:text-gray-700 bg-transparent border-none cursor-pointer shrink-0">
+                                                                <Search size={14} />
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                    <td className="px-2 py-2.5">
+                                                        <input 
+                                                            type="number" 
+                                                            className="w-full h-8 border border-gray-300 rounded-[3px] px-2 text-center text-[12px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 font-mono" 
+                                                            value={line.qty} 
+                                                            onChange={(e) => {
+                                                                const newItems = [...items];
+                                                                newItems[idx].qty = e.target.value;
+                                                                setItems(newItems);
+                                                            }} 
+                                                        />
+                                                    </td>
+                                                    <td className="px-2 py-2.5">
+                                                        <input 
+                                                            type="text" 
+                                                            className="w-full h-8 border border-gray-300 rounded-[3px] px-2 text-right text-[12px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 font-mono" 
+                                                            value={line.cost} 
+                                                            onChange={(e) => {
+                                                                const newItems = [...items];
+                                                                newItems[idx].cost = e.target.value;
+                                                                setItems(newItems);
+                                                            }} 
+                                                        />
+                                                    </td>
+                                                    <td className="px-4 py-2.5 text-right font-mono font-black text-gray-700 bg-gray-50/30">
+                                                        {((parseFloat(line.cost) || 0) * (parseInt(line.qty) || 0)).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                                    </td>
+                                                    <td className="px-2 py-2.5">
+                                                        <input 
+                                                            type="text" 
+                                                            className="w-full h-8 border border-gray-300 rounded-[3px] px-2 text-[12px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700" 
+                                                            value={line.description} 
+                                                            onChange={(e) => {
+                                                                const newItems = [...items];
+                                                                newItems[idx].description = e.target.value;
+                                                                setItems(newItems);
+                                                            }} 
+                                                            placeholder="Memo"
+                                                        />
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                            {items.length === 0 && (
+                                                <tr>
+                                                    <td colSpan="6" className="py-12 text-center text-gray-300 font-black italic text-[11px] uppercase tracking-widest">No items added.</td>
+                                                </tr>
+                                            )}
+                                        </tbody>
+                                    </table>
+                                    <div className="mt-auto border-t border-slate-200 bg-slate-50 p-2">
+                                        <button 
+                                            onClick={() => setItems([...items, { itemCode: '', description: '', qty: '1', cost: '0.00' }])} 
+                                            className="w-full py-2.5 text-[#0285fd] font-bold text-[10px] uppercase tracking-widest hover:bg-blue-50 transition-all flex items-center justify-center gap-2 border border-dashed border-[#0285fd]/30 rounded-[3px] bg-transparent"
+                                        >
+                                            <Save size={12} /> ADD ITEM LINE
+                                        </button>
+                                    </div>
+                                </>
                             )}
-                        </tbody>
-                    </table>
+                        </div>
+                    </div>
+
+                    {/* Validation Summary */}
+                    <div className="mt-4 bg-white p-3 border border-slate-200 rounded-[3px] flex justify-between items-center">
+                        <div className="flex items-center gap-6">
+                            <div>
+                                <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1 block">Accounting Delta</span>
+                                <span className="text-[18px] font-mono font-black text-slate-800 tracking-tighter">
+                                    {calculateTotal().toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                </span>
+                            </div>
+                            <div className="h-8 w-px bg-slate-200" />
+                            <div className="flex items-center gap-2">
+                                <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-sm shadow-emerald-200"></div>
+                                <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">Entry Validated</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </SimpleModal>
+            </TransactionFormWrapper>
 
-        <CalendarModal 
-            isOpen={showCalendar}
-            onClose={() => setShowCalendar(false)}
-            onDateSelect={handleDateSelect}
-            initialDate={formData.date}
-        />
+            {/* Bank Search Modal */}
+            <SimpleModal isOpen={showBankModal} onClose={() => setShowBankModal(false)} title={`Bank Accounts - ${lookups.banks.length} Found`}>
+                <div className="flex flex-col h-full font-['Tahoma']">
+                    <div className="flex items-center gap-4 bg-slate-50 p-4 border-b border-gray-100 mb-2">
+                        <span className="text-[12px] font-bold text-gray-500 uppercase tracking-wider">Search Facility</span>
+                        <input 
+                            type="text" 
+                            className="w-full h-10 px-4 border border-gray-300 rounded-[3px] outline-none text-sm focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white shadow-sm flex-1" 
+                            value={bankSearch} 
+                            onChange={(e) => setBankSearch(e.target.value)} 
+                            placeholder="Search by name..."
+                        />
+                    </div>
+                    <div className="max-h-[50vh] overflow-y-auto no-scrollbar border border-gray-100 rounded-[5px] shadow-sm">
+                        <table className="w-full text-sm text-left">
+                            <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 z-10 shadow-sm">
+                                <tr>
+                                    <th className="border-b px-5 py-3">Code</th>
+                                    <th className="border-b px-5 py-3">Bank Name</th>
+                                    <th className="border-b text-center w-24 px-5 py-3">Select</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-100">
+                                {lookups.banks.filter(b => b.name.toLowerCase().includes(bankSearch.toLowerCase())).map((b, idx) => (
+                                    <tr key={idx} className="group hover:bg-blue-50/50  transition-all border-b border-gray-50 cursor-pointer group border-b border-gray-50">
+                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{b.code}</td>
+                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{b.name}</td>
+                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">
+                                            <button onClick={() => {
+                                                setFormData({...formData, bankAcc: b.code});
+                                                fetchBankBalance(b.code);
+                                                setShowBankModal(false);
+                                            }} className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </SimpleModal>
 
-        <ConfirmModal 
-            isOpen={showVoidConfirm}
-            onClose={() => setShowVoidConfirm(false)}
-            onConfirm={() => {
-                handleClear();
-                setShowVoidConfirm(false);
-                onClose();
-                showSuccessToast('Document sequence cancelled and cleared.');
-            }}
-            title="Void Transaction Portfolio?"
-            message="This will reset all current entries and discard the pending cheque sequence. This action cannot be reversed within this session."
-            variant="danger"
-            confirmText="Yes, Void Doc"
-        />
+            {/* Cost Center Search Modal */}
+            <SimpleModal isOpen={showCCModal} onClose={() => setShowCCModal(false)} title={`Cost Center Directory - ${lookups.costCenters.length} Found`}>
+                <div className="flex flex-col h-full font-['Tahoma']">
+                    <div className="flex items-center gap-4 bg-slate-50 p-4 border-b border-gray-100 mb-2">
+                        <span className="text-[12px] font-bold text-gray-500 uppercase tracking-wider">Search Facility</span>
+                        <input 
+                            type="text" 
+                            className="w-full h-10 px-4 border border-gray-300 rounded-[3px] outline-none text-sm focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white shadow-sm flex-1" 
+                            value={ccSearch} 
+                            onChange={(e) => setCcSearch(e.target.value)} 
+                        />
+                    </div>
+                    <div className="max-h-[50vh] overflow-y-auto no-scrollbar border border-gray-100 rounded-[5px] shadow-sm">
+                        <table className="w-full text-sm text-left">
+                            <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 z-10 shadow-sm">
+                                <tr>
+                                    <th className="border-b px-5 py-3">Code</th>
+                                    <th className="border-b px-5 py-3">Cost Center</th>
+                                    <th className="border-b text-center w-24 px-5 py-3">Select</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-100">
+                                {lookups.costCenters.filter(c => c.costCenterName.toLowerCase().includes(ccSearch.toLowerCase())).map((c, idx) => (
+                                    <tr key={idx} className="group hover:bg-blue-50/50  transition-all border-b border-gray-50 cursor-pointer group border-b border-gray-50">
+                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{c.costCenterCode}</td>
+                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{c.costCenterName}</td>
+                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">
+                                            <button onClick={() => {
+                                                if (ccSource === 'header') {
+                                                    setFormData({...formData, costCenter: c.costCenterCode});
+                                                } else {
+                                                    const newExp = [...expenses];
+                                                    newExp[ccIndex].costCenter = c.costCenterCode;
+                                                    setExpenses(newExp);
+                                                }
+                                                setShowCCModal(false);
+                                            }} className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </SimpleModal>
+
+            {/* Endorsement Modal */}
+            <SimpleModal isOpen={showEndorsementModal} onClose={() => setShowEndorsementModal(false)} title="Select Crossing Type" maxWidth="max-w-[700px]">
+                <div className="flex flex-col h-full font-['Tahoma']">
+                    <div className="max-h-[50vh] overflow-y-auto no-scrollbar border border-gray-100 rounded-[5px] shadow-sm">
+                        <table className="w-full text-sm text-left">
+                            <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 z-10 shadow-sm">
+                                <tr>
+                                    <th className="border-b px-5 py-3">ID</th>
+                                    <th className="border-b px-5 py-3">Endorsement Type</th>
+                                    <th className="border-b text-center w-24 px-5 py-3">Select</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-100">
+                                {lookups.endorsements.map((type, idx) => (
+                                    <tr key={idx} className="group hover:bg-blue-50/50  transition-all border-b border-gray-50 cursor-pointer group border-b border-gray-50">
+                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{idx + 1}</td>
+                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{type}</td>
+                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">
+                                            <button onClick={() => {
+                                                setFormData(prev => ({ ...prev, endorsement: type }));
+                                                setShowEndorsementModal(false);
+                                            }} className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </SimpleModal>
+
+            {/* Account Search Modal */}
+            <SimpleModal isOpen={showAccModal} onClose={() => setShowAccModal(false)} title={`Ledger Accounts - ${lookups.accounts.length} Found`}>
+                <div className="flex flex-col h-full font-['Tahoma']">
+                    <div className="flex items-center gap-4 bg-slate-50 p-4 border-b border-gray-100 mb-2">
+                        <span className="text-[12px] font-bold text-gray-500 uppercase tracking-wider">Search Facility</span>
+                        <input 
+                            type="text" 
+                            className="w-full h-10 px-4 border border-gray-300 rounded-[3px] outline-none text-sm focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white shadow-sm flex-1" 
+                            value={accSearch} 
+                            onChange={(e) => setAccSearch(e.target.value)} 
+                            placeholder="Filter accounts..."
+                        />
+                    </div>
+                    <div className="max-h-[50vh] overflow-y-auto no-scrollbar border border-gray-100 rounded-[5px] shadow-sm">
+                        <table className="w-full text-sm text-left">
+                            <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 z-10 shadow-sm">
+                                <tr>
+                                    <th className="border-b px-5 py-3">Code</th>
+                                    <th className="border-b px-5 py-3">Account Name</th>
+                                    <th className="border-b text-center w-24 px-5 py-3">Select</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-100">
+                                {lookups.accounts.filter(a => a.name.toLowerCase().includes(accSearch.toLowerCase()) || a.code.includes(accSearch)).map((a, idx) => (
+                                    <tr key={idx} className="group hover:bg-blue-50/50  transition-all border-b border-gray-50 cursor-pointer group border-b border-gray-50">
+                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{a.code}</td>
+                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{a.name}</td>
+                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">
+                                            <button onClick={() => {
+                                                const newExp = [...expenses];
+                                                newExp[accIndex].accCode = a.code;
+                                                setExpenses(newExp);
+                                                setShowAccModal(false);
+                                            }} className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </SimpleModal>
+
+            {/* Item Search Modal */}
+            <SimpleModal isOpen={showItemModal} onClose={() => setShowItemModal(false)} title={`Inventory Products - ${lookups.products.length} Found`}>
+                <div className="flex flex-col h-full font-['Tahoma']">
+                    <div className="flex items-center gap-4 bg-slate-50 p-4 border-b border-gray-100 mb-2">
+                        <span className="text-[12px] font-bold text-gray-500 uppercase tracking-wider">Search Facility</span>
+                        <input 
+                            type="text" 
+                            className="w-full h-10 px-4 border border-gray-300 rounded-[3px] outline-none text-sm focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white shadow-sm flex-1" 
+                            value={itemSearch} 
+                            onChange={(e) => setItemSearch(e.target.value)} 
+                            placeholder="Search products..."
+                        />
+                    </div>
+                    <div className="max-h-[50vh] overflow-y-auto no-scrollbar border border-gray-100 rounded-[5px] shadow-sm">
+                        <table className="w-full text-sm text-left">
+                            <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 z-10 shadow-sm">
+                                <tr>
+                                    <th className="border-b px-5 py-3">Code</th>
+                                    <th className="border-b px-5 py-3">Product Name</th>
+                                    <th className="border-b text-center w-24 px-5 py-3">Select</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-100">
+                                {lookups.products.filter(p => p.prod_Name.toLowerCase().includes(itemSearch.toLowerCase()) || p.code.includes(itemSearch)).map((p, idx) => (
+                                    <tr key={idx} className="group hover:bg-blue-50/50  transition-all border-b border-gray-50 cursor-pointer group border-b border-gray-50">
+                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{p.code}</td>
+                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{p.prod_Name}</td>
+                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">
+                                            <button onClick={() => {
+                                                const newItems = [...items];
+                                                newItems[itemIndex].itemCode = p.code;
+                                                newItems[itemIndex].description = p.prod_Name;
+                                                setItems(newItems);
+                                                setShowItemModal(false);
+                                            }} className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </SimpleModal>
+
+            {/* Payee Search Modal */}
+            <SimpleModal isOpen={showPayeeModal} onClose={() => setShowPayeeModal(false)} title={`Payee Records - ${lookups.customers.length} Found`}>
+                <div className="flex flex-col h-full font-['Tahoma']">
+                    <div className="flex items-center gap-4 bg-slate-50 p-4 border-b border-gray-100 mb-2">
+                        <span className="text-[12px] font-bold text-gray-500 uppercase tracking-wider">Search Facility</span>
+                        <input 
+                            type="text" 
+                            className="w-full h-10 px-4 border border-gray-300 rounded-[3px] outline-none text-sm focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white shadow-sm flex-1" 
+                            value={formData.payeeName}
+                            onChange={(e) => setFormData({...formData, payeeName: e.target.value})} 
+                            placeholder="Search payees..."
+                        />
+                    </div>
+                    <div className="max-h-[50vh] overflow-y-auto no-scrollbar border border-gray-100 rounded-[5px] shadow-sm">
+                        <table className="w-full text-sm text-left">
+                            <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 z-10 shadow-sm">
+                                <tr>
+                                    <th className="border-b px-5 py-3">Code</th>
+                                    <th className="border-b px-5 py-3">Payee Name</th>
+                                    <th className="border-b text-center w-24 px-5 py-3">Select</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-100">
+                                {lookups.customers.filter(c => c.name.toLowerCase().includes((formData.payeeName || '').toLowerCase())).map((c, idx) => (
+                                    <tr key={idx} className="group hover:bg-blue-50/50  transition-all border-b border-gray-50 cursor-pointer group border-b border-gray-50">
+                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{c.code}</td>
+                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{c.name}</td>
+                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">
+                                            <button onClick={() => {
+                                                setFormData({...formData, payeeId: c.code, payeeName: c.name});
+                                                setShowPayeeModal(false);
+                                            }} className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </SimpleModal>
+
+            {/* Vendor Search Modal */}
+            <SimpleModal isOpen={showVendorModal} onClose={() => setShowVendorModal(false)} title={`Supplier / Vendor - ${lookups.vendors.length} Found`}>
+                <div className="flex flex-col h-full font-['Tahoma']">
+                    <div className="flex items-center gap-4 bg-slate-50 p-4 border-b border-gray-100 mb-2">
+                        <span className="text-[12px] font-bold text-gray-500 uppercase tracking-wider">Search Facility</span>
+                        <input 
+                            type="text" 
+                            className="w-full h-10 px-4 border border-gray-300 rounded-[3px] outline-none text-sm focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white shadow-sm flex-1" 
+                            value={docSearchQuery}
+                            onChange={(e) => setDocSearchQuery(e.target.value)} 
+                            placeholder="Search vendors..."
+                        />
+                    </div>
+                    <div className="max-h-[50vh] overflow-y-auto no-scrollbar border border-gray-100 rounded-[5px] shadow-sm">
+                        <table className="w-full text-sm text-left">
+                            <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 z-10 shadow-sm">
+                                <tr>
+                                    <th className="border-b px-5 py-3">Code</th>
+                                    <th className="border-b px-5 py-3">Supplier Name</th>
+                                    <th className="border-b text-center w-24 px-5 py-3">Select</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-100">
+                                {lookups.vendors.filter(v => 
+                                    (v.name?.toLowerCase() || '').includes(docSearchQuery.toLowerCase()) || 
+                                    (v.id?.toLowerCase() || '').includes(docSearchQuery.toLowerCase())
+                                ).map((v, idx) => (
+                                    <tr key={idx} className="group hover:bg-blue-50/50  transition-all border-b border-gray-50 cursor-pointer group border-b border-gray-50">
+                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{v.id}</td>
+                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{v.name}</td>
+                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">
+                                            <button onClick={() => {
+                                                setFormData({...formData, payeeId: v.id, payeeName: v.name, address: v.address});
+                                                setShowVendorModal(false);
+                                            }} className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </SimpleModal>
+
+            {/* Search Saved Cheques Modal */}
+            <SimpleModal isOpen={showSearchModal} onClose={() => setShowSearchModal(false)} title={`Saved Cheques - ${savedDocs.length} Found`} maxWidth="max-w-[700px]">
+                <div className="flex flex-col h-full font-['Tahoma']">
+                    <div className="flex items-center gap-4 bg-slate-50 p-4 border-b border-gray-100 mb-2">
+                        <span className="text-[12px] font-bold text-gray-500 uppercase tracking-wider">Search Document / Payee</span>
+                        <input 
+                            type="text" 
+                            className="w-full h-10 px-4 border border-gray-300 rounded-[3px] outline-none text-sm focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white shadow-sm flex-1" 
+                            value={docSearchQuery} 
+                            onChange={(e) => setDocSearchQuery(e.target.value)} 
+                            placeholder="Enter Doc No or Payee..."
+                        />
+                    </div>
+                    <div className="max-h-[50vh] overflow-y-auto no-scrollbar border border-gray-100 rounded-[5px] shadow-sm">
+                        <table className="w-full text-sm text-left">
+                            <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 z-10 shadow-sm">
+                                <tr>
+                                    <th className="border-b px-5 py-3">Doc No</th>
+                                    <th className="border-b px-5 py-3">Date</th>
+                                    <th className="border-b px-5 py-3">Payee</th>
+                                    <th className="border-b px-5 py-3">Bank</th>
+                                    <th className="border-b text-right px-5 py-3">Amount</th>
+                                    <th className="border-b text-center w-24 px-5 py-3">Select</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-100">
+                                {savedDocs.filter(d => 
+                                    (d.docNo?.toLowerCase() || '').includes(docSearchQuery.toLowerCase()) || 
+                                    (d.payee?.toLowerCase() || '').includes(docSearchQuery.toLowerCase())
+                                ).map((d, idx) => (
+                                    <tr key={idx} className="group hover:bg-blue-50/50  transition-all border-b border-gray-50 cursor-pointer group border-b border-gray-50">
+                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{d.docNo}</td>
+                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{new Date(d.date).toLocaleDateString('en-GB')}</td>
+                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{d.payee}</td>
+                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{d.bankCode}</td>
+                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{d.amount?.toLocaleString('en-US', {minimumFractionDigits:2})}</td>
+                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">
+                                            <button onClick={() => handleLoadDoc(d.docNo)} className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button>
+                                        </td>
+                                    </tr>
+                                ))}
+                                {savedDocs.length === 0 && (
+                                    <tr>
+                                        <td colSpan="6" className="text-center py-16 text-gray-400 text-[11px] font-bold uppercase tracking-widest">No saved documents found.</td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </SimpleModal>
+
+            <CalendarModal 
+                isOpen={showCalendar}
+                onClose={() => setShowCalendar(false)}
+                onDateSelect={handleDateSelect}
+                initialDate={formData.date}
+            />
+
+            <ConfirmModal 
+                isOpen={showVoidConfirm}
+                onClose={() => setShowVoidConfirm(false)}
+                onConfirm={() => {
+                    handleClear();
+                    setShowVoidConfirm(false);
+                    onClose();
+                    showSuccessToast('Document sequence cancelled and cleared.');
+                }}
+                title="Void Transaction Portfolio?"
+                message="This will reset all current entries and discard the pending cheque sequence. This action cannot be reversed within this session."
+                variant="danger"
+                confirmText="Yes, Void Doc"
+            />
         </>
     );
 };

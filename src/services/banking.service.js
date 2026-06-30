@@ -246,18 +246,20 @@ export const bankingService = {
         }
     },
 
-    generateReconDocNo: async (companyCode = getCompanyCode()) => {
+    generateReconDocNo: async (companyCode) => {
         try {
-            const resp = await api.get(`bankreconciliation/gen-docno?companyCode=${companyCode}`);
+            const code = companyCode || getCompanyCode();
+            const resp = await api.get(`bankreconciliation/gen-docno?companyCode=${code}`);
             return resp.data;
         } catch (error) {
             return { docNo: 'BRC000000001' };
         }
     },
 
-    initializeReconTemp: async (tempDocNo, companyCode = getCompanyCode()) => {
+    initializeReconTemp: async (tempDocNo, companyCode) => {
         try {
-            const resp = await api.get(`bankreconciliation/init-temp?tempDocNo=${tempDocNo}&companyCode=${companyCode}`);
+            const code = companyCode || getCompanyCode();
+            const resp = await api.get(`bankreconciliation/init-temp?tempDocNo=${tempDocNo}&companyCode=${code}`);
             return resp.data;
         } catch (error) {
             return null;

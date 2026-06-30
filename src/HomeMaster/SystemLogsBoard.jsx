@@ -86,7 +86,7 @@ const SystemLogsBoard = () => {
                             link.click();
                             document.body.removeChild(link);
                         }}
-                        className="px-4 py-2.5 bg-white border border-slate-200 hover:border-[#00acee] hover:text-[#00acee] text-slate-600 text-xs font-bold uppercase tracking-wider rounded-xl shadow-sm transition-all flex items-center gap-2"
+                        className="px-4 py-2.5 bg-white border border-slate-200 hover:border-[#00acee] hover:text-[#00acee] text-slate-600 text-xs font-bold uppercase tracking-wider rounded-[3px] shadow-sm transition-all flex items-center gap-2"
                     >
                         <Download size={14} />
                         Export CSV
@@ -94,7 +94,7 @@ const SystemLogsBoard = () => {
                     <button 
                         onClick={fetchLogs}
                         disabled={loading}
-                        className="px-5 py-2.5 bg-[#00acee] hover:bg-[#009adb] text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-md transition-all active:scale-95 flex items-center gap-2 disabled:opacity-70"
+                        className="px-5 py-2.5 bg-[#00acee] hover:bg-[#009adb] text-white text-xs font-bold uppercase tracking-wider rounded-[3px] shadow-md transition-all active:scale-95 flex items-center gap-2 disabled:opacity-70"
                     >
                         {loading ? <Loader2 size={14} className="animate-spin" /> : null}
                         Refresh Logs
@@ -111,7 +111,7 @@ const SystemLogsBoard = () => {
                             placeholder="Search user, action, or IP..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full pl-9 pr-4 py-2 border border-slate-200 bg-white rounded-xl text-sm outline-none focus:border-[#00acee] focus:ring-1 focus:ring-[#00acee] transition-all"
+                            className="w-full pl-9 pr-4 py-2 border border-slate-200 bg-white rounded-[3px] text-sm outline-none focus:border-[#00acee] focus:ring-1 focus:ring-[#00acee] transition-all"
                         />
                     </div>
                     <div className="flex items-center gap-2 w-full sm:w-auto">
@@ -119,7 +119,7 @@ const SystemLogsBoard = () => {
                         <select 
                             value={statusFilter}
                             onChange={(e) => setStatusFilter(e.target.value)}
-                            className="w-full sm:w-auto px-4 py-2 bg-white border border-slate-200 text-slate-600 text-sm font-bold rounded-xl outline-none focus:border-[#00acee] cursor-pointer"
+                            className="w-full sm:w-auto px-4 py-2 bg-white border border-slate-200 text-slate-600 text-sm font-bold rounded-[3px] outline-none focus:border-[#00acee] cursor-pointer"
                         >
                             <option value="All">All Statuses</option>
                             <option value="Success">Success</option>
@@ -173,7 +173,7 @@ const SystemLogsBoard = () => {
                                         </td>
                                         <td className="py-3 px-6">
                                             <div className="flex justify-center">
-                                                <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full border text-[10px] font-bold uppercase tracking-wider ${getStatusStyle(log.status)}`}>
+                                                <div className={`flex items-center gap-1.5 px-3 py-1 rounded-[3px] border text-[10px] font-bold uppercase tracking-wider ${getStatusStyle(log.status)}`}>
                                                     {getStatusIcon(log.status)}
                                                     {log.status || 'Success'}
                                                 </div>

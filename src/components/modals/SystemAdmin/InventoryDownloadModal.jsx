@@ -43,19 +43,19 @@ const LookupSearchModal = ({ isOpen, onClose, onSelect, title, data, searchPlace
             isOpen={isOpen}
             onClose={onClose}
             title={title.toUpperCase()}
-            maxWidth="max-w-2xl"
+            maxWidth="max-w-[700px]"
             showHeaderClose={true}
         >
             <div className="p-2 space-y-6 font-['Tahoma']">
                 {/* Global Search Container */}
-                <div className="bg-slate-50/80 p-5 rounded-[5px] border border-gray-100 flex items-center gap-6 shadow-sm">
+                <div className="bg-slate-50/80 p-5 rounded-[3px] border border-gray-200 flex items-center gap-6 shadow-sm">
                     <label className="text-[11px] font-black text-slate-500 uppercase tracking-[0.15em] shrink-0">{searchTitle || 'Global Search'}</label>
                     <div className="relative flex-1">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
                         <input
                             type="text"
                             placeholder={searchPlaceholder}
-                            className="w-full h-10 pl-10 pr-4 bg-white border border-gray-200 rounded-lg outline-none focus:border-[#0285fd] focus:ring-4 focus:ring-blue-50 transition-all text-[13px] font-bold text-slate-700 shadow-sm"
+                            className="w-full h-10 pl-10 pr-4 border border-gray-300 rounded-[3px] outline-none text-[13px] focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] shadow-sm bg-white"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                             autoFocus
@@ -64,8 +64,8 @@ const LookupSearchModal = ({ isOpen, onClose, onSelect, title, data, searchPlace
                 </div>
 
                 {/* Data Table */}
-                <div className="border border-gray-100 rounded-[5px] overflow-hidden shadow-lg bg-white">
-                    <div className="bg-slate-50/80 px-6 py-2.5 flex items-center gap-4 border-b border-gray-100">
+                <div className="border border-gray-200 rounded-[3px] overflow-hidden shadow-lg bg-white">
+                    <div className="flex items-center gap-4 bg-slate-50 p-4 border-b border-gray-100 mb-2">
                         <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest w-40">{idLabel}</span>
                         <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex-1">{nameLabel}</span>
                         <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest w-32 text-center">Select</span>
@@ -86,7 +86,7 @@ const LookupSearchModal = ({ isOpen, onClose, onSelect, title, data, searchPlace
                                                 onSelect(item);
                                                 onClose();
                                             }}
-                                            className="px-4 h-7 bg-[#e49e1b] text-white text-[9px] font-black rounded-[5px] flex items-center gap-2 shadow-sm hover:bg-[#cb9b34] transition-all active:scale-95 uppercase tracking-widest"
+                                            className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase"
                                         >
                                          SELECT
                                         </button>
@@ -219,17 +219,17 @@ const InventoryDownloadModal = ({ isOpen, onClose }) => {
                 isOpen={isOpen}
                 onClose={onClose}
                 title="Inventory Data Download"
-                maxWidth="max-w-[1000px]"
+                maxWidth="max-w-[700px]"
                 showHeaderClose={true}
                 footer={
                     <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-slate-200 rounded-b-xl">
                         <div className="flex gap-3">
-                            <button onClick={handleClear} disabled={loading} className="px-6 py-3 bg-[#00adff] hover:bg-[#0099e6] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] transition-all active:scale-95 flex items-center justify-center gap-2 border-none">
+                            <button onClick={handleClear} disabled={loading} className="px-6 py-3 bg-white text-[#00adff] border-2 border-[#00adff] hover:bg-blue-50 font-mono font-bold text-sm uppercase tracking-widest rounded-[3px] transition-all active:scale-95 flex items-center justify-center gap-2 border-none">
                                 <RotateCcw size={14} /> CLEAR
                             </button>
                         </div>
                         <div className="flex gap-3">
-                            <button onClick={handleSave} disabled={loading} className={`px-6 py-3 bg-[#2bb744] hover:bg-[#259b3a] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] shadow-md shadow-green-100 transition-all active:scale-95 flex items-center justify-center gap-2 border-none ${loading ? 'opacity-50' : ''}`}>
+                            <button onClick={handleSave} disabled={loading} className={`px-6 py-3 bg-white text-[#2bb744] border-2 border-[#2bb744] hover:bg-green-50 font-mono font-bold text-sm uppercase tracking-widest rounded-[3px] shadow-md shadow-green-100 transition-all active:scale-95 flex items-center justify-center gap-2 border-none ${loading ? 'opacity-50' : ''}`}>
                                 <CheckCircle size={14} /> SAVE & APPLY
                             </button>
                         </div>
@@ -238,7 +238,7 @@ const InventoryDownloadModal = ({ isOpen, onClose }) => {
             >
                 <div className="flex flex-col space-y-4 font-['Tahoma'] relative min-h-[550px]">
                     {loading && (
-                        <div className="absolute inset-0 bg-white/60 backdrop-blur-[2px] z-[60] flex flex-col items-center justify-center rounded-lg animate-in fade-in duration-300">
+                        <div className="absolute inset-0 bg-white/60 backdrop-blur-[2px] z-[60] flex flex-col items-center justify-center rounded-[3px] animate-in fade-in duration-300">
                             <div className="w-24 h-24">
                                 <DotLottiePlayer src="/lottiefile/Loading animation blue.lottie" autoplay loop />
                             </div>
@@ -265,7 +265,7 @@ const InventoryDownloadModal = ({ isOpen, onClose }) => {
                     </div>
 
                     {/* Filters Section - Mirroring PO Board Container Styles */}
-                    <div className="bg-slate-50/50 p-4 border border-slate-200 rounded-[5px] relative overflow-hidden space-y-4">
+                    <div className="bg-slate-50/50 p-4 border border-slate-200 rounded-[3px] relative overflow-hidden space-y-4">
                         <div className="grid grid-cols-12 gap-x-6 gap-y-3.5 relative z-10">
                             
                             {/* Date From - Column 1 */}
@@ -276,10 +276,10 @@ const InventoryDownloadModal = ({ isOpen, onClose }) => {
                                         type="text"
                                         readOnly
                                         value={dateFrom}
-                                        className="flex-1 min-w-0 h-8 border border-slate-200 rounded-[5px] px-3 text-[12px] outline-none bg-white text-gray-700 font-bold cursor-pointer shadow-sm focus:border-[#0285fd]"
+                                        className="flex-1 min-w-0 h-8 border border-slate-200 rounded-[3px] px-3 text-[12px] outline-none bg-white text-gray-700 font-bold cursor-pointer shadow-sm focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd]"
                                         onClick={() => openCalendar('from')}
                                     />
-                                    <button onClick={() => openCalendar('from')} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
+                                    <button onClick={() => openCalendar('from')} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0">
                                         <CalendarIcon size={16} />
                                     </button>
                                 </div>
@@ -293,10 +293,10 @@ const InventoryDownloadModal = ({ isOpen, onClose }) => {
                                         type="text"
                                         readOnly
                                         value={dateTo}
-                                        className="flex-1 min-w-0 h-8 border border-slate-200 rounded-[5px] px-3 text-[12px] outline-none bg-white text-gray-700 font-bold cursor-pointer shadow-sm focus:border-[#0285fd]"
+                                        className="flex-1 min-w-0 h-8 border border-slate-200 rounded-[3px] px-3 text-[12px] outline-none bg-white text-gray-700 font-bold cursor-pointer shadow-sm focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd]"
                                         onClick={() => openCalendar('to')}
                                     />
-                                    <button onClick={() => openCalendar('to')} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
+                                    <button onClick={() => openCalendar('to')} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0">
                                         <CalendarIcon size={16} />
                                     </button>
                                 </div>
@@ -310,10 +310,10 @@ const InventoryDownloadModal = ({ isOpen, onClose }) => {
                                         type="text"
                                         readOnly
                                         value={selectedLocation.code ? `${selectedLocation.code} - ${selectedLocation.name}` : ''}
-                                        className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-bold text-blue-600 bg-gray-50 rounded-[5px] outline-none shadow-sm cursor-pointer truncate"
+                                        className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-bold text-blue-600 bg-gray-50 rounded-[3px] outline-none shadow-sm cursor-pointer truncate"
                                         onClick={() => setShowLocationSearch(true)}
                                     />
-                                    <button onClick={() => setShowLocationSearch(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
+                                    <button onClick={() => setShowLocationSearch(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0">
                                         <Search size={16} />
                                     </button>
                                 </div>
@@ -322,20 +322,20 @@ const InventoryDownloadModal = ({ isOpen, onClose }) => {
                             {/* Secondary Location/Detail Row */}
                             <div className="col-span-8 flex items-center gap-2">
                                 <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Sub Branch</label>
-                                <div className="flex-1 h-8 border border-slate-200 rounded-[5px] bg-slate-50 flex items-center px-3 cursor-not-allowed">
+                                <div className="flex-1 h-8 border border-slate-200 rounded-[3px] bg-slate-50 flex items-center px-3 cursor-not-allowed">
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     {/* Data Grid Area - Mirroring PO Board Table Styles */}
-                    <div className="flex-1 border border-gray-100 rounded-lg bg-white shadow-sm flex flex-col min-h-[300px] overflow-hidden">
+                    <div className="flex-1 border border-gray-200 rounded-[3px] bg-white shadow-sm flex flex-col min-h-[300px] overflow-hidden">
                         {/* Table header */}
-                        <div className="flex bg-slate-50/80 border-b border-gray-100 text-[10px] font-black text-gray-400 uppercase tracking-widest items-center">
-                            <div className="w-12 py-2.5 text-center border-r border-gray-100">#</div>
-                            <div className="w-36 py-2.5 px-4 border-r border-gray-100">Document No</div>
-                            <div className="w-32 py-2.5 px-4 border-r border-gray-100">Sync Date</div>
-                            <div className="flex-1 py-2.5 px-4 border-r border-gray-100">Transactional Description</div>
+                        <div className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 shadow-sm z-10">
+                            <div className="w-12 py-2.5 text-center border-r border-gray-200">#</div>
+                            <div className="w-36 py-2.5 px-4 border-r border-gray-200">Document No</div>
+                            <div className="w-32 py-2.5 px-4 border-r border-gray-200">Sync Date</div>
+                            <div className="flex-1 py-2.5 px-4 border-r border-gray-200">Transactional Description</div>
                             <div className="w-40 py-2.5 px-4 text-right">Settled Amount</div>
                         </div>
                         
@@ -347,7 +347,7 @@ const InventoryDownloadModal = ({ isOpen, onClose }) => {
                                 </div>
                             ) : (
                                 items.map((item, idx) => (
-                                    <div key={idx} className="flex border-b border-gray-100 h-8 items-center text-[11px] font-bold text-slate-700 hover:bg-blue-50/30 transition-colors group">
+                                    <div key={idx} className="flex border-b border-gray-200 h-8 items-center text-[11px] font-bold text-slate-700 hover:bg-blue-50/50/30 transition-all group cursor-pointer group border-b border-gray-50">
                                         <div className="w-12 text-center text-slate-400 font-mono border-r border-gray-50">{idx + 1}</div>
                                         {/* Grid cells would go here */}
                                     </div>
@@ -364,12 +364,12 @@ const InventoryDownloadModal = ({ isOpen, onClose }) => {
                                 id="selectAll"
                                 checked={selectAll}
                                 onChange={(e) => setSelectAll(e.target.checked)}
-                                className="w-4 h-4 rounded-[5px] border-gray-300 text-[#0285fd] focus:ring-[#0285fd] transition-all cursor-pointer" 
+                                className="w-4 h-4 rounded-[3px] border-gray-300 text-[#0285fd] focus:ring-[#0285fd] transition-all cursor-pointer" 
                             />
                             <label htmlFor="selectAll" className="text-[12px] font-bold text-slate-600 uppercase cursor-pointer select-none">Global Selection Toggle</label>
                         </div>
 
-                        <div className="grid grid-cols-12 gap-x-6 items-end bg-slate-50/30 p-3 rounded-lg border border-gray-50">
+                        <div className="grid grid-cols-12 gap-x-6 items-end bg-slate-50/30 p-3 rounded-[3px] border border-gray-50">
                             {/* Cost Center */}
                             <div className="col-span-4 flex flex-col gap-1">
                                 <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest">Cost Center Allocation</label>
@@ -378,10 +378,10 @@ const InventoryDownloadModal = ({ isOpen, onClose }) => {
                                         type="text"
                                         readOnly
                                         value={selectedCostCenter.code ? `${selectedCostCenter.code} - ${selectedCostCenter.name}` : ''}
-                                        className="flex-1 border border-gray-300 rounded-[5px] px-3 text-[12px] font-bold text-red-600 bg-gray-50 outline-none shadow-sm cursor-pointer truncate"
+                                        className="flex-1 border border-gray-300 rounded-[3px] px-3 text-[12px] font-bold text-red-600 bg-gray-50 outline-none shadow-sm cursor-pointer truncate"
                                         onClick={() => setShowCostCenterSearch(true)}
                                     />
-                                    <button onClick={() => setShowCostCenterSearch(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
+                                    <button onClick={() => setShowCostCenterSearch(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0">
                                         <Search size={14} />
                                     </button>
                                 </div>
@@ -394,7 +394,7 @@ const InventoryDownloadModal = ({ isOpen, onClose }) => {
                                     type="text" 
                                     readOnly
                                     value={totals.amount.toFixed(2)}
-                                    className="h-8 border border-gray-300 rounded-[5px] bg-white px-3 text-right text-[13px] font-mono font-bold text-slate-900 shadow-inner"
+                                    className="h-8 border border-gray-300 rounded-[3px] bg-white px-3 text-right text-[13px] font-mono font-bold text-slate-900 shadow-inner"
                                 />
                             </div>
 
@@ -405,7 +405,7 @@ const InventoryDownloadModal = ({ isOpen, onClose }) => {
                                     type="text" 
                                     readOnly
                                     value={totals.transfer.toFixed(2)}
-                                    className="h-8 border border-gray-300 rounded-[5px] bg-white px-3 text-right text-[13px] font-mono font-bold text-slate-900 shadow-inner"
+                                    className="h-8 border border-gray-300 rounded-[3px] bg-white px-3 text-right text-[13px] font-mono font-bold text-slate-900 shadow-inner"
                                 />
                             </div>
 
@@ -416,7 +416,7 @@ const InventoryDownloadModal = ({ isOpen, onClose }) => {
                                     type="text" 
                                     readOnly
                                     value={totals.balance.toFixed(2)}
-                                    className="h-8 border border-gray-300 rounded-[5px] bg-white px-3 text-right text-[13px] font-mono font-bold text-[#2bb744] shadow-inner"
+                                    className="h-8 border border-gray-300 rounded-[3px] bg-white px-3 text-right text-[13px] font-mono font-bold text-[#2bb744] shadow-inner"
                                 />
                             </div>
                         </div>

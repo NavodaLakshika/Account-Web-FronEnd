@@ -123,17 +123,17 @@ const ChequeRegisterBoard = ({ isOpen, onClose }) => {
     );
 
     const footer = (
-        <div className="bg-slate-50 px-6 py-4 w-full flex justify-end gap-3 border-t border-gray-100 mt-2 rounded-b-xl">
+        <div className="bg-slate-50 px-6 py-4 w-full flex justify-end gap-3 border-t border-gray-200 mt-2 rounded-b-xl">
             <button 
                 onClick={handleSave}
                 disabled={loading}
-                className="px-8 h-10 bg-[#2bb744] text-white text-sm font-black rounded-[5px] shadow-md shadow-green-100 hover:bg-[#259b3a] transition-all active:scale-95 flex items-center justify-center gap-2 uppercase tracking-tight"
+                className="px-8 h-10 bg-white text-[#2bb744] border-2 border-[#2bb744] hover:bg-green-50 text-sm font-black rounded-[3px] shadow-md shadow-green-100 hover:bg-[#259b3a] transition-all active:scale-95 flex items-center justify-center gap-2 uppercase tracking-tight"
             >
                 {loading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />} SAVE 
             </button>
             <button 
                 onClick={handleClear}
-                className="px-8 h-10 bg-[#00adff] text-white text-sm font-black rounded-[5px] hover:bg-[#0099e6] transition-all active:scale-95 flex items-center justify-center gap-2 border-none uppercase tracking-tight"
+                className="px-8 h-10 bg-white text-[#00adff] border-2 border-[#00adff] hover:bg-blue-50 text-sm font-black rounded-[3px] hover:bg-[#0099e6] transition-all active:scale-95 flex items-center justify-center gap-2 border-none uppercase tracking-tight"
             >
                 <RotateCcw size={14} /> CLEAR 
             </button>
@@ -150,7 +150,7 @@ const ChequeRegisterBoard = ({ isOpen, onClose }) => {
                 footer={footer}
             >
                 <div className="space-y-4 pt-1 font-['Tahoma',_sans-serif]">
-                    <div className="border-b border-gray-100 pb-2 flex items-center justify-center">
+                    <div className="border-b border-gray-200 pb-2 flex items-center justify-center">
                         <h2 className="text-[17px] font-mono font-bold text-black uppercase tracking-tight text-center">Enter New Cheque Book Configuration</h2>
                     </div>
 
@@ -166,9 +166,9 @@ const ChequeRegisterBoard = ({ isOpen, onClose }) => {
                                     readOnly 
                                     value={formData.accCode ? `${formData.accCode} - ${formData.accName}` : ''}
                                     onClick={() => setShowAccountSearch(true)}
-                                    className="flex-1 h-9 border border-gray-300 rounded-[5px] px-3 font-mono font-bold text-slate-800 text-[12.5px] outline-none shadow-sm bg-gray-50 cursor-pointer" 
+                                    className="flex-1 h-9 border border-gray-300 rounded-[3px] px-3 font-mono font-bold text-slate-800 text-[12.5px] outline-none shadow-sm bg-gray-50 cursor-pointer" 
                                 />
-                                <button onClick={() => setShowAccountSearch(true)} className="w-10 h-9 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
+                                <button onClick={() => setShowAccountSearch(true)} className="w-10 h-9 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0">
                                     <Search size={16} />
                                 </button>
                             </div>
@@ -182,7 +182,7 @@ const ChequeRegisterBoard = ({ isOpen, onClose }) => {
                                     type="text" 
                                     readOnly
                                     value={formData.bookNo}
-                                    className="w-full h-9 border border-gray-300 rounded-[5px] px-3 font-mono font-black text-[#0285fd] text-[13px] outline-none shadow-sm bg-gray-50" 
+                                    className="w-full h-9 border border-gray-300 rounded-[3px] px-3 font-mono font-black text-[#0285fd] text-[13px] outline-none shadow-sm bg-gray-50" 
                                 />
                             </div>
                         </div>
@@ -195,9 +195,9 @@ const ChequeRegisterBoard = ({ isOpen, onClose }) => {
                                     type="text" 
                                     readOnly 
                                     value={formData.date}
-                                    className="flex-1 h-9 border border-gray-300 rounded-[5px] px-3 font-mono font-bold text-slate-800 text-[12.5px] outline-none bg-gray-50/50 shadow-sm" 
+                                    className="flex-1 h-9 border border-gray-300 rounded-[3px] px-3 font-mono font-bold text-slate-800 text-[12.5px] outline-none bg-gray-50/50 shadow-sm" 
                                 />
-                                <button onClick={() => setCalendar({ isOpen: true, target: 'date' })} className="w-10 h-9 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-sm active:scale-90 shrink-0">
+                                <button onClick={() => setCalendar({ isOpen: true, target: 'date' })} className="w-10 h-9 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-sm active:scale-90 shrink-0">
                                     <Calendar size={15} />
                                 </button>
                             </div>
@@ -211,7 +211,7 @@ const ChequeRegisterBoard = ({ isOpen, onClose }) => {
                                     type="number" 
                                     value={formData.startNo}
                                     onChange={e => setFormData({ ...formData, startNo: e.target.value })}
-                                    className="w-full h-9 border border-gray-300 rounded-[5px] px-3 font-mono font-black text-[#0285fd] text-[13px] outline-none shadow-sm bg-white focus:border-slate-400" 
+                                    className="w-full h-9 border border-gray-300 rounded-[3px] px-3 font-mono font-black text-[#0285fd] text-[13px] outline-none shadow-sm bg-white focus:border-slate-400" 
                                 />
                             </div>
                         </div>
@@ -224,7 +224,7 @@ const ChequeRegisterBoard = ({ isOpen, onClose }) => {
                                     type="number" 
                                     value={formData.endNo}
                                     onChange={e => setFormData({ ...formData, endNo: e.target.value })}
-                                    className="w-full h-9 border border-gray-300 rounded-[5px] px-3 font-mono font-black text-[#0285fd] text-[13px] outline-none shadow-sm bg-white focus:border-slate-400" 
+                                    className="w-full h-9 border border-gray-300 rounded-[3px] px-3 font-mono font-black text-[#0285fd] text-[13px] outline-none shadow-sm bg-white focus:border-slate-400" 
                                 />
                             </div>
                         </div>
@@ -248,43 +248,43 @@ const ChequeRegisterBoard = ({ isOpen, onClose }) => {
                 maxWidth="max-w-[700px]"
             >
                 <div className="space-y-4 font-['Tahoma']">
-                    <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-lg border border-gray-100 mb-2">
+                    <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-[3px] border border-gray-200 mb-2">
                         <span className="text-[12px] font-bold text-gray-500 uppercase tracking-widest shrink-0">Search Facility</span>
                         <div className="relative flex-1">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
                             <input
                                 type="text"
                                 placeholder="Scan account by descriptive title or reference code..."
-                                className="w-full h-9 pl-10 pr-4 border border-gray-300 rounded-[5px] outline-none text-sm focus:border-[#0285fd] bg-white shadow-sm font-bold"
+                                className="w-full h-10 pl-10 pr-4 border border-gray-300 rounded-[3px] outline-none text-[13px] focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] shadow-sm bg-white"
                                 value={accountSearchQuery}
                                 onChange={(e) => setAccountSearchQuery(e.target.value)}
                                 autoFocus
                             />
                         </div>
                     </div>
-                    <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm bg-white">
+                    <div className="border border-gray-200 rounded-[3px] overflow-hidden shadow-sm bg-white">
                         <div className="max-h-[400px] overflow-y-auto no-scrollbar">
                             <table className="w-full text-left">
-                                <thead className="bg-[#f8fafd] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 z-10">
+                                <thead className="bg-[#f8fafd] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-200 z-10">
                                     <tr>
-                                        <th className="px-5 py-3">Code</th>
-                                        <th className="px-5 py-3">Account Description</th>
-                                        <th className="px-5 py-3 text-right">Action</th>
+                                        <th className=" px-5 py-3">Code</th>
+                                        <th className=" px-5 py-3">Account Description</th>
+                                        <th className="text-right px-5 py-3">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-50">
                                     {filteredAccounts.map(acc => (
                                         <tr 
                                             key={acc.code} 
-                                            className="group hover:bg-blue-50/50 cursor-pointer transition-all" 
+                                            className="group hover:bg-blue-50/50  transition-all cursor-pointer group border-b border-gray-50" 
                                             onClick={() => handleAccountSelect(acc)}
                                         >
-                                            <td className="px-5 py-3 font-mono text-[12px] font-bold text-blue-600">{acc.code}</td>
-                                            <td className="px-5 py-3 text-[13px] font-bold text-gray-700 uppercase group-hover:text-blue-600 transition-colors leading-relaxed">
+                                            <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{acc.code}</td>
+                                            <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">
                                                 {acc.name}
                                             </td>
-                                            <td className="px-5 py-3 text-right">
-                                                 <button className="bg-[#0285fd] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#0073ff] shadow-md transition-all active:scale-95 uppercase tracking-tighter">SELECT</button>
+                                            <td className="text-right px-5 py-3">
+                                                 <button className="bg-[#0285fd] text-white text-[10px] px-5 py-2 rounded-[3px] font-black hover:bg-[#0073ff] shadow-md transition-all active:scale-95 uppercase tracking-tighter">SELECT</button>
                                             </td>
                                         </tr>
                                     ))}

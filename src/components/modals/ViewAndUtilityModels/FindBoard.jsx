@@ -22,7 +22,7 @@ const FindBoard = ({ isOpen, onClose }) => {
 
                 <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-white">
                     <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-xl bg-[#4f83ff]/10 flex items-center justify-center">
+                        <div className="w-9 h-9 rounded-[3px] bg-[#4f83ff]/10 flex items-center justify-center">
                             <Search size={16} className="text-[#4f83ff]" />
                         </div>
                         <div>
@@ -30,14 +30,14 @@ const FindBoard = ({ isOpen, onClose }) => {
                             <p className="text-[10px] text-slate-400 font-medium tracking-wider">Search & Retrieval</p>
                         </div>
                     </div>
-                    <button onClick={onClose} className="w-9 h-9 rounded-xl bg-red-50 hover:bg-red-100 flex items-center justify-center transition-all active:scale-90">
+                    <button onClick={onClose} className="w-9 h-9 rounded-[3px] bg-red-50 hover:bg-red-100 flex items-center justify-center transition-all active:scale-90">
                         <X size={28} strokeWidth={1.5} className="text-red-600" />
                     </button>
                 </div>
 
                 <div className="flex-1 overflow-y-auto custom-scrollbar p-6">
                     <div className="select-none space-y-4">
-                        <div className="flex bg-slate-100/50 p-1 rounded-xl gap-1">
+                        <div className="flex bg-slate-100/50 p-1 rounded-[3px] gap-1">
                             {['General', 'Advance'].map(tab => (
                                 <button
                                     key={tab}
@@ -53,11 +53,11 @@ const FindBoard = ({ isOpen, onClose }) => {
                             ))}
                         </div>
 
-                        <div className="bg-slate-50/50 p-5 border border-slate-100 rounded-xl space-y-4">
+                        <div className="bg-slate-50/50 p-5 border border-slate-100 rounded-[3px] space-y-4">
                             <div className="grid grid-cols-12 gap-y-4 gap-x-6">
                                 <div className="col-span-4 flex items-center gap-3">
                                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest w-28 shrink-0">Trans Type</label>
-                                    <select className="flex-1 h-8 px-3 border border-slate-200 rounded-[5px] text-[12px] font-bold text-slate-700 bg-white outline-none focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 transition-all shadow-sm">
+                                    <select className="flex-1 h-8 px-3 border border-slate-200 rounded-[3px] text-[12px] font-bold text-slate-700 bg-white outline-none focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 transition-all shadow-sm">
                                         <option value="">All Types</option>
                                     </select>
                                 </div>
@@ -69,7 +69,7 @@ const FindBoard = ({ isOpen, onClose }) => {
                                             <span className="text-[11px] font-bold text-slate-600 group-hover:text-[#4f83ff] transition-colors uppercase tracking-wider">{opt}</span>
                                         </label>
                                     ))}
-                                    <select className="flex-1 h-8 px-3 border border-slate-200 rounded-[5px] text-[12px] font-bold text-slate-700 bg-white outline-none focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 transition-all shadow-sm min-w-[150px]">
+                                    <select className="flex-1 h-8 px-3 border border-slate-200 rounded-[3px] text-[12px] font-bold text-slate-700 bg-white outline-none focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 transition-all shadow-sm min-w-[150px]">
                                         <option value=""></option>
                                     </select>
                                 </div>
@@ -80,7 +80,7 @@ const FindBoard = ({ isOpen, onClose }) => {
                                         type="text"
                                         value={docNo}
                                         onChange={(e) => setDocNo(e.target.value)}
-                                        className="flex-1 h-8 px-3 border border-slate-200 rounded-[5px] text-[12px] font-bold text-slate-700 bg-white outline-none focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 transition-all shadow-sm"
+                                        className="flex-1 h-8 px-3 border border-slate-200 rounded-[3px] text-[12px] font-bold text-slate-700 bg-white outline-none focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 transition-all shadow-sm"
                                         placeholder="Document number..."
                                     />
                                 </div>
@@ -92,7 +92,7 @@ const FindBoard = ({ isOpen, onClose }) => {
                                             type="text"
                                             value={amount}
                                             onChange={(e) => setAmount(e.target.value)}
-                                            className="flex-1 h-8 px-3 border border-slate-200 rounded-[5px] text-[12px] font-bold text-slate-700 bg-white outline-none focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 transition-all shadow-sm"
+                                            className="flex-1 h-8 px-3 border border-slate-200 rounded-[3px] text-[12px] font-bold text-slate-700 bg-white outline-none focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 transition-all shadow-sm"
                                             placeholder="0.00"
                                         />
                                     </div>
@@ -106,7 +106,7 @@ const FindBoard = ({ isOpen, onClose }) => {
                                                 type="text"
                                                 value={dateFrom}
                                                 readOnly
-                                                className="w-[130px] h-8 px-3 border border-slate-200 rounded-[5px] text-[12px] font-bold text-slate-700 bg-white outline-none focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 shadow-sm transition-all"
+                                                className="w-[130px] h-8 px-3 border border-slate-200 rounded-[3px] text-[12px] font-bold text-slate-700 bg-white outline-none focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 shadow-sm transition-all"
                                             />
                                         </div>
                                         <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">To</span>
@@ -115,7 +115,7 @@ const FindBoard = ({ isOpen, onClose }) => {
                                                 type="text"
                                                 value={dateTo}
                                                 readOnly
-                                                className="w-[130px] h-8 px-3 border border-slate-200 rounded-[5px] text-[12px] font-bold text-slate-700 bg-white outline-none focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 shadow-sm transition-all"
+                                                className="w-[130px] h-8 px-3 border border-slate-200 rounded-[3px] text-[12px] font-bold text-slate-700 bg-white outline-none focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 shadow-sm transition-all"
                                             />
                                         </div>
                                     </div>
@@ -145,10 +145,10 @@ const FindBoard = ({ isOpen, onClose }) => {
                 <div className="bg-slate-50 border-t border-slate-200 flex items-center justify-between shrink-0 px-6 py-4 rounded-b-[5px]">
                     <span className="text-[12px] font-black text-slate-300 italic tracking-wider opacity-50">onimta IT</span>
                     <div className="flex gap-4">
-                        <button className="px-8 h-10 bg-[#00adff] hover:bg-[#0099e6] text-white font-mono font-bold text-[13px] uppercase tracking-widest rounded-[5px] shadow-md shadow-blue-100 transition-all active:scale-95 flex items-center gap-2 border-none">
+                        <button className="px-8 h-10 bg-white text-[#00adff] border-2 border-[#00adff] hover:bg-blue-50 font-mono font-bold text-[13px] uppercase tracking-widest rounded-[3px] shadow-md shadow-blue-100 transition-all active:scale-95 flex items-center gap-2 border-none">
                             <Search size={14} strokeWidth={3} /> FIND
                         </button>
-                        <button className="px-8 h-10 bg-white text-[#00adff] border-2 border-[#00adff] hover:bg-blue-50 font-mono font-bold text-[13px] uppercase tracking-widest rounded-[5px] transition-all active:scale-95 flex items-center gap-2 shadow-sm">
+                        <button className="px-8 h-10 bg-white text-[#00adff] border-2 border-[#00adff] hover:bg-blue-50 font-mono font-bold text-[13px] uppercase tracking-widest rounded-[3px] transition-all active:scale-95 flex items-center gap-2 shadow-sm">
                             <RotateCcw size={14} /> CLEAR
                         </button>
                     </div>

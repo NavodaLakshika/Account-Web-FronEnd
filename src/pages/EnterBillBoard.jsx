@@ -249,18 +249,17 @@ const EnterBillBoard = ({ isOpen, onClose }) => {
                 isOpen={isOpen}
                 onClose={onClose}
                 title="Enter Bill"
-                subtitle="Bill Management"
+                subtitle="Enter Bill"
                 icon={FileText}
-                maxWidth="max-w-[1200px]"
                 footer={
-                    <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-slate-200 rounded-b-xl">
+                    <div className="bg-[#fcfcfc] px-6 py-4 w-full flex justify-between items-center border-t border-gray-200 rounded-b-[10px] shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]">
                         <div className="flex gap-3">
-                            <button type="button" onClick={handleClear} disabled={loading} className="px-6 py-3 bg-[#00adff] hover:bg-[#0099e6] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] transition-all active:scale-95 flex items-center justify-center gap-2 border-none">
+                            <button type="button" onClick={handleClear} disabled={loading} className="px-6 py-2 border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2">
                                 <RotateCcw size={14} /> CLEAR FORM
                             </button>
                         </div>
                         <div className="flex gap-3">
-                            <button type="button" onClick={handleSave} disabled={loading} className={`px-6 py-3 bg-[#2bb744] hover:bg-[#259b3a] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] shadow-md shadow-green-100 transition-all active:scale-95 flex items-center justify-center gap-2 border-none ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                            <button type="button" onClick={handleSave} disabled={loading} className={`px-6 py-2 bg-[#0285fd] hover:bg-[#0073ff] text-white font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}>
                                 {loading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />} SAVE BILL
                             </button>
                         </div>
@@ -269,50 +268,50 @@ const EnterBillBoard = ({ isOpen, onClose }) => {
             >
                 <div className="select-none font-['Tahoma']">
                     {/* Header Information Section */}
-                    <div className="bg-white p-4 border border-slate-200 rounded-[5px] space-y-4">
+                    <div className="bg-white p-4 border border-slate-200 rounded-[3px] space-y-4">
                         <div className="flex items-center justify-between border-b border-slate-200 pb-3 mb-2">
-                             <div className="flex items-center gap-2">
-                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Doc No</label>
-                                <div className="flex gap-1 h-8">
+                             <div className="">
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Doc No</label>
+                                <div className="relative">
                                     <input
                                         type="text"
                                         name="docNo"
                                         value={formData.docNo}
                                         readOnly
-                                        className="w-32 h-8 border border-slate-200 px-3 text-[12px] font-bold text-blue-600 bg-slate-50 rounded outline-none transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 text-center"
+                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700 truncate"
                                     />
-                                    <button onClick={() => setShowSearchModal(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
+                                    <button onClick={() => setShowSearchModal(true)} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
                                         <Search size={16} />
                                     </button>
                                 </div>
                             </div>
 
-                            <div className="flex items-center bg-slate-100 p-1 rounded-[5px]">
+                            <div className="flex items-center bg-slate-100 p-1 rounded-[3px]">
                                 <button 
                                     onClick={() => setBillType('Bill')}
-                                    className={`px-8 py-1 text-[11px] font-bold rounded-[5px] transition-all uppercase tracking-widest ${billType === 'Bill' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}
+                                    className={`px-8 py-1 text-[11px] font-bold rounded-[3px] transition-all uppercase tracking-widest ${billType === 'Bill' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}
                                 >
                                     BILL
                                 </button>
                                 <button 
                                     onClick={() => setBillType('Credit')}
-                                    className={`px-8 py-1 text-[11px] font-bold rounded-[5px] transition-all uppercase tracking-widest ${billType === 'Credit' ? 'bg-white text-red-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}
+                                    className={`px-8 py-1 text-[11px] font-bold rounded-[3px] transition-all uppercase tracking-widest ${billType === 'Credit' ? 'bg-white text-red-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}
                                 >
                                     CREDIT
                                 </button>
                             </div>
 
-                            <div className="flex items-center gap-2">
-                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Post Date</label>
-                                <div className="flex h-8 gap-1">
+                            <div className="">
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Post Date</label>
+                                <div className="relative w-full">
                                     <input 
                                         type="text" 
                                         readOnly 
                                         value={formData.postDate} 
-                                        className="w-[110px] h-8 border border-slate-200 px-3 text-[12px] font-bold text-gray-700 bg-slate-50 rounded outline-none transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 text-center" 
+                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700" 
                                         onClick={() => openCalendar('postDate')}
                                     />
-                                    <button onClick={() => openCalendar('postDate')} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
+                                    <button onClick={() => openCalendar('postDate')} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
                                         <Calendar size={16} />
                                     </button>
                                 </div>
@@ -322,89 +321,89 @@ const EnterBillBoard = ({ isOpen, onClose }) => {
                         <div className="grid grid-cols-12 gap-x-6 gap-y-3.5">
                             {/* Left Column Fields */}
                             <div className="col-span-6 space-y-3.5">
-                                <div className="flex items-center gap-2">
-                                    <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Vendor Name</label>
-                                    <div className="flex-1 flex gap-1 h-8 min-w-0">
+                                <div className="">
+                                    <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Vendor Name</label>
+                                    <div className="relative">
                                         <input
                                             type="text"
                                             readOnly
                                             value={lookups.vendors.find(v => v.code === formData.vendorId)?.name || ''}
-                                            className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-bold text-blue-600 bg-slate-50 rounded outline-none transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20"
+                                            className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700 truncate"
                                             onClick={() => setShowVendorModal(true)}
                                         />
-                                        <button onClick={() => setShowVendorModal(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
+                                        <button onClick={() => setShowVendorModal(true)} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
                                             <Search size={16} />
                                         </button>
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-2">
-                                    <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Cost Center</label>
-                                    <div className="flex-1 flex gap-1 h-8 min-w-0">
+                                <div className="">
+                                    <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Cost Center</label>
+                                    <div className="relative">
                                         <input
                                             type="text"
                                             readOnly
                                             value={lookups.costCenters.find(c => c.code === formData.costCenter)?.name || ''}
-                                            className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-bold text-gray-700 bg-slate-50 rounded outline-none transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20"
+                                            className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700"
                                             onClick={() => { setCcSource('header'); setShowCostCenterModal(true); }}
                                         />
-                                        <button onClick={() => { setCcSource('header'); setShowCostCenterModal(true); }} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
+                                        <button onClick={() => { setCcSource('header'); setShowCostCenterModal(true); }} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
                                             <Search size={16} />
                                         </button>
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-2">
-                                    <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Bill Terms</label>
-                                    <input name="terms" value={formData.terms} onChange={handleInputChange} type="text" className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-bold text-gray-700 bg-slate-50 rounded outline-none transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" />
+                                <div className="">
+                                    <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Bill Terms</label>
+                                    <input name="terms" value={formData.terms} onChange={handleInputChange} type="text" className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700" />
                                 </div>
-                                <div className="flex items-center gap-2">
-                                    <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">General Memo</label>
-                                    <input name="memo" value={formData.memo} onChange={handleInputChange} type="text" className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-bold text-gray-700 bg-slate-50 rounded outline-none transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" />
+                                <div className="">
+                                    <label className="block text-[13px] font-medium text-gray-700 mb-1.5">General Memo</label>
+                                    <input name="memo" value={formData.memo} onChange={handleInputChange} type="text" className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700" />
                                 </div>
                             </div>
 
                             {/* Right Column Fields */}
                             <div className="col-span-6 space-y-3.5">
-                                <div className="flex items-center gap-2">
-                                    <label className="text-[11px] font-bold text-gray-500 uppercase w-32 shrink-0">A/P Account (GL)</label>
-                                    <div className="flex-1 flex gap-1 h-8 min-w-0">
+                                <div className="">
+                                    <label className="block text-[13px] font-medium text-gray-700 mb-1.5">A/P Account (GL)</label>
+                                    <div className="relative">
                                         <input
                                             type="text"
                                             readOnly
                                             value={lookups.payAccounts.find(a => a.code === formData.accId)?.name ? `${formData.accId} - ${lookups.payAccounts.find(a => a.code === formData.accId)?.name}` : ''}
-                                            className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-bold text-gray-700 bg-slate-50 rounded outline-none transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20"
+                                            className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700"
                                             onClick={() => setShowAPModal(true)}
                                         />
-                                        <button onClick={() => setShowAPModal(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
+                                        <button onClick={() => setShowAPModal(true)} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
                                             <Search size={16} />
                                         </button>
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-2">
-                                    <label className="text-[11px] font-bold text-gray-500 uppercase w-32 shrink-0">Supplier Bill No</label>
-                                    <input name="billNo" value={formData.billNo} onChange={handleInputChange} type="text" className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-bold text-blue-800 bg-slate-50 rounded outline-none transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" />
+                                <div className="">
+                                    <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Supplier Bill No</label>
+                                    <input name="billNo" value={formData.billNo} onChange={handleInputChange} type="text" className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700" />
                                 </div>
-                                <div className="flex items-center gap-2">
-                                    <label className="text-[11px] font-bold text-gray-500 uppercase w-32 shrink-0">Reference No</label>
-                                    <input name="refNo" value={formData.refNo} onChange={handleInputChange} type="text" className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-bold text-gray-700 bg-slate-50 rounded outline-none transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" />
+                                <div className="">
+                                    <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Reference No</label>
+                                    <input name="refNo" value={formData.refNo} onChange={handleInputChange} type="text" className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700" />
                                 </div>
-                                <div className="flex items-center gap-2">
-                                    <label className="text-[11px] font-bold text-gray-500 uppercase w-32 shrink-0">Due Date</label>
-                                    <div className="flex-1 flex gap-1 h-8 min-w-0">
+                                <div className="">
+                                    <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Due Date</label>
+                                    <div className="relative">
                                         <input
                                             type="text"
                                             readOnly
                                             value={formData.billDueDate}
-                                            className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-bold text-blue-800 bg-slate-50 rounded outline-none transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 text-center"
+                                            className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700 truncate"
                                             onClick={() => openCalendar('billDueDate')}
                                         />
-                                        <button onClick={() => openCalendar('billDueDate')} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
+                                        <button onClick={() => openCalendar('billDueDate')} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
                                             <Calendar size={16} />
                                         </button>
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-2 pt-1">
-                                    <label className="text-[11px] font-bold text-gray-500 uppercase w-32 shrink-0">Total Due Amount</label>
-                                    <div className="flex-1 h-8 border border-red-200 bg-red-50/50 px-3 text-[14px] font-bold text-red-600 text-right flex items-center justify-end rounded-[5px]">
+                                <div className="">
+                                    <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Total Due Amount</label>
+                                    <div className="w-full h-10 border border-red-200 bg-red-50/50 px-3 text-[14px] font-bold text-red-600 text-right flex items-center justify-end rounded-[3px]">
                                         {calculateTotal()}
                                     </div>
                                 </div>
@@ -424,9 +423,9 @@ const EnterBillBoard = ({ isOpen, onClose }) => {
                              </div>
                         </div>
 
-                        <div className="border border-gray-100 rounded-xl bg-white shadow-xl overflow-hidden flex flex-col min-h-[300px]">
+                        <div className="border border-gray-200 rounded-[3px] bg-white shadow-xl overflow-hidden flex flex-col min-h-[300px]">
                                     <table className="w-full text-sm text-left border-collapse">
-                                        <thead className="bg-[#f8fafc] text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 leading-10">
+                                        <thead className="bg-slate-50 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-200 leading-10">
                                             <tr>
                                                 <th className="px-4 w-[30%]">Expense Account / Category</th>
                                                 <th className="px-4 w-[20%]">Cost Center</th>
@@ -443,7 +442,7 @@ const EnterBillBoard = ({ isOpen, onClose }) => {
                                                     <td className="py-2.5 px-4 text-right font-mono font-black text-red-600 bg-red-50/10 tracking-tighter">{parseFloat(exp.amount).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
                                                     <td className="py-2.5 px-4 italic text-gray-400 font-medium">{exp.memo || '---'}</td>
                                                     <td className="py-2.5 px-2 text-center">
-                                                        <button onClick={() => handleRemoveLine(idx)} className="text-red-300 hover:text-red-500 bg-red-50 p-1.5 rounded-md transition-all active:scale-95"><Trash2 size={14} /></button>
+                                                        <button onClick={() => handleRemoveLine(idx)} className="text-red-300 hover:text-red-500 bg-red-50 p-1.5 rounded-[3px] transition-all active:scale-95"><Trash2 size={14} /></button>
                                                     </td>
                                                 </tr>
                                             ))}
@@ -457,38 +456,38 @@ const EnterBillBoard = ({ isOpen, onClose }) => {
 
                                     {/* Entry Input Row */}
                                     <div className="mt-auto border-t border-slate-200 bg-slate-50 p-2 flex gap-3 items-center">
-                                        <div className="flex-[2] flex gap-1 h-8">
+                                        <div className="flex-[2] relative">
                                             <input
                                                 type="text"
                                                 readOnly
                                                 value={lookups.expAccounts.find(a => a.code === currentLine.accCode)?.name ? `${currentLine.accCode} - ${lookups.expAccounts.find(a => a.code === currentLine.accCode)?.name}` : ''}
-                                                className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-bold text-gray-700 bg-white rounded outline-none transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 cursor-pointer"
+                                                className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700"
                                                 onClick={() => setShowExpModal(true)}
                                                 placeholder="Expense Account"
                                             />
-                                            <button onClick={() => setShowExpModal(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
+                                            <button onClick={() => setShowExpModal(true)} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
                                                 <Search size={16} />
                                             </button>
                                         </div>
-                                        <div className="flex-[1.2] flex gap-1 h-8">
+                                        <div className="flex-[1.5] relative">
                                             <input
                                                 type="text"
                                                 readOnly
                                                 value={lookups.costCenters.find(c => c.code === currentLine.costCenter)?.name || ''}
-                                                className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-bold text-gray-700 bg-white rounded outline-none transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 cursor-pointer"
+                                                className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700"
                                                 onClick={() => { setCcSource('line'); setShowCostCenterModal(true); }}
                                                 placeholder="Cost Center"
                                             />
-                                            <button onClick={() => { setCcSource('line'); setShowCostCenterModal(true); }} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[5px] transition-all shadow-md active:scale-95 shrink-0">
+                                            <button onClick={() => { setCcSource('line'); setShowCostCenterModal(true); }} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
                                                 <Search size={16} />
                                             </button>
                                         </div>
-                                        <div className="flex-1 h-8">
-                                            <input name="amount" value={currentLine.amount} onChange={handleLineChange} onKeyDown={handleAddLine} type="number" className="w-full h-8 border border-slate-200 px-3 text-[13px] text-right font-black text-blue-700 rounded outline-none transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 bg-white" placeholder="Amount" />
+                                        <div className="flex-1">
+                                            <input name="amount" value={currentLine.amount} onChange={handleLineChange} onKeyDown={handleAddLine} type="number" className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700" placeholder="Amount" />
                                         </div>
-                                        <div className="flex-[2] flex gap-2 h-8">
-                                            <input name="memo" value={currentLine.memo} onChange={handleLineChange} onKeyDown={handleAddLine} type="text" className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-bold rounded outline-none transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 bg-white" placeholder="Memo" />
-                                            <button onClick={handleAddLine} className="px-6 h-8 bg-[#00adff] text-white font-mono font-bold text-[12px] uppercase tracking-widest rounded-[5px] hover:bg-[#0099e6] whitespace-nowrap transition-all active:scale-95 shadow-md flex items-center gap-2 border-none">
+                                        <div className="flex-[2] flex gap-2">
+                                            <input name="memo" value={currentLine.memo} onChange={handleLineChange} onKeyDown={handleAddLine} type="text" className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700" placeholder="Memo" />
+                                            <button onClick={handleAddLine} className="h-10 px-6 bg-white border border-[#0285fd] text-[#0285fd] font-semibold rounded-[3px] text-[13px] hover:bg-blue-50 transition-all flex items-center justify-center whitespace-nowrap">
                                                 ADD LINE
                                             </button>
                                         </div>
@@ -500,36 +499,36 @@ const EnterBillBoard = ({ isOpen, onClose }) => {
             </TransactionFormWrapper>
 
             {/* Vendor Search Modal */}
-            <SimpleModal isOpen={showVendorModal} onClose={() => setShowVendorModal(false)} title={`Vendor Records - ${lookups.vendors.length} Found`} maxWidth="max-w-xl">
+            <SimpleModal isOpen={showVendorModal} onClose={() => setShowVendorModal(false)} title={`Vendor Records - ${lookups.vendors.length} Found`}>
                  <div className="flex flex-col h-full font-['Tahoma']">
-                    <div className="p-4 bg-slate-50 border-b border-gray-100 flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-4 bg-slate-50 p-4 border-b border-gray-100 mb-2">
                         <span className="text-[12px] font-bold text-gray-500 uppercase tracking-wider">Search Facility</span>
                         <input 
                             type="text" 
-                            className="h-9 border border-gray-300 px-3 text-sm rounded-md w-72 focus:border-[#0285fd] outline-none shadow-sm" 
+                            className="w-full h-10 px-4 border border-gray-300 rounded-[3px] outline-none text-sm focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white shadow-sm flex-1" 
                             value={vendorSearch} 
                             onChange={(e) => setVendorSearch(e.target.value)} 
                         />
                     </div>
-                    <div className="overflow-y-auto max-h-[50vh] custom-scrollbar">
+                    <div className="max-h-[50vh] overflow-y-auto no-scrollbar border border-gray-100 rounded-[5px] shadow-sm">
                         <table className="w-full text-sm text-left">
-                            <thead className="bg-[#f8fafc] sticky top-0 text-gray-600 font-bold uppercase text-[11px] tracking-wider z-10 shadow-sm leading-8">
+                            <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 z-10 shadow-sm">
                                 <tr>
-                                    <th className="px-3 border-b">Code</th>
-                                    <th className="px-3 border-b">Vendor Name</th>
-                                    <th className="px-3 border-b text-center w-24">Select</th>
+                                    <th className="border-b px-5 py-3">Code</th>
+                                    <th className="border-b px-5 py-3">Vendor Name</th>
+                                    <th className="border-b text-center w-24 px-5 py-3">Select</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100">
                                 {lookups.vendors.filter(v => (v.name || '').toLowerCase().includes(vendorSearch.toLowerCase()) || (v.code || '').toLowerCase().includes(vendorSearch.toLowerCase())).map((v, idx) => (
-                                    <tr key={idx} className="hover:bg-blue-50/50 transition-colors border-b border-gray-50">
-                                        <td className="p-3 font-bold text-gray-700">{v.code}</td>
-                                        <td className="p-3 font-mono uppercase text-gray-700">{v.name}</td>
-                                        <td className="p-3 text-center">
+                                    <tr key={idx} className="group hover:bg-blue-50/50  transition-all border-b border-gray-50 cursor-pointer group border-b border-gray-50">
+                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{v.code}</td>
+                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{v.name}</td>
+                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">
                                             <button onClick={() => {
                                                 setFormData(prev => ({ ...prev, vendorId: v.code }));
                                                 setShowVendorModal(false);
-                                            }} className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95">SELECT</button>
+                                            }} className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button>
                                         </td>
                                     </tr>
                                 ))}
@@ -540,37 +539,37 @@ const EnterBillBoard = ({ isOpen, onClose }) => {
             </SimpleModal>
 
             {/* Cost Center Search Modal */}
-             <SimpleModal isOpen={showCostCenterModal} onClose={() => setShowCostCenterModal(false)} title={`Cost Center Directory - ${lookups.costCenters.length} Found`} maxWidth="max-w-xl">
+             <SimpleModal isOpen={showCostCenterModal} onClose={() => setShowCostCenterModal(false)} title={`Cost Center Directory - ${lookups.costCenters.length} Found`}>
                  <div className="flex flex-col h-full font-['Tahoma']">
-                    <div className="p-4 bg-slate-50 border-b border-gray-100 flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-4 bg-slate-50 p-4 border-b border-gray-100 mb-2">
                         <span className="text-[12px] font-bold text-gray-500 uppercase tracking-wider">Search Facility</span>
                         <input 
                             type="text" 
-                            className="h-9 border border-gray-300 px-3 text-sm rounded-md w-72 focus:border-[#0285fd] outline-none shadow-sm" 
+                            className="w-full h-10 px-4 border border-gray-300 rounded-[3px] outline-none text-sm focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white shadow-sm flex-1" 
                             value={ccSearch} 
                             onChange={(e) => setCcSearch(e.target.value)} 
                         />
                     </div>
-                    <div className="overflow-y-auto max-h-[50vh] custom-scrollbar">
+                    <div className="max-h-[50vh] overflow-y-auto no-scrollbar border border-gray-100 rounded-[5px] shadow-sm">
                         <table className="w-full text-sm text-left">
-                            <thead className="bg-[#f8fafc] sticky top-0 text-gray-600 font-bold uppercase text-[11px] tracking-wider z-10 shadow-sm leading-8">
+                            <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 z-10 shadow-sm">
                                 <tr>
-                                    <th className="px-3 border-b">Code</th>
-                                    <th className="px-3 border-b">Cost Center</th>
-                                    <th className="px-3 border-b text-center w-24">Select</th>
+                                    <th className="border-b px-5 py-3">Code</th>
+                                    <th className="border-b px-5 py-3">Cost Center</th>
+                                    <th className="border-b text-center w-24 px-5 py-3">Select</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100">
                                 {lookups.costCenters.filter(c => (c.name || '').toLowerCase().includes(ccSearch.toLowerCase()) || (c.code || '').toLowerCase().includes(ccSearch.toLowerCase())).map((c, idx) => (
-                                    <tr key={idx} className="hover:bg-blue-50/50 transition-colors border-b border-gray-50">
-                                        <td className="p-3 font-bold text-gray-700">{c.code}</td>
-                                        <td className="p-3 font-mono uppercase text-gray-700">{c.name}</td>
-                                        <td className="p-3 text-center">
+                                    <tr key={idx} className="group hover:bg-blue-50/50  transition-all border-b border-gray-50 cursor-pointer group border-b border-gray-50">
+                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{c.code}</td>
+                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{c.name}</td>
+                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">
                                             <button onClick={() => {
                                                 if (ccSource === 'header') setFormData(prev => ({ ...prev, costCenter: c.code }));
                                                 else setCurrentLine(prev => ({ ...prev, costCenter: c.code }));
                                                 setShowCostCenterModal(false);
-                                            }} className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95">SELECT</button>
+                                            }} className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button>
                                         </td>
                                     </tr>
                                 ))}
@@ -581,36 +580,36 @@ const EnterBillBoard = ({ isOpen, onClose }) => {
             </SimpleModal>
 
             {/* A/P Account Search Modal */}
-            <SimpleModal isOpen={showAPModal} onClose={() => setShowAPModal(false)} title={`GL Accounts Directory - ${lookups.payAccounts.length} Found`} maxWidth="max-w-xl">
+            <SimpleModal isOpen={showAPModal} onClose={() => setShowAPModal(false)} title={`GL Accounts Directory - ${lookups.payAccounts.length} Found`}>
                  <div className="flex flex-col h-full font-['Tahoma']">
-                    <div className="p-4 bg-slate-50 border-b border-gray-100 flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-4 bg-slate-50 p-4 border-b border-gray-100 mb-2">
                         <span className="text-[12px] font-bold text-gray-500 uppercase tracking-wider">Search Facility</span>
                         <input 
                             type="text" 
-                            className="h-9 border border-gray-300 px-3 text-sm rounded-md w-72 focus:border-[#0285fd] outline-none shadow-sm" 
+                            className="w-full h-10 px-4 border border-gray-300 rounded-[3px] outline-none text-sm focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white shadow-sm flex-1" 
                             value={apSearch} 
                             onChange={(e) => setApSearch(e.target.value)} 
                         />
                     </div>
-                    <div className="overflow-y-auto max-h-[50vh] custom-scrollbar">
+                    <div className="max-h-[50vh] overflow-y-auto no-scrollbar border border-gray-100 rounded-[5px] shadow-sm">
                         <table className="w-full text-sm text-left">
-                            <thead className="bg-[#f8fafc] sticky top-0 text-gray-600 font-bold uppercase text-[11px] tracking-wider z-10 shadow-sm leading-8">
+                            <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 z-10 shadow-sm">
                                 <tr>
-                                    <th className="px-3 border-b">Code</th>
-                                    <th className="px-3 border-b">Account Name</th>
-                                    <th className="px-3 border-b text-center w-24">Select</th>
+                                    <th className="border-b px-5 py-3">Code</th>
+                                    <th className="border-b px-5 py-3">Account Name</th>
+                                    <th className="border-b text-center w-24 px-5 py-3">Select</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100">
                                 {lookups.payAccounts.filter(a => (a.name || '').toLowerCase().includes(apSearch.toLowerCase()) || (a.code || '').toLowerCase().includes(apSearch.toLowerCase())).map((a, idx) => (
-                                    <tr key={idx} className="hover:bg-blue-50/50 transition-colors border-b border-gray-50">
-                                        <td className="p-3 font-bold text-gray-700">{a.code}</td>
-                                        <td className="p-3 font-mono uppercase text-gray-700">{a.name}</td>
-                                        <td className="p-3 text-center">
+                                    <tr key={idx} className="group hover:bg-blue-50/50  transition-all border-b border-gray-50 cursor-pointer group border-b border-gray-50">
+                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{a.code}</td>
+                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{a.name}</td>
+                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">
                                             <button onClick={() => {
                                                 setFormData(prev => ({ ...prev, accId: a.code }));
                                                 setShowAPModal(false);
-                                            }} className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95">SELECT</button>
+                                            }} className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button>
                                         </td>
                                     </tr>
                                 ))}
@@ -621,36 +620,36 @@ const EnterBillBoard = ({ isOpen, onClose }) => {
             </SimpleModal>
 
             {/* Expense Account Search Modal */}
-            <SimpleModal isOpen={showExpModal} onClose={() => setShowExpModal(false)} title={`Expense Accounts - ${lookups.expAccounts.length} Found`} maxWidth="max-w-xl">
+            <SimpleModal isOpen={showExpModal} onClose={() => setShowExpModal(false)} title={`Expense Accounts - ${lookups.expAccounts.length} Found`}>
                  <div className="flex flex-col h-full font-['Tahoma']">
-                    <div className="p-4 bg-slate-50 border-b border-gray-100 flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-4 bg-slate-50 p-4 border-b border-gray-100 mb-2">
                         <span className="text-[12px] font-bold text-gray-500 uppercase tracking-wider">Search Facility</span>
                         <input 
                             type="text" 
-                            className="h-9 border border-gray-300 px-3 text-sm rounded-md w-72 focus:border-[#0285fd] outline-none shadow-sm" 
+                            className="w-full h-10 px-4 border border-gray-300 rounded-[3px] outline-none text-sm focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white shadow-sm flex-1" 
                             value={expSearch} 
                             onChange={(e) => setExpSearch(e.target.value)} 
                         />
                     </div>
-                    <div className="overflow-y-auto max-h-[50vh] custom-scrollbar">
+                    <div className="max-h-[50vh] overflow-y-auto no-scrollbar border border-gray-100 rounded-[5px] shadow-sm">
                         <table className="w-full text-sm text-left">
-                            <thead className="bg-[#f8fafc] sticky top-0 text-gray-600 font-bold uppercase text-[11px] tracking-wider z-10 shadow-sm leading-8">
+                            <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 z-10 shadow-sm">
                                 <tr>
-                                    <th className="px-3 border-b">Code</th>
-                                    <th className="px-3 border-b">Account Name</th>
-                                    <th className="px-3 border-b text-center w-24">Select</th>
+                                    <th className="border-b px-5 py-3">Code</th>
+                                    <th className="border-b px-5 py-3">Account Name</th>
+                                    <th className="border-b text-center w-24 px-5 py-3">Select</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100">
                                 {lookups.expAccounts.filter(a => (a.name || '').toLowerCase().includes(expSearch.toLowerCase()) || (a.code || '').toLowerCase().includes(expSearch.toLowerCase())).map((a, idx) => (
-                                    <tr key={idx} className="hover:bg-blue-50/50 transition-colors border-b border-gray-50">
-                                        <td className="p-3 font-bold text-gray-700">{a.code}</td>
-                                        <td className="p-3 font-mono uppercase text-gray-700">{a.name}</td>
-                                        <td className="p-3 text-center">
+                                    <tr key={idx} className="group hover:bg-blue-50/50  transition-all border-b border-gray-50 cursor-pointer group border-b border-gray-50">
+                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{a.code}</td>
+                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{a.name}</td>
+                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">
                                             <button onClick={() => {
                                                 setCurrentLine(prev => ({ ...prev, accCode: a.code }));
                                                 setShowExpModal(false);
-                                            }} className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95">SELECT</button>
+                                            }} className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button>
                                         </td>
                                     </tr>
                                 ))}
@@ -661,32 +660,32 @@ const EnterBillBoard = ({ isOpen, onClose }) => {
             </SimpleModal>
 
             {/* Item Search Modal */}
-            <SimpleModal isOpen={showItemModal} onClose={() => setShowItemModal(false)} title={`Items - ${lookups.items?.length || 0} Found`} maxWidth="max-w-xl">
+            <SimpleModal isOpen={showItemModal} onClose={() => setShowItemModal(false)} title={`Items - ${lookups.items?.length || 0} Found`}>
                  <div className="flex flex-col h-full font-['Tahoma']">
-                    <div className="p-4 bg-slate-50 border-b border-gray-100 flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-4 bg-slate-50 p-4 border-b border-gray-100 mb-2">
                         <span className="text-[12px] font-bold text-gray-500 uppercase tracking-wider">Search Facility</span>
                         <input 
                             type="text" 
-                            className="h-9 border border-gray-300 px-3 text-sm rounded-md w-72 focus:border-[#0285fd] outline-none shadow-sm" 
+                            className="w-full h-10 px-4 border border-gray-300 rounded-[3px] outline-none text-sm focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white shadow-sm flex-1" 
                             value={itemSearch} 
                             onChange={(e) => setItemSearch(e.target.value)} 
                         />
                     </div>
-                    <div className="overflow-y-auto max-h-[50vh] custom-scrollbar">
+                    <div className="max-h-[50vh] overflow-y-auto no-scrollbar border border-gray-100 rounded-[5px] shadow-sm">
                         <table className="w-full text-sm text-left">
-                            <thead className="bg-[#f8fafc] sticky top-0 text-gray-600 font-bold uppercase text-[11px] tracking-wider z-10 shadow-sm leading-8">
+                            <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 z-10 shadow-sm">
                                 <tr>
-                                    <th className="px-3 border-b">Code</th>
-                                    <th className="px-3 border-b">Item Name</th>
-                                    <th className="px-3 border-b text-center w-24">Select</th>
+                                    <th className="border-b px-5 py-3">Code</th>
+                                    <th className="border-b px-5 py-3">Item Name</th>
+                                    <th className="border-b text-center w-24 px-5 py-3">Select</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100">
                                 {(lookups.items || []).filter(i => (i.name || '').toLowerCase().includes(itemSearch.toLowerCase()) || (i.code || '').toLowerCase().includes(itemSearch.toLowerCase())).map((item, idx) => (
-                                    <tr key={idx} className="hover:bg-blue-50/50 transition-colors border-b border-gray-50">
-                                        <td className="p-3 font-bold text-gray-700">{item.code}</td>
-                                        <td className="p-3 font-mono uppercase text-gray-700">{item.name}</td>
-                                        <td className="p-3 text-center">
+                                    <tr key={idx} className="group hover:bg-blue-50/50  transition-all border-b border-gray-50 cursor-pointer group border-b border-gray-50">
+                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{item.code}</td>
+                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{item.name}</td>
+                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">
                                             <button onClick={() => {
                                                 setCurrentItem(prev => ({ ...prev, itemId: item.code, description: item.name, cost: item.cost }));
                                                 setShowItemModal(false);
@@ -708,44 +707,44 @@ const EnterBillBoard = ({ isOpen, onClose }) => {
             />
 
             {/* Bill Search Modal */}
-            <SimpleModal isOpen={showSearchModal} onClose={() => setShowSearchModal(false)} title={`Existing Bills - ${billSearchResults.length} Found`} maxWidth="max-w-2xl">
+            <SimpleModal isOpen={showSearchModal} onClose={() => setShowSearchModal(false)} title={`Existing Bills - ${billSearchResults.length} Found`}>
                  <div className="flex flex-col h-full font-['Tahoma']">
-                    <div className="p-4 bg-slate-50 border-b border-gray-100 flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-4 bg-slate-50 p-4 border-b border-gray-100 mb-2">
                         <span className="text-[12px] font-bold text-gray-500 uppercase tracking-wider">Search Document / Vendor</span>
                         <input 
                             type="text" 
-                            className="h-9 border border-gray-300 px-3 text-sm rounded-md w-72 focus:border-[#0285fd] outline-none shadow-sm" 
+                            className="w-full h-10 px-4 border border-gray-300 rounded-[3px] outline-none text-sm focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white shadow-sm flex-1" 
                             value={billSearchQuery} 
                             onChange={(e) => setBillSearchQuery(e.target.value)} 
                             placeholder="Enter Doc No or Vendor..."
                         />
                     </div>
-                    <div className="overflow-y-auto max-h-[50vh] custom-scrollbar">
+                    <div className="max-h-[50vh] overflow-y-auto no-scrollbar border border-gray-100 rounded-[5px] shadow-sm">
                         <table className="w-full text-sm text-left">
-                            <thead className="bg-[#f8fafc] sticky top-0 text-gray-600 font-bold uppercase text-[11px] tracking-wider z-10 shadow-sm leading-8">
+                            <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 z-10 shadow-sm">
                                 <tr>
-                                    <th className="px-3 border-b">Doc No</th>
-                                    <th className="px-3 border-b">Vendor</th>
-                                    <th className="px-3 border-b">Post Date</th>
-                                    <th className="px-3 border-b text-right">Amount</th>
-                                    <th className="px-3 border-b text-center w-24">Select</th>
+                                    <th className="border-b px-5 py-3">Doc No</th>
+                                    <th className="border-b px-5 py-3">Vendor</th>
+                                    <th className="border-b px-5 py-3">Post Date</th>
+                                    <th className="border-b text-right px-5 py-3">Amount</th>
+                                    <th className="border-b text-center w-24 px-5 py-3">Select</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100">
                                 {billSearchResults.map((b, idx) => (
-                                    <tr key={idx} className="hover:bg-blue-50/50 transition-colors border-b border-gray-50">
-                                        <td className="p-2 text-[11px] font-bold text-blue-600">{b.docNo}</td>
-                                        <td className="p-2 text-[11px] font-mono uppercase text-gray-700">{lookups.vendors?.find(v => v.code === b.vendorId)?.name || b.vendorId}</td>
-                                        <td className="p-2 text-[11px] font-mono text-gray-600">{b.date ? b.date.split('T')[0] : ''}</td>
-                                        <td className="p-2 text-[11px] text-right font-bold text-red-600">{b.amount?.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                                        <td className="p-2 text-center">
-                                            <button onClick={() => loadBill(b.docNo)} className="bg-[#e49e1b] text-white text-[9px] px-4 py-1.5 rounded-[5px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95">SELECT</button>
+                                    <tr key={idx} className="group hover:bg-blue-50/50  transition-all border-b border-gray-50 cursor-pointer group border-b border-gray-50">
+                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{b.docNo}</td>
+                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{lookups.vendors?.find(v => v.code === b.vendorId)?.name || b.vendorId}</td>
+                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{b.date ? b.date.split('T')[0] : ''}</td>
+                                        <td className="text-[11px] text-right font-bold text-red-600 px-5 py-3">{b.amount?.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">
+                                            <button onClick={() => loadBill(b.docNo)} className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button>
                                         </td>
                                     </tr>
                                 ))}
                                 {billSearchResults.length === 0 && (
                                     <tr>
-                                        <td colSpan="5" className="p-6 text-center text-gray-400 font-bold italic">No bills found matching your search.</td>
+                                        <td colSpan="5" className="text-center py-16 text-gray-400 text-[11px] font-bold uppercase tracking-widest">No bills found matching your search.</td>
                                     </tr>
                                 )}
                             </tbody>

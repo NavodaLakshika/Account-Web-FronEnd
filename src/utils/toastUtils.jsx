@@ -62,7 +62,7 @@ const ToastLayout = ({
                 <div 
                     className={`fixed inset-0 w-full h-full pointer-events-none z-[9998] transition-opacity duration-1000 ease-in-out ${isGlowActive ? 'opacity-100' : 'opacity-0'}`}
                     style={{
-                        background: `radial-gradient(ellipse at 50% 100%, ${glowColor} 0%, transparent 60%)`
+                        background: `linear-gradient(180deg, ${glowColor} 0%, rgba(255,255,255,0) 60%)`
                     }}
                 />,
                 document.body
@@ -99,15 +99,13 @@ const ToastLayout = ({
                                     <Pause size={14} strokeWidth={2.5} fill="currentColor" />
                                 </button>
                             )}
-                            {isPaused && (
-                                <button 
-                                    onClick={() => toast.dismiss(t.id)} 
-                                    className="text-white hover:text-white/80 transition-colors"
-                                    title="Close"
-                                >
-                                    <X size={16} strokeWidth={3} />
-                                </button>
-                            )}
+                            <button 
+                                onClick={() => toast.dismiss(t.id)} 
+                                className="text-white hover:text-white/80 transition-colors"
+                                title="Close"
+                            >
+                                <X size={16} strokeWidth={3} />
+                            </button>
                         </div>
                     </div>
 
@@ -169,6 +167,7 @@ export const showSuccessToast = (message, subMessageOrOptions) => {
                 )}
                 bgClass="bg-[#5cb85c]"
                 btnClass="bg-[#5cb85c]"
+                glowColor="rgba(92, 184, 92, 0.15)"
                 duration={duration}
             />
         ),
@@ -202,9 +201,9 @@ export const showErrorToast = (message, subMessageOrOptions) => {
                         </svg>
                     </div>
                 )}
-                bgClass="bg-[#d9534f]"
-                btnClass="bg-[#d9534f]"
-                glowColor="rgba(217, 83, 79, 0.4)"
+                bgClass="bg-[#dc2626]"
+                btnClass="bg-[#dc2626]"
+                glowColor="rgba(220, 38, 38, 0.15)"
                 duration={duration}
             />
         ),
@@ -238,6 +237,7 @@ export const showInfoToast = (message, subMessageOrOptions) => {
                 )}
                 bgClass="bg-[#5bc0de]"
                 btnClass="bg-[#5bc0de]"
+                glowColor="rgba(91, 192, 222, 0.15)"
                 duration={duration}
             />
         ),
@@ -271,6 +271,7 @@ export const showPendingToast = (message, subMessageOrOptions) => {
                 )}
                 bgClass="bg-[#f0ad4e]"
                 btnClass="bg-[#f0ad4e]"
+                glowColor="rgba(240, 173, 78, 0.15)"
                 duration={duration}
             />
         ),

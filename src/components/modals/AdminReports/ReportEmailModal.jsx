@@ -167,7 +167,7 @@ const ReportEmailModal = ({ isOpen, onClose, title, companyName, userName }) => 
                 {/* Footer */}
                 <div className="p-6 pt-4 flex justify-between items-center">
                     <div className="flex items-center gap-3">
-                        <div className={`text-[13px] font-semibold ${statusMsg.includes('success') ? 'text-green-600' : statusMsg.includes('Please') || statusMsg.includes('Failed') || statusMsg.includes('Error') ? 'text-red-600' : 'text-[#0077c5]'}`}>
+                        <div className={`text-[13px] font-semibold ${statusMsg.includes('success') ? 'text-blue-600' : statusMsg.includes('Please') || statusMsg.includes('Failed') || statusMsg.includes('Error') ? 'text-red-600' : 'text-[#0077c5]'}`}>
                             {statusMsg}
                         </div>
                     </div>

@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { X, Printer, Loader2, FileText, Download } from 'lucide-react';
 import SimpleModal from '../SimpleModal';
 import { enterBillService } from '../../services/enterBill.service';
 import { getSessionData } from '../../utils/session';
 import { showErrorToast } from '../../utils/toastUtils';
 import html2pdf from 'html2pdf.js';
+import api from '../../services/api';
 
 const TransactionReceiptModal = ({ selectedTx, onClose }) => {
   const [loading, setLoading] = useState(false);
@@ -14,7 +16,24 @@ const TransactionReceiptModal = ({ selectedTx, onClose }) => {
   
   const session = getSessionData();
   const companyName = session?.companyName || 'ONIMTA INFORMATION TECHNOLOGY';
-  const userName = session?.username || 'System Admin';
+  const userName = session?.userName || 'System Admin';
+  const [fullCompanyDetails, setFullCompanyDetails] = useState(session?.companyDetails || {});
+
+  useEffect(() => {
+    const fetchCompanyDetails = async () => {
+      if (session?.companyCode) {
+        try {
+          const response = await api.get(`/company/details/${session.companyCode}`);
+          if (response.data) {
+            setFullCompanyDetails(response.data);
+          }
+        } catch (error) {
+          console.error("Failed to fetch full company details:", error);
+        }
+      }
+    };
+    fetchCompanyDetails();
+  }, [session?.companyCode]);
 
   const handleDownloadPdf = async () => {
     const element = receiptRef.current;
@@ -73,220 +92,146 @@ const TransactionReceiptModal = ({ selectedTx, onClose }) => {
 
   if (!selectedTx) return null;
 
-  return (
-      <div className="fixed inset-0 z-[1100] flex flex-col items-center justify-center bg-[#2d3748]/60 backdrop-blur-[2px] transition-opacity p-4">
-          <div className="relative w-full max-w-[480px] flex flex-col items-center drop-shadow-2xl animate-in fade-in zoom-in-95 duration-200 receipt-printable print:bg-white print:shadow-none mt-12">
-            {/* Action Buttons */}
-            <div className="absolute -top-12 right-0 flex gap-3 print:hidden">
-                <button onClick={handleDownloadPdf} disabled={isPdfGenerating} className={`text-white hover:text-blue-200 p-2 transition-colors bg-white/20 rounded-full hover:bg-white/30 backdrop-blur-md ${isPdfGenerating ? 'opacity-50 cursor-not-allowed' : ''}`} title="Download PDF">
-                    {isPdfGenerating ? <Loader2 size={20} className="animate-spin" /> : <Download size={20} />}
-                </button>
-                <button onClick={() => window.print()} className="text-white hover:text-blue-200 p-2 transition-colors bg-white/20 rounded-full hover:bg-white/30 backdrop-blur-md" title="Print Receipt">
-                    <Printer size={20} />
-                </button>
-                <button onClick={onClose} className="text-white hover:text-red-200 p-2 transition-colors bg-white/20 rounded-full hover:bg-white/30 backdrop-blur-md">
-                    <X size={22} />
-                </button>
-            </div>
-
+  const modalContent = (
+      <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-[#2d3748]/60 backdrop-blur-[2px] transition-opacity p-4 print:p-0 print:bg-white">
+          <div className="relative w-full max-w-[700px] flex flex-col bg-white drop-shadow-2xl animate-in fade-in zoom-in-95 duration-200 receipt-printable print:shadow-none min-h-[600px] max-h-[90vh] overflow-y-auto">
+            
             {/* Main Receipt Body */}
-            <div ref={receiptRef} className="w-full bg-gradient-to-b from-white to-[#f4f6f9] pt-8 pb-10 px-10 relative overflow-hidden min-h-[550px]" 
-                 style={{ boxShadow: 'inset 0 0 60px rgba(0,0,0,0.02)' }}>
+            <div ref={receiptRef} className="w-full bg-white pt-12 pb-12 px-12 relative flex-1 flex flex-col print:pt-0 print:px-0">
               
               {/* Header */}
-              <div className="text-center mb-4">
-                <h2 className="text-[20px] font-mono tracking-[0.25em] text-[#5a677a] mb-1">{selectedTx.type}</h2>
-                <div className="text-[12px] font-black text-[#2d3748] uppercase tracking-widest leading-tight">{companyName}</div>
-                <div className="text-[9px] font-mono text-[#829ab1] uppercase mt-1 tracking-wider">Transaction Details</div>
+              <div className="flex justify-between items-start mb-10">
+                  <div>
+                      <div className="font-bold text-[16px] text-slate-800 uppercase tracking-widest">{companyName}</div>
+                      {(fullCompanyDetails.Address1 || fullCompanyDetails.address1 || fullCompanyDetails.Phone || fullCompanyDetails.phone || fullCompanyDetails.Email || fullCompanyDetails.email) ? (
+                          <div className="text-[11px] text-slate-600 mt-2 leading-relaxed">
+                              {(fullCompanyDetails.Address1 || fullCompanyDetails.address1) && <>{fullCompanyDetails.Address1 || fullCompanyDetails.address1}<br/></>}
+                              {(fullCompanyDetails.Phone || fullCompanyDetails.phone) && <>{fullCompanyDetails.Phone || fullCompanyDetails.phone}<br/></>}
+                              {(fullCompanyDetails.Email || fullCompanyDetails.email) && <>{fullCompanyDetails.Email || fullCompanyDetails.email}</>}
+                          </div>
+                      ) : (
+                          <div className="text-[11px] text-slate-600 mt-2 leading-relaxed opacity-50 italic">
+                              Contact details unavailable
+                          </div>
+                      )}
+                  </div>
+                  <div className="text-right">
+                      <h1 className="text-[36px] font-bold text-[#0066cc] mb-6">Receipt</h1>
+                      <div className="flex text-[11px] font-bold text-slate-800 mb-2">
+                          <div className="w-[120px] text-center">Receipt Number</div>
+                          <div className="w-[120px] text-center">Receipt Date</div>
+                      </div>
+                      <div className="flex text-[11px] text-slate-600 border-t-2 border-slate-100 pt-2">
+                          <div className="w-[120px] text-center">{selectedTx.docNo}</div>
+                          <div className="w-[120px] text-center">{selectedTx?.date ? selectedTx.date.split('T')[0] : '---'}</div>
+                      </div>
+                  </div>
               </div>
-              
-              <div className="text-[#a0aec0] font-mono text-center tracking-[0.2em] mb-4 text-xs overflow-hidden whitespace-nowrap opacity-60">
-                  ***********************************
+
+              {/* To Section */}
+              <div className="mb-8">
+                  <div className="font-bold text-[12px] text-slate-800 mb-1.5">To</div>
+                  <div className="text-[11px] text-slate-800">
+                      <span className="font-bold">Name:</span> {selectedTx.payee || selectedTx.category || '---'}
+                  </div>
+                  {billDetails?.header?.address && (
+                      <div className="text-[11px] text-slate-800 mt-0.5">
+                          <span className="font-bold">Address:</span> {billDetails.header.address}
+                      </div>
+                  )}
               </div>
               
               {loading ? (
-                  <div className="flex justify-center items-center py-6">
-                      <Loader2 size={20} className="text-blue-500 animate-spin" />
+                  <div className="flex justify-center items-center py-10">
+                      <Loader2 size={24} className="text-blue-500 animate-spin" />
                   </div>
               ) : (
                   <>
-                      {/* Info */}
-                      <div className="w-full flex justify-between font-mono text-[#4a5568] mb-1.5 text-[12px]">
-                          <span className="uppercase tracking-wider shrink-0">Payee</span>
-                          <span className="text-right ml-2 break-all">{selectedTx.payee || selectedTx.category || '---'}</span>
-                      </div>
-                      <div className="w-full flex justify-between font-mono text-[#4a5568] mb-1.5 text-[12px]">
-                          <span className="uppercase tracking-wider">Doc No</span>
-                          <span className="text-right">{selectedTx.docNo}</span>
-                      </div>
+                      {/* Table */}
+                      <table className="w-full text-left text-[11px] mb-8 border-collapse">
+                          <thead>
+                              <tr className="text-[#0066cc] font-bold border-t-2 border-b-2 border-slate-100">
+                                  <th className="py-3 px-2 w-[15%] text-center">Item#</th>
+                                  <th className="py-3 px-2 w-[45%]">Item Description</th>
+                                  <th className="py-3 px-2 w-[20%] text-center">Quantity</th>
+                                  <th className="py-3 px-2 w-[20%] text-center bg-[#f5f8fc]">Total Amount Due</th>
+                              </tr>
+                          </thead>
+                          <tbody>
+                              {billDetails && billDetails.expenses && billDetails.expenses.length > 0 ? (
+                                  billDetails.expenses.map((exp, idx) => (
+                                      <tr key={idx} className="border-b border-slate-50">
+                                          <td className="py-3 px-2 text-center">{idx + 1}</td>
+                                          <td className="py-3 px-2">{exp.memo || exp.accCode || exp.acc_Code || 'Item'}</td>
+                                          <td className="py-3 px-2 text-center">1</td>
+                                          <td className="py-3 px-2 text-center">LKR {parseFloat(exp.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                                      </tr>
+                                  ))
+                              ) : (
+                                  <tr className="border-b border-slate-50">
+                                      <td className="py-3 px-2 text-center">1</td>
+                                      <td className="py-3 px-2">{selectedTx.category || 'Payment'}</td>
+                                      <td className="py-3 px-2 text-center">1</td>
+                                      <td className="py-3 px-2 text-center">LKR {(selectedTx.total || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                                  </tr>
+                              )}
+                          </tbody>
+                      </table>
 
-                      {billDetails?.header?.customerCode && (
-                          <div className="w-full flex justify-between font-mono text-[#4a5568] mb-1.5 text-[12px]">
-                              <span className="uppercase tracking-wider">Cust Code</span>
-                              <span className="text-right">{billDetails.header.customerCode}</span>
+                      {/* Totals Section */}
+                      <div className="flex justify-end mb-12">
+                          <div className="w-[45%] bg-[#0066cc] text-white text-[11px] p-4">
+                              <div className="flex justify-between py-1.5">
+                                  <span>Subtotal</span>
+                                  <span>LKR {(selectedTx.total || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                              </div>
+                              <div className="flex justify-between py-1.5">
+                                  <span>Less: Amount Received</span>
+                                  <span>LKR 0.00</span>
+                              </div>
+                              <div className="flex justify-between py-1.5 font-bold border-t border-white/20 mt-1.5 pt-2.5">
+                                  <span>Total Balance Due</span>
+                                  <span>LKR {(selectedTx.total || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                              </div>
                           </div>
-                      )}
-                      
-                      {(billDetails?.header?.ref_No || billDetails?.header?.refNo) && (
-                          <div className="w-full flex justify-between font-mono text-[#4a5568] mb-1.5 text-[12px]">
-                              <span className="uppercase tracking-wider">Ref No</span>
-                              <span className="text-right">{billDetails.header.ref_No || billDetails.header.refNo}</span>
-                          </div>
-                      )}
-                      {(billDetails?.header?.bill_No || billDetails?.header?.billNo) && (
-                          <div className="w-full flex justify-between font-mono text-[#4a5568] mb-1.5 text-[12px]">
-                              <span className="uppercase tracking-wider">Bill No</span>
-                              <span className="text-right">{billDetails.header.bill_No || billDetails.header.billNo}</span>
-                          </div>
-                      )}
-                      {billDetails?.header?.terms && (
-                          <div className="w-full flex justify-between font-mono text-[#4a5568] mb-1.5 text-[12px]">
-                              <span className="uppercase tracking-wider">Terms</span>
-                              <span className="text-right">{billDetails.header.terms}</span>
-                          </div>
-                      )}
-                      {(billDetails?.header?.post_Date || billDetails?.header?.postDate) && (
-                          <div className="w-full flex justify-between font-mono text-[#4a5568] mb-1.5 text-[12px]">
-                              <span className="uppercase tracking-wider">Post Date</span>
-                              <span className="text-right">{(billDetails.header.post_Date || billDetails.header.postDate).split('T')[0]}</span>
-                          </div>
-                      )}
-                      {(billDetails?.header?.bill_Due_Date || billDetails?.header?.billDueDate) && (
-                          <div className="w-full flex justify-between font-mono text-[#4a5568] mb-1.5 text-[12px]">
-                              <span className="uppercase tracking-wider">Due Date</span>
-                              <span className="text-right">{(billDetails.header.bill_Due_Date || billDetails.header.billDueDate).split('T')[0]}</span>
-                          </div>
-                      )}
-                      {billDetails?.header?.memo && (
-                          <div className="w-full flex justify-between font-mono text-[#4a5568] mb-1.5 text-[12px]">
-                              <span className="uppercase tracking-wider">Memo</span>
-                              <span className="text-right break-words max-w-[150px]">{billDetails.header.memo}</span>
-                          </div>
-                      )}
-                      {billDetails?.header?.payType && (
-                          <div className="w-full flex justify-between font-mono text-[#4a5568] mb-1.5 text-[12px]">
-                              <span className="uppercase tracking-wider">Pay Mode</span>
-                              <span className="text-right">{billDetails.header.payType}</span>
-                          </div>
-                      )}
-                      {billDetails?.header?.bank && (
-                          <div className="w-full flex justify-between font-mono text-[#4a5568] mb-1.5 text-[12px]">
-                              <span className="uppercase tracking-wider">Bank</span>
-                              <span className="text-right break-words max-w-[150px]">{billDetails.header.bank}</span>
-                          </div>
-                      )}
-                      {billDetails?.header?.branch && (
-                          <div className="w-full flex justify-between font-mono text-[#4a5568] mb-1.5 text-[12px]">
-                              <span className="uppercase tracking-wider">Branch</span>
-                              <span className="text-right break-words max-w-[150px]">{billDetails.header.branch}</span>
-                          </div>
-                      )}
-                      {billDetails?.header?.chequeNo && (
-                          <div className="w-full flex justify-between font-mono text-[#4a5568] mb-1.5 text-[12px]">
-                              <span className="uppercase tracking-wider">Cheque No</span>
-                              <span className="text-right">{billDetails.header.chequeNo}</span>
-                          </div>
-                      )}
-                      {billDetails?.header?.chequeDate && (
-                          <div className="w-full flex justify-between font-mono text-[#4a5568] mb-1.5 text-[12px]">
-                              <span className="uppercase tracking-wider">Cheque Date</span>
-                              <span className="text-right">{billDetails.header.chequeDate.split('T')[0]}</span>
-                          </div>
-                      )}
-                      {(billDetails?.header?.costCenter || billDetails?.header?.cost_Center) && (
-                          <div className="w-full flex justify-between font-mono text-[#4a5568] mb-1.5 text-[12px]">
-                              <span className="uppercase tracking-wider">Cost Center</span>
-                              <span className="text-right break-words max-w-[150px]">{billDetails.header.costCenter || billDetails.header.cost_Center}</span>
-                          </div>
-                      )}
-                      {billDetails?.header?.grossAmount && (
-                          <div className="w-full flex justify-between font-mono text-[#4a5568] mb-1.5 text-[12px]">
-                              <span className="uppercase tracking-wider">Gross Amt</span>
-                              <span className="text-right">{billDetails.header.grossAmount}</span>
-                          </div>
-                      )}
-                      {billDetails?.header?.discountAmount && parseFloat(billDetails.header.discountAmount) > 0 ? (
-                          <div className="w-full flex justify-between font-mono text-[#4a5568] mb-1.5 text-[12px]">
-                              <span className="uppercase tracking-wider">Discount</span>
-                              <span className="text-right">{billDetails.header.discountAmount}</span>
-                          </div>
-                      ) : null}
-                      {billDetails?.header?.setOff && parseFloat(billDetails.header.setOff) > 0 ? (
-                          <div className="w-full flex justify-between font-mono text-[#4a5568] mb-1.5 text-[12px]">
-                              <span className="uppercase tracking-wider">Debit SetOff</span>
-                              <span className="text-right">{billDetails.header.setOff}</span>
-                          </div>
-                      ) : null}
-                      {billDetails?.header?.overPayment && parseFloat(billDetails.header.overPayment) > 0 ? (
-                          <div className="w-full flex justify-between font-mono text-[#4a5568] mb-1.5 text-[12px]">
-                              <span className="uppercase tracking-wider">Over Payment</span>
-                              <span className="text-right">{billDetails.header.overPayment}</span>
-                          </div>
-                      ) : null}
-
-                      <div className="w-full flex justify-between font-mono text-[#4a5568] mb-4 text-[12px]">
-                          <span className="uppercase tracking-wider">Status</span>
-                          <span className="text-right uppercase">{selectedTx.status || 'RECORDED'}</span>
-                      </div>
-
-                      {billDetails && billDetails.expenses && billDetails.expenses.length > 0 && (
-                          <div className="w-full mb-4">
-                              <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 pb-1 border-b border-dashed border-[#cbd5e0]">Line Items</div>
-                              {billDetails.expenses.map((exp, idx) => (
-                                  <div key={idx} className="flex flex-col mb-2 leading-normal">
-                                      <div className="flex justify-between font-mono text-[11px] text-[#4a5568]">
-                                          <span className="break-words max-w-[180px] uppercase py-0.5">{exp.accCode || exp.acc_Code}</span>
-                                          <span className="py-0.5">{parseFloat(exp.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                                      </div>
-                                      {exp.memo && <span className="font-mono text-[9px] text-[#829ab1] italic break-words mt-0.5 leading-snug">{exp.memo}</span>}
-                                      {(exp.costCenter || exp.cost_Center) && <span className="font-mono text-[9px] text-[#829ab1] break-words mt-0.5 leading-snug">CC: {exp.costCenter || exp.cost_Center}</span>}
-                                  </div>
-                              ))}
-                          </div>
-                      )}
-                      
-                      {/* Divider */}
-                      <div className="w-full border-t-[2px] border-dashed border-[#cbd5e0] mb-3 opacity-70"></div>
-                      
-                      {/* Total */}
-                      <div className="w-full flex justify-between items-end font-mono text-[#2d3748] mb-4">
-                          <span className="text-[14px] tracking-wider uppercase">Total</span>
-                          <span className="text-[18px] font-bold">
-                              {(selectedTx?.total || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                          </span>
                       </div>
                   </>
               )}
               
-              {/* Date */}
-              <div className="w-full flex justify-between font-mono text-[#829ab1] text-[11px] mb-3">
-                  <span className="uppercase tracking-wider">Date</span>
-                  <span>{selectedTx?.date ? selectedTx.date.split('T')[0].split('-').reverse().join('.') : '---'}</span>
-              </div>
-              
-              <div className="text-[#a0aec0] font-mono text-center tracking-[0.2em] mb-2 text-xs overflow-hidden whitespace-nowrap opacity-60">
-                  ***********************************
-              </div>
-
-              <div className="w-full flex justify-between font-mono text-[#829ab1] text-[9px] mb-2">
-                  <span>REF: {selectedTx.docNo}</span>
-                  <span>TYPE: {selectedTx.type.split(' ')[0]}</span>
-              </div>
-              <div className="w-full flex justify-center font-mono text-[#829ab1] text-[8px] mt-4 opacity-70">
-                  <span>SERVED BY: {userName.toUpperCase()}</span>
+              <div className="text-center text-[10px] text-slate-500 mt-auto font-medium">
+                  If you find any variances of this receipt, please report to us immediately. Thank you very much.
               </div>
             </div>
 
-            {/* Scalloped Bottom Edge */}
-            <div className="w-full h-[12px] shrink-0" style={{
-                background: 'radial-gradient(circle at 50% 0, #f4f6f9 6px, transparent 6.5px) repeat-x',
-                backgroundSize: '12px 12px',
-                marginTop: '-1px'
-            }} />
-
+            {/* Action Buttons Footer */}
+            <div className="bg-slate-50 px-6 py-4 flex items-center justify-end gap-3 border-t border-slate-200 print:hidden shrink-0">
+                <button
+                    onClick={handleDownloadPdf}
+                    disabled={isPdfGenerating}
+                    className={`flex items-center gap-2 px-5 py-2 bg-white text-slate-700 border border-slate-300 hover:bg-slate-50 font-bold text-[12px] uppercase tracking-widest rounded-[3px] transition-all active:scale-95 ${isPdfGenerating ? 'opacity-50 cursor-not-allowed' : ''}`}
+                >
+                    {isPdfGenerating ? <Loader2 size={16} className="animate-spin" /> : <Download size={16} />}
+                    Download
+                </button>
+                <button
+                    onClick={() => window.print()}
+                    className="flex items-center gap-2 px-5 py-2 bg-[#0066cc] text-white hover:bg-[#0052a3] font-bold text-[12px] uppercase tracking-widest rounded-[3px] shadow-sm transition-all active:scale-95"
+                >
+                    <Printer size={16} />
+                    Print
+                </button>
+                <button
+                    onClick={onClose}
+                    className="px-5 py-2 bg-slate-200 text-slate-700 hover:bg-slate-300 font-bold text-[12px] uppercase tracking-widest rounded-[3px] shadow-sm transition-all active:scale-95 ml-2"
+                >
+                    Close
+                </button>
+            </div>
          </div>
       </div>
     );
+
+    return createPortal(modalContent, document.body);
 };
 
 export default TransactionReceiptModal;

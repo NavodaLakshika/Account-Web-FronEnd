@@ -5,10 +5,9 @@ const SimpleModal = ({ isOpen, onClose, title, subtitle, children, footer, maxWi
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 font-['Tahoma']">
+        <div className="fixed inset-0 z-[1000] flex items-start justify-center p-4 pt-12 font-['Tahoma']">
             <div className="absolute inset-0 bg-slate-900/30 backdrop-blur-sm" onClick={onClose} />
-
- <div className={`relative w-full ${maxWidth} bg-white shadow-2xl rounded-[5px] overflow-hidden flex flex-col animate-in slide-in-from-bottom-10 fade-in duration-400`} style={{ zoom }}>
+            <div className={`relative w-full ${maxWidth} bg-white shadow-2xl rounded-[3px] overflow-hidden flex flex-col animate-in slide-in-from-bottom-10 fade-in duration-400`} style={{ zoom }}>
                 <div className="bg-white px-6 py-3 flex items-center justify-between border-b border-slate-200 select-none relative shrink-0">
                     <div className="flex flex-col gap-0.5 overflow-hidden">
                         <span className="text-[15px] font-mono font-bold text-slate-800 uppercase tracking-widest truncate">

@@ -1,22 +1,23 @@
 import React, { useState } from 'react';
 import SimpleModal from '../components/SimpleModal';
 import { ChevronDown, Printer, UserPlus, FileText, Calendar , X} from 'lucide-react';
+import TransactionFormWrapper from '../components/TransactionFormWrapper';
 
 const CustomerBoard = ({ isOpen, onClose }) => {
     const [selectedTab, setSelectedTab] = useState('Customer Search');
 
     return (
-        <SimpleModal
+        <TransactionFormWrapper subtitle="Transaction Management" icon={FileText}
             isOpen={isOpen}
             onClose={onClose}
             title="Customer Center"
-            maxWidth="max-w-[1100px]"
+            maxWidth="max-w-[700px]"
             footer={
                 <div className="flex items-center justify-between w-full">
                     <div className="flex items-center gap-2 pl-4">
                         <span className="text-[24px] font-black italic text-[#0078d4]/30 tracking-tighter select-none">onimta IT</span>
                     </div>
-                    <button onClick={onClose} className="px-6 h-10 bg-slate-100 text-slate-600 text-sm font-bold rounded-md hover:bg-slate-200 transition-all active:scale-95">
+                    <button onClick={onClose} className="px-6 h-10 bg-slate-100 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-200 transition-all active:scale-95">
                         <X size={14} /> Exit
                     </button>
                 </div>
@@ -55,8 +56,8 @@ const CustomerBoard = ({ isOpen, onClose }) => {
                 <div className="flex flex-1 gap-4 px-1 min-h-0">
                     
                     {/* Left Side: Search & List (30%) */}
-                    <div className="w-[320px] flex flex-col border border-gray-200 rounded-lg bg-white shadow-sm overflow-hidden">
-                        <div className="flex border-b border-gray-100 bg-gray-50/50">
+                    <div className="w-[320px] flex flex-col border border-gray-200 rounded-[3px] bg-white shadow-sm overflow-hidden">
+                        <div className="flex border-b border-gray-200 bg-gray-50/50">
                             {['Customer Search', 'Transaction'].map(tab => (
                                 <button
                                     key={tab}
@@ -86,13 +87,15 @@ const CustomerBoard = ({ isOpen, onClose }) => {
                                     <tr>
                                         <th className="px-4 py-2 text-[11px] font-black text-gray-400 uppercase tracking-widest border-r border-blue-50/30">Customer</th>
                                         <th className="px-4 py-2 text-[11px] font-black text-gray-400 uppercase tracking-widest text-right">Balance</th>
-                                    </tr>
+                                    <th className="text-right px-5 py-3">Action</th></tr>
                                 </thead>
                                 <tbody>
                                     <tr className="bg-cyan-50/50 border-b border-blue-50 group hover:bg-blue-50 transition-colors cursor-pointer">
                                         <td className="px-4 py-3 text-[13px] font-bold text-[#0078d4] border-r border-blue-50/30">CASH SALES</td>
                                         <td className="px-4 py-3 text-[13px] font-black text-right text-gray-600">0.00</td>
-                                    </tr>
+                                    
+                                            <td className="text-right px-5 py-3"><button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button></td>
+                                        </tr>
                                     {[...Array(15)].map((_, i) => (
                                         <tr key={i} className="border-b border-gray-50">
                                             <td className="px-4 py-3 border-r border-gray-50"></td>
@@ -107,7 +110,7 @@ const CustomerBoard = ({ isOpen, onClose }) => {
                     {/* Right Side: Detailed Details (70%) */}
                     <div className="flex-1 flex flex-col gap-4 min-w-0">
                         {/* Information Section */}
-                        <div className="bg-[#f8faff] border border-blue-100 rounded-lg p-6 shadow-sm">
+                        <div className="bg-[#f8faff] border border-blue-100 rounded-[3px] p-6 shadow-sm">
                             <h3 className="text-[14px] font-black text-[#0078d4] italic mb-6 border-b border-blue-100 pb-2">Customer Information</h3>
                             <div className="grid grid-cols-2 gap-x-12 gap-y-3">
                                 <div className="space-y-3">
@@ -142,8 +145,8 @@ const CustomerBoard = ({ isOpen, onClose }) => {
                         </div>
 
                         {/* Transaction List Section */}
-                        <div className="flex-1 border border-gray-200 rounded-lg bg-white shadow-sm flex flex-col overflow-hidden">
-                            <div className="p-3 bg-gray-50/50 border-b border-gray-100 flex items-center justify-start gap-8">
+                        <div className="flex-1 border border-gray-200 rounded-[3px] bg-white shadow-sm flex flex-col overflow-hidden">
+                            <div className="p-3 bg-gray-50/50 border-b border-gray-200 flex items-center justify-start gap-8">
                                 <div className="flex items-center gap-3">
                                     <span className="text-[12px] font-bold text-gray-500">Show</span>
                                     <div className="relative w-48">
@@ -157,7 +160,7 @@ const CustomerBoard = ({ isOpen, onClose }) => {
                                     <span className="text-[12px] font-bold text-gray-500">Date</span>
                                     <div className="flex items-center border border-gray-300 rounded h-8 px-2 bg-white shadow-sm w-40">
                                         <input type="text" defaultValue="17/03/2026" className="flex-1 text-[12px] font-bold text-gray-700 outline-none" />
-                                        <button className="h-full pl-2 border-l border-gray-100 text-[#0078d4]">
+                                        <button className="h-full pl-2 border-l border-gray-200 text-[#0078d4]">
                                             <Calendar size={13} />
                                         </button>
                                     </div>
@@ -173,7 +176,7 @@ const CustomerBoard = ({ isOpen, onClose }) => {
                                             <th className="px-4 py-2 text-[11px] font-black text-gray-400 uppercase tracking-widest border-r border-blue-50/30">Date</th>
                                             <th className="px-4 py-2 text-[11px] font-black text-gray-400 uppercase tracking-widest border-r border-blue-50/30">Account</th>
                                             <th className="px-4 py-2 text-[11px] font-black text-gray-400 uppercase tracking-widest text-right">Amount</th>
-                                        </tr>
+                                        <th className="text-right px-5 py-3">Action</th></tr>
                                     </thead>
                                     <tbody>
                                         {[...Array(20)].map((_, i) => (
@@ -192,7 +195,7 @@ const CustomerBoard = ({ isOpen, onClose }) => {
                     </div>
                 </div>
             </div>
-        </SimpleModal>
+        </TransactionFormWrapper>
     );
 };
 

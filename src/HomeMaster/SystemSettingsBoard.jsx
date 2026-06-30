@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import SimpleModal from '../components/SimpleModal';
-import { Settings, Shield, Users, Building, Plus, Trash2, CheckCircle, Save, X, Lock } from 'lucide-react';
+import { Settings, Shield, Users, Building, Plus, Trash2, CheckCircle, Save, X, Lock , FileText} from 'lucide-react';
 import api from '../services/api';
 import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
+import TransactionFormWrapper from '../components/TransactionFormWrapper';
 
 const SystemSettingsBoard = ({ isOpen = true, onClose, isInline = false }) => {
     const allModules = [
@@ -28,7 +29,6 @@ const SystemSettingsBoard = ({ isOpen = true, onClose, isInline = false }) => {
             { label: 'Stock Balance Update', id: 'stockUpdate' },
             { label: 'Inventory Download', id: 'inventoryDownload' },
             { label: 'Delete Account', id: 'deleteAccount' },
-            { label: 'Transaction Search', id: 'search' },
             { label: 'Document Editor', id: 'journalEditor' },
             { label: 'Transaction Editor', id: 'transactionEditor' },
             { label: 'System Update', id: 'update' },
@@ -281,7 +281,7 @@ const SystemSettingsBoard = ({ isOpen = true, onClose, isInline = false }) => {
     };
 
     const content = (
-        <div className="h-[80vh] flex flex-col bg-white dark:bg-slate-900 rounded-xl overflow-hidden relative">
+        <div className="h-[80vh] flex flex-col bg-white dark:bg-slate-900 rounded-[3px] overflow-hidden relative">
             {/* Header */}
             <div className="flex items-center justify-between p-6 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50">
                 <div>
@@ -294,7 +294,7 @@ const SystemSettingsBoard = ({ isOpen = true, onClose, isInline = false }) => {
                     </p>
                 </div>
                 {!isInline && (
-                    <button onClick={onClose} className="p-2 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg transition-colors">
+                    <button onClick={onClose} className="p-2 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-[3px] transition-colors">
                         <X className="text-slate-500" />
                     </button>
                 )}
@@ -332,7 +332,7 @@ const SystemSettingsBoard = ({ isOpen = true, onClose, isInline = false }) => {
                             <div className="p-4">
                                 <button 
                                     onClick={handleCreateNewProfile}
-                                    className="w-full py-2 px-4 bg-[#0078d4] hover:bg-[#006cbd] text-white rounded-lg flex items-center justify-center gap-2 transition-colors text-sm font-medium"
+                                    className="w-full py-2 px-4 bg-[#0078d4] hover:bg-[#006cbd] text-white rounded-[3px] flex items-center justify-center gap-2 transition-colors text-sm font-medium"
                                 >
                                     <Plus size={16} /> New Profile
                                 </button>
@@ -342,7 +342,7 @@ const SystemSettingsBoard = ({ isOpen = true, onClose, isInline = false }) => {
                                     <div 
                                         key={p.id}
                                         onClick={() => handleSelectProfile(p.id)}
-                                        className={`p-3 mb-1 rounded-lg cursor-pointer flex items-center justify-between group ${selectedProfileId === p.id ? 'bg-[#0078d4]/10 text-[#0078d4]' : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300'}`}
+                                        className={`p-3 mb-1 rounded-[3px] cursor-pointer flex items-center justify-between group ${selectedProfileId === p.id ? 'bg-[#0078d4]/10 text-[#0078d4]' : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300'}`}
                                     >
                                         <span className="font-medium text-sm truncate">{p.profileName}</span>
                                         <button 
@@ -370,7 +370,7 @@ const SystemSettingsBoard = ({ isOpen = true, onClose, isInline = false }) => {
                                             value={profileName}
                                             onChange={e => setProfileName(e.target.value)}
                                             placeholder="e.g. Branch Manager"
-                                            className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-[#0078d4] outline-none"
+                                            className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-[3px] px-3 py-2 text-sm focus:ring-2 focus:ring-[#0078d4] outline-none"
                                         />
                                     </div>
                                     <div>
@@ -380,7 +380,7 @@ const SystemSettingsBoard = ({ isOpen = true, onClose, isInline = false }) => {
                                             value={profileDesc}
                                             onChange={e => setProfileDesc(e.target.value)}
                                             placeholder="Optional description..."
-                                            className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-[#0078d4] outline-none"
+                                            className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-[3px] px-3 py-2 text-sm focus:ring-2 focus:ring-[#0078d4] outline-none"
                                         />
                                     </div>
                                 </div>
@@ -394,7 +394,7 @@ const SystemSettingsBoard = ({ isOpen = true, onClose, isInline = false }) => {
                                 
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                     {allModules.map((group, idx) => (
-                                        <div key={idx} className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-4 shadow-sm">
+                                        <div key={idx} className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-[3px] p-4 shadow-sm">
                                             <h5 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3">{group.group}</h5>
                                             <div className="space-y-2">
                                                 {group.items.map(item => (
@@ -420,7 +420,7 @@ const SystemSettingsBoard = ({ isOpen = true, onClose, isInline = false }) => {
                             <div className="p-4 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex justify-end">
                                 <button 
                                     onClick={handleSaveProfile}
-                                    className="px-6 py-2 bg-[#0078d4] hover:bg-[#006cbd] text-white rounded-lg font-medium flex items-center gap-2 transition-colors shadow-lg shadow-[#0078d4]/20"
+                                    className="px-6 py-2 bg-[#0078d4] hover:bg-[#006cbd] text-white rounded-[3px] font-medium flex items-center gap-2 transition-colors shadow-lg shadow-[#0078d4]/20"
                                 >
                                     <Save size={16} /> Save Profile
                                 </button>
@@ -431,7 +431,7 @@ const SystemSettingsBoard = ({ isOpen = true, onClose, isInline = false }) => {
                     // Assignments Tab
                     <div className="w-full h-full p-6 flex gap-6 overflow-hidden">
                         {/* Assignment Form */}
-                        <div className="w-1/3 flex flex-col bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-sm p-6 overflow-y-auto">
+                        <div className="w-1/3 flex flex-col bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-[3px] shadow-sm p-6 overflow-y-auto">
                             <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-6">Assign Profile</h3>
                             
                             <div className="space-y-5">
@@ -440,7 +440,7 @@ const SystemSettingsBoard = ({ isOpen = true, onClose, isInline = false }) => {
                                     <select 
                                         value={assignEmpCode}
                                         onChange={e => setAssignEmpCode(e.target.value)}
-                                        className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2.5 text-sm outline-none"
+                                        className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-[3px] px-3 py-2.5 text-sm outline-none"
                                     >
                                         <option value="">-- Choose Employee --</option>
                                         {employees.map(e => (
@@ -454,7 +454,7 @@ const SystemSettingsBoard = ({ isOpen = true, onClose, isInline = false }) => {
                                     <select 
                                         value={assignProfileId}
                                         onChange={e => setAssignProfileId(e.target.value)}
-                                        className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2.5 text-sm outline-none"
+                                        className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-[3px] px-3 py-2.5 text-sm outline-none"
                                     >
                                         <option value="">-- Choose Profile --</option>
                                         {profiles.map(p => (
@@ -464,7 +464,7 @@ const SystemSettingsBoard = ({ isOpen = true, onClose, isInline = false }) => {
                                 </div>
 
                                 <div className="pt-2">
-                                    <label className="flex items-center gap-3 p-3 border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900/50 cursor-pointer">
+                                    <label className="flex items-center gap-3 p-3 border border-slate-200 dark:border-slate-700 rounded-[3px] bg-slate-50 dark:bg-slate-900/50 cursor-pointer">
                                         <input 
                                             type="checkbox" 
                                             checked={assignIsGlobal}
@@ -483,7 +483,7 @@ const SystemSettingsBoard = ({ isOpen = true, onClose, isInline = false }) => {
                                         <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2 flex items-center gap-2">
                                             <Building size={14}/> Select Target Companies
                                         </label>
-                                        <div className="border border-slate-200 dark:border-slate-700 rounded-lg max-h-48 overflow-y-auto bg-slate-50 dark:bg-slate-900">
+                                        <div className="border border-slate-200 dark:border-slate-700 rounded-[3px] max-h-48 overflow-y-auto bg-slate-50 dark:bg-slate-900">
                                             {companies.map(c => {
                                                 const code = c.company_Code || c.Code || c.code;
                                                 const name = c.company_Name || c.Comp_Name || c.comp_Name || code;
@@ -508,7 +508,7 @@ const SystemSettingsBoard = ({ isOpen = true, onClose, isInline = false }) => {
 
                                 <button 
                                     onClick={handleSaveAssignment}
-                                    className="w-full py-2.5 bg-[#0078d4] hover:bg-[#006cbd] text-white rounded-lg font-medium shadow-md transition-colors flex items-center justify-center gap-2 mt-4"
+                                    className="w-full py-2.5 bg-[#0078d4] hover:bg-[#006cbd] text-white rounded-[3px] font-medium shadow-md transition-colors flex items-center justify-center gap-2 mt-4"
                                 >
                                     <CheckCircle size={16} /> Assign Policy
                                 </button>
@@ -516,7 +516,7 @@ const SystemSettingsBoard = ({ isOpen = true, onClose, isInline = false }) => {
                         </div>
 
                         {/* Active Assignments List */}
-                        <div className="flex-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-sm overflow-hidden flex flex-col">
+                        <div className="flex-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-[3px] shadow-sm overflow-hidden flex flex-col">
                             <div className="p-4 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50">
                                 <h3 className="font-bold text-slate-800 dark:text-white">Active Assignments</h3>
                             </div>
@@ -530,7 +530,7 @@ const SystemSettingsBoard = ({ isOpen = true, onClose, isInline = false }) => {
                                             const prof = profiles.find(p => p.id === a.profileId);
                                             
                                             return (
-                                                <div key={a.id} className="p-4 border border-slate-200 dark:border-slate-700 rounded-lg hover:border-[#0078d4] transition-colors flex items-start justify-between bg-slate-50 dark:bg-slate-900/50">
+                                                <div key={a.id} className="p-4 border border-slate-200 dark:border-slate-700 rounded-[3px] hover:border-[#0078d4] transition-colors flex items-start justify-between bg-slate-50 dark:bg-slate-900/50">
                                                     <div>
                                                         <div className="flex items-center gap-2 mb-1">
                                                             {(() => { 
@@ -575,9 +575,9 @@ const SystemSettingsBoard = ({ isOpen = true, onClose, isInline = false }) => {
     if (isInline) return content;
 
     return (
-        <SimpleModal isOpen={isOpen} onClose={onClose} width="max-w-[1200px]" height="h-[80vh]">
+        <TransactionFormWrapper subtitle="Transaction Management" icon={FileText} isOpen={isOpen} onClose={onClose} width="max-w-[1200px]" height="h-[80vh]">
             {content}
-        </SimpleModal>
+        </TransactionFormWrapper>
     );
 };
 

@@ -30,21 +30,21 @@ const SendFileBoard = ({ isOpen, onClose }) => {
 
                 <div className="flex-1 overflow-y-auto custom-scrollbar p-6">
                     <div className="select-none space-y-5">
-                        <div className="bg-white p-5 border border-slate-100 rounded-xl space-y-5">
+                        <div className="bg-white p-5 border border-slate-100 rounded-[3px] space-y-5">
                             <div className="flex items-center gap-4">
                                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest w-[110px] shrink-0">File Name</label>
                                 <div className="flex-1 flex gap-2">
                                     <div className="relative flex-1">
                                         <input
                                             type="text"
-                                            className="w-full h-9 px-3 border border-slate-200 rounded-lg text-[12px] font-bold text-slate-700 bg-white outline-none focus:border-[#4f83ff] focus:ring-1 focus:ring-[#4f83ff]/20 transition-all shadow-sm placeholder:text-slate-300"
+                                            className="w-full h-9 px-3 border border-slate-200 rounded-[3px] text-[12px] font-bold text-slate-700 bg-white outline-none focus:border-[#4f83ff] focus:ring-1 focus:ring-[#4f83ff]/20 transition-all shadow-sm placeholder:text-slate-300"
                                             placeholder="Select file to send..."
                                         />
                                     </div>
-                                    <button className="w-9 h-9 bg-white border border-slate-200 rounded-lg flex items-center justify-center hover:bg-slate-50 transition-all shadow-sm text-slate-500 hover:text-[#6366f1]">
+                                    <button className="w-9 h-9 bg-white border border-slate-200 rounded-[3px] flex items-center justify-center hover:bg-slate-50 transition-all shadow-sm text-slate-500 hover:text-[#6366f1]">
                                         <FileUp size={16} />
                                     </button>
-                                    <button className="w-9 h-9 bg-white border border-slate-200 rounded-lg flex items-center justify-center hover:bg-slate-50 transition-all shadow-sm text-slate-500 hover:text-[#6366f1]">
+                                    <button className="w-9 h-9 bg-white border border-slate-200 rounded-[3px] flex items-center justify-center hover:bg-slate-50 transition-all shadow-sm text-slate-500 hover:text-[#6366f1]">
                                         <Search size={16} />
                                     </button>
                                 </div>
@@ -56,11 +56,11 @@ const SendFileBoard = ({ isOpen, onClose }) => {
                                     <div className="relative flex-1">
                                         <input
                                             type="text"
-                                            className="w-full h-9 px-3 border border-slate-200 rounded-lg text-[12px] font-bold text-slate-700 bg-white outline-none focus:border-[#4f83ff] focus:ring-1 focus:ring-[#4f83ff]/20 transition-all shadow-sm placeholder:text-slate-300"
+                                            className="w-full h-9 px-3 border border-slate-200 rounded-[3px] text-[12px] font-bold text-slate-700 bg-white outline-none focus:border-[#4f83ff] focus:ring-1 focus:ring-[#4f83ff]/20 transition-all shadow-sm placeholder:text-slate-300"
                                             placeholder="Select recipient computer..."
                                         />
                                     </div>
-                                    <button className="w-9 h-9 bg-white border border-slate-200 rounded-lg flex items-center justify-center hover:bg-slate-50 transition-all shadow-sm text-slate-500 hover:text-[#6366f1]">
+                                    <button className="w-9 h-9 bg-white border border-slate-200 rounded-[3px] flex items-center justify-center hover:bg-slate-50 transition-all shadow-sm text-slate-500 hover:text-[#6366f1]">
                                         <Network size={16} />
                                     </button>
                                 </div>
@@ -68,8 +68,8 @@ const SendFileBoard = ({ isOpen, onClose }) => {
                         </div>
 
                         <div className="flex justify-end">
-                            <button className="flex items-center gap-3 px-5 py-2.5 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-all shadow-sm group">
-                                <div className="w-8 h-8 bg-[#eef2ff] rounded-lg flex items-center justify-center group-hover:bg-[#e0e7ff] transition-colors">
+                            <button className="flex items-center gap-3 px-5 py-2.5 bg-white border border-slate-200 rounded-[3px] hover:bg-slate-50 transition-all shadow-sm group">
+                                <div className="w-8 h-8 bg-[#eef2ff] rounded-[3px] flex items-center justify-center group-hover:bg-[#e0e7ff] transition-colors">
                                     <Monitor size={16} className="text-[#6366f1]" />
                                 </div>
                                 <span className="text-[11px] font-black text-slate-600 uppercase tracking-widest group-hover:text-slate-800 transition-colors">
@@ -82,7 +82,7 @@ const SendFileBoard = ({ isOpen, onClose }) => {
 
                 <div className="bg-white border-t border-slate-100 flex items-center justify-between shrink-0 px-6 py-4">
                     <span className="text-[10px] text-slate-400 font-medium">Network Transfer Utility</span>
-                    <button className="px-8 h-10 bg-[#6366f1] text-white text-[12px] font-black rounded-md shadow-sm hover:bg-[#4f46e5] transition-all active:scale-95 flex items-center gap-2 border-none uppercase tracking-widest">
+                    <button className="px-8 h-10 bg-[#6366f1] text-white text-[12px] font-black rounded-[3px] shadow-sm hover:bg-[#4f46e5] transition-all active:scale-95 flex items-center gap-2 border-none uppercase tracking-widest">
                         <Send size={14} /> Send File
                     </button>
                 </div>

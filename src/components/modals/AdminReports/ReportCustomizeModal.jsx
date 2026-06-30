@@ -178,7 +178,7 @@ const ReportCustomizeModal = ({ isOpen, onClose, customizations, onApply, column
                                             <span className="text-[13px] text-gray-700">Round to the nearest whole number</span>
                                         </label>
                                         
-                                        <div className="mt-4 pt-4 border-t border-gray-100">
+                                        <div className="mt-4 pt-4 border-t border-gray-200">
                                             <label className="block text-[12px] text-gray-600 mb-2">Negative numbers</label>
                                             <div className="flex gap-6 items-center">
                                                 <select value={localState.negativeNumbers || '-100'} onChange={e => updateState('negativeNumbers', e.target.value)} className="w-24 h-9 border border-gray-300 rounded px-2 text-[13px] text-gray-700 outline-none focus:border-[#0077c5]">
@@ -357,7 +357,7 @@ const ReportCustomizeModal = ({ isOpen, onClose, customizations, onApply, column
 
                 {/* Footer */}
                 <div className="p-4 bg-[#f4f5f8] border-t border-gray-200 flex justify-between items-center shrink-0">
-                    <button onClick={onClose} className="px-6 py-2.5 text-[14px] font-bold text-[#0077c5] hover:bg-[#eef6fc] rounded-full transition-colors">
+                    <button onClick={onClose} className="px-6 py-2.5 text-[14px] font-bold text-[#0077c5] hover:bg-[#eef6fc] rounded-[3px] transition-colors">
                         Close
                     </button>
                     {/* The Apply button is removed since changes now apply automatically */}

@@ -34,7 +34,7 @@ export const MasterFormWrapper = ({
                         <button
                             onClick={onClear}
                             disabled={loading}
-                            className="px-8 h-10 bg-[#00adff] hover:bg-[#0099e6] text-white font-mono font-bold text-[13px] uppercase tracking-widest rounded-[5px] shadow-md shadow-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border-none disabled:opacity-50"
+                            className="px-8 h-10 bg-white text-[#00adff] border-2 border-[#00adff] hover:bg-blue-50 font-mono font-bold text-[13px] uppercase tracking-widest rounded-[3px] shadow-sm transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-50"
                         >
                             <RefreshCw size={14} /> CLEAR FORM
                         </button>
@@ -43,7 +43,7 @@ export const MasterFormWrapper = ({
                             <button
                                 onClick={onDelete}
                                 disabled={loading}
-                                className="px-8 h-10 bg-[#ff3b30] hover:bg-[#e03127] text-white font-mono font-bold text-[13px] uppercase tracking-widest rounded-[5px] shadow-md shadow-red-100 transition-all active:scale-95 flex items-center justify-center gap-2 border-none disabled:opacity-50"
+                                className="px-8 h-10 bg-white text-[#ff3b30] border-2 border-[#ff3b30] hover:bg-red-50 font-mono font-bold text-[13px] uppercase tracking-widest rounded-[3px] shadow-sm transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-50"
                             >
                                 {loading ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />} DELETE DOC
                             </button>
@@ -52,9 +52,9 @@ export const MasterFormWrapper = ({
                         <button
                             onClick={onSave}
                             disabled={loading}
-                            className={`px-8 h-10 text-white font-mono font-bold text-[13px] uppercase tracking-widest rounded-[5px] transition-all active:scale-95 flex items-center justify-center gap-2 border-none disabled:opacity-50 shadow-md ${isEditMode
-                                ? 'bg-[#2bb744] hover:bg-[#259b3a] shadow-green-100'
-                                : 'bg-[#2bb744] hover:bg-[#259b3a] shadow-green-100'
+                            className={`px-8 h-10 bg-white font-mono font-bold text-[13px] uppercase tracking-widest rounded-[3px] transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-50 shadow-sm border-2 ${isEditMode
+                                ? 'text-[#2bb744] border-[#2bb744] hover:bg-green-50'
+                                : 'text-[#2bb744] border-[#2bb744] hover:bg-green-50'
                                 }`}
                         >
                             {loading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
@@ -65,7 +65,7 @@ export const MasterFormWrapper = ({
             }
         >
             <div className="space-y-4 overflow-y-auto no-scrollbar font-['Tahoma']">
-                <div className="bg-white p-4 border border-slate-200 rounded-[5px] space-y-4">
+                <div className="bg-white p-4 border border-slate-200 rounded-[3px] space-y-4">
                     <div className="grid grid-cols-12 gap-x-6 gap-y-3.5">
                         {children}
                     </div>
@@ -184,55 +184,59 @@ export const MasterLookupModal = ({
     emptyMsg = "No records found"
 }) => {
     return (
-        <SimpleModal isOpen={isOpen} onClose={onClose} title={title} maxWidth="max-w-[650px]">
-            <div className="space-y-3">
-                <div className="flex items-center gap-3 p-2 rounded-[5px] border border-slate-200 bg-white">
-                    <Search className="text-gray-400 shrink-0" size={13} />
-                    <input
-                        type="text"
-                        className="w-full h-7 border border-slate-200 px-2.5 text-xs font-mono bg-slate-50 rounded outline-none focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 transition-all"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        autoFocus
-                        placeholder="Search..."
-                    />
+        <SimpleModal isOpen={isOpen} onClose={onClose} title={title} maxWidth="max-w-[700px]">
+            <div className="space-y-4">
+                <div className="flex items-center gap-4 bg-slate-50 p-4 border-b border-gray-100 mb-2">
+                    <span className="text-[12px] font-bold text-gray-500 uppercase tracking-wider shrink-0">Search</span>
+                    <div className="relative flex-1">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
+                        <input
+                            type="text"
+                            className="w-full h-10 pl-10 pr-4 border border-gray-300 rounded-[3px] outline-none text-[13px] focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] shadow-sm bg-white"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            autoFocus
+                            placeholder="Search..."
+                        />
+                    </div>
                 </div>
-                <div className="border border-slate-200 rounded-[5px] overflow-hidden max-h-[250px] overflow-y-auto no-scrollbar bg-white">
-                    <table className="w-full text-left">
-                        <thead className="bg-slate-50 sticky top-0 text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-slate-200 z-10">
-                            <tr>
-                                {columns.map((col, i) => (
-                                    <th key={i} className={`px-5 py-3 ${col.align === 'right' ? 'text-right' : ''} ${col.width || ''}`}>
-                                        {col.label}
-                                    </th>
-                                ))}
-                                <th className="px-5 py-3 text-right">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-slate-100">
-                            {loading ? (
+                <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm">
+                    <div className="max-h-[350px] overflow-y-auto no-scrollbar">
+                        <table className="w-full text-left">
+                            <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 shadow-sm z-10">
                                 <tr>
-                                    <td colSpan={columns.length + 1} className="px-5 py-6 text-center">
-                                        <Loader2 size={18} className="animate-spin text-[#00D1FF] mx-auto mb-1.5" />
-                                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Loading...</p>
-                                    </td>
+                                    {columns.map((col, i) => (
+                                        <th key={i} className={`px-5 py-3 ${col.align === 'right' ? 'text-right' : ''} ${col.width || ''}`}>
+                                            {col.label}
+                                        </th>
+                                    ))}
+                                    <th className="text-right px-5 py-3">Action</th>
                                 </tr>
-                            ) : items.length > 0 ? (
-                                items.map((item, idx) => (
-                                    <tr
-                                        key={idx}
-                                        className="group hover:bg-slate-50 cursor-pointer transition-colors"
-                                        onClick={() => onSelect(item)}
-                                    >
-                                        {columns.map((col, i) => (
-                                            <td key={i} className={`px-5 py-3 ${col.align === 'right' ? 'text-right' : ''}`}>
-                                                <span className={`text-[10px] font-bold ${col.isId ? 'font-mono text-slate-500' : 'text-slate-700 uppercase group-hover:text-blue-600 transition-colors'}`}>
-                                                    {col.render ? col.render(item) : item[col.key]}
-                                                </span>
+                            </thead>
+                            <tbody className="divide-y divide-gray-100">
+                                {loading ? (
+                                    <tr>
+                                        <td colSpan={columns.length + 1} className="px-5 py-6 text-center">
+                                            <Loader2 size={18} className="animate-spin text-[#00D1FF] mx-auto mb-1.5" />
+                                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Loading...</p>
+                                        </td>
+                                    </tr>
+                                ) : items.length > 0 ? (
+                                    items.map((item, idx) => (
+                                        <tr
+                                            key={idx}
+                                            className="group hover:bg-blue-50/50 cursor-pointer transition-all border-b border-gray-50"
+                                            onClick={() => onSelect(item)}
+                                        >
+                                            {columns.map((col, i) => (
+                                                <td key={i} className={`px-5 py-3 ${col.align === 'right' ? 'text-right' : ''}`}>
+                                                    <span className={`text-[12px] font-bold ${col.isId ? 'font-mono text-blue-600' : 'text-slate-700 uppercase group-hover:text-blue-600 transition-colors'}`}>
+                                                        {col.render ? col.render(item) : item[col.key]}
+                                                    </span>
                                             </td>
                                         ))}
-                                        <td className="px-5 py-3 text-right">
-                                            <button className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded font-bold hover:bg-[#cb9b34] shadow-sm transition-all active:scale-95 uppercase tracking-widest border-none">
+                                        <td className="text-right px-5 py-3">
+                                            <button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">
                                                 Select
                                             </button>
                                         </td>
@@ -240,13 +244,14 @@ export const MasterLookupModal = ({
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan={columns.length + 1} className="px-3 py-6 text-center text-[10px] font-mono font-bold text-slate-400 uppercase tracking-widest">
+                                    <td colSpan={columns.length + 1} className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">
                                         {emptyMsg}
                                     </td>
                                 </tr>
                             )}
                         </tbody>
                     </table>
+                    </div>
                 </div>
             </div>
         </SimpleModal>

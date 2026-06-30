@@ -899,7 +899,7 @@ const ReportTemplate = ({
             <div className="flex items-center justify-between px-6 py-3 bg-white border-b border-gray-200 shrink-0">
                 <button
                     onClick={onClose}
-                    className="flex items-center gap-2 text-green-700 font-bold text-[13px] hover:underline"
+                    className="flex items-center gap-2 text-blue-700 font-bold text-[13px] hover:underline"
                 >
                     <ChevronLeft size={16} />
                     Back to dashboard
@@ -1023,7 +1023,7 @@ const ReportTemplate = ({
                                                 className="w-full text-left px-4 py-2 text-[13px] text-gray-700 hover:bg-gray-100 flex items-center gap-2"
                                             >
                                                 <div className="w-4 flex justify-center">
-                                                    {displayColumnsBy === option && <Check size={14} className="text-green-600 font-bold" />}
+                                                    {displayColumnsBy === option && <Check size={14} className="text-blue-600 font-bold" />}
                                                 </div>
                                                 <span>{option}</span>
                                             </button>
@@ -1072,7 +1072,7 @@ const ReportTemplate = ({
                                             </label>
                                         ))}
 
-                                        <div className="px-4 py-2 mt-1 border-t border-gray-100 text-[12px] text-gray-500 font-medium">Calculations</div>
+                                        <div className="px-4 py-2 mt-1 border-t border-gray-200 text-[12px] text-gray-500 font-medium">Calculations</div>
                                         {[
                                             { key: 'PctRow', label: '% of Row' },
                                             { key: 'PctCol', label: '% of Column' },
@@ -1116,7 +1116,7 @@ const ReportTemplate = ({
                 <div className="w-full max-w-[1000px] bg-white border border-gray-200 shadow-sm flex flex-col h-max min-h-[500px]">
 
                     {/* Inner Toolbar */}
-                    <div className="flex items-center justify-between p-4 border-b border-gray-100">
+                    <div className="flex items-center justify-between p-4 border-b border-gray-200">
                         <div className="flex items-center gap-4">
                             <div className="relative">
                                 <button
@@ -1211,7 +1211,7 @@ const ReportTemplate = ({
                                             <FileText size={14} />
                                             {showNoteArea ? 'Hide Note' : 'Add Note'}
                                         </button>
-                                        <div className="border-t border-gray-100 my-1" />
+                                        <div className="border-t border-gray-200 my-1" />
                                         <button
                                             onClick={() => { fetchReportData(); setShowMoreMenu(false); }}
                                             className="w-full text-left px-4 py-2 text-[13px] text-gray-700 hover:bg-gray-100 hover:text-[#0077c5] flex items-center gap-2"
@@ -1233,7 +1233,7 @@ const ReportTemplate = ({
                                             <Mail size={14} />
                                             Email
                                         </button>
-                                        <div className="border-t border-gray-100 my-1" />
+                                        <div className="border-t border-gray-200 my-1" />
                                         <button
                                             onClick={handleExportExcel}
                                             className="w-full text-left px-4 py-2 text-[13px] text-gray-700 hover:bg-gray-100 hover:text-[#0077c5] flex items-center gap-2"
@@ -1333,7 +1333,7 @@ const ReportTemplate = ({
                                             const acc = col.accessor || col.key || col.header;
                                             const isFilterActive = activeFilterColumn === acc || (columnFilters[acc] && columnFilters[acc] !== '');
                                             return (
-                                            <th key={i} className={`font-bold text-gray-800 group relative ${compactView ? 'p-1.5 text-[10.5px]' : 'p-2 text-[12px]'}`} style={{ textAlign: col.align || 'left' }}>
+                                            <th key={i} className={`font-bold text-gray-800 group relative ${compactView ? 'p-1.5 text-[10.5px]' : 'p-2 text-[12px]'}`} style={{ textAlign: col.align || 'left', whiteSpace: 'nowrap' }}>
                                                 <div className="flex flex-col gap-1.5">
                                                     <div className={`flex items-center gap-2 w-full ${col.align === 'right' ? 'justify-end text-right' : 'justify-between text-left'}`}>
                                                         <span className="flex-1">
@@ -1371,7 +1371,7 @@ const ReportTemplate = ({
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {apiLoading ? <tr><td colSpan="100%" className="text-center py-4">Loading data from database...</td></tr> : displayData.map((row, i) => {
+                                    {apiLoading ? <tr><td colSpan="100%" className="text-center py-4">Loading data from database...</td><th className="text-right px-5 py-3">Action</th></tr> : displayData.map((row, i) => {
                                         const isBillPaymentList = title === "Bill Payment List";
                                         const isQuotationSummary = title === "Quotation Summary";
                                         const isSalesOrderSummary = title === "Sales Order Summary";
@@ -1382,7 +1382,7 @@ const ReportTemplate = ({
                                         return (
                                         <tr 
                                             key={i} 
-                                            className={`${compactView ? 'border-b border-gray-100' : 'border-b border-gray-200 hover:bg-gray-50'} ${isClickableRow && payDocVal ? 'cursor-pointer group relative' : ''}`}
+                                            className={`${compactView ? 'border-b border-gray-200' : 'border-b border-gray-200 hover:bg-gray-50'} ${isClickableRow && payDocVal ? 'cursor-pointer group relative' : ''}`}
                                             onClick={() => {
                                                 if (isBillPaymentList && payDocVal) {
                                                     setSelectedPayDoc(payDocVal);
@@ -1396,7 +1396,7 @@ const ReportTemplate = ({
                                             {displayColumns.map((col, j) => {
                                                 const acc = col.accessor || col.key || col.header;
                                                 return (
-                                                <td key={j} className={`text-gray-700 ${compactView ? 'p-1 text-[11px]' : 'p-2 text-[12px]'} relative`} style={{ textAlign: col.align || 'left' }}>
+                                                <td key={j} className={`text-gray-700 ${compactView ? 'p-1 text-[11px]' : 'p-2 text-[12px]'} relative`} style={{ textAlign: col.align || 'left', whiteSpace: 'nowrap' }}>
                                                     {formatCellValue(row[acc], col)}
                                                     {isClickableRow && payDocVal && j === 0 && (
                                                         <div className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 flex items-center gap-1 bg-[#0077c5] text-white text-[10px] font-bold px-2 py-1 rounded shadow-sm whitespace-nowrap transition-opacity pointer-events-none">
@@ -1410,7 +1410,7 @@ const ReportTemplate = ({
                                     )})}
 
                                     {hasTotals && displayData.length > 0 && !apiLoading && (
-                                        <tr className={`${compactView ? 'border-t-2 border-double border-gray-400' : 'border-t-[3px] border-double border-gray-400'} bg-[#f8fafc] font-bold`}>
+                                        <tr className={`${compactView ? 'border-t-2 border-double border-gray-400' : 'border-t-[3px] border-double border-gray-400'} bg-slate-50 font-bold`}>
                                             {displayColumns.map((col, j) => {
                                                 const accessor = col.accessor || col.key || col.header;
                                                 const isFirstCol = j === 0;
@@ -1452,7 +1452,7 @@ const ReportTemplate = ({
 
                     {/* Footer */}
                     {/* Footer */}
-                    <div className={`px-8 py-6 flex flex-col text-[12px] text-gray-500 border-t border-gray-100 mt-auto ${customizations.footerAlignment === 'Left' ? 'items-start text-left' :
+                    <div className={`px-8 py-6 flex flex-col text-[12px] text-gray-500 border-t border-gray-200 mt-auto ${customizations.footerAlignment === 'Left' ? 'items-start text-left' :
                             customizations.footerAlignment === 'Right' ? 'items-end text-right' : 'items-center text-center'
                         }`}>
                         <div className="w-full flex items-center justify-between mb-4">

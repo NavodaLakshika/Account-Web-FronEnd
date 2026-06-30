@@ -155,7 +155,7 @@ const DocumentSearchModal = ({ isOpen, onClose, onSelect }) => {
 
                     <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-white">
                         <div className="flex items-center gap-3">
-                            <div className="w-9 h-9 rounded-xl bg-[#4f83ff]/10 flex items-center justify-center">
+                            <div className="w-9 h-9 rounded-[3px] bg-[#4f83ff]/10 flex items-center justify-center">
                                 <Search size={16} className="text-[#4f83ff]" />
                             </div>
                             <div>
@@ -163,7 +163,7 @@ const DocumentSearchModal = ({ isOpen, onClose, onSelect }) => {
                                 <p className="text-[10px] text-slate-400 font-medium tracking-wider">Advanced Document Retrieval</p>
                             </div>
                         </div>
-                        <button onClick={onClose} className="w-9 h-9 rounded-xl bg-red-50 hover:bg-red-100 flex items-center justify-center transition-all active:scale-90">
+                        <button onClick={onClose} className="w-9 h-9 rounded-[3px] bg-red-50 hover:bg-red-100 flex items-center justify-center transition-all active:scale-90">
                             <X size={28} strokeWidth={1.5} className="text-red-600" />
                         </button>
                     </div>
@@ -177,7 +177,7 @@ const DocumentSearchModal = ({ isOpen, onClose, onSelect }) => {
                                         <div className="relative group">
                                             <button
                                                 onClick={() => setShowProfileLookup(true)}
-                                                className="w-full h-10 pl-3 pr-10 bg-white border border-slate-200 rounded-[5px] text-[12px] font-black text-[#4f83ff] outline-none hover:border-[#4f83ff] transition-all flex items-center shadow-sm uppercase tracking-tighter"
+                                                className="w-full h-10 pl-3 pr-10 bg-white border border-slate-200 rounded-[3px] text-[12px] font-black text-[#4f83ff] outline-none hover:border-[#4f83ff] transition-all flex items-center shadow-sm uppercase tracking-tighter"
                                             >
                                                 {filters.transTypeName || 'Select Type...'}
                                             </button>
@@ -211,7 +211,7 @@ const DocumentSearchModal = ({ isOpen, onClose, onSelect }) => {
                                         <div className="relative group">
                                             <button
                                                 onClick={() => setShowEntityLookup(true)}
-                                                className="w-full h-10 px-3 bg-white border border-slate-200 rounded-[5px] text-[12px] font-bold text-slate-700 outline-none hover:border-[#4f83ff] transition-all flex items-center shadow-sm overflow-hidden"
+                                                className="w-full h-10 px-3 bg-white border border-slate-200 rounded-[3px] text-[12px] font-bold text-slate-700 outline-none hover:border-[#4f83ff] transition-all flex items-center shadow-sm overflow-hidden"
                                             >
                                                 <span className="truncate">{filters.vendorName || `Select ${filters.searchType}...`}</span>
                                             </button>
@@ -228,7 +228,7 @@ const DocumentSearchModal = ({ isOpen, onClose, onSelect }) => {
                                             value={filters.docNo}
                                             onChange={(e) => setFilters(prev => ({ ...prev, docNo: e.target.value }))}
                                             placeholder="Search Doc/Inv/Vou..."
-                                            className="w-full h-9 px-3 border border-slate-200 rounded-lg text-[12px] font-bold text-slate-700 bg-white outline-none focus:border-[#4f83ff] focus:ring-1 focus:ring-[#4f83ff]/20 transition-all shadow-sm placeholder:text-slate-300"
+                                            className="w-full h-9 px-3 border border-slate-200 rounded-[3px] text-[12px] font-bold text-slate-700 bg-white outline-none focus:border-[#4f83ff] focus:ring-1 focus:ring-[#4f83ff]/20 transition-all shadow-sm placeholder:text-slate-300"
                                         />
                                     </div>
 
@@ -237,7 +237,7 @@ const DocumentSearchModal = ({ isOpen, onClose, onSelect }) => {
                                         <div className="relative group">
                                             <button
                                                 onClick={() => setShowCostCenterLookup(true)}
-                                                className="w-full h-10 px-3 bg-white border border-slate-200 rounded-[5px] text-[12px] font-bold text-slate-700 outline-none hover:border-[#4f83ff] transition-all flex items-center shadow-sm"
+                                                className="w-full h-10 px-3 bg-white border border-slate-200 rounded-[3px] text-[12px] font-bold text-slate-700 outline-none hover:border-[#4f83ff] transition-all flex items-center shadow-sm"
                                             >
                                                 {filters.costCenterName || 'Select Center...'}
                                             </button>
@@ -253,7 +253,7 @@ const DocumentSearchModal = ({ isOpen, onClose, onSelect }) => {
                                             type="text"
                                             value={filters.chequeNo}
                                             onChange={(e) => setFilters(prev => ({ ...prev, chequeNo: e.target.value }))}
-                                            className="w-full h-9 px-3 border border-slate-200 rounded-lg text-[12px] font-bold text-slate-700 bg-white outline-none focus:border-[#4f83ff] focus:ring-1 focus:ring-[#4f83ff]/20 transition-all shadow-sm placeholder:text-slate-300"
+                                            className="w-full h-9 px-3 border border-slate-200 rounded-[3px] text-[12px] font-bold text-slate-700 bg-white outline-none focus:border-[#4f83ff] focus:ring-1 focus:ring-[#4f83ff]/20 transition-all shadow-sm placeholder:text-slate-300"
                                         />
                                     </div>
 
@@ -263,7 +263,7 @@ const DocumentSearchModal = ({ isOpen, onClose, onSelect }) => {
                                             type="number"
                                             value={filters.amount}
                                             onChange={(e) => setFilters(prev => ({ ...prev, amount: e.target.value }))}
-                                            className="w-full h-9 px-3 border border-slate-200 rounded-lg text-[12px] font-bold text-slate-700 bg-white outline-none focus:border-[#4f83ff] focus:ring-1 focus:ring-[#4f83ff]/20 transition-all shadow-sm placeholder:text-slate-300"
+                                            className="w-full h-9 px-3 border border-slate-200 rounded-[3px] text-[12px] font-bold text-slate-700 bg-white outline-none focus:border-[#4f83ff] focus:ring-1 focus:ring-[#4f83ff]/20 transition-all shadow-sm placeholder:text-slate-300"
                                         />
                                     </div>
 
@@ -272,7 +272,7 @@ const DocumentSearchModal = ({ isOpen, onClose, onSelect }) => {
                                         <select
                                             value={filters.payee}
                                             onChange={(e) => setFilters(prev => ({ ...prev, payee: e.target.value }))}
-                                            className="w-full h-9 px-3 border border-slate-200 rounded-lg text-[12px] font-bold text-slate-700 bg-white outline-none focus:border-[#4f83ff] focus:ring-1 focus:ring-[#4f83ff]/20 transition-all shadow-sm"
+                                            className="w-full h-9 px-3 border border-slate-200 rounded-[3px] text-[12px] font-bold text-slate-700 bg-white outline-none focus:border-[#4f83ff] focus:ring-1 focus:ring-[#4f83ff]/20 transition-all shadow-sm"
                                         >
                                             <option value="">All Payees</option>
                                             {lookups.payees.map(p => (
@@ -298,7 +298,7 @@ const DocumentSearchModal = ({ isOpen, onClose, onSelect }) => {
                                         <div className={`grid grid-cols-2 gap-2 transition-opacity duration-300 ${!filters.useDate ? 'opacity-40 pointer-events-none' : ''}`}>
                                             <button
                                                 onClick={() => openDatePicker('dateFrom')}
-                                                className="h-9 bg-white border border-slate-200 rounded-lg flex items-center px-3 gap-2 hover:border-[#4f83ff] transition-colors"
+                                                className="h-9 bg-white border border-slate-200 rounded-[3px] flex items-center px-3 gap-2 hover:border-[#4f83ff] transition-colors"
                                             >
                                                 <Calendar size={14} className="text-slate-400" />
                                                 <span className="text-[11px] font-bold text-slate-600 uppercase tracking-tighter">
@@ -307,7 +307,7 @@ const DocumentSearchModal = ({ isOpen, onClose, onSelect }) => {
                                             </button>
                                             <button
                                                 onClick={() => openDatePicker('dateTo')}
-                                                className="h-9 bg-white border border-slate-200 rounded-lg flex items-center px-3 gap-2 hover:border-[#4f83ff] transition-colors"
+                                                className="h-9 bg-white border border-slate-200 rounded-[3px] flex items-center px-3 gap-2 hover:border-[#4f83ff] transition-colors"
                                             >
                                                 <Calendar size={14} className="text-slate-400" />
                                                 <span className="text-[11px] font-bold text-slate-600 uppercase tracking-tighter">
@@ -321,7 +321,7 @@ const DocumentSearchModal = ({ isOpen, onClose, onSelect }) => {
                                         <button
                                             onClick={handleSearch}
                                             disabled={loading}
-                                            className="flex-1 h-9 bg-[#4f83ff] text-white text-[11px] font-black rounded-[5px] shadow-md hover:bg-[#3a6fdf] transition-all active:scale-95 flex items-center justify-center gap-2 uppercase tracking-widest"
+                                            className="flex-1 h-9 bg-[#4f83ff] text-white text-[11px] font-black rounded-[3px] shadow-md hover:bg-[#3a6fdf] transition-all active:scale-95 flex items-center justify-center gap-2 uppercase tracking-widest"
                                         >
                                             {loading ? (
                                                 <RotateCcw className="animate-spin" size={16} />
@@ -334,7 +334,7 @@ const DocumentSearchModal = ({ isOpen, onClose, onSelect }) => {
                                         </button>
                                         <button
                                             onClick={handleReset}
-                                            className="w-9 h-9 bg-white border border-slate-200 text-slate-400 rounded-lg flex items-center justify-center hover:bg-slate-50 hover:text-slate-600 transition-all active:scale-95"
+                                            className="w-9 h-9 bg-white border border-slate-200 text-slate-400 rounded-[3px] flex items-center justify-center hover:bg-slate-50 hover:text-slate-600 transition-all active:scale-95"
                                             title="Reset Filters"
                                         >
                                             <RotateCcw size={18} />
@@ -349,13 +349,13 @@ const DocumentSearchModal = ({ isOpen, onClose, onSelect }) => {
                                 <div className="flex items-center gap-3">
                                     <div className="w-1 h-5 bg-[#4f83ff] rounded-full" />
                                     <h3 className="text-[13px] font-black text-slate-800 uppercase tracking-widest">Search Results</h3>
-                                    <span className="px-2 py-0.5 bg-slate-100 text-slate-500 text-[10px] font-bold rounded-full">
+                                    <span className="px-2 py-0.5 bg-slate-100 text-slate-500 text-[10px] font-bold rounded-[3px]">
                                         {results.length} Documents Found
                                     </span>
                                 </div>
                             </div>
 
-                            <div className="flex-1 border border-slate-100 rounded-xl overflow-hidden flex flex-col shadow-inner bg-slate-50/30">
+                            <div className="flex-1 border border-slate-100 rounded-[3px] overflow-hidden flex flex-col shadow-inner bg-slate-50/30">
                                 <div className="overflow-auto flex-1 no-scrollbar">
                                     <table className="w-full text-left border-collapse">
                                         <thead className="sticky top-0 z-10">

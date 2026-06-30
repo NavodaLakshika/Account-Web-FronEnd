@@ -59,15 +59,15 @@ const SystemUpdateModal = ({ isOpen, onClose }) => {
             isOpen={isOpen}
             onClose={onClose}
             title="SYSTEM ADMINISTRATION"
-            maxWidth="max-w-md"
+            maxWidth="max-w-[700px]"
         >
             <div className="py-6 px-8 select-none font-['Tahoma'] bg-white">
                 
                 {/* Clean Header */}
                 <div className="flex items-start justify-between mb-8 pb-4 border-b border-slate-100">
                     <div className="space-y-1">
-                        <h2 className="text-[20px] font-bold text-[#0285fd] tracking-tight">System Update</h2>
-                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em]">Maintenance Utility | Build 2024.05</p>
+                        <h2 className="text-[15px] font-mono font-bold text-slate-800 uppercase tracking-widest truncate">System Update</h2>
+                        <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider truncate">Maintenance Utility | Build 2024.05</p>
                     </div>
                     <div className="p-2 bg-blue-50 rounded">
                         <Settings size={20} className="text-[#0285fd]" />
@@ -87,7 +87,7 @@ const SystemUpdateModal = ({ isOpen, onClose }) => {
                             <div className="pt-2">
                                 <button 
                                     onClick={handleBeginUpdate}
-                                    className="w-full h-10 bg-[#0285fd] hover:bg-[#0073ff] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] shadow-md shadow-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border-none"
+                                    className="w-full h-10 bg-[#0285fd] hover:bg-[#0073ff] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[3px] shadow-md shadow-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border-none"
                                 >
                                     <Terminal size={14} />
                                     Execute Update Sequence
@@ -109,7 +109,7 @@ const SystemUpdateModal = ({ isOpen, onClose }) => {
                                     </div>
                                     <span className="text-[#0285fd]">{progress}%</span>
                                 </div>
-                                <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                                <div className="h-1.5 w-full bg-slate-100 rounded-[3px] overflow-hidden">
                                     <div 
                                         className="h-full bg-gradient-to-r from-[#0285fd] to-[#00adff] transition-all duration-500"
                                         style={{ width: `${progress}%` }}
@@ -140,7 +140,7 @@ const SystemUpdateModal = ({ isOpen, onClose }) => {
                             </div>
                             <button 
                                 onClick={onClose}
-                                className="w-full h-10 bg-[#00adff] hover:bg-[#0099e6] text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[5px] transition-all active:scale-95 flex items-center justify-center gap-2 border-none"
+                                className="w-full h-10 bg-white text-[#00adff] border-2 border-[#00adff] hover:bg-blue-50 font-mono font-bold text-sm uppercase tracking-widest rounded-[3px] transition-all active:scale-95 flex items-center justify-center gap-2 border-none"
                             >
                                 Close Console
                             </button>

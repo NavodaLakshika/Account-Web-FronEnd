@@ -109,7 +109,7 @@ const AlertModal = ({
 
                     {/* Header */}
                     <div className="px-6 py-4 border-b border-black/10 flex justify-between items-center relative z-10">
-                        <h3 className="text-[22px] font-normal text-white tracking-wide">{title}</h3>
+                        <h3 className="text-[15px] font-mono font-bold text-white uppercase tracking-widest">{title}</h3>
                         <button onClick={onClose} className="text-white hover:text-white/80 transition-colors mt-1">
                             <X size={20} strokeWidth={3} />
                         </button>

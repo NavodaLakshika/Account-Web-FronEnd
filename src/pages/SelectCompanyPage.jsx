@@ -268,7 +268,7 @@ const SelectCompanyPage = () => {
                 <ul className="flex items-center gap-4 list-none m-0 p-0">
                     {/* Facebook */}
                     <li className="relative group flex flex-col items-center">
-                        <span className="absolute top-[50px] px-3 py-1.5 bg-[#4267B2] text-white text-[12px] font-bold rounded-[5px] opacity-0 group-hover:opacity-100 group-hover:top-[55px] transition-all duration-300 pointer-events-none shadow-lg shadow-[#4267B2]/30 after:content-[''] after:absolute after:top-[-5px] after:left-1/2 after:-translate-x-1/2 after:border-l-[6px] after:border-l-transparent after:border-r-[6px] after:border-r-transparent after:border-b-[6px] after:border-b-[#4267B2]">
+                        <span className="absolute top-[50px] px-3 py-1.5 bg-[#4267B2] text-white text-[12px] font-bold rounded-[3px] opacity-0 group-hover:opacity-100 group-hover:top-[55px] transition-all duration-300 pointer-events-none shadow-lg shadow-[#4267B2]/30 after:content-[''] after:absolute after:top-[-5px] after:left-1/2 after:-translate-x-1/2 after:border-l-[6px] after:border-l-transparent after:border-r-[6px] after:border-r-transparent after:border-b-[6px] after:border-b-[#4267B2]">
                             Facebook
                         </span>
                         <a href="https://www.facebook.com/onimta" target="_blank" rel="noreferrer" className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center text-white/60 hover:text-white hover:bg-[#4267B2] transition-all duration-300 shadow-xl group-hover:scale-110">
@@ -278,7 +278,7 @@ const SelectCompanyPage = () => {
 
                     {/* LinkedIn */}
                     <li className="relative group flex flex-col items-center">
-                        <span className="absolute top-[50px] px-3 py-1.5 bg-[#0077b5] text-white text-[12px] font-bold rounded-[5px] opacity-0 group-hover:opacity-100 group-hover:top-[55px] transition-all duration-300 pointer-events-none shadow-lg shadow-[#0077b5]/30 after:content-[''] after:absolute after:top-[-5px] after:left-1/2 after:-translate-x-1/2 after:border-l-[6px] after:border-l-transparent after:border-r-[6px] after:border-r-transparent after:border-b-[6px] after:border-b-[#0077b5]">
+                        <span className="absolute top-[50px] px-3 py-1.5 bg-[#0077b5] text-white text-[12px] font-bold rounded-[3px] opacity-0 group-hover:opacity-100 group-hover:top-[55px] transition-all duration-300 pointer-events-none shadow-lg shadow-[#0077b5]/30 after:content-[''] after:absolute after:top-[-5px] after:left-1/2 after:-translate-x-1/2 after:border-l-[6px] after:border-l-transparent after:border-r-[6px] after:border-r-transparent after:border-b-[6px] after:border-b-[#0077b5]">
                             LinkedIn
                         </span>
                         <a href="https://www.linkedin.com/company/onimta" target="_blank" rel="noreferrer" className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center text-white/60 hover:text-white hover:bg-[#0077b5] transition-all duration-300 shadow-xl group-hover:scale-110">
@@ -288,7 +288,7 @@ const SelectCompanyPage = () => {
 
                     {/* Web Link (Globe) */}
                     <li className="relative group flex flex-col items-center">
-                        <span className="absolute top-[50px] px-3 py-1.5 bg-[#00acee] text-white text-[12px] font-bold rounded-[5px] opacity-0 group-hover:opacity-100 group-hover:top-[55px] transition-all duration-300 pointer-events-none shadow-lg shadow-[#00acee]/30 after:content-[''] after:absolute after:top-[-5px] after:left-1/2 after:-translate-x-1/2 after:border-l-[6px] after:border-l-transparent after:border-r-[6px] after:border-r-transparent after:border-b-[6px] after:border-b-[#00acee]">
+                        <span className="absolute top-[50px] px-3 py-1.5 bg-[#00acee] text-white text-[12px] font-bold rounded-[3px] opacity-0 group-hover:opacity-100 group-hover:top-[55px] transition-all duration-300 pointer-events-none shadow-lg shadow-[#00acee]/30 after:content-[''] after:absolute after:top-[-5px] after:left-1/2 after:-translate-x-1/2 after:border-l-[6px] after:border-l-transparent after:border-r-[6px] after:border-r-transparent after:border-b-[6px] after:border-b-[#00acee]">
                             Website
                         </span>
                         <a href="https://www.onimtait.com" target="_blank" rel="noreferrer" className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center text-white/60 hover:text-white hover:bg-[#00acee] transition-all duration-300 shadow-xl group-hover:scale-110">
