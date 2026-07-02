@@ -263,8 +263,8 @@ const relatedLinks = [
 
 const ReportLearnMoreModal = ({ isOpen, onClose }) => {
     const [expandedSection, setExpandedSection] = useState(null);
-    const [searchQuery, setSearchQuery] = useState('');
     const [feedbackStatus, setFeedbackStatus] = useState(null);
+    const [helpfulCount, setHelpfulCount] = useState(422);
 
     const toggleSection = (id) => {
         setExpandedSection(prev => prev === id ? null : id);
@@ -279,30 +279,14 @@ const ReportLearnMoreModal = ({ isOpen, onClose }) => {
             
             {/* Side Panel Drawer */}
             <div className="fixed inset-y-0 right-0 z-[601] w-[450px] bg-white shadow-2xl flex flex-col transform transition-transform duration-300 font-sans border-l border-gray-200">
-                {/* Header (Blue) */}
-                <div className="bg-[#105b9b] px-4 pt-3 pb-4 shrink-0 flex flex-col shadow-md z-10 relative">
-                    <div className="flex justify-end mb-3">
-                        <button onClick={onClose} className="text-white hover:text-gray-200 transition-colors">
-                            <X size={22} strokeWidth={2.5} />
-                        </button>
-                    </div>
-                    <div className="relative">
-                        <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-bold" strokeWidth={2.5} />
-                        <input 
-                            type="text" 
-                            placeholder="Search questions, keywords or topics" 
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full h-10 pl-9 pr-3 rounded-[3px] bg-white text-[14px] text-gray-800 outline-none placeholder:text-gray-500 font-medium border border-transparent focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition-all shadow-sm" 
-                        />
-                    </div>
-                </div>
-
                 {/* Body Content */}
-                <div className="flex-1 overflow-y-auto bg-white">
-                    <div className="p-7">
+                <div className="flex-1 overflow-y-auto bg-white relative">
+                    <button onClick={onClose} className="absolute top-5 right-5 text-gray-400 hover:text-gray-600 transition-colors z-10 bg-white/80 rounded-full p-1">
+                        <X size={22} strokeWidth={2.5} />
+                    </button>
+                    <div className="p-7 pt-10">
                         {/* Title & Meta */}
-                        <div className="border-t border-gray-200 pt-3 mb-6">
+                        <div className="mb-6">
                             <h1 className="text-[22px] font-bold text-gray-900 leading-tight mb-4">
                                 Customise your reports with a modern view in ONIMTA
                             </h1>
@@ -310,7 +294,7 @@ const ReportLearnMoreModal = ({ isOpen, onClose }) => {
                             <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[13px] text-gray-600 mb-6 font-medium">
                                 <span className="font-bold text-gray-900">by ONIMTA</span>
                                 <span>•</span>
-                                <span className="flex items-center gap-1.5"><ThumbsUp size={14} className="text-gray-500" /> 422</span>
+                                <span className="flex items-center gap-1.5"><ThumbsUp size={14} className="text-gray-500" /> {helpfulCount}</span>
                                 <span>•</span>
                                 <span className="flex items-center gap-1.5"><Clock size={14} className="text-gray-500" /> Updated 3 weeks ago</span>
                             </div>
@@ -385,7 +369,7 @@ const ReportLearnMoreModal = ({ isOpen, onClose }) => {
                         {!feedbackStatus && (
                             <div className="flex gap-2">
                                 <button 
-                                    onClick={() => setFeedbackStatus('yes')}
+                                    onClick={() => { setFeedbackStatus('yes'); setHelpfulCount(prev => prev + 1); }}
                                     className="px-5 py-1.5 border border-gray-400 bg-white hover:bg-gray-50 hover:border-[#0077c5] hover:text-[#0077c5] rounded text-[13px] font-bold text-gray-700 transition-colors shadow-sm"
                                 >
                                     Yes
@@ -400,7 +384,7 @@ const ReportLearnMoreModal = ({ isOpen, onClose }) => {
                         )}
                     </div>
                     <div className="w-full border-t border-gray-200 my-1" />
-                    <button className="px-5 py-2 border-2 border-green-700 text-blue-700 hover:bg-blue-50 rounded-[3px] font-bold text-[14px] bg-white transition-colors shadow-sm">
+                    <button className="px-5 h-10 bg-[#0285fd] hover:bg-[#0275e0] text-white rounded-[3px] font-bold text-[14px] transition-colors shadow-sm">
                         Contact Us
                     </button>
                 </div>

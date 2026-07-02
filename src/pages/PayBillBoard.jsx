@@ -356,14 +356,14 @@ const PayBillBoard = ({ isOpen, onClose }) => {
                 subtitle="Bill Payment"
                 icon={DollarSign}
                 footer={
-                    <div className="bg-[#fcfcfc] px-6 py-4 w-full flex justify-between items-center border-t border-gray-200 rounded-b-[10px] shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]">
+                    <div className="bg-[#fcfcfc] px-6 py-5 w-full flex justify-between items-center border-t border-gray-200 rounded-b-[10px] shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]">
                         <div className="flex gap-3">
-                            <button type="button" onClick={handleClear} disabled={loading} className="px-6 py-2 border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2">
+                            <button type="button" onClick={handleClear} disabled={loading} className="px-6 h-10 border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2">
                                 <RotateCcw size={14} /> CLEAR FORM
                             </button>
                         </div>
                         <div className="flex gap-3">
-                            <button type="button" onClick={handleSave} disabled={loading} className={`px-6 py-2 bg-[#0285fd] hover:bg-[#0073ff] text-white font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                            <button type="button" onClick={handleSave} disabled={loading} className={`px-6 h-10 bg-[#0285fd] hover:bg-[#0073ff] text-white font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}>
                                 {loading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />} PAY BILL
                             </button>
                         </div>
@@ -768,15 +768,15 @@ const PayBillBoard = ({ isOpen, onClose }) => {
                                 <tr>
                                     <th className="border-b px-5 py-3">ID</th>
                                     <th className="border-b px-5 py-3">Method Descriptor</th>
-                                    <th className="border-b text-center w-24 px-5 py-3">Select</th>
-                                <th className="text-right px-5 py-3">Action</th></tr>
+                                    <th className="border-b text-center px-5 py-3">Select</th>
+                                </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100">
                                 {['Cash', 'Cheque', 'Online', 'Petty Cash', 'Settlement'].map((type, idx) => (
                                     <tr key={idx} className="group hover:bg-blue-50/50  transition-all border-b border-gray-50 cursor-pointer group border-b border-gray-50">
                                         <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{idx + 1}</td>
                                         <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{type}</td>
-                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">
+                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3 ml-10       ">
                                             <button
                                                 onClick={() => {
                                                     setFormData(prev => ({ ...prev, payType: type, accId: '' }));
@@ -787,8 +787,6 @@ const PayBillBoard = ({ isOpen, onClose }) => {
                                                 SELECT
                                             </button>
                                         </td>
-                                    
-                                            <td className="text-right px-5 py-3"><button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button></td>
                                         </tr>
                                 ))}
                             </tbody>
@@ -859,8 +857,8 @@ const PayBillBoard = ({ isOpen, onClose }) => {
                                     <th className="border-b px-5 py-3">Vendor</th>
                                     <th className="border-b px-5 py-3">Date</th>
                                     <th className="border-b text-right px-5 py-3">Amount</th>
-                                    <th className="border-b text-center w-24 px-5 py-3">Select</th>
-                                <th className="text-right px-5 py-3">Action</th></tr>
+                                    <th className="border-b text-center w-24 px-5 py-3">Action</th>
+                                </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100">
                                 {searchingPayments ? (
@@ -875,8 +873,8 @@ const PayBillBoard = ({ isOpen, onClose }) => {
                                         <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{p.payDoc}</td>
                                         <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{p.vendorId}</td>
                                         <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{p.date}</td>
-                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{parseFloat(p.amount || 0).toFixed(2)}</td>
-                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">
+                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3 text-right">{parseFloat(p.amount || 0).toFixed(2)}</td>
+                                        <td className="text-center px-5 py-3">
                                             <button onClick={() => handleSelectPayment(p.payDoc)} className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">Select</button>
                                         </td>
                                     </tr>

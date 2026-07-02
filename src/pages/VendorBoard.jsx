@@ -190,7 +190,7 @@ const VendorBoard = ({ isOpen, onClose }) => {
             <button 
                 onClick={handleSave}
                 disabled={loading}
-                className={`px-6 py-2 bg-[#0285fd] hover:bg-[#0073ff] text-white font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                className={`px-6 h-10 bg-[#0285fd] hover:bg-[#0073ff] text-white font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
                 {loading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />} {isEditMode ? 'UPDATE' : 'SAVE'}
             </button>
@@ -203,7 +203,7 @@ const VendorBoard = ({ isOpen, onClose }) => {
             </button>
             <button 
                 onClick={handleClear}
-                className="px-6 py-2 border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2"
+                className="px-6 h-10 border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2"
             >
                 <RotateCcw size={14} /> CLEAR
             </button>

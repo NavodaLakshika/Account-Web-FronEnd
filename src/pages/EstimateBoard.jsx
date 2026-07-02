@@ -227,20 +227,20 @@ const EstimateBoard = ({ isOpen, onClose }) => {
                 title="Quotation - Estimate"
                 subtitle={`COMPANY: ${formData.company || 'N/A'}${formData.docNo ? `  |  DOC: ${formData.docNo}` : ''}`}
                 footer={
-                    <div className="bg-[#fcfcfc] px-6 py-4 w-full flex justify-between items-center border-t border-gray-200 rounded-b-[10px] shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]">
+                    <div className="bg-[#fcfcfc] px-6 py-5 w-full flex justify-between items-center border-t border-gray-200 rounded-b-[10px] shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]">
                         <div className="flex gap-3">
-                            <button onClick={handleDelete} className="px-6 py-2 border-2 border-red-500 text-red-600 bg-white hover:bg-red-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2">
+                            <button onClick={handleDelete} className="px-6 h-10 border-2 border-red-500 text-red-600 bg-white hover:bg-red-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2">
                                 <Trash2 size={14} /> DELETE
                             </button>
-                            <button type="button" onClick={handleClear} className="px-6 py-2 border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2">
+                            <button type="button" onClick={handleClear} className="px-6 h-10 border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2">
                                 <RotateCcw size={14} /> CLEAR
                             </button>
                         </div>
                         <div className="flex gap-3">
-                            <button onClick={handleSaveDraft} disabled={isApplying || items.length === 0} className="px-6 py-2 border-2 border-[#0285fd] text-[#0285fd] bg-white hover:bg-blue-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2 disabled:opacity-50">
+                            <button onClick={handleSaveDraft} disabled={isApplying || items.length === 0} className="px-6 h-10 border-2 border-[#0285fd] text-[#0285fd] bg-white hover:bg-blue-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2 disabled:opacity-50">
                                 {isApplying ? <Loader2 className="animate-spin" size={14} /> : <Save size={14} />} SAVE DRAFT
                             </button>
-                            <button onClick={handleApply} disabled={isApplying || items.length === 0} className={`px-6 py-2 bg-[#0285fd] hover:bg-[#0073ff] text-white font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2 ${(isApplying || items.length === 0) ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                            <button onClick={handleApply} disabled={isApplying || items.length === 0} className={`px-6 h-10 bg-[#0285fd] hover:bg-[#0073ff] text-white font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2 ${(isApplying || items.length === 0) ? 'opacity-50 cursor-not-allowed' : ''}`}>
                                 {isApplying ? <Loader2 className="animate-spin" size={14} /> : <CheckCircle size={14} />} APPLY
                             </button>
                         </div>

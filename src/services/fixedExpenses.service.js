@@ -1,27 +1,11 @@
-import axios from 'axios';
+import api from './api';
 
-const api = axios.create({
-  baseURL: '/api/FixedExpenses',
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
 
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
 
 export const fixedExpensesService = {
   async getLookups() {
     try {
-      const response = await api.get('/lookups');
+      const response = await api.get('/FixedExpenses/lookups');
       return response.data;
     } catch (error) {
       throw error.response?.data || 'Failed to fetch lookups';
@@ -30,7 +14,7 @@ export const fixedExpensesService = {
 
   async getList(company) {
     try {
-      const response = await api.get('/list', { params: { company } });
+      const response = await api.get('/FixedExpenses/list', { params: { company } });
       return response.data;
     } catch (error) {
       throw error.response?.data || 'Failed to fetch expense list';
@@ -39,7 +23,7 @@ export const fixedExpensesService = {
 
   async save(data) {
     try {
-      const response = await api.post('/save', data);
+      const response = await api.post('/FixedExpenses/save', data);
       return response.data;
     } catch (error) {
       throw error.response?.data || 'Failed to save record';

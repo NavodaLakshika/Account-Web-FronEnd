@@ -1,27 +1,11 @@
-import axios from 'axios';
+import api from './api';
 
-const api = axios.create({
-  baseURL: '/api/Grn',
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
 
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
 
 export const grnService = {
   async getLookups(company) {
     try {
-      const response = await api.get('/lookups', { params: { company } });
+      const response = await api.get('/Grn/lookups', { params: { company } });
       return response.data;
     } catch (error) {
       throw error.response?.data || 'Failed to fetch lookups';
@@ -30,7 +14,7 @@ export const grnService = {
 
   async searchProducts(query) {
     try {
-      const response = await api.get('/search-products', { params: { query } });
+      const response = await api.get('/Grn/search-products', { params: { query } });
       return response.data;
     } catch (error) {
       throw error.response?.data || 'Failed to search products';
@@ -39,7 +23,7 @@ export const grnService = {
 
   async generateDocNo(company) {
     try {
-      const response = await api.get('/generate-doc', { params: { company } });
+      const response = await api.get('/Grn/generate-doc', { params: { company } });
       return response.data;
     } catch (error) {
       throw error.response?.data || 'Failed to generate document number';
@@ -48,7 +32,7 @@ export const grnService = {
 
   async searchDocs(company) {
     try {
-      const response = await api.get('/search', { params: { company } });
+      const response = await api.get('/Grn/search', { params: { company } });
       return response.data;
     } catch (error) {
       throw error.response?.data || 'Failed to search GRNs';
@@ -57,7 +41,7 @@ export const grnService = {
 
   async getOrder(docNo, company) {
     try {
-      const response = await api.get(`/${docNo}`, { params: { company } });
+      const response = await api.get(`/Grn/${docNo}`, { params: { company } });
       return response.data;
     } catch (error) {
       throw error.response?.data || 'Failed to fetch GRN details';
@@ -66,7 +50,7 @@ export const grnService = {
 
   async getPODetails(docNo, company) {
     try {
-      const response = await api.get(`/po-details/${docNo}`, { params: { company } });
+      const response = await api.get(`/Grn/po-details/${docNo}`, { params: { company } });
       return response.data;
     } catch (error) {
       throw error.response?.data || 'Failed to fetch PO details';
@@ -75,7 +59,7 @@ export const grnService = {
 
   async save(data) {
     try {
-      const response = await api.post('/save', data);
+      const response = await api.post('/Grn/save', data);
       return response.data;
     } catch (error) {
       throw error.response?.data || 'Failed to save GRN draft';
@@ -84,7 +68,7 @@ export const grnService = {
 
   async apply(data) {
     try {
-      const response = await api.post('/apply', data);
+      const response = await api.post('/Grn/apply', data);
       return response.data;
     } catch (error) {
       throw error.response?.data || 'Failed to apply GRN';
@@ -93,7 +77,7 @@ export const grnService = {
 
   async bulkApply(dataList) {
     try {
-      const response = await api.post('/bulk-apply', dataList);
+      const response = await api.post('/Grn/bulk-apply', dataList);
       return response.data;
     } catch (error) {
       throw error.response?.data || 'Failed to bulk apply GRNs';
@@ -102,7 +86,7 @@ export const grnService = {
 
   async bulkSave(dataList) {
     try {
-      const response = await api.post('/bulk-save', dataList);
+      const response = await api.post('/Grn/bulk-save', dataList);
       return response.data;
     } catch (error) {
       throw error.response?.data || 'Failed to bulk save GRNs';
@@ -111,7 +95,7 @@ export const grnService = {
 
   async delete(docNo, company) {
     try {
-      const response = await api.delete(`/${docNo}`, { params: { company } });
+      const response = await api.delete(`/Grn/${docNo}`, { params: { company } });
       return response.data;
     } catch (error) {
       throw error.response?.data || 'Failed to delete GRN';
@@ -120,7 +104,7 @@ export const grnService = {
 
   async createProduct(data) {
     try {
-      const response = await api.post('/create-product', data);
+      const response = await api.post('/Grn/create-product', data);
       return response.data;
     } catch (error) {
       throw error.response?.data || 'Failed to create product';

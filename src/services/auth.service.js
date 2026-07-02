@@ -71,6 +71,14 @@ export const authService = {
     }
   },
 
+  // CHECK EMAIL EXISTS
+  async checkEmailExists(email) {
+    const response = await api.get(`/Auth/check-email`, {
+      params: { email }
+    });
+    return response.data;
+  },
+
   // SEND OTP FOR REGISTRATION
   async sendOtpForRegistration(phoneNumber) {
     try {
@@ -166,12 +174,12 @@ export const authService = {
     }
   },
 
-  // GET COMPANIES BY EMPLOYEE
-  async getCompaniesByEmployee(empName) {
+  // GET COMPANIES BY EMPLOYEE CODE
+  async getCompaniesByEmployee(empCode) {
     try {
       const token = this.getToken();
       const response = await api.get(`/Company/search/byEmployee`, {
-        params: { empName },
+        params: { empCode },
         headers: { Authorization: `Bearer ${token}` }
       });
       return response.data;
@@ -182,11 +190,11 @@ export const authService = {
   },
 
   // OPEN COMPANY
-  async openCompany(empName, companyCode) {
+  async openCompany(empCode, companyCode) {
     try {
       const token = this.getToken();
       const response = await api.post(`/Company/open`, {
-        EmpName: empName,
+        EmpCode: empCode,
         CompanyCode: companyCode
       }, {
         headers: { Authorization: `Bearer ${token}` }

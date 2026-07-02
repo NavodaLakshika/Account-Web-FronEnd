@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import SimpleModal from '../../SimpleModal';
+import TransactionFormWrapper from '../../TransactionFormWrapper';
 import { 
     Trash2,
     ShieldCheck,
@@ -14,7 +15,8 @@ import {
     Table as TableIcon,
     ChevronDown,
     Eye,
-    EyeOff
+    EyeOff,
+    Loader2
 } from 'lucide-react';
 import { deleteAccountService } from '../../../services/deleteAccount.service';
 
@@ -40,62 +42,61 @@ const LookupSearchModal = ({ isOpen, onClose, onSelect, title, data, searchPlace
             title={title}
             maxWidth="max-w-[700px]"
         >
-            <div className="space-y-4 font-['Tahoma']">
-                <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-[3px] border border-gray-200 mb-2">
-                    <span className="text-[12px] font-bold text-gray-500 uppercase tracking-widest">{searchTitle || 'Search Facility'}</span>
-                    <div className="relative flex-1">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
-                        <input
-                            type="text"
-                            placeholder={searchPlaceholder}
-                            className="w-full h-10 pl-10 pr-4 border border-gray-300 rounded-[3px] outline-none text-[13px] focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] shadow-sm bg-white"
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            autoFocus
-                        />
-                    </div>
+            <div className="flex flex-col h-full font-['Tahoma']">
+                <div className="flex items-center gap-4 bg-slate-50 p-4 border-b border-gray-100 mb-2">
+                    <span className="text-[12px] font-bold text-gray-500 uppercase tracking-tight">{searchTitle || 'Search Facility'}</span>
+                    <input
+                        type="text"
+                        placeholder={searchPlaceholder}
+                        className="w-full h-10 px-4 border border-gray-300 rounded-[3px] outline-none text-sm focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white shadow-sm flex-1"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        autoFocus
+                    />
                 </div>
-
-                <div className="border border-gray-200 rounded-[3px] overflow-hidden shadow-sm">
-                    <div className="max-h-[300px] overflow-y-auto no-scrollbar">
-                        <table className="w-full text-left">
-                            <thead className="bg-[#f8fafd] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-200">
-                                <tr>
-                                    <th className=" px-5 py-3">{idLabel}</th>
-                                    <th className=" px-5 py-3">{nameLabel}</th>
-                                    <th className="text-right px-5 py-3">ACTION</th>
-                                <th className="text-right px-5 py-3">Action</th></tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-50">
-                                {filteredData.length > 0 ? (
-                                    filteredData.map((item) => (
-                                        <tr 
-                                            key={item.code} 
-                                            className="group hover:bg-blue-50/50  transition-all cursor-pointer group border-b border-gray-50"
-                                            onClick={() => {
-                                                onSelect(item);
-                                                onClose();
-                                            }}
-                                        >
-                                            <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{item.code}</td>
-                                            <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{item.name}</td>
-                                            <td className="text-right px-5 py-3">
-                                                <button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">
-                                                    SELECT
-                                                </button>
-                                            </td>
-                                        
-                                            <td className="text-right px-5 py-3"><button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button></td>
-                                        </tr>
-                                    ))
-                                ) : (
-                                    <tr>
-                                        <td colSpan="3" className="text-center py-16 text-gray-400 text-[11px] font-bold uppercase tracking-widest">No records found</td>
+                <div className="max-h-[50vh] overflow-y-auto no-scrollbar border border-gray-100 rounded-[5px] shadow-sm">
+                    <table className="w-full text-sm text-left">
+                        <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 z-10 shadow-sm">
+                            <tr>
+                                <th className="border-b px-5 py-3">{idLabel}</th>
+                                <th className="border-b px-5 py-3">{nameLabel}</th>
+                                <th className="border-b text-center w-24 px-5 py-3">Select</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-100">
+                            {filteredData.length > 0 ? (
+                                filteredData.map((item, idx) => (
+                                    <tr 
+                                        key={idx} 
+                                        className="group hover:bg-blue-50/50 transition-all border-b border-gray-50 cursor-pointer"
+                                        onClick={() => {
+                                            onSelect(item);
+                                            onClose();
+                                        }}
+                                    >
+                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{item.code}</td>
+                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{item.name}</td>
+                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3 text-center">
+                                            <button 
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    onSelect(item);
+                                                    onClose();
+                                                }}
+                                                className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase"
+                                            >
+                                                SELECT
+                                            </button>
+                                        </td>
                                     </tr>
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan="3" className="text-center py-16 text-gray-400 text-[11px] font-bold uppercase tracking-widest">No records found</td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </SimpleModal>
@@ -185,6 +186,7 @@ const DeleteAccountModal = ({ isOpen, onClose }) => {
     const [selectedAccount, setSelectedAccount] = useState({ code: '', name: '' });
     const [selectedUser, setSelectedUser] = useState({ code: '', name: '' });
     const [password, setPassword] = useState('');
+    const [note, setNote] = useState('');
     
     // UI State
     const [loading, setLoading] = useState(false);
@@ -204,9 +206,10 @@ const DeleteAccountModal = ({ isOpen, onClose }) => {
     const fetchLookups = async () => {
         try {
             setLoading(true);
+            const session = getSessionData();
             const [accResp, empResp] = await Promise.all([
-                deleteAccountService.getAccounts(),
-                deleteAccountService.getEmployees()
+                deleteAccountService.getAccounts(session.companyCode),
+                deleteAccountService.getEmployees(session.companyCode)
             ]);
             
             setAccounts(accResp.data);
@@ -233,7 +236,8 @@ const DeleteAccountModal = ({ isOpen, onClose }) => {
                 accountCode: selectedAccount.code,
                 companyCode: session.companyCode,
                 userCode: selectedUser.code,
-                password: password
+                password: password,
+                note: note
             });
             
             showSuccessToast(resp.data.message);
@@ -252,99 +256,112 @@ const DeleteAccountModal = ({ isOpen, onClose }) => {
         setSelectedAccount({ code: '', name: '' });
         setSelectedUser({ code: '', name: '' });
         setPassword('');
+        setNote('');
     };
 
     return (
         <>
-            <SimpleModal
-                isOpen={isOpen}
-                onClose={onClose}
-                title="Delete Account"
-                maxWidth="max-w-[700px]"
-                footer={
-                    <div className="bg-slate-50 px-6 py-4 w-full flex justify-center items-center gap-3 border-t border-slate-200 rounded-b-xl">
-                        <button onClick={handleDeleteClick} disabled={loading} className={`px-6 py-3 bg-white text-[#ff3b30] border-2 border-[#ff3b30] hover:bg-red-50 font-mono font-bold text-sm uppercase tracking-widest rounded-[3px] shadow-md shadow-red-100 transition-all active:scale-95 flex items-center justify-center gap-2 border-none ${loading ? 'opacity-50' : ''}`}>
-                            <Trash2 size={14} /> DELETE
-                        </button>
-                        <button onClick={handleClear} disabled={loading} className="px-6 py-3 bg-white text-[#00adff] border-2 border-[#00adff] hover:bg-blue-50 font-mono font-bold text-sm uppercase tracking-widest rounded-[3px] transition-all active:scale-95 flex items-center justify-center gap-2 border-none">
-                            <RotateCcw size={14} /> CLEAR
+        <TransactionFormWrapper
+            isOpen={isOpen}
+            onClose={onClose}
+            title="Delete Account"
+            subtitle="System Administration"
+            icon={Trash2}
+            maxWidth="max-w-xl"
+            footer={
+                <div className="bg-[#fcfcfc] px-6 py-5 w-full flex justify-between items-center border-t border-gray-200 rounded-b-[10px] shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]">
+                    <div className="flex gap-3">
+                        <button onClick={handleClear} disabled={loading} className="px-6 h-10 border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2">
+                            <RotateCcw size={14} /> CLEAR FORM
                         </button>
                     </div>
-                }
-            >
-                <div className="space-y-4 font-['Tahoma']">
-                    <div className="bg-slate-50/50 p-6 border border-slate-200 rounded-[3px] relative overflow-hidden space-y-6">
-                        <div className="grid grid-cols-12 gap-y-5 relative z-10">
-                            
-                            {/* Account Row */}
-                            <div className="col-span-12 flex flex-col gap-1.5">
-                                <label className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">Account</label>
-                                <div className="flex gap-1 h-8">
-                                    <input
-                                        type="text"
-                                        readOnly
-                                        value={selectedAccount.code || ''}
-                                        className="w-24 h-8 border border-slate-200 px-3 text-[12px] font-bold text-gray-700 bg-white rounded-[3px] outline-none cursor-pointer transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20"
-                                        onClick={() => setShowAccountSearch(true)}
-                                        placeholder=""
-                                    />
-                                    <input
-                                        type="text"
-                                        readOnly
-                                        value={selectedAccount.name || ''}
-                                        className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-bold text-gray-700 bg-white rounded-[3px] outline-none cursor-pointer truncate transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20"
-                                        onClick={() => setShowAccountSearch(true)}
-                                        placeholder=" "
-                                    />
-                                    <button onClick={() => setShowAccountSearch(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0">
-                                        <Search size={16} />
-                                    </button>
-                                </div>
-                            </div>
-
-                            {/* Authorize Row */}
-                            <div className="col-span-12 flex flex-col gap-1.5">
-                                <label className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">Authorize</label>
-                                <div className="flex gap-1 h-8">
-                                    <input
-                                        type="text"
-                                        readOnly
-                                        value={selectedUser.name || ''}
-                                        className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-bold text-gray-700 bg-white rounded-[3px] outline-none cursor-pointer truncate transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20"
-                                        onClick={() => setShowUserSearch(true)}
-                                        placeholder=""
-                                    />
-                                    <button onClick={() => setShowUserSearch(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0">
-                                        <Search size={16} />
-                                    </button>
-                                </div>
-                            </div>
-
-                            {/* Password Row */}
-                            <div className="col-span-12 flex flex-col gap-1.5">
-                                <label className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">Password</label>
-                                <div className="relative">
-                                    <input
-                                        type={showPassword ? "text" : "password"}
-                                        value={password}
-                                        onChange={(e) => setPassword(e.target.value)}
-                                        placeholder="••••••••"
-                                        className="w-full h-8 border border-slate-200 px-3 pr-10 text-[12px] font-bold text-slate-700 bg-white rounded-[3px] outline-none shadow-sm transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20"
-                                    />
-                                    <button
-                                        type="button"
-                                        onClick={() => setShowPassword(!showPassword)}
-                                        className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
-                                    >
-                                        {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                                    </button>
-                                </div>
-                            </div>
-
-                        </div>
+                    <div className="flex gap-3">
+                        <button onClick={handleDeleteClick} disabled={loading} className={`px-6 h-10 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                            <Trash2 size={14} /> DELETE ACCOUNT
+                        </button>
                     </div>
                 </div>
-            </SimpleModal>
+            }
+        >
+            <div className="font-['Tahoma']">
+                <div className="bg-white p-5 border border-slate-200 rounded-[3px] space-y-4 shadow-sm">
+                    <div className="space-y-4">
+                        
+                        {/* Account Row */}
+                        <div>
+                            <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Select Account</label>
+                            <div className="relative">
+                                <input
+                                    type="text"
+                                    readOnly
+                                    value={selectedAccount.name || selectedAccount.code || ''}
+                                    className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700 truncate"
+                                    onClick={() => setShowAccountSearch(true)}
+                                    placeholder="Search account..."
+                                />
+                                <button onClick={() => setShowAccountSearch(true)} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
+                                    <Search size={16} />
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Authorize Row */}
+                        <div>
+                            <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Authorized User</label>
+                            <div className="relative">
+                                <input
+                                    type="text"
+                                    readOnly
+                                    value={selectedUser.name || selectedUser.code || ''}
+                                    className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700 truncate"
+                                    onClick={() => setShowUserSearch(true)}
+                                    placeholder="Search user..."
+                                />
+                                <button onClick={() => setShowUserSearch(true)} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
+                                    <Search size={16} />
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Password Row */}
+                        <div>
+                            <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Authorization Password</label>
+                            <div className="relative">
+                                <input
+                                    type={showPassword ? "text" : "password"}
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    placeholder="••••••••"
+                                    className="w-full h-10 border border-gray-300 rounded-[3px] px-3 pr-10 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 font-mono"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer"
+                                >
+                                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Note Row */}
+                        <div>
+                            <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Reason for Deletion</label>
+                            <div className="relative">
+                                <input
+                                    type="text"
+                                    value={note}
+                                    onChange={(e) => setNote(e.target.value)}
+                                    placeholder="Add an optional note..."
+                                    className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700"
+                                />
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </TransactionFormWrapper>
 
             {/* Sub Modals */}
             <LookupSearchModal 
@@ -353,10 +370,10 @@ const DeleteAccountModal = ({ isOpen, onClose }) => {
                 onSelect={setSelectedAccount}
                 title="Account Selection"
                 data={accounts}
-                searchPlaceholder=""
-                idLabel="REFERENCE ID"
-                nameLabel="Account Description"
-                searchTitle="Global Account Search"
+                searchPlaceholder="Filter accounts"
+                idLabel="Code"
+                nameLabel="Account Descriptor"
+                searchTitle="Search Available Ledgers"
             />
 
             <LookupSearchModal 
@@ -364,11 +381,15 @@ const DeleteAccountModal = ({ isOpen, onClose }) => {
                 onClose={() => setShowUserSearch(false)}
                 onSelect={setSelectedUser}
                 title="User Selection"
-                data={employees}
-                searchPlaceholder=""
-                idLabel="USER ID"
+                data={employees.map(emp => ({
+                    ...emp,
+                    code: emp.emp_Code || emp.empCode || emp.code,
+                    name: emp.emp_Name || emp.empName || emp.name
+                }))}
+                searchPlaceholder="Filter users"
+                idLabel="Code"
                 nameLabel="User Description"
-                searchTitle="Global User Search"
+                searchTitle="Search Facility"
             />
 
             <DeleteConfirmationModal

@@ -35,13 +35,34 @@ const SelectCompanyPage = () => {
     const [showCreateCompanyModal, setShowCreateCompanyModal] = useState(false);
     const itemsPerPage = 3; // Vertical list fits better in the right panel
 
-    const handleCompanyCreated = async () => {
+    const handleCompanyCreated = async (newCompanyName) => {
         setShowCreateCompanyModal(false);
-        await fetchUserCompanies();
+        setFetching(true);
+        try {
+            const data = await authService.getCompaniesByEmployee(empCode);
+            const mapped = data.map(c => ({
+                id: c.companyCode || c.CompanyCode,
+                name: c.companyName || c.CompanyName
+            }));
+            setCompanies(mapped);
+            
+            const created = mapped.find(c => c.name === newCompanyName);
+            if (created) {
+                setSelectedCompanyId(created.id);
+                await launchCompany(created.id, created.name);
+            } else if (mapped.length > 0) {
+                setSelectedCompanyId(mapped[0].id);
+            }
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setFetching(false);
+        }
     };
 
     const user = authService.getCurrentUser();
     const userName = user ? (user.EmpName || user.empName || user.Emp_Name || 'User') : 'Guest';
+    const empCode = user ? (user.EmpCode || user.empCode) : null;
 
     useEffect(() => {
         if (videoRef.current) {
@@ -57,7 +78,7 @@ const SelectCompanyPage = () => {
         }
         try {
             setFetching(true);
-            const data = await authService.getCompaniesByEmployee(userName);
+            const data = await authService.getCompaniesByEmployee(empCode);
             const mapped = data.map(c => ({
                 id: c.companyCode || c.CompanyCode,
                 name: c.companyName || c.CompanyName
@@ -77,16 +98,11 @@ const SelectCompanyPage = () => {
         }
     };
 
-    const handleOpen = async () => {
-        const selected = companies.find(c => c.id === selectedCompanyId);
-        if (!selected) {
-            showErrorToast('Please select a company first');
-            return;
-        }
+    const launchCompany = async (id, name) => {
         setLoading(true);
         try {
-            await authService.openCompany(userName, selected.id);
-            showPendingToast(`Connecting to ${selected.name}...`, "Initializing workspace");
+            await authService.openCompany(empCode, id);
+            showPendingToast(`Connecting to ${name}...`, "Initializing workspace");
 
             // Play success sound
             const audio = new Audio(SUCCESS_SOUND_URL);
@@ -99,6 +115,15 @@ const SelectCompanyPage = () => {
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleOpen = async () => {
+        const selected = companies.find(c => c.id === selectedCompanyId);
+        if (!selected) {
+            showErrorToast('Please select a company first');
+            return;
+        }
+        await launchCompany(selected.id, selected.name);
     };
 
     const totalPages = Math.ceil(companies.length / itemsPerPage);
@@ -173,7 +198,7 @@ const SelectCompanyPage = () => {
                         <h2 className="text-white text-3xl font-bold font-tahoma">Select Entity</h2>
                         <button
                             onClick={() => setShowCreateCompanyModal(true)}
-                            className="px-4 py-2 border border-[#00acee] hover:bg-[#00acee] text-[#00acee] hover:text-white transition-all text-[11px] font-mono font-bold tracking-wider uppercase rounded"
+                            className="px-4 h-10 border border-[#00acee] hover:bg-[#00acee] text-[#00acee] hover:text-white transition-all text-[11px] font-mono font-bold tracking-wider uppercase rounded"
                         >
                             + New Company
                         </button>

@@ -141,14 +141,14 @@ const AccountBoard = ({ isOpen, onClose, selectedType, initialData }) => {
                     <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-slate-200 rounded-b-[5px]">
                         <button
                             onClick={() => setFormData({ ...formData, accountId: '', accountName: '', description: '', note: '' })}
-                            className="px-6 py-2 border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center gap-2"
+                            className="px-6 h-10 border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center gap-2"
                         >
                             <RotateCcw size={14} /> CLEAR
                         </button>
                         <button
                             onClick={handleSave}
                             disabled={loading}
-                            className={`px-6 py-2 bg-[#0285fd] hover:bg-[#0073ff] text-white font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center gap-2 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            className={`px-6 h-10 bg-[#0285fd] hover:bg-[#0073ff] text-white font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center gap-2 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                         >
                             {loading ? <RotateCcw className="animate-spin" size={14} /> : <Save size={14} />} SAVE
                         </button>

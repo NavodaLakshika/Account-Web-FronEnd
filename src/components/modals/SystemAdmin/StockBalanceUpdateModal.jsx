@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import SimpleModal from '../../SimpleModal';
+import TransactionFormWrapper from '../../TransactionFormWrapper';
 import { 
     RotateCcw, 
     Save, 
@@ -10,16 +10,14 @@ import {
     Database,
     ShieldCheck,
     CheckCircle,
-    X
+    X,
+    Loader2
 } from 'lucide-react';
 import { stockBalanceService } from '../../../services/stockBalance.service';
-import { DotLottiePlayer } from '@dotlottie/react-player';
 import { getSessionData } from '../../../utils/session';
 import CalendarModal from '../../CalendarModal';
 import ConfirmModal from '../ConfirmModal';
-
 import { showSuccessToast, showErrorToast } from '../../../utils/toastUtils';
-
 
 const StockBalanceUpdateModal = ({ isOpen, onClose }) => {
     const [items, setItems] = useState([]);
@@ -101,120 +99,106 @@ const StockBalanceUpdateModal = ({ isOpen, onClose }) => {
         setStatusMessage('READY');
     };
 
+    if (!isOpen) return null;
+
     return (
         <>
-            <style>
-                {`
-                    @keyframes toastProgress {
-                        0% { width: 100%; }
-                        100% { width: 0%; }
-                    }
-                    .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-                    .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-                    .custom-scrollbar::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
-                `}
-            </style>
-            <SimpleModal
+            <TransactionFormWrapper
                 isOpen={isOpen}
                 onClose={onClose}
                 title="Stock Balance Update"
-                maxWidth="max-w-[700px]"
-                showHeaderClose={true}
+                subtitle="Inventory Management"
+                icon={Database}
+                maxWidth="max-w-4xl"
                 footer={
-                    <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-slate-200 rounded-b-xl">
+                    <div className="bg-[#fcfcfc] px-6 py-5 w-full flex justify-between items-center border-t border-gray-200 rounded-b-[10px] shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]">
                         <div className="flex gap-3">
-                            <button onClick={handleClear} disabled={loading} className="px-6 py-3 bg-white text-[#00adff] border-2 border-[#00adff] hover:bg-blue-50 font-mono font-bold text-sm uppercase tracking-widest rounded-[3px] transition-all active:scale-95 flex items-center justify-center gap-2 border-none">
+                            <button onClick={handleClear} disabled={loading} className="px-6 h-10 border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2">
                                 <RotateCcw size={14} /> CLEAR
                             </button>
                         </div>
                         <div className="flex gap-3">
-                            <button onClick={handleSaveClick} disabled={loading} className={`px-6 py-3 bg-white text-[#2bb744] border-2 border-[#2bb744] hover:bg-green-50 font-mono font-bold text-sm uppercase tracking-widest rounded-[3px] shadow-md shadow-green-100 transition-all active:scale-95 flex items-center justify-center gap-2 border-none ${loading ? 'opacity-50' : ''}`}>
-                                <CheckCircle size={14} /> SAVE & APPLY
+                            <button onClick={handleSaveClick} disabled={loading} className={`px-6 h-10 bg-[#0285fd] hover:bg-[#0073ff] text-white font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2 ${loading ? 'opacity-70' : ''}`}>
+                                {loading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />} SAVE & APPLY
                             </button>
                         </div>
                     </div>
                 }
             >
-                <div className="space-y-4 overflow-y-auto no-scrollbar font-['Tahoma']">
+                <div className="space-y-4 select-none font-['Tahoma']">
+                    
                     {/* Header Controls */}
-                    <div className="bg-slate-50/50 p-4 border border-slate-200 rounded-[3px] relative overflow-hidden">
-                        {/* {loading && (
-                            <div className="absolute inset-0 bg-white/80 backdrop-blur-[2px] z-[60] flex flex-col items-center justify-center rounded-[3px] animate-in fade-in duration-300">
-                                <div className="w-24 h-24">
-                                    <DotLottiePlayer src="/lottiefile/Loading animation blue.lottie" autoplay loop />
-                                </div>
-                                <span className="text-[11px] font-black text-[#00adff] uppercase tracking-[0.2em] animate-pulse -mt-2">{statusMessage}</span>
-                            </div>
-                        )} */}
-                        
-                        <div className="grid grid-cols-12 gap-x-6 gap-y-3.5 relative z-10">
-                            <div className="col-span-8 flex items-center gap-2">
-                                <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Stock Date</label>
-                                <div className="flex-1 flex gap-1 h-8 min-w-0">
-                                    <input
-                                        type="text"
-                                        readOnly
-                                        value={stockDate}
-                                        className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-bold text-gray-700 bg-white rounded outline-none cursor-pointer transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20"
-                                        onClick={() => setShowCalendar(true)}
-                                    />
-                                    <button
-                                        onClick={() => setShowCalendar(true)}
-                                        className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0"
-                                    >
-                                        <CalendarIcon size={16} />
-                                    </button>
+                    <div className="bg-white p-4 border border-slate-200 rounded-[3px] space-y-4">
+                        <div className="grid grid-cols-12 gap-x-6 gap-y-3.5">
+                            <div className="col-span-12 lg:col-span-8 flex items-end gap-2">
+                                <div className="flex-1">
+                                    <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Stock Date</label>
+                                    <div className="relative">
+                                        <input
+                                            type="text"
+                                            readOnly
+                                            value={stockDate}
+                                            className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 cursor-pointer"
+                                            onClick={() => setShowCalendar(true)}
+                                        />
+                                        <button onClick={() => setShowCalendar(true)} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
+                                            <CalendarIcon size={16} />
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-                            <div className="col-span-4 flex justify-end">
+                            <div className="col-span-12 lg:col-span-4 flex items-end justify-end">
                                 <button 
                                     onClick={handleLoad}
                                     disabled={loading}
-                                    className="h-8 px-6 bg-[#0285fd] text-white font-mono font-bold text-xs uppercase tracking-widest rounded-[3px] hover:bg-[#0073ff] transition-all shadow-md active:scale-95 flex items-center gap-2"
+                                    className="px-6 h-10 bg-[#0285fd] hover:bg-[#0073ff] text-white font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2"
                                 >
-                                    <Search size={14} /> Load
+                                    <Search size={14} /> LOAD DATA
                                 </button>
                             </div>
                         </div>
                     </div>
 
                     {/* Data Table */}
-                    <div className="border border-gray-300 rounded-[3px] overflow-hidden flex flex-col min-h-[350px] bg-white shadow-inner">
+                    <div className="border border-gray-200 rounded-[3px] bg-white shadow-xl overflow-hidden flex flex-col min-h-[350px]">
                         {/* Table header */}
-                        <div className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 shadow-sm z-10">
-                            <div className="w-32 py-2.5 px-4 border-r border-gray-200 text-center uppercase tracking-wider text-[11px]">CC Code</div>
-                            <div className="flex-1 py-2.5 px-4 border-r border-gray-200 uppercase tracking-wider text-[11px]">Cost Center Description</div>
-                            <div className="w-40 py-2.5 px-4 text-right uppercase tracking-wider text-[11px]">Stock Value</div>
+                        <div className="bg-slate-50 flex sticky top-0 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-200 leading-10 shadow-sm z-10">
+                            <div className="w-32 px-4 border-r border-gray-200 text-center">CC Code</div>
+                            <div className="flex-1 px-4 border-r border-gray-200">Cost Center Description</div>
+                            <div className="w-40 px-4 text-right">Stock Value</div>
                         </div>
 
-                        <div className="flex-1 bg-slate-50/30 relative overflow-y-auto max-h-[380px] no-scrollbar custom-scrollbar divide-y divide-gray-100">
+                        <div className="flex-1 bg-white relative overflow-y-auto max-h-[380px] no-scrollbar">
                             {items.length > 0 ? (
                                 items.map((item, index) => (
-                                    <div key={index} className="flex border-b border-gray-200 text-[11px] font-bold text-slate-700 hover:bg-blue-50/50/30 items-center transition-all group bg-white cursor-pointer group border-b border-gray-50">
-                                        <div className="w-32 py-2.5 px-4 border-r border-gray-200 text-center text-blue-600 font-mono">
+                                    <div key={index} className="flex border-b border-gray-50 text-[12px] text-gray-700 hover:bg-blue-50/30 items-center transition-all group bg-white cursor-pointer">
+                                        <div className="w-32 py-2 px-4 border-r border-gray-100 text-center text-blue-700 font-mono font-bold uppercase">
                                             {item.costCenterCode}
                                         </div>
-                                        <div className="flex-1 py-2.5 px-4 border-r border-gray-200 uppercase truncate">
+                                        <div className="flex-1 py-2 px-4 border-r border-gray-100 uppercase truncate font-bold text-slate-700">
                                             {item.costCenterName}
                                         </div>
-                                        <div className="w-40 border-r border-gray-200 px-1 py-1 bg-white group-hover:bg-transparent">
+                                        <div className="w-40 px-2 py-1 bg-white group-hover:bg-transparent">
                                             <input 
                                                 type="number"
                                                 value={item.stock}
                                                 onChange={(e) => handleInputChange(index, e.target.value)}
-                                                className="w-full h-7 bg-transparent text-right text-[12px] font-mono font-black text-slate-900 outline-none focus:bg-white border-none px-2"
+                                                className="w-full h-8 bg-transparent text-right text-[12px] font-mono font-bold text-blue-700 outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] border border-transparent rounded-[3px] px-2 transition-all hover:border-gray-200"
                                                 onFocus={(e) => e.target.select()}
                                             />
                                         </div>
                                     </div>
                                 ))
                             ) : (
-                                <div className="h-full flex flex-col items-center justify-center gap-3 opacity-20 py-20">
-                                    <Table size={48} className="text-slate-400" />
-                                    <span className="font-bold uppercase tracking-[0.3em] text-slate-500">No Data Loaded</span>
-                                    <div className="absolute inset-0 pointer-events-none opacity-[0.03]" 
-                                         style={{ backgroundImage: 'linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px)', backgroundSize: '40px 40px' }} 
-                                    />
+                                <div className="h-full flex flex-col items-center justify-center gap-3 py-20 text-slate-400">
+                                    {loading ? (
+                                        <Loader2 size={32} className="animate-spin text-blue-500" />
+                                    ) : (
+                                        <>
+                                            <Table size={48} className="opacity-20" />
+                                            <span className="text-[11px] font-bold uppercase tracking-[0.2em] opacity-50">No Data Loaded</span>
+                                        </>
+                                    )}
                                 </div>
                             )}
                         </div>
@@ -229,7 +213,7 @@ const StockBalanceUpdateModal = ({ isOpen, onClose }) => {
                         <span className="text-[10px] font-mono text-slate-400 opacity-50 uppercase tracking-tighter italic">Authorized for {getSessionData().userName}</span>
                     </div>
                 </div>
-            </SimpleModal>
+            </TransactionFormWrapper>
 
             <CalendarModal 
                 isOpen={showCalendar}

@@ -1,61 +1,45 @@
-import axios from 'axios';
+import api from './api';
 
-const api = axios.create({
-    baseURL: '/api/Quotation',
-    headers: {
-        'Content-Type': 'application/json',
-    },
-});
 
-api.interceptors.request.use(
-    (config) => {
-        const token = localStorage.getItem('token');
-        if (token) {
-            config.headers.Authorization = `Bearer ${token}`;
-        }
-        return config;
-    },
-    (error) => Promise.reject(error)
-);
 
 export const quotationService = {
     getLookups: async (company) => {
-        const response = await api.get('/lookups', { params: { company } });
+        const response = await api.get('/Quotation/lookups', { params: { company } });
         return response.data;
     },
 
     generateDocNo: async (company) => {
-        const response = await api.get('/generate-doc', { params: { company } });
+        const response = await api.get('/Quotation/generate-doc', { params: { company } });
         return response.data;
     },
 
     save: async (payload) => {
-        const response = await api.post('/save', payload);
+        const response = await api.post('/Quotation/save', payload);
         return response.data;
     },
 
     apply: async (payload) => {
-        const response = await api.post('/apply', payload);
+        const response = await api.post('/Quotation/apply', payload);
         return response.data;
     },
 
     searchDocs: async (company) => {
-        const response = await api.get('/search', { params: { company } });
+        const response = await api.get('/Quotation/search', { params: { company } });
         return response.data;
     },
 
     getDoc: async (docNo, company) => {
-    const response = await api.get(`/${docNo}`, { params: { company } });
+    const response = await api.get(`/Quotation/${docNo}`, { params: { company } });
     return response.data;
 },
 
     getAppliedDoc: async (docNo, company) => {
-        const response = await api.get(`/applied/${docNo}`, { params: { company } });
+        const response = await api.get(`/Quotation/applied/${docNo}`, { params: { company } });
         return response.data;
     },
 
     delete: async (docNo, company) => {
-        const response = await api.delete(`/${docNo}`, { params: { company } });
+        const response = await api.delete(`/Quotation/${docNo}`, { params: { company } });
         return response.data;
     }
 };

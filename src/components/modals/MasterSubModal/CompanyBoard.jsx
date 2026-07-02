@@ -57,7 +57,8 @@ const CompanyBoard = ({ isOpen, onClose }) => {
         setLoading(true); setShowLookup(true);
         try {
             const userName = user?.empName || user?.EmpName || user?.username;
-            let data = (userName && userName !== 'Admin') ? await authService.getCompaniesByEmployee(userName) : await authService.getAllCompanies();
+            const empCode = user?.EmpCode || user?.empCode;
+            let data = (userName && userName !== 'Admin' && empCode) ? await authService.getCompaniesByEmployee(empCode) : userName === 'Admin' ? await authService.getAllCompanies() : [];
             setLookupResults(data.map(c => ({ ...c, companyCode: c.companyCode || c.CompanyCode, companyName: c.companyName || c.CompanyName })));
         } catch (error) { console.error('Error fetching companies:', error); showErrorToast('Failed to load companies for search.'); } finally { setLoading(false); }
     };

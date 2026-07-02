@@ -174,7 +174,7 @@ import JournalEntryEditorBoard from './JournalEntryEditorBoard';
 import TransactionEditorModal from '../components/modals/SystemAdmin/TransactionEditorModal';
 import CompanyUsersModal from '../components/modals/SystemAdmin/CompanyUsersModal';
 import ReportsCenterModal from '../components/modals/AdminReports/ReportsCenterModal';
-import ReportLearnMoreModal from '../components/modals/AdminReports/ReportLearnMoreModal';
+import DashboardHelpModal from '../components/modals/DashboardHelpModal';
 
 // Reports Modals
 
@@ -1735,7 +1735,7 @@ const Dashboard = () => {
                 empCode={user?.EmpCode || user?.empCode || user?.emp_Code || user?.id_No || user?.Id_No || user?.IdNo}
                 companyCode={selectedCompany?.Company_Id || selectedCompany?.companyId || selectedCompany?.code || selectedCompany?.companyCode}
             />
-            <ReportLearnMoreModal isOpen={showLearnMoreModal} onClose={() => setShowLearnMoreModal(false)} />
+            <DashboardHelpModal isOpen={showLearnMoreModal} onClose={() => setShowLearnMoreModal(false)} />
 
             {/* Reports Modals */}
 
@@ -2002,10 +2002,11 @@ const Dashboard = () => {
                                                                                                     setNavReportSearch('');
                                                                                                 }}
                                                                                                 disabled={isLockedReport}
-                                                                                                className={`w-full text-left text-[13px] font-sans font-medium text-gray-600 ${isLockedReport ? '' : 'hover:text-[#0078d4] hover:bg-[#f4f5f8]'} px-2 py-1.5 -mx-2 rounded-[3px] transition-all flex items-center justify-between pr-8`}
+                                                                                                className={`w-full text-left text-[13px] font-sans font-medium text-gray-600 ${isLockedReport ? '' : 'hover:text-[#0078d4] hover:bg-[#f4f5f8]'} px-2 py-1.5 -mx-2 rounded-[3px] transition-all flex items-start justify-between pr-8`}
+                                                                                                title={subItem.label}
                                                                                             >
-                                                                                                <span className="truncate">{subItem.label}</span>
-                                                                                                {isLockedReport && <Lock size={12} className="text-slate-400 group-hover/item:text-red-500 transition-colors shrink-0 ml-2" />}
+                                                                                                <span className="whitespace-normal leading-snug pt-0.5">{subItem.label}</span>
+                                                                                                {isLockedReport && <Lock size={12} className="text-slate-400 group-hover/item:text-red-500 transition-colors shrink-0 ml-2 mt-0.5" />}
                                                                                             </button>
                                                                                             {isReports && !isLockedReport && (
                                                                                                 <button
@@ -2272,7 +2273,7 @@ const Dashboard = () => {
                                                             pay_bill: { icon: CreditCard, label: 'Pay Bill', onClick: () => setShowPayBillModal(true), active: showPayBillModal, iconColor: '#ea580c', bg: '#fff7ed' },
                                                             write_chq: { icon: PenTool, label: 'Write Cheque', onClick: () => setShowWriteChequeModal(true), active: showWriteChequeModal, iconColor: '#7c3aed', bg: '#faf5ff' },
                                                             petty_cash: { icon: Wallet, label: 'Petty Cash', onClick: () => setShowPettyCashModal(true), active: showPettyCashModal, iconColor: '#16a34a', bg: '#f0fdf4' },
-                                                            make_deposit: { icon: ArrowDownLeft, label: 'Deposit', onClick: () => setShowMakeDepositModal(true), active: showMakeDepositModal, iconColor: '#2563eb', bg: '#eff6ff' },
+                                                            make_deposit: { icon: ArrowDownLeft, label: 'Deposit', onClick: () => setShowCollectionToDepositModal(true), active: showCollectionToDepositModal, iconColor: '#2563eb', bg: '#eff6ff' },
                                                             journal_entry: { icon: BookOpen, label: 'Journal', onClick: () => setShowJournalEntryModal(true), active: showJournalEntryModal, iconColor: '#9333ea', bg: '#fdf4ff' },
                                                             bank_rec: { icon: RefreshCcw, label: 'Bank Rec', onClick: () => setShowBankRecModal(true), active: showBankRecModal, iconColor: '#0d9488', bg: '#f0fdfa' },
                                                             trial_balance: { icon: BarChart2, label: 'Trial Balance', onClick: () => setShowTrialBalanceModal(true), active: showTrialBalanceModal, iconColor: '#4f46e5', bg: '#eef2ff' },

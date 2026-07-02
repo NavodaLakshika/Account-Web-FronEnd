@@ -1,27 +1,11 @@
-import axios from 'axios';
+import api from './api';
 
-const api = axios.create({
-  baseURL: '/api/FixedAsset',
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
 
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
 
 export const fixedAssetService = {
   async getLookups() {
     try {
-      const response = await api.get('/lookups');
+      const response = await api.get('/FixedAsset/lookups');
       return response.data;
     } catch (error) {
       throw error.response?.data || 'Failed to fetch lookups';
@@ -30,7 +14,7 @@ export const fixedAssetService = {
 
   async getNextCode(company) {
     try {
-      const response = await api.get('/next-code', { params: { company } });
+      const response = await api.get('/FixedAsset/next-code', { params: { company } });
       return response.data.nextCode;
     } catch (error) {
       throw error.response?.data || '1';
@@ -39,7 +23,7 @@ export const fixedAssetService = {
 
   async getByCode(code, company) {
     try {
-      const response = await api.get(`/${code}`, { params: { company } });
+      const response = await api.get(`/FixedAsset/${code}`, { params: { company } });
       return response.data;
     } catch (error) {
       throw error.response?.data || 'Failed to fetch asset';
@@ -48,7 +32,7 @@ export const fixedAssetService = {
 
   async search(company) {
     try {
-      const response = await api.get('/search', { params: { company } });
+      const response = await api.get('/FixedAsset/search', { params: { company } });
       return response.data;
     } catch (error) {
       throw error.response?.data || 'Search failed';
@@ -57,7 +41,7 @@ export const fixedAssetService = {
 
   async save(data) {
     try {
-      const response = await api.post('/save', data);
+      const response = await api.post('/FixedAsset/save', data);
       return response.data;
     } catch (error) {
       throw error.response?.data || 'Failed to save record';
