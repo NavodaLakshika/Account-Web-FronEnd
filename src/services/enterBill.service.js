@@ -1,27 +1,10 @@
-import axios from 'axios';
+import api from './api';
 
-const api = axios.create({
-  baseURL: '/api/EnterBill',
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
-
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
 
 export const enterBillService = {
   async getLookups() {
     try {
-      const response = await api.get('/lookups');
+      const response = await api.get('/EnterBill/lookups');
       return response.data;
     } catch (error) {
       throw error.response?.data || 'Failed to fetch lookups';
@@ -30,7 +13,7 @@ export const enterBillService = {
 
   async generateDocNo(company) {
     try {
-      const response = await api.get('/generate-doc', { params: { company } });
+      const response = await api.get('/EnterBill/generate-doc', { params: { company } });
       return response.data;
     } catch (error) {
       throw error.response?.data || 'Failed to generate document number';
@@ -39,7 +22,7 @@ export const enterBillService = {
 
   async save(data) {
     try {
-      const response = await api.post('/save', data);
+      const response = await api.post('/EnterBill/save', data);
       return response.data;
     } catch (error) {
       throw error.response?.data || 'Failed to save bill';
@@ -48,7 +31,7 @@ export const enterBillService = {
 
   async searchBills(query, company) {
     try {
-      const response = await api.get('/search', { params: { query, company } });
+      const response = await api.get('/EnterBill/search', { params: { query, company } });
       return response.data;
     } catch (error) {
       throw error.response?.data || 'Failed to search bills';
@@ -57,7 +40,7 @@ export const enterBillService = {
 
   async getBill(docNo, company) {
     try {
-      const response = await api.get(`/${docNo}`, { params: { company } });
+      const response = await api.get(`/EnterBill/${docNo}`, { params: { company } });
       return response.data;
     } catch (error) {
       throw error.response?.data || 'Failed to load bill';

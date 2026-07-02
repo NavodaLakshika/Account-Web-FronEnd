@@ -1,27 +1,11 @@
-import axios from 'axios';
+import api from './api';
 
-const api = axios.create({
-  baseURL: '/api/PurchOrder',
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
 
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
 
 export const purchOrderService = {
   async getLookups(company) {
     try {
-      const response = await api.get('/lookups', { params: { company } });
+      const response = await api.get('/PurchOrder/lookups', { params: { company } });
       return response.data;
     } catch (error) {
       throw error.response?.data || 'Failed to fetch lookups';
@@ -30,7 +14,7 @@ export const purchOrderService = {
   
   async searchProducts(query) {
     try {
-      const response = await api.get('/search-products', { params: { query } });
+      const response = await api.get('/PurchOrder/search-products', { params: { query } });
       return response.data;
     } catch (error) {
       throw error.response?.data || 'Failed to search products';
@@ -39,7 +23,7 @@ export const purchOrderService = {
 
   async generateDocNo(company) {
     try {
-      const response = await api.get('/generate-doc', { params: { company } });
+      const response = await api.get('/PurchOrder/generate-doc', { params: { company } });
       return response.data;
     } catch (error) {
       throw error.response?.data || 'Failed to generate document number';
@@ -48,7 +32,7 @@ export const purchOrderService = {
 
   async searchDocs(company) {
     try {
-      const response = await api.get('/search', { params: { company } });
+      const response = await api.get('/PurchOrder/search', { params: { company } });
       return response.data;
     } catch (error) {
       throw error.response?.data || 'Failed to search documents';
@@ -57,7 +41,7 @@ export const purchOrderService = {
 
   async getOrder(docNo, company) {
     try {
-      const response = await api.get(`/${docNo}`, { params: { company } });
+      const response = await api.get(`/PurchOrder/${docNo}`, { params: { company } });
       return response.data;
     } catch (error) {
       throw error.response?.data || 'Failed to fetch order details';
@@ -66,7 +50,7 @@ export const purchOrderService = {
 
   async save(data) {
     try {
-      const response = await api.post('/save', data);
+      const response = await api.post('/PurchOrder/save', data);
       console.log(response.data)
       return response.data;
     } catch (error) {
@@ -76,7 +60,7 @@ export const purchOrderService = {
 
   async delete(docNo, company) {
     try {
-      const response = await api.delete(`/${docNo}`, { params: { company } });
+      const response = await api.delete(`/PurchOrder/${docNo}`, { params: { company } });
       return response.data;
     } catch (error) {
       throw error.response?.data || 'Failed to delete record';
@@ -85,7 +69,7 @@ export const purchOrderService = {
 
   async apply(data) {
     try {
-      const response = await api.post('/apply', data);
+      const response = await api.post('/PurchOrder/apply', data);
       return response.data;
     } catch (error) {
       throw error.response?.data || 'Failed to apply record';
@@ -94,7 +78,7 @@ export const purchOrderService = {
 
   async createProduct(productData) {
     try {
-      const response = await api.post('/create-product', productData);
+      const response = await api.post('/PurchOrder/create-product', productData);
       return response.data;
     } catch (error) {
       throw error.response?.data || 'Failed to create product';

@@ -163,7 +163,7 @@ const NewAccountBoard = ({ isOpen, onClose }) => {
 
                 <div className="mt-8 flex justify-end">
                     <button
-                        className="px-6 py-2 bg-[#0285fd] hover:bg-[#0073ff] text-white font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center gap-2"
+                        className="px-6 h-10 bg-[#0285fd] hover:bg-[#0073ff] text-white font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center gap-2"
                         onClick={handleCreateClick}
                     >
                         <ChevronRight size={14} /> Create

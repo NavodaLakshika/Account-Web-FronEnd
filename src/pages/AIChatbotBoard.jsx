@@ -557,7 +557,7 @@ const AIChatbotBoard = ({ isOpen, onClose, position = 'center' }) => {
                                             <button 
                                                 type="button"
                                                 onClick={handleStopGeneration}
-                                                className="px-6 py-2 border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2"
+                                                className="px-6 h-10 border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2"
                                             >
                                                 <Square size={12} fill="currentColor" /> Stop
                                             </button>

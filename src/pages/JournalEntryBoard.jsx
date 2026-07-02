@@ -501,13 +501,13 @@ const JournalEntryBoard = ({ isOpen, onClose, onComplete }) => {
                                     setTempEntries([]);
                                     resetLine();
                                 }}
-                                className="px-6 py-2 border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center gap-2"
+                                className="px-6 h-10 border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center gap-2"
                             >
                                 <RotateCcw size={14} /> CLEAR
                             </button>
                             <button
                                 onClick={() => setActiveModal('history')}
-                                className="px-6 py-2 border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center gap-2"
+                                className="px-6 h-10 border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center gap-2"
                             >
                                 <History size={14} /> JOURNAL
                             </button>
@@ -516,7 +516,7 @@ const JournalEntryBoard = ({ isOpen, onClose, onComplete }) => {
                             <button
                                 onClick={handleSave}
                                 disabled={loading || tempEntries.length === 0 || totalDebit !== totalCredit}
-                                className={`px-6 py-2 bg-[#0285fd] hover:bg-[#0073ff] text-white font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center gap-2 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                className={`px-6 h-10 bg-[#0285fd] hover:bg-[#0073ff] text-white font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center gap-2 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                             >
                                 {loading ? <Loader2 size={14} className="animate-spin" /> : <CheckCircle2 size={14} />} APPLY
                             </button>
@@ -1045,7 +1045,7 @@ const JournalDetailsModal = ({ journal, onClose }) => {
                 <div className="flex justify-end pt-2">
                     <button
                         onClick={onClose}
-                        className="px-6 py-2 bg-[#0285fd] text-white font-semibold rounded-[3px] shadow-sm text-[13px] hover:bg-[#0073ff] transition-all uppercase"
+                        className="px-6 h-10 bg-[#0285fd] text-white font-semibold rounded-[3px] shadow-sm text-[13px] hover:bg-[#0073ff] transition-all uppercase"
                     >
                         DONE
                     </button>

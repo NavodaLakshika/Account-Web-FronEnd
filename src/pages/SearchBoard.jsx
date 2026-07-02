@@ -101,7 +101,7 @@ const SearchBoard = ({ isOpen, onClose }) => {
             title="Search Archive"
             footer={
                 <div className="bg-slate-50 px-6 py-4 w-full flex justify-end gap-3 border-t border-gray-200 rounded-b-xl">
-                    <button onClick={handleReset} className="px-6 py-2 border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2">
+                    <button onClick={handleReset} className="px-6 h-10 border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2">
                         <RotateCcw size={14} /> CLEAR SEARCH
                     </button>
                     <button className="px-6 h-10 bg-indigo-50/50 backdrop-blur-md border border-indigo-200 text-indigo-700 text-sm font-bold rounded-[3px] shadow-sm hover:bg-indigo-100/80 transition-all active:scale-95 flex items-center gap-2">
@@ -224,7 +224,7 @@ const SearchBoard = ({ isOpen, onClose }) => {
                                 </div>
                                 </div>
                             </div>
-                            <button onClick={runSearch} disabled={loading} className={`px-6 py-2 bg-[#0285fd] hover:bg-[#0073ff] text-white font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                            <button onClick={runSearch} disabled={loading} className={`px-6 h-10 bg-[#0285fd] hover:bg-[#0073ff] text-white font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}>
                                 {loading ? <Loader2 size={18} className="animate-spin text-blue-400" /> : <FileSearch size={18} className="text-blue-400" />} 
                                 Execute Archive Query
                             </button>

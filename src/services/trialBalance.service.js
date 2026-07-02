@@ -1,18 +1,16 @@
-import axios from 'axios';
+import api from './api';
 import { getCompanyCode } from '../utils/session';
-
-const API_URL = '/api';
 
 export const trialBalanceService = {
     getLookups: async (companyCode) => {
-        const response = await axios.get(`${API_URL}/TrialBalance/lookups`, {
+        const response = await api.get(`/TrialBalance/lookups`, {
             params: { companyCode }
         });
         return response.data;
     },
 
     generate: async (params) => {
-        const response = await axios.get(`${API_URL}/TrialBalance/get-report`, {
+        const response = await api.get(`/TrialBalance/get-report`, {
             params: {
                 dateFrom: params.dateFrom,
                 dateTo: params.dateTo,

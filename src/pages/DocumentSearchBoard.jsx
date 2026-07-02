@@ -150,10 +150,10 @@ const DocumentSearchBoard = ({ isOpen, onClose }) => {
                 footer={
                     <div className="w-full flex justify-end items-center px-6 py-4">
                         <div className="flex gap-3">
-                            <button onClick={handleClear} className="px-5 py-2 border border-gray-400 text-gray-800 font-semibold text-[14px] rounded-[3px] hover:bg-gray-100 transition-colors">
+                            <button onClick={handleClear} className="px-5 h-10 border border-gray-400 text-gray-800 font-semibold text-[14px] rounded-[3px] hover:bg-gray-100 transition-colors">
                                 Cancel
                             </button>
-                            <button onClick={() => runSearch()} className="px-5 py-2 bg-[#0285fd] hover:bg-[#0073ff] text-white font-semibold text-[14px] rounded-[3px] transition-colors">
+                            <button onClick={() => runSearch()} className="px-5 h-10 bg-[#0285fd] hover:bg-[#0073ff] text-white font-semibold text-[14px] rounded-[3px] transition-colors">
                                 Execute Search
                             </button>
                         </div>
@@ -295,14 +295,14 @@ const DocumentSearchBoard = ({ isOpen, onClose }) => {
                                                 }}
                                                 className="hover:bg-blue-50/50 cursor-pointer transition-colors"
                                             >
-                                                <td className="px-4 py-2 border-r border-slate-200 text-[11px] font-bold text-slate-700 whitespace-nowrap">{row.date}</td>
-                                                <td className="px-4 py-2 border-r border-slate-200 text-[11px] font-bold text-slate-700 whitespace-nowrap">{row.docNo}</td>
-                                                <td className="px-4 py-2 border-r border-slate-200 text-[11px] font-bold text-slate-700 truncate max-w-[140px]">{row.name}</td>
-                                                <td className="px-4 py-2 border-r border-slate-200 text-[11px] font-bold text-slate-700 whitespace-nowrap">{row.invNo}</td>
-                                                <td className="px-4 py-2 border-r border-slate-200 text-[11px] font-bold text-slate-700 truncate max-w-[120px]">{row.accName}</td>
-                                                <td className="px-4 py-2 border-r border-slate-200 text-[11px] font-bold text-slate-700 whitespace-nowrap">{row.chqNo}</td>
-                                                <td className="px-4 py-2 border-r border-slate-200 text-[11px] font-bold text-slate-700 whitespace-nowrap">{row.chqDate}</td>
-                                                <td className="px-4 py-2 border-r border-slate-200 text-[11px] font-bold text-slate-500 truncate max-w-[120px]">{row.memo}</td>
+                                                <td className="px-4 h-10 border-r border-slate-200 text-[11px] font-bold text-slate-700 whitespace-nowrap">{row.date}</td>
+                                                <td className="px-4 h-10 border-r border-slate-200 text-[11px] font-bold text-slate-700 whitespace-nowrap">{row.docNo}</td>
+                                                <td className="px-4 h-10 border-r border-slate-200 text-[11px] font-bold text-slate-700 truncate max-w-[140px]">{row.name}</td>
+                                                <td className="px-4 h-10 border-r border-slate-200 text-[11px] font-bold text-slate-700 whitespace-nowrap">{row.invNo}</td>
+                                                <td className="px-4 h-10 border-r border-slate-200 text-[11px] font-bold text-slate-700 truncate max-w-[120px]">{row.accName}</td>
+                                                <td className="px-4 h-10 border-r border-slate-200 text-[11px] font-bold text-slate-700 whitespace-nowrap">{row.chqNo}</td>
+                                                <td className="px-4 h-10 border-r border-slate-200 text-[11px] font-bold text-slate-700 whitespace-nowrap">{row.chqDate}</td>
+                                                <td className="px-4 h-10 border-r border-slate-200 text-[11px] font-bold text-slate-500 truncate max-w-[120px]">{row.memo}</td>
                                                 <td className="px-4 py-2 text-right text-[12px] font-mono font-black text-slate-800 whitespace-nowrap">
                                                     {(row.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                                 </td>

@@ -24,6 +24,7 @@ const CompanySelectModal = ({ isOpen, onClose, onSelect, user }) => {
     const [showCreateCompany, setShowCreateCompany] = useState(false);
 
     const userName = user ? (user.EmpName || user.empName || user.Emp_Name || 'User') : 'Guest';
+    const empCode = user ? (user.EmpCode || user.empCode) : null;
 
     useEffect(() => {
         if (isOpen) {
@@ -34,7 +35,7 @@ const CompanySelectModal = ({ isOpen, onClose, onSelect, user }) => {
     const fetchUserCompanies = async () => {
         try {
             setFetching(true);
-            const data = await authService.getCompaniesByEmployee(userName);
+            const data = await authService.getCompaniesByEmployee(empCode);
             const mapped = data.map(c => ({
                 id: c.companyCode || c.CompanyCode,
                 name: c.companyName || c.CompanyName
@@ -53,16 +54,11 @@ const CompanySelectModal = ({ isOpen, onClose, onSelect, user }) => {
         }
     };
 
-    const handleOpen = async () => {
-        const selected = companies.find(c => c.id === selectedCompanyId);
-        if (!selected) {
-            showErrorToast('Please select a company first');
-            return;
-        }
+    const launchCompany = async (id, name) => {
         setLoading(true);
         try {
-            await authService.openCompany(userName, selected.id);
-            setConnectingCompany(selected.name);
+            await authService.openCompany(empCode, id);
+            setConnectingCompany(name);
 
             const audio = new Audio(SUCCESS_SOUND_URL);
             audio.volume = 0.5;
@@ -74,6 +70,15 @@ const CompanySelectModal = ({ isOpen, onClose, onSelect, user }) => {
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleOpen = async () => {
+        const selected = companies.find(c => c.id === selectedCompanyId);
+        if (!selected) {
+            showErrorToast('Please select a company first');
+            return;
+        }
+        await launchCompany(selected.id, selected.name);
     };
 
     if (!isOpen) return null;
@@ -188,9 +193,29 @@ const CompanySelectModal = ({ isOpen, onClose, onSelect, user }) => {
                 isOpen={showCreateCompany}
                 onClose={() => setShowCreateCompany(false)}
                 user={user}
-                onCreated={() => {
+                onCreated={async (newCompanyName) => {
                     setShowCreateCompany(false);
-                    fetchUserCompanies();
+                    setFetching(true);
+                    try {
+                        const data = await authService.getCompaniesByEmployee(empCode);
+                        const mapped = data.map(c => ({
+                            id: c.companyCode || c.CompanyCode,
+                            name: c.companyName || c.CompanyName
+                        }));
+                        setCompanies(mapped);
+                        
+                        const created = mapped.find(c => c.name === newCompanyName);
+                        if (created) {
+                            setSelectedCompanyId(created.id);
+                            await launchCompany(created.id, created.name);
+                        } else if (mapped.length > 0) {
+                            setSelectedCompanyId(mapped[0].id);
+                        }
+                    } catch (err) {
+                        console.error(err);
+                    } finally {
+                        setFetching(false);
+                    }
                 }}
             />
         </div>

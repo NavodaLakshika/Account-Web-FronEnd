@@ -117,10 +117,10 @@ const AddReminderBoard = ({ isOpen, onClose, editTask }) => {
             {/* Footer */}
             <div className="bg-[#fcfcfc] px-5 py-4 border-t border-gray-200 shrink-0">
                 <div className="flex justify-between items-center gap-3">
-                    <button onClick={handleClear} className="px-5 py-2 border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2">
+                    <button onClick={handleClear} className="px-5 h-10 border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2">
                         <RotateCcw size={14} /> CLEAR
                     </button>
-                    <button onClick={handleSave} disabled={saving} className="px-6 py-2 bg-[#0285fd] hover:bg-[#0073ff] text-white font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2 disabled:opacity-50">
+                    <button onClick={handleSave} disabled={saving} className="px-6 h-10 bg-[#0285fd] hover:bg-[#0073ff] text-white font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2 disabled:opacity-50">
                         {saving ? <span className="animate-spin">⟳</span> : <Save size={14} />} {editTask ? 'UPDATE' : 'SAVE'}
                     </button>
                 </div>

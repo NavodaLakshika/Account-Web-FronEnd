@@ -1,27 +1,11 @@
-import axios from 'axios';
+import api from './api';
 
-const api = axios.create({
-  baseURL: '/api/DepRate',
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
 
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
 
 export const depRateService = {
   async getLookups() {
     try {
-      const response = await api.get('/lookups');
+      const response = await api.get('/DepRate/lookups');
       return response.data;
     } catch (error) {
       throw error.response?.data || 'Failed to fetch lookups';
@@ -30,7 +14,7 @@ export const depRateService = {
 
   async getList() {
     try {
-      const response = await api.get('/list');
+      const response = await api.get('/DepRate/list');
       return response.data;
     } catch (error) {
       throw error.response?.data || 'Failed to fetch rate list';
@@ -39,7 +23,7 @@ export const depRateService = {
 
   async getByCode(code) {
     try {
-      const response = await api.get(`/by-code/${code}`);
+      const response = await api.get(`/DepRate/by-code/${code}`);
       return response.data;
     } catch (error) {
       throw error.response?.data || 'Failed to fetch rate details';
@@ -48,7 +32,7 @@ export const depRateService = {
 
   async save(data) {
     try {
-      const response = await api.post('/save', data);
+      const response = await api.post('/DepRate/save', data);
       return response.data;
     } catch (error) {
       throw error.response?.data || 'Failed to save record';
@@ -57,7 +41,7 @@ export const depRateService = {
 
   async edit(data) {
     try {
-      const response = await api.post('/edit', data);
+      const response = await api.post('/DepRate/edit', data);
       return response.data;
     } catch (error) {
       throw error.response?.data || 'Failed to update record';

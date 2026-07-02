@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { X, UserPlus, Users, Trash2, Shield, Mail, Phone, Lock, Loader2, Search, List, Save, AlertCircle } from 'lucide-react';
+import { X, UserPlus, Users, Trash2, Shield, Mail, Phone, Lock, Loader2, Search, List, Save, AlertCircle, RotateCcw } from 'lucide-react';
 import api from '../../../services/api';
 import ConfirmModal from '../ConfirmModal';
 import { showSuccessToast, showErrorToast } from '../../../utils/toastUtils';
+import TransactionFormWrapper from '../../TransactionFormWrapper';
+import SimpleModal from '../../SimpleModal';
 
 const CompanyUsersModal = ({ isOpen, onClose }) => {
     const [employees, setEmployees] = useState([]);
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
-    const [showAddForm, setShowAddForm] = useState(false);
     const [companyCode, setCompanyCode] = useState('');
 
     // Form fields
@@ -103,7 +104,7 @@ const CompanyUsersModal = ({ isOpen, onClose }) => {
     };
 
     const handleAddUser = async (e) => {
-        e.preventDefault();
+        if (e && e.preventDefault) e.preventDefault();
         if (!username || !password) {
             showErrorToast('Username and password are required.');
             return;
@@ -121,7 +122,6 @@ const CompanyUsersModal = ({ isOpen, onClose }) => {
             });
             showSuccessToast(`User ${username} created successfully!`);
             setUsername(''); setPassword(''); setEmail(''); setPhone('');
-            setShowAddForm(false);
             fetchEmployees(companyCode);
         } catch (err) {
             showErrorToast(err.response?.data?.message || 'Failed to create user.');
@@ -154,204 +154,185 @@ const CompanyUsersModal = ({ isOpen, onClose }) => {
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 font-['Tahoma']">
-            <div className="absolute inset-0 bg-slate-900/30 backdrop-blur-sm" onClick={onClose} />
- <div className="relative w-full max-w-[900px] bg-white shadow-2xl rounded-[3px] overflow-hidden flex flex-col animate-in slide-in-from-bottom-10 fade-in duration-400">
-                
-                {/* Custom Header similar to original but refined */}
-                <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-slate-200 select-none">
-                    <div className="flex items-center gap-3">
-                        <Users size={18} className="text-[#0285fd]" />
-                        <span className="text-[14px] font-bold text-slate-800 uppercase tracking-widest font-mono">
-                            USER & ROLE MANAGEMENT
-                        </span>
+        <TransactionFormWrapper
+            isOpen={isOpen}
+            onClose={onClose}
+            title="User & Role Management"
+            subtitle="System Administration"
+            icon={Users}
+            maxWidth="max-w-5xl"
+            footer={
+                <div className="bg-[#fcfcfc] px-6 py-5 w-full flex justify-between items-center border-t border-gray-200 rounded-b-[10px] shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]">
+                    <div className="flex gap-3">
+                        <button type="button" onClick={() => {setUsername(''); setPassword(''); setEmail(''); setPhone('');}} disabled={submitting} className="px-6 h-10 border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2">
+                            <RotateCcw size={14} /> CLEAR
+                        </button>
                     </div>
-                    <button 
-                        onClick={onClose} 
-                        className="w-8 h-8 flex items-center justify-center bg-red-50 hover:bg-red-100 text-red-500 rounded-[3px] transition-all outline-none border-none group"
-                        title="Close"
-                    >
-                        <X size={28} className="group-hover:scale-110 transition-transform" />
-                    </button>
+                    <div className="flex gap-3">
+                        <button type="button" onClick={handleAddUser} disabled={submitting} className={`px-6 h-10 bg-[#0285fd] hover:bg-[#0073ff] text-white font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2 ${submitting ? 'opacity-70' : ''}`}>
+                            {submitting ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />} CREATE ACCOUNT
+                        </button>
+                    </div>
                 </div>
+            }
+        >
+            <div className="select-none font-['Tahoma'] space-y-4">
+                
+                {/* Add User Form Section */}
+                <div className="bg-white p-4 border border-slate-200 rounded-[3px] space-y-4">
+                    <div className="flex items-center gap-3 border-b border-slate-200 pb-3 mb-2">
+                        <div className="h-4 w-1.5 bg-[#0285fd] rounded"></div>
+                        <h4 className="text-[13px] font-bold text-gray-700 uppercase tracking-widest leading-none">
+                            Register System User
+                        </h4>
+                    </div>
 
-                <div className="p-5 bg-white flex-1 overflow-y-auto max-h-[75vh] space-y-5">
-                    {/* Toolbar / Add Form */}
-                    <div>
-                        {!showAddForm ? (
-                            <button
-                                onClick={() => setShowAddForm(true)}
-                                className="px-6 h-8 bg-white text-[#00adff] border-2 border-[#00adff] hover:bg-blue-50 font-mono text-[11px] font-bold rounded-[3px] transition-all active:scale-95 flex items-center justify-center gap-2 border-none uppercase tracking-widest"
-                            >
-                                <UserPlus size={14} /> ADD NEW EMPLOYEE USER
-                            </button>
-                        ) : (
-                            <div className="bg-[#f8fafd] border border-blue-100/50 rounded-[3px] p-5 shadow-sm relative overflow-hidden animate-in slide-in-from-top-2">
-                                <div className="flex items-center justify-between pb-3 mb-3 border-b border-blue-100 relative z-10">
-                                    <div className="flex items-center gap-2 text-[#0285fd]">
-                                        <Shield size={16} />
-                                        <h4 className="text-[11px] font-black uppercase tracking-widest">Register System User</h4>
-                                    </div>
-                                    <button 
-                                        type="button" 
-                                        onClick={() => setShowAddForm(false)}
-                                        className="text-[10px] font-bold text-red-500 hover:text-red-600 uppercase tracking-widest transition-all flex items-center gap-1 border border-red-100 hover:bg-red-50 px-3 py-1 rounded"
-                                    >
-                                        <X size={28} /> CANCEL
+                    <form id="addUserForm" onSubmit={handleAddUser} className="grid grid-cols-12 gap-x-6 gap-y-3.5">
+                        <div className="col-span-12 lg:col-span-6 space-y-3.5">
+                            <div>
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Username *</label>
+                                <input type="text" value={username} onChange={e => setUsername(e.target.value)} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700" required />
+                            </div>
+                            <div>
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Password *</label>
+                                <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 font-mono" required />
+                            </div>
+                            <div>
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">User Role *</label>
+                                <div className="relative">
+                                    <input type="text" readOnly value={roleOptions.find(o => o.id === roleId)?.name || 'Select Role'} onClick={() => setShowRoleModal(true)} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 cursor-pointer pr-10 uppercase" />
+                                    <button type="button" onClick={() => setShowRoleModal(true)} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
+                                        <Search size={16} />
                                     </button>
                                 </div>
-
-                                <form onSubmit={handleAddUser} className="grid grid-cols-12 gap-x-5 gap-y-4 relative z-10">
-                                    <div className="col-span-12 lg:col-span-6 flex flex-col gap-1">
-                                        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Username *</label>
-                                        <input type="text" value={username} onChange={e => setUsername(e.target.value)} className="w-full h-8 border border-slate-200 px-3 text-[12px] font-bold text-slate-700 bg-white rounded-[3px] outline-none focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 transition-all" required />
-                                    </div>
-                                    <div className="col-span-12 lg:col-span-6 flex flex-col gap-1">
-                                        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Password *</label>
-                                        <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" className="w-full h-8 border border-slate-200 px-3 text-[12px] font-bold text-slate-700 bg-white rounded-[3px] outline-none focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 transition-all font-mono" required />
-                                    </div>
-                                    <div className="col-span-12 lg:col-span-6 flex flex-col gap-1">
-                                        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Email Address</label>
-                                        <input type="email" value={email} onChange={e => setEmail(e.target.value)} className="w-full h-8 border border-slate-200 px-3 text-[12px] font-bold text-slate-700 bg-white rounded-[3px] outline-none focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 transition-all" />
-                                    </div>
-                                    <div className="col-span-12 lg:col-span-6 flex flex-col gap-1">
-                                        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Phone Number</label>
-                                        <input type="text" value={phone} onChange={e => setPhone(e.target.value)} className="w-full h-8 border border-slate-200 px-3 text-[12px] font-bold text-slate-700 bg-white rounded-[3px] outline-none focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 transition-all font-mono" />
-                                    </div>
-
-                                    <div className="col-span-12 lg:col-span-6 flex flex-col gap-1">
-                                        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">User Role *</label>
-                                        <div className="flex gap-1 h-8">
-                                            <input type="text" readOnly value={roleOptions.find(o => o.id === roleId)?.name || 'Select Role'} onClick={() => setShowRoleModal(true)} className="flex-1 h-8 border border-slate-200 px-3 text-[12px] font-bold text-[#0285fd] bg-white rounded-[3px] outline-none cursor-pointer focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 transition-all uppercase" />
-                                            <button type="button" onClick={() => setShowRoleModal(true)} className="w-10 h-8 bg-white text-[#00adff] border-2 border-[#00adff] hover:bg-blue-50 flex items-center justify-center hover:bg-[#0099e6] rounded-[3px] transition-all active:scale-95 border-none">
-                                                <Search size={14} />
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <div className="col-span-12 lg:col-span-6 flex flex-col gap-1">
-                                        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Group Access</label>
-                                        <input type="text" value={groupName} disabled className="w-full h-8 border border-slate-200 px-3 text-[12px] font-bold text-slate-400 bg-slate-50 rounded-[3px] cursor-not-allowed outline-none uppercase" />
-                                    </div>
-
-                                    <div className="col-span-12 mt-2">
-                                        <button type="submit" disabled={submitting} className={`px-6 h-8 bg-[#0285fd] hover:bg-[#0073ff] text-white font-mono text-[11px] font-bold rounded-[3px] shadow-sm transition-all active:scale-95 flex items-center justify-center gap-2 border-none uppercase tracking-widest ${submitting ? 'opacity-70' : ''}`}>
-                                            {submitting ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />} CREATE ACCOUNT
-                                        </button>
-                                    </div>
-                                </form>
                             </div>
-                        )}
+                        </div>
+
+                        <div className="col-span-12 lg:col-span-6 space-y-3.5">
+                            <div>
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Email Address</label>
+                                <input type="email" value={email} onChange={e => setEmail(e.target.value)} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700" />
+                            </div>
+                            <div>
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Phone Number</label>
+                                <input type="text" value={phone} onChange={e => setPhone(e.target.value)} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 font-mono" />
+                            </div>
+                            <div>
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Group Access</label>
+                                <input type="text" value={groupName} disabled className="w-full h-10 border border-gray-200 rounded-[3px] px-3 text-[14px] bg-gray-50 outline-none text-gray-500 uppercase cursor-not-allowed" />
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                {/* Table Section */}
+                <div className="border border-gray-200 rounded-[3px] bg-white shadow-xl overflow-hidden flex flex-col min-h-[300px]">
+                    <div className="flex items-center gap-3 mb-2 px-4 py-3 border-b border-gray-200">
+                        <button className="text-[13px] font-black uppercase tracking-widest pb-1 border-b-2 transition-all border-blue-600 text-blue-600 leading-none">
+                            System Users List
+                        </button>
                     </div>
-
-                    {/* Table */}
-                    <div className="border border-slate-200 rounded-[3px] overflow-hidden">
-                        {loading ? (
-                            <div className="p-10 flex flex-col items-center justify-center text-slate-400 gap-3">
-                                <Loader2 size={24} className="animate-spin text-[#00adff]" />
-                                <span className="text-[10px] font-bold uppercase tracking-widest">Loading...</span>
-                            </div>
-                        ) : (
-                            <table className="w-full text-left border-collapse bg-white">
-                                <thead className="bg-[#f8fafd] sticky top-0 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-200">
+                    
+                    <div className="flex-1 overflow-auto">
+                        <table className="w-full text-sm text-left border-collapse">
+                            <thead className="bg-slate-50 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-200 leading-10">
+                                <tr>
+                                    <th className="px-4 h-10 border-r border-slate-200">Employee ID</th>
+                                    <th className="px-4 h-10 border-r border-slate-200">Details</th>
+                                    <th className="px-4 h-10 border-r border-slate-200 text-center">System Role</th>
+                                    <th className="px-4 py-2 text-center">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {loading && (
                                     <tr>
-                                        <th className="px-4 py-2 border-r border-slate-200">Employee ID</th>
-                                        <th className="px-4 py-2 border-r border-slate-200">Details</th>
-                                        <th className="px-4 py-2 border-r border-slate-200 text-center">System Role</th>
-                                        <th className="px-4 py-2 text-center">Action</th>
+                                        <td colSpan="4" className="py-12 text-center text-gray-300 font-black italic text-[11px] uppercase tracking-widest animate-pulse">Loading Users...</td>
                                     </tr>
-                                </thead>
-                                <tbody className="divide-y divide-slate-100">
-                                    {employees.map((emp) => {
-                                        const roleName = roleOptions.find(o => o.id === emp.userRole_Id || o.id === emp.UserRole_Id)?.name || 'Custom';
-                                        const code = emp.emp_Code || emp.empCode;
-                                        return (
-                                            <tr key={code} className="hover:bg-blue-50/30 transition-colors">
-                                                <td className="px-4 py-2 border-r border-slate-100">
-                                                    <div className="text-[12px] font-bold text-slate-700 uppercase">{emp.emp_Name || emp.empName}</div>
-                                                    <div className="text-[10px] font-mono font-bold text-slate-400 tracking-wider">{code}</div>
-                                                </td>
-                                                <td className="px-4 py-2 border-r border-slate-100 text-[11px] font-mono text-slate-600">
-                                                    {emp.email && <div className="flex items-center gap-2"><Mail size={10} className="text-slate-400"/> {emp.email}</div>}
-                                                    {emp.phone_Number && <div className="flex items-center gap-2 mt-0.5"><Phone size={10} className="text-slate-400"/> {emp.phone_Number}</div>}
-                                                    {!emp.email && !emp.phone_Number && <span className="text-slate-400 italic font-sans text-[10px]">N/A</span>}
-                                                </td>
-                                                <td className="px-4 py-2 border-r border-slate-100 text-center">
-                                                    <span className={`inline-flex items-center px-2 py-0.5 rounded-[3px] border text-[9px] font-black uppercase tracking-wider ${
-                                                        emp.userRole_Id === 1 || emp.UserRole_Id === 1 ? 'bg-blue-50 border-blue-200 text-[#0285fd]' : 'bg-slate-50 border-slate-200 text-slate-500'
-                                                    }`}>
-                                                        {roleName}
-                                                    </span>
-                                                </td>
-                                                <td className="px-4 py-2 text-center">
-                                                    {emp.userRole_Id !== 1 && emp.UserRole_Id !== 1 ? (
-                                                        <button
-                                                            onClick={() => requestDeleteUser(code)}
-                                                            className="w-7 h-7 inline-flex items-center justify-center hover:bg-red-50 text-red-400 hover:text-red-600 rounded transition-all border border-transparent hover:border-red-100"
-                                                            title="Delete User"
-                                                        >
-                                                            <Trash2 size={13} />
-                                                        </button>
-                                                    ) : (
-                                                        <span className="text-[9px] text-slate-400 font-bold uppercase tracking-widest">Protected</span>
-                                                    )}
-                                                </td>
-                                            </tr>
-                                        );
-                                    })}
-                                </tbody>
-                            </table>
-                        )}
+                                )}
+                                {!loading && employees.length === 0 && (
+                                    <tr>
+                                        <td colSpan="4" className="py-12 text-center text-gray-300 font-black italic text-[11px] uppercase tracking-widest">No users found.</td>
+                                    </tr>
+                                )}
+                                {!loading && employees.map((emp) => {
+                                    const roleName = roleOptions.find(o => o.id === emp.userRole_Id || o.id === emp.UserRole_Id)?.name || 'Custom';
+                                    const code = emp.emp_Code || emp.empCode;
+                                    return (
+                                        <tr key={code} className="border-b border-gray-50 text-[12px] text-gray-700 hover:bg-blue-50/30 transition-colors">
+                                            <td className="px-4 py-3 border-r border-slate-100">
+                                                <div className="font-bold text-slate-700 uppercase">{emp.emp_Name || emp.empName}</div>
+                                                <div className="text-[10px] font-mono font-bold text-slate-400 tracking-wider">{code}</div>
+                                            </td>
+                                            <td className="px-4 py-3 border-r border-slate-100 text-[11px] font-mono text-slate-600">
+                                                {emp.email && <div className="flex items-center gap-2"><Mail size={12} className="text-slate-400"/> {emp.email}</div>}
+                                                {emp.phone_Number && <div className="flex items-center gap-2 mt-1"><Phone size={12} className="text-slate-400"/> {emp.phone_Number}</div>}
+                                                {!emp.email && !emp.phone_Number && <span className="text-slate-400 italic font-sans text-[10px]">N/A</span>}
+                                            </td>
+                                            <td className="px-4 py-3 border-r border-slate-100 text-center">
+                                                <span className={`inline-flex items-center px-2 py-0.5 rounded-[3px] border text-[9px] font-black uppercase tracking-wider ${
+                                                    emp.userRole_Id === 1 || emp.UserRole_Id === 1 ? 'bg-blue-50 border-blue-200 text-[#0285fd]' : 'bg-slate-50 border-slate-200 text-slate-500'
+                                                }`}>
+                                                    {roleName}
+                                                </span>
+                                            </td>
+                                            <td className="px-4 py-3 text-center">
+                                                {emp.userRole_Id !== 1 && emp.UserRole_Id !== 1 ? (
+                                                    <button
+                                                        onClick={() => requestDeleteUser(code)}
+                                                        className="w-7 h-7 inline-flex items-center justify-center hover:bg-red-50 text-red-400 hover:text-red-600 rounded transition-all border border-transparent hover:border-red-100"
+                                                        title="Delete User"
+                                                    >
+                                                        <Trash2 size={14} />
+                                                    </button>
+                                                ) : (
+                                                    <span className="text-[9px] text-slate-400 font-bold uppercase tracking-widest flex items-center justify-center gap-1"><Lock size={10} /> Protected</span>
+                                                )}
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
 
             {/* Role Search Modal styled to match */}
-            {showRoleModal && (
-                <div className="fixed inset-0 z-[1010] flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-slate-900/30 backdrop-blur-sm" onClick={() => setShowRoleModal(false)} />
- <div className="relative w-full max-w-[500px] bg-white shadow-2xl rounded-[3px] overflow-hidden flex flex-col animate-in zoom-in-95">
-                        <div className="bg-[#f8fafd] px-4 py-3 flex justify-between items-center border-b border-slate-200">
-                            <span className="text-[12px] font-black text-slate-600 uppercase tracking-widest">Select User Role</span>
-                            <button onClick={() => setShowRoleModal(false)} className="text-slate-400 hover:text-red-500"><X size={28}/></button>
-                        </div>
-                        <div className="p-4">
-                            <div className="relative mb-4">
-                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={14} />
-                                <input
-                                    type="text"
-                                    placeholder="SEARCH ROLES..."
-                                    className="w-full h-8 pl-9 pr-3 border border-slate-200 rounded-[3px] text-[11px] font-bold outline-none focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 transition-all uppercase placeholder-slate-300"
-                                    value={roleSearchTerm}
-                                    onChange={(e) => setRoleSearchTerm(e.target.value)}
-                                    autoFocus
-                                />
-                            </div>
-                            <div className="border border-slate-200 rounded-[3px] max-h-[300px] overflow-y-auto">
-                                <table className="w-full text-left border-collapse">
-                                    <thead className="bg-[#f8fafd] sticky top-0 text-[9px] font-black text-gray-400 uppercase tracking-widest border-b border-slate-200">
-                                        <tr>
-                                            <th className="px-4 py-2 border-r border-slate-200">Code</th>
-                                            <th className="px-4 py-2 border-r border-slate-200">Role Name</th>
-                                            <th className="px-4 py-2 text-center">Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-slate-100">
-                                        {roleOptions.filter(r => (r.name || '').toLowerCase().includes(roleSearchTerm.toLowerCase())).map(role => (
-                                            <tr key={role.id} className="hover:bg-blue-50/30">
-                                                <td className="px-4 py-2 border-r border-slate-100 font-mono text-[11px] font-bold text-slate-500">{role.id}</td>
-                                                <td className="px-4 py-2 border-r border-slate-100 text-[11px] font-bold text-slate-700 uppercase">{role.name}</td>
-                                                <td className="px-4 py-2 text-center">
-                                                    <button onClick={() => handleSelectRole(role)} className="px-3 py-1 bg-[#0285fd] hover:bg-[#0073ff] text-white text-[9px] font-black rounded-[3px] uppercase tracking-widest">Select</button>
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
+            <SimpleModal isOpen={showRoleModal} onClose={() => setShowRoleModal(false)} title="Select User Role">
+                <div className="flex flex-col h-full font-['Tahoma']">
+                    <div className="flex items-center gap-4 bg-slate-50 p-4 border-b border-gray-100 mb-2">
+                        <span className="text-[12px] font-bold text-gray-500 uppercase tracking-wider">Search Roles</span>
+                        <input
+                            type="text"
+                            className="w-full h-10 px-4 border border-gray-300 rounded-[3px] outline-none text-sm focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white shadow-sm flex-1 uppercase"
+                            value={roleSearchTerm}
+                            onChange={(e) => setRoleSearchTerm(e.target.value)}
+                        />
+                    </div>
+                    <div className="max-h-[50vh] overflow-y-auto no-scrollbar border border-gray-100 rounded-[5px] shadow-sm">
+                        <table className="w-full text-sm text-left">
+                            <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 z-10 shadow-sm">
+                                <tr>
+                                    <th className="border-b px-5 py-3">Code</th>
+                                    <th className="border-b px-5 py-3">Role Name</th>
+                                    <th className="border-b text-center w-24 px-5 py-3">Select</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-100">
+                                {roleOptions.filter(r => (r.name || '').toLowerCase().includes(roleSearchTerm.toLowerCase())).map((role, idx) => (
+                                    <tr key={idx} className="group hover:bg-blue-50/50 transition-all border-b border-gray-50 cursor-pointer">
+                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{role.id}</td>
+                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3 uppercase">{role.name}</td>
+                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3 text-center">
+                                            <button onClick={() => handleSelectRole(role)} className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
-            )}
+            </SimpleModal>
 
             {/* Warning alerts styled like ConfirmModal */}
             {showDeleteConfirm && (
@@ -367,7 +348,7 @@ const CompanyUsersModal = ({ isOpen, onClose }) => {
                     variant="danger"
                 />
             )}
-        </div>
+        </TransactionFormWrapper>
     );
 };
 

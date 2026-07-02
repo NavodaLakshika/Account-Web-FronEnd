@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Save, RotateCcw, Loader2, AlertTriangle, Key, User, Search, Eye, EyeOff } from 'lucide-react';
-import axios from 'axios';
 import { showSuccessToast, showErrorToast } from '../../../utils/toastUtils';
+import api from '../../../services/api';
 import { MasterFormWrapper, MasterFieldRow, MasterInput, MasterLookupInput, MasterLookupModal } from '../../MasterFormComponents';
 import ConfirmModal from '../ConfirmModal';
 
-const api = axios.create({ baseURL: '/api' });
+
 
 const ChangePasswordBoard = ({ isOpen, onClose }) => {
     const initialState = { EmpCode: '', UserName: '', CurrentPassword: '', NewPassword: '', ConfirmPassword: '', LastModUser: '' };

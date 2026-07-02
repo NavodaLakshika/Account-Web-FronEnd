@@ -1,20 +1,6 @@
-import axios from 'axios';
-import { authService } from './auth.service';
+import api from './api';
 
-const api = axios.create({
-  baseURL: '/api',
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
 
-api.interceptors.request.use((config) => {
-  const token = authService.getToken();
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
 
 export const subscriptionService = {
   async getUsers() {

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { X, MessageSquare, Settings, HelpCircle, History } from 'lucide-react';
 import SubmitReviewModal from './modals/SubmitReviewModal';
-import HelpModal from './modals/HelpModal';
+import FormHelpModal from './modals/FormHelpModal';
 import FeatureLockedModal from './modals/FeatureLockedModal';
 
 const TransactionFormWrapper = ({ isOpen, onClose, title, subtitle, icon: Icon, children, footer, maxWidth = 'max-w-7xl' }) => {
@@ -29,17 +29,22 @@ const TransactionFormWrapper = ({ isOpen, onClose, title, subtitle, icon: Icon, 
             >
               <History size={20} strokeWidth={2} />
             </button>
-            <div className="flex flex-col gap-0.5 overflow-hidden justify-center">
-              <span className="text-[15px] font-mono font-bold text-slate-800 uppercase tracking-widest truncate flex items-center gap-2">
-                 {Icon && <Icon size={18} className="text-gray-600" />}
-                 {title}
-              </span>
-              {subtitle && (
-                  <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider truncate flex items-center gap-2">
-                      {Icon && <span className="w-[18px]"></span>}
-                      {subtitle}
-                  </span>
+            <div className="flex items-center gap-3">
+              {Icon && (
+                <div className="flex items-center justify-center text-gray-600">
+                  <Icon size={32} strokeWidth={1.5} />
+                </div>
               )}
+              <div className="flex flex-col gap-0.5 overflow-hidden justify-center">
+                <span className="text-[15px] font-mono font-bold text-slate-800 uppercase tracking-widest truncate">
+                   {title}
+                </span>
+                {subtitle && (
+                    <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider truncate">
+                        {subtitle}
+                    </span>
+                )}
+              </div>
             </div>
           </div>
           
@@ -91,7 +96,7 @@ const TransactionFormWrapper = ({ isOpen, onClose, title, subtitle, icon: Icon, 
 
       {/* Action Modals */}
       <SubmitReviewModal isOpen={showReviewModal} onClose={() => setShowReviewModal(false)} />
-      <HelpModal isOpen={showHelpModal} onClose={() => setShowHelpModal(false)} />
+      <FormHelpModal isOpen={showHelpModal} onClose={() => setShowHelpModal(false)} />
       <FeatureLockedModal isOpen={showLockedModal} onClose={() => setShowLockedModal(false)} message={lockedMessage} />
     </div>
   );

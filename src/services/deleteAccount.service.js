@@ -1,7 +1,7 @@
 import api from './api';
 
 export const deleteAccountService = {
-    getAccounts: () => api.get('/AccountDeletion/accounts'),
-    getEmployees: () => api.get('/AccountDeletion/lookup-employees'),
+    getAccounts: (companyCode) => api.get(`/AccountDeletion/accounts?companyCode=${companyCode}`),
+    getEmployees: (companyCode) => api.get(`/AccountDeletion/lookup-employees?companyCode=${companyCode}`),
     deleteAccount: (data) => api.post('/AccountDeletion/delete', data)
 };

@@ -1,9 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, Lock, Mail, Loader2, Phone, ShieldCheck, CheckCircle2, ArrowLeft, KeyRound } from 'lucide-react';
+import { User, Lock, Mail, Loader2, Phone, ShieldCheck, CheckCircle2, ArrowLeft, KeyRound, Eye, EyeOff, X, Info, AlertCircle, CheckCircle } from 'lucide-react';
 import { authService } from '../services/auth.service';
-import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
 import { Helmet } from 'react-helmet-async';
+import { DotLottiePlayer } from '@dotlottie/react-player';
+import '@dotlottie/react-player/dist/index.css';
 import AboutUsModal from '../components/modals/AboutUsModal';
 import HelpModal from '../components/modals/HelpModal';
 import LegalTextModal from '../components/modals/LegalTextModal';
@@ -22,7 +23,25 @@ const RegisterPage = () => {
         Emp_Name: '', Email: '', Phone_Number: '', Pass_Word: '', Conpass_Word: ''
     });
     const [passwordFocused, setPasswordFocused] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
     const [displayedRegisterText, setDisplayedRegisterText] = useState('');
+    const [pageAlert, setPageAlert] = useState(null);
+    const [glowType, setGlowType] = useState(null);
+
+    useEffect(() => {
+        if (pageAlert) {
+            setGlowType(pageAlert.type);
+            const glowTimer = setTimeout(() => setGlowType(null), 1000);
+            const alertTimer = setTimeout(() => setPageAlert(null), 4000);
+            return () => {
+                clearTimeout(glowTimer);
+                clearTimeout(alertTimer);
+                setGlowType(null);
+            };
+        }
+    }, [pageAlert]);
+
+    const showPageAlert = (type, title, message) => setPageAlert({ type, title, message });
 
     useEffect(() => {
         if (step === 1) {
@@ -35,6 +54,13 @@ const RegisterPage = () => {
                 if (i >= text.length) clearInterval(timer);
             }, 80);
             return () => clearInterval(timer);
+        }
+    }, [step]);
+
+    useEffect(() => {
+        if (step === 2) {
+            setOtp(['', '', '', '', '', '']);
+            otpRefs.current[0]?.focus();
         }
     }, [step]);
 
@@ -70,26 +96,33 @@ const RegisterPage = () => {
 
     const handleSendOtp = async (e) => {
         e?.preventDefault();
-        if (formData.Pass_Word !== formData.Conpass_Word) { showErrorToast('Passwords do not match'); return; }
-        if (!formData.Phone_Number) { showErrorToast('Phone number is required'); return; }
+        if (formData.Pass_Word !== formData.Conpass_Word) { showPageAlert('error', 'Validation Error', 'Passwords do not match'); return; }
+        if (!formData.Phone_Number) { showPageAlert('error', 'Validation Error', 'Phone number is required'); return; }
+        if (!formData.Email) { showPageAlert('error', 'Validation Error', 'Email is required'); return; }
         setLoading(true);
         try {
+            const emailCheck = await authService.checkEmailExists(formData.Email);
+            if (emailCheck?.exists) {
+                showPageAlert('error', 'Email Already Registered', 'This email is already registered. Please use a different email or sign in.');
+                setLoading(false);
+                return;
+            }
             const sentOtp = await authService.sendSmsOtp(formData.Phone_Number);
             generatedOtp.current = sentOtp; // store for local verification
-            showSuccessToast('OTP sent to ' + formData.Phone_Number);
+            showPageAlert('success', 'OTP Sent', 'OTP sent to ' + formData.Phone_Number);
             setStep(2);
         } catch (err) {
-            showErrorToast(typeof err === 'string' ? err : err?.message || 'Failed to send OTP');
+            showPageAlert('error', 'OTP Failed', typeof err === 'string' ? err : err?.message || 'Failed to send OTP');
         } finally { setLoading(false); }
     };
 
     const handleVerifyAndRegister = async (e) => {
         e.preventDefault();
         const otpCode = otp.join('');
-        if (otpCode.length < 6) { showErrorToast('Enter the 6-digit OTP'); return; }
+        if (otpCode.length < 6) { showPageAlert('error', 'Validation Error', 'Enter the 6-digit OTP'); return; }
         // Verify locally against the OTP sent via SMS
         if (otpCode !== generatedOtp.current) {
-            showErrorToast('Incorrect OTP. Please try again.');
+            showPageAlert('error', 'Invalid OTP', 'Incorrect OTP. Please try again.');
             return;
         }
         setLoading(true);
@@ -97,7 +130,7 @@ const RegisterPage = () => {
             await authService.register(formData);
             setStep(3);
         } catch (err) {
-            showErrorToast(typeof err === 'string' ? err : err?.message || 'Registration failed');
+            showPageAlert('error', 'Registration Failed', typeof err === 'string' ? err : err?.message || 'Registration failed');
         } finally { setLoading(false); }
     };
 
@@ -113,18 +146,41 @@ const RegisterPage = () => {
                 .otp-box:focus { border-color: #00acee !important; box-shadow: 0 0 0 3px rgba(0,172,238,0.25); outline: none; }
             `}</style>
 
-            <div className="relative z-10 w-full max-w-6xl px-12 flex items-center justify-center mt-16">
+            {/* Full-page Loading Overlay */}
+            {loading && (
+                <div className="fixed inset-0 z-[60] flex items-center justify-center bg-white/80 animate-in fade-in duration-300">
+                    <div className="w-[120px] h-[120px]">
+                        <DotLottiePlayer
+                            src="/lottiefile/DashboardLoader.lottie"
+                            autoplay
+                            loop
+                        />
+                    </div>
+                </div>
+            )}
+
+            <div className="relative z-10 w-full max-w-6xl px-12 flex items-start justify-center mt-8">
 
                 <div className="w-full py-12">
                     {/* Step indicator */}
-                    <div className="flex items-center gap-2 mb-8">
-                        {[1,2,3].map(s => (
-                            <React.Fragment key={s}>
-                                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold font-mono transition-all ${step >= s ? 'bg-[#00acee] text-white shadow-md' : 'bg-slate-200 text-slate-400'}`}>{s}</div>
-                                {s < 3 && <div className={`flex-1 h-[1px] transition-all ${step > s ? 'bg-[#00acee]' : 'bg-slate-200'}`} />}
-                            </React.Fragment>
-                        ))}
+                    <div className="mb-10">
+                        <div className="flex items-center justify-between mb-2">
+                            <span className="text-[11px] font-bold font-mono uppercase tracking-wider text-slate-400">
+                                {step === 1 ? 'Details' : step === 2 ? 'Verify' : 'Done'}
+                            </span>
+                            <span className="text-[11px] font-bold font-mono uppercase tracking-wider text-[#00acee]">
+                                Step {step} of 3
+                            </span>
+                        </div>
+                        <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
+                            <div
+                                className="h-full bg-[#00acee] rounded-full transition-all duration-500 ease-out"
+                                style={{ width: `${((step - 1) / 2) * 100}%` }}
+                            />
+                        </div>
                     </div>
+
+                    <div className="max-w-md mx-auto">
 
                     {/* STEP 1 */}
                     {step === 1 && (
@@ -161,14 +217,20 @@ const RegisterPage = () => {
                                     <label htmlFor="Pass_Word" className="block text-sm font-sans font-medium text-slate-700 ml-1">
                                         Password
                                     </label>
-                                    <input type="password" id="Pass_Word" name="Pass_Word" value={formData.Pass_Word} onChange={handleChange}
-                                        onFocus={() => setPasswordFocused(true)}
-                                        onBlur={() => setPasswordFocused(false)}
-                                        required
-                                        className="w-full px-4 py-3 bg-white font-mono text-slate-800 font-bold outline-none border border-slate-300 hover:border-[#00acee] focus:border-[#00acee] focus:ring-4 focus:ring-[#00acee]/30 transition-all" />
+                                    <div className="relative">
+                                        <input type={showPassword ? "text" : "password"} id="Pass_Word" name="Pass_Word" value={formData.Pass_Word} onChange={handleChange}
+                                            onFocus={() => setPasswordFocused(true)}
+                                            onBlur={() => setPasswordFocused(false)}
+                                            required
+                                            className="w-full px-4 py-3 bg-white font-mono text-slate-800 font-bold outline-none border border-slate-300 hover:border-[#00acee] focus:border-[#00acee] focus:ring-4 focus:ring-[#00acee]/30 transition-all pr-12" />
+                                        <button type="button" onClick={() => setShowPassword(!showPassword)}
+                                            className="absolute right-1.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white hover:bg-[#00acee] bg-white border border-slate-200 hover:border-[#00acee] rounded-md p-1.5 transition-all shadow-sm">
+                                            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                        </button>
+                                    </div>
                                     
+                                        {passwordFocused && (
                                         <div className="mt-2 w-full bg-slate-50/50 rounded-[3px] border border-slate-200 p-4 animate-in fade-in">
-                                            {/* Strength Bar */}
                                             <div className="mb-4">
                                                 <div className="flex justify-between items-center mb-1.5">
                                                     <span className="text-[11px] font-bold text-slate-600 uppercase tracking-wider">Password Strength</span>
@@ -202,14 +264,17 @@ const RegisterPage = () => {
                                                 </li>
                                             </ul>
                                         </div>
+                                        )}
                                 </div>
                                 <div className="space-y-1">
                                     <label htmlFor="Conpass_Word" className="block text-sm font-sans font-medium text-slate-700 ml-1">
                                         Confirm Password
                                     </label>
-                                    <input type="password" id="Conpass_Word" name="Conpass_Word" value={formData.Conpass_Word} onChange={handleChange}
-                                        required
-                                        className="w-full px-4 py-3 bg-white font-mono text-slate-800 font-bold outline-none border border-slate-300 hover:border-[#00acee] focus:border-[#00acee] focus:ring-4 focus:ring-[#00acee]/30 transition-all" />
+                                    <div>
+                                        <input type="password" id="Conpass_Word" name="Conpass_Word" value={formData.Conpass_Word} onChange={handleChange}
+                                            required
+                                            className="w-full px-4 py-3 bg-white font-mono text-slate-800 font-bold outline-none border border-slate-300 hover:border-[#00acee] focus:border-[#00acee] focus:ring-4 focus:ring-[#00acee]/30 transition-all" />
+                                    </div>
                                 </div>
                                 <div className="flex items-start gap-3 py-2">
                                     <ShieldCheck size={16} className="text-[#00acee] mt-0.5 shrink-0" />
@@ -279,6 +344,7 @@ const RegisterPage = () => {
                             </button>
                         </div>
                     )}
+                    </div>
                 </div>
             </div>
 
@@ -338,6 +404,67 @@ const RegisterPage = () => {
                     © 2026 Onimta Information Technology Pvt Ltd. All rights reserved.
                 </p>
             </div>
+
+            {/* Full-page Glow Effect */}
+            {glowType && (
+                <div
+                    className="fixed inset-0 w-full h-full pointer-events-none z-40 animate-in fade-in duration-300"
+                    style={{
+                        background: glowType === 'error'
+                            ? 'linear-gradient(180deg, rgba(220,38,38,0.15) 0%, rgba(220,38,38,0.04) 40%, transparent 70%)'
+                            : glowType === 'success'
+                            ? 'linear-gradient(180deg, rgba(5,150,105,0.15) 0%, rgba(5,150,105,0.04) 40%, transparent 70%)'
+                            : 'linear-gradient(180deg, rgba(2,132,199,0.15) 0%, rgba(2,132,199,0.04) 40%, transparent 70%)'
+                    }}
+                />
+            )}
+
+            {/* Full-width Bottom Alert Bar */}
+            {pageAlert && (
+                <div
+                    className={`fixed bottom-0 left-0 right-0 z-50 animate-in slide-in-from-bottom-full duration-300 ${pageAlert.type === 'error' ? 'bg-red-600' : pageAlert.type === 'success' ? 'bg-emerald-600' : 'bg-sky-600'} text-white shadow-2xl`}
+                >
+                    <div className="px-8 py-5">
+                        <div className="flex items-start justify-between">
+                            <div className="flex items-start gap-3 min-w-0">
+                                <div className="mt-0.5">
+                                    {pageAlert.type === 'error' ? (
+                                        <AlertCircle size={20} strokeWidth={2.5} />
+                                    ) : pageAlert.type === 'success' ? (
+                                        <CheckCircle size={20} strokeWidth={2.5} />
+                                    ) : (
+                                        <Info size={20} strokeWidth={2.5} />
+                                    )}
+                                </div>
+                                <div className="min-w-0">
+                                    <h3 className="font-bold text-[16px] font-sans tracking-wide">{pageAlert.title}</h3>
+                                    <p className="text-[13px] text-white/85 font-sans mt-0.5 leading-relaxed">{pageAlert.message}</p>
+                                </div>
+                            </div>
+                            <button
+                                onClick={() => setPageAlert(null)}
+                                className="text-white/70 hover:text-white transition-colors ml-4 shrink-0"
+                            >
+                                <X size={18} strokeWidth={3} />
+                            </button>
+                        </div>
+                    </div>
+                    <div className="w-full h-[3px] bg-white/20">
+                        <div
+                            className="h-full bg-white/90"
+                            style={{
+                                animation: 'toastProgress 4000ms linear forwards'
+                            }}
+                        />
+                    </div>
+                </div>
+            )}
+            <style>{`
+                @keyframes toastProgress {
+                    from { width: 100%; }
+                    to { width: 0%; }
+                }
+            `}</style>
 
             {/* About Us Sidebar Modal */}
             <AboutUsModal

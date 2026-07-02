@@ -95,8 +95,8 @@ const UniversalLookupModal = ({ isOpen, onClose, onSelect, type, title, placehol
                                 <tr>
                                     <th className=" px-5 py-3">Reference ID</th>
                                     <th className=" px-5 py-3">Profile Description</th>
-                                    <th className="text-right px-5 py-3">Interaction</th>
-                                <th className="text-right px-5 py-3">Action</th></tr>
+                                    <th className="text-right px-5 py-3">Action</th>
+                                </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-50 bg-white">
                                 {loading && data.length === 0 ? (
@@ -112,7 +112,7 @@ const UniversalLookupModal = ({ isOpen, onClose, onSelect, type, title, placehol
                                     filteredData.map((item, i) => (
                                         <tr 
                                             key={i} 
-                                            className="group hover:bg-blue-50/50  transition-all cursor-pointer group border-b border-gray-50" 
+                                            className="group hover:bg-blue-50/50  transition-all cursor-pointer border-b border-gray-50" 
                                             onClick={() => onSelect(item)}
                                         >
                                             <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">
@@ -132,8 +132,6 @@ const UniversalLookupModal = ({ isOpen, onClose, onSelect, type, title, placehol
                                                     SELECT
                                                  </button>
                                             </td>
-                                        
-                                            <td className="text-right px-5 py-3"><button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button></td>
                                         </tr>
                                     ))
                                 ) : (

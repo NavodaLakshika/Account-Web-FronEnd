@@ -1,28 +1,12 @@
-import axios from 'axios';
+import api from './api';
 import { getCompanyCode } from '../utils/session';
 
-const api = axios.create({
-  baseURL: '/api/WriteCheque',
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
 
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
 
 export const writeChequeService = {
   async getInitData(company = getCompanyCode()) {
     try {
-      const response = await api.get(`/init-data?company=${encodeURIComponent(company)}`);
+      const response = await api.get(`/WriteCheque/init-data?company=${encodeURIComponent(company)}`);
       return response.data;
     } catch (error) {
       throw error.response?.data || 'Failed to initialize data';
@@ -31,7 +15,7 @@ export const writeChequeService = {
 
   async getBankBalance(bankCode, company = getCompanyCode()) {
     try {
-      const response = await api.get(`/bank-balance?bankCode=${encodeURIComponent(bankCode)}&company=${encodeURIComponent(company)}`);
+      const response = await api.get(`/WriteCheque/bank-balance?bankCode=${encodeURIComponent(bankCode)}&company=${encodeURIComponent(company)}`);
       return response.data;
     } catch (error) {
       throw error.response?.data || 'Failed to fetch bank balance';
@@ -40,7 +24,7 @@ export const writeChequeService = {
 
   async tempSaveExpense(data) {
     try {
-      const response = await api.post('/temp-save-expense', data);
+      const response = await api.post('/WriteCheque/temp-save-expense', data);
       return response.data;
     } catch (error) {
       throw error.response?.data || 'Failed to save expense line';
@@ -49,7 +33,7 @@ export const writeChequeService = {
 
   async tempSaveItem(data) {
     try {
-      const response = await api.post('/temp-save-item', data);
+      const response = await api.post('/WriteCheque/temp-save-item', data);
       return response.data;
     } catch (error) {
       throw error.response?.data || 'Failed to save item line';
@@ -58,7 +42,7 @@ export const writeChequeService = {
 
   async saveHeader(data) {
     try {
-      const response = await api.post('/save-header', data);
+      const response = await api.post('/WriteCheque/save-header', data);
       return response.data;
     } catch (error) {
       throw error.response?.data || 'Failed to save header';
@@ -67,7 +51,7 @@ export const writeChequeService = {
 
   async apply(data) {
     try {
-      const response = await api.post('/apply', data);
+      const response = await api.post('/WriteCheque/apply', data);
       return response.data;
     } catch (error) {
       throw error.response?.data || 'Failed to apply transaction';
@@ -76,7 +60,7 @@ export const writeChequeService = {
 
   async searchSaved(company = getCompanyCode()) {
     try {
-      const response = await api.get(`/search?company=${encodeURIComponent(company)}`);
+      const response = await api.get(`/WriteCheque/search?company=${encodeURIComponent(company)}`);
       return response.data;
     } catch (error) {
       throw error.response?.data || 'Failed to search saved documents';
@@ -85,7 +69,7 @@ export const writeChequeService = {
 
   async loadSaved(docNo, company = getCompanyCode()) {
     try {
-      const response = await api.get(`/${encodeURIComponent(docNo)}?company=${encodeURIComponent(company)}`);
+      const response = await api.get(`/WriteCheque/${encodeURIComponent(docNo)}?company=${encodeURIComponent(company)}`);
       return response.data;
     } catch (error) {
       throw error.response?.data || 'Failed to load document';

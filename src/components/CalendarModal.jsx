@@ -81,6 +81,10 @@ const CalendarModal = ({ isOpen, onClose, onDateSelect, onDateChange, initialDat
     for (let i = 1; i <= daysInMonth; i++) {
         calendarDays.push(i);
     }
+    // Pad the remaining cells to ensure a fixed height of 6 weeks (42 cells)
+    while (calendarDays.length < 42) {
+        calendarDays.push(null);
+    }
 
     if (!isOpen) return null;
 

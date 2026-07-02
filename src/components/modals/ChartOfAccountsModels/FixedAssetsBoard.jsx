@@ -504,7 +504,7 @@ const FixedAssetsBoard = ({ isOpen, onClose }) => {
                         </div>
 
                         {/* Footer */}
-                        <div className="bg-gray-50 px-4 py-2 border-t border-gray-200 flex justify-between items-center text-[10px] text-gray-400">
+                        <div className="bg-gray-50 px-4 h-10 border-t border-gray-200 flex justify-between items-center text-[10px] text-gray-400">
                             <span>{assetsList.length} Result(s) Found</span>
                         </div>
                     </div>
@@ -586,7 +586,7 @@ const FixedAssetsBoard = ({ isOpen, onClose }) => {
                         </div>
 
                         {/* Footer */}
-                        <div className="bg-gray-50 px-4 py-2 border-t border-gray-200 flex justify-between items-center text-[10px] text-gray-400">
+                        <div className="bg-gray-50 px-4 h-10 border-t border-gray-200 flex justify-between items-center text-[10px] text-gray-400">
                             <span>{accounts.length} Account(s) Available</span>
                         </div>
                     </div>

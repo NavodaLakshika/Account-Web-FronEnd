@@ -1,27 +1,11 @@
-import axios from 'axios';
+import api from './api';
 
-const api = axios.create({
-  baseURL: '/api/PayBill',
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
 
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
 
 export const payBillService = {
   async getLookups() {
     try {
-      const response = await api.get('/lookups');
+      const response = await api.get('/PayBill/lookups');
       return response.data;
     } catch (error) {
       throw error.response?.data || 'Failed to fetch lookups';
@@ -30,7 +14,7 @@ export const payBillService = {
 
   async generateDocNo(company) {
     try {
-      const response = await api.get('/generate-doc', { params: { company } });
+      const response = await api.get('/PayBill/generate-doc', { params: { company } });
       return response.data;
     } catch (error) {
       throw error.response?.data || 'Failed to generate document number';
@@ -39,7 +23,7 @@ export const payBillService = {
 
   async getVendorBills(vendorId, company) {
     try {
-      const response = await api.get('/vendor-bills', { params: { vendorId, company } });
+      const response = await api.get('/PayBill/vendor-bills', { params: { vendorId, company } });
       return response.data;
     } catch (error) {
       throw error.response?.data || 'Failed to fetch vendor bills';
@@ -48,7 +32,7 @@ export const payBillService = {
 
   async save(data) {
     try {
-      const response = await api.post('/save', data);
+      const response = await api.post('/PayBill/save', data);
       return response.data;
     } catch (error) {
       throw error.response?.data || 'Failed to process payment';
@@ -57,7 +41,7 @@ export const payBillService = {
 
   async search(query = '') {
     try {
-      const response = await api.get('/search', { params: { query } });
+      const response = await api.get('/PayBill/search', { params: { query } });
       return response.data;
     } catch (error) {
       throw error.response?.data || 'Failed to search payments';
@@ -67,7 +51,7 @@ export const payBillService = {
   // Fetch all payments for a company (used by report list)
   async getAllPayments(companyId) {
     try {
-      const response = await api.get('/all', { params: { company: companyId } });
+      const response = await api.get('/PayBill/all', { params: { company: companyId } });
       return response.data;
     } catch (error) {
       throw error.response?.data || 'Failed to load payments report';
@@ -76,7 +60,7 @@ export const payBillService = {
 
   async getPayment(payDoc) {
     try {
-      const response = await api.get(`/${payDoc}`);
+      const response = await api.get(`/PayBill/${payDoc}`);
       return response.data;
     } catch (error) {
       throw error.response?.data || 'Failed to load payment details';
