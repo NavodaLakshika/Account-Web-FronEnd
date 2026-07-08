@@ -21,7 +21,7 @@ api.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       // Only redirect to login if this was NOT the login request itself
-      const isLoginRequest = error.config?.url?.includes('/Auth/login');
+      const isLoginRequest = error.config?.url?.includes('/Auth/login') || error.config?.url?.includes('/Auth/verify-2fa-login');
       if (!isLoginRequest) {
         localStorage.removeItem('user');
         localStorage.removeItem('token');
@@ -56,6 +56,26 @@ export const authService = {
     } catch (error) {
       console.error('Login Error:', error);
       throw error.response?.data || 'Login failed. Please check your credentials.';
+    }
+  },
+
+  // VERIFY 2FA LOGIN
+  async verify2FALogin(empCode, tempToken, code) {
+    try {
+      const response = await api.post('/Auth/verify-2fa-login', {
+        EmpCode: empCode,
+        TempToken: tempToken,
+        Code: code
+      });
+      if (response.data && (response.data.token || response.data.Token)) {
+        const token = response.data.token || response.data.Token;
+        localStorage.setItem('user', JSON.stringify(response.data));
+        localStorage.setItem('token', token);
+      }
+      return response.data;
+    } catch (error) {
+      console.error('Verify 2FA Login Error:', error);
+      throw error.response?.data || 'Invalid 2FA code.';
     }
   },
 

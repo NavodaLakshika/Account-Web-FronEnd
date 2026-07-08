@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Database, RefreshCw, Download, Trash2, Search, FileEdit, CloudLightning, Eraser, Lock, FileText, Key, Layout, Users } from 'lucide-react';
+import { X, Database, RefreshCw, Download, Trash2, Search, FileEdit, CloudLightning, Eraser, Lock, FileText, Key, Layout, Users, ShieldAlert } from 'lucide-react';
 import DatabaseBackupModal from './DatabaseBackupModal';
 import StockBalanceUpdateModal from './StockBalanceUpdateModal';
 import InventoryDownloadModal from './InventoryDownloadModal';
@@ -13,7 +13,10 @@ import SystemSettingsBoard from '../../../HomeMaster/SystemSettingsBoard';
 import ChangePasswordBoard from '../MasterSubModal/ChangePasswordBoard';
 import PeriodLockModal from './PeriodLockModal';
 import CompanyUsersModal from './CompanyUsersModal';
+import TwoFactorSetupModal from './TwoFactorSetupModal';
+
 const SystemAdminModal = ({ isOpen, onClose }) => {
+    const [showTwoFactorModal, setShowTwoFactorModal] = useState(false);
     const [showBackupModal, setShowBackupModal] = useState(false);
     const [showStockUpdateModal, setShowStockUpdateModal] = useState(false);
     const [showInventoryDownloadModal, setShowInventoryDownloadModal] = useState(false);
@@ -45,6 +48,7 @@ const SystemAdminModal = ({ isOpen, onClose }) => {
             case 'systemSettings': setShowSystemSettings(true); break;
             case 'changePassword': setShowChangePassword(true); break;
             case 'users': setShowUsersModal(true); break;
+            case 'twoFactor': setShowTwoFactorModal(true); break;
         }
     };
 
@@ -59,6 +63,7 @@ const SystemAdminModal = ({ isOpen, onClose }) => {
         { icon: Eraser, label: 'Clear Temp Data', action: 'clear' },
         { icon: Lock, label: 'Period Lock Facility', action: 'lock' },
         { icon: Users, label: 'User & Role Management', action: 'users' },
+        { icon: ShieldAlert, label: 'Two-Factor Verification', action: 'twoFactor' },
         { icon: Key, label: 'Change Password', action: 'changePassword' },
     ];
 
@@ -176,6 +181,7 @@ const SystemAdminModal = ({ isOpen, onClose }) => {
             <SystemSettingsBoard isOpen={showSystemSettings} onClose={() => setShowSystemSettings(false)} />
             <ChangePasswordBoard isOpen={showChangePassword} onClose={() => setShowChangePassword(false)} />
             <CompanyUsersModal isOpen={showUsersModal} onClose={() => setShowUsersModal(false)} />
+            <TwoFactorSetupModal isOpen={showTwoFactorModal} onClose={() => setShowTwoFactorModal(false)} />
         </>
     );
 };

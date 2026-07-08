@@ -1316,12 +1316,14 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
                           {/* Inner glowing pulse */}
                           <div className="absolute inset-0 bg-blue-50/50 opacity-0 group-hover:opacity-100 transition-opacity"></div>
 
-                          {/* Custom AI Asterisk animated */}
-                          <div className="relative flex items-center justify-center w-[18px] h-[18px] group-hover:rotate-180 transition-transform duration-1000 ease-[cubic-bezier(0.34,1.56,0.64,1)] shrink-0">
-                            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[3px] h-full bg-gradient-to-b from-[#3b82f6] to-[#1e1b4b] rounded-full"></div>
-                            <div className="absolute top-1/2 left-0 -translate-y-1/2 w-full h-[3px] bg-gradient-to-r from-[#60a5fa] to-[#4338ca] rounded-[3px]"></div>
-                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-[3px] bg-gradient-to-r from-[#93c5fd] to-[#312e81] rounded-[3px] rotate-45"></div>
-                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-[3px] bg-gradient-to-r from-[#bfdbfe] to-[#3730a3] rounded-[3px] -rotate-45"></div>
+                          {/* AI Lottie Icon */}
+                          <div className="w-[28px] h-[28px] flex items-center justify-center shrink-0">
+                              <DotLottiePlayer
+                                  src="/lottiefile/AI loading.lottie"
+                                  autoplay
+                                  loop
+                                  style={{ width: '100%', height: '100%' }}
+                              />
                           </div>
 
                           {/* Animated Shimmering Text */}

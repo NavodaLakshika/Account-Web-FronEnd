@@ -9,8 +9,42 @@ import { getUserName, getCompanyName } from '../utils/session';
 import AIAsterisk from '../components/AIAsterisk';
 import ThinkingProcess from '../components/ThinkingProcess';
 import HowWeUseAIModal from '../components/modals/HowWeUseAIModal';
+import { getSystemKnowledge, findRelevantModules } from '../ai/aiKnowledgeBase';
+import { aiDataService } from '../ai/aiDataService';
+import { DotLottiePlayer } from '@dotlottie/react-player';
+import '@dotlottie/react-player/dist/index.css';
 
-const AIChatbotBoard = ({ isOpen, onClose, position = 'center' }) => {
+const AVAILABLE_ACTIONS = {
+  'new_account': { label: 'Open New Account', action: 'new_account' },
+  'customers': { label: 'Open Customers', action: 'customers' },
+  'vendors': { label: 'Open Vendors', action: 'vendors' },
+  'enter_bill': { label: 'Enter Bill', action: 'enter_bill' },
+  'pay_bill': { label: 'Pay Bill', action: 'pay_bill' },
+  'invoice': { label: 'Create Invoice', action: 'invoice' },
+  'sales_order': { label: 'Create Sales Order', action: 'sales_order' },
+  'journal': { label: 'Journal Entry', action: 'journal' },
+  'customer_master': { label: 'Customer Master', action: 'customer_master' },
+  'supplier_master': { label: 'Supplier Master', action: 'supplier_master' },
+  'chart_of_accounts': { label: 'Chart of Accounts', action: 'chart_of_accounts' },
+  'reports': { label: 'View Reports', action: 'reports' },
+  'search': { label: 'Search Transactions', action: 'search' },
+  'bank_reconcile': { label: 'Bank Reconciliation', action: 'bank_reconcile' },
+  'make_deposit': { label: 'Make Deposit', action: 'make_deposit' },
+  'write_cheque': { label: 'Write Cheque', action: 'write_cheque' },
+  'purchase_order': { label: 'Purchase Order', action: 'purchase_order' },
+  'grn': { label: 'Goods Receipt Note', action: 'grn' },
+  'sales_receipt': { label: 'Sales Receipt', action: 'sales_receipt' },
+  'receive_payment': { label: 'Receive Payment', action: 'receive_payment' },
+  'petty_cash': { label: 'Petty Cash', action: 'petty_cash' },
+  'trial_balance': { label: 'Trial Balance', action: 'trial_balance' },
+  'backup': { label: 'Data Backup', action: 'backup' },
+  'expenses': { label: 'Expenses Dashboard', action: 'expenses' },
+  'marketing': { label: 'Marketing Tool', action: 'marketing' },
+  'reversal': { label: 'Reversal Entry', action: 'reversal' },
+  'payment_setoff': { label: 'Payment Setoff', action: 'payment_setoff' },
+};
+
+const AIChatbotBoard = ({ isOpen, onClose, position = 'center', onAction }) => {
     // Persistent History from localStorage
     const [history, setHistory] = useState(() => {
         const saved = localStorage.getItem('ai_chat_history');
@@ -80,9 +114,86 @@ const AIChatbotBoard = ({ isOpen, onClose, position = 'center' }) => {
             const API_KEY = import.meta.env.VITE_GROQ_API_KEY;
             const userName = getUserName() || 'User';
             const companyName = getCompanyName() || 'your company';
-            
+
+            const query = newUserMessage.text;
+            const lower = (query || '').toLowerCase();
+
+            const relevantModules = findRelevantModules(query);
+            const knowledgeContext = relevantModules.length > 0
+                ? `\nRELEVANT MODULES FOR THIS QUERY:\n${relevantModules.map(m =>
+                    `- ${m.name}: ${m.description}\n  Workflow: ${m.workflow || 'See navigation above.'}`
+                  ).join('\n\n')}`
+                : '';
+
+            let dataContext = '';
+            const wantsList = /\b(list|show|get|find|search|view|my|balance|recent|how many|total|summary|all)\b/i.test(lower);
+            const dataType = /(customer|client|invoice|sale|bill|supplier|vendor|product|item|stock|inventory|expense|spend|income|revenue|earnings|payment|receipt|transaction|account|report|order|quotation|estimate|cheque|deposit|journal|ledger)/i.test(lower);
+
+            if (wantsList && dataType) {
+                const searchTerm = lower.replace(/^(list|show|get|find|search|view|my|recent)\s+/i, '').replace(/^(me|the|all|my)\s+/i, '').trim();
+                const fetches = [];
+
+                if (/(customer|client)/i.test(lower)) {
+                    const term = lower.match(/customer\s+(\w+)/i)?.[1] || '';
+                    fetches.push(aiDataService.getCustomers(term).then(d => d.length > 0 ? `CUSTOMERS:\n${JSON.stringify(d, null, 2)}` : '').catch(() => ''));
+                }
+                if (/(invoice|sale)/i.test(lower) && !/(sales.?order|sales.?receipt)/i.test(lower)) {
+                    const term = lower.match(/invoice\s+(\w+)/i)?.[1] || '';
+                    fetches.push(aiDataService.getInvoices(term).then(d => d.length > 0 ? `INVOICES:\n${JSON.stringify(d, null, 2)}` : '').catch(() => ''));
+                }
+                if (/(supplier|vendor)/i.test(lower)) {
+                    const term = lower.match(/(supplier|vendor)\s+(\w+)/i)?.[2] || '';
+                    fetches.push(aiDataService.getSuppliers(term).then(d => d.length > 0 ? `SUPPLIERS:\n${JSON.stringify(d, null, 2)}` : '').catch(() => ''));
+                }
+                if (/(bill|payable)/i.test(lower)) {
+                    fetches.push(aiDataService.getBills().then(d => d.length > 0 ? `BILLS:\n${JSON.stringify(d, null, 2)}` : '').catch(() => ''));
+                }
+                if (/(product|item|stock|inventory)/i.test(lower)) {
+                    const term = lower.match(/(product|item)\s+(\w+)/i)?.[2] || '';
+                    fetches.push(aiDataService.getProducts(term).then(d => d.length > 0 ? `PRODUCTS:\n${JSON.stringify(d, null, 2)}` : '').catch(() => ''));
+                }
+                if (/(expense|spend)/i.test(lower)) fetches.push(aiDataService.getExpensesSummary().then(d => d ? `EXPENSES:\n${JSON.stringify(d, null, 2)}` : '').catch(() => ''));
+                if (/(income|revenue|earnings)/i.test(lower)) fetches.push(aiDataService.getIncomeSummary().then(d => d ? `INCOME:\n${JSON.stringify(d, null, 2)}` : '').catch(() => ''));
+
+                if (fetches.length === 0 && /(summary|overview|everything|all)/i.test(lower)) {
+                    fetches.push(aiDataService.getSummary().then(d => d ? `SYSTEM SUMMARY:\n${JSON.stringify(d, null, 2)}` : '').catch(() => ''));
+                }
+
+                if (fetches.length > 0) {
+                    const results = await Promise.all(fetches);
+                    const nonEmpty = results.filter(r => r && r.length > 20);
+                    if (nonEmpty.length > 0) {
+                        dataContext = `\n\nLIVE DATA FROM YOUR ACCOUNTING SYSTEM:\n${nonEmpty.join('\n\n')}`;
+                    }
+                }
+            }
+
+            const { aiSystemPrompt } = getSystemKnowledge();
+            const basePrompt = aiSystemPrompt.content;
+
+            const actionInstructions = `
+YOU CAN PERFORM ACTIONS IN THE SYSTEM. When the user asks you to DO something (create, add, enter, open, etc.), include an action marker at the END of your response to open the relevant page/form.
+
+HOW TO USE: End your response with <<action:action_key>>
+Example: "Opening the New Account form for you. <<action:new_account>>"
+
+Available actions:
+${Object.entries(AVAILABLE_ACTIONS).map(([key, val]) => `- ${key}: ${val.label}`).join('\n')}
+
+Only include ONE marker per response, at the very end.
+
+DATA YOU CAN FETCH LIVE:
+- List customers, suppliers, products, invoices, bills
+- Show customer/invoice/bill details
+- Show expenses and income summaries
+- Search for specific records
+When the user asks "show me", "list", "find", "search" for data, use the live data fetches directly.`;
+
             const apiMessages = [
-                { role: "system", content: `You are a helpful, professional AI Assistant integrated into ONIMTA Information Technology's accounting dashboard. You assist ${userName} and other users with accounting queries, balances, and system workflows for ${companyName}.` },
+                {
+                    role: "system",
+                    content: `${basePrompt}\n\nYou are assisting ${userName} from ${companyName}.${knowledgeContext}${dataContext}\n\nIMPORTANT: Use the live data provided above to answer the user's query about their accounting data. If the data was fetched, reference specific values from it. If no live data was fetched and the user asked about their data, explain that you don't have access to that specific data and guide them on how to find it in the system.\n\n${actionInstructions}`
+                },
                 ...messages.map(m => ({
                     role: m.sender === 'user' ? "user" : "assistant",
                     content: m.text
@@ -113,18 +224,28 @@ const AIChatbotBoard = ({ isOpen, onClose, position = 'center' }) => {
             }
 
             const data = await response.json();
-            const aiText = data.choices && data.choices[0] && data.choices[0].message.content
+            let aiText = data.choices && data.choices[0] && data.choices[0].message.content
                 ? data.choices[0].message.content
                 : "I couldn't process that response correctly.";
 
-            // Ensure minimum delay of 3.5s to show the thinking process
+            let actionToExecute = null;
+            const actionMatch = aiText.match(/<<action:(\w+)>>/);
+            if (actionMatch && AVAILABLE_ACTIONS[actionMatch[1]]) {
+                actionToExecute = actionMatch[1];
+                aiText = aiText.replace(/<<action:\w+>>/g, '').trim();
+            }
+
             const elapsed = Date.now() - newUserMessage.timestamp.getTime();
             if (elapsed < 3500) {
                 await new Promise(resolve => setTimeout(resolve, 3500 - elapsed));
             }
 
-            const aiResponse = { id: Date.now() + 1, text: aiText, sender: 'ai', timestamp: new Date() };
+            const aiResponse = { id: Date.now() + 1, text: aiText, sender: 'ai', timestamp: new Date(), action: actionToExecute };
             setMessages(prev => [...prev, aiResponse]);
+
+            if (actionToExecute && onAction) {
+                setTimeout(() => onAction(actionToExecute), 500);
+            }
         } catch (error) {
             if (error.name === 'AbortError') {
                 console.log("Generation stopped by user");
@@ -266,7 +387,7 @@ const AIChatbotBoard = ({ isOpen, onClose, position = 'center' }) => {
                         {sidebarCollapsed ? <PanelLeft size={20} /> : <PanelLeftClose size={20} />}
                     </button>
                     <div className="w-6 h-6 flex items-center justify-center shrink-0">
-                        <AIAsterisk size={24} isThinking={true} />
+                        <DotLottiePlayer src="/lottiefile/AI loading.lottie" autoplay loop style={{ width: '150%', height: '150%' }} />
                     </div>
                     <h2 className="text-[15px] font-semibold text-slate-800 flex items-center gap-2">
                         Onimta Intelligence
@@ -420,8 +541,8 @@ const AIChatbotBoard = ({ isOpen, onClose, position = 'center' }) => {
                                             </div>
                                         ) : (
                                             <div className="flex gap-4 max-w-[90%]">
-                                                <div className="w-8 h-8 rounded-full bg-indigo-50 border border-indigo-100 flex items-center justify-center shrink-0 mt-1 group">
-                                                    <AIAsterisk size={16} />
+                                                <div className="w-8 h-8 rounded-full bg-indigo-50 border border-indigo-100 flex items-center justify-center shrink-0 mt-1 group overflow-hidden">
+                                                    <DotLottiePlayer src="/lottiefile/AI loading.lottie" autoplay loop style={{ width: '130%', height: '130%' }} />
                                                 </div>
                                                 <div className="flex flex-col gap-2">
                                                     <div className="text-[12px] font-medium text-slate-400 flex items-center gap-1.5">
@@ -462,6 +583,18 @@ const AIChatbotBoard = ({ isOpen, onClose, position = 'center' }) => {
                                                             <Download size={14} /> Download
                                                         </button>
                                                     </div>
+
+                                                    {/* Action button */}
+                                                    {msg.action && AVAILABLE_ACTIONS[msg.action] && onAction && (
+                                                        <div className="mt-4">
+                                                            <button
+                                                                onClick={() => onAction(msg.action)}
+                                                                className="px-5 py-2 bg-[#0B1D4A] text-white text-[13px] font-bold rounded-[3px] hover:bg-[#122b5c] transition-colors flex items-center gap-2"
+                                                            >
+                                                                {AVAILABLE_ACTIONS[msg.action].label}
+                                                            </button>
+                                                        </div>
+                                                    )}
 
                                                     {/* Suggested follow-ups (show only on last message) */}
                                                     {idx === messages.length - 1 && (

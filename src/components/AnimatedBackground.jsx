@@ -1,8 +1,13 @@
 import React, { useEffect, useRef } from 'react';
 
-const AnimatedBackground = ({ customColor = null }) => {
+const AnimatedBackground = ({ customColor = null, isPaused = false }) => {
     const canvasRef = useRef(null);
     const colorRef = useRef("255, 255, 255");
+    const isPausedRef = useRef(isPaused);
+
+    useEffect(() => {
+        isPausedRef.current = isPaused;
+    }, [isPaused]);
 
     useEffect(() => {
         const updateColor = () => {
@@ -45,11 +50,13 @@ const AnimatedBackground = ({ customColor = null }) => {
                 this.speedY = Math.random() * 2 - 1;
             }
             update() {
-                this.x += this.speedX;
-                this.y += this.speedY;
+                if (!isPausedRef.current) {
+                    this.x += this.speedX;
+                    this.y += this.speedY;
 
-                if (this.x < 0 || this.x > canvas.width) this.speedX = -this.speedX;
-                if (this.y < 0 || this.y > canvas.height) this.speedY = -this.speedY;
+                    if (this.x < 0 || this.x > canvas.width) this.speedX = -this.speedX;
+                    if (this.y < 0 || this.y > canvas.height) this.speedY = -this.speedY;
+                }
             }
             draw() {
                 // Not drawing the dots, only the lines, to match the geometric style of the second image

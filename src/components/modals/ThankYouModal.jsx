@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { authService } from '../../services/auth.service';
+import AnimatedBackground from '../AnimatedBackground';
 
 const styles = `
 @import url('https://fonts.googleapis.com/css2?family=Allura&display=swap');
@@ -77,9 +78,9 @@ const ThankYouModal = ({ isOpen, onClose }) => {
                 authService.logout();
                 localStorage.removeItem('selectedCompany');
                 window.location.href = '/login';
-            }, 3200000);
+            }, 3200);
 
-            const duration = 500000;
+            const duration = 5000;
             const startTime = Date.now();
             let animationFrameId;
 
@@ -106,7 +107,8 @@ const ThankYouModal = ({ isOpen, onClose }) => {
 
     return (
         <div className="fixed inset-0 z-[10000] flex items-center justify-center">
-            <div className="absolute inset-0 bg-white/60 backdrop-blur-[3px]" />
+            <div className="absolute inset-0 bg-white" />
+            <div className="absolute inset-0 opacity-100"><AnimatedBackground customColor="11, 29, 74" /></div>
             <div className="relative flex flex-col items-center pointer-events-auto select-none">
                 {/* Typography Art - Letter by Letter Drawing */}
                 <div className="relative flex flex-col items-center mb-8">
@@ -199,15 +201,15 @@ const ThankYouModal = ({ isOpen, onClose }) => {
                     style={{
                         animationDelay: '2.8s',
                         fontFamily: "'Inter', sans-serif",
-                        background: '#0f172a',
+                        background: '#0B1D4A',
                         letterSpacing: '3px',
                     }}
                     onMouseEnter={(e) => {
-                        e.currentTarget.style.background = '#1e293b';
+                        e.currentTarget.style.background = '#122b5c';
                         e.currentTarget.style.transform = 'translateY(-1px)';
                     }}
                     onMouseLeave={(e) => {
-                        e.currentTarget.style.background = '#061e58ff';
+                        e.currentTarget.style.background = '#0B1D4A';
                         e.currentTarget.style.transform = 'translateY(0)';
                     }}
                 >

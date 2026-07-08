@@ -167,6 +167,7 @@ import BackupBoard from './BackupBoard';
 import StockBalanceUpdateModal from '../components/modals/SystemAdmin/StockBalanceUpdateModal';
 import InventoryDownloadBoard from './InventoryDownloadBoard';
 import DeleteAccountModal from '../components/modals/SystemAdmin/DeleteAccountModal';
+import TwoFactorSetupModal from '../components/modals/SystemAdmin/TwoFactorSetupModal';
 import SystemUpdateModal from '../components/modals/SystemAdmin/SystemUpdateModal';
 import ClearTempDataModal from '../components/modals/SystemAdmin/ClearTempDataModal';
 import PeriodLockModal from '../components/modals/SystemAdmin/PeriodLockModal';
@@ -218,7 +219,7 @@ const LiveClock = () => {
     }, []);
 
     return (
-        <div className="flex flex-col items-end mr-4 pr-4 border-r border-slate-200/80 mb-0.5">
+        <div className="hidden">
             <span className="text-[13px] font-bold text-slate-700">{time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">{time.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' })}</span>
         </div>
@@ -263,6 +264,7 @@ const Dashboard = () => {
     const [showStockBalanceUpdateModal, setShowStockBalanceUpdateModal] = useState(false);
     const [showInventoryDownloadModal, setShowInventoryDownloadModal] = useState(false);
     const [showDeleteAccountModal, setShowDeleteAccountModal] = useState(false);
+    const [showTwoFactorModal, setShowTwoFactorModal] = useState(false);
     const [showSystemUpdateModal, setShowSystemUpdateModal] = useState(false);
     const [showClearTempDataModal, setShowClearTempDataModal] = useState(false);
     const [showPeriodLockModal, setShowPeriodLockModal] = useState(false);
@@ -423,7 +425,8 @@ const Dashboard = () => {
     const [showDashboardLockedModal, setShowDashboardLockedModal] = useState(false);
 
     const [showAIChatbotModal, setShowAIChatbotModal] = useState(false);
-    const [showAIText, setShowAIText] = useState(false);
+    const [showAITyping, setShowAITyping] = useState(false);
+    const [aiTypingText, setAiTypingText] = useState('');
     const [showItemsServicesReport, setShowItemsServicesReport] = useState(false);
     const [itemsServicesData, setItemsServicesData] = useState([]);
 
@@ -673,7 +676,6 @@ const Dashboard = () => {
     const [isTopBarCollapsed, setIsTopBarCollapsed] = useState(false);
     const [showQuickActions, setShowQuickActions] = useState(false);
     const [biData, setBiData] = useState(null);
-    const [isAIThinking, setIsAIThinking] = useState(false);
     const [isLoaderStopped, setIsLoaderStopped] = useState(false);
     const [depositData, setDepositData] = useState(null);
 
@@ -999,16 +1001,58 @@ const Dashboard = () => {
     };
 
     const handleAIClick = () => {
-        setIsAIThinking(true);
-        setTimeout(() => {
-            setIsAIThinking(false);
-            setShowAIChatbotModal(true);
-        }, 3000);
+        setShowAITyping(true);
+        setAiTypingText('');
+        const fullText = "Hello! I'm ONIMTA Intelligence. How can I assist you today?";
+        let idx = 0;
+        const typeInterval = setInterval(() => {
+            idx++;
+            setAiTypingText(fullText.slice(0, idx));
+            if (idx >= fullText.length) {
+                clearInterval(typeInterval);
+                setTimeout(() => {
+                    setShowAITyping(false);
+                    setShowAIChatbotModal(true);
+                }, 600);
+            }
+        }, 45);
     };
 
-
-
-
+    const handleAIAction = (actionKey) => {
+        setShowAIChatbotModal(false);
+        setTimeout(() => {
+            switch (actionKey) {
+                case 'new_account': setShowNewAccountModal(true); break;
+                case 'customers': setShowCustomerModal(true); break;
+                case 'vendors': setShowVendorModal(true); break;
+                case 'enter_bill': setShowEnterBillModal(true); break;
+                case 'pay_bill': setShowPayBillModal(true); break;
+                case 'invoice': setShowSalesOrderModal(true); break;
+                case 'sales_order': setShowSalesOrderModal(true); break;
+                case 'journal': setShowJournalEntryModal(true); break;
+                case 'customer_master': setShowCustomerMasterBoard(true); break;
+                case 'supplier_master': setShowSupplierMasterBoard(true); break;
+                case 'chart_of_accounts': setShowChartOfAccountantModal(true); break;
+                case 'reports': setShowReportsCenterModal(true); break;
+                case 'search': setShowSearchModal(true); break;
+                case 'bank_reconcile': setShowBankRecModal(true); break;
+                case 'make_deposit': setShowMakeDepositModal(true); break;
+                case 'write_cheque': setShowWriteChequeModal(true); break;
+                case 'purchase_order': setShowPurchaseOrderModal(true); break;
+                case 'grn': setShowGRNModal(true); break;
+                case 'sales_receipt': setShowSalesReceiptModal(true); break;
+                case 'receive_payment': setShowReceivePaymentModal(true); break;
+                case 'petty_cash': setShowPettyCashModal(true); break;
+                case 'trial_balance': setShowTrialBalanceModal(true); break;
+                case 'backup': setShowBackupBoard(true); break;
+                case 'expenses': setShowExpensesDashboardModal(true); break;
+                case 'marketing': setShowMarketingToolModal(true); break;
+                case 'reversal': setShowReversalEntryModal(true); break;
+                case 'payment_setoff': setShowPaymentSetoffModal(true); break;
+                default: break;
+            }
+        }, 300);
+    };
 
     const handleCollectionComplete = (data) => {
         setDepositData(data);
@@ -1366,6 +1410,7 @@ const Dashboard = () => {
             { label: 'Clear Temp Data', onClick: () => setShowClearTempDataModal(true) },
             { label: 'Period Lock Facility', onClick: () => setShowPeriodLockModal(true) },
             { label: 'User & Role Management', onClick: () => setShowCompanyUsersModal(true) },
+            { label: 'Two-Factor Verification', onClick: () => setShowTwoFactorModal(true) },
             { label: 'Change Password', onClick: () => setShowChangePasswordBoard(true) },
         ],
     };
@@ -1781,61 +1826,27 @@ const Dashboard = () => {
             {/* Dashboard Loader Overlay */}
             {showDashboardLoader && <SystemLoader />}
 
-            {/* AI Thinking Overlay (Robot Animation centered) */}
-            {isAIThinking && (() => {
-                const FULL_TEXT = 'Assistant';
-                const AITypingText = () => {
-                    const [displayed, setDisplayed] = React.useState('');
-                    React.useEffect(() => {
-                        let i = 0;
-                        setDisplayed('');
-                        const iv = setInterval(() => {
-                            i++;
-                            setDisplayed(FULL_TEXT.slice(0, i));
-                            if (i >= FULL_TEXT.length) { clearInterval(iv); }
-                        }, 80);
-                        return () => clearInterval(iv);
-                    }, []);
-                    return (
-                        <span>
-                            {displayed}
-                            <span className="inline-block w-[2px] h-[14px] bg-[#0285fd] ml-1 align-middle animate-[blink_1s_step-end_infinite]" />
-                        </span>
-                    );
-                };
-                return (
-                    <div className="fixed inset-0 z-[1100] flex items-center justify-center bg-white transition-all duration-500 overflow-hidden">
-                        {/* Giant ghost watermark text behind lottie */}
-                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
-                            <span
-                                className="text-[12vw] font-black uppercase tracking-[0.15em] text-[#0285fd]/[0.04] leading-none whitespace-nowrap"
-                                style={{ fontFamily: 'Tahoma, sans-serif' }}
-                            >
-                                A&nbsp;&nbsp;I
-                            </span>
-                        </div>
-
-                        {/* Subtle radial glow behind lottie */}
-                        <div className="absolute w-[500px] h-[500px] rounded-full bg-[#0285fd]/5 blur-3xl pointer-events-none" />
-
-                        <div className="relative flex flex-col items-center z-10">
+            {/* AI Typing Animation Overlay */}
+            {showAITyping && (
+                <div className="fixed inset-0 z-[9999] bg-black/50 backdrop-blur-sm flex items-center justify-center animate-in fade-in duration-300">
+                    <div className="flex flex-col items-center gap-8 max-w-2xl px-8">
+                        <div className="w-32 h-32 flex items-center justify-center">
                             <DotLottiePlayer
-                                src="/images/Ai Robot Vector Art.lottie"
+                                src="/lottiefile/AI loading.lottie"
                                 autoplay
                                 loop
-                                style={{ width: 300, height: 300 }}
+                                style={{ width: '100%', height: '100%' }}
                             />
-                            <div className="mt-2 text-[#0285fd] text-[20px] font-black uppercase tracking-[0.55em] font-mono">
-                                <AITypingText />
-                            </div>
                         </div>
-
-                        <style>{`
-                            @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
-                        `}</style>
+                        <div className="h-16 flex items-center justify-center">
+                              <span className="text-white/90 text-2xl md:text-3xl font-light tracking-wide">
+                                  {aiTypingText}
+                                  <span className="animate-pulse ml-0.5 text-indigo-400">|</span>
+                              </span>
+                        </div>
                     </div>
-                );
-            })()}
+                </div>
+            )}
 
 
 
@@ -2183,7 +2194,7 @@ const Dashboard = () => {
                         {/* AI Button - Custom Animated Pill */}
                         <button
                             data-tour="ai-chatbot"
-                            onClick={() => setShowAIChatbotModal(!showAIChatbotModal)}
+                            onClick={handleAIClick}
                             className="relative flex items-center justify-center ml-1 group cursor-pointer transition-transform hover:scale-[1.02]"
                             title="AI Assistant"
                         >
@@ -2193,12 +2204,14 @@ const Dashboard = () => {
                                     {/* Inner glowing pulse */}
                                     <div className="absolute inset-0 bg-blue-50/50 opacity-0 group-hover:opacity-100 transition-opacity"></div>
 
-                                    {/* Custom AI Asterisk animated */}
-                                    <div className="relative flex items-center justify-center w-[18px] h-[18px] group-hover:rotate-180 transition-transform duration-1000 ease-[cubic-bezier(0.34,1.56,0.64,1)] shrink-0">
-                                        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[3px] h-full bg-gradient-to-b from-[#3b82f6] to-[#1e1b4b] rounded-full"></div>
-                                        <div className="absolute top-1/2 left-0 -translate-y-1/2 w-full h-[3px] bg-gradient-to-r from-[#60a5fa] to-[#4338ca] rounded-[3px]"></div>
-                                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-[3px] bg-gradient-to-r from-[#93c5fd] to-[#312e81] rounded-[3px] rotate-45"></div>
-                                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-[3px] bg-gradient-to-r from-[#bfdbfe] to-[#3730a3] rounded-[3px] -rotate-45"></div>
+                                    {/* AI Lottie Icon */}
+                                    <div className="w-[28px] h-[28px] flex items-center justify-center shrink-0">
+                                        <DotLottiePlayer
+                                            src="/lottiefile/AI loading.lottie"
+                                            autoplay
+                                            loop
+                                            style={{ width: '100%', height: '100%' }}
+                                        />
                                     </div>
 
                                     {/* Animated Shimmering Text */}
@@ -2277,7 +2290,7 @@ const Dashboard = () => {
                                                             bank_rec: { icon: RefreshCcw, label: 'Bank Rec', onClick: () => setShowBankRecModal(true), active: showBankRecModal, iconColor: '#0d9488', bg: '#f0fdfa' },
                                                             trial_balance: { icon: BarChart2, label: 'Trial Balance', onClick: () => setShowTrialBalanceModal(true), active: showTrialBalanceModal, iconColor: '#4f46e5', bg: '#eef2ff' },
                                                             // search: { icon: Search, label: 'Search', onClick: () => setShowSearchModal(true), active: showSearchModal, iconColor: '#64748b', bg: '#f8fafc' },
-                                                            ai_chat: { icon: Bot, label: 'AI Chat', onClick: handleAIClick, active: showAIChatbotModal, iconColor: '#db2777', bg: '#fdf2f8' },
+                                                            ai_chat: { icon: Bot, label: 'AI Chat', onClick: handleAIClick, active: showAIChatbotModal, iconColor: '#db2777', bg: '#fdf2f8', isLottie: true },
                                                             department: { icon: Building2, label: 'Department', onClick: () => setShowDepartmentModal(true), active: showDepartmentModal, iconColor: '#1d4ed8', bg: '#eff6ff' },
                                                             calculator: { icon: Calculator, label: 'Calculator', onClick: () => window.open('ms-calculator:'), iconColor: '#9333ea', bg: '#faf5ff' },
                                                             help: { icon: HelpCircle, label: 'Help', onClick: () => { }, iconColor: '#64748b', bg: '#f8fafc' },
@@ -2295,7 +2308,11 @@ const Dashboard = () => {
                                                                 className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-[3px] transition-all duration-150 group/item ${isActive ? 'bg-blue-50/80 text-blue-700 shadow-sm' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'}`}
                                                             >
                                                                 <div className="w-8 h-8 rounded-[3px] flex items-center justify-center shrink-0 transition-transform group-hover/item:scale-110" style={{ backgroundColor: isActive ? '#dbeafe' : iconData.bg }}>
-                                                                    <Icon size={16} strokeWidth={2.2} style={{ color: isActive ? '#1d4ed8' : iconData.iconColor }} />
+                                                                    {iconData.isLottie ? (
+                                                                        <DotLottiePlayer src="/lottiefile/AI loading.lottie" autoplay loop style={{ width: '20px', height: '20px' }} />
+                                                                    ) : (
+                                                                        <Icon size={16} strokeWidth={2.2} style={{ color: isActive ? '#1d4ed8' : iconData.iconColor }} />
+                                                                    )}
                                                                 </div>
                                                                 <span className="text-[12.5px] font-semibold flex-1 text-left">{iconData.label}</span>
                                                                 {isActive && <span className="w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0" />}
@@ -2470,6 +2487,12 @@ const Dashboard = () => {
                 <AIChatbotBoard
                     isOpen={showAIChatbotModal}
                     onClose={() => setShowAIChatbotModal(false)}
+                    position="inline-right"
+                    onAction={handleAIAction}
+                />
+                <TwoFactorSetupModal 
+                    isOpen={showTwoFactorModal} 
+                    onClose={() => setShowTwoFactorModal(false)} 
                     position="inline-right"
                 />
                 <AddReminderBoard

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { User, Lock, Loader2, Github, Twitter, Facebook, Chrome, AlertCircle } from 'lucide-react';
+import { User, Lock, Loader2, Github, Twitter, Facebook, Chrome, AlertCircle, ShieldAlert } from 'lucide-react';
 import { authService } from '../services/auth.service';
 import toast from 'react-hot-toast';
 import { showSuccessToast } from '../utils/toastUtils';
@@ -20,6 +20,12 @@ const LoginPage = () => {
     password: ''
   });
 
+  const [show2FA, setShow2FA] = useState(false);
+  const [twoFACode, setTwoFACode] = useState('');
+  const [tempToken, setTempToken] = useState('');
+  const [authEmpCode, setAuthEmpCode] = useState('');
+  const [twoFAMethod, setTwoFAMethod] = useState('APP');
+
   const handleChange = (e) => {
     setErrorMsg(''); // Clear error when user starts typing
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -36,6 +42,14 @@ const LoginPage = () => {
     try {
       const result = await authService.login(formData.empName, formData.password);
       
+      if (result.requires2FA || result.Requires2FA) {
+        setTempToken(result.tempToken || result.TempToken);
+        setAuthEmpCode(result.empCode || result.EmpCode);
+        setTwoFAMethod(result.method || result.Method || 'APP');
+        setShow2FA(true);
+        return;
+      }
+
       const subStatus = result.subscriptionStatus || result.SubscriptionStatus;
       const subEndDate = result.subscriptionEndDate || result.SubscriptionEndDate;
 
@@ -69,6 +83,53 @@ const LoginPage = () => {
       navigate('/dashboard');
     } catch (err) {
       const msg = typeof err === 'string' ? err : (err.message || 'Invalid username or password. Please try again.');
+      setErrorMsg(msg);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleVerify2FA = async (e) => {
+    e.preventDefault();
+    if (!twoFACode || twoFACode.length !== 6) {
+      setErrorMsg('Please enter a valid 6-digit code.');
+      return;
+    }
+    setLoading(true);
+    setErrorMsg('');
+    try {
+      const result = await authService.verify2FALogin(authEmpCode, tempToken, twoFACode);
+      
+      const subStatus = result.subscriptionStatus || result.SubscriptionStatus;
+      const subEndDate = result.subscriptionEndDate || result.SubscriptionEndDate;
+
+      let successMessage = result.message || 'Login Successful!';
+      
+      if (subStatus === 'Trial') {
+        const endDateStr = subEndDate ? new Date(subEndDate).toLocaleDateString() : '1 month';
+        toast((t) => (
+          <div className="flex flex-col gap-2">
+            <span className="font-bold text-slate-800">Free Trial Active</span>
+            <span className="text-sm text-slate-600">You are currently on a free trial which will expire on {endDateStr}.</span>
+            <button 
+              onClick={() => toast.dismiss(t.id)} 
+              className="mt-2 bg-blue-600 text-white rounded px-3 py-1 text-sm font-bold w-max"
+            >
+              Acknowledge
+            </button>
+          </div>
+        ), { duration: 8000, icon: '🎉' });
+      } else {
+        showSuccessToast(successMessage);
+      }
+      
+      const audio = new Audio(SUCCESS_SOUND_URL);
+      audio.volume = 0.5;
+      audio.play().catch(e => console.error("Audio play failed:", e));
+
+      navigate('/dashboard');
+    } catch (err) {
+      const msg = typeof err === 'string' ? err : (err.message || 'Invalid 2FA code.');
       setErrorMsg(msg);
     } finally {
       setLoading(false);
@@ -120,7 +181,57 @@ const LoginPage = () => {
             <h1 className="text-4xl font-black text-slate-800 text-center mb-2">Login</h1>
             <p className="text-slate-400 text-center mb-10 text-sm">Please enter your accounting credentials</p>
 
-            <form onSubmit={handleLogin} className="space-y-5">
+            {show2FA ? (
+              <form onSubmit={handleVerify2FA} className="space-y-5 animate-in slide-in-from-right duration-500">
+                <div className="text-center mb-6">
+                  <ShieldAlert className="w-16 h-16 text-[#2b5797] mx-auto mb-4" />
+                  <h2 className="text-xl font-bold text-slate-800">Two-Factor Authentication</h2>
+                  <p className="text-sm text-slate-500 mt-2">
+                    {twoFAMethod === 'EMAIL' 
+                      ? 'Please enter the 6-digit code sent to your email.' 
+                      : 'Please enter the 6-digit code from your authenticator app.'}
+                  </p>
+                </div>
+                <div className="group">
+                  <label className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1.5 block ml-1 transition-colors group-focus-within:text-[#2b5797]">Verification Code</label>
+                  <div className="relative">
+                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-[#2b5797] transition-colors" />
+                    <input
+                      type="text"
+                      maxLength={6}
+                      value={twoFACode}
+                      onChange={(e) => { setErrorMsg(''); setTwoFACode(e.target.value); }}
+                      placeholder="000000"
+                      className={`w-full pl-12 pr-4 py-4 bg-slate-50 border-2 rounded-2xl focus:bg-white outline-none transition-all placeholder:text-slate-400 text-slate-700 font-bold tracking-widest text-center ${errorMsg ? 'border-red-200 focus:border-red-400' : 'border-transparent focus:border-[#2b5797]'}`}
+                    />
+                  </div>
+                </div>
+
+                {errorMsg && (
+                  <div className="flex items-start gap-3 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-2xl animate-in fade-in slide-in-from-top-2 duration-300">
+                    <AlertCircle className="w-5 h-5 mt-0.5 shrink-0 text-red-500" />
+                    <span className="text-sm font-semibold">{errorMsg}</span>
+                  </div>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full bg-[#2b5797] text-white py-4 rounded-2xl font-black shadow-xl shadow-blue-900/20 hover:bg-[#1e40af] hover:shadow-2xl hover:translate-y-[-2px] active:translate-y-0 transition-all flex items-center justify-center gap-2"
+                >
+                  {loading ? <Loader2 className="w-6 h-6 animate-spin" /> : "VERIFY CODE"}
+                </button>
+                
+                <button
+                  type="button"
+                  onClick={() => { setShow2FA(false); setTwoFACode(''); setErrorMsg(''); }}
+                  className="w-full mt-2 text-slate-500 hover:text-slate-800 text-sm font-semibold"
+                >
+                  Back to Login
+                </button>
+              </form>
+            ) : (
+            <form onSubmit={handleLogin} className="space-y-5 animate-in slide-in-from-left duration-500">
               <div className="group">
                 <label className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1.5 block ml-1 transition-colors group-focus-within:text-[#2b5797]">User Identity</label>
                 <div className="relative">
@@ -174,6 +285,7 @@ const LoginPage = () => {
                 {loading ? <Loader2 className="w-6 h-6 animate-spin" /> : "AUTHENTICATE"}
               </button>
             </form>
+            )}
 
             <div className="mt-12 text-center">
               <span className="text-[10px] text-slate-400 font-black uppercase tracking-[0.3em] block mb-6">Secured by Onimta Cloud</span>

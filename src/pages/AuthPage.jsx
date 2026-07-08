@@ -42,6 +42,12 @@ const AuthPage = () => {
     const [pageAlert, setPageAlert] = useState(null);
     const [glowType, setGlowType] = useState(null);
 
+    const [show2FA, setShow2FA] = useState(false);
+    const [tempToken, setTempToken] = useState('');
+    const [authEmpCode, setAuthEmpCode] = useState('');
+    const [twoFACode, setTwoFACode] = useState('');
+    const [twoFAMethod, setTwoFAMethod] = useState('APP');
+
     useEffect(() => {
         if (pageAlert) {
             setGlowType(pageAlert.type);
@@ -109,6 +115,15 @@ const AuthPage = () => {
         setLoading(true);
         try {
             const result = await authService.login(loginData.empName, loginData.password);
+            
+            if (result.requires2FA || result.Requires2FA) {
+                setTempToken(result.tempToken || result.TempToken);
+                setAuthEmpCode(result.empCode || result.EmpCode);
+                setTwoFAMethod(result.method || result.Method || 'APP');
+                setShow2FA(true);
+                return;
+            }
+
             const user = authService.getCurrentUser();
             setCurrentUser(user);
 
@@ -134,6 +149,45 @@ const AuthPage = () => {
         } catch (err) {
             const errorMessage = typeof err === 'object' ? (err.message || err.Message || 'Invalid credentials') : err;
             showPageAlert('error', 'Login Failed', errorMessage);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleVerify2FA = async (e) => {
+        e.preventDefault();
+        if (!twoFACode || twoFACode.length !== 6) {
+            showPageAlert('error', 'Validation Failed', 'Please enter a valid 6-digit code.');
+            return;
+        }
+        setLoading(true);
+        try {
+            const result = await authService.verify2FALogin(authEmpCode, tempToken, twoFACode);
+            
+            const user = authService.getCurrentUser();
+            setCurrentUser(user);
+
+            if (rememberMe) {
+                const accountToSave = {
+                    empName: authEmpCode,
+                    lastAccessed: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+                };
+                localStorage.setItem('onimta_saved_account', JSON.stringify(accountToSave));
+                setSavedAccount(accountToSave);
+            } else {
+                localStorage.removeItem('onimta_saved_account');
+                setSavedAccount(null);
+            }
+
+            showPageAlert('success', 'Login Successful', result.message || 'Verification Successful');
+            setShow2FA(false);
+
+            setTimeout(() => {
+                setShowWelcome(true);
+            }, 1000);
+        } catch (err) {
+            const errorMessage = typeof err === 'object' ? (err.message || err.Message || 'Invalid 2FA code.') : err;
+            showPageAlert('error', 'Verification Failed', errorMessage);
         } finally {
             setLoading(false);
         }
@@ -263,6 +317,53 @@ const AuthPage = () => {
                             <p className="text-[10px] text-slate-400 text-center border-t border-slate-200 pt-4 w-full mt-2">
                                 Invisible reCAPTCHA by Google <a href="#" className="hover:underline">Privacy Policy</a> and <a href="#" className="hover:underline">Terms of Use</a>.
                             </p>
+                        </div>
+                    ) : show2FA ? (
+                        <div className="animate-in fade-in slide-in-from-right-4 duration-500">
+                            <div className="text-center mb-8">
+                                <h2 className="text-slate-800 text-3xl font-tahoma font-bold mb-4 uppercase tracking-tight">
+                                    Two-Factor Auth
+                                </h2>
+                                <p className="text-slate-500 font-mono text-sm leading-relaxed">
+                                    {twoFAMethod === 'EMAIL' 
+                                      ? 'Please enter the 6-digit code sent to your email.' 
+                                      : 'Please enter the 6-digit code from your authenticator app.'}
+                                </p>
+                            </div>
+
+                            <form onSubmit={handleVerify2FA} className="space-y-6">
+                                <div className="space-y-1">
+                                    <label className="block text-sm font-sans font-medium text-slate-700 ml-1">
+                                        Verification Code
+                                    </label>
+                                    <input
+                                        type="text"
+                                        maxLength={6}
+                                        value={twoFACode}
+                                        onChange={(e) => setTwoFACode(e.target.value)}
+                                        placeholder="000000"
+                                        className="w-full px-4 py-4 bg-white font-mono text-slate-800 font-bold tracking-[0.5em] text-center text-xl outline-none border border-slate-300 hover:border-[#00acee] focus:border-[#00acee] focus:ring-4 focus:ring-[#00acee]/30 transition-all"
+                                        required
+                                    />
+                                </div>
+                                
+                                <div className="flex flex-col gap-4 pt-2">
+                                    <button
+                                        disabled={loading}
+                                        className="w-full py-4 bg-[#00acee] hover:bg-[#0092cc] text-white font-mono font-bold tracking-[0.2em] transition-all active:scale-[0.98] disabled:opacity-70 uppercase shadow-lg shadow-black/10"
+                                    >
+                                        {loading ? <Loader2 className="animate-spin mx-auto text-white" /> : "VERIFY CODE"}
+                                    </button>
+                                    
+                                    <button
+                                        type="button"
+                                        onClick={() => { setShow2FA(false); setTwoFACode(''); }}
+                                        className="w-full py-2 border border-transparent text-slate-500 hover:text-slate-800 font-mono font-bold tracking-[0.1em] transition-all uppercase text-xs"
+                                    >
+                                        Back to Login
+                                    </button>
+                                </div>
+                            </form>
                         </div>
                     ) : !showForgot ? (
                         <>
