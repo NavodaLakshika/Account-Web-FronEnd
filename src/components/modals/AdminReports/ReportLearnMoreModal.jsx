@@ -384,7 +384,7 @@ const ReportLearnMoreModal = ({ isOpen, onClose }) => {
                         )}
                     </div>
                     <div className="w-full border-t border-gray-200 my-1" />
-                    <button className="px-5 h-10 bg-[#0285fd] hover:bg-[#0275e0] text-white rounded-[3px] font-bold text-[14px] transition-colors shadow-sm">
+                    <button className="px-5 h-10 bg-[#0285fd] hover:bg-[#0275e0] text-slate-800 dark:text-white rounded-[3px] font-bold text-[14px] transition-colors shadow-sm">
                         Contact Us
                     </button>
                 </div>
@@ -394,4 +394,8 @@ const ReportLearnMoreModal = ({ isOpen, onClose }) => {
 };
 
 export default ReportLearnMoreModal;
+
+
+
+
 

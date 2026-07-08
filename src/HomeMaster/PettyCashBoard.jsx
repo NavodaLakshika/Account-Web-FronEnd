@@ -354,7 +354,7 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                             <button onClick={handleSaveDraft} disabled={loading} className="px-6 py-2 border border-[#0285fd] text-[#0285fd] bg-white hover:bg-blue-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2">
                                 {loading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />} SAVE DRAFT
                             </button>
-                            <button onClick={handleSave} disabled={loading} className={`px-6 py-2 bg-[#0285fd] hover:bg-[#0073ff] text-white font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                            <button onClick={handleSave} disabled={loading} className={`px-6 py-2 bg-[#0285fd] hover:bg-[#0073ff] text-slate-800 dark:text-white font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}>
                                 {loading ? <Loader2 size={14} className="animate-spin" /> : <CheckCircle size={14} />} APPLY
                             </button>
                         </div>
@@ -966,3 +966,7 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
 };
 
 export default PettyCashBoard;
+
+
+
+

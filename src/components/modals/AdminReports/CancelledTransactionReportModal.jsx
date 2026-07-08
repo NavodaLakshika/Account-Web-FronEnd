@@ -38,7 +38,7 @@ const CancelledTransactionReportModal = ({ isOpen, onClose }) => {
             <button
                 onClick={handleDisplay}
                 disabled={loading}
-                className="px-7 h-8 bg-[#0285fd] text-white text-[11px] font-bold rounded-[4px] shadow-sm shadow-blue-200 hover:bg-[#0073ff] transition-all active:scale-95 flex items-center justify-center gap-1.5 disabled:opacity-50"
+                className="px-7 h-8 bg-[#0285fd] text-slate-800 dark:text-white text-[11px] font-bold rounded-[4px] shadow-sm shadow-blue-200 hover:bg-[#0073ff] transition-all active:scale-95 flex items-center justify-center gap-1.5 disabled:opacity-50"
             >
                 <Play size={11} fill="currentColor" /> {loading ? 'Processing...' : 'Display'}
             </button>
@@ -68,12 +68,12 @@ const CancelledTransactionReportModal = ({ isOpen, onClose }) => {
                                         value={transactionType}
                                         onChange={(e) => setTransactionType(e.target.value)}
                                         disabled={isAllTypes}
-                                        className="flex-1 h-8 px-2.5 border border-gray-300 bg-white rounded-[4px] outline-none font-bold text-[12px] text-slate-700 shadow-sm focus:border-blue-400 disabled:bg-slate-50 disabled:text-slate-400"
+                                        className="flex-1 h-8 px-2.5 border border-gray-300 bg-white rounded-[4px] outline-none font-bold text-[12px] text-slate-700 shadow-sm focus:border-blue-400 disabled:bg-slate-50 disabled:text-slate-500 dark:text-slate-400"
                                     />
                                     <button
                                         onClick={() => setShowTypeLookup(true)}
                                         disabled={isAllTypes}
-                                        className="w-9 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] transition-all shadow-sm active:scale-95 ml-1.5 rounded-[4px] disabled:opacity-50"
+                                        className="w-9 h-8 bg-[#0285fd] text-slate-800 dark:text-white flex items-center justify-center hover:bg-[#0073ff] transition-all shadow-sm active:scale-95 ml-1.5 rounded-[4px] disabled:opacity-50"
                                     >
                                         <Search size={13} />
                                     </button>
@@ -107,7 +107,7 @@ const CancelledTransactionReportModal = ({ isOpen, onClose }) => {
                                     />
                                     <button
                                         onClick={() => setShowCalendarFrom(true)}
-                                        className="w-9 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] transition-all shadow-sm active:scale-95 ml-1.5 rounded-[4px]"
+                                        className="w-9 h-8 bg-[#0285fd] text-slate-800 dark:text-white flex items-center justify-center hover:bg-[#0073ff] transition-all shadow-sm active:scale-95 ml-1.5 rounded-[4px]"
                                     >
                                         <Calendar size={11} />
                                     </button>
@@ -125,7 +125,7 @@ const CancelledTransactionReportModal = ({ isOpen, onClose }) => {
                                     />
                                     <button
                                         onClick={() => setShowCalendarTo(true)}
-                                        className="w-9 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] transition-all shadow-sm active:scale-95 ml-1.5 rounded-[4px]"
+                                        className="w-9 h-8 bg-[#0285fd] text-slate-800 dark:text-white flex items-center justify-center hover:bg-[#0073ff] transition-all shadow-sm active:scale-95 ml-1.5 rounded-[4px]"
                                     >
                                         <Calendar size={11} />
                                     </button>
@@ -161,3 +161,7 @@ const CancelledTransactionReportModal = ({ isOpen, onClose }) => {
 };
 
 export default CancelledTransactionReportModal;
+
+
+
+

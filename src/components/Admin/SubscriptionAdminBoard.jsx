@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { subscriptionService } from '../../services/subscription.service';
 import { subscriptionPlanService } from '../../services/subscriptionPlan.service';
-import { Loader2, Search, UserCheck, ShieldAlert, CalendarClock, CreditCard, Plus, Edit, Trash2 } from 'lucide-react';
+import { Loader2, Search, CalendarClock, CreditCard, Plus, Edit, Trash2, CheckCircle, XCircle } from 'lucide-react';
 import { showSuccessToast, showErrorToast } from '../../utils/toastUtils';
+import ConfirmModal from '../modals/ConfirmModal';
 import PlanEditorModal from './PlanEditorModal';
 
 const SubscriptionAdminBoard = () => {
-  const [activeTab, setActiveTab] = useState('users'); // 'users' or 'plans'
-  
+  const [activeTab, setActiveTab] = useState('users');
+
   // Users State
   const [users, setUsers] = useState([]);
   const [loadingUsers, setLoadingUsers] = useState(true);
@@ -15,12 +16,14 @@ const SubscriptionAdminBoard = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [extendMonths, setExtendMonths] = useState(1);
   const [newStatus, setNewStatus] = useState('Active');
+  const [updatingUser, setUpdatingUser] = useState(false);
 
   // Plans State
   const [plans, setPlans] = useState([]);
   const [loadingPlans, setLoadingPlans] = useState(false);
   const [showPlanEditor, setShowPlanEditor] = useState(false);
   const [editingPlan, setEditingPlan] = useState(null);
+  const [deleteConfirm, setDeleteConfirm] = useState({ isOpen: false, id: null, loading: false });
 
   useEffect(() => {
     if (activeTab === 'users') {
@@ -35,7 +38,6 @@ const SubscriptionAdminBoard = () => {
     try {
       const data = await subscriptionPlanService.getAllPlans();
       if (!data || data.length === 0) {
-          // If no plans, try to initialize once
           await subscriptionPlanService.initTable();
           const newData = await subscriptionPlanService.getAllPlans();
           setPlans(newData || []);
@@ -49,14 +51,20 @@ const SubscriptionAdminBoard = () => {
     }
   };
 
-  const handleDeletePlan = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this plan?')) return;
+  const handleDeletePlan = (id) => {
+    setDeleteConfirm({ isOpen: true, id, loading: false });
+  };
+
+  const executeDeletePlan = async () => {
+    setDeleteConfirm(prev => ({ ...prev, loading: true }));
     try {
-      await subscriptionPlanService.deletePlan(id);
-      showSuccessToast('Plan deleted');
+      await subscriptionPlanService.deletePlan(deleteConfirm.id);
+      showSuccessToast('Plan deleted successfully');
+      setDeleteConfirm({ isOpen: false, id: null, loading: false });
       fetchPlans();
     } catch (err) {
       showErrorToast('Failed to delete plan');
+      setDeleteConfirm(prev => ({ ...prev, loading: false }));
     }
   };
 
@@ -77,15 +85,18 @@ const SubscriptionAdminBoard = () => {
   const handleUpdate = async (e) => {
     e.preventDefault();
     if (!selectedUser) return;
+    setUpdatingUser(true);
     try {
       const res = await subscriptionService.updateSubscription(selectedUser.emp_Code, extendMonths, newStatus);
       if (res.success) {
-        showSuccessToast('Subscription updated');
+        showSuccessToast('Subscription updated successfully');
         setSelectedUser(null);
         fetchUsers();
       }
     } catch (err) {
       showErrorToast(err.message || 'Update failed');
+    } finally {
+      setUpdatingUser(false);
     }
   };
 
@@ -95,226 +106,266 @@ const SubscriptionAdminBoard = () => {
   );
 
   return (
-    <div className="h-full flex flex-col">
-      <div className="flex items-center justify-between mb-6">
+    <div className="bg-slate-100 dark:bg-white/5 backdrop-blur-md shadow-lg border border-slate-300 dark:border-white/10 flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-2 duration-300 pb-6 rounded-[12px] overflow-hidden mb-6 min-h-[500px]">
+      {/* Header */}
+      <div className="px-6 py-4 border-b border-slate-300 dark:border-white/10 flex items-center justify-between bg-slate-50 dark:bg-[#0c0c0c]/50">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-amber-50 flex items-center justify-center">
-            <CalendarClock className="w-4 h-4 text-amber-600" />
+          <div className="w-8 h-8 bg-amber-500/20 flex items-center justify-center rounded-none">
+            <CalendarClock className="w-4 h-4 text-amber-300" />
           </div>
           <div>
-            <h2 className="text-[15px] font-bold text-slate-800">Subscription & Pricing Management</h2>
-            <p className="text-[11px] text-slate-500 font-medium">Manage employee free trials and subscription pricing plans</p>
+            <h2 className="text-[15px] font-bold text-slate-800 dark:text-white">Subscription & Pricing Management</h2>
+            <p className="text-[11px] text-gray-400 font-medium">Manage employee subscriptions and pricing plans</p>
           </div>
         </div>
-        
-        <div className="flex bg-slate-200/50 p-1 rounded-[12px]">
-            <button 
-                onClick={() => setActiveTab('users')}
-                className={`px-4 py-2 rounded-[12px] text-xs font-bold transition-all ${activeTab === 'users' ? 'bg-white shadow-sm text-blue-600' : 'text-slate-500 hover:text-slate-700'}`}
+        {activeTab === 'plans' && (
+          <div className="flex items-center gap-3 self-start">
+            <button
+              onClick={() => {
+                setEditingPlan(null);
+                setShowPlanEditor(true);
+              }}
+              className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-slate-800 dark:text-white text-xs font-bold rounded-none transition-all flex items-center gap-2"
             >
-                User Subscriptions
+              <Plus size={14} />
+              Create Plan
             </button>
-            <button 
-                onClick={() => setActiveTab('plans')}
-                className={`px-4 py-2 rounded-[12px] text-xs font-bold transition-all ${activeTab === 'plans' ? 'bg-white shadow-sm text-blue-600' : 'text-slate-500 hover:text-slate-700'}`}
-            >
-                Pricing Plans
-            </button>
-        </div>
+          </div>
+        )}
       </div>
 
-      {activeTab === 'users' ? (
-        <>
-          <div className="flex items-center justify-end mb-4">
-            <div className="relative w-64">
-              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-              <input 
-                type="text" 
-                placeholder="Search users..." 
-                className="w-full pl-9 pr-4 py-2 text-[13px] bg-slate-100/60 border border-slate-200/60 rounded-[12px] focus:outline-none focus:ring-2 focus:ring-[#0078d4]/20 focus:border-[#0078d4]"
+      {/* Selector Bar */}
+      <div className="bg-slate-50 dark:bg-[#0c0c0c] p-4 border border-slate-300 dark:border-white/10 mx-6 flex flex-col gap-4 rounded-none shadow-inner">
+        <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-xs font-black text-gray-400 uppercase tracking-widest mr-2">Select View:</span>
+            <button
+              onClick={() => setActiveTab('users')}
+              className={`px-3 py-1.5 text-xs font-bold rounded-none transition-all ${activeTab === 'users'
+                ? 'bg-[#0078d4] text-white shadow-sm border border-[#0078d4]'
+: 'bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:bg-white/10 border border-slate-200 dark:border-white/20 text-slate-600 dark:text-gray-300'
+              }`}
+            >
+              User Subscriptions
+            </button>
+            <button
+              onClick={() => setActiveTab('plans')}
+              className={`px-3 py-1.5 text-xs font-bold rounded-none transition-all ${activeTab === 'plans'
+                ? 'bg-amber-600 text-slate-800 dark:text-white shadow-sm border border-amber-600'
+: 'bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:bg-white/10 border border-slate-200 dark:border-white/20 text-slate-600 dark:text-gray-300'
+              }`}
+            >
+              Pricing Plans
+            </button>
+          </div>
+
+          {activeTab === 'users' && (
+            <div className="relative w-full md:w-64">
+              <Search className="absolute left-3 top-2.5 text-gray-500 w-4 h-4" />
+              <input
+                type="text"
+                placeholder="Search users..."
                 value={search}
-                onChange={(e) => setSearch(e.target.value)}
+                onChange={e => setSearch(e.target.value)}
+                className="pl-9 pr-4 py-1.5 border border-slate-200 dark:border-white/20 bg-slate-100 dark:bg-white/5 text-slate-800 dark:text-white text-xs w-full outline-none focus:border-[#0078d4] focus:bg-slate-200 dark:bg-white/10 rounded-none transition-all placeholder:text-gray-600"
               />
             </div>
-          </div>
-
-          <div className="flex-1 bg-white shadow-sm border border-slate-200/60 overflow-hidden flex flex-col">
-        <div className="w-full overflow-x-auto">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="border-b border-slate-100 bg-slate-50/50">
-                <th className="py-3.5 px-6 text-[11px] font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap">Emp Code</th>
-                <th className="py-3.5 px-6 text-[11px] font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap">Name</th>
-                <th className="py-3.5 px-6 text-[11px] font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap">First Login</th>
-                <th className="py-3.5 px-6 text-[11px] font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap">Expiry Date</th>
-                <th className="py-3.5 px-6 text-[11px] font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap">Status</th>
-                <th className="py-3.5 px-6 text-[11px] font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {loadingUsers ? (
-                <tr>
-                  <td colSpan="6" className="py-8 text-center text-slate-400">
-                    <Loader2 className="w-6 h-6 animate-spin mx-auto" />
-                  </td>
-                <th className="text-right px-5 py-3">Action</th></tr>
-              ) : filteredUsers.map(user => (
-                <tr key={user.emp_Code} className="border-b border-slate-50 hover:bg-slate-50/80 transition-colors">
-                  <td className="py-3.5 px-6 font-mono text-[13px] text-slate-900 font-bold">{user.emp_Code}</td>
-                  <td className="py-3.5 px-6 text-[13px] text-slate-900 font-bold">{user.emp_Name}</td>
-                  <td className="py-3.5 px-6 text-[13px] text-slate-500 font-medium">
-                    {user.first_Login_Date ? new Date(user.first_Login_Date).toLocaleDateString() : 'Never'}
-                  </td>
-                  <td className="py-3.5 px-6 text-[13px] text-slate-500 font-medium">
-                    {user.subscription_End_Date ? new Date(user.subscription_End_Date).toLocaleDateString() : 'N/A'}
-                  </td>
-                  <td className="py-3.5 px-6">
-                    <span className={`px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider ${
-                      user.subscription_Status === 'Trial' ? 'bg-blue-100 text-blue-700' :
-                      user.subscription_Status === 'Active' ? 'bg-emerald-100 text-emerald-700' :
-                      'bg-red-100 text-red-700'
-                    }`}>
-                      {user.subscription_Status || 'Trial'}
-                    </span>
-                  </td>
-                  <td className="py-3.5 px-6 text-right">
-                    <button 
-                      onClick={() => setSelectedUser(user)}
-                      className="px-4 py-2 bg-[#0078d4]/10 hover:bg-[#0078d4]/20 text-[#0078d4] text-xs font-bold transition-colors"
-                    >
-                      Manage
-                    </button>
-                  </td>
-                </tr>
-              ))}
-              {!loadingUsers && filteredUsers.length === 0 && (
-                <tr>
-                  <td colSpan="6" className="py-8 text-center text-[13px] text-slate-400 font-medium">No users found.</td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+          )}
         </div>
       </div>
 
-      {/* End of Users Tab */}
-        </>
-      ) : (
-        <>
-          <div className="flex items-center justify-end mb-4">
-             <button 
+      {/* USERS TAB */}
+      {activeTab === 'users' && (
+        <div className="border border-slate-300 dark:border-white/10 overflow-hidden mx-6 bg-slate-100 dark:bg-white/5 rounded-none shadow-sm">
+          <div className="w-full overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-slate-50 dark:bg-[#0c0c0c]/80 border-b border-slate-300 dark:border-white/10 text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                  <th className="px-4 py-3">Emp Code</th>
+                  <th className="px-4 py-3">Name</th>
+                  <th className="px-4 py-3">First Login</th>
+                  <th className="px-4 py-3">Expiry Date</th>
+                  <th className="px-4 py-3 text-center">Status</th>
+                  <th className="px-4 py-3 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-200 dark:divide-white/5">
+                {loadingUsers ? (
+                  <tr>
+                    <td colSpan="6" className="py-8 text-center text-gray-500">
+                      <Loader2 className="w-6 h-6 animate-spin mx-auto" />
+                    </td>
+                  </tr>
+                ) : filteredUsers.length === 0 ? (
+                  <tr>
+                    <td colSpan="6" className="py-8 text-center text-[13px] text-gray-500 font-medium">No users found.</td>
+                  </tr>
+                ) : (
+                  filteredUsers.map(user => (
+                    <tr key={user.emp_Code} className="hover:bg-slate-100 dark:bg-white/5 transition-colors">
+                      <td className="px-4 py-3 font-mono text-[13px] text-slate-800 dark:text-white font-bold">{user.emp_Code}</td>
+                      <td className="px-4 py-3 text-[13px] text-slate-800 dark:text-gray-200 font-bold">{user.emp_Name}</td>
+                      <td className="px-4 py-3 text-[13px] text-gray-400 font-medium">
+                        {user.first_Login_Date ? new Date(user.first_Login_Date).toLocaleDateString() : <span className="text-gray-600">Never</span>}
+                      </td>
+                      <td className="px-4 py-3 text-[13px] text-gray-400 font-medium">
+                        {user.subscription_End_Date ? new Date(user.subscription_End_Date).toLocaleDateString() : <span className="text-gray-600">N/A</span>}
+                      </td>
+                      <td className="px-4 py-3 text-center">
+                        <span className={`px-2 py-0.5 text-[9px] font-black uppercase tracking-widest border rounded-none ${
+                          user.subscription_Status === 'Trial' ? 'bg-blue-600/20 text-blue-400 border-blue-500/50' :
+                          user.subscription_Status === 'Active' ? 'bg-emerald-600/20 text-emerald-400 border-emerald-500/50' :
+                          'bg-red-600/20 text-red-400 border-red-500/50'
+                        }`}>
+                          {user.subscription_Status || 'Trial'}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-right">
+                        <button
+                          onClick={() => {
+                            setSelectedUser(user);
+                            setExtendMonths(1);
+                            setNewStatus(user.subscription_Status || 'Active');
+                          }}
+                          className="px-3 py-1 text-[10px] font-black uppercase tracking-wider rounded-none transition-all bg-blue-600 text-white shadow-sm border border-blue-500 hover:bg-blue-500 flex items-center gap-1 ml-auto"
+                        >
+                          <CreditCard size={10} /> Manage
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* PLANS TAB */}
+      {activeTab === 'plans' && (
+        <div className="mx-6">
+          {loadingPlans ? (
+            <div className="flex flex-col items-center justify-center py-20 text-gray-500">
+              <Loader2 className="w-8 h-8 animate-spin mb-4 text-blue-400" />
+              <span className="text-xs font-medium">Loading pricing plans...</span>
+            </div>
+          ) : plans.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-20 gap-4 text-gray-500 border border-dashed border-white/20 bg-slate-100 dark:bg-white/5">
+              <CreditCard size={40} className="text-gray-600" />
+              <div className="text-center">
+                <p className="text-[13px] font-bold text-gray-400 mb-1">No Pricing Plans Found</p>
+                <p className="text-[11px] text-gray-500 font-medium">Create your first pricing plan to get started.</p>
+              </div>
+              <button
                 onClick={() => {
                   setEditingPlan(null);
                   setShowPlanEditor(true);
                 }}
-                className="flex items-center gap-2 bg-[#0078d4] hover:bg-[#005a9e] text-white px-4 py-2 text-xs font-bold shadow-sm transition-all"
-             >
-                <Plus className="w-4 h-4" /> Add New Plan
-             </button>
-          </div>
+                className="px-6 py-2.5 bg-[#0078d4] hover:bg-[#005a9e] text-white text-xs font-bold rounded-none transition-all flex items-center gap-2 shadow-sm"
+              >
+                <Plus size={14} /> Create Pricing Plan
+              </button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {plans.map((plan) => (
+                <div key={plan.id} className="bg-slate-100 dark:bg-white/5 border border-slate-300 dark:border-white/10 shadow-sm flex flex-col relative transition-all hover:bg-white/[0.07]">
+                  {!plan.isActive && (
+                    <div className="absolute top-4 right-4 bg-red-600/20 text-red-400 text-[10px] font-bold px-2 py-1 border border-red-500/50 uppercase tracking-widest">
+                      Inactive
+                    </div>
+                  )}
+                  <div className="p-6">
+                    <h3 className="text-lg font-black text-slate-800 dark:text-white">{plan.planName}</h3>
+                    <div className="mt-3 flex items-baseline gap-1">
+                      <span className="text-3xl font-black text-slate-800 dark:text-white">${plan.price}</span>
+                      <span className="text-gray-400 text-sm font-medium">/{plan.billingCycle.toLowerCase()}</span>
+                    </div>
+                    
+                    <div className="mt-6 space-y-3">
+                      <div className="flex items-center justify-between text-sm border-b border-white/5 pb-2">
+                        <span className="text-gray-400 font-medium">Max Users</span>
+                        <span className="font-bold text-slate-800 dark:text-white">{plan.maxUsers}</span>
+                      </div>
+                      <div className="flex items-center justify-between text-sm border-b border-white/5 pb-2">
+                        <span className="text-gray-400 font-medium">Max Companies</span>
+                        <span className="font-bold text-slate-800 dark:text-white">{plan.maxCompanies}</span>
+                      </div>
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-gray-400 font-medium">Status</span>
+                        <span className={`px-2 py-0.5 text-[9px] font-black uppercase tracking-widest border ${plan.isActive ? 'bg-emerald-600/20 text-emerald-400 border-emerald-500/50' : 'bg-slate-200 dark:bg-white/10 text-gray-400 border-white/20'}`}>
+                          {plan.isActive ? 'Active' : 'Inactive'}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
 
-          <div className="flex-1 overflow-y-auto">
-            {loadingPlans ? (
-                <div className="flex flex-col items-center justify-center h-64 text-slate-400">
-                    <Loader2 className="w-8 h-8 animate-spin mb-4 text-blue-500" />
-                    Loading pricing plans...
+                  <div className="mt-auto border-t border-slate-300 dark:border-white/10 p-4 flex gap-2 bg-black/20">
+                    <button
+                      onClick={() => {
+                        setEditingPlan(plan);
+                        setShowPlanEditor(true);
+                      }}
+                      className="flex-1 flex items-center justify-center gap-2 bg-blue-600/20 hover:bg-blue-600/40 text-blue-400 border border-blue-500/50 py-2 text-xs font-bold transition-all rounded-none uppercase tracking-wider"
+                    >
+                      <Edit size={12} /> Edit
+                    </button>
+                    <button
+                      onClick={() => handleDeletePlan(plan.id)}
+                      className="flex items-center justify-center gap-2 bg-red-600/20 hover:bg-red-600/40 text-red-400 border border-red-500/50 px-3 py-2 text-xs font-bold transition-all rounded-none uppercase tracking-wider"
+                    >
+                      <Trash2 size={12} />
+                    </button>
+                  </div>
                 </div>
-            ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {plans.map((plan) => (
- <div key={plan.id} className="bg-white rounded-sm border-t-4 border-t-[#f97316] shadow-sm p-6 flex flex-col relative transition-shadow hover:shadow-md">
-                            {!plan.isActive && (
-                                <div className="absolute top-4 right-4 bg-red-100 text-red-600 text-[10px] font-bold px-2 py-1 rounded-[3px] uppercase">
-                                    Inactive
-                                </div>
-                            )}
-                            <h3 className="text-xl font-bold text-slate-800">{plan.planName}</h3>
-                            <div className="mt-2 flex items-baseline gap-1">
-                                <span className="text-3xl font-black text-slate-800">${plan.price}</span>
-                                <span className="text-slate-500 text-sm">/{plan.billingCycle.toLowerCase()}</span>
-                            </div>
-                            
-                            <div className="mt-6 space-y-3 flex-1">
-                                <div className="flex items-center justify-between text-sm">
-                                    <span className="text-slate-500">Max Users</span>
-                                    <span className="font-bold text-slate-800">{plan.maxUsers}</span>
-                                </div>
-                                <div className="flex items-center justify-between text-sm">
-                                    <span className="text-slate-500">Max Companies</span>
-                                    <span className="font-bold text-slate-800">{plan.maxCompanies}</span>
-                                </div>
-                            </div>
-
-                            <div className="mt-6 pt-6 border-t border-slate-100 flex gap-2">
-                                <button 
-                                    onClick={() => {
-                                        setEditingPlan(plan);
-                                        setShowPlanEditor(true);
-                                    }}
-                                    className="flex-1 flex items-center justify-center gap-2 bg-orange-50 hover:bg-orange-100 text-[#ea580c] py-2 rounded-[3px] text-sm font-bold transition-all"
-                                >
-                                    <Edit className="w-4 h-4" /> Edit
-                                </button>
-                                <button 
-                                    onClick={() => handleDeletePlan(plan.id)}
-                                    className="flex-none p-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-[3px] transition-all"
-                                >
-                                    <Trash2 className="w-5 h-5" />
-                                </button>
-                            </div>
-                        </div>
-                    ))}
-                    {plans.length === 0 && (
-                        <div className="col-span-full py-12 text-center text-[13px] text-slate-400 font-medium bg-white border border-dashed border-slate-200">
-                            No pricing plans created yet.
-                        </div>
-                    )}
-                </div>
-            )}
-          </div>
-        </>
+              ))}
+            </div>
+          )}
+        </div>
       )}
 
       {/* Manage User Modal */}
-      {selectedUser && (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4 font-sans">
- <div className="bg-white rounded-[16px] shadow-2xl w-full max-w-[420px] overflow-hidden animate-in fade-in zoom-in-95 duration-200 flex flex-col">
-            <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
-              <h3 className="text-[17px] font-bold text-slate-800">Manage Subscription</h3>
-              <button onClick={() => setSelectedUser(null)} className="text-slate-400 hover:text-slate-600 transition-colors text-xl leading-none font-light">×</button>
+            {selectedUser && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-[#000000]/70 backdrop-blur-sm p-4 font-sans">
+          <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-[#334155] border-t-[6px] border-t-blue-500 shadow-2xl w-full max-w-md animate-in fade-in zoom-in-95 duration-200 flex flex-col rounded-none">
+            <div className="px-6 py-4 border-b border-slate-200 dark:border-[#334155] flex items-center justify-between bg-white dark:bg-[#0f172a]/50">
+              <h3 className="text-[15px] font-bold text-slate-800 dark:text-white">Manage Subscription</h3>
+              <button onClick={() => setSelectedUser(null)} className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-300 hover:bg-slate-200 dark:bg-white/10 transition-colors rounded-none">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+              </button>
             </div>
             
-            <form onSubmit={handleUpdate} className="p-6 space-y-6">
+            <form onSubmit={handleUpdate} className="p-6 flex flex-col gap-5">
               <div>
-                <p className="text-[12px] font-semibold text-slate-500 mb-1">User</p>
-                <p className="text-[15px] font-bold text-slate-800 uppercase tracking-wide">{selectedUser.emp_Name} ({selectedUser.emp_Code})</p>
+                <p className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-1">User</p>
+                <p className="text-[15px] font-bold text-slate-800 dark:text-white">{selectedUser.emp_Name} <span className="text-gray-400 font-mono">({selectedUser.emp_Code})</span></p>
               </div>
 
               <div>
-                <label className="block text-[13px] font-semibold text-slate-600 mb-2">Extend By (Months)</label>
-                <input 
-                  type="number" 
+                <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Extend By (Months)</label>
+                <input
+                  type="number"
                   min="0"
-                  className="w-full px-4 py-3 border border-slate-200 rounded-[12px] text-[14px] focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
                   value={extendMonths}
                   onChange={e => setExtendMonths(parseInt(e.target.value) || 0)}
+                  className="w-full px-4 py-2.5 bg-slate-200/50 dark:bg-black/40 border border-slate-300 dark:border-white/10 text-slate-800 dark:text-white text-sm outline-none focus:border-[#0078d4] focus:bg-slate-100 dark:bg-white/5 transition-all rounded-none"
                 />
               </div>
 
               <div>
-                <label className="block text-[13px] font-semibold text-slate-600 mb-2">Status</label>
-                <div className="flex bg-slate-100/80 p-1.5 rounded-[14px] gap-1 relative border border-slate-200/60">
+                <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Status</label>
+                <div className="grid grid-cols-3 gap-2">
                   {['Trial', 'Active', 'Expired'].map(status => (
                     <button
                       key={status}
                       type="button"
                       onClick={() => setNewStatus(status)}
-                      className={`flex-1 py-2 text-[13px] font-bold rounded-[3px] transition-all duration-300 ${
-                        newStatus === status 
-                          ? status === 'Trial' ? 'bg-blue-500 text-white shadow-[0_2px_10px_rgba(59,130,246,0.3)]'
-                            : status === 'Active' ? 'bg-emerald-500 text-white shadow-[0_2px_10px_rgba(16,185,129,0.3)]'
-                            : 'bg-red-500 text-white shadow-[0_2px_10px_rgba(239,68,68,0.3)]'
-                          : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'
+                      className={`px-3 py-2 text-xs font-bold rounded-none transition-all ${
+                        newStatus === status
+                          ? status === 'Trial' ? 'bg-blue-600 text-white shadow-sm border border-blue-600'
+                            : status === 'Active' ? 'bg-emerald-600 text-white shadow-sm border border-emerald-600'
+                            : 'bg-red-600 text-white shadow-sm border border-red-600'
+                          : 'bg-slate-100 dark:bg-white/5 border border-white/20 text-gray-400 hover:bg-slate-200 dark:bg-white/10'
                       }`}
                     >
                       {status}
@@ -323,19 +374,20 @@ const SubscriptionAdminBoard = () => {
                 </div>
               </div>
 
-              <div className="pt-2 flex gap-3">
-                <button 
-                  type="button" 
+              <div className="mt-2 flex gap-3">
+                <button
+                  type="button"
                   onClick={() => setSelectedUser(null)}
-                  className="flex-1 py-3 px-4 bg-slate-100/80 text-slate-800 rounded-[12px] text-[14px] font-bold hover:bg-slate-200/80 transition-colors"
+                  className="flex-1 px-5 py-2.5 bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:bg-white/10 text-gray-300 text-xs font-bold uppercase tracking-wider border border-slate-300 dark:border-white/10 transition-all rounded-none"
                 >
                   Cancel
                 </button>
-                <button 
+                <button
                   type="submit"
-                  className="flex-1 py-3 px-4 bg-[#4f46e5] text-white rounded-[12px] text-[14px] font-bold hover:bg-[#4338ca] transition-colors"
+                  disabled={updatingUser}
+                  className="flex-1 px-5 py-2.5 bg-[#0078d4] hover:bg-[#005a9e] text-slate-800 dark:text-white text-xs font-bold uppercase tracking-wider shadow-md transition-all rounded-none flex items-center justify-center gap-2 disabled:opacity-50"
                 >
-                  Save Changes
+                  {updatingUser ? <><Loader2 className="animate-spin" size={14} /> Saving...</> : 'Save Changes'}
                 </button>
               </div>
             </form>
@@ -343,7 +395,19 @@ const SubscriptionAdminBoard = () => {
         </div>
       )}
 
-      <PlanEditorModal 
+      <ConfirmModal
+        isOpen={deleteConfirm.isOpen}
+        onClose={() => setDeleteConfirm({ isOpen: false, id: null, loading: false })}
+        onConfirm={executeDeletePlan}
+        title="Delete Pricing Plan"
+        message="Are you sure you want to permanently delete this pricing plan? This action cannot be undone."
+        loading={deleteConfirm.loading}
+        confirmText="Delete"
+        cancelText="Cancel"
+        variant="danger"
+      />
+
+      <PlanEditorModal
         isOpen={showPlanEditor}
         onClose={() => setShowPlanEditor(false)}
         editingPlan={editingPlan}
@@ -354,3 +418,7 @@ const SubscriptionAdminBoard = () => {
 };
 
 export default SubscriptionAdminBoard;
+
+
+
+

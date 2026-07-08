@@ -66,7 +66,8 @@ const AdminCompanyReportsBoard = ({ hierarchy, allEmployees }) => {
     }, [compSearch, companies]);
 
     const handleOpenReport = (reportId) => {
-        setActiveReport(reportId);
+        const url = `/report-viewer?title=${encodeURIComponent(reportId)}&companyCode=${encodeURIComponent(selectedCompany)}&empCode=${encodeURIComponent(selectedEmployee)}`;
+        window.open(url, '_blank');
     };
 
     const handleCloseReport = () => {
@@ -85,18 +86,15 @@ const AdminCompanyReportsBoard = ({ hierarchy, allEmployees }) => {
         }
     }, [selectedEmployee, selectedCompany]);
 
-    const handleToggleHide = (e, reportId, reportName) => {
+    const handleToggleHideClick = (e, reportId, reportName) => {
         e.stopPropagation();
-        setAuthModalConfig({
-            isOpen: true,
-            pendingReport: { reportId, reportName }
-        });
+        setAuthModalConfig({ isOpen: true, pendingReport: { id: reportId, name: reportName } });
     };
 
     const executeToggleVisibility = async () => {
         if (!authModalConfig.pendingReport) return;
-        const { reportId, reportName } = authModalConfig.pendingReport;
-
+        const { id: reportId, name: reportName } = authModalConfig.pendingReport;
+        
         try {
             const res = await api.post('/SuperAdmin/reports/toggle-visibility', {
                 empCode: selectedEmployee,
@@ -107,7 +105,7 @@ const AdminCompanyReportsBoard = ({ hierarchy, allEmployees }) => {
                 setHiddenReports(prev => [...prev, reportId]);
                 showSuccessToast(`Report '${reportName}' is now hidden`);
             } else {
-                setHiddenReports(prev => prev.filter(id => id !== reportId));
+                setHiddenReports(prev => prev.filter(id => id !== reportId && id !== reportName));
                 showSuccessToast(`Report '${reportName}' is now visible`);
             }
         } catch (err) {
@@ -123,26 +121,26 @@ const AdminCompanyReportsBoard = ({ hierarchy, allEmployees }) => {
     return (
         <div className="flex flex-col gap-6 animate-in fade-in zoom-in-95 duration-200">
             {/* Header */}
- <div className="bg-white rounded-sm shadow-sm p-6">
+            <div className="bg-white dark:bg-[#0f172a]/50 border border-slate-200 dark:border-[#334155] rounded-none shadow-sm p-6 mb-6">
                 <div className="flex items-center gap-3 mb-6">
-                    <div className="w-10 h-10 rounded-[3px] bg-[#00acee]/10 flex items-center justify-center">
-                        <FileText className="w-5 h-5 text-[#00acee]" />
+                    <div className="w-10 h-10 rounded-none bg-blue-500/20 flex items-center justify-center">
+                        <FileText className="w-5 h-5 text-blue-300" />
                     </div>
                     <div>
-                        <h2 className="text-[15px] font-bold text-slate-800">Company Reports</h2>
-                        <p className="text-[11px] text-slate-500 font-medium">Select an employee and company to view available reports</p>
+                        <h2 className="text-[15px] font-bold text-slate-800 dark:text-white">Company Reports</h2>
+                        <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Select an employee and company to view available reports</p>
                     </div>
                 </div>
 
-                <div className="bg-slate-50 p-4 border border-slate-200/60">
- <div className="bg-white p-4 rounded-sm flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
+                <div className="bg-white dark:bg-[#0f172a]/50 p-4 border border-slate-200 dark:border-[#334155]">
+                    <div className="bg-white dark:bg-[#0f172a]/50 border border-slate-200 dark:border-[#334155] p-4 rounded-none flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
                         <div className="flex flex-col w-full sm:w-auto">
-                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Selection Target</span>
+                            <span className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1">Selection Target</span>
                             <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
-                                <span className="text-sm font-bold text-slate-700">
+                                <span className="text-sm font-bold text-slate-800 dark:text-gray-200">
                                     {selectedEmployee ? selectedEmployeeName : 'No Employee Selected'}
                                 </span>
-                                <span className="hidden sm:inline text-slate-300">/</span>
+                                <span className="hidden sm:inline text-slate-500">/</span>
                                 <span className="text-sm font-bold text-[#00acee]">
                                     {selectedCompany ? selectedCompanyName : 'No Company Selected'}
                                 </span>
@@ -151,7 +149,7 @@ const AdminCompanyReportsBoard = ({ hierarchy, allEmployees }) => {
                         <div className="flex gap-2 w-full sm:w-auto">
                             <button
                                 onClick={() => { setShowEmpModal(true); setEmpSearch(''); setEmpSearchTriggered(false); }}
-                                className="flex-1 sm:flex-none px-5 py-2.5 bg-slate-50 border border-slate-200 hover:border-[#00acee] hover:text-[#00acee] text-slate-600 text-xs font-bold uppercase tracking-wider rounded-[3px] shadow-sm transition-all flex items-center justify-center gap-2"
+                                className="flex-1 sm:flex-none px-5 py-2.5 bg-blue-600/20 border border-blue-500/50 hover:bg-blue-600/40 text-blue-400 text-xs font-bold uppercase tracking-wider rounded-none transition-all flex items-center justify-center gap-2"
                             >
                                 <Users size={14} />
                                 Employee
@@ -159,7 +157,7 @@ const AdminCompanyReportsBoard = ({ hierarchy, allEmployees }) => {
                             <button
                                 onClick={() => { setShowCompModal(true); setCompSearch(''); setCompSearchTriggered(false); }}
                                 disabled={!selectedEmployee}
-                                className="flex-1 sm:flex-none px-5 py-2.5 bg-slate-50 border border-slate-200 hover:border-[#00acee] hover:text-[#00acee] text-slate-600 text-xs font-bold uppercase tracking-wider rounded-[3px] shadow-sm transition-all flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
+                                className="flex-1 sm:flex-none px-5 py-2.5 bg-emerald-600/20 border border-emerald-500/50 hover:bg-emerald-600/40 text-emerald-400 text-xs font-bold uppercase tracking-wider rounded-none transition-all flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
                             >
                                 <Building2 size={14} />
                                 Company
@@ -173,17 +171,17 @@ const AdminCompanyReportsBoard = ({ hierarchy, allEmployees }) => {
             {selectedCompany && (
                 <div className="space-y-8">
                     {/* Search Bar */}
-                    <div className="bg-slate-50/50 p-3 rounded-[3px] border border-slate-200/60 mb-6 flex items-center">
-                        <Search className="text-slate-400 ml-2 w-5 h-5 shrink-0" />
+                    <div className="bg-white dark:bg-[#0f172a]/50 p-3 rounded-none border border-slate-200 dark:border-[#334155] mb-6 flex items-center">
+                        <Search className="text-slate-500 ml-2 w-5 h-5 shrink-0" />
                         <input
                             type="text"
                             placeholder="Search across all reports..."
                             value={globalSearch}
                             onChange={(e) => setGlobalSearch(e.target.value)}
-                            className="bg-transparent border-none outline-none text-sm font-medium text-slate-700 w-full ml-3 placeholder:text-slate-400"
+                            className="bg-transparent border-none outline-none text-sm font-medium text-slate-800 dark:text-white w-full ml-3 placeholder:text-slate-600"
                         />
                         {globalSearch && (
-                            <button onClick={() => setGlobalSearch('')} className="p-1 text-slate-400 hover:text-slate-600 transition-colors">
+                            <button onClick={() => setGlobalSearch('')} className="p-1 text-slate-500 hover:text-slate-800 dark:text-white transition-colors">
                                 <X className="w-4 h-4" />
                             </button>
                         )}
@@ -198,39 +196,40 @@ const AdminCompanyReportsBoard = ({ hierarchy, allEmployees }) => {
                         return (
                             <div key={gIdx}>
                                 <div className="flex items-center gap-3 mb-4">
-                                    <div className={`w-8 h-8 rounded-[3px] bg-blue-50 flex items-center justify-center`}>
-                                        <CategoryIcon size={16} className="text-blue-600" />
+                                    <div className={`w-8 h-8 rounded-none bg-blue-500/20 flex items-center justify-center`}>
+                                        <CategoryIcon size={16} className="text-blue-400" />
                                     </div>
-                                    <h3 className="text-sm font-bold text-slate-700 uppercase tracking-widest">{group.title}</h3>
+                                    <h3 className="text-sm font-bold text-slate-600 dark:text-slate-300 uppercase tracking-widest">{group.title}</h3>
                                 </div>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                                <div className="flex flex-col gap-2">
                                     {filteredItems.map((item, idx) => {
                                         const itemId = item.toLowerCase().replace(/ /g, '-').replace(/\//g, '-');
                                         const isHidden = hiddenReports.includes(itemId) || hiddenReports.includes(item);
                                         return (
-                                            <div key={idx} className="relative group">
-                                                <button
-                                                    onClick={() => handleOpenReport(item)}
-                                                    className={`w-full bg-white shadow-sm border border-slate-200/50 hover:border-slate-400 p-5 transition-all text-left hover:shadow-lg active:scale-[0.98] ${isHidden ? 'opacity-50 grayscale' : ''}`}
-                                                >
-                                                    <div className={`w-10 h-10 rounded-[3px] bg-slate-50 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform`}>
-                                                        <FileText className={`w-5 h-5 text-slate-500`} />
+                                            <div key={idx} className={`bg-white dark:bg-[#0f172a]/50 border border-slate-200 dark:border-[#334155] p-4 hover:bg-slate-200 dark:bg-white/10 transition-colors flex items-center justify-between group ${isHidden ? 'opacity-50 grayscale' : ''}`}>
+                                                <div className="flex items-center gap-4">
+                                                    <div className="w-10 h-10 flex items-center justify-center rounded-none bg-white dark:bg-[#0f172a]/50 border border-slate-200 dark:border-[#334155]">
+                                                        <FileText className="w-5 h-5 text-slate-500 dark:text-slate-400" />
                                                     </div>
-                                                    <h4 className="text-[13px] font-bold text-slate-900 mb-1.5 line-clamp-1" title={item}>{item}</h4>
-                                                    <p className="text-[11px] text-slate-500 font-medium leading-relaxed line-clamp-2">Detailed insights and records for {item}.</p>
-                                                    <div className="mt-3 flex items-center gap-1.5 text-[#00acee] text-[10px] font-bold uppercase tracking-wider opacity-0 group-hover:opacity-100 transition-all">
-                                                        <Eye className="w-3 h-3" />
-                                                        View Report
+                                                    <div>
+                                                        <h4 className="text-[13px] font-bold text-slate-800 dark:text-white mb-0.5">{item}</h4>
+                                                        <p className="text-[11px] text-slate-500 font-medium">Detailed insights and records for {item}.</p>
                                                     </div>
-                                                </button>
-                                                
-                                                <button
-                                                    onClick={(e) => handleToggleHide(e, itemId, item)}
-                                                    title={isHidden ? "Show Report" : "Hide Report"}
-                                                    className={`absolute top-3 right-3 p-2 rounded-[3px] transition-all opacity-0 group-hover:opacity-100 ${isHidden ? 'bg-red-50 text-red-500 hover:bg-red-100' : 'bg-slate-50 text-slate-400 hover:text-[#00acee] hover:bg-[#00acee]/10'}`}
-                                                >
-                                                    {isHidden ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                                                </button>
+                                                </div>
+                                                <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                    <button
+                                                        onClick={() => handleOpenReport(item)}
+                                                        className="px-4 py-2 text-[12px] font-bold bg-[#4a6cf7] hover:bg-[#3d59cc] text-slate-800 dark:text-white rounded-none transition-all flex items-center justify-center gap-1.5 min-w-[90px]"
+                                                    >
+                                                        <Eye size={13} /> View Report
+                                                    </button>
+                                                    <button
+                                                        onClick={(e) => handleToggleHideClick(e, itemId, item)}
+                                                        className={`px-4 py-2 text-[12px] font-bold rounded-none transition-all flex items-center justify-center gap-1.5 min-w-[90px] ${isHidden ? 'bg-[#05b171] hover:bg-[#04945e] text-slate-800 dark:text-white' : 'bg-[#e13c3c] hover:bg-[#c83232] text-slate-800 dark:text-white'}`}
+                                                    >
+                                                        {isHidden ? <><Eye size={13} /> Show</> : <><EyeOff size={13} /> Hide</>}
+                                                    </button>
+                                                </div>
                                             </div>
                                         );
                                     })}
@@ -242,20 +241,20 @@ const AdminCompanyReportsBoard = ({ hierarchy, allEmployees }) => {
             )}
 
             {selectedEmployee && !selectedCompany && (
-                <div className="bg-slate-50 border border-dashed border-slate-200 p-12 flex flex-col items-center justify-center text-center">
-                    <Building2 className="w-12 h-12 text-slate-300 mb-3" />
-                    <h3 className="text-[15px] font-bold text-slate-600">Select a Company</h3>
-                    <p className="text-[13px] text-slate-400 mt-1 max-w-md">
+                <div className="bg-white dark:bg-[#0f172a]/50 border border-dashed border-slate-200 dark:border-[#334155] p-12 flex flex-col items-center justify-center text-center">
+                    <Building2 className="w-12 h-12 text-slate-500 mb-3" />
+                    <h3 className="text-[15px] font-bold text-slate-600 dark:text-slate-300">Select a Company</h3>
+                    <p className="text-[13px] text-slate-500 mt-1 max-w-md">
                         Choose a company to view available reports for {selectedEmployeeName}.
                     </p>
                 </div>
             )}
 
             {!selectedEmployee && (
-                <div className="bg-slate-50 border border-dashed border-slate-200 p-12 flex flex-col items-center justify-center text-center">
-                    <Users className="w-12 h-12 text-slate-300 mb-3" />
-                    <h3 className="text-[15px] font-bold text-slate-600">Select an Employee</h3>
-                    <p className="text-[13px] text-slate-400 mt-1 max-w-md">
+                <div className="bg-white dark:bg-[#0f172a]/50 border border-dashed border-slate-200 dark:border-[#334155] p-12 flex flex-col items-center justify-center text-center">
+                    <Users className="w-12 h-12 text-slate-500 mb-3" />
+                    <h3 className="text-[15px] font-bold text-slate-600 dark:text-slate-300">Select an Employee</h3>
+                    <p className="text-[13px] text-slate-500 mt-1 max-w-md">
                         Choose an employee to see their associated companies and available reports.
                     </p>
                 </div>
@@ -263,11 +262,11 @@ const AdminCompanyReportsBoard = ({ hierarchy, allEmployees }) => {
 
             {/* Employee Selection Modal */}
             {showEmpModal && (
-                <div className="fixed inset-0 z-[200] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4">
- <div className="bg-white rounded-sm shadow-2xl w-full max-w-md overflow-visible animate-in fade-in zoom-in-95 duration-200 flex flex-col">
-                        <div className="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50">
-                            <h3 className="text-[13px] font-bold tracking-wide uppercase text-slate-900">Select Employee</h3>
-                            <button onClick={() => setShowEmpModal(false)} className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-200 transition-colors">
+                <div className="fixed inset-0 z-[200] flex items-center justify-center bg-slate-100 dark:bg-slate-900/60 backdrop-blur-sm p-4">
+ <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-[#334155] rounded-none shadow-2xl w-full max-w-md overflow-visible animate-in fade-in zoom-in-95 duration-200 flex flex-col">
+                        <div className="p-5 border-b border-slate-200 dark:border-[#334155] flex items-center justify-between bg-white dark:bg-[#0f172a]/50">
+                            <h3 className="text-[13px] font-bold tracking-wide uppercase text-slate-800 dark:text-white">Select Employee</h3>
+                            <button onClick={() => setShowEmpModal(false)} className="w-8 h-8 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:text-white hover:bg-slate-200 dark:bg-white/10 transition-colors rounded-none">
                                 <X size={28} />
                             </button>
                         </div>
@@ -275,27 +274,27 @@ const AdminCompanyReportsBoard = ({ hierarchy, allEmployees }) => {
                             <div className="flex flex-col gap-4 relative z-20">
                                 <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest">Search & Select Employee</label>
                                 <div className="relative">
-                                    <Search className="absolute left-3 top-3.5 text-slate-400 w-4 h-4" />
+                                    <Search className="absolute left-3 top-3.5 text-slate-500 dark:text-slate-400 w-4 h-4" />
                                     <input
                                         type="text"
                                         placeholder="Search Employee..."
                                         value={empSearch}
                                         onChange={e => { setEmpSearch(e.target.value); setEmpSearchTriggered(false); }}
                                         onKeyDown={e => e.key === 'Enter' && setEmpSearchTriggered(true)}
-                                        className="w-full pl-9 pr-24 p-3 border border-slate-300 rounded-[3px] text-sm bg-white font-bold text-slate-700 outline-none focus:border-[#00acee] focus:ring-1 focus:ring-[#00acee] transition-all"
+                                        className="w-full pl-9 pr-24 p-3 border border-slate-200 dark:border-[#334155] rounded-none text-sm bg-white dark:bg-[#0f172a]/50 font-bold text-slate-800 dark:text-white outline-none focus:border-[#00acee] focus:bg-slate-200 dark:bg-white/10 transition-all placeholder:text-slate-600"
                                         autoFocus
                                     />
                                     <button
                                         onClick={() => setEmpSearchTriggered(true)}
-                                        className="absolute right-1.5 top-1.5 bottom-1.5 px-4 bg-[#00acee] hover:bg-[#009adb] text-white text-[11px] font-bold uppercase tracking-wider rounded-[3px] transition-colors shadow-sm"
+                                        className="absolute right-1.5 top-1.5 bottom-1.5 px-4 bg-emerald-600/20 hover:bg-emerald-600/40 border border-emerald-500/50 text-emerald-400 text-[11px] font-bold uppercase tracking-wider rounded-none transition-colors shadow-sm"
                                     >
                                         Load
                                     </button>
                                     {empSearchTriggered && (
- <div className="absolute top-[100%] mt-2 left-0 w-full z-50 bg-white rounded-sm shadow-2xl max-h-[250px] overflow-y-auto">
+ <div className="absolute top-[100%] mt-2 left-0 w-full z-50 bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-[#334155] rounded-none shadow-2xl max-h-[250px] overflow-y-auto">
                                             <div
                                                 onClick={() => { setSelectedEmployee(''); setSelectedCompany(''); setShowEmpModal(false); setEmpSearch(''); setEmpSearchTriggered(false); }}
-                                                className="p-3 border-b border-slate-100 text-sm cursor-pointer transition-all bg-[#00acee]/5 text-[#00acee] font-bold hover:bg-[#00acee]/10"
+                                                className="p-3 border-b border-slate-200 dark:border-[#334155] text-sm cursor-pointer transition-all bg-blue-500/10 text-blue-400 font-bold hover:bg-blue-500/20"
                                             >
                                                 -- All Employees (Global) --
                                             </div>
@@ -315,14 +314,14 @@ const AdminCompanyReportsBoard = ({ hierarchy, allEmployees }) => {
                                                             if (companies.length === 1) setSelectedCompany(companies[0].code);
                                                             else setSelectedCompany('');
                                                         }}
-                                                        className="p-3 border-b border-slate-100 text-sm cursor-pointer transition-all text-slate-600 hover:bg-slate-50 font-medium"
+                                                        className="p-3 border-b border-slate-200 dark:border-[#334155] text-sm cursor-pointer transition-all text-slate-600 dark:text-slate-300 hover:bg-white dark:bg-[#0f172a]/50 font-medium hover:text-slate-800 dark:text-white"
                                                     >
-                                                        {name} <span className="text-slate-400 font-normal ml-1">[{roleName}]</span>
+                                                        {name} <span className="text-slate-500 font-normal ml-1">[{roleName}]</span>
                                                     </div>
                                                 );
                                             })}
                                             {filteredEmployees.length === 0 && (
-                                                <div className="p-6 text-center text-sm text-slate-400">No employees found.</div>
+                                                <div className="p-6 text-center text-sm text-slate-500">No employees found.</div>
                                             )}
                                         </div>
                                     )}
@@ -335,11 +334,11 @@ const AdminCompanyReportsBoard = ({ hierarchy, allEmployees }) => {
 
             {/* Company Selection Modal */}
             {showCompModal && (
-                <div className="fixed inset-0 z-[200] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4">
-                    <div className="bg-white rounded-sm shadow-2xl w-full max-w-md overflow-visible animate-in fade-in zoom-in-95 duration-200 flex flex-col">
-                        <div className="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50 rounded-t-2xl">
-                            <h3 className="text-sm font-bold tracking-wide uppercase text-slate-900">Select Company</h3>
-                            <button onClick={() => setShowCompModal(false)} className="w-8 h-8 flex items-center justify-center rounded-[3px] text-slate-400 hover:text-slate-700 hover:bg-slate-200 transition-colors">
+                <div className="fixed inset-0 z-[200] flex items-center justify-center bg-slate-100 dark:bg-slate-900/60 backdrop-blur-sm p-4">
+                    <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-[#334155] rounded-none shadow-2xl w-full max-w-md overflow-visible animate-in fade-in zoom-in-95 duration-200 flex flex-col">
+                        <div className="p-5 border-b border-slate-200 dark:border-[#334155] flex items-center justify-between bg-white dark:bg-[#0f172a]/50">
+                            <h3 className="text-[13px] font-bold tracking-wide uppercase text-slate-800 dark:text-white">Select Company</h3>
+                            <button onClick={() => setShowCompModal(false)} className="w-8 h-8 flex items-center justify-center rounded-none text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:text-white hover:bg-slate-200 dark:bg-white/10 transition-colors">
                                 <X size={28} />
                             </button>
                         </div>
@@ -347,27 +346,27 @@ const AdminCompanyReportsBoard = ({ hierarchy, allEmployees }) => {
                             <div className="flex flex-col gap-4 relative z-20">
                                 <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest">Search & Select Company</label>
                                 <div className="relative">
-                                    <Search className="absolute left-3 top-3.5 text-slate-400 w-4 h-4" />
+                                    <Search className="absolute left-3 top-3.5 text-slate-500 dark:text-slate-400 w-4 h-4" />
                                     <input
                                         type="text"
                                         placeholder="Search Company..."
                                         value={compSearch}
                                         onChange={e => { setCompSearch(e.target.value); setCompSearchTriggered(false); }}
                                         onKeyDown={e => e.key === 'Enter' && setCompSearchTriggered(true)}
-                                        className="w-full pl-9 pr-24 p-3 border border-slate-300 rounded-[3px] text-sm bg-white font-bold text-slate-700 outline-none focus:border-[#00acee] focus:ring-1 focus:ring-[#00acee] transition-all"
+                                        className="w-full pl-9 pr-24 p-3 border border-slate-200 dark:border-[#334155] rounded-none text-sm bg-white dark:bg-[#0f172a]/50 font-bold text-slate-800 dark:text-white outline-none focus:border-[#00acee] focus:bg-slate-200 dark:bg-white/10 transition-all placeholder:text-slate-600"
                                         autoFocus
                                     />
                                     <button
                                         onClick={() => setCompSearchTriggered(true)}
-                                        className="absolute right-1.5 top-1.5 bottom-1.5 px-4 bg-[#00acee] hover:bg-[#009adb] text-white text-[11px] font-bold uppercase tracking-wider rounded-[3px] transition-colors shadow-sm"
+                                        className="absolute right-1.5 top-1.5 bottom-1.5 px-4 bg-emerald-600/20 hover:bg-emerald-600/40 border border-emerald-500/50 text-emerald-400 text-[11px] font-bold uppercase tracking-wider rounded-none transition-colors shadow-sm"
                                     >
                                         Load
                                     </button>
                                     {compSearchTriggered && (
-                                        <div className="absolute top-[100%] mt-2 left-0 w-full z-50 bg-white rounded-sm shadow-2xl max-h-[250px] overflow-y-auto">
+                                        <div className="absolute top-[100%] mt-2 left-0 w-full z-50 bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-[#334155] rounded-none shadow-2xl max-h-[250px] overflow-y-auto">
                                             <div
                                                 onClick={() => { setSelectedCompany(''); setShowCompModal(false); setCompSearch(''); setCompSearchTriggered(false); }}
-                                                className="p-3 border-b border-slate-100 text-sm cursor-pointer transition-all bg-[#00acee]/5 text-[#00acee] font-bold hover:bg-[#00acee]/10"
+                                                className="p-3 border-b border-slate-200 dark:border-[#334155] text-sm cursor-pointer transition-all bg-blue-500/10 text-blue-400 font-bold hover:bg-blue-500/20"
                                             >
                                                 -- All Companies (Global) --
                                             </div>
@@ -375,13 +374,13 @@ const AdminCompanyReportsBoard = ({ hierarchy, allEmployees }) => {
                                                 <div
                                                     key={c.code}
                                                     onClick={() => { setSelectedCompany(c.code); setShowCompModal(false); setCompSearch(''); setCompSearchTriggered(false); }}
-                                                    className="p-3 border-b border-slate-100 text-sm cursor-pointer transition-all text-slate-600 hover:bg-slate-50 font-medium"
+                                                    className="p-3 border-b border-slate-200 dark:border-[#334155] text-sm cursor-pointer transition-all text-slate-600 dark:text-slate-300 hover:bg-white dark:bg-[#0f172a]/50 font-medium hover:text-slate-800 dark:text-white"
                                                 >
                                                     {c.name}
                                                 </div>
                                             ))}
                                             {filteredCompanies.length === 0 && (
-                                                <div className="p-6 text-center text-sm text-slate-400">
+                                                <div className="p-6 text-center text-sm text-slate-500">
                                                     {companies.length === 0 ? 'No companies available for this employee.' : 'No companies match your search.'}
                                                 </div>
                                             )}
@@ -393,26 +392,20 @@ const AdminCompanyReportsBoard = ({ hierarchy, allEmployees }) => {
                     </div>
                 </div>
             )}
-            {activeReport && (
-                <ReportTemplate
-                    companyName={selectedCompanyName}
-                    title={activeReport}
-                    subtitle={`As of ${new Date().toLocaleDateString()}`}
-                    onClose={handleCloseReport}
-                    onSwitchReport={setActiveReport}
-                    companyCode={selectedCompany}
-                    empCode={selectedEmployee}
-                    roleId="1"
-                />
-            )}
-
-            <SystemUpdateAuthModal
-                isOpen={authModalConfig.isOpen}
-                onClose={() => setAuthModalConfig({ isOpen: false, pendingReport: null })}
-                onVerified={executeToggleVisibility}
+            <SystemUpdateAuthModal 
+                isOpen={authModalConfig.isOpen} 
+                onClose={() => setAuthModalConfig({ isOpen: false, pendingReport: null })} 
+                onVerified={executeToggleVisibility} 
             />
+
         </div>
     );
 };
 
 export default AdminCompanyReportsBoard;
+
+
+
+
+
+

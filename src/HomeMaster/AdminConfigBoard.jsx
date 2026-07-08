@@ -220,9 +220,9 @@ const AdminConfigBoard = ({ hierarchy, allEmployees }) => {
     return (
         <div className="flex flex-col gap-6 animate-in fade-in zoom-in-95 duration-200">
             {/* Header */}
-            <div className="bg-white rounded-sm shadow-sm p-6">
+            <div className="bg-white rounded-none-sm shadow-sm p-6">
                 <div className="flex items-center gap-3 mb-6">
-                    <div className="w-10 h-10 rounded-[3px] bg-[#00acee]/10 flex items-center justify-center">
+                    <div className="w-10 h-10 rounded-none bg-[#00acee]/10 flex items-center justify-center">
                         <Settings className="w-5 h-5 text-[#00acee]" />
                     </div>
                     <div>
@@ -232,19 +232,19 @@ const AdminConfigBoard = ({ hierarchy, allEmployees }) => {
                 </div>
 
                 <div className="bg-slate-50 p-4 border border-slate-200/60">
-                    <div className="bg-white p-4 rounded-sm flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
+                    <div className="bg-white p-4 rounded-none-sm flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
                         <div className="flex flex-col w-full sm:w-auto">
-                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Selection Target</span>
+                            <span className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1">Selection Target</span>
                             <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
                                 <span className="text-sm font-bold text-slate-700">
                                     {selectedEmployee ? selectedEmployeeName : 'No Employee Selected'}
                                 </span>
-                                <span className="hidden sm:inline text-slate-300">/</span>
+                                <span className="hidden sm:inline text-slate-600 dark:text-slate-300">/</span>
                                 <span className="text-sm font-bold text-[#00acee]">
                                     {selectedCompany ? selectedCompanyName : 'No Company Selected'}
                                 </span>
                                 {selectedEmployee && selectedCompany && (
-                                    <span className="ml-2 px-2 py-0.5 bg-red-50 text-red-600 border border-red-200 rounded text-[10px] font-bold uppercase tracking-wider">
+                                    <span className="ml-2 px-2 py-0.5 bg-red-50 text-red-600 border border-red-200 rounded-none text-[10px] font-bold uppercase tracking-wider">
                                         {lockedCount} / {totalModules} Locked
                                     </span>
                                 )}
@@ -253,14 +253,14 @@ const AdminConfigBoard = ({ hierarchy, allEmployees }) => {
                         <div className="flex gap-2 w-full sm:w-auto">
                             <button
                                 onClick={() => { setShowEmpModal(true); setEmpSearch(''); setEmpSearchTriggered(false); }}
-                                className="flex-1 sm:flex-none px-5 py-2.5 bg-slate-50 border border-slate-200 hover:border-[#00acee] hover:text-[#00acee] text-slate-600 text-xs font-bold uppercase tracking-wider rounded-[3px] shadow-sm transition-all flex items-center justify-center gap-2"
+                                className="flex-1 sm:flex-none px-5 py-2.5 bg-slate-50 border border-slate-200 hover:border-[#00acee] hover:text-[#00acee] text-slate-600 text-xs font-bold uppercase tracking-wider rounded-none shadow-sm transition-all flex items-center justify-center gap-2"
                             >
                                 <Users size={14} /> Employee
                             </button>
                             <button
                                 onClick={() => { setShowCompModal(true); setCompSearch(''); setCompSearchTriggered(false); }}
                                 disabled={!selectedEmployee}
-                                className="flex-1 sm:flex-none px-5 py-2.5 bg-slate-50 border border-slate-200 hover:border-[#00acee] hover:text-[#00acee] text-slate-600 text-xs font-bold uppercase tracking-wider rounded-[3px] shadow-sm transition-all flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
+                                className="flex-1 sm:flex-none px-5 py-2.5 bg-slate-50 border border-slate-200 hover:border-[#00acee] hover:text-[#00acee] text-slate-600 text-xs font-bold uppercase tracking-wider rounded-none shadow-sm transition-all flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
                             >
                                 <Building2 size={14} /> Company
                             </button>
@@ -273,17 +273,17 @@ const AdminConfigBoard = ({ hierarchy, allEmployees }) => {
             {selectedCompany && (
                 <div className="space-y-8">
                     {/* Search */}
-                    <div className="bg-slate-50/50 p-3 rounded-[3px] border border-slate-200/60 flex items-center">
-                        <Search className="text-slate-400 ml-2 w-5 h-5 shrink-0" />
+                    <div className="bg-slate-50/50 p-3 rounded-none border border-slate-200/60 flex items-center">
+                        <Search className="text-slate-500 dark:text-slate-400 ml-2 w-5 h-5 shrink-0" />
                         <input
                             type="text"
                             placeholder="Search across all modules..."
                             value={globalSearch}
                             onChange={e => setGlobalSearch(e.target.value)}
-                            className="bg-transparent border-none outline-none text-sm font-medium text-slate-700 w-full ml-3 placeholder:text-slate-400"
+                            className="bg-transparent border-none outline-none text-sm font-medium text-slate-700 w-full ml-3 placeholder:text-slate-500 dark:text-slate-400"
                         />
                         {globalSearch && (
-                            <button onClick={() => setGlobalSearch('')} className="p-1 text-slate-400 hover:text-slate-600 transition-colors">
+                            <button onClick={() => setGlobalSearch('')} className="p-1 text-slate-500 dark:text-slate-400 hover:text-slate-600 transition-colors">
                                 <X className="w-4 h-4" />
                             </button>
                         )}
@@ -304,11 +304,11 @@ const AdminConfigBoard = ({ hierarchy, allEmployees }) => {
                             return (
                                 <div key={gIdx}>
                                     <div className="flex items-center gap-3 mb-4">
-                                        <div className={`w-8 h-8 rounded-[3px] ${colors.bg} flex items-center justify-center`}>
+                                        <div className={`w-8 h-8 rounded-none ${colors.bg} flex items-center justify-center`}>
                                             <Shield size={16} className={colors.icon} />
                                         </div>
                                         <h3 className="text-sm font-bold text-slate-700 uppercase tracking-widest">{group.group}</h3>
-                                        <span className={`ml-1 px-2 py-0.5 rounded text-[10px] font-bold ${colors.badge}`}>
+                                        <span className={`ml-1 px-2 py-0.5 rounded-none text-[10px] font-bold ${colors.badge}`}>
                                             {filteredItems.filter(i => lockedModules.includes(i.id)).length} locked
                                         </span>
                                     </div>
@@ -318,7 +318,7 @@ const AdminConfigBoard = ({ hierarchy, allEmployees }) => {
                                             return (
                                                 <div key={idx} className="relative group">
                                                     <div className={`w-full bg-white shadow-sm border p-5 transition-all ${isLocked ? 'border-red-200 opacity-60 grayscale' : 'border-slate-200/50 hover:border-slate-400 hover:shadow-lg'}`}>
-                                                        <div className={`w-10 h-10 rounded-[3px] flex items-center justify-center mb-3 ${isLocked ? 'bg-red-50' : `${colors.bg} group-hover:scale-110 transition-transform`}`}>
+                                                        <div className={`w-10 h-10 rounded-none flex items-center justify-center mb-3 ${isLocked ? 'bg-red-50' : `${colors.bg} group-hover:scale-110 transition-transform`}`}>
                                                             {isLocked
                                                                 ? <Lock className="w-5 h-5 text-red-500" />
                                                                 : <Unlock className={`w-5 h-5 ${colors.icon}`} />
@@ -338,7 +338,7 @@ const AdminConfigBoard = ({ hierarchy, allEmployees }) => {
                                                     <button
                                                         onClick={e => handleToggleLock(e, item.id, item.label)}
                                                         title={isLocked ? 'Unlock Module' : 'Lock Module'}
-                                                        className={`absolute top-3 right-3 p-2 rounded-[3px] transition-all opacity-0 group-hover:opacity-100 ${isLocked ? 'bg-emerald-50 text-emerald-500 hover:bg-emerald-100' : 'bg-slate-50 text-slate-400 hover:text-red-500 hover:bg-red-50'}`}
+                                                        className={`absolute top-3 right-3 p-2 rounded-none transition-all opacity-0 group-hover:opacity-100 ${isLocked ? 'bg-emerald-50 text-emerald-500 hover:bg-emerald-100' : 'bg-slate-50 text-slate-500 dark:text-slate-400 hover:text-red-500 hover:bg-red-50'}`}
                                                     >
                                                         {isLocked ? <Unlock className="w-4 h-4" /> : <Lock className="w-4 h-4" />}
                                                     </button>
@@ -355,9 +355,9 @@ const AdminConfigBoard = ({ hierarchy, allEmployees }) => {
 
             {selectedEmployee && !selectedCompany && (
                 <div className="bg-slate-50 border border-dashed border-slate-200 p-12 flex flex-col items-center justify-center text-center">
-                    <Building2 className="w-12 h-12 text-slate-300 mb-3" />
+                    <Building2 className="w-12 h-12 text-slate-600 dark:text-slate-300 mb-3" />
                     <h3 className="text-[15px] font-bold text-slate-600">Select a Company</h3>
-                    <p className="text-[13px] text-slate-400 mt-1 max-w-md">
+                    <p className="text-[13px] text-slate-500 dark:text-slate-400 mt-1 max-w-md">
                         Choose a company to configure module access for {selectedEmployeeName}.
                     </p>
                 </div>
@@ -365,9 +365,9 @@ const AdminConfigBoard = ({ hierarchy, allEmployees }) => {
 
             {!selectedEmployee && (
                 <div className="bg-slate-50 border border-dashed border-slate-200 p-12 flex flex-col items-center justify-center text-center">
-                    <Users className="w-12 h-12 text-slate-300 mb-3" />
+                    <Users className="w-12 h-12 text-slate-600 dark:text-slate-300 mb-3" />
                     <h3 className="text-[15px] font-bold text-slate-600">Select an Employee</h3>
-                    <p className="text-[13px] text-slate-400 mt-1 max-w-md">
+                    <p className="text-[13px] text-slate-500 dark:text-slate-400 mt-1 max-w-md">
                         Choose an employee to configure their module access permissions.
                     </p>
                 </div>
@@ -375,11 +375,11 @@ const AdminConfigBoard = ({ hierarchy, allEmployees }) => {
 
             {/* Employee Selection Modal */}
             {showEmpModal && (
-                <div className="fixed inset-0 z-[200] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4">
-                    <div className="bg-white rounded-sm shadow-2xl w-full max-w-md overflow-visible animate-in fade-in zoom-in-95 duration-200 flex flex-col">
+                <div className="fixed inset-0 z-[200] flex items-center justify-center bg-slate-100 dark:bg-slate-900/40 backdrop-blur-sm p-4">
+                    <div className="bg-white rounded-none-sm shadow-2xl w-full max-w-md overflow-visible animate-in fade-in zoom-in-95 duration-200 flex flex-col">
                         <div className="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50">
                             <h3 className="text-[13px] font-bold tracking-wide uppercase text-slate-900">Select Employee</h3>
-                            <button onClick={() => setShowEmpModal(false)} className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-200 transition-colors">
+                            <button onClick={() => setShowEmpModal(false)} className="w-8 h-8 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-slate-700 hover:bg-slate-200 transition-colors">
                                 <X size={20} />
                             </button>
                         </div>
@@ -387,24 +387,24 @@ const AdminConfigBoard = ({ hierarchy, allEmployees }) => {
                             <div className="flex flex-col gap-4 relative z-20">
                                 <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest">Search & Select Employee</label>
                                 <div className="relative">
-                                    <Search className="absolute left-3 top-3.5 text-slate-400 w-4 h-4" />
+                                    <Search className="absolute left-3 top-3.5 text-slate-500 dark:text-slate-400 w-4 h-4" />
                                     <input
                                         type="text"
                                         placeholder="Search Employee..."
                                         value={empSearch}
                                         onChange={e => { setEmpSearch(e.target.value); setEmpSearchTriggered(false); }}
                                         onKeyDown={e => e.key === 'Enter' && setEmpSearchTriggered(true)}
-                                        className="w-full pl-9 pr-24 p-3 border border-slate-300 rounded-[3px] text-sm bg-white font-bold text-slate-700 outline-none focus:border-[#00acee] focus:ring-1 focus:ring-[#00acee] transition-all"
+                                        className="w-full pl-9 pr-24 p-3 border border-slate-300 rounded-none text-sm bg-white font-bold text-slate-700 outline-none focus:border-[#00acee] focus:ring-1 focus:ring-[#00acee] transition-all"
                                         autoFocus
                                     />
                                     <button
                                         onClick={() => setEmpSearchTriggered(true)}
-                                        className="absolute right-1.5 top-1.5 bottom-1.5 px-4 bg-[#00acee] hover:bg-[#009adb] text-white text-[11px] font-bold uppercase tracking-wider rounded-[3px] transition-colors shadow-sm"
+                                        className="absolute right-1.5 top-1.5 bottom-1.5 px-4 bg-[#00acee] hover:bg-[#009adb] text-slate-800 dark:text-white text-[11px] font-bold uppercase tracking-wider rounded-none transition-colors shadow-sm"
                                     >
                                         Load
                                     </button>
                                     {empSearchTriggered && (
-                                        <div className="absolute top-[100%] mt-2 left-0 w-full z-50 bg-white rounded-sm shadow-2xl max-h-[250px] overflow-y-auto">
+                                        <div className="absolute top-[100%] mt-2 left-0 w-full z-50 bg-white rounded-none-sm shadow-2xl max-h-[250px] overflow-y-auto">
                                             {filteredEmployees.map(e => {
                                                 const code = e.emp_Code || e.empCode;
                                                 const name = e.emp_Name || e.empName;
@@ -422,12 +422,12 @@ const AdminConfigBoard = ({ hierarchy, allEmployees }) => {
                                                         }}
                                                         className="p-3 border-b border-slate-100 text-sm cursor-pointer transition-all text-slate-600 hover:bg-slate-50 font-medium"
                                                     >
-                                                        {name} <span className="text-slate-400 font-normal ml-1">[{roleName}]</span>
+                                                        {name} <span className="text-slate-500 dark:text-slate-400 font-normal ml-1">[{roleName}]</span>
                                                     </div>
                                                 );
                                             })}
                                             {filteredEmployees.length === 0 && (
-                                                <div className="p-6 text-center text-sm text-slate-400">No employees found.</div>
+                                                <div className="p-6 text-center text-sm text-slate-500 dark:text-slate-400">No employees found.</div>
                                             )}
                                         </div>
                                     )}
@@ -440,11 +440,11 @@ const AdminConfigBoard = ({ hierarchy, allEmployees }) => {
 
             {/* Company Selection Modal */}
             {showCompModal && (
-                <div className="fixed inset-0 z-[200] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4">
-                    <div className="bg-white rounded-sm shadow-2xl w-full max-w-md overflow-visible animate-in fade-in zoom-in-95 duration-200 flex flex-col">
-                        <div className="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50 rounded-t-2xl">
+                <div className="fixed inset-0 z-[200] flex items-center justify-center bg-slate-100 dark:bg-slate-900/40 backdrop-blur-sm p-4">
+                    <div className="bg-white rounded-none-sm shadow-2xl w-full max-w-md overflow-visible animate-in fade-in zoom-in-95 duration-200 flex flex-col">
+                        <div className="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50 rounded-none-t-2xl">
                             <h3 className="text-sm font-bold tracking-wide uppercase text-slate-900">Select Company</h3>
-                            <button onClick={() => setShowCompModal(false)} className="w-8 h-8 flex items-center justify-center rounded-[3px] text-slate-400 hover:text-slate-700 hover:bg-slate-200 transition-colors">
+                            <button onClick={() => setShowCompModal(false)} className="w-8 h-8 flex items-center justify-center rounded-none text-slate-500 dark:text-slate-400 hover:text-slate-700 hover:bg-slate-200 transition-colors">
                                 <X size={20} />
                             </button>
                         </div>
@@ -452,24 +452,24 @@ const AdminConfigBoard = ({ hierarchy, allEmployees }) => {
                             <div className="flex flex-col gap-4 relative z-20">
                                 <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest">Search & Select Company</label>
                                 <div className="relative">
-                                    <Search className="absolute left-3 top-3.5 text-slate-400 w-4 h-4" />
+                                    <Search className="absolute left-3 top-3.5 text-slate-500 dark:text-slate-400 w-4 h-4" />
                                     <input
                                         type="text"
                                         placeholder="Search Company..."
                                         value={compSearch}
                                         onChange={e => { setCompSearch(e.target.value); setCompSearchTriggered(false); }}
                                         onKeyDown={e => e.key === 'Enter' && setCompSearchTriggered(true)}
-                                        className="w-full pl-9 pr-24 p-3 border border-slate-300 rounded-[3px] text-sm bg-white font-bold text-slate-700 outline-none focus:border-[#00acee] focus:ring-1 focus:ring-[#00acee] transition-all"
+                                        className="w-full pl-9 pr-24 p-3 border border-slate-300 rounded-none text-sm bg-white font-bold text-slate-700 outline-none focus:border-[#00acee] focus:ring-1 focus:ring-[#00acee] transition-all"
                                         autoFocus
                                     />
                                     <button
                                         onClick={() => setCompSearchTriggered(true)}
-                                        className="absolute right-1.5 top-1.5 bottom-1.5 px-4 bg-[#00acee] hover:bg-[#009adb] text-white text-[11px] font-bold uppercase tracking-wider rounded-[3px] transition-colors shadow-sm"
+                                        className="absolute right-1.5 top-1.5 bottom-1.5 px-4 bg-[#00acee] hover:bg-[#009adb] text-slate-800 dark:text-white text-[11px] font-bold uppercase tracking-wider rounded-none transition-colors shadow-sm"
                                     >
                                         Load
                                     </button>
                                     {compSearchTriggered && (
-                                        <div className="absolute top-[100%] mt-2 left-0 w-full z-50 bg-white rounded-sm shadow-2xl max-h-[250px] overflow-y-auto">
+                                        <div className="absolute top-[100%] mt-2 left-0 w-full z-50 bg-white rounded-none-sm shadow-2xl max-h-[250px] overflow-y-auto">
                                             {filteredCompanies.map(c => (
                                                 <div
                                                     key={c.code}
@@ -480,7 +480,7 @@ const AdminConfigBoard = ({ hierarchy, allEmployees }) => {
                                                 </div>
                                             ))}
                                             {filteredCompanies.length === 0 && (
-                                                <div className="p-6 text-center text-sm text-slate-400">
+                                                <div className="p-6 text-center text-sm text-slate-500 dark:text-slate-400">
                                                     {companies.length === 0 ? 'No companies available for this employee.' : 'No companies match your search.'}
                                                 </div>
                                             )}
@@ -503,3 +503,9 @@ const AdminConfigBoard = ({ hierarchy, allEmployees }) => {
 };
 
 export default AdminConfigBoard;
+
+
+
+
+
+

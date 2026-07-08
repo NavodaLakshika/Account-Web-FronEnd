@@ -62,103 +62,113 @@ const PlanEditorModal = ({ isOpen, onClose, editingPlan, onSaveSuccess }) => {
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-[3000] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
- <div className="bg-white rounded-[16px] shadow-2xl w-full max-w-[420px] overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-                <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
-                    <h3 className="text-[17px] font-bold text-slate-800">
+        <div className="fixed inset-0 z-[3000] flex items-center justify-center bg-[#000000]/70 backdrop-blur-sm p-4 font-sans">
+            <div className="bg-slate-50 dark:bg-[#0c0c0c] border border-slate-300 dark:border-white/10 shadow-2xl w-full max-w-md animate-in fade-in zoom-in-95 duration-200 flex flex-col rounded-none">
+                <div className="px-6 py-4 border-b border-slate-300 dark:border-white/10 flex items-center justify-between bg-slate-100 dark:bg-white/5">
+                    <h3 className="text-[15px] font-bold text-slate-800 dark:text-white">
                         {editingPlan ? 'Edit Pricing Plan' : 'Create Pricing Plan'}
                     </h3>
-                    <button onClick={onClose} className="text-slate-400 hover:text-slate-600 transition-colors text-xl leading-none font-light">×</button>
+                    <button onClick={onClose} className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-300 hover:bg-slate-200 dark:bg-white/10 transition-colors rounded-none">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
                 </div>
                 
-                <form onSubmit={handleSubmit} className="p-6 space-y-5">
+                <form onSubmit={handleSubmit} className="p-6 flex flex-col gap-4">
                     <div>
-                        <label className="block text-[13px] font-semibold text-slate-600 mb-2">Plan Name</label>
-                        <input 
-                            type="text" 
+                        <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Plan Name *</label>
+                        <input
+                            type="text"
                             required
-                            className="w-full px-4 py-3 border border-slate-200 rounded-[12px] text-[14px] focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
                             value={formData.planName}
                             onChange={e => setFormData({...formData, planName: e.target.value})}
+                            placeholder="e.g. Professional"
+                            className="w-full px-4 py-2.5 bg-slate-200/50 dark:bg-black/40 border border-slate-300 dark:border-white/10 text-slate-800 dark:text-white text-sm outline-none focus:border-[#0078d4] focus:bg-slate-100 dark:bg-white/5 transition-all rounded-none placeholder:text-gray-600"
+                            autoFocus
                         />
                     </div>
 
                     <div className="flex gap-4">
                         <div className="flex-1">
-                            <label className="block text-[13px] font-semibold text-slate-600 mb-2">Price ($)</label>
-                            <input 
-                                type="number" 
+                            <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Price ($) *</label>
+                            <input
+                                type="number"
                                 step="0.01"
                                 required
-                                className="w-full px-4 py-3 border border-slate-200 rounded-[12px] text-[14px] focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
                                 value={formData.price}
                                 onChange={e => setFormData({...formData, price: parseFloat(e.target.value) || 0})}
+                                placeholder="0.00"
+                                className="w-full px-4 py-2.5 bg-slate-200/50 dark:bg-black/40 border border-slate-300 dark:border-white/10 text-slate-800 dark:text-white text-sm outline-none focus:border-[#0078d4] focus:bg-slate-100 dark:bg-white/5 transition-all rounded-none placeholder:text-gray-600"
                             />
                         </div>
                         <div className="flex-1">
-                            <label className="block text-[13px] font-semibold text-slate-600 mb-2">Billing Cycle</label>
-                            <select 
-                                className="w-full px-4 py-3 border border-slate-200 rounded-[12px] text-[14px] focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all bg-white"
+                            <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Billing Cycle *</label>
+                            <select
                                 value={formData.billingCycle}
                                 onChange={e => setFormData({...formData, billingCycle: e.target.value})}
+                                className="w-full px-4 py-2.5 bg-slate-200/50 dark:bg-black/40 border border-slate-300 dark:border-white/10 text-slate-800 dark:text-white text-sm outline-none focus:border-[#0078d4] focus:bg-slate-100 dark:bg-white/5 transition-all rounded-none"
                             >
-                                <option value="Monthly">Monthly</option>
-                                <option value="Yearly">Yearly</option>
+                                <option value="Monthly" className="bg-slate-50 dark:bg-[#0c0c0c]">Monthly</option>
+                                <option value="Yearly" className="bg-slate-50 dark:bg-[#0c0c0c]">Yearly</option>
                             </select>
                         </div>
                     </div>
 
                     <div className="flex gap-4">
                         <div className="flex-1">
-                            <label className="block text-[13px] font-semibold text-slate-600 mb-2">Max Users</label>
-                            <input 
-                                type="number" 
+                            <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Max Users *</label>
+                            <input
+                                type="number"
                                 required
-                                className="w-full px-4 py-3 border border-slate-200 rounded-[12px] text-[14px] focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
                                 value={formData.maxUsers}
                                 onChange={e => setFormData({...formData, maxUsers: parseInt(e.target.value) || 0})}
+                                placeholder="5"
+                                className="w-full px-4 py-2.5 bg-slate-200/50 dark:bg-black/40 border border-slate-300 dark:border-white/10 text-slate-800 dark:text-white text-sm outline-none focus:border-[#0078d4] focus:bg-slate-100 dark:bg-white/5 transition-all rounded-none placeholder:text-gray-600"
                             />
                         </div>
                         <div className="flex-1">
-                            <label className="block text-[13px] font-semibold text-slate-600 mb-2">Max Companies</label>
-                            <input 
-                                type="number" 
+                            <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Max Companies *</label>
+                            <input
+                                type="number"
                                 required
-                                className="w-full px-4 py-3 border border-slate-200 rounded-[12px] text-[14px] focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
                                 value={formData.maxCompanies}
                                 onChange={e => setFormData({...formData, maxCompanies: parseInt(e.target.value) || 0})}
+                                placeholder="1"
+                                className="w-full px-4 py-2.5 bg-slate-200/50 dark:bg-black/40 border border-slate-300 dark:border-white/10 text-slate-800 dark:text-white text-sm outline-none focus:border-[#0078d4] focus:bg-slate-100 dark:bg-white/5 transition-all rounded-none placeholder:text-gray-600"
                             />
                         </div>
                     </div>
 
                     <div className="flex items-center gap-3 pt-2">
-                        <input 
-                            type="checkbox" 
-                            id="isActivePlan"
-                            checked={formData.isActive}
-                            onChange={e => setFormData({...formData, isActive: e.target.checked})}
-                            className="w-4 h-4 text-blue-600 border-slate-300 rounded focus:ring-blue-500"
-                        />
-                        <label htmlFor="isActivePlan" className="text-[14px] font-semibold text-slate-700">
-                            Plan is Active (Visible to users)
+                        <label className="relative inline-flex items-center cursor-pointer">
+                            <input
+                                type="checkbox"
+                                checked={formData.isActive}
+                                onChange={e => setFormData({...formData, isActive: e.target.checked})}
+                                className="sr-only peer"
+                            />
+                            <div className="w-11 h-6 bg-white/20 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
                         </label>
+                        <span className="text-xs font-bold text-gray-300">Plan is Active (Visible to users)</span>
                     </div>
 
-                    <div className="pt-4 flex gap-3">
-                        <button 
-                            type="button" 
+                    <div className="mt-4 flex gap-3 justify-end">
+                        <button
+                            type="button"
                             onClick={onClose}
-                            className="flex-1 py-3 px-4 bg-slate-100/80 text-slate-800 rounded-[12px] text-[14px] font-bold hover:bg-slate-200/80 transition-colors"
+                            className="px-5 py-2.5 bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:bg-white/10 text-gray-300 text-xs font-bold uppercase tracking-wider border border-slate-300 dark:border-white/10 transition-all rounded-none"
                         >
                             Cancel
                         </button>
-                        <button 
+                        <button
                             type="submit"
                             disabled={saving}
-                            className="flex-1 py-3 px-4 bg-[#4f46e5] text-white rounded-[12px] text-[14px] font-bold hover:bg-[#4338ca] transition-colors disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                            className="px-5 py-2.5 bg-[#0078d4] hover:bg-[#005a9e] text-white text-xs font-bold uppercase tracking-wider shadow-md transition-all rounded-none flex items-center gap-2 disabled:opacity-50"
                         >
-                            {saving && <Loader2 className="w-4 h-4 animate-spin" />}
-                            {saving ? 'Saving...' : 'Save Plan'}
+                            {saving ? (
+                                <><Loader2 className="animate-spin" size={14} /> Saving...</>
+                            ) : (
+                                'Save Plan'
+                            )}
                         </button>
                     </div>
                 </form>
@@ -168,3 +178,7 @@ const PlanEditorModal = ({ isOpen, onClose, editingPlan, onSaveSuccess }) => {
 };
 
 export default PlanEditorModal;
+
+
+
+

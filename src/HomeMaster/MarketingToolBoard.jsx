@@ -224,20 +224,20 @@ const MarketingToolBoard = ({ isOpen, onClose }) => {
                 <div className="flex gap-4 mb-6 border-b border-gray-200 pb-2">
                     <button 
                         onClick={() => setSelectedTab('Sales Target')}
-                        className={`px-4 py-2 text-[12.5px] font-black uppercase tracking-widest transition-all rounded-[3px] ${selectedTab === 'Sales Target' ? 'bg-[#e49e1b] text-white shadow-md' : 'text-slate-400 hover:text-slate-600 hover:bg-slate-100'}`}
+                        className={`px-4 py-2 text-[12.5px] font-black uppercase tracking-widest transition-all rounded-[3px] ${selectedTab === 'Sales Target' ? 'bg-[#e49e1b] text-slate-800 dark:text-white shadow-md' : 'text-slate-500 dark:text-slate-400 hover:text-slate-600 hover:bg-slate-100'}`}
                     >
                         Sales Target
                     </button>
                     <button 
                         onClick={() => setSelectedTab('Commision Level')}
-                        className={`px-4 py-2 text-[12.5px] font-black uppercase tracking-widest transition-all rounded-[3px] ${selectedTab === 'Commision Level' ? 'bg-[#e49e1b] text-white shadow-md' : 'text-slate-400 hover:text-slate-600 hover:bg-slate-100'}`}
+                        className={`px-4 py-2 text-[12.5px] font-black uppercase tracking-widest transition-all rounded-[3px] ${selectedTab === 'Commision Level' ? 'bg-[#e49e1b] text-slate-800 dark:text-white shadow-md' : 'text-slate-500 dark:text-slate-400 hover:text-slate-600 hover:bg-slate-100'}`}
                     >
                         Commission Level
                     </button>
                 </div>
 
                 {/* Content Area */}
-                <div className="bg-white/50 backdrop-blur-sm border border-gray-200 rounded-[3px] p-6 shadow-sm min-h-[400px]">
+                <div className="bg-slate-100 dark:bg-white/50 backdrop-blur-sm border border-gray-200 rounded-[3px] p-6 shadow-sm min-h-[400px]">
                     {selectedTab === 'Sales Target' ? (
                         <div className="space-y-3">
                             <div className="flex items-center justify-between border-b border-gray-200 pb-4 mb-4">
@@ -286,7 +286,7 @@ const MarketingToolBoard = ({ isOpen, onClose }) => {
                                         <button 
                                             onClick={handleSaveConfig}
                                             disabled={loading}
-                                            className="w-full h-9 bg-[#0285fd] text-white text-[11px] font-black uppercase tracking-widest rounded-[3px] hover:bg-[#0073ff] transition-all active:scale-95 shadow-md flex items-center justify-center gap-1.5 disabled:opacity-50"
+                                            className="w-full h-9 bg-[#0285fd] text-slate-800 dark:text-white text-[11px] font-black uppercase tracking-widest rounded-[3px] hover:bg-[#0073ff] transition-all active:scale-95 shadow-md flex items-center justify-center gap-1.5 disabled:opacity-50"
                                         >
                                             {loading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />} COMMIT
                                         </button>
@@ -315,7 +315,7 @@ const MarketingToolBoard = ({ isOpen, onClose }) => {
                                                     setShowLevelSearch(true);
                                                     handleLevelSearch();
                                                 }}
-                                                className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0"
+                                                className="w-10 h-8 bg-[#0285fd] text-slate-800 dark:text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0"
                                             >
                                                 <Search size={16} />
                                             </button>
@@ -452,7 +452,7 @@ const MarketingToolBoard = ({ isOpen, onClose }) => {
                             placeholder="Find by Code or Description"
                             className="w-full h-10 px-4 border border-gray-300 rounded-[3px] outline-none text-sm focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white shadow-sm flex-1"
                         />
-                        <button onClick={handleLevelSearch} disabled={searching} className="px-4 h-9 bg-[#0285fd] text-white rounded-[3px] font-bold text-[12px] hover:bg-[#0073ff] transition-all flex items-center gap-2 disabled:opacity-50 shadow-md">
+                        <button onClick={handleLevelSearch} disabled={searching} className="px-4 h-9 bg-[#0285fd] text-slate-800 dark:text-white rounded-[3px] font-bold text-[12px] hover:bg-[#0073ff] transition-all flex items-center gap-2 disabled:opacity-50 shadow-md">
                             {searching ? <Loader2 size={16} className="animate-spin" /> : 'Search'}
                         </button>
                     </div>
@@ -501,3 +501,7 @@ const MarketingToolBoard = ({ isOpen, onClose }) => {
 };
 
 export default MarketingToolBoard;
+
+
+
+

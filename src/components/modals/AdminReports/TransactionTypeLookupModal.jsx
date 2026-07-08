@@ -55,7 +55,7 @@ const TransactionTypeLookupModal = ({ isOpen, onClose, onSelect }) => {
                 {/* List Content */}
                 <div className="max-h-[300px] overflow-y-auto border border-gray-200 rounded-b-[5px] no-scrollbar">
                     {loading ? (
-                        <div className="py-10 flex items-center justify-center gap-2 text-slate-400">
+                        <div className="py-10 flex items-center justify-center gap-2 text-slate-500 dark:text-slate-400">
                             <Loader2 size={16} className="animate-spin" />
                             <span className="text-[13px] italic">Loading...</span>
                         </div>
@@ -74,14 +74,14 @@ const TransactionTypeLookupModal = ({ isOpen, onClose, onSelect }) => {
                             </button>
                         ))
                     ) : (
-                        <div className="py-10 text-center text-slate-400 italic text-[13px]">
+                        <div className="py-10 text-center text-slate-500 dark:text-slate-400 italic text-[13px]">
                             No matching types found
                         </div>
                     )}
                 </div>
 
                 {/* Footer Info */}
-                <div className="mt-4 pt-3 border-t border-gray-200 flex items-center gap-2 text-slate-400">
+                <div className="mt-4 pt-3 border-t border-gray-200 flex items-center gap-2 text-slate-500 dark:text-slate-400">
                     <ListChecks size={14} className="text-blue-400" />
                     <span className="text-[10px] font-bold uppercase tracking-widest italic">Double click to select and return to report</span>
                 </div>
@@ -91,3 +91,7 @@ const TransactionTypeLookupModal = ({ isOpen, onClose, onSelect }) => {
 };
 
 export default TransactionTypeLookupModal;
+
+
+
+

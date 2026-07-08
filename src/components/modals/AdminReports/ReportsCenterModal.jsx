@@ -7,26 +7,68 @@ export const menuGroups = [
         title: 'Business Overview',
         icon: PieChart,
         items: [
-            "Profit and Loss", "Balance Sheet", "Trial Balance", "General Ledger", "Journal Report", "Statement of Cash Flows"
+            "Profit and Loss", "Balance Sheet", "Trial Balance", "Statement of Cash Flows", "Statement of Changes in Equity", "Business Snapshot", "Profit and Loss Comparison", "Balance Sheet Comparison", "Custom Summary Report", "Profit and Loss as % of total income", "Profit and Loss by Month", "Profit and Loss Detail", "Profit and Loss year-to-date comparison", "Quarterly Profit and Loss Summary"
         ]
     },
     {
         title: 'Sales and Customers',
         icon: Users,
         items: [
-            "Customer Balance Summary", "Invoice List", "Sales Orders Report", "Received Payments List", "Income by Customer"
+            "Quotation Summary", "Sales by Customer Summary", "Sales by Customer Detail", "Sales by Product/Service Summary", "Sales by Product/Service Detail", "Income by Customer Summary", "Customer Contact List", "Transaction List by Customer", "Time Activities by Customer Detail", "Estimates by Customer", "Customer Phone List", "Sales by Customer Type Detail", "Project Profitability Summary", "Product/Item Profitability by Customer"
         ]
     },
     {
-        title: 'Purchases and Suppliers',
+        title: 'Who Owes You',
+        icon: Wallet,
+        items: [
+            "Customer Balance Summary", "Customer Balance Detail", "Open Invoices", "Accounts receivable ageing summary", "Accounts receivable ageing detail", "Collections Report", "Invoice List", "Statement List", "Invoices and Received Payments"
+        ]
+    },
+    {
+        title: 'Expenses and Vendors',
         icon: ShoppingCart,
         items: [
-            "Supplier Balance Summary", "Unpaid Bills", "Bill Payments Report", "Purchase Orders Report"
+            "Purchase List", "Purchases by Product/Service Detail", "Purchases by Supplier Detail", "Expenses by Supplier Summary", "Transaction List by Supplier", "Supplier Contact List", "Cheque Detail", "Bill Payment List", "Open Purchase Order Detail", "Open Purchase Order List", "Bills and Applied Payments", "Supplier Phone List", "Bill Approval Status", "Invoice Approval Status"
+        ]
+    },
+    {
+        title: 'What You Owe',
+        icon: Landmark,
+        items: [
+            "Supplier Balance Summary", "Supplier Balance Detail", "Unpaid Bills", "Accounts payable ageing summary", "Accounts payable ageing detail"
+        ]
+    },
+    {
+        title: 'Accountant Reports',
+        icon: BookOpen,
+        items: [
+            "Journal", "General Ledger", "General Ledger List", "Transaction Detail by Account", "Transaction List with Splits", "Transaction List by Date", "Recent Transactions", "Invalid Journal Transactions", "Account List", "Reconciliation Reports", "Adjusted Trial Balance", "Profit and Loss By Tag Group", "Transaction List by Tag Group"
+        ]
+    },
+    {
+        title: 'Inventory & Products',
+        icon: Package,
+        items: [
+            "Inventory Valuation Summary", "Inventory Valuation Detail", "Stock Take Worksheet", "Product/Service List", "Products Report"
+        ]
+    },
+    {
+        title: 'Employees & Time',
+        icon: Clock,
+        items: [
+            "Unbilled time", "Unbilled charges", "Time Summary by Pay Type", "Timesheet Detail by Employee", "Time Activities by Employee Detail", "Employee Contact List", "Recent/Edited Time Activities"
+        ]
+    },
+    {
+        title: 'Taxes & Other Lists',
+        icon: FileText,
+        items: [
+            "Tax Liability Report", "Terms List", "Payment Method List", "Deposit Detail", "Recurring Template List", "Audit Log"
         ]
     },
     {
         title: 'Banking and Cash',
-        icon: Landmark,
+        icon: CreditCard,
         items: [
             "Cheque Register", "Petty Cash Report", "Bank Reconciliation Report", "Deposits List"
         ]
@@ -85,7 +127,7 @@ const ReportsCenterModal = ({ isOpen, onClose, onSelectReport, empCode, companyC
 
     return (
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
-            <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={onClose} />
+            <div className="absolute inset-0 bg-slate-100 dark:bg-slate-900/40 backdrop-blur-sm" onClick={onClose} />
 
             <div className="relative w-full max-w-[1300px] h-[85vh] bg-gray-50 rounded-[3px] shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
                 {/* Header */}
@@ -171,3 +213,7 @@ const ReportsCenterModal = ({ isOpen, onClose, onSelectReport, empCode, companyC
 };
 
 export default ReportsCenterModal;
+
+
+
+

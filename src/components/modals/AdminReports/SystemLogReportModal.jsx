@@ -53,7 +53,7 @@ const SystemLogReportModal = ({ isOpen, onClose }) => {
             <button 
                 onClick={handleDisplay} 
                 disabled={loading}
-                className="px-7 h-8 bg-[#0285fd] text-white text-[11px] font-bold rounded-[4px] shadow-sm shadow-blue-200 hover:bg-[#0073ff] transition-all active:scale-95 flex items-center justify-center gap-1.5 disabled:opacity-50"
+                className="px-7 h-8 bg-[#0285fd] text-slate-800 dark:text-white text-[11px] font-bold rounded-[4px] shadow-sm shadow-blue-200 hover:bg-[#0073ff] transition-all active:scale-95 flex items-center justify-center gap-1.5 disabled:opacity-50"
             >
                 <Play size={11} /> {loading ? 'Processing...' : 'Display'}
             </button>
@@ -113,7 +113,7 @@ const SystemLogReportModal = ({ isOpen, onClose }) => {
                                 />
                                 <button 
                                     onClick={() => setShowCalendarFrom(true)}
-                                    className="w-9 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] transition-all shadow-sm active:scale-95 ml-1.5 rounded-[4px]"
+                                    className="w-9 h-8 bg-[#0285fd] text-slate-800 dark:text-white flex items-center justify-center hover:bg-[#0073ff] transition-all shadow-sm active:scale-95 ml-1.5 rounded-[4px]"
                                 >
                                     <Calendar size={11} />
                                 </button>
@@ -132,7 +132,7 @@ const SystemLogReportModal = ({ isOpen, onClose }) => {
                                 />
                                 <button 
                                     onClick={() => setShowCalendarTo(true)}
-                                    className="w-9 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] transition-all shadow-sm active:scale-95 ml-1.5 rounded-[4px]"
+                                    className="w-9 h-8 bg-[#0285fd] text-slate-800 dark:text-white flex items-center justify-center hover:bg-[#0073ff] transition-all shadow-sm active:scale-95 ml-1.5 rounded-[4px]"
                                 >
                                     <Calendar size={11} />
                                 </button>
@@ -162,3 +162,7 @@ const SystemLogReportModal = ({ isOpen, onClose }) => {
 };
 
 export default SystemLogReportModal;
+
+
+
+

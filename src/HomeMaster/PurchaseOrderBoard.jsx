@@ -432,7 +432,7 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
                                 <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Document ID</label>
                                 <div className="flex-1 flex gap-1 h-8 min-w-0">
                                         <input type="text" name="docNo" value={formData.docNo} onChange={handleInput} onKeyDown={(e) => e.key === 'Enter' && handleSelectOrder(formData.docNo)} className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-bold text-blue-600 bg-slate-50 rounded outline-none transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" />
-                                    <button onClick={handleSearch} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0">
+                                    <button onClick={handleSearch} className="w-10 h-8 bg-[#0285fd] text-slate-800 dark:text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0">
                                         <Search size={16} />
                                     </button>
                                 </div>
@@ -451,7 +451,7 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
                                     />
                                     <button
                                         onClick={() => { setDatePickerField('postDate'); setShowDatePicker(true); }}
-                                        className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0"
+                                        className="w-10 h-8 bg-[#0285fd] text-slate-800 dark:text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0"
                                     >
                                         <Calendar size={16} />
                                     </button>
@@ -471,7 +471,7 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
                                     />
                                     <button
                                         onClick={() => { setDatePickerField('expectedDate'); setShowDatePicker(true); }}
-                                        className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0"
+                                        className="w-10 h-8 bg-[#0285fd] text-slate-800 dark:text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0"
                                     >
                                         <Calendar size={16} />
                                     </button>
@@ -489,7 +489,7 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
                                         className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-bold text-red-600 bg-slate-50 rounded outline-none cursor-pointer transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20"
                                         onClick={() => setShowSupplierSearch(true)}
                                     />
-                                    <button onClick={() => setShowSupplierSearch(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0">
+                                    <button onClick={() => setShowSupplierSearch(true)} className="w-10 h-8 bg-[#0285fd] text-slate-800 dark:text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0">
                                         <Search size={16} />
                                     </button>
                                 </div>
@@ -506,7 +506,7 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
                                         className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-bold text-gray-700 bg-slate-50 rounded outline-none cursor-pointer transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20"
                                         onClick={() => setShowPayMethodSearch(true)}
                                     />
-                                    <button onClick={() => setShowPayMethodSearch(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0">
+                                    <button onClick={() => setShowPayMethodSearch(true)} className="w-10 h-8 bg-[#0285fd] text-slate-800 dark:text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0">
                                         <Search size={16} />
                                     </button>
                                 </div>
@@ -533,7 +533,7 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
                                 <span>Item Selection Portfolio</span>
                                 <button
                                     onClick={handleOpenAddProduct}
-                                    className="w-8 h-7 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0"
+                                    className="w-8 h-7 bg-[#0285fd] text-slate-800 dark:text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0"
                                     title="Add Product"
                                 ><Plus size={14} /></button>
                             </div>
@@ -798,7 +798,7 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
                     <div className="flex items-center justify-between gap-4 bg-slate-50/80 p-3 rounded-[3px] border border-gray-200 mb-2">
                         <div className="flex items-center gap-3 flex-1">
                             <div className="relative flex-1 max-w-[400px]">
-                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400" size={16} />
                                 <input
                                     type="text"
                                     placeholder="Search Inventory.."
@@ -878,13 +878,13 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
             >
                 <div className="space-y-6 px-1 py-2 font-['Tahoma']">
                     <div className="bg-slate-50/50 p-5 rounded-[3px] border border-slate-100 flex flex-col items-center text-center">
-                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1.5">Active Selection</span>
+                        <span className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] mb-1.5">Active Selection</span>
                         <h3 className="text-[18px] font-black text-slate-700 uppercase leading-[1.2] tracking-tight max-w-[90%] break-words">
                             {entry.prodName}
                         </h3>
                         <div className="flex items-center gap-2 mt-2">
                             <span className="text-[11px] font-mono font-bold text-blue-500 bg-white px-3 py-0.5 rounded-[3px] shadow-sm border border-slate-100">{entry.prodCode}</span>
-                            <span className="text-[10px] font-black text-slate-300 uppercase">Product Code</span>
+                            <span className="text-[10px] font-black text-slate-600 dark:text-slate-300 uppercase">Product Code</span>
                         </div>
                     </div>
 
@@ -928,7 +928,7 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
                         </div>
                         <button
                             onClick={() => { addProduct(); setShowProductQtyModal(false); setShowAddProductModal(false); setProductSearchQuery(''); }}
-                            className="h-11 px-8 bg-[#0285fd] text-white text-[13px] font-bold rounded-[3px] hover:bg-[#0073ff] transition-all active:scale-95 flex items-center gap-2 border-none"
+                            className="h-11 px-8 bg-[#0285fd] text-slate-800 dark:text-white text-[13px] font-bold rounded-[3px] hover:bg-[#0073ff] transition-all active:scale-95 flex items-center gap-2 border-none"
                         >
                             <Plus size={16} /> ADD TO LIST
                         </button>
@@ -991,7 +991,7 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
                                             <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{p.name}</td>
                                             <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{p.price?.toFixed(2)}</td>
                                             <td className="text-right px-5 py-3">
-                                                 <button className="bg-[#0285fd] text-white text-[10px] px-5 py-2 rounded-[3px] font-black hover:bg-[#0073ff] shadow-md transition-all active:scale-95">SELECT</button>
+                                                 <button className="bg-[#0285fd] text-slate-800 dark:text-white text-[10px] px-5 py-2 rounded-[3px] font-black hover:bg-[#0073ff] shadow-md transition-all active:scale-95">SELECT</button>
                                             </td>
                                         </tr>
                                     ))}
@@ -1095,3 +1095,7 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
 };
 
 export default PurchaseOrderBoard;
+
+
+
+

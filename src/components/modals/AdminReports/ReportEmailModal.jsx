@@ -61,7 +61,7 @@ const ReportEmailModal = ({ isOpen, onClose, title, companyName, userName }) => 
     };
 
     return (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4 font-sans">
+        <div className="fixed inset-0 bg-slate-200/50 dark:bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4 font-sans">
             <div className="bg-white shadow-2xl rounded-[2px] w-full max-w-[750px] overflow-hidden flex flex-col max-h-[90vh]">
                 
                 {/* Header */}
@@ -174,7 +174,7 @@ const ReportEmailModal = ({ isOpen, onClose, title, companyName, userName }) => 
                     <button 
                         onClick={handleSend}
                         disabled={isSending}
-                        className={`px-5 py-2 text-white font-bold transition-colors shadow-md ${isSending ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#0077c5] hover:bg-[#005c9a]'}`}
+                        className={`px-5 py-2 text-slate-800 dark:text-white font-bold transition-colors shadow-md ${isSending ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#0077c5] hover:bg-[#005c9a]'}`}
                     >
                         {isSending ? 'Sending...' : 'Send email'}
                     </button>
@@ -185,3 +185,7 @@ const ReportEmailModal = ({ isOpen, onClose, title, companyName, userName }) => 
 };
 
 export default ReportEmailModal;
+
+
+
+

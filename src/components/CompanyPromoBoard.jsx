@@ -123,81 +123,58 @@ const CompanyPromoBoard = ({ isOpen, onClose }) => {
     const progress = ((AUTO_CLOSE_SECONDS - countdown) / AUTO_CLOSE_SECONDS) * 100;
 
     return (
-        <div className="fixed inset-0 z-[2060] flex items-center justify-center p-4">
+        <div className="fixed top-0 left-0 z-[99999] flex flex-col pointer-events-none transition-all duration-400">
             <div 
-                className={`absolute inset-0 bg-slate-900/30 backdrop-blur-sm transition-opacity duration-400 ${entering ? 'opacity-0' : 'opacity-100'}`}
-                onClick={handleClose}
-            />
-            <div 
-                className={`relative w-full max-w-[420px] bg-white rounded-none shadow-2xl overflow-hidden transition-all duration-400 ${
-                    entering || exiting ? 'opacity-0 scale-95 translate-y-4' : 'opacity-100 scale-100 translate-y-0'
+                className={`relative bg-white shadow-xl border border-slate-200 p-5 rounded-none transition-all duration-400 pointer-events-auto ${
+                    entering || exiting ? 'opacity-0 scale-95' : 'opacity-100 scale-100'
                 }`}
             >
-                {/* Progress bar at top */}
-                <div className="h-1 bg-slate-100 w-full">
-                    <div 
-                        className="h-full transition-all duration-1000 ease-linear rounded-none"
-                        style={{ 
-                            width: `${progress}%`, 
-                            backgroundColor: accentColor,
-                            transitionDuration: `${exiting ? '0ms' : '1000ms'}`
-                        }}
-                    />
-                </div>
-
-                {/* Close button */}
-                <button
-                    onClick={handleClose}
-                    className="absolute top-3 right-3 text-gray-400 hover:text-gray-800 transition-colors z-10"
-                >
-                    <X size={28} strokeWidth={1.5} />
-                </button>
-
                 {/* Ad content */}
-                <div className="p-6">
-                    <div className="flex flex-col items-center text-center gap-4">
-                        {/* Icon */}
-                        <div 
-                            className="w-16 h-16 rounded-none flex items-center justify-center shadow-lg"
-                            style={{ backgroundColor: `${accentColor}15` }}
-                        >
-                            <Icon size={28} style={{ color: accentColor }} />
-                        </div>
-
-                        {/* Title */}
-                        <h3 className="text-[17px] font-bold text-slate-800 leading-tight">
-                            {title}
-                        </h3>
-
-                        {/* Description */}
-                        {desc && (
-                            <p className="text-[13px] text-slate-500 leading-relaxed">
-                                {desc}
-                            </p>
-                        )}
-
-                        {/* CTA */}
-                        <a
-                            href="https://www.onimtait.com"
-                            target="_blank"
-                            rel="noreferrer"
-                            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-none text-[13px] font-bold text-white transition-all active:scale-95 shadow-md hover:shadow-lg"
-                            style={{ backgroundColor: accentColor }}
-                        >
-                            <ExternalLink size={15} />
-                            Learn More
-                        </a>
-
-                        {/* Sponsored + countdown */}
-                        <div className="flex items-center gap-3 pt-2">
-                            <span className="text-[9px] font-bold text-slate-300 uppercase tracking-widest">Sponsored</span>
-                            <div className="w-px h-3 bg-slate-200" />
-                            <div className="flex items-center gap-1.5 text-[11px] font-mono font-bold text-slate-400">
-                                <Clock size={12} />
-                                <span>{countdown}s</span>
+                <div className="flex flex-col gap-3 max-w-[280px]">
+                    {/* Header */}
+                    <div className="flex items-start justify-between gap-3">
+                        <div className="flex items-center gap-3">
+                            {/* Icon */}
+                            <div 
+                                className="w-10 h-10 shrink-0 rounded-none flex items-center justify-center shadow-md border border-slate-200/50"
+                                style={{ backgroundColor: accentColor }}
+                            >
+                                <Icon size={20} className="text-white" />
+                            </div>
+                            <div className="flex flex-col">
+                                <h3 className="text-[16px] font-extrabold text-slate-800 leading-tight">
+                                    {title}
+                                </h3>
+                                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">Sponsored • {countdown}s</span>
                             </div>
                         </div>
+                        {/* Close button */}
+                        <button
+                            onClick={handleClose}
+                            className="text-slate-400 hover:text-slate-800 transition-colors p-1"
+                        >
+                            <X size={18} strokeWidth={2.5} />
+                        </button>
                     </div>
+
+                    {/* Description */}
+                    {desc && (
+                        <p className="text-[13px] text-slate-700 font-medium leading-snug drop-shadow-sm">
+                            {desc}
+                        </p>
+                    )}
+
+                    {/* CTA */}
+                    <a
+                        href="https://www.onimtait.com"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center justify-center gap-2 px-5 py-2 rounded-none text-[13px] font-bold text-white transition-all active:scale-95 shadow-md hover:shadow-lg w-fit mt-1"
+                        style={{ backgroundColor: accentColor }}
+                    >
+                        <ExternalLink size={14} />
+                        Learn More
+                    </a>
                 </div>
             </div>
         </div>

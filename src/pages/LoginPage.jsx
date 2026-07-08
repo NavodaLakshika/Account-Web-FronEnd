@@ -4,6 +4,7 @@ import { User, Lock, Loader2, Github, Twitter, Facebook, Chrome, AlertCircle } f
 import { authService } from '../services/auth.service';
 import toast from 'react-hot-toast';
 import { showSuccessToast } from '../utils/toastUtils';
+import AnimatedBackground from '../components/AnimatedBackground';
 
 
 const SUCCESS_SOUND_URL = '/Music/mrstokes302-success-videogame-sfx-423626.mp3';
@@ -80,6 +81,7 @@ const LoginPage = () => {
       style={{ backgroundImage: 'url("/auth_bg_v2.png")' }}
     >
       <div className="absolute inset-0 bg-white/40 backdrop-blur-sm"></div>
+      <AnimatedBackground />
       <div className="w-full max-w-4xl bg-white/80 backdrop-blur-xl rounded-[32px] overflow-hidden shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] flex h-[620px] border border-white/50 relative z-10">
 
         {/* Left Pane - Welcome Section (Blue/Red Branding) */}

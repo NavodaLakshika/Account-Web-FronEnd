@@ -395,7 +395,17 @@ const ReportTemplate = ({
                     }
                 }
 
-                const response = await api.get(`/report/${endpoint}?companyId=${companyId}&startDate=${startStr}&endDate=${endStr}&accountingMethod=${accountingMethod}&displayColumnsBy=${displayColumnsBy}&compareTo=${compareTo}`);
+                let compareToStr = compareTo;
+                if (compareTo === 'Custom' || compareTo === 'Select Period' || Object.values(compareToState).some(Boolean)) {
+                    const activeCompares = Object.keys(compareToState).filter(k => compareToState[k]);
+                    if (activeCompares.length > 0) {
+                        compareToStr = activeCompares.join(',');
+                    } else if (compareTo === 'Select Period') {
+                        compareToStr = '';
+                    }
+                }
+
+                const response = await api.get(`/report/${endpoint}?companyId=${companyId}&startDate=${startStr}&endDate=${endStr}&accountingMethod=${accountingMethod}&displayColumnsBy=${displayColumnsBy}&compareTo=${compareToStr}`);
                 
                 let processedData = response.data;
                 if (processedData && processedData.length > 0 && processedData.some(r => 'PivotColumn' in r || 'pivotcolumn' in r)) {
@@ -1112,8 +1122,8 @@ const ReportTemplate = ({
             </div>
 
             {/* Main Report Container */}
-            <div className="flex-1 p-6 md:p-10 flex justify-center">
-                <div className="w-full max-w-[1000px] bg-white border border-gray-200 shadow-sm flex flex-col h-max min-h-[500px]">
+            <div className="flex-1 p-6 md:p-10 flex justify-center items-stretch">
+                <div className="w-full max-w-[1000px] bg-white border border-gray-200 shadow-sm flex flex-col min-h-[500px]">
 
                     {/* Inner Toolbar */}
                     <div className="flex items-center justify-between p-4 border-b border-gray-200">

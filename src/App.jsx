@@ -12,7 +12,7 @@ import ReportBillPayments from './pages/ReportBillPayments';
 import ReportSalesOrders from './pages/ReportSalesOrders';
 import ChequeRegisterReport from './pages/ChequeRegisterReport';
 import GeneralLedgerReport from './pages/GeneralLedgerReport';
-
+import ReportViewerPage from './pages/ReportViewerPage';
 
 import SuperAdminDashboard from './pages/SuperAdminDashboard';
 
@@ -38,6 +38,7 @@ function App() {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/bi-dashboard" element={<BIDashboardPage />} />
             <Route path="/super-admin" element={<SuperAdminDashboard />} />
+            <Route path="/report-viewer" element={<ReportViewerPage />} />
 
             <Route path="/report/items-services" element={<ItemsServicesReportPage />} />
             <Route path="/report/products" element={<ProductsReportPage />} />

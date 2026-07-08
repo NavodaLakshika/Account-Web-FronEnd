@@ -155,7 +155,7 @@ const ChequeRegisterBoard = ({ isOpen, onClose }) => {
                     </div>
 
                     {/* Compact Filter Section */}
-                    <div className="bg-white/50 backdrop-blur-sm p-6 border border-gray-200 rounded-[8px] shadow-sm space-y-3">
+                    <div className="bg-slate-100 dark:bg-white/50 backdrop-blur-sm p-6 border border-gray-200 rounded-[8px] shadow-sm space-y-3">
                         
                         {/* Row 1: Account */}
                         <div className="flex items-center">
@@ -168,7 +168,7 @@ const ChequeRegisterBoard = ({ isOpen, onClose }) => {
                                     onClick={() => setShowAccountSearch(true)}
                                     className="flex-1 h-9 border border-gray-300 rounded-[3px] px-3 font-mono font-bold text-slate-800 text-[12.5px] outline-none shadow-sm bg-gray-50 cursor-pointer" 
                                 />
-                                <button onClick={() => setShowAccountSearch(true)} className="w-10 h-9 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0">
+                                <button onClick={() => setShowAccountSearch(true)} className="w-10 h-9 bg-[#0285fd] text-slate-800 dark:text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0">
                                     <Search size={16} />
                                 </button>
                             </div>
@@ -197,7 +197,7 @@ const ChequeRegisterBoard = ({ isOpen, onClose }) => {
                                     value={formData.date}
                                     className="flex-1 h-9 border border-gray-300 rounded-[3px] px-3 font-mono font-bold text-slate-800 text-[12.5px] outline-none bg-gray-50/50 shadow-sm" 
                                 />
-                                <button onClick={() => setCalendar({ isOpen: true, target: 'date' })} className="w-10 h-9 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-sm active:scale-90 shrink-0">
+                                <button onClick={() => setCalendar({ isOpen: true, target: 'date' })} className="w-10 h-9 bg-[#0285fd] text-slate-800 dark:text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-sm active:scale-90 shrink-0">
                                     <Calendar size={15} />
                                 </button>
                             </div>
@@ -284,7 +284,7 @@ const ChequeRegisterBoard = ({ isOpen, onClose }) => {
                                                 {acc.name}
                                             </td>
                                             <td className="text-right px-5 py-3">
-                                                 <button className="bg-[#0285fd] text-white text-[10px] px-5 py-2 rounded-[3px] font-black hover:bg-[#0073ff] shadow-md transition-all active:scale-95 uppercase tracking-tighter">SELECT</button>
+                                                 <button className="bg-[#0285fd] text-slate-800 dark:text-white text-[10px] px-5 py-2 rounded-[3px] font-black hover:bg-[#0073ff] shadow-md transition-all active:scale-95 uppercase tracking-tighter">SELECT</button>
                                             </td>
                                         </tr>
                                     ))}
@@ -314,3 +314,7 @@ const ChequeRegisterBoard = ({ isOpen, onClose }) => {
 };
 
 export default ChequeRegisterBoard;
+
+
+
+
