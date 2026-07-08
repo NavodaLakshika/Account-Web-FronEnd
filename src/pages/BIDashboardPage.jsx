@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { DotLottiePlayer } from '@dotlottie/react-player';
 import GetThingsDoneBoard from './GetThingsDoneBoard';
 import AIChatbotBoard from './AIChatbotBoard';
 import { authService } from '../services/auth.service';
@@ -39,6 +40,8 @@ const BIDashboardPage = () => {
     const [user, setUser] = useState(null);
     const [selectedCompany, setSelectedCompany] = useState(null);
     const [showAIChatbotModal, setShowAIChatbotModal] = useState(false);
+    const [showAITyping, setShowAITyping] = useState(false);
+    const [aiTypingText, setAiTypingText] = useState('');
 
     // Modal States
     const [showEnterBillModal, setShowEnterBillModal] = useState(false);
@@ -92,6 +95,43 @@ const BIDashboardPage = () => {
 
     const handleClose = () => {
         navigate('/dashboard');
+    };
+
+    const handleAIAction = (actionKey) => {
+        setShowAIChatbotModal(false);
+        setTimeout(() => {
+            const aiActionMap = {
+                'new_account': () => navigate('/dashboard'),
+                'customers': () => setShowCustomerModal(true),
+                'vendors': () => setShowVendorModal(true),
+                'enter_bill': () => setShowEnterBillModal(true),
+                'pay_bill': () => setShowPayBillModal(true),
+                'invoice': () => setShowSalesInvoiceModal(true),
+                'sales_order': () => setShowSalesOrderModal(true),
+                'journal': () => setShowJournalEntryModal(true),
+                'customer_master': () => navigate('/dashboard'),
+                'supplier_master': () => setShowVendorModal(true),
+                'chart_of_accounts': () => navigate('/dashboard'),
+                'reports': () => setShowReportsCenterModal(true),
+                'search': () => navigate('/dashboard'),
+                'bank_reconcile': () => setShowBankRecModal(true),
+                'make_deposit': () => setShowMakeDepositModal(true),
+                'write_cheque': () => setShowWriteChequeModal(true),
+                'purchase_order': () => setShowPurchaseOrderModal(true),
+                'grn': () => setShowGRNModal(true),
+                'sales_receipt': () => setShowSalesReceiptModal(true),
+                'receive_payment': () => setShowReceivePaymentModal(true),
+                'petty_cash': () => setShowPettyCashModal(true),
+                'trial_balance': () => setShowTrialBalanceModal(true),
+                'backup': () => navigate('/dashboard'),
+                'expenses': () => setShowExpensesDashboardModal(true),
+                'marketing': () => setShowMarketingToolModal(true),
+                'reversal': () => navigate('/dashboard'),
+                'payment_setoff': () => navigate('/dashboard'),
+            };
+            const handler = aiActionMap[actionKey];
+            if (handler) handler();
+        }, 300);
     };
 
     const actionToStateSetter = {
@@ -167,7 +207,25 @@ const BIDashboardPage = () => {
                     selectedCompany={selectedCompany}
                     onAction={(actionId) => {
                         if (actionId === 'header_ai') {
-                            setShowAIChatbotModal(prev => !prev);
+                            if (showAIChatbotModal) {
+                                setShowAIChatbotModal(false);
+                            } else {
+                                setShowAITyping(true);
+                                setAiTypingText('');
+                                const fullText = "Hello! I'm ONIMTA Intelligence. How can I assist you today?";
+                                let idx = 0;
+                                const typeInterval = setInterval(() => {
+                                    idx++;
+                                    setAiTypingText(fullText.slice(0, idx));
+                                    if (idx >= fullText.length) {
+                                        clearInterval(typeInterval);
+                                        setTimeout(() => {
+                                            setShowAITyping(false);
+                                            setShowAIChatbotModal(true);
+                                        }, 600);
+                                    }
+                                }, 45);
+                            }
                             return;
                         }
                         
@@ -187,10 +245,33 @@ const BIDashboardPage = () => {
                 />
             </div>
 
+            {/* AI Typing Animation Overlay */}
+            {showAITyping && (
+                <div className="fixed inset-0 z-[9999] bg-black/50 backdrop-blur-sm flex items-center justify-center animate-in fade-in duration-300">
+                    <div className="flex flex-col items-center gap-8 max-w-2xl px-8">
+                        <div className="w-32 h-32 flex items-center justify-center">
+                            <DotLottiePlayer
+                                src="/lottiefile/AI loading.lottie"
+                                autoplay
+                                loop
+                                style={{ width: '100%', height: '100%' }}
+                            />
+                        </div>
+                        <div className="h-16 flex items-center justify-center">
+                            <span className="text-white/90 text-2xl md:text-3xl font-light tracking-wide">
+                                {aiTypingText}
+                                <span className="animate-pulse ml-0.5 text-indigo-400">|</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             <AIChatbotBoard 
                 isOpen={showAIChatbotModal} 
                 onClose={() => setShowAIChatbotModal(false)} 
                 position="inline-right" 
+                onAction={handleAIAction}
             />
             </div>
 

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import AIAsterisk from './AIAsterisk';
+import { DotLottiePlayer } from '@dotlottie/react-player';
+import '@dotlottie/react-player/dist/index.css';
 
 const ThinkingProcess = () => {
     const allSteps = [
@@ -23,8 +24,8 @@ const ThinkingProcess = () => {
     return (
         <div className="flex flex-col gap-3">
             <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-indigo-50 border border-indigo-100 flex items-center justify-center shrink-0">
-                    <AIAsterisk size={16} isThinking={true} />
+                <div className="w-8 h-8 rounded-full bg-indigo-50 border border-indigo-100 flex items-center justify-center shrink-0 mt-1 overflow-hidden">
+                    <DotLottiePlayer src="/lottiefile/AI loading.lottie" autoplay loop style={{ width: '130%', height: '130%' }} />
                 </div>
                 <span className="text-[14px] font-semibold text-slate-700">Working...</span>
             </div>

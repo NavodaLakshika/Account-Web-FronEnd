@@ -241,3 +241,19 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     size: auto;
   }
 }
+
+/* Super Admin Compact Mode Styles */
+.sa-compact-mode table th,
+.sa-compact-mode table td {
+  padding-top: 0.35rem !important;
+  padding-bottom: 0.35rem !important;
+}
+
+.sa-compact-mode .p-6,
+.sa-compact-mode .p-8 {
+  padding: 1rem !important;
+}
+
+.sa-compact-mode .mb-8 {
+  margin-bottom: 1rem !important;
+}

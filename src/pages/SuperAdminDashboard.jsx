@@ -60,12 +60,13 @@ import EmployeeMessageDropdown from '../components/Admin/EmployeeMessageDropdown
 import AdminAIChatbot from '../components/modals/AdminAIChatbot';
 import AIAsterisk from '../components/AIAsterisk';
 import AnimatedBackground from '../components/AnimatedBackground';
+import SuperAdminSettingsModal from '../components/modals/SuperAdminSettingsModal';
 
 const SuperAdminDashboard = () => {
     const navigate = useNavigate();
     const [hierarchy, setHierarchy] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [activeMenu, setActiveMenu] = useState('Dashboard');
+    const [activeMenu, setActiveMenu] = useState(() => localStorage.getItem('saDefaultView') || 'Dashboard');
     const [searchTerm, setSearchTerm] = useState('');
     const [expandedEmps, setExpandedEmps] = useState({});
     
@@ -81,7 +82,61 @@ const SuperAdminDashboard = () => {
         const saved = localStorage.getItem('saDarkMode');
         return saved ? saved === 'true' : true; // Default to Dark Mode for Super Admin
     });
+    
+    const [showSettingsModal, setShowSettingsModal] = useState(false);
+    const [animationsEnabled, setAnimationsEnabled] = useState(() => {
+        const saved = localStorage.getItem('saAnimationsEnabled');
+        return saved ? saved === 'true' : true;
+    });
+    const [compactMode, setCompactMode] = useState(() => {
+        const saved = localStorage.getItem('saCompactMode');
+        return saved ? saved === 'true' : false;
+    });
+    const [sessionTimeout, setSessionTimeout] = useState(() => {
+        return localStorage.getItem('saSessionTimeout') || 'never';
+    });
+    const [defaultView, setDefaultView] = useState(() => {
+        return localStorage.getItem('saDefaultView') || 'Dashboard';
+    });
+    const [autoRefresh, setAutoRefresh] = useState(() => {
+        const saved = localStorage.getItem('saAutoRefresh');
+        return saved ? saved === 'true' : false;
+    });
     const [showAIChatbot, setShowAIChatbot] = useState(false);
+    const [showAITyping, setShowAITyping] = useState(false);
+    const [aiTypingText, setAiTypingText] = useState('');
+
+    const handleAIAction = (actionKey) => {
+        setShowAIChatbot(false);
+        const menuMap = {
+            'dashboard': 'Dashboard',
+            'companies': 'Companies',
+            'employees': 'Employees',
+            'roles': 'Role Features',
+            'reports': 'Reports',
+            'engagement': 'Engagement',
+            'subscriptions': 'Subscriptions',
+            'plans': 'Subscriptions',
+            'pricing': 'Subscriptions',
+            'database': 'Database',
+            'backup': 'Database',
+            'security': 'Security Audit',
+            'audit': 'Security Audit',
+            'integrations': 'Integrations',
+            'feedback': 'User Feedback',
+            'reviews': 'Engagement',
+            'ads': 'Engagement',
+            'logs': 'Dashboard',
+            'config': 'Dashboard',
+            'settings': 'Dashboard',
+            'messaging': 'Employees',
+            'sms': 'Employees',
+            'resets': 'Dashboard',
+            'stats': 'Dashboard',
+        };
+        const menu = menuMap[actionKey];
+        if (menu) setActiveMenu(menu);
+    };
 
     useEffect(() => {
         if (darkMode) {
@@ -197,6 +252,37 @@ const SuperAdminDashboard = () => {
             fetchFeedback();
         }
     }, [activeMenu]);
+
+    useEffect(() => {
+        if (!autoRefresh) return;
+        const interval = setInterval(() => {
+            fetchData();
+        }, 5 * 60 * 1000);
+        return () => clearInterval(interval);
+    }, [autoRefresh]);
+
+    useEffect(() => {
+        if (sessionTimeout === 'never') return;
+        const timeoutMs = parseInt(sessionTimeout) * 60 * 1000;
+        if (isNaN(timeoutMs)) return;
+        let timeoutId;
+        const resetTimer = () => {
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(() => {
+                localStorage.removeItem('user');
+                localStorage.removeItem('token');
+                navigate('/login');
+            }, timeoutMs);
+        };
+        window.addEventListener('mousemove', resetTimer);
+        window.addEventListener('keydown', resetTimer);
+        resetTimer();
+        return () => {
+            clearTimeout(timeoutId);
+            window.removeEventListener('mousemove', resetTimer);
+            window.removeEventListener('keydown', resetTimer);
+        };
+    }, [sessionTimeout, navigate]);
 
     const handleDeleteFeedback = (feedbackId) => {
         setConfirmConfig({
@@ -326,6 +412,47 @@ const SuperAdminDashboard = () => {
         localStorage.clear();
         navigate('/login');
     };
+
+    useEffect(() => {
+        if (!autoRefresh) return;
+        const intervalId = setInterval(() => {
+            fetchAdminData();
+            fetchSystemRoles();
+        }, 5 * 60 * 1000);
+        return () => clearInterval(intervalId);
+    }, [autoRefresh]);
+
+    useEffect(() => {
+        if (!sessionTimeout || sessionTimeout.toString().toLowerCase() === 'never') return;
+        
+        const timeoutMs = parseInt(sessionTimeout) * 60 * 1000;
+        let timeoutId;
+        
+        const resetTimeout = () => {
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(() => {
+                handleLogout();
+            }, timeoutMs);
+        };
+        
+        resetTimeout();
+        
+        const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'];
+        const handleUserActivity = () => {
+            resetTimeout();
+        };
+
+        events.forEach(event => {
+            window.addEventListener(event, handleUserActivity);
+        });
+
+        return () => {
+            clearTimeout(timeoutId);
+            events.forEach(event => {
+                window.removeEventListener(event, handleUserActivity);
+            });
+        };
+    }, [sessionTimeout]);
 
     useEffect(() => {
         if (activeMenu === 'Role Features') {
@@ -713,12 +840,13 @@ const SuperAdminDashboard = () => {
     ];
 
     return (
-        <div className="flex h-screen bg-white dark:bg-[#0f172a] font-sans overflow-hidden relative">
-            <AnimatedBackground />
+        <div className={`min-h-screen ${darkMode ? 'dark' : ''} ${compactMode ? 'sa-compact-mode' : ''}`}>
+            <div className="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 font-sans h-screen flex overflow-hidden">
+                <AnimatedBackground isPaused={!animationsEnabled} />
             {/* Sidebar */}
             <aside id="tour-sidebar" className={`relative overflow-hidden group bg-white dark:bg-[#1e293b] border-r border-slate-200 dark:border-gray-800 shadow-[4px_0_15px_rgba(0,0,0,0.2)] flex flex-col h-full hidden md:flex transition-all duration-300 ease-in-out ${sidebarCollapsed ? 'w-[80px]' : 'w-[80px] hover:w-[260px]'} z-40 ${showAIChatbot ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
                 <div className="absolute inset-0 pointer-events-none opacity-20 z-0">
-                    <AnimatedBackground />
+                    <AnimatedBackground isPaused={!animationsEnabled} />
                 </div>
                 
                 <div className={`relative z-10 flex items-center border-b border-slate-200 dark:border-gray-800/60 h-20 pl-[24px]`}>
@@ -756,21 +884,6 @@ const SuperAdminDashboard = () => {
                         ))}
                     </ul>
                 </nav>
-
-                <div className="relative z-10 mb-6 w-full">
-                    <div className="w-[90%]">
-                        <button
-                            onClick={handleLogout}
-                            className={`w-full flex items-center transition-all duration-300 pl-[20px] py-[12px] rounded-r-[50px] text-red-400 hover:bg-slate-50 dark:bg-[#0c0c0c] hover:text-red-300`}
-                            title={sidebarCollapsed ? 'Logout' : undefined}
-                        >
-                            {/* <LogOut className="w-[22px] h-[22px] shrink-0" /> */}
-                            <span className={`transition-all duration-300 opacity-0 group-hover:opacity-100 whitespace-nowrap font-bold text-[14.5px] ml-4 ${sidebarCollapsed ? 'hidden' : ''}`}>
-                                Logout
-                            </span>
-                        </button>
-                    </div>
-                </div>
             </aside>
 
             {/* Mobile sidebar overlay */}
@@ -831,6 +944,13 @@ const SuperAdminDashboard = () => {
 
                         {/* Right: Actions */}
                         <div className="flex items-center gap-2">
+                            <button
+                                onClick={() => setShowSettingsModal(true)}
+                                className="relative p-2 hover:bg-slate-200 dark:hover:bg-gray-800 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white rounded-[12px] transition-colors"
+                                title="Settings"
+                            >
+                                <Settings className="w-[18px] h-[18px]" />
+                            </button>
                             <button
                                 onClick={() => setDarkMode(prev => !prev)}
                                 className="relative p-2 hover:bg-slate-200 dark:hover:bg-gray-800 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white rounded-[12px] transition-colors"
@@ -976,7 +1096,7 @@ const SuperAdminDashboard = () => {
                                                     className="w-full flex items-center gap-2 px-3 py-2.5 text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors text-xs font-bold text-left"
                                                 >
                                                     <LogOut className="w-[14px] h-[14px]" />
-                                                    Secure Logout
+                                                    Logout
                                                 </button>
                                             </div>
                                         </div>
@@ -1071,9 +1191,16 @@ const SuperAdminDashboard = () => {
                                             <p className="text-[11px] text-slate-600 dark:text-slate-300 font-medium">Employee hierarchy & company assignments</p>
                                         </div>
                                     </div>
-                                    <button className="p-2 bg-white dark:bg-[#1e293b]/50 border border-slate-200 dark:border-[#334155] text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:text-white hover:border-white/20 hover:bg-slate-200 dark:bg-white/10 rounded-[12px] transition-all" title="Refresh">
-                                        <Search className="w-[18px] h-[18px]" />
-                                    </button>
+                                    <div className="relative w-[200px] md:w-[250px]">
+                                        <Search className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
+                                        <input
+                                            type="text"
+                                            placeholder="Search overview..."
+                                            value={searchTerm}
+                                            onChange={e => setSearchTerm(e.target.value)}
+                                            className="w-full pl-9 pr-4 py-2 bg-white dark:bg-[#1e293b]/50 border border-slate-200 dark:border-[#334155] text-slate-800 dark:text-white rounded-[6px] text-[12px] focus:outline-none focus:border-blue-500 transition-colors placeholder:text-slate-500"
+                                        />
+                                    </div>
                                 </div>
 
                                 <div className="w-full overflow-x-auto">
@@ -1493,7 +1620,7 @@ const SuperAdminDashboard = () => {
                             ) : (
                                 <div className="border border-slate-200 dark:border-[#334155] overflow-hidden mx-6 bg-white dark:bg-[#1e293b]/50 rounded-none shadow-sm relative">
                                     <div className="absolute inset-0 z-0 pointer-events-none opacity-40">
-                                        <AnimatedBackground />
+                                        <AnimatedBackground isPaused={!animationsEnabled} />
                                     </div>
                                     <div className="relative z-10">
                                         <table className="w-full text-left border-collapse">
@@ -2159,11 +2286,27 @@ const SuperAdminDashboard = () => {
             )}
 
             {/* AI Chatbot Trigger Button */}
-            {!showAIChatbot && (
+            {!showAIChatbot && !showAITyping && (
                 <div className="fixed bottom-6 right-6 z-[9900] group">
                     <div className="absolute inset-0 bg-indigo-400 rounded-full animate-ping opacity-25"></div>
                     <button 
-                        onClick={() => setShowAIChatbot(true)}
+                        onClick={() => {
+                            setShowAITyping(true);
+                            setAiTypingText('');
+                            const fullText = "Hello! I'm ONIMTA Intelligence. How can I assist you today?";
+                            let idx = 0;
+                            const typeInterval = setInterval(() => {
+                                idx++;
+                                setAiTypingText(fullText.slice(0, idx));
+                                if (idx >= fullText.length) {
+                                    clearInterval(typeInterval);
+                                    setTimeout(() => {
+                                        setShowAITyping(false);
+                                        setShowAIChatbot(true);
+                                    }, 800);
+                                }
+                            }, 45);
+                        }}
                         className="w-20 h-20 flex items-center justify-center hover:scale-110 transition-all"
                         title="Open Onimta Intelligence"
                     >
@@ -2172,8 +2315,45 @@ const SuperAdminDashboard = () => {
                 </div>
             )}
 
+            {/* AI Typing Animation Overlay */}
+            {showAITyping && (
+                <div className="fixed inset-0 z-[9999] bg-black/50 backdrop-blur-sm flex items-center justify-center animate-in fade-in duration-300">
+                    <div className="flex flex-col items-center gap-8 max-w-2xl px-8">
+                        <div className="w-32 h-32 flex items-center justify-center">
+                            <DotLottiePlayer src="/lottiefile/AI loading.lottie" autoplay loop style={{ width: '100%', height: '100%' }} />
+                        </div>
+                        <div className="h-16 flex items-center justify-center">
+                            <span className="text-white/90 text-2xl md:text-3xl font-light tracking-wide">
+                                {aiTypingText}
+                                <span className="animate-pulse ml-0.5 text-indigo-400">|</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* AI Chatbot Component */}
-            <AdminAIChatbot isOpen={showAIChatbot} onClose={() => setShowAIChatbot(false)} />
+            <AdminAIChatbot isOpen={showAIChatbot} onClose={() => setShowAIChatbot(false)} onAction={handleAIAction} />
+
+            {/* Settings Modal */}
+            <SuperAdminSettingsModal 
+                isOpen={showSettingsModal} 
+                onClose={() => setShowSettingsModal(false)}
+                darkMode={darkMode}
+                setDarkMode={setDarkMode}
+                animationsEnabled={animationsEnabled}
+                setAnimationsEnabled={setAnimationsEnabled}
+                compactMode={compactMode}
+                setCompactMode={setCompactMode}
+                sessionTimeout={sessionTimeout}
+                setSessionTimeout={setSessionTimeout}
+                defaultView={defaultView}
+                setDefaultView={setDefaultView}
+                autoRefresh={autoRefresh}
+                setAutoRefresh={setAutoRefresh}
+                currentUserCode={currentUserCode}
+            />
+        </div>
         </div>
     );
 };

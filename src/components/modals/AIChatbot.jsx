@@ -4,7 +4,8 @@ import {
     ThumbsUp, ThumbsDown, Download, PanelLeftClose, PanelLeft,
     Sparkles, MessageSquare, Clock, Edit, Copy, Check
 } from 'lucide-react';
-import AIAsterisk from '../AIAsterisk';
+import { DotLottiePlayer } from '@dotlottie/react-player';
+import '@dotlottie/react-player/dist/index.css';
 import ThinkingProcess from '../ThinkingProcess';
 import HowWeUseAIModal from './HowWeUseAIModal';
 import { getUserName, getCompanyName } from '../../utils/session';
@@ -129,7 +130,7 @@ const AIChatbot = ({ isOpen, onClose }) => {
                             </button>
                         )}
                         <div className="w-6 h-6 flex items-center justify-center shrink-0">
-                            <AIAsterisk size={24} isThinking={true} />
+                            <DotLottiePlayer src="/lottiefile/AI loading.lottie" autoplay loop style={{ width: '150%', height: '150%' }} />
                         </div>
                         <h2 className="text-[15px] font-semibold text-slate-800 flex items-center gap-2">
                             Onimta Intelligence
@@ -245,8 +246,8 @@ const AIChatbot = ({ isOpen, onClose }) => {
                                                 </div>
                                             ) : (
                                                 <div className="flex gap-4 max-w-[90%]">
-                                                    <div className="w-8 h-8 rounded-full bg-indigo-50 border border-indigo-100 flex items-center justify-center shrink-0 mt-1 group">
-                                                        <AIAsterisk size={16} />
+                                                    <div className="w-8 h-8 rounded-full bg-indigo-50 border border-indigo-100 flex items-center justify-center shrink-0 mt-1 overflow-hidden">
+                                                        <DotLottiePlayer src="/lottiefile/AI loading.lottie" autoplay loop style={{ width: '130%', height: '130%' }} />
                                                     </div>
                                                     <div className="flex flex-col gap-2">
                                                         <div className="text-[12px] font-medium text-slate-400 flex items-center gap-1.5">
