@@ -104,7 +104,7 @@ const SystemAnalyticsBoard = ({ allEmployees = [], allCompanies = [], hierarchy 
     return (
         <div className="flex flex-col gap-6 animate-in fade-in zoom-in-95 duration-200 h-full max-h-[82vh] overflow-y-auto no-scrollbar pb-10">
             {/* Header */}
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0">
+            <div className="bg-white rounded-none-2xl shadow-sm border border-slate-200 p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0">
                 <div>
                     <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
                         <Activity className="text-emerald-500" size={20} />
@@ -115,7 +115,7 @@ const SystemAnalyticsBoard = ({ allEmployees = [], allCompanies = [], hierarchy 
                 <div className="flex items-center gap-3">
                     <button
                         onClick={() => navigate('/report/system-analytics')}
-                        className="px-4 py-2.5 bg-white border border-slate-200 hover:border-emerald-500 hover:text-emerald-500 text-slate-600 text-xs font-bold uppercase tracking-wider rounded-[3px] shadow-sm transition-all flex items-center gap-2"
+                        className="px-4 py-2.5 bg-white border border-slate-200 hover:border-emerald-500 hover:text-emerald-500 text-slate-600 text-xs font-bold uppercase tracking-wider rounded-none shadow-sm transition-all flex items-center gap-2"
                     >
                         <Download size={14} />
                         Export Report
@@ -123,7 +123,7 @@ const SystemAnalyticsBoard = ({ allEmployees = [], allCompanies = [], hierarchy 
                     <button
                         onClick={fetchLogs}
                         disabled={loading}
-                        className="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold rounded-[3px] shadow-md transition-all active:scale-95 flex items-center gap-2 disabled:opacity-70"
+                        className="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold rounded-none shadow-md transition-all active:scale-95 flex items-center gap-2 disabled:opacity-70"
                     >
                         {loading ? <Loader2 size={14} className="animate-spin" /> : null}
                         Refresh Data
@@ -139,7 +139,7 @@ const SystemAnalyticsBoard = ({ allEmployees = [], allCompanies = [], hierarchy 
                     { title: 'Total Transactions', value: totalTransactions.toString(), change: 'Volume', colorClass: 'border-t-purple-500', textClass: 'text-purple-500' },
                     { title: 'Pending Resets', value: pendingActions.toString(), change: pendingActions > 0 ? 'Needs Action' : 'Clear', colorClass: pendingActions > 0 ? 'border-t-red-500' : 'border-t-orange-500', textClass: pendingActions > 0 ? 'text-red-500' : 'text-emerald-500' },
                 ].map((stat, i) => (
-                    <div key={i} className={`bg-white p-5 rounded-2xl border border-slate-200 shadow-sm border-t-4 ${stat.colorClass}`}>
+                    <div key={i} className={`bg-white p-5 rounded-none-2xl border border-slate-200 shadow-sm border-t-4 ${stat.colorClass}`}>
                         <h3 className="text-slate-500 text-[10px] font-black uppercase tracking-widest mb-2">{stat.title}</h3>
                         <div className="flex items-end gap-2">
                             <p className="text-3xl font-black text-slate-900">{stat.value}</p>
@@ -151,7 +151,7 @@ const SystemAnalyticsBoard = ({ allEmployees = [], allCompanies = [], hierarchy 
 
             {/* Charts Area */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 shrink-0">
-                <div className="lg:col-span-2 bg-white rounded-2xl border border-slate-200 shadow-sm p-6 flex flex-col min-h-[300px]">
+                <div className="lg:col-span-2 bg-white rounded-none-2xl border border-slate-200 shadow-sm p-6 flex flex-col min-h-[300px]">
                     <h3 className="text-sm font-bold text-slate-900 uppercase tracking-widest mb-6">Traffic Overview (Last 7 Days)</h3>
                         {loading ? (
                             <div className="flex-1 flex items-center justify-center">
@@ -163,12 +163,12 @@ const SystemAnalyticsBoard = ({ allEmployees = [], allCompanies = [], hierarchy 
                                     const h = day.count > 0 ? Math.max((day.count / maxTraffic) * 100, 5) : 0;
                                     return (
                                         <div key={i} className="flex-1 flex flex-col items-center justify-end gap-2 group h-full">
-                                            <div className="w-full bg-emerald-100 rounded-t-md relative group-hover:bg-emerald-500 transition-colors" style={{ height: `${h}%` }}>
-                                                <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[10px] font-bold px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity z-10 pointer-events-none shadow-md whitespace-nowrap">
+                                            <div className="w-full bg-emerald-100 rounded-none-t-md relative group-hover:bg-emerald-500 transition-colors" style={{ height: `${h}%` }}>
+                                                <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[10px] font-bold px-2 py-1 rounded-none opacity-0 group-hover:opacity-100 transition-opacity z-10 pointer-events-none shadow-md whitespace-nowrap">
                                                     {day.count} events
                                                 </div>
                                             </div>
-                                            <span className="text-[10px] font-bold text-slate-400 uppercase">
+                                            <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">
                                                 {day.label}
                                             </span>
                                         </div>
@@ -178,7 +178,7 @@ const SystemAnalyticsBoard = ({ allEmployees = [], allCompanies = [], hierarchy 
                         )}
                 </div>
 
-                <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 flex flex-col min-h-[300px]">
+                <div className="bg-white rounded-none-2xl border border-slate-200 shadow-sm p-6 flex flex-col min-h-[300px]">
                     <h3 className="text-sm font-bold text-slate-900 uppercase tracking-widest mb-4">Recent Audit Logs</h3>
                     <div className="flex flex-col gap-4 flex-1 overflow-auto">
                         {loading ? (
@@ -186,13 +186,13 @@ const SystemAnalyticsBoard = ({ allEmployees = [], allCompanies = [], hierarchy 
                                 <Loader2 className="w-6 h-6 text-emerald-500 animate-spin" />
                             </div>
                         ) : recentLogs.length === 0 ? (
-                            <p className="text-xs text-slate-400 font-medium italic mt-4 text-center">No recent activity found.</p>
+                            <p className="text-xs text-slate-500 dark:text-slate-400 font-medium italic mt-4 text-center">No recent activity found.</p>
                         ) : (
                             recentLogs.map((log, i) => {
                                 const timeStr = log.date ? new Date(log.date).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Unknown time';
                                 return (
                                     <div key={i} className="flex gap-3">
-                                        <div className={`w-2 h-2 mt-1.5 rounded-full shrink-0 ${getTypeColor(log.action)}`} />
+                                        <div className={`w-2 h-2 mt-1.5 rounded-none-full shrink-0 ${getTypeColor(log.action)}`} />
                                         <div>
                                             <p className="text-xs font-bold text-slate-800 line-clamp-1">{log.action || 'Unknown Action'}</p>
                                             <p className="text-[10px] text-slate-500 uppercase tracking-wider">{log.user || 'System'} • {timeStr}</p>
@@ -206,18 +206,18 @@ const SystemAnalyticsBoard = ({ allEmployees = [], allCompanies = [], hierarchy 
             </div>
 
             {/* Full Logs Table */}
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 flex flex-col overflow-hidden shrink-0 min-h-[400px]">
+            <div className="bg-white rounded-none-2xl shadow-sm border border-slate-200 flex flex-col overflow-hidden shrink-0 min-h-[400px]">
                 <div className="p-4 border-b border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4 bg-slate-50/50">
                     <h3 className="text-sm font-bold text-slate-900 uppercase tracking-widest hidden md:block ml-2">Full Audit Trail</h3>
                     <div className="flex items-center gap-4 w-full md:w-auto">
                         <div className="relative flex-1 md:w-64">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400 w-4 h-4" />
                             <input
                                 type="text"
                                 placeholder="Search logs..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                className="w-full pl-9 pr-4 py-2 border border-slate-200 bg-white rounded-[3px] text-sm outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all"
+                                className="w-full pl-9 pr-4 py-2 border border-slate-200 bg-white rounded-none text-sm outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all"
                             />
                         </div>
                     </div>
@@ -225,12 +225,12 @@ const SystemAnalyticsBoard = ({ allEmployees = [], allCompanies = [], hierarchy 
 
                 <div className="flex-1 overflow-auto max-h-[500px]">
                     {loading ? (
-                        <div className="flex flex-col items-center justify-center h-64 gap-4 text-slate-400">
+                        <div className="flex flex-col items-center justify-center h-64 gap-4 text-slate-500 dark:text-slate-400">
                             <Loader2 className="animate-spin text-emerald-500 w-8 h-8" />
                         </div>
                     ) : filteredLogs.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center h-64 gap-4 text-slate-400">
-                            <FileText className="w-12 h-12 text-slate-300" />
+                        <div className="flex flex-col items-center justify-center h-64 gap-4 text-slate-500 dark:text-slate-400">
+                            <FileText className="w-12 h-12 text-slate-600 dark:text-slate-300" />
                             <p className="text-sm font-bold">No logs found matching your criteria.</p>
                         </div>
                     ) : (
@@ -256,12 +256,12 @@ const SystemAnalyticsBoard = ({ allEmployees = [], allCompanies = [], hierarchy 
                                         <td className="py-3 px-6">
                                             <span className="text-sm text-slate-700 font-medium">{log.action || 'Unknown Action'}</span>
                                         </td>
-                                        <td className="py-3 px-6 text-xs font-mono text-slate-400">
+                                        <td className="py-3 px-6 text-xs font-mono text-slate-500 dark:text-slate-400">
                                             {log.ip || '0.0.0.0'}
                                         </td>
                                         <td className="py-3 px-6">
                                             <div className="flex justify-center">
-                                                <div className={`flex items-center gap-1.5 px-3 py-1 rounded-[3px] border text-[10px] font-bold uppercase tracking-wider ${getStatusStyle(log.status)}`}>
+                                                <div className={`flex items-center gap-1.5 px-3 py-1 rounded-none border text-[10px] font-bold uppercase tracking-wider ${getStatusStyle(log.status)}`}>
                                                     {getStatusIcon(log.status)}
                                                     {log.status || 'Success'}
                                                 </div>
@@ -279,3 +279,9 @@ const SystemAnalyticsBoard = ({ allEmployees = [], allCompanies = [], hierarchy 
 };
 
 export default SystemAnalyticsBoard;
+
+
+
+
+
+

@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import SystemLoader from '../components/SystemLoader';
 import toast from 'react-hot-toast';
 import { showSuccessToast } from '../utils/toastUtils';
 import api from '../services/api';
+import { DotLottiePlayer } from '@dotlottie/react-player';
+import '@dotlottie/react-player/dist/index.css';
 import {
     LayoutDashboard,
     Building2,
@@ -35,7 +38,8 @@ import {
     Megaphone,
     Lock,
     Unlock,
-    Sparkles
+    Sparkles,
+    Plus
 } from 'lucide-react';
 import ConfirmModal from '../components/modals/ConfirmModal';
 import AlertModal from '../components/modals/AlertModal';
@@ -51,9 +55,11 @@ import SubscriptionAdminBoard from '../components/Admin/SubscriptionAdminBoard';
 import CompanyOverviewBoard from '../HomeMaster/CompanyOverviewBoard';
 import AdminCompanyReportsBoard from '../HomeMaster/AdminCompanyReportsBoard';
 import EngagementAdminBoard from '../components/Admin/EngagementAdminBoard';
+import DatabaseAdminBoard from '../components/Admin/DatabaseAdminBoard';
 import EmployeeMessageDropdown from '../components/Admin/EmployeeMessageDropdown';
 import AdminAIChatbot from '../components/modals/AdminAIChatbot';
 import AIAsterisk from '../components/AIAsterisk';
+import AnimatedBackground from '../components/AnimatedBackground';
 
 const SuperAdminDashboard = () => {
     const navigate = useNavigate();
@@ -62,12 +68,30 @@ const SuperAdminDashboard = () => {
     const [activeMenu, setActiveMenu] = useState('Dashboard');
     const [searchTerm, setSearchTerm] = useState('');
     const [expandedEmps, setExpandedEmps] = useState({});
+    
     const [showMessageDropdown, setShowMessageDropdown] = useState(false);
     const [currentUserCode, setCurrentUserCode] = useState('');
 
     // Flat Lists State
     const [allCompanies, setAllCompanies] = useState([]);
     const [allEmployees, setAllEmployees] = useState([]);
+    const [stats, setStats] = useState({ totalAdmins: 0, totalCompanies: 0, totalEmployees: 0, activeSubscriptions: 0 });
+
+    const [darkMode, setDarkMode] = useState(() => {
+        const saved = localStorage.getItem('saDarkMode');
+        return saved ? saved === 'true' : true; // Default to Dark Mode for Super Admin
+    });
+    const [showAIChatbot, setShowAIChatbot] = useState(false);
+
+    useEffect(() => {
+        if (darkMode) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+        localStorage.setItem('saDarkMode', darkMode);
+    }, [darkMode]);
+
     const [allModules, setAllModules] = useState([]);
 
     // User Groups & Editing State
@@ -88,6 +112,9 @@ const SuperAdminDashboard = () => {
     const [pendingResets, setPendingResets] = useState([]);
     const [showResets, setShowResets] = useState(false);
 
+    // Profile Menu State
+    const [showProfileMenu, setShowProfileMenu] = useState(false);
+
 
 
     // Role Permissions Editor State
@@ -96,98 +123,27 @@ const SuperAdminDashboard = () => {
     const [permissions, setPermissions] = useState([]);
     const [loadingPermissions, setLoadingPermissions] = useState(false);
     const [savingPermissions, setSavingPermissions] = useState(false);
-    const [showPasswordConfirmModal, setShowPasswordConfirmModal] = useState(false);
-    const [confirmPasswordInput, setConfirmPasswordInput] = useState('');
-    const [showTogglePasswordModal, setShowTogglePasswordModal] = useState(false);
-    const [togglePasswordInput, setTogglePasswordInput] = useState('');
-    const [pendingToggleFunc, setPendingToggleFunc] = useState(null);
+
+    
+    // Create Role State
+    const [showCreateRoleModal, setShowCreateRoleModal] = useState(false);
+    const [newRoleName, setNewRoleName] = useState('');
+    const [newRoleDescription, setNewRoleDescription] = useState('');
+    const [creatingRole, setCreatingRole] = useState(false);
     const [permSearch, setPermSearch] = useState('');
-    const [selectedPermEmployee, setSelectedPermEmployee] = useState('');
-    const [selectedPermCompany, setSelectedPermCompany] = useState('');
-    const [showPermTargetModal, setShowPermTargetModal] = useState(false);
-    const [permEmpSearchText, setPermEmpSearchText] = useState('');
-    const [permCompSearchText, setPermCompSearchText] = useState('');
-    const [permEmpSearchTriggered, setPermEmpSearchTriggered] = useState(false);
-    const [permCompSearchTriggered, setPermCompSearchTriggered] = useState(false);
     const [seedingFunctions, setSeedingFunctions] = useState(false);
 
     // Employee Detail View State
     const [selectedEmployeeView, setSelectedEmployeeView] = useState(null);
 
+    // User Role Management State
+    const [editingUserRole, setEditingUserRole] = useState(null);
+    const [editRoleName, setEditRoleName] = useState('');
+    const [editRoleDesc, setEditRoleDesc] = useState('');
+    const [savingUserRole, setSavingUserRole] = useState(false);
+
     // Company Detail View State
     const [selectedCompanyView, setSelectedCompanyView] = useState(null);
-
-    // Filter companies based on selected employee for Permissions Editor
-    const fetchBackups = async () => {
-        try {
-            const res = await api.get('/Backup/history');
-            if (res.data) setBackups(res.data);
-        } catch (error) {
-            console.error("Failed to fetch backups", error);
-        }
-    };
-
-    useEffect(() => {
-        if (activeMenu === 'Database') {
-            fetchBackups();
-        }
-    }, [activeMenu]);
-
-    const handleCreateBackup = async () => {
-        setCreatingBackup(true);
-        try {
-            // Get default path
-            let defaultPath = "C:\\Backup";
-            try {
-                const pathRes = await api.get('/Backup/default-path');
-                if (pathRes.data?.path) defaultPath = pathRes.data.path;
-            } catch (e) { }
-
-            const res = await api.post('/Backup/create', {
-                DatabaseName: 'Acc_Web',
-                BackupPath: defaultPath,
-                UserName: 'SuperAdmin'
-            });
-
-            setAlertConfig({
-                isOpen: true,
-                title: 'Success',
-                message: res.data?.message || 'Backup created successfully',
-                variant: 'success'
-            });
-            fetchBackups(); // Refresh list
-        } catch (error) {
-            console.error("Backup failed", error);
-            setAlertConfig({
-                isOpen: true,
-                title: 'Error',
-                message: error.response?.data?.message || 'Failed to create backup',
-                variant: 'warning'
-            });
-        } finally {
-            setCreatingBackup(false);
-        }
-    };
-
-    const getAvailablePermCompanies = () => {
-        if (!selectedPermEmployee) return allCompanies;
-        const empNode = hierarchy.find(h => h.empCode === selectedPermEmployee || h.emp_Code === selectedPermEmployee);
-        if (empNode && empNode.companies) {
-            return empNode.companies.map(c => ({
-                code: c.companyCode || c.company_Code,
-                comp_Name: c.companyName || c.company_Name
-            }));
-        }
-        return [];
-    };
-
-    const availablePermCompanies = getAvailablePermCompanies();
-
-    useEffect(() => {
-        if (selectedPermCompany && !availablePermCompanies.find(c => c.code === selectedPermCompany)) {
-            setSelectedPermCompany('');
-        }
-    }, [selectedPermEmployee, availablePermCompanies, selectedPermCompany]);
 
     // Confirm Modal State
     const [confirmConfig, setConfirmConfig] = useState({
@@ -206,27 +162,18 @@ const SuperAdminDashboard = () => {
     });
 
     const [showAdminConfig, setShowAdminConfig] = useState(false);
-    const [backups, setBackups] = useState([]);
-    const [creatingBackup, setCreatingBackup] = useState(false);
     const [showSystemLogReport, setShowSystemLogReport] = useState(false);
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-    const [darkMode, setDarkMode] = useState(false);
-    const [showAIChatbot, setShowAIChatbot] = useState(false);
 
-    useEffect(() => {
-        if (darkMode) {
-            document.documentElement.classList.add('dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-        }
-        localStorage.setItem('saDarkMode', darkMode);
-    }, [darkMode]);
-
-    // Delete flow state (confirm → password → execute)
+    const [isMobile, setIsMobile] = useState(window.innerWidth < 768);// Delete flow state (confirm → password → execute)
     const [showDeletePasswordModal, setShowDeletePasswordModal] = useState(false);
     const [deletePasswordInput, setDeletePasswordInput] = useState('');
     const [pendingDeleteAction, setPendingDeleteAction] = useState(null);
+
+    // Save Permissions flow state
+    const [showSavePermissionsPasswordModal, setShowSavePermissionsPasswordModal] = useState(false);
+    const [savePermissionsPasswordInput, setSavePermissionsPasswordInput] = useState('');
 
     // Feedback state
     const [feedbackData, setFeedbackData] = useState([]);
@@ -387,10 +334,10 @@ const SuperAdminDashboard = () => {
     }, [activeMenu]);
 
     useEffect(() => {
-        if (activeMenu === 'Role Features' && selectedRole && !showPermTargetModal) {
+        if (activeMenu === 'Role Features' && selectedRole) {
             fetchRolePermissions(selectedRole);
         }
-    }, [activeMenu, selectedRole, showPermTargetModal]);
+    }, [activeMenu, selectedRole]);
 
     const fetchSystemRoles = async () => {
         try {
@@ -409,14 +356,31 @@ const SuperAdminDashboard = () => {
         }
     };
 
+    const handleCreateRole = async () => {
+        if (!newRoleName.trim()) {
+            setAlertConfig({ isOpen: true, title: 'Validation Error', message: 'Role Name is required.', variant: 'warning' });
+            return;
+        }
+        setCreatingRole(true);
+        try {
+            await api.post('/UserGroup/create', { Group_Name: newRoleName, Description: newRoleDescription });
+            setAlertConfig({ isOpen: true, title: 'Success', message: 'Role created successfully.', variant: 'success' });
+            setShowCreateRoleModal(false);
+            setNewRoleName('');
+            setNewRoleDescription('');
+            await fetchSystemRoles();
+            await fetchAdminData();
+        } catch (error) {
+            setAlertConfig({ isOpen: true, title: 'Error', message: error.response?.data?.message || 'Failed to create role.', variant: 'danger' });
+        } finally {
+            setCreatingRole(false);
+        }
+    };
+
     const fetchRolePermissions = async (roleId) => {
         setLoadingPermissions(true);
         try {
-            const params = { userRoleId: roleId };
-            if (selectedPermEmployee) params.empCode = selectedPermEmployee;
-            if (selectedPermCompany) params.companyCode = selectedPermCompany;
-
-            const res = await api.get('/UserRole/system-permissions', { params });
+            const res = await api.get('/UserRole/system-permissions', { params: { userRoleId: roleId } });
             const data = res.data || [];
 
             const uniquePerms = Array.from(new Map(data.map(item => [item.system_Fuction || item.systemFuction || item.System_Fuction, item])).values());
@@ -435,26 +399,10 @@ const SuperAdminDashboard = () => {
         }
     };
 
-    const handleInitiateToggle = (funcCode) => {
-        setPendingToggleFunc(funcCode);
-        setTogglePasswordInput('');
-        setShowTogglePasswordModal(true);
-    };
-
-    const confirmAndTogglePermission = () => {
-        if (!togglePasswordInput) {
-            setAlertConfig({
-                isOpen: true,
-                title: 'Error',
-                message: 'Super Admin password is required to toggle permission.',
-                variant: 'warning'
-            });
-            return;
-        }
-
+    const handleTogglePermission = (funcCode) => {
         setPermissions(prev => prev.map(p => {
             const code = p.system_Fuction || p.systemFuction || p.System_Fuction;
-            if (code === pendingToggleFunc) {
+            if (code === funcCode) {
                 const currentAllow = p.allow_Fuction || p.allowFuction || p.Allow_Fuction;
                 const newAllow = currentAllow === 'T' ? 'F' : 'T';
                 return {
@@ -466,9 +414,6 @@ const SuperAdminDashboard = () => {
             }
             return p;
         }));
-
-        setShowTogglePasswordModal(false);
-        setPendingToggleFunc(null);
     };
 
     const handleAllowAllPermissions = () => {
@@ -493,28 +438,25 @@ const SuperAdminDashboard = () => {
     };
 
     const handleInitiateSavePermissions = () => {
-        setConfirmPasswordInput('');
-        setShowPasswordConfirmModal(true);
+        setSavePermissionsPasswordInput('');
+        setShowSavePermissionsPasswordModal(true);
     };
 
-    const confirmAndSavePermissions = async () => {
-        if (!confirmPasswordInput) {
+    const handleSavePermissions = async () => {
+        if (!savePermissionsPasswordInput) {
             setAlertConfig({
                 isOpen: true,
                 title: 'Error',
-                message: 'Super Admin password is required to save permissions.',
+                message: 'Super Admin password is required to save role permissions.',
                 variant: 'warning'
             });
             return;
         }
-
-        setShowPasswordConfirmModal(false);
+        setShowSavePermissionsPasswordModal(false);
         setSavingPermissions(true);
         try {
             const payload = {
                 userRoleId: selectedRole.toString(),
-                empCode: selectedPermEmployee || null,
-                companyCode: selectedPermCompany || null,
                 permissions: permissions.map(p => ({
                     system_Fuction: p.system_Fuction || p.systemFuction || p.System_Fuction,
                     allow_Fuction: p.allow_Fuction || p.allowFuction || p.Allow_Fuction
@@ -560,13 +502,14 @@ const SuperAdminDashboard = () => {
         });
     };
 
-    const handleToggleEmployeeLock = (e, empCode) => {
+    const handleToggleEmployeeLock = (e, empCode, isCurrentlyLocked) => {
         e.stopPropagation();
         setConfirmConfig({
             isOpen: true,
-            title: 'Toggle Employee Lock',
-            message: `Are you sure you want to change the lock status for employee ${empCode}?`,
+            title: isCurrentlyLocked ? 'Unlock Employee' : 'Lock Employee',
+            message: `Are you sure you want to ${isCurrentlyLocked ? 'unlock' : 'lock'} employee ${empCode}?`,
             loading: false,
+            confirmText: isCurrentlyLocked ? 'Yes, Unlock' : 'Yes, Lock',
             onConfirm: async () => {
                 closeConfirm();
                 try {
@@ -663,6 +606,11 @@ const SuperAdminDashboard = () => {
                 await api.delete(`/reportfeedback/${action.feedbackId}`);
                 setFeedbackData(prev => prev.filter(f => f.id !== action.feedbackId));
                 showSuccessToast('Feedback deleted successfully.');
+            } else if (action.type === 'userrole') {
+                await api.delete(`/UserGroup/delete/${action.roleId}`);
+                showSuccessToast('User role deleted successfully.');
+                await fetchAdminData();
+                await fetchSystemRoles();
             }
         } catch (error) {
             setAlertConfig({
@@ -672,6 +620,41 @@ const SuperAdminDashboard = () => {
                 variant: 'warning'
             });
             console.error(error);
+        }
+    };
+
+    const handleDeleteUserRole = (e, roleId) => {
+        e.stopPropagation();
+        setConfirmConfig({
+            isOpen: true,
+            title: 'Delete User Role',
+            message: `Are you sure you want to delete role ID ${roleId}? This action cannot be undone and may affect users assigned to this role.`,
+            loading: false,
+            onConfirm: () => {
+                closeConfirm();
+                setPendingDeleteAction({ type: 'userrole', roleId });
+                setDeletePasswordInput('');
+                setShowDeletePasswordModal(true);
+            }
+        });
+    };
+
+    const handleUpdateUserRole = async () => {
+        if (!editRoleName.trim()) {
+            setAlertConfig({ isOpen: true, title: 'Validation Error', message: 'Role Name is required.', variant: 'warning' });
+            return;
+        }
+        setSavingUserRole(true);
+        try {
+            await api.put(`/UserGroup/update/${editingUserRole.group_Id}`, { Group_Name: editRoleName, Description: editRoleDesc });
+            setAlertConfig({ isOpen: true, title: 'Success', message: 'User role updated successfully.', variant: 'success' });
+            setEditingUserRole(null);
+            await fetchAdminData();
+            await fetchSystemRoles();
+        } catch (error) {
+            setAlertConfig({ isOpen: true, title: 'Error', message: error.response?.data?.message || 'Failed to update user role.', variant: 'warning' });
+        } finally {
+            setSavingUserRole(false);
         }
     };
 
@@ -720,71 +703,87 @@ const SuperAdminDashboard = () => {
         { name: 'Companies', icon: Building2 },
         { name: 'Employees', icon: Users },
         { name: 'Role Features', icon: ShieldAlert },
-        { name: 'Admin Config', icon: Settings },
         { name: 'Reports', icon: FileText },
         { name: 'Engagement', icon: Megaphone },
         { name: 'Subscriptions', icon: CalendarClock },
         { name: 'Database', icon: Database },
         { name: 'Security Audit', icon: ShieldCheck },
         { name: 'Integrations', icon: Puzzle },
-        { name: 'App List', icon: AppWindow },
         { name: 'User Feedback', icon: MessageSquare }
     ];
 
     return (
-        <div className="flex h-screen bg-[#f4f5f8] font-sans overflow-hidden">
+        <div className="flex h-screen bg-white dark:bg-[#0f172a] font-sans overflow-hidden relative">
+            <AnimatedBackground />
             {/* Sidebar */}
-            <aside id="tour-sidebar" className={`bg-white border-r border-slate-200 shadow-[0_1px_4px_rgba(0,0,0,0.06)] flex flex-col h-full hidden md:flex  transition-all duration-300 ${sidebarCollapsed ? 'w-16' : 'w-64'} z-30`}>
-                <div className={`flex items-center border-b border-slate-100 ${sidebarCollapsed ? 'h-16 justify-center px-0' : 'h-16 px-6'}`}>
-                    <div className={`flex items-center ${sidebarCollapsed ? 'justify-center' : 'gap-3'}`}>
-                        <img src="/onimta_logo-modified.png" alt="Onimta Logo" className="h-8 w-auto object-contain rounded-[12px] shrink-0" />
-                        <div className={sidebarCollapsed ? 'hidden' : ''}>
-                            <h1 className="text-[16px] font-bold text-[#393a3d] tracking-tight leading-none">Accounts</h1>
-                            <p className="text-[10px] text-[#6b6c72] uppercase tracking-wider font-bold leading-tight">Super Admin</p>
+            <aside id="tour-sidebar" className={`relative overflow-hidden group bg-white dark:bg-[#1e293b] border-r border-slate-200 dark:border-gray-800 shadow-[4px_0_15px_rgba(0,0,0,0.2)] flex flex-col h-full hidden md:flex transition-all duration-300 ease-in-out ${sidebarCollapsed ? 'w-[80px]' : 'w-[80px] hover:w-[260px]'} z-40 ${showAIChatbot ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
+                <div className="absolute inset-0 pointer-events-none opacity-20 z-0">
+                    <AnimatedBackground />
+                </div>
+                
+                <div className={`relative z-10 flex items-center border-b border-slate-200 dark:border-gray-800/60 h-20 pl-[24px]`}>
+                    <div className="flex items-center w-full overflow-hidden">
+                        <div className="w-[32px] flex justify-center shrink-0">
+                            <img src="/onimta_logo-modified.png" alt="Onimta Logo" className="h-10 w-auto object-contain rounded-[10px]" />
+                        </div>
+                        <div className={`transition-all duration-300 opacity-0 group-hover:opacity-100 whitespace-nowrap flex flex-col justify-center ml-3 ${sidebarCollapsed ? 'hidden' : ''}`}>
+                            <h1 className="text-[18px] font-bold text-slate-800 dark:text-white tracking-tight leading-none mt-1">Accounts</h1>
+                            <p className="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-wider font-bold leading-tight mt-1">Super Admin</p>
                         </div>
                     </div>
                 </div>
 
-                <nav className={`flex-1 py-4 space-y-1 overflow-y-auto no-scrollbar ${sidebarCollapsed ? 'px-2' : 'px-3'}`}>
-                    {menuItems.map((item) => (
-                        <button
-                            key={item.name}
-                            onClick={() => setActiveMenu(item.name)}
-                            className={`w-full flex items-center  rounded-[12px] transition-all ${sidebarCollapsed ? 'justify-center px-0 py-3' : 'gap-3 px-3 py-2.5'} ${activeMenu === item.name
-                                ? 'bg-blue-50 text-[#0078d4] font-bold'
-                                : 'text-slate-600 hover:bg-[#f4f5f8] hover:text-[#0078d4] font-medium text-[13.5px]'
-                                }`}
-                            title={sidebarCollapsed ? item.name : undefined}
-                        >
-                            <item.icon className={`w-[18px] h-[18px] rounded-[12px] shrink-0 ${activeMenu === item.name ? 'text-[#0078d4]' : 'text-slate-400'}`} />
-                            <span className={sidebarCollapsed ? 'hidden' : ''}>{item.name}</span>
-                        </button>
-                    ))}
+                <nav className="relative z-10 flex-1 py-6 overflow-y-auto overflow-x-hidden no-scrollbar menu-content">
+                    <ul className="flex flex-col w-full">
+                        {menuItems.map((item) => (
+                            <li key={item.name} className="w-[90%] mb-[20px]">
+                                <button
+                                    onClick={() => setActiveMenu(item.name)}
+                                    className={`w-full flex items-center transition-all duration-300 pl-[24px] py-[12px] rounded-r-[50px] ${activeMenu === item.name
+                                        ? 'bg-slate-50 dark:bg-[#0c0c0c] text-slate-800 dark:text-white shadow-md'
+                                        : 'text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:bg-[#0c0c0c] hover:text-slate-800 dark:text-white'
+                                        }`}
+                                    title={sidebarCollapsed ? item.name : undefined}
+                                >
+                                    <div className="w-[32px] flex justify-center shrink-0">
+                                        <item.icon className={`w-[22px] h-[22px] transition-colors ${activeMenu === item.name ? 'text-[#3b82f6]' : 'text-slate-500 dark:text-slate-400'}`} />
+                                    </div>
+                                    <span className={`transition-all duration-300 opacity-0 group-hover:opacity-100 whitespace-nowrap font-medium text-[14.5px] ml-3 ${sidebarCollapsed ? 'hidden' : ''}`}>
+                                        {item.name}
+                                    </span>
+                                </button>
+                            </li>
+                        ))}
+                    </ul>
                 </nav>
 
-                <div className={`p-3 mb-3 ${sidebarCollapsed ? 'flex justify-center' : ''}`}>
-                    <button
-                        onClick={handleLogout}
-                        className={`flex items-center text-red-500 font-bold hover:bg-red-50  rounded-[12px] transition-all text-[13px] ${sidebarCollapsed ? 'justify-center p-2.5 w-auto' : 'w-full gap-3 px-3 py-2.5'}`}
-                        title={sidebarCollapsed ? 'Logout' : undefined}
-                    >
-                        <LogOut className="w-[18px] h-[18px] rounded-[12px] shrink-0" />
-                        <span className={sidebarCollapsed ? 'hidden' : ''}>Logout</span>
-                    </button>
+                <div className="relative z-10 mb-6 w-full">
+                    <div className="w-[90%]">
+                        <button
+                            onClick={handleLogout}
+                            className={`w-full flex items-center transition-all duration-300 pl-[20px] py-[12px] rounded-r-[50px] text-red-400 hover:bg-slate-50 dark:bg-[#0c0c0c] hover:text-red-300`}
+                            title={sidebarCollapsed ? 'Logout' : undefined}
+                        >
+                            {/* <LogOut className="w-[22px] h-[22px] shrink-0" /> */}
+                            <span className={`transition-all duration-300 opacity-0 group-hover:opacity-100 whitespace-nowrap font-bold text-[14.5px] ml-4 ${sidebarCollapsed ? 'hidden' : ''}`}>
+                                Logout
+                            </span>
+                        </button>
+                    </div>
                 </div>
             </aside>
 
             {/* Mobile sidebar overlay */}
             {sidebarOpen && (
                 <div className="fixed inset-0 z-50 md:hidden">
-                    <div className="absolute inset-0 bg-slate-900/30 backdrop-blur-sm dark:bg-slate-900/80" onClick={() => setSidebarOpen(false)} />
+                    <div className="absolute inset-0 bg-slate-100 dark:bg-slate-900/30 backdrop-blur-sm dark:bg-slate-100 dark:bg-slate-900/80" onClick={() => setSidebarOpen(false)} />
                     <aside className="absolute left-0 top-0 h-full w-64 bg-white dark:bg-slate-800 shadow-2xl animate-in slide-in-from-left duration-200">
                         <div className="h-16 flex items-center px-6 border-b border-slate-100 dark:border-slate-700">
                             <div className="flex items-center gap-3">
                                 <img src="/onimta_logo-modified.png" alt="Onimta Logo" className="h-8 w-auto object-contain" />
                                 <div>
-                                    <h1 className="text-[16px] font-bold text-[#393a3d] dark:text-white tracking-tight leading-none">Accounts</h1>
-                                    <p className="text-[10px] text-[#6b6c72] dark:text-slate-400 uppercase tracking-wider font-bold leading-tight">Super Admin</p>
+                                    <h1 className="text-[16px] font-bold text-[#393a3d] dark:text-slate-800 dark:text-white tracking-tight leading-none">Accounts</h1>
+                                    <p className="text-[10px] text-[#6b6c72] dark:text-slate-500 dark:text-slate-400 uppercase tracking-wider font-bold leading-tight">Super Admin</p>
                                 </div>
                             </div>
                         </div>
@@ -798,48 +797,35 @@ const SuperAdminDashboard = () => {
                                         : 'text-slate-600 hover:bg-[#f4f5f8] hover:text-[#0078d4] font-medium text-[13.5px]'
                                         }`}
                                 >
-                                    <item.icon className={`w-[18px] h-[18px] ${activeMenu === item.name ? 'text-[#0078d4]' : 'text-slate-400'}`} />
+                                    <item.icon className={`w-[18px] h-[18px] ${activeMenu === item.name ? 'text-[#0078d4]' : 'text-slate-500 dark:text-slate-400'}`} />
                                     {item.name}
                                 </button>
                             ))}
                         </nav>
-                        <div className="p-3 mb-3">
-                            <button onClick={handleLogout} className="w-full flex items-center gap-3 px-3 py-2.5 text-red-500 font-bold hover:bg-red-50  rounded-[12px] transition-all text-[13px]">
-                                <LogOut className="w-[18px] h-[18px]" />
-                                Logout
-                            </button>
-                        </div>
                     </aside>
                 </div>
             )}
 
             {/* Main Content */}
-            <main id="tour-main-content" className="flex-1 flex flex-col h-full overflow-hidden">
+            <main id="tour-main-content" className={`flex-1 flex flex-col h-full overflow-hidden transition-opacity duration-300 ${showAIChatbot ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
 
                 {/* Topbar */}
-                <header className="z-50 bg-white shadow-[0_1px_4px_rgba(0,0,0,0.06)]  shrink-0">
-                    <div className="flex items-center justify-between px-6 border-b border-slate-100 h-14">
-                        {/* Left: Menu Toggle + Branding */}
+                <header className="z-50 bg-white dark:bg-[#1e293b]/50 backdrop-blur-md border-b border-slate-200 dark:border-gray-800 shrink-0">
+                    <div className="flex items-center justify-between px-6 h-14">
+                        {/* Left: Branding */}
                         <div className="flex items-center gap-3 rounded-[12px] shrink-0">
-                            <Menu className="w-5 h-5 text-slate-500 hover:text-[#0078d4] cursor-pointer rounded-[12px] transition-colors" onClick={() => { if (window.innerWidth < 768) { setSidebarOpen(true); } else { setSidebarCollapsed(prev => !prev); } }} />
-                            <div className="h-7 w-px bg-[#eceef1]" />
-                            {/* <img src="/onimta_logo-modified.png" alt="ONIMTA" className="h-7 w-auto object-contain" />
-                            <div className="h-7 w-px bg-[#eceef1]" /> */}
-                            {/* <div>
-                                <div className="text-[16px] font-bold text-[#393a3d] leading-tight tracking-tight">Super Admin</div>
-                                <div className="text-[10px] font-bold text-[#6b6c72] uppercase tracking-wider">System Owner</div>
-                            </div> */}
+                            {/* <img src="/onimta_logo-modified.png" alt="Onimta Logo" className="h-10 w-auto object-contain shrink-0 drop-shadow-md" /> */}
                         </div>
 
                         {/* Center: Search */}
-                        <div id="tour-topbar-search" className="relative hidden md:block w-[400px]">
-                            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 " />
+                        <div id="tour-topbar-search" className="relative hidden md:block w-[600px]">
+                            <Search className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2 " />
                             <input
                                 type="text"
                                 placeholder="Search employees or companies..."
                                 value={searchTerm}
                                 onChange={e => setSearchTerm(e.target.value)}
-                                className="w-full pl-9 pr-4 py-1.5 bg-slate-50 hover:bg-white rounded-[3px]  text-[13px] font-medium text-slate-800 placeholder-slate-400 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#0078d4]/30 focus:border-[#0078d4]/50 rounded-[12px] transition-all"
+                                className="w-full pl-9 pr-4 py-1.5 bg-slate-100 dark:bg-[#0d1117]/80 hover:bg-slate-200 dark:hover:bg-black rounded-[5px] text-[13px] font-medium text-slate-800 dark:text-white placeholder-slate-500 dark:placeholder-gray-600 border border-slate-300 dark:border-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all"
                             />
                         </div>
 
@@ -847,18 +833,18 @@ const SuperAdminDashboard = () => {
                         <div className="flex items-center gap-2">
                             <button
                                 onClick={() => setDarkMode(prev => !prev)}
-                                className="relative p-2  hover:bg-slate-100 text-slate-500 hover:text-[#0078d4] rounded-[12px] transition-colors"
+                                className="relative p-2 hover:bg-slate-200 dark:hover:bg-gray-800 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white rounded-[12px] transition-colors"
                                 title={darkMode ? 'Light Mode' : 'Dark Mode'}
                             >
                                 {darkMode ? <Sun className="w-[18px] h-[18px]" /> : <Moon className="w-[18px] h-[18px]" />}
                             </button>
                             <div id="tour-topbar-messages" className="relative">
                                 <button
-                                    className="relative p-2  hover:bg-slate-100 text-slate-500 hover:text-[#0078d4] rounded-[12px] transition-colors"
+                                    className="relative p-2 hover:bg-slate-200 dark:hover:bg-gray-800 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white rounded-[12px] transition-colors"
                                     onClick={() => setShowMessageDropdown(!showMessageDropdown)}
                                 >
                                     <MessageSquare className="w-[18px] h-[18px]" />
-                                    <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500  border-2 border-white"></span>
+                                    <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 border border-white dark:border-[#161b22] rounded-full"></span>
                                 </button>
                                 {showMessageDropdown && (
                                     <EmployeeMessageDropdown
@@ -869,68 +855,133 @@ const SuperAdminDashboard = () => {
                             </div>
                             <div id="tour-topbar-notifications" className="relative">
                                 <button
-                                    className="relative p-2  hover:bg-slate-100 text-slate-500 hover:text-[#0078d4] rounded-[12px] transition-colors"
+                                    className="relative p-2 hover:bg-slate-200 dark:hover:bg-gray-800 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white rounded-[12px] transition-colors"
                                     onClick={() => setShowResets(!showResets)}
                                 >
                                     <Bell className="w-[18px] h-[18px]" />
                                     {pendingResets.length > 0 && (
-                                        <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-amber-500  border-2 border-white"></span>
+                                        <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-amber-500 border border-white dark:border-[#161b22] rounded-full"></span>
                                     )}
                                 </button>
 
-                                {showResets && (
-                                    <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-slate-800 shadow-[0_8px_30px_rgb(0,0,0,0.12)] dark:border-slate-700 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200 border border-gray-200">
-                                        <div className="p-4 border-b border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 flex items-center justify-between">
-                                            <h3 className="font-bold text-slate-900 dark:text-white text-[13px]">Password Recovery Alerts</h3>
-                                            <span className="bg-red-100 dark:bg-red-500/20 text-red-600 dark:text-red-400 text-[10px] font-bold px-2 py-1 ">{pendingResets.length}</span>
-                                        </div>
-                                        <div className="max-h-[300px] overflow-auto">
-                                            {pendingResets.length === 0 ? (
-                                                <div className="p-6 text-center text-slate-500 dark:text-slate-400 text-sm">
-                                                    No pending password resets.
-                                                </div>
-                                            ) : (
-                                                pendingResets.map(req => (
-                                                    <div key={req.empCode} className="p-4 border-b border-slate-50 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50 rounded-[12px] transition-colors">
-                                                        <div className="flex justify-between items-start mb-2">
-                                                            <div>
-                                                                <p className="text-sm font-bold text-slate-900 dark:text-white">{req.empName}</p>
-                                                                <p className="text-xs text-slate-500 dark:text-slate-400 font-mono">{req.empCode}</p>
-                                                            </div>
-                                                            <p className="text-[10px] font-bold text-red-500 uppercase">Action Req</p>
-                                                        </div>
-                                                        <div className="bg-slate-100 dark:bg-slate-700 p-2  flex items-center justify-between">
-                                                            <code className="text-xs text-slate-600 dark:text-slate-300 font-mono truncate mr-2">{req.token}</code>
-                                                            <button
-                                                                onClick={() => {
-                                                                    navigator.clipboard.writeText(req.token);
-                                                                    setAlertConfig({
-                                                                        isOpen: true,
-                                                                        title: 'Token Copied!',
-                                                                        message: 'Give this token to the employee so they can securely reset their password.',
-                                                                        variant: 'success'
-                                                                    });
-                                                                }}
-                                                                className="text-[#0078d4] hover:text-[#005a9e] text-xs font-bold uppercase tracking-wider"
-                                                            >
-                                                                Copy
-                                                            </button>
-                                                        </div>
+                                {showResets && createPortal(
+                                    <div className="fixed inset-0 z-[9999] bg-black/20 animate-in fade-in duration-200" onClick={() => setShowResets(false)}>
+                                        <div 
+                                            className="absolute top-6 bottom-6 right-6 w-1/4 min-w-[320px] bg-white dark:bg-[#1e293b]/80 backdrop-blur-xl border border-slate-200 dark:border-[#334155] border-l-[6px] border-l-amber-500 shadow-2xl overflow-hidden flex flex-col animate-in slide-in-from-right duration-300"
+                                            onClick={(e) => e.stopPropagation()}
+                                        >
+                                            <div className="p-5 border-b border-slate-200 dark:border-[#334155] bg-transparent">
+                                                <div className="flex items-center justify-between mb-2">
+                                                    <h3 className="font-bold text-slate-800 dark:text-white text-base flex items-center gap-2">
+                                                        <Bell size={18} className="text-amber-500" />
+                                                        Password Recovery Alerts
+                                                    </h3>
+                                                    <div className="flex items-center gap-3">
+                                                        <span className="bg-red-500/20 text-red-400 text-xs font-bold px-2.5 py-1 rounded">{pendingResets.length}</span>
+                                                        <button onClick={() => setShowResets(false)} className="p-1.5 text-slate-500 dark:text-slate-400 hover:text-red-400 hover:bg-red-500/20 rounded transition-colors">
+                                                            <X size={20} />
+                                                        </button>
                                                     </div>
-                                                ))
-                                            )}
+                                                </div>
+                                            </div>
+                                            <div className="flex-1 overflow-y-auto p-3 no-scrollbar bg-transparent">
+                                                {pendingResets.length === 0 ? (
+                                                    <div className="p-6 text-center text-slate-500 text-sm mt-10">
+                                                        No pending password resets.
+                                                    </div>
+                                                ) : (
+                                                    pendingResets.map(req => (
+                                                        <div key={req.empCode} className="p-4 mb-2 bg-white dark:bg-[#0f172a]/40 border border-slate-200 dark:border-[#334155] hover:border-amber-500/50 rounded transition-all shadow-sm">
+                                                            <div className="flex justify-between items-start mb-3">
+                                                                <div>
+                                                                    <p className="text-sm font-bold text-slate-800 dark:text-white">{req.empName}</p>
+                                                                    <p className="text-[11px] text-slate-500 dark:text-slate-400 font-mono mt-0.5">{req.empCode}</p>
+                                                                </div>
+                                                                <p className="text-[10px] font-bold text-amber-500 bg-amber-500/10 px-2 py-0.5 rounded uppercase tracking-wider">Action Req</p>
+                                                            </div>
+                                                            <div className="bg-white dark:bg-[#0f172a]/80 p-2.5 rounded border border-slate-200 dark:border-[#334155]/50 flex items-center justify-between">
+                                                                <code className="text-xs text-slate-600 dark:text-slate-300 font-mono truncate mr-2">{req.token}</code>
+                                                                <button
+                                                                    onClick={() => {
+                                                                        navigator.clipboard.writeText(req.token);
+                                                                        setAlertConfig({
+                                                                            isOpen: true,
+                                                                            title: 'Token Copied!',
+                                                                            message: 'Give this token to the employee so they can securely reset their password.',
+                                                                            variant: 'success'
+                                                                        });
+                                                                    }}
+                                                                    className="text-amber-500 hover:text-amber-400 text-xs font-bold uppercase tracking-wider px-2 py-1 hover:bg-amber-500/10 rounded transition-colors"
+                                                                >
+                                                                    Copy
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    ))
+                                                )}
+                                            </div>
                                         </div>
-                                    </div>
+                                    </div>,
+                                    document.body
                                 )}
                             </div>
-                            <div className="flex items-center gap-2 pl-3 border-l border-slate-200">
-                                {/* <div className="text-right hidden sm:block">
-                                    <p className="text-[13px] text-[#393a3d] font-bold">Super Admin</p>
-                                    <p className="text-[10px] text-[#6b6c72] font-bold uppercase tracking-wider">System Owner</p>
-                                </div> */}
-                                <div className="w-[28px] h-[28px]  bg-[#4096ff] text-white flex items-center justify-center font-bold text-[14px] shadow-sm rounded-full">
+                            
+                            {/* Profile Dropdown */}
+                            <div className="relative flex items-center gap-2 pl-3 border-l border-gray-700 ml-1">
+                                <button 
+                                    onClick={() => setShowProfileMenu(prev => !prev)}
+                                    className="w-[28px] h-[28px] bg-blue-600 text-white flex items-center justify-center font-bold text-[14px] shadow-sm rounded-full hover:ring-2 hover:ring-blue-500/50 transition-all focus:outline-none"
+                                >
                                     A
-                                </div>
+                                </button>
+                                
+                                {showProfileMenu && (
+                                    <>
+                                        {/* Invisible overlay to close dropdown */}
+                                        <div className="fixed inset-0 z-[90]" onClick={() => setShowProfileMenu(false)} />
+                                        
+                                        <div className="absolute right-0 top-full mt-3 w-64 bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-[#334155] shadow-2xl rounded-none z-[100] animate-in fade-in slide-in-from-top-2 duration-200">
+                                            <div className="p-4 border-b border-slate-200 dark:border-[#334155] bg-white dark:bg-[#0f172a]/50 flex items-center gap-3">
+                                                <div className="w-10 h-10 bg-blue-600 text-white flex items-center justify-center font-bold text-lg rounded-none shadow-sm shrink-0">
+                                                    A
+                                                </div>
+                                                <div className="overflow-hidden">
+                                                    <h3 className="font-bold text-slate-800 dark:text-white text-sm truncate">Super Admin</h3>
+                                                    <p className="text-[11px] text-slate-500 dark:text-slate-400 font-mono truncate">admin@accounts.lk</p>
+                                                </div>
+                                            </div>
+                                            
+                                            <div className="p-2">
+                                                <div className="px-3 py-2">
+                                                    <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">System Access</p>
+                                                    <div className="flex flex-col gap-1.5">
+                                                        <div className="flex items-center justify-between text-xs">
+                                                            <span className="text-slate-500 dark:text-slate-400">Role ID</span>
+                                                            <span className="font-bold text-slate-800 dark:text-white bg-white dark:bg-[#0f172a] px-1.5 py-0.5 border border-slate-200 dark:border-[#334155]">99</span>
+                                                        </div>
+                                                        <div className="flex items-center justify-between text-xs">
+                                                            <span className="text-slate-500 dark:text-slate-400">Portal</span>
+                                                            <span className="font-bold text-slate-800 dark:text-white">Full Access</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div className="h-px bg-[#334155] my-2" />
+                                                
+                                                <button 
+                                                    onClick={() => {
+                                                        setShowProfileMenu(false);
+                                                        handleLogout();
+                                                    }}
+                                                    className="w-full flex items-center gap-2 px-3 py-2.5 text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors text-xs font-bold text-left"
+                                                >
+                                                    <LogOut className="w-[14px] h-[14px]" />
+                                                    Secure Logout
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -943,8 +994,8 @@ const SuperAdminDashboard = () => {
                     {activeMenu === 'Dashboard' && (
                         <>
                             {/* Greeting Header */}
-                            <div className="flex flex-col mb-6 animate-in fade-in slide-in-from-bottom-1 duration-300">
-                                <h1 className="text-[28px] font-extrabold text-[#1e293b] leading-tight tracking-tight">
+                            <div className="flex flex-col mb-6 animate-in fade-in slide-in-from-bottom-1 duration-300 relative z-10">
+                                <h1 className="text-[42px] font-mono text-slate-800 dark:text-white leading-tight tracking-tight drop-shadow-sm">
                                     {(() => {
                                         const h = new Date().getHours();
                                         if (h < 12) return 'Good Morning';
@@ -952,70 +1003,75 @@ const SuperAdminDashboard = () => {
                                         return 'Good Evening';
                                     })()}, Admin
                                 </h1>
-                                <p className="text-[14px] font-semibold text-slate-500 mt-1">
+                                <p className="text-[15px]  text-slate-500 dark:text-slate-400 mt-1">
                                     Here's your system overview for {new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
                                 </p>
                             </div>
 
                             {/* Metric Cards */}
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                                <div className="bg-white p-5 shadow-sm hover:shadow-md rounded-[12px] transition-all flex flex-col justify-between border border-slate-200/60 hover:border-[#0078d4]/20 ">
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                                {/* Metric Card 1 */}
+                                <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-[#334155] border-l-[6px] border-l-blue-500 p-5 shadow-sm hover:shadow-md rounded-none transition-all flex flex-col justify-between">
                                     <div className="flex justify-between items-start mb-4">
                                         <div>
-                                            <p className="text-[11px] font-extrabold text-slate-500 uppercase tracking-wider">Total Employees</p>
+                                            <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Total Employees</p>
                                         </div>
-                                        <div className="w-9 h-9  bg-blue-50 flex items-center justify-center">
-                                            <Users className="w-[18px] h-[18px] text-[#0078d4]" />
+                                        <div className="w-8 h-8 bg-blue-500/10 rounded-none flex items-center justify-center border border-blue-500/20">
+                                            <Users className="w-4 h-4 text-blue-400" />
                                         </div>
                                     </div>
-                                    <div className="flex items-end justify-between">
-                                        <span className="text-[32px] font-black text-slate-800 leading-none">{hierarchy.length}</span>
-                                        <span className="text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2 py-1 ">Active</span>
+                                    <div className="flex items-end justify-between mt-2">
+                                        <span className="text-3xl font-black text-slate-800 dark:text-white leading-none">{hierarchy.length}</span>
+                                        <span className="text-[10px] font-bold text-white bg-blue-600 px-2 py-1 rounded-none uppercase tracking-wider">Active</span>
                                     </div>
                                 </div>
-                                <div className="bg-white p-5 shadow-sm hover:shadow-md rounded-[12px] transition-all flex flex-col justify-between border border-slate-200/60 hover:border-emerald-500/20 ">
+
+                                {/* Metric Card 2 */}
+                                <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-[#334155] border-l-[6px] border-l-emerald-500 p-5 shadow-sm hover:shadow-md rounded-none transition-all flex flex-col justify-between">
                                     <div className="flex justify-between items-start mb-4">
                                         <div>
-                                            <p className="text-[11px] font-extrabold text-slate-500 uppercase tracking-wider">Total Companies</p>
+                                            <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Total Companies</p>
                                         </div>
-                                        <div className="w-9 h-9  bg-emerald-50 flex items-center justify-center">
-                                            <Building2 className="w-[18px] h-[18px] text-emerald-600" />
+                                        <div className="w-8 h-8 bg-emerald-500/10 rounded-none flex items-center justify-center border border-emerald-500/20">
+                                            <Building2 className="w-4 h-4 text-emerald-400" />
                                         </div>
                                     </div>
-                                    <div className="flex items-end justify-between">
-                                        <span className="text-[32px] font-black text-slate-800 leading-none">{totalCompanies}</span>
-                                        <span className="text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2 py-1 ">Registered</span>
+                                    <div className="flex items-end justify-between mt-2">
+                                        <span className="text-3xl font-black text-slate-800 dark:text-white leading-none">{totalCompanies}</span>
+                                        <span className="text-[10px] font-bold text-white bg-emerald-600 px-2 py-1 rounded-none uppercase tracking-wider">Registered</span>
                                     </div>
                                 </div>
-                                <div className="bg-white p-5 shadow-sm hover:shadow-md rounded-[12px] transition-all flex flex-col justify-between border border-slate-200/60 hover:border-purple-500/20 ">
+
+                                {/* Metric Card 3 */}
+                                <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-[#334155] border-l-[6px] border-l-amber-500 p-5 shadow-sm hover:shadow-md rounded-none transition-all flex flex-col justify-between">
                                     <div className="flex justify-between items-start mb-4">
                                         <div>
-                                            <p className="text-[11px] font-extrabold text-slate-500 uppercase tracking-wider">Total Entities</p>
+                                            <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Total Entities</p>
                                         </div>
-                                        <div className="w-9 h-9  bg-purple-50 flex items-center justify-center">
-                                            <Database className="w-[18px] h-[18px] text-purple-600" />
+                                        <div className="w-8 h-8 bg-amber-500/10 rounded-none flex items-center justify-center border border-amber-500/20">
+                                            <Database className="w-4 h-4 text-amber-400" />
                                         </div>
                                     </div>
-                                    <div className="flex items-end justify-between">
-                                        <span className="text-[32px] font-black text-slate-800 leading-none">{hierarchy.length + totalCompanies}</span>
-                                        <span className="text-[11px] font-bold text-purple-600 bg-purple-50 px-2 py-1 ">Combined</span>
+                                    <div className="flex items-end justify-between mt-2">
+                                        <span className="text-3xl font-black text-slate-800 dark:text-white leading-none">{hierarchy.length + totalCompanies}</span>
+                                        <span className="text-[10px] font-bold text-white bg-amber-600 px-2 py-1 rounded-none uppercase tracking-wider">Combined</span>
                                     </div>
                                 </div>
                             </div>
 
                             {/* Main Table Card */}
-                            <div className="bg-white shadow-sm border border-slate-200/60 overflow-hidden mb-6 ">
-                                <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+                            <div className="bg-white dark:bg-[#0f172a]/50 shadow-inner border border-slate-200 dark:border-[#334155] overflow-hidden mb-6 rounded-none">
+                                <div className="px-6 py-4 border-b border-slate-200 dark:border-[#334155] flex items-center justify-between">
                                     <div className="flex items-center gap-3">
-                                        <div className="w-8 h-8  bg-blue-50 flex items-center justify-center">
-                                            <LayoutDashboard className="w-4 h-4 text-[#0078d4]" />
+                                        <div className="w-8 h-8 bg-blue-500/20 flex items-center justify-center rounded-[8px] border border-blue-400/30">
+                                            <LayoutDashboard className="w-4 h-4 text-blue-300" />
                                         </div>
                                         <div>
-                                            <h2 className="text-[15px] font-bold text-slate-800">System Overview</h2>
-                                            <p className="text-[11px] text-slate-500 font-medium">Employee hierarchy & company assignments</p>
+                                            <h2 className="text-[15px] font-bold text-slate-800 dark:text-white">System Overview</h2>
+                                            <p className="text-[11px] text-slate-600 dark:text-slate-300 font-medium">Employee hierarchy & company assignments</p>
                                         </div>
                                     </div>
-                                    <button className="p-2 bg-white border border-slate-200  text-slate-400 hover:text-[#0078d4] hover:border-[#0078d4]/30 hover:bg-[#e8f2fb] rounded-[12px] transition-all" title="Refresh">
+                                    <button className="p-2 bg-white dark:bg-[#1e293b]/50 border border-slate-200 dark:border-[#334155] text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:text-white hover:border-white/20 hover:bg-slate-200 dark:bg-white/10 rounded-[12px] transition-all" title="Refresh">
                                         <Search className="w-[18px] h-[18px]" />
                                     </button>
                                 </div>
@@ -1023,57 +1079,57 @@ const SuperAdminDashboard = () => {
                                 <div className="w-full overflow-x-auto">
                                     <table className="w-full text-left border-collapse">
                                         <thead>
-                                            <tr className="border-b border-slate-100 bg-slate-50/50">
-                                                <th className="py-3.5 px-6 text-[11px] font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap">Employee</th>
-                                                <th className="py-3.5 px-6 text-[11px] font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap">Role</th>
-                                                <th className="py-3.5 px-6 text-[11px] font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap">Last Login</th>
-                                                <th className="py-3.5 px-6 text-[11px] font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap">Login Count</th>
-                                                <th className="py-3.5 px-6 text-[11px] font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap">Companies</th>
-                                                <th className="py-3.5 px-6 text-[11px] font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap text-right">Action</th>
+                                            <tr className="border-b border-slate-200 dark:border-[#334155] bg-white dark:bg-[#1e293b]/50">
+                                                <th className="py-3.5 px-6 text-[11px] font-bold tracking-wider uppercase text-slate-700 dark:text-slate-400 whitespace-nowrap">Employee</th>
+                                                <th className="py-3.5 px-6 text-[11px] font-bold tracking-wider uppercase text-slate-700 dark:text-slate-400 whitespace-nowrap">Role</th>
+                                                <th className="py-3.5 px-6 text-[11px] font-bold tracking-wider uppercase text-slate-700 dark:text-slate-400 whitespace-nowrap">Last Login</th>
+                                                <th className="py-3.5 px-6 text-[11px] font-bold tracking-wider uppercase text-slate-700 dark:text-slate-400 whitespace-nowrap">Login Count</th>
+                                                <th className="py-3.5 px-6 text-[11px] font-bold tracking-wider uppercase text-slate-700 dark:text-slate-400 whitespace-nowrap">Companies</th>
+                                                <th className="py-3.5 px-6 text-[11px] font-bold tracking-wider uppercase text-slate-700 dark:text-slate-400 whitespace-nowrap text-right">Action</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             {filteredHierarchy.map((emp) => (
                                                 <React.Fragment key={emp.empCode}>
-                                                    <tr className="border-b border-slate-50 hover:bg-slate-50/80 rounded-[12px] transition-colors cursor-pointer group" onClick={() => toggleEmp(emp.empCode)}>
+                                                    <tr className="border-b border-slate-200 dark:border-white/5 hover:bg-white dark:bg-[#1e293b]/50 transition-colors cursor-pointer group" onClick={() => toggleEmp(emp.empCode)}>
                                                         <td className="py-3.5 px-6">
                                                             <div className="flex items-center gap-3">
-                                                                <div className="w-9 h-9  bg-gradient-to-br from-[#0078d4] to-[#004a7c] text-white flex items-center justify-center font-bold text-sm shadow-sm rounded-[12px] shrink-0">
+                                                                <div className="w-9 h-9 bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-white flex items-center justify-center font-bold text-sm shadow-sm rounded-none border border-slate-300 dark:border-slate-600 shrink-0">
                                                                     {emp.empName.charAt(0).toUpperCase()}
                                                                 </div>
                                                                 <div>
-                                                                    <p className="text-[13px] font-bold text-slate-900">{emp.empName}</p>
-                                                                    <p className="text-[11px] text-slate-500 font-mono mt-0.5">{emp.empCode} <span className="text-slate-300 mx-1">•</span> {emp.email || 'No Email'}</p>
+                                                                    <p className="text-[13px] font-bold text-slate-800 dark:text-white">{emp.empName}</p>
+                                                                    <p className="text-[11px] text-slate-600 dark:text-slate-300 font-mono mt-0.5">{emp.empCode} <span className="text-slate-500 dark:text-slate-400 mx-1">•</span> {emp.email || 'No Email'}</p>
                                                                 </div>
                                                             </div>
                                                         </td>
                                                         <td className="py-3.5 px-6">
-                                                            <span className={`inline-flex items-center px-2.5 py-1  text-[10px] uppercase tracking-widest font-bold ${emp.role === 99 ? 'bg-purple-100 text-purple-700' : 'bg-slate-100 text-slate-600'}`}>
+                                                            <span className={`inline-flex items-center px-2.5 py-1 text-[10px] uppercase tracking-widest font-bold rounded-none ${emp.role === 99 ? 'bg-indigo-600 text-white border border-indigo-700' : 'bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-white border border-slate-300 dark:border-slate-600'}`}>
                                                                 {emp.role === 99 ? 'Super Admin' : `Role ${emp.role}`}
                                                             </span>
                                                         </td>
                                                         <td className="py-3.5 px-6">
-                                                            <span className="text-[13px] font-medium text-slate-700">
-                                                                {emp.lastLogin ? new Date(emp.lastLogin).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : <span className="text-slate-400">Never</span>}
+                                                            <span className="text-[13px] font-medium text-slate-800 dark:text-white">
+                                                                {emp.lastLogin ? new Date(emp.lastLogin).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : <span className="text-slate-500 dark:text-slate-400">Never</span>}
                                                             </span>
                                                         </td>
                                                         <td className="py-3.5 px-6">
-                                                            <span className="text-[13px] font-bold text-slate-700">{emp.loginCount || 0}</span>
+                                                            <span className="text-[13px] font-bold text-slate-800 dark:text-white">{emp.loginCount || 0}</span>
                                                         </td>
                                                         <td className="py-3.5 px-6">
                                                             <div className="flex items-center gap-2">
-                                                                <span className="w-7 h-7  bg-emerald-100 text-emerald-700 flex items-center justify-center text-[11px] font-bold">
+                                                                <span className="w-7 h-7 bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 text-slate-800 dark:text-white flex items-center justify-center text-[11px] font-bold rounded-none">
                                                                     {emp.companies.length}
                                                                 </span>
                                                                 {expandedEmps[emp.empCode]
-                                                                    ? <ChevronDown className="w-[18px] h-[18px] text-slate-400" />
-                                                                    : <ChevronRight className="w-[18px] h-[18px] text-slate-400" />}
+                                                                    ? <ChevronDown className="w-[18px] h-[18px] text-slate-800 dark:text-white" />
+                                                                    : <ChevronRight className="w-[18px] h-[18px] text-slate-800 dark:text-white" />}
                                                             </div>
                                                         </td>
                                                         <td className="py-3.5 px-6 text-right">
-                                                            <div className="flex items-center justify-end gap-1">
+                                                            <div className="flex items-center justify-end gap-2">
                                                                 <button
-                                                                    className="p-2 text-slate-400 hover:text-[#0078d4] hover:bg-blue-50  rounded-[12px] transition-all"
+                                                                    className="px-3 py-1.5 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 border border-blue-700 shadow-sm rounded-none transition-all flex items-center gap-1.5"
                                                                     onClick={(e) => {
                                                                         e.stopPropagation();
                                                                         setEditingEmp(emp);
@@ -1082,14 +1138,14 @@ const SuperAdminDashboard = () => {
                                                                     }}
                                                                     title="Edit User Role"
                                                                 >
-                                                                    <Edit className="w-[18px] h-[18px]" />
+                                                                    <Edit className="w-[14px] h-[14px]" /> Edit
                                                                 </button>
                                                                 <button
-                                                                    className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50  rounded-[12px] transition-all"
+                                                                    className="px-3 py-1.5 text-xs font-bold text-white bg-red-600 hover:bg-red-700 border border-red-700 shadow-sm rounded-none transition-all flex items-center gap-1.5"
                                                                     onClick={(e) => handleDeleteEmployee(e, emp.empCode)}
                                                                     title="Delete Employee"
                                                                 >
-                                                                    <Trash2 className="w-[18px] h-[18px]" />
+                                                                    <Trash2 className="w-[14px] h-[14px]" /> Delete
                                                                 </button>
                                                             </div>
                                                         </td>
@@ -1097,43 +1153,46 @@ const SuperAdminDashboard = () => {
 
                                                     {/* Nested Companies */}
                                                     {expandedEmps[emp.empCode] && (
-                                                        <tr className="bg-slate-50/50">
-                                                            <td colSpan={6} className="p-0 border-b border-slate-100">
+                                                        <tr className="bg-white dark:bg-[#1e293b]/50 backdrop-blur-sm">
+                                                            <td colSpan={6} className="p-0 border-b border-slate-200 dark:border-[#334155]">
                                                                 <div className="py-4 px-6">
-                                                                    <div className="border-l-2 border-[#0078d4]/20 ml-3 pl-6 space-y-2">
+                                                                    <div className="border-l-2 border-slate-200 dark:border-white/20 ml-3 pl-6 space-y-2">
                                                                         {emp.companies.length === 0 ? (
-                                                                            <p className="text-[13px] text-slate-400 italic py-2">No companies assigned.</p>
+                                                                            <p className="text-[13px] text-slate-500 dark:text-slate-400 italic py-2">No companies assigned.</p>
                                                                         ) : (
                                                                             emp.companies.map((comp, idx) => (
-                                                                                <div key={comp.companyCode} onClick={() => openTransactionsModal(comp)} className="group flex items-center justify-between p-3  hover:bg-white hover:shadow-sm border border-transparent hover:border-slate-200 rounded-[12px] transition-all cursor-pointer">
+                                                                                <div key={comp.companyCode} onClick={() => openTransactionsModal(comp)} className="group flex items-center justify-between p-3 hover:bg-slate-200 dark:bg-white/10 hover:shadow-sm border border-transparent hover:border-white/20 rounded-none transition-all cursor-pointer">
                                                                                     <div className="flex items-center gap-4">
-                                                                                        <div className="w-9 h-9  bg-emerald-50 flex items-center justify-center group-hover:bg-emerald-100 rounded-[12px] transition-colors border border-emerald-100/50">
-                                                                                            <Building2 className="w-[18px] h-[18px] text-emerald-500" />
+                                                                                        <div className="w-9 h-9 bg-slate-100 dark:bg-slate-700 flex items-center justify-center border border-slate-300 dark:border-slate-600 rounded-none transition-colors">
+                                                                                            <Building2 className="w-[18px] h-[18px] text-slate-800 dark:text-white" />
                                                                                         </div>
                                                                                         <div>
-                                                                                            <p className="text-[13px] font-bold text-slate-800 group-hover:text-[#0078d4] rounded-[12px] transition-colors">{comp.companyName || 'Unknown Company'}</p>
-                                                                                            <p className="text-[11px] font-mono text-slate-400 mt-0.5">{comp.companyCode}</p>
+                                                                                            <p className="text-[13px] font-bold text-slate-800 dark:text-white transition-colors">{comp.companyName || 'Unknown Company'}</p>
+                                                                                            <p className="text-[11px] font-mono text-slate-600 dark:text-slate-300 mt-0.5">{comp.companyCode}</p>
                                                                                         </div>
                                                                                     </div>
                                                                                     <div className="flex items-center gap-4">
                                                                                         <div className="flex flex-col items-end">
-                                                                                            <span className="text-[9px] font-bold uppercase tracking-widest text-slate-400 mb-0.5">Transactions</span>
-                                                                                            <span className="text-[13px] font-black text-slate-700 bg-slate-100 px-2 py-0.5 ">{comp.transactions}</span>
+                                                                                            <span className="text-[9px] font-bold uppercase tracking-widest text-slate-600 dark:text-slate-300 mb-0.5">Transactions</span>
+                                                                                            <span className="text-[13px] font-black text-slate-800 dark:text-white bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 px-2 py-0.5 rounded-none">{comp.transactions}</span>
                                                                                         </div>
-                                                                                        <button
-                                                                                            className={`opacity-0 group-hover:opacity-100 p-1.5  rounded-[12px] transition-all ${comp.accDesable === 1 ? 'text-red-500 bg-red-50 hover:bg-red-100' : 'text-slate-400 hover:text-orange-500 hover:bg-orange-50'}`}
-                                                                                            onClick={(e) => { e.stopPropagation(); handleToggleCompanyLock(e, comp.companyCode); }}
-                                                                                            title={comp.accDesable === 1 ? "Unlock Company" : "Lock Company"}
-                                                                                        >
-                                                                                            {comp.accDesable === 1 ? <Lock className="w-[18px] h-[18px]" /> : <Unlock className="w-[18px] h-[18px]" />}
-                                                                                        </button>
-                                                                                        <button
-                                                                                            className="opacity-0 group-hover:opacity-100 p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50  rounded-[12px] transition-all"
-                                                                                            onClick={(e) => { e.stopPropagation(); handleDeleteCompany(e, comp.companyCode, emp.empCode); }}
-                                                                                            title="Remove Company Access"
-                                                                                        >
-                                                                                            <Trash2 className="w-[18px] h-[18px]" />
-                                                                                        </button>
+                                                                                        <div className="flex gap-2">
+                                                                                            <button
+                                                                                                className={`opacity-0 group-hover:opacity-100 px-3 py-1.5 text-xs font-bold text-white shadow-sm rounded-none transition-all flex items-center gap-1.5 ${comp.accDesable === 1 ? 'bg-red-600 hover:bg-red-700 border border-red-700' : 'bg-orange-500 hover:bg-orange-600 border border-orange-600'}`}
+                                                                                                onClick={(e) => { e.stopPropagation(); handleToggleCompanyLock(e, comp.companyCode); }}
+                                                                                                title={comp.accDesable === 1 ? "Unlock Company" : "Lock Company"}
+                                                                                            >
+                                                                                                {comp.accDesable === 1 ? <Lock className="w-[14px] h-[14px]" /> : <Unlock className="w-[14px] h-[14px]" />}
+                                                                                                {comp.accDesable === 1 ? "Unlock" : "Lock"}
+                                                                                            </button>
+                                                                                            <button
+                                                                                                className="opacity-0 group-hover:opacity-100 px-3 py-1.5 text-xs font-bold text-white bg-red-600 hover:bg-red-700 border border-red-700 shadow-sm rounded-none transition-all flex items-center gap-1.5"
+                                                                                                onClick={(e) => { e.stopPropagation(); handleDeleteCompany(e, comp.companyCode, emp.empCode); }}
+                                                                                                title="Remove Company Access"
+                                                                                            >
+                                                                                                <Trash2 className="w-[14px] h-[14px]" /> Remove
+                                                                                            </button>
+                                                                                        </div>
                                                                                     </div>
                                                                                 </div>
                                                                             ))
@@ -1154,28 +1213,28 @@ const SuperAdminDashboard = () => {
 
                     {/* COMPANIES VIEW */}
                     {activeMenu === 'Companies' && (
-                        <div className="bg-white shadow-sm border border-slate-200/60 overflow-hidden  animate-in fade-in slide-in-from-bottom-2 duration-300 mb-6">
-                            <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+                        <div className="bg-white dark:bg-[#0f172a]/50 shadow-inner border border-slate-200 dark:border-[#334155] overflow-hidden mb-6 rounded-none">
+                            <div className="px-6 py-4 border-b border-slate-200 dark:border-[#334155] flex items-center justify-between">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-8 h-8  bg-emerald-50 flex items-center justify-center">
-                                        <Building2 className="w-4 h-4 text-emerald-600" />
+                                    <div className="w-8 h-8 bg-emerald-500/20 flex items-center justify-center rounded-[8px] border border-emerald-400/30">
+                                        <Building2 className="w-4 h-4 text-emerald-300" />
                                     </div>
                                     <div>
-                                        <h2 className="text-[15px] font-bold text-slate-800">All Registered Companies</h2>
-                                        <p className="text-[11px] text-slate-500 font-medium">Manage all company records</p>
+                                        <h2 className="text-[15px] font-bold text-slate-800 dark:text-white">All Registered Companies</h2>
+                                        <p className="text-[11px] text-slate-600 dark:text-slate-300 font-medium">Manage all company records</p>
                                     </div>
                                 </div>
-                                <span className="bg-emerald-100 text-emerald-700 text-[10px] font-bold px-2.5 py-1 ">{allCompanies.length} Companies</span>
+                                <span className="bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 text-[10px] font-bold px-2.5 py-1 rounded-[6px]">{allCompanies.length} Companies</span>
                             </div>
                             <div className="w-full overflow-x-auto">
                                 <table className="w-full text-left border-collapse">
                                     <thead>
-                                        <tr className="border-b border-slate-100 bg-slate-50/50">
-                                            <th className="py-3.5 px-6 text-[11px] font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap">Company Code</th>
-                                            <th className="py-3.5 px-6 text-[11px] font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap">Company Name</th>
-                                            <th className="py-3.5 px-6 text-[11px] font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap">Email</th>
-                                            <th className="py-3.5 px-6 text-[11px] font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap">Phone</th>
-                                            <th className="py-3.5 px-6 text-[11px] font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap text-right">Action</th>
+                                        <tr className="border-b border-slate-200 dark:border-[#334155] bg-white dark:bg-[#1e293b]/50">
+                                            <th className="py-3.5 px-6 text-[11px] font-bold tracking-wider uppercase text-slate-700 dark:text-slate-400 whitespace-nowrap">Company Code</th>
+                                            <th className="py-3.5 px-6 text-[11px] font-bold tracking-wider uppercase text-slate-700 dark:text-slate-400 whitespace-nowrap">Company Name</th>
+                                            <th className="py-3.5 px-6 text-[11px] font-bold tracking-wider uppercase text-slate-700 dark:text-slate-400 whitespace-nowrap">Email</th>
+                                            <th className="py-3.5 px-6 text-[11px] font-bold tracking-wider uppercase text-slate-700 dark:text-slate-400 whitespace-nowrap">Phone</th>
+                                            <th className="py-3.5 px-6 text-[11px] font-bold tracking-wider uppercase text-slate-700 dark:text-slate-400 whitespace-nowrap text-right">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -1183,22 +1242,27 @@ const SuperAdminDashboard = () => {
                                             c.comp_Name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                                             c.code?.toLowerCase().includes(searchTerm.toLowerCase())
                                         ).map(comp => (
-                                            <tr key={comp.code} onClick={() => setSelectedCompany(comp)} className="border-b border-slate-50 hover:bg-slate-50/80 cursor-pointer rounded-[12px] transition-colors">
-                                                <td className="py-3.5 px-6 font-mono text-[13px] text-slate-900 font-bold">{comp.code}</td>
-                                                <td className="py-3.5 px-6 text-[13px] text-slate-900 font-bold">{comp.comp_Name || 'N/A'}</td>
-                                                <td className="py-3.5 px-6 text-[13px] text-slate-500 font-medium">{comp.email || 'N/A'}</td>
-                                                <td className="py-3.5 px-6 text-[13px] text-slate-500 font-medium">{comp.phone || 'N/A'}</td>
+                                            <tr key={comp.code} onClick={() => setSelectedCompany(comp)} className="border-b border-slate-200 dark:border-white/5 hover:bg-white dark:bg-[#1e293b]/50 cursor-pointer transition-colors group">
+                                                <td className="py-3.5 px-6 font-mono text-[13px] text-slate-800 dark:text-white font-bold">{comp.code}</td>
+                                                <td className="py-3.5 px-6 text-[13px] text-slate-800 dark:text-white font-bold">{comp.comp_Name || 'N/A'}</td>
+                                                <td className="py-3.5 px-6 text-[13px] text-slate-600 dark:text-slate-300 font-medium">{comp.email || 'N/A'}</td>
+                                                <td className="py-3.5 px-6 text-[13px] text-slate-600 dark:text-slate-300 font-medium">{comp.phone || 'N/A'}</td>
                                                 <td className="py-3.5 px-6 text-right">
-                                                    <div className="flex items-center justify-end gap-1">
+                                                    <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                                         <button
-                                                            className={`p-1.5  rounded-[12px] transition-all ${comp.acc_Desable === 1 ? 'text-red-500 bg-red-50 hover:bg-red-100' : 'text-slate-400 hover:text-orange-500 hover:bg-orange-50'}`}
+                                                            className={`px-3 py-1.5 text-xs font-bold text-white shadow-sm rounded-none transition-all flex items-center gap-1.5 ${comp.acc_Desable === 1 ? 'bg-red-600 hover:bg-red-700 border border-red-700' : 'bg-orange-500 hover:bg-orange-600 border border-orange-600'}`}
                                                             onClick={(e) => handleToggleCompanyLock(e, comp.code)}
                                                             title={comp.acc_Desable === 1 ? "Unlock Company" : "Lock Company"}
                                                         >
-                                                            {comp.acc_Desable === 1 ? <Lock className="w-[18px] h-[18px]" /> : <Unlock className="w-[18px] h-[18px]" />}
+                                                            {comp.acc_Desable === 1 ? <Lock className="w-[14px] h-[14px]" /> : <Unlock className="w-[14px] h-[14px]" />}
+                                                            {comp.acc_Desable === 1 ? "Unlock" : "Lock"}
                                                         </button>
-                                                        <button className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50  rounded-[12px] transition-all" onClick={(e) => { e.stopPropagation(); handleDeleteCompany(e, comp.code, null); }} title="Delete Company">
-                                                            <Trash2 className="w-[18px] h-[18px]" />
+                                                        <button
+                                                            className="px-3 py-1.5 text-xs font-bold text-white bg-red-600 hover:bg-red-700 border border-red-700 shadow-sm rounded-none transition-all flex items-center gap-1.5"
+                                                            onClick={(e) => { e.stopPropagation(); handleDeleteCompany(e, comp.code, null); }}
+                                                            title="Delete Company"
+                                                        >
+                                                            <Trash2 className="w-[14px] h-[14px]" /> Delete
                                                         </button>
                                                     </div>
                                                 </td>
@@ -1212,28 +1276,28 @@ const SuperAdminDashboard = () => {
 
                     {/* EMPLOYEES VIEW */}
                     {activeMenu === 'Employees' && (
-                        <div className="bg-white shadow-sm border border-slate-200/60 overflow-hidden  animate-in fade-in slide-in-from-bottom-2 duration-300 mb-6">
-                            <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+                        <div className="bg-white dark:bg-[#0f172a]/50 shadow-inner border border-slate-200 dark:border-[#334155] overflow-hidden mb-6 rounded-none">
+                            <div className="px-6 py-4 border-b border-slate-200 dark:border-[#334155] flex items-center justify-between">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-8 h-8  bg-blue-50 flex items-center justify-center">
-                                        <Users className="w-4 h-4 text-[#0078d4]" />
+                                    <div className="w-8 h-8 bg-blue-500/20 flex items-center justify-center rounded-[8px] border border-blue-400/30">
+                                        <Users className="w-4 h-4 text-blue-300" />
                                     </div>
                                     <div>
-                                        <h2 className="text-[15px] font-bold text-slate-800">All Employees</h2>
-                                        <p className="text-[11px] text-slate-500 font-medium">Manage employee accounts & roles</p>
+                                        <h2 className="text-[15px] font-bold text-slate-800 dark:text-white">All Employees</h2>
+                                        <p className="text-[11px] text-slate-600 dark:text-slate-300 font-medium">Manage employee accounts & roles</p>
                                     </div>
                                 </div>
-                                <span className="bg-blue-100 text-[#0078d4] text-[10px] font-bold px-2.5 py-1 ">{allEmployees.length} Employees</span>
+                                <span className="bg-blue-500/20 border border-blue-500/30 text-blue-300 text-[10px] font-bold px-2.5 py-1 rounded-[6px]">{allEmployees.length} Employees</span>
                             </div>
                             <div className="w-full overflow-x-auto">
                                 <table className="w-full text-left border-collapse">
                                     <thead>
-                                        <tr className="border-b border-slate-100 bg-slate-50/50">
-                                            <th className="py-3.5 px-6 text-[11px] font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap">Emp Code</th>
-                                            <th className="py-3.5 px-6 text-[11px] font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap">Employee Name</th>
-                                            <th className="py-3.5 px-6 text-[11px] font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap">Email</th>
-                                            <th className="py-3.5 px-6 text-[11px] font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap">Role</th>
-                                            <th className="py-3.5 px-6 text-[11px] font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap text-right">Action</th>
+                                        <tr className="border-b border-slate-200 dark:border-[#334155] bg-white dark:bg-[#1e293b]/50">
+                                            <th className="py-3.5 px-6 text-[11px] font-bold tracking-wider uppercase text-slate-700 dark:text-slate-400 whitespace-nowrap">Emp Code</th>
+                                            <th className="py-3.5 px-6 text-[11px] font-bold tracking-wider uppercase text-slate-700 dark:text-slate-400 whitespace-nowrap">Employee Name</th>
+                                            <th className="py-3.5 px-6 text-[11px] font-bold tracking-wider uppercase text-slate-700 dark:text-slate-400 whitespace-nowrap">Email</th>
+                                            <th className="py-3.5 px-6 text-[11px] font-bold tracking-wider uppercase text-slate-700 dark:text-slate-400 whitespace-nowrap">Role</th>
+                                            <th className="py-3.5 px-6 text-[11px] font-bold tracking-wider uppercase text-slate-700 dark:text-slate-400 whitespace-nowrap text-right">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -1241,19 +1305,19 @@ const SuperAdminDashboard = () => {
                                             e.emp_Name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                                             e.emp_Code?.toLowerCase().includes(searchTerm.toLowerCase())
                                         ).map(emp => (
-                                            <tr key={emp.emp_Code} onClick={() => setSelectedEmployeeView(emp)} className="border-b border-slate-50 hover:bg-slate-50/80 cursor-pointer rounded-[12px] transition-colors">
-                                                <td className="py-3.5 px-6 font-mono text-[13px] text-slate-900 font-bold">{emp.emp_Code}</td>
-                                                <td className="py-3.5 px-6 text-[13px] text-slate-900 font-bold">{emp.emp_Name || 'N/A'}</td>
-                                                <td className="py-3.5 px-6 text-[13px] text-slate-500 font-medium">{emp.email || 'N/A'}</td>
+                                            <tr key={emp.emp_Code} onClick={() => setSelectedEmployeeView(emp)} className="border-b border-slate-200 dark:border-white/5 hover:bg-white dark:bg-[#1e293b]/50 cursor-pointer transition-colors group">
+                                                <td className="py-3.5 px-6 font-mono text-[13px] text-slate-800 dark:text-white font-bold">{emp.emp_Code}</td>
+                                                <td className="py-3.5 px-6 text-[13px] text-slate-800 dark:text-white font-bold">{emp.emp_Name || 'N/A'}</td>
+                                                <td className="py-3.5 px-6 text-[13px] text-slate-600 dark:text-slate-300 font-medium">{emp.email || 'N/A'}</td>
                                                 <td className="py-3.5 px-6">
-                                                    <span className={`inline-flex items-center px-2.5 py-1  text-[10px] uppercase tracking-widest font-bold ${emp.userRole_Id === 99 ? 'bg-purple-100 text-purple-700' : 'bg-slate-100 text-slate-600'}`}>
-                                                        {emp.userRole_Id === 99 ? 'Super Admin' : `Role ${emp.userRole_Id}`}
+                                                    <span className={`inline-flex items-center px-2.5 py-1 text-[10px] uppercase tracking-widest font-bold rounded-none ${emp.userRole_Id === 99 ? 'bg-indigo-600 text-white border border-indigo-700' : 'bg-[#0078d4] text-white border border-[#005a9e]'}`}>
+                                                        {systemRoles.find(r => r.id === emp.userRole_Id || r.id?.toString() === emp.userRole_Id?.toString())?.name || (emp.userRole_Id === 99 ? 'Super Admin' : `Role ${emp.userRole_Id}`)}
                                                     </span>
                                                 </td>
                                                 <td className="py-3.5 px-6 text-right">
-                                                    <div className="flex items-center justify-end gap-1">
+                                                    <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                                         <button
-                                                            className="p-1.5 text-slate-400 hover:text-[#0078d4] hover:bg-blue-50  rounded-[12px] transition-all"
+                                                            className="px-3 py-1.5 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 border border-blue-700 shadow-sm rounded-none transition-all flex items-center gap-1.5"
                                                             onClick={(e) => {
                                                                 e.stopPropagation();
                                                                 setEditingEmp(emp);
@@ -1262,17 +1326,26 @@ const SuperAdminDashboard = () => {
                                                             }}
                                                             title="Edit Employee Role"
                                                         >
-                                                            <Edit className="w-[18px] h-[18px]" />
+                                                            <Edit className="w-[14px] h-[14px]" /> Edit
                                                         </button>
                                                         <button
-                                                            className={`p-1.5  rounded-[12px] transition-all ${emp.acc_Desable === "1" || emp.accDesable === "1" ? 'text-red-500 bg-red-50 hover:bg-red-100' : 'text-slate-400 hover:text-orange-500 hover:bg-orange-50'}`}
-                                                            onClick={(e) => { e.stopPropagation(); handleToggleEmployeeLock(e, emp.empCode || emp.emp_Code); }}
+                                                            className={`px-3 py-1.5 text-xs font-bold text-white shadow-sm rounded-none transition-all flex items-center gap-1.5 ${emp.acc_Desable === "1" || emp.accDesable === "1" ? 'bg-red-600 hover:bg-red-700 border border-red-700' : 'bg-orange-500 hover:bg-orange-600 border border-orange-600'}`}
+                                                            onClick={(e) => { e.stopPropagation(); handleToggleEmployeeLock(e, emp.empCode || emp.emp_Code, (emp.acc_Desable === "1" || emp.accDesable === "1")); }}
                                                             title={(emp.acc_Desable === "1" || emp.accDesable === "1") ? "Unlock Employee" : "Lock Employee"}
                                                         >
-                                                            {(emp.acc_Desable === "1" || emp.accDesable === "1") ? <Lock className="w-[18px] h-[18px]" /> : <Unlock className="w-[18px] h-[18px]" />}
+                                                            {(emp.acc_Desable === "1" || emp.accDesable === "1") ? <Lock className="w-[14px] h-[14px]" /> : <Unlock className="w-[14px] h-[14px]" />}
+                                                            {(emp.acc_Desable === "1" || emp.accDesable === "1") ? "Unlock" : "Lock"}
                                                         </button>
-                                                        <button className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50  rounded-[12px] transition-all" onClick={(e) => { e.stopPropagation(); handleDeleteEmployee(e, emp.emp_Code); }} title="Delete Employee">
-                                                            <Trash2 className="w-[18px] h-[18px]" />
+                                                        <button
+                                                            className={`px-3 py-1.5 text-xs font-bold text-white shadow-sm rounded-none transition-all flex items-center gap-1.5 ${emp.userRole_Id == 99 ? 'bg-gray-500 cursor-not-allowed border-gray-600' : 'bg-red-600 hover:bg-red-700 border border-red-700'}`}
+                                                            onClick={(e) => { 
+                                                                e.stopPropagation(); 
+                                                                if (emp.userRole_Id != 99) handleDeleteEmployee(e, emp.emp_Code); 
+                                                            }}
+                                                            title={emp.userRole_Id == 99 ? "Super Admin cannot be deleted" : "Delete Employee"}
+                                                            disabled={emp.userRole_Id == 99}
+                                                        >
+                                                            <Trash2 className="w-[14px] h-[14px]" /> Delete
                                                         </button>
                                                     </div>
                                                 </td>
@@ -1284,150 +1357,29 @@ const SuperAdminDashboard = () => {
                         </div>
                     )}                    {/* DATABASE VIEW */}
                     {activeMenu === 'Database' && (
-                        <div className="flex flex-col gap-6 animate-in fade-in zoom-in-95 duration-200 h-full pb-10">
-                            <div className="bg-white shadow-sm border border-slate-200/60 p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 rounded-[12px] shrink-0">
-                                <div className="flex items-center gap-4">
-                                    <div className="w-10 h-10 bg-blue-50 flex items-center justify-center">
-                                        <Database className="text-[#0078d4]" size={20} />
-                                    </div>
-                                    <div>
-                                        <h2 className="text-[15px] font-bold text-slate-800">Database Management</h2>
-                                        <p className="text-[11px] text-slate-500 font-medium">Manage system backups, optimize performance, and monitor database health.</p>
-                                    </div>
-                                </div>
-                                <div className="flex items-center gap-3">
-                                    <button
-                                        onClick={handleCreateBackup}
-                                        disabled={creatingBackup}
-                                        className="px-5 py-2.5 bg-[#0078d4] hover:bg-[#005a9e] text-white text-xs font-bold shadow-md rounded-[12px] transition-all active:scale-95 flex items-center gap-2 disabled:opacity-50"
-                                    >
-                                        {creatingBackup ? <Loader2 size={14} className="animate-spin" /> : <Database size={14} />}
-                                        {creatingBackup ? 'Creating...' : 'Create Full Backup'}
-                                    </button>
-                                </div>
-                            </div>
-
-                            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 rounded-[12px] shrink-0">
-                                <div className="bg-white p-5 border border-slate-200/60 shadow-sm flex flex-col justify-between">
-                                    <div className="flex items-center justify-between mb-4">
-                                        <div className="w-10 h-10 bg-blue-50 flex items-center justify-center text-blue-500">
-                                            <Database size={18} />
-                                        </div>
-                                        <span className="px-2 py-1 bg-emerald-50 text-emerald-600 text-[10px] font-bold uppercase tracking-wider">Healthy</span>
-                                    </div>
-                                    <div>
-                                        <h3 className="text-slate-500 text-xs font-black uppercase tracking-widest mb-1">Database Size</h3>
-                                        <p className="text-2xl font-bold text-slate-900">N/A</p>
-                                    </div>
-                                </div>
-                                <div className="bg-white p-5 border border-slate-200/60 shadow-sm flex flex-col justify-between">
-                                    <div className="flex items-center justify-between mb-4">
-                                        <div className="w-10 h-10 bg-purple-50 flex items-center justify-center text-purple-500">
-                                            <Users size={18} />
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <h3 className="text-slate-500 text-xs font-black uppercase tracking-widest mb-1">Total Records</h3>
-                                        <p className="text-2xl font-bold text-slate-900">
-                                            {allCompanies.length + allEmployees.length + hierarchy.reduce((acc, emp) => acc + (emp.companies ? emp.companies.reduce((sum, comp) => sum + (comp.transactions || comp.Transactions || 0), 0) : 0), 0)}
-                                        </p>
-                                    </div>
-                                </div>
-                                <div className="bg-white p-5 border border-slate-200/60 shadow-sm flex flex-col justify-between">
-                                    <div className="flex items-center justify-between mb-4">
-                                        <div className="w-10 h-10 bg-orange-50 flex items-center justify-center text-orange-500">
-                                            <Activity size={18} />
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <h3 className="text-slate-500 text-xs font-black uppercase tracking-widest mb-1">Active Connections</h3>
-                                        <p className="text-2xl font-bold text-slate-900">{allEmployees.length || 0}</p>
-                                    </div>
-                                </div>
-                                <div className="bg-white p-5 border border-slate-200/60 shadow-sm flex flex-col justify-between">
-                                    <div className="flex items-center justify-between mb-4">
-                                        <div className="w-10 h-10 bg-emerald-50 flex items-center justify-center text-emerald-500">
-                                            <CheckCircle size={18} />
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <h3 className="text-slate-500 text-xs font-black uppercase tracking-widest mb-1">Last Backup</h3>
-                                        <p className="text-lg font-bold text-slate-900">
-                                            {backups.length > 0 && backups[0].createdAt
-                                                ? new Date(backups[backups.length - 1].createdAt || backups[0].createdAt).toLocaleString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true }).toUpperCase()
-                                                : 'No Backups'}
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 rounded-[12px] shrink-0">
-                                <div className="bg-white border border-slate-200/60 shadow-sm p-6">
-                                    <h3 className="text-sm font-bold text-slate-900 uppercase tracking-widest mb-4">Maintenance Operations</h3>
-                                    <div className="flex flex-col gap-3">
-                                        <div className="flex items-center justify-between p-4 bg-slate-50 border border-slate-100">
-                                            <div>
-                                                <h4 className="text-sm font-bold text-slate-800">Rebuild Indexes</h4>
-                                                <p className="text-xs text-slate-500 mt-1">Improves database query performance by defragmenting indexes.</p>
-                                            </div>
-                                            <button className="px-4 py-2 bg-white border border-slate-200 hover:border-[#0078d4] hover:text-[#0078d4] text-slate-600 text-xs font-bold shadow-sm rounded-[12px] transition-all rounded-[12px] shrink-0">Run Now</button>
-                                        </div>
-                                        <div className="flex items-center justify-between p-4 bg-slate-50 border border-slate-100">
-                                            <div>
-                                                <h4 className="text-sm font-bold text-slate-800">Clear Query Cache</h4>
-                                                <p className="text-xs text-slate-500 mt-1">Frees up memory by clearing the SQL server query plan cache.</p>
-                                            </div>
-                                            <button className="px-4 py-2 bg-white border border-slate-200 hover:border-orange-500 hover:text-orange-500 text-slate-600 text-xs font-bold shadow-sm rounded-[12px] transition-all rounded-[12px] shrink-0">Clear</button>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="bg-white border border-slate-200/60 shadow-sm p-6">
-                                    <h3 className="text-sm font-bold text-slate-900 uppercase tracking-widest mb-4">Recent Backups</h3>
-                                    <div className="flex flex-col gap-0 border border-slate-100 overflow-hidden">
-                                        {(backups.length > 0 ? backups.slice().reverse().slice(0, 5) : []).map((b, i) => {
-                                            const isFailed = b.status?.toLowerCase() === 'failed';
-                                            return (
-                                                <div key={i} className="flex items-center justify-between p-3 border-b border-slate-100 last:border-0 bg-white hover:bg-slate-50 rounded-[12px] transition-colors">
-                                                    <div className="flex items-center gap-3">
-                                                        <div className={`w-8 h-8 flex items-center justify-center rounded-[12px] shrink-0 ${isFailed ? 'bg-red-50 text-red-500' : 'bg-emerald-50 text-emerald-500'}`}>
-                                                            {isFailed ? <X size={28} /> : <CheckCircle size={28} />}
-                                                        </div>
-                                                        <div>
-                                                            <p className="text-xs font-bold text-slate-800" title={b.backupPath}>
-                                                                {b.createdAt ? new Date(b.createdAt).toLocaleString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true }).toUpperCase() : 'N/A'}
-                                                            </p>
-                                                            <p className="text-[10px] text-slate-500 uppercase tracking-wider">{b.createdBy || 'Manual'} • {b.status}</p>
-                                                        </div>
-                                                    </div>
-                                                    <button className="text-[#0078d4] hover:text-[#005a9e] text-xs font-bold px-3 py-1 bg-[#0078d4]/10 rounded-[12px] shrink-0">Restore</button>
-                                                </div>
-                                            );
-                                        })}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <DatabaseAdminBoard />
                     )}
+
+                    {/* USER ROLES VIEW REMOVED */}
 
                     {/* ROLE FEATURES VIEW */}
                     {activeMenu === 'Role Features' && (
-                        <div className="bg-white shadow-sm border border-slate-200/60 flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-2 duration-300 pb-6">
-                            <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+                        <div className="bg-white dark:bg-[#0f172a]/50 shadow-inner border border-slate-200 dark:border-[#334155] flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-2 duration-300 pb-6 rounded-none overflow-hidden mb-6">
+                            <div className="px-6 py-4 border-b border-slate-200 dark:border-[#334155] flex items-center justify-between bg-slate-50 dark:bg-[#0c0c0c]/50">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-8 h-8 bg-blue-50 flex items-center justify-center">
-                                        <ShieldAlert className="w-4 h-4 text-[#0078d4]" />
+                                    <div className="w-8 h-8 bg-blue-500/20 flex items-center justify-center rounded-none">
+                                        <ShieldAlert className="w-4 h-4 text-blue-300" />
                                     </div>
                                     <div>
-                                        <h2 className="text-[15px] font-bold text-slate-800">System Role Permission Master Editor</h2>
-                                        <p className="text-[11px] text-slate-500 font-medium">Configure default enabled/disabled features for each user role</p>
+                                        <h2 className="text-[15px] font-bold text-slate-800 dark:text-white">System Role Permission Master Editor</h2>
+                                        <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Configure default enabled/disabled features for each user role</p>
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-3 self-start">
                                     <button
                                         onClick={handleSeedFunctions}
                                         disabled={seedingFunctions || loadingPermissions}
-                                        className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold rounded-[12px] transition-all active:scale-95 flex items-center gap-2"
+                                        className="px-4 py-2.5 bg-slate-200 dark:bg-white/10 hover:bg-white/20 text-slate-800 dark:text-white text-xs font-bold rounded-none transition-all flex items-center gap-2"
                                     >
                                         {seedingFunctions ? (
                                             <><Loader2 className="animate-spin" size={13} />Seeding...</>
@@ -1438,7 +1390,7 @@ const SuperAdminDashboard = () => {
                                     <button
                                         onClick={handleAllowAllPermissions}
                                         disabled={loadingPermissions || !permissions.length}
-                                        className="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold shadow-md rounded-[12px] transition-all active:scale-95 flex items-center gap-2"
+                                        className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-sm rounded-none transition-all flex items-center gap-2 disabled:opacity-50"
                                     >
                                         <CheckCircle size={14} />
                                         Allow All
@@ -1446,7 +1398,7 @@ const SuperAdminDashboard = () => {
                                     <button
                                         onClick={handleInitiateSavePermissions}
                                         disabled={savingPermissions || loadingPermissions || !permissions.length}
-                                        className="px-5 py-2.5 bg-[#0078d4] hover:bg-[#005a9e] text-white text-xs font-bold shadow-md rounded-[12px] transition-all active:scale-95 flex items-center gap-2"
+                                        className="px-5 py-2.5 bg-[#0078d4] hover:bg-[#005a9e] text-white text-xs font-bold shadow-sm rounded-none transition-all flex items-center gap-2 disabled:opacity-50"
                                     >
                                         {savingPermissions ? (
                                             <><Loader2 className="animate-spin" size={13} />Saving Changes...</>
@@ -1457,53 +1409,61 @@ const SuperAdminDashboard = () => {
                                 </div>
                             </div>
 
-                            <div className="bg-slate-50 p-4 border border-slate-200/60 mx-6 flex flex-col gap-4">
-                                <div className="bg-white p-4 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
-                                    <div className="flex flex-col w-full sm:w-auto">
-                                        <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Configuration Target</span>
-                                        <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
-                                            <span className="text-sm font-bold text-slate-700">
-                                                {selectedPermEmployee ? allEmployees.find(e => e.emp_Code === selectedPermEmployee)?.empName || allEmployees.find(e => e.emp_Code === selectedPermEmployee)?.emp_Name || selectedPermEmployee : 'Global Employees'}
-                                            </span>
-                                            <span className="hidden sm:inline text-slate-300">/</span>
-                                            <span className="text-sm font-bold text-[#0078d4]">
-                                                {selectedPermCompany ? availablePermCompanies.find(c => c.code === selectedPermCompany || c.companyCode === selectedPermCompany)?.comp_Name || availablePermCompanies.find(c => c.code === selectedPermCompany || c.companyCode === selectedPermCompany)?.companyName || selectedPermCompany : 'Global Companies'}
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <button
-                                        onClick={() => setShowPermTargetModal(true)}
-                                        className="w-full sm:w-auto px-5 py-2.5 bg-slate-50 border border-slate-200 hover:border-[#0078d4] hover:text-[#0078d4] text-slate-600 text-xs font-bold uppercase tracking-wider shadow-sm rounded-[12px] transition-all"
-                                    >
-                                        Change Target
-                                    </button>
-                                </div>
-
-                                <div className="flex flex-col md:flex-row justify-between items-center gap-4 pt-2 border-t border-slate-200 border-dashed">
+                            <div className="bg-slate-50 dark:bg-[#0c0c0c] p-4 border border-slate-200 dark:border-[#334155] mx-6 flex flex-col gap-4 rounded-none shadow-inner">
+                                <div className="flex flex-col md:flex-row justify-between items-center gap-4">
                                     <div className="flex flex-wrap items-center gap-2">
-                                        <span className="text-xs font-black text-slate-500 uppercase tracking-widest mr-2">Select Role:</span>
+                                        <span className="text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mr-2">Select Role:</span>
                                         {systemRoles.map(role => (
                                             <button
                                                 key={role.id}
                                                 onClick={() => setSelectedRole(role.id)}
-                                                className={`px-3 py-1.5 text-xs font-bold rounded-[12px] transition-all ${selectedRole === role.id
-                                                    ? 'bg-[#0078d4] text-white shadow-sm'
-                                                    : 'bg-white hover:bg-slate-100 border border-slate-200 text-slate-600'
+                                                className={`px-3 py-1.5 text-xs font-bold rounded-none transition-all ${selectedRole === role.id
+                                                    ? 'bg-[#0078d4] text-white shadow-sm border border-[#0078d4]'
+                                                    : 'bg-white dark:bg-[#1e293b]/50 hover:bg-slate-200 dark:bg-white/10 border border-slate-200 dark:border-white/20 text-slate-600 dark:text-slate-300'
                                                     }`}
                                             >
                                                 {role.name}
                                             </button>
                                         ))}
+                                        <button
+                                            onClick={() => setShowCreateRoleModal(true)}
+                                            className="px-3 py-1.5 text-xs font-bold bg-emerald-600/20 hover:bg-emerald-600/40 border border-emerald-500/50 text-emerald-400 rounded-none transition-all flex items-center gap-1"
+                                        >
+                                            <Plus size={12} /> Add Role
+                                        </button>
+                                        {selectedRole && selectedRole !== 1 && selectedRole !== 99 && (
+                                            <>
+                                                <button
+                                                    onClick={(e) => {
+                                                        const group = userGroups.find(g => g.group_Id === selectedRole);
+                                                        if(group) {
+                                                            setEditingUserRole(group);
+                                                            setEditRoleName(group.group_Name);
+                                                            setEditRoleDesc(group.description || '');
+                                                        }
+                                                    }}
+                                                    className="px-3 py-1.5 text-xs font-bold bg-blue-600/20 hover:bg-blue-600/40 border border-blue-500/50 text-blue-400 rounded-none transition-all flex items-center gap-1"
+                                                >
+                                                    <Edit size={12} /> Edit Role
+                                                </button>
+                                                <button
+                                                    onClick={(e) => handleDeleteUserRole(e, selectedRole)}
+                                                    className="px-3 py-1.5 text-xs font-bold bg-red-600/20 hover:bg-red-600/40 border border-red-500/50 text-red-400 rounded-none transition-all flex items-center gap-1"
+                                                >
+                                                    <Trash2 size={12} /> Delete Role
+                                                </button>
+                                            </>
+                                        )}
                                     </div>
 
                                     <div className="relative w-full md:w-64">
-                                        <Search className="absolute left-3 top-2.5 text-slate-400 w-4 h-4" />
+                                        <Search className="absolute left-3 top-2.5 text-slate-500 w-4 h-4" />
                                         <input
                                             type="text"
                                             placeholder="Search functions..."
                                             value={permSearch}
                                             onChange={e => setPermSearch(e.target.value)}
-                                            className="pl-9 pr-4 py-1.5 border border-slate-200 bg-white text-xs w-full outline-none focus:border-[#0078d4] focus:ring-1 focus:ring-[#0078d4] rounded-[12px] transition-all"
+                                            className="pl-9 pr-4 py-1.5 border border-slate-200 dark:border-white/20 bg-white dark:bg-[#1e293b]/50 text-slate-800 dark:text-white text-xs w-full outline-none focus:border-[#0078d4] focus:bg-slate-200 dark:bg-white/10 rounded-none transition-all placeholder:text-slate-600"
                                         />
                                     </div>
                                 </div>
@@ -1512,16 +1472,16 @@ const SuperAdminDashboard = () => {
                             {loadingPermissions ? (
                                 <SystemLoader inline message="Fetching role permission matrix..." />
                             ) : !permissions.length ? (
-                                <div className="flex flex-col items-center justify-center py-20 gap-4 text-slate-400 mx-6 border border-dashed border-slate-200">
-                                    <Database size={40} className="text-slate-300" />
+                                <div className="flex flex-col items-center justify-center py-20 gap-4 text-slate-500 mx-6 border border-dashed border-slate-200 dark:border-white/20 bg-white dark:bg-[#1e293b]/50">
+                                    <Database size={40} className="text-slate-600" />
                                     <div className="text-center">
-                                        <p className="text-[13px] font-bold text-slate-500 mb-1">No System Functions Found</p>
-                                        <p className="text-[11px] text-slate-400 font-medium">The system permission table is empty. Seed default functions to get started.</p>
+                                        <p className="text-[13px] font-bold text-slate-500 dark:text-slate-400 mb-1">No System Functions Found</p>
+                                        <p className="text-[11px] text-slate-500 font-medium">The system permission table is empty. Seed default functions to get started.</p>
                                     </div>
                                     <button
                                         onClick={handleSeedFunctions}
                                         disabled={seedingFunctions}
-                                        className="px-6 py-2.5 bg-[#0078d4] hover:bg-[#005a9e] text-white text-xs font-bold rounded-[12px] transition-all active:scale-95 flex items-center gap-2 shadow-md shadow-[#0078d4]/20"
+                                        className="px-6 py-2.5 bg-[#0078d4] hover:bg-[#005a9e] text-white text-xs font-bold rounded-none transition-all flex items-center gap-2 shadow-sm"
                                     >
                                         {seedingFunctions ? (
                                             <><Loader2 className="animate-spin" size={14} />Seeding Functions...</>
@@ -1531,16 +1491,20 @@ const SuperAdminDashboard = () => {
                                     </button>
                                 </div>
                             ) : (
-                                <div className="border border-slate-200/80 overflow-hidden mx-6">
-                                    <table className="w-full text-left border-collapse">
-                                        <thead>
-                                            <tr className="bg-slate-50 border-b border-slate-200 text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-                                                <th className="px-4 py-3 w-1/3">Function Code</th>
-                                                <th className="px-4 py-3 w-1/2">Description</th>
-                                                <th className="px-4 py-3 text-center">Status</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody className="divide-y divide-slate-100">
+                                <div className="border border-slate-200 dark:border-[#334155] overflow-hidden mx-6 bg-white dark:bg-[#1e293b]/50 rounded-none shadow-sm relative">
+                                    <div className="absolute inset-0 z-0 pointer-events-none opacity-40">
+                                        <AnimatedBackground />
+                                    </div>
+                                    <div className="relative z-10">
+                                        <table className="w-full text-left border-collapse">
+                                            <thead>
+                                                <tr className="bg-white dark:bg-[#0f172a]/80 border-b border-slate-200 dark:border-[#334155] text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider backdrop-blur-sm">
+                                                    <th className="px-4 py-3 w-1/3">Function Code</th>
+                                                    <th className="px-4 py-3 w-1/2">Description</th>
+                                                    <th className="px-4 py-3 text-center">Status</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody className="divide-y divide-slate-200 dark:divide-[#334155]">
                                             {(() => {
                                                 const filtered = permissions.filter(p => {
                                                     const code = (p.system_Fuction || p.systemFuction || p.System_Fuction || '').toLowerCase();
@@ -1576,12 +1540,12 @@ const SuperAdminDashboard = () => {
                                                 const renderItems = (items, label) => {
                                                     if (!items.length) return;
                                                     rows.push(
-                                                        <tr key={`cat-${label}`} className="bg-slate-50/80 border-b border-slate-200">
+                                                        <tr key={`cat-${label}`} className="bg-slate-200/50 dark:bg-black/40 border-b border-white/5">
                                                             <td colSpan={3} className="px-4 py-2.5">
-                                                                <span className="text-[11px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
+                                                                <span className="text-[11px] font-black text-slate-600 dark:text-slate-300 uppercase tracking-widest flex items-center gap-2">
                                                                     <span className="w-1.5 h-1.5 bg-[#0078d4] inline-block"></span>
                                                                     {label}
-                                                                    <span className="text-[10px] font-normal text-slate-400 normal-case">({items.length} function{(items.length !== 1) ? 's' : ''})</span>
+                                                                    <span className="text-[10px] font-normal text-slate-500 normal-case">({items.length} function{(items.length !== 1) ? 's' : ''})</span>
                                                                 </span>
                                                             </td>
                                                         </tr>
@@ -1591,19 +1555,19 @@ const SuperAdminDashboard = () => {
                                                         const desc = p.function_Description || p.functionDescription || p.Function_Description || p.fuction_Description || code;
                                                         const isAllowed = (p.allow_Fuction || p.allowFuction || p.Allow_Fuction) === 'T';
                                                         rows.push(
-                                                            <tr key={code} className="hover:bg-slate-50/50 transition-colors">
+                                                            <tr key={code} className="hover:bg-white dark:bg-[#1e293b]/50 transition-colors">
                                                                 <td className="px-4 py-3">
-                                                                    <span className="font-mono text-xs font-bold text-slate-700 bg-slate-100 px-2 py-0.5">{code}</span>
+                                                                    <span className="font-mono text-xs font-bold text-slate-600 dark:text-slate-300 bg-slate-200/50 dark:bg-black/40 border border-slate-200 dark:border-[#334155] px-2 py-0.5 rounded-none">{code}</span>
                                                                 </td>
                                                                 <td className="px-4 py-3">
-                                                                    <span className="text-xs text-slate-600 font-medium">{desc}</span>
+                                                                    <span className="text-xs text-slate-600 dark:text-slate-300 font-medium">{desc}</span>
                                                                 </td>
                                                                 <td className="px-4 py-3 text-center">
                                                                     <button
-                                                                        onClick={() => handleInitiateToggle(code)}
-                                                                        className={`px-3 py-1 text-[10px] font-black uppercase tracking-wider rounded-[12px] transition-all ${isAllowed
-                                                                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                                                                            : 'bg-red-50 text-red-700 border border-red-200'
+                                                                        onClick={() => handleTogglePermission(code)}
+                                                                        className={`px-3 py-1 text-[10px] font-black uppercase tracking-wider rounded-none transition-all ${isAllowed
+                                                                            ? 'bg-emerald-600 text-white shadow-sm border border-emerald-500'
+                                                                            : 'bg-red-600 text-white shadow-sm border border-red-500'
                                                                             }`}
                                                                     >
                                                                         {isAllowed ? 'Allowed' : 'Denied'}
@@ -1629,11 +1593,12 @@ const SuperAdminDashboard = () => {
                                         const term = permSearch.toLowerCase();
                                         return code.includes(term) || desc.includes(term);
                                     }).length && (
-                                            <div className="flex items-center justify-center py-12 text-slate-400 gap-2">
+                                            <div className="flex items-center justify-center py-12 text-slate-500 gap-2">
                                                 <Search size={16} />
                                                 <span className="text-xs font-medium">No functions match your search.</span>
                                             </div>
                                         )}
+                                    </div>
                                 </div>
                             )}
                         </div>
@@ -1662,57 +1627,31 @@ const SuperAdminDashboard = () => {
 
                     {/* SECURITY AUDIT VIEW */}
                     {activeMenu === 'Security Audit' && (
-                        <div className="bg-white shadow-sm border border-slate-200/60 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                            <div className="px-6 py-4 border-b border-slate-100 flex items-center gap-3">
-                                <div className="w-8 h-8 bg-purple-50 flex items-center justify-center">
-                                    <ShieldCheck className="w-4 h-4 text-purple-600" />
-                                </div>
-                                <div>
-                                    <h2 className="text-[15px] font-bold text-slate-800">Security Audit</h2>
-                                    <p className="text-[11px] text-slate-500 font-medium">Monitor system access and security events</p>
-                                </div>
-                            </div>
-                            <div className="p-6">
-                                <SecurityAuditBoard
-                                    allEmployees={allEmployees}
-                                    allCompanies={allCompanies}
-                                    hierarchy={hierarchy}
-                                />
-                            </div>
-                        </div>
+                        <SecurityAuditBoard
+                            allEmployees={allEmployees}
+                            allCompanies={allCompanies}
+                            hierarchy={hierarchy}
+                        />
                     )}
 
                     {/* INTEGRATIONS VIEW */}
                     {activeMenu === 'Integrations' && (
-                        <div className="bg-white shadow-sm border border-slate-200/60 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                            <div className="px-6 py-4 border-b border-slate-100 flex items-center gap-3">
-                                <div className="w-8 h-8 bg-indigo-50 flex items-center justify-center">
-                                    <Puzzle className="w-4 h-4 text-indigo-600" />
-                                </div>
-                                <div>
-                                    <h2 className="text-[15px] font-bold text-slate-800">Integrations</h2>
-                                    <p className="text-[11px] text-slate-500 font-medium">Connect external services and APIs</p>
-                                </div>
-                            </div>
-                            <div className="p-6">
-                                <IntegrationsBoard />
-                            </div>
-                        </div>
+                        <IntegrationsBoard />
                     )}
 
                     {/* REPORTS VIEW */}
                     {activeMenu === 'Reports' && (
-                        <div className="bg-white shadow-sm border border-slate-200/60 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                            <div className="px-6 py-4 border-b border-slate-100 flex items-center gap-3">
-                                <div className="w-8 h-8 bg-blue-50 flex items-center justify-center">
-                                    <FileText className="w-4 h-4 text-[#0078d4]" />
+                        <div className="bg-white dark:bg-[#0f172a]/50 shadow-inner border border-slate-200 dark:border-[#334155] flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-2 duration-300 pb-6 rounded-none overflow-hidden mb-6">
+                            <div className="px-6 py-4 border-b border-slate-200 dark:border-[#334155] flex items-center gap-3 bg-slate-50 dark:bg-[#0c0c0c]/50">
+                                <div className="w-8 h-8 bg-blue-500/20 flex items-center justify-center rounded-none">
+                                    <FileText className="w-4 h-4 text-blue-300" />
                                 </div>
                                 <div>
-                                    <h2 className="text-[15px] font-bold text-slate-800">Admin Reports</h2>
-                                    <p className="text-[11px] text-slate-500 font-medium">View system-wide reports and analytics</p>
+                                    <h2 className="text-[15px] font-bold text-slate-800 dark:text-white">Admin Reports</h2>
+                                    <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">View system-wide reports and analytics</p>
                                 </div>
                             </div>
-                            <div className="p-6">
+                            <div className="px-6">
                                 <AdminCompanyReportsBoard
                                     hierarchy={hierarchy}
                                     allEmployees={allEmployees}
@@ -1792,129 +1731,164 @@ const SuperAdminDashboard = () => {
 
                     {/* SUBSCRIPTIONS VIEW */}
                     {activeMenu === 'Subscriptions' && (
-                        <div className="bg-white shadow-sm border border-slate-200/60 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                            <div className="px-6 py-4 border-b border-slate-100 flex items-center gap-3">
-                                <div className="w-8 h-8 bg-amber-50 flex items-center justify-center">
-                                    <CalendarClock className="w-4 h-4 text-amber-600" />
-                                </div>
-                                <div>
-                                    <h2 className="text-[15px] font-bold text-slate-800">Subscription Management</h2>
-                                    <p className="text-[11px] text-slate-500 font-medium">Manage tenant subscriptions and billing</p>
-                                </div>
+                        <SubscriptionAdminBoard />
+                    )}
+
+                    {/* Create Role Modal */}
+            {showCreateRoleModal && (
+                <div className="fixed inset-0 z-[200] flex items-center justify-center bg-[#000000]/70 backdrop-blur-sm p-4 font-sans">
+                    <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-[#334155] border-t-[6px] border-t-blue-500 shadow-2xl w-full max-w-md animate-in fade-in zoom-in-95 duration-200 flex flex-col rounded-none">
+                        <div className="px-6 py-4 border-b border-slate-200 dark:border-[#334155] flex items-center justify-between bg-white dark:bg-[#0f172a]/50">
+                            <h3 className="text-[15px] font-bold text-slate-800 dark:text-white">Create New Role</h3>
+                            <button onClick={() => setShowCreateRoleModal(false)} className="w-8 h-8 flex items-center justify-center text-slate-500 hover:text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:bg-white/10 transition-colors rounded-none">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                            </button>
+                        </div>
+                        <div className="p-6 flex flex-col gap-4">
+                            <div>
+                                <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">Role Name *</label>
+                                <input
+                                    type="text"
+                                    value={newRoleName}
+                                    onChange={e => setNewRoleName(e.target.value)}
+                                    placeholder="e.g. HR Manager"
+                                    className="w-full px-4 py-2.5 bg-slate-200/50 dark:bg-black/40 border border-slate-200 dark:border-[#334155] text-slate-800 dark:text-white text-sm outline-none focus:border-[#0078d4] focus:bg-white dark:bg-[#1e293b]/50 transition-all rounded-none placeholder:text-slate-600"
+                                    autoFocus
+                                />
                             </div>
-                            <div className="p-6">
-                                <SubscriptionAdminBoard />
+                            <div>
+                                <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">Description</label>
+                                <input
+                                    type="text"
+                                    value={newRoleDescription}
+                                    onChange={e => setNewRoleDescription(e.target.value)}
+                                    placeholder="Optional description"
+                                    className="w-full px-4 py-2.5 bg-slate-200/50 dark:bg-black/40 border border-slate-200 dark:border-[#334155] text-slate-800 dark:text-white text-sm outline-none focus:border-[#0078d4] focus:bg-white dark:bg-[#1e293b]/50 transition-all rounded-none placeholder:text-slate-600"
+                                />
+                            </div>
+                            <div className="mt-4 flex gap-3 justify-end">
+                                <button
+                                    onClick={() => setShowCreateRoleModal(false)}
+                                    className="px-5 py-2.5 bg-white dark:bg-[#1e293b]/50 hover:bg-slate-200 dark:bg-white/10 text-slate-600 dark:text-slate-300 text-xs font-bold uppercase tracking-wider border border-slate-200 dark:border-[#334155] transition-all rounded-none"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={handleCreateRole}
+                                    disabled={creatingRole}
+                                    className="px-5 py-2.5 bg-[#0078d4] hover:bg-[#005a9e] text-white text-xs font-bold uppercase tracking-wider shadow-md transition-all rounded-none flex items-center gap-2 disabled:opacity-50"
+                                >
+                                    {creatingRole ? (
+                                        <><Loader2 className="animate-spin" size={14} /> Creating...</>
+                                    ) : (
+                                        'Create Role'
+                                    )}
+                                </button>
                             </div>
                         </div>
-                    )}
+                    </div>
+                </div>
+            )}
 
                     {/* ENGAGEMENT VIEW */}
                     {activeMenu === 'Engagement' && (
-                        <div className="bg-white shadow-sm border border-slate-200/60 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                            <div className="px-6 py-4 border-b border-slate-100 flex items-center gap-3">
-                                <div className="w-8 h-8 bg-rose-50 flex items-center justify-center">
-                                    <Megaphone className="w-4 h-4 text-rose-600" />
-                                </div>
-                                <div>
-                                    <h2 className="text-[15px] font-bold text-slate-800">Employee Engagement</h2>
-                                    <p className="text-[11px] text-slate-500 font-medium">Track engagement and interaction metrics</p>
-                                </div>
-                            </div>
-                            <div className="p-6">
-                                <EngagementAdminBoard />
-                            </div>
-                        </div>
+                        <EngagementAdminBoard />
                     )}
 
                     {/* USER FEEDBACK VIEW */}
                     {activeMenu === 'User Feedback' && (
-                        <div className="bg-white shadow-sm border border-slate-200/60 pb-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                            <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+                        <div className="bg-white dark:bg-[#0f172a]/50 shadow-inner border border-slate-200 dark:border-[#334155] flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-2 duration-300 pb-6 rounded-none overflow-hidden mb-6 min-h-[500px]">
+                            <div className="px-6 py-4 border-b border-slate-200 dark:border-[#334155] flex items-center justify-between bg-slate-50 dark:bg-[#0c0c0c]/50">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-8 h-8 bg-blue-50 flex items-center justify-center">
+                                    <div className="w-8 h-8 bg-[#0078d4]/20 flex items-center justify-center rounded-none">
                                         <MessageSquare className="w-4 h-4 text-[#0078d4]" />
                                     </div>
                                     <div>
-                                        <h2 className="text-[15px] font-bold text-slate-800">User Feedback</h2>
-                                        <p className="text-[11px] text-slate-500 font-medium">View and manage feedback submitted from Report Builder</p>
+                                        <h2 className="text-[15px] font-bold text-slate-800 dark:text-white">User Feedback</h2>
+                                        <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">View and manage feedback submitted from Report Builder</p>
                                     </div>
                                 </div>
-                                <span className="bg-blue-100 text-[#0078d4] text-[10px] font-bold px-2.5 py-1 ">{feedbackData.length} Records</span>
+                                <span className="bg-slate-50 dark:bg-[#0c0c0c] border border-slate-200 dark:border-[#334155] shadow-inner text-slate-600 dark:text-slate-300 text-[10px] font-bold px-3 py-1.5 rounded-none">{feedbackData.length} Records</span>
                             </div>
-                            <div className="w-full overflow-x-auto">
+                            
+                            <div className="border border-slate-200 dark:border-[#334155] overflow-hidden mx-6 bg-white dark:bg-[#1e293b]/50 rounded-none shadow-sm flex-1 flex flex-col mb-4">
+                                <div className="w-full overflow-x-auto">
                                 <table className="w-full text-left border-collapse">
                                     <thead>
-                                        <tr className="border-b border-slate-100 bg-slate-50/50">
-                                            <th className="py-3.5 px-6 text-[11px] font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap">Date</th>
-                                            <th className="py-3.5 px-6 text-[11px] font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap">Employee Name</th>
-                                            <th className="py-3.5 px-6 text-[11px] font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap">Company</th>
-                                            <th className="py-3.5 px-6 text-[11px] font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap">Report Name</th>
-                                            <th className="py-3.5 px-6 text-[11px] font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap">Feedback</th>
-                                            <th className="py-3.5 px-6 text-[11px] font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap">Images</th>
-                                            <th className="py-3.5 px-6 text-[11px] font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap text-right">Action</th>
+                                        <tr className="bg-slate-50 dark:bg-[#0c0c0c]/80 border-b border-slate-200 dark:border-[#334155] text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                                            <th className="px-4 py-3">Date</th>
+                                            <th className="px-4 py-3">Employee Name</th>
+                                            <th className="px-4 py-3">Company</th>
+                                            <th className="px-4 py-3">Report Name</th>
+                                            <th className="px-4 py-3">Feedback</th>
+                                            <th className="px-4 py-3">Images</th>
+                                            <th className="px-4 py-3 text-right">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {feedbackLoading ? (
                                             <tr>
-                                                <td colSpan={7} className="py-12 text-center text-slate-400 text-[13px] font-medium">Loading feedback...</td>
+                                                <td colSpan={7} className="py-12 text-center text-slate-500 text-[13px] font-medium">Loading feedback...</td>
                                             </tr>
                                         ) : feedbackData.length === 0 ? (
                                             <tr>
-                                                <td colSpan={7} className="py-12 text-center text-slate-400 text-[13px] font-medium">No feedback records found.</td>
+                                                <td colSpan={7} className="py-12 text-center text-slate-500 text-[13px] font-medium">No feedback records found.</td>
                                             </tr>
                                         ) : (
                                             feedbackData.map((item) => (
-                                                <tr key={item.id} className="border-b border-slate-50 hover:bg-slate-50/80 transition-colors">
-                                                    <td className="py-3.5 px-6 text-[12px] text-slate-600 whitespace-nowrap">
+                                                <tr key={item.id} className="border-b border-slate-200 dark:border-white/5 hover:bg-white dark:bg-[#1e293b]/50 transition-colors">
+                                                    <td className="py-3.5 px-6 text-[12px] text-slate-500 dark:text-slate-400 whitespace-nowrap">
                                                         {new Date(item.createdAt).toLocaleString()}
                                                     </td>
-                                                    <td className="py-3.5 px-6 text-[13px] text-slate-900 font-bold">
+                                                    <td className="py-3.5 px-6 text-[13px] text-slate-800 dark:text-gray-200 font-bold">
                                                         {item.employeeName || '-'}
                                                     </td>
-                                                    <td className="py-3.5 px-6 text-[12px] text-slate-600 font-mono">
+                                                    <td className="py-3.5 px-6 text-[12px] text-slate-500 dark:text-slate-400 font-mono">
                                                         {item.companyId || '-'}
                                                     </td>
-                                                    <td className="py-3.5 px-6 text-[12px] font-medium text-slate-800">
+                                                    <td className="py-3.5 px-6 text-[12px] font-medium text-slate-600 dark:text-slate-300">
                                                         {item.reportName || '-'}
                                                     </td>
-                                                    <td className="py-3.5 px-6 text-[12px] text-slate-700 max-w-[250px] truncate" title={item.feedbackText}>
+                                                    <td className="py-3.5 px-6 text-[12px] text-slate-500 dark:text-slate-400 max-w-[250px] truncate" title={item.feedbackText}>
                                                         {item.feedbackText}
                                                     </td>
                                                     <td className="py-3.5 px-6">
                                                         {(() => {
                                                             try {
-                                                                if (!item.images || item.images === '[]') return <span className="text-[12px] text-slate-400">-</span>;
+                                                                if (!item.images || item.images === '[]') return <span className="text-[12px] text-slate-500">-</span>;
                                                                 const imgs = JSON.parse(item.images);
-                                                                if (!Array.isArray(imgs) || imgs.length === 0) return <span className="text-[12px] text-slate-400">-</span>;
+                                                                if (!Array.isArray(imgs) || imgs.length === 0) return <span className="text-[12px] text-slate-500">-</span>;
                                                                 return (
                                                                     <div className="flex gap-1.5 overflow-x-auto max-w-[120px] pb-1">
                                                                         {imgs.map((img, i) => (
                                                                             <div key={i} onClick={() => setFullScreenImage(img)} className="shrink-0 block cursor-pointer" title="Click to view full image">
-                                                                                <img src={img} alt={`Attachment ${i+1}`} className="w-8 h-8 object-cover rounded shadow-sm border border-slate-200 hover:opacity-80 transition-opacity" />
+                                                                                <img src={img} alt={`Attachment ${i+1}`} className="w-8 h-8 object-cover rounded shadow-sm border border-slate-200 dark:border-[#334155] hover:opacity-80 transition-opacity" />
                                                                             </div>
                                                                         ))}
                                                                     </div>
                                                                 );
                                                             } catch (e) {
-                                                                return <span className="text-[12px] text-slate-400">Error</span>;
+                                                                return <span className="text-[12px] text-slate-500">Error</span>;
                                                             }
                                                         })()}
                                                     </td>
-                                                    <td className="py-3.5 px-6 text-right">
-                                                        <button
-                                                            className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-[12px] transition-all"
-                                                            onClick={() => handleDeleteFeedback(item.id)}
-                                                            title="Delete Feedback"
-                                                        >
-                                                            <Trash2 className="w-[18px] h-[18px]" />
-                                                        </button>
+                                                    <td className="px-4 py-3 text-right">
+                                                        <div className="flex justify-end">
+                                                            <button
+                                                                className="px-3 py-1 text-[10px] font-black uppercase tracking-wider rounded-none transition-all bg-red-600 text-white shadow-sm border border-red-500 hover:bg-red-500 flex items-center gap-1"
+                                                                onClick={() => handleDeleteFeedback(item.id)}
+                                                                title="Delete Feedback"
+                                                            >
+                                                                <Trash2 size={10} /> Delete
+                                                            </button>
+                                                        </div>
                                                     </td>
                                                 </tr>
                                             ))
                                         )}
                                     </tbody>
                                 </table>
+                                </div>
                             </div>
                         </div>
                     )}
@@ -1943,27 +1917,27 @@ const SuperAdminDashboard = () => {
 
             {/* Edit Role Modal */}
             {editingEmp && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/30 backdrop-blur-sm backdrop-blur-sm p-4">
-                    <div className="bg-white dark:bg-slate-800  shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200 font-sans">
+                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+                    <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-[#334155] border-t-[6px] border-t-blue-500 shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200 font-sans rounded-none">
                         {/* Header */}
-                        <div className="p-6 border-b border-slate-100 dark:border-slate-700">
+                        <div className="p-6 border-b border-slate-200 dark:border-[#334155] bg-white dark:bg-[#0f172a]/50">
                             <div className="flex items-center justify-between">
-                                <h2 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                                    <ShieldAlert className="text-[#0078d4]" size={18} />
+                                <h2 className="text-lg font-bold text-slate-800 dark:text-white flex items-center gap-2">
+                                    <ShieldAlert className="text-blue-400" size={18} />
                                     Manage Employee Role
                                 </h2>
-                                <button onClick={() => setEditingEmp(null)} className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700  rounded-[12px] transition-all">
+                                <button onClick={() => setEditingEmp(null)} className="p-2 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:text-white hover:bg-[#334155]/50 transition-all rounded-none">
                                     <X size={28} strokeWidth={1.5} className="w-5 h-5" />
                                 </button>
                             </div>
-                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Editing <span className="font-bold text-slate-700 dark:text-slate-300">{editingEmp.empName || editingEmp.emp_Name}</span> ({editingEmp.empCode || editingEmp.emp_Code})</p>
+                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Editing <span className="font-bold text-slate-800 dark:text-white">{editingEmp.empName || editingEmp.emp_Name}</span> ({editingEmp.empCode || editingEmp.emp_Code})</p>
                         </div>
 
                         {/* Body */}
-                        <div className="p-6 space-y-6">
+                        <div className="p-6 space-y-6 bg-transparent">
                             {/* Employee Info Card */}
-                            <div className="bg-slate-50 dark:bg-slate-700/50  p-4 border border-slate-200 dark:border-slate-600 flex items-center gap-3">
-                                <div className="w-10 h-10  bg-[#0078d4]/10 text-[#0078d4] flex items-center justify-center font-bold text-sm rounded-[12px] shrink-0">
+                            <div className="bg-white dark:bg-[#0f172a]/50 p-4 border border-slate-200 dark:border-[#334155] flex items-center gap-3 rounded-none">
+                                <div className="w-10 h-10 bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold text-sm shrink-0 border border-blue-500/20 rounded-none">
                                     {(editingEmp.empName || editingEmp.emp_Name || 'U')[0]}
                                 </div>
                                 <div>
@@ -1972,59 +1946,47 @@ const SuperAdminDashboard = () => {
                                 </div>
                             </div>
 
-                            {/* Role Level Select (Button Group like Role Features) */}
+                            {/* Role Selection */}
                             <div>
-                                <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-3">Role Level</label>
+                                <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-3">Assign Role</label>
                                 <div className="flex flex-wrap gap-2">
                                     {systemRoles.map(role => (
                                         <button
                                             key={role.id}
-                                            onClick={() => setSelectedRoleId(role.id)}
-                                            className={`px-3 py-1.5  text-xs font-bold rounded-[12px] transition-all ${selectedRoleId === role.id
-                                                ? 'bg-[#0078d4] text-white shadow-sm'
-                                                : 'bg-white dark:bg-slate-700 hover:bg-slate-100 dark:hover:bg-slate-600 border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300'
+                                            onClick={() => {
+                                                setSelectedRoleId(role.id);
+                                                const matchedGroup = userGroups.find(g => g.group_Name?.toLowerCase() === role.name?.toLowerCase());
+                                                setSelectedGroupName(matchedGroup ? matchedGroup.group_Name : role.name);
+                                            }}
+                                            className={`px-3 py-1.5 text-xs font-bold transition-all border rounded-none ${selectedRoleId === role.id
+                                                ? 'bg-blue-600 border-blue-500 text-slate-800 dark:text-white shadow-sm'
+                                                : 'bg-white dark:bg-[#0f172a]/50 hover:bg-[#334155]/50 border-slate-200 dark:border-[#334155] hover:border-blue-500/50 text-slate-600 dark:text-slate-300'
                                                 }`}
                                         >
-                                            {role.name} ({role.id})
+                                            {role.name}
                                         </button>
                                     ))}
                                 </div>
-                                <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-2 leading-snug">ID 99 = Super Admin portal access &bull; ID 1 = Tenant configuration access</p>
-                            </div>
-
-                            {/* Member Group Select (Button Group) */}
-                            <div>
-                                <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-3">Member Group</label>
-                                <div className="flex flex-wrap gap-2">
-                                    {userGroups.map(g => (
-                                        <button
-                                            key={g.group_Id}
-                                            onClick={() => setSelectedGroupName(g.group_Name)}
-                                            className={`px-3 py-1.5  text-xs font-bold rounded-[12px] transition-all ${selectedGroupName === g.group_Name
-                                                ? 'bg-[#0078d4] text-white shadow-sm'
-                                                : 'bg-white dark:bg-slate-700 hover:bg-slate-100 dark:hover:bg-slate-600 border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300'
-                                                }`}
-                                        >
-                                            {g.group_Name}
-                                        </button>
-                                    ))}
+                                <div className="mt-4 p-3 bg-white dark:bg-[#0f172a]/50 border border-slate-200 dark:border-[#334155] rounded-none">
+                                    <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-snug">
+                                        <span className="font-bold text-slate-600 dark:text-slate-300">Simplified Assignment:</span> Clicking a role automatically assigns both the Role Level (ID {selectedRoleId || '?'}) and maps the user to the correct Member Group (<span className="text-blue-400 font-mono">{selectedGroupName || '?'}</span>).
+                                    </p>
                                 </div>
-                                <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-2 leading-snug">Maps user to access control matrices defined in Master settings.</p>
                             </div>
                         </div>
 
                         {/* Footer */}
-                        <div className="bg-slate-50/50 dark:bg-slate-800/80 px-6 py-4 flex justify-end gap-3 border-t border-slate-100 dark:border-slate-700">
+                        <div className="bg-white dark:bg-[#0f172a]/80 px-6 py-4 flex justify-end gap-3 border-t border-slate-200 dark:border-[#334155]">
                             <button
                                 onClick={() => setEditingEmp(null)}
-                                className="px-5 py-2.5 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 hover:border-[#0078d4] text-slate-600 dark:text-slate-300 text-xs font-bold  rounded-[12px] transition-all"
+                                className="px-5 py-2.5 bg-transparent border border-slate-200 dark:border-[#334155] hover:bg-[#334155]/50 text-slate-600 dark:text-slate-300 text-xs font-bold transition-all rounded-none"
                             >
                                 Cancel
                             </button>
                             <button
                                 onClick={handleInitiateUpdateRole}
                                 disabled={savingRole}
-                                className="px-6 py-2.5 bg-[#0078d4] hover:bg-[#005a9e] text-white text-xs font-bold  shadow-md rounded-[12px] transition-all active:scale-[0.98] flex items-center gap-2 disabled:opacity-50"
+                                className="px-6 py-2.5 bg-blue-600 hover:bg-blue-500 text-slate-800 dark:text-white text-xs font-bold shadow-md transition-all active:scale-[0.98] flex items-center gap-2 disabled:opacity-50 rounded-none"
                             >
                                 {savingRole && <Loader2 className="w-4 h-4 animate-spin" />}
                                 {savingRole ? 'Saving...' : 'Save Role'}
@@ -2036,31 +1998,33 @@ const SuperAdminDashboard = () => {
 
             {/* Employee Details View Modal */}
             {selectedEmployeeView && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/30 backdrop-blur-sm backdrop-blur-sm p-4">
-                    <div className="bg-white dark:bg-slate-800  shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden animate-in fade-in zoom-in duration-200 flex flex-col font-sans">
-                        <div className="p-6 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between bg-slate-50/50 dark:bg-slate-800/50 rounded-[12px] shrink-0">
+                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+                    <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-[#334155] border-t-[6px] border-t-blue-500 shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden animate-in fade-in zoom-in duration-200 flex flex-col font-sans">
+                        <div className="p-6 border-b border-slate-200 dark:border-[#334155] flex items-center justify-between bg-white dark:bg-[#0f172a]/50 shrink-0">
                             <div className="flex items-center gap-4">
-                                <div className="w-12 h-12  bg-purple-50 dark:bg-purple-500/10 flex items-center justify-center">
-                                    <Users className="w-6 h-6 text-purple-500" />
+                                <div className="w-12 h-12 bg-blue-500/20 border border-blue-400/30 flex items-center justify-center rounded-none">
+                                    <Users className="w-6 h-6 text-blue-300" />
                                 </div>
                                 <div>
-                                    <h2 className="text-xl font-bold text-slate-900 dark:text-white">Employee Details</h2>
-                                    <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">{selectedEmployeeView.emp_Name || selectedEmployeeView.empName || 'N/A'} ({selectedEmployeeView.emp_Code || selectedEmployeeView.empCode})</p>
+                                    <h2 className="text-xl font-bold text-slate-800 dark:text-white">Employee Details</h2>
+                                    <p className="text-sm text-slate-600 dark:text-slate-300 mt-0.5">{selectedEmployeeView.emp_Name || selectedEmployeeView.empName || 'N/A'} ({selectedEmployeeView.emp_Code || selectedEmployeeView.empCode})</p>
                                 </div>
                             </div>
-                            <button onClick={() => setSelectedEmployeeView(null)} className="p-2 text-slate-400 dark:text-slate-500 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-700  rounded-[12px] transition-all">
+                            <button onClick={() => setSelectedEmployeeView(null)} className="p-2 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:text-white hover:bg-slate-200 dark:bg-white/10 rounded-none transition-all">
                                 <X size={28} strokeWidth={1.5} className="w-5 h-5" />
                             </button>
                         </div>
-                        <div className="p-6 overflow-y-auto bg-slate-50/30 dark:bg-slate-800/20">
+                        <div className="p-6 overflow-y-auto bg-transparent">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 {Object.entries({
                                     ...selectedEmployeeView,
                                     'PASSWORD': selectedEmployeeView.pass_Word || selectedEmployeeView.password || selectedEmployeeView.Pass_Word || '•••••••• (Encrypted by Backend)'
-                                }).map(([key, value]) => (
-                                    <div key={key} className="bg-white dark:bg-slate-700 p-4  dark:border-slate-600 shadow-sm flex flex-col justify-center">
-                                        <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-1">{key.replace(/_/g, ' ')}</h3>
-                                        <p className="text-sm font-bold text-slate-800 dark:text-slate-200 break-all">{value !== null && value !== undefined && value !== '' ? String(value) : <span className="text-slate-300 dark:text-slate-500 font-normal italic">Empty</span>}</p>
+                                })
+                                .filter(([key, value]) => typeof value !== 'object' && key !== 'companies' && key !== 'pass_Word' && key !== 'password' && key !== 'Pass_Word')
+                                .map(([key, value], index, array) => (
+                                    <div key={key} className={`bg-white dark:bg-[#1e293b]/50 border border-slate-200 dark:border-[#334155] p-4 shadow-sm flex flex-col justify-center rounded-none ${key === 'PASSWORD' && array.length % 2 !== 0 ? 'md:col-span-2' : ''}`}>
+                                        <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-1">{key.replace(/_/g, ' ')}</h3>
+                                        <p className="text-sm font-bold text-slate-800 dark:text-white break-all">{value !== null && value !== undefined && value !== '' ? String(value) : <span className="text-slate-500 font-normal italic">Empty</span>}</p>
                                     </div>
                                 ))}
                             </div>
@@ -2068,8 +2032,64 @@ const SuperAdminDashboard = () => {
                     </div>
                 </div>
             )}
+            {/* Edit User Role Modal */}
+            {editingUserRole && (
+                <div className="fixed inset-0 z-[200] flex items-center justify-center bg-[#000000]/70 backdrop-blur-sm p-4 font-sans">
+                    <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-[#334155] border-t-[6px] border-t-blue-500 shadow-2xl w-full max-w-md animate-in fade-in zoom-in-95 duration-200 flex flex-col rounded-none">
+                        <div className="px-6 py-4 border-b border-slate-200 dark:border-[#334155] flex items-center justify-between bg-white dark:bg-[#0f172a]/50">
+                            <h3 className="text-[15px] font-bold text-slate-800 dark:text-white">Edit User Role</h3>
+                            <button onClick={() => setEditingUserRole(null)} className="w-8 h-8 flex items-center justify-center text-slate-500 hover:text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:bg-white/10 transition-colors rounded-none">
+                                <X className="w-4 h-4" />
+                            </button>
+                        </div>
+                        <div className="p-6 flex flex-col gap-4">
+                            <div>
+                                <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">Role Name *</label>
+                                <input
+                                    type="text"
+                                    value={editRoleName}
+                                    onChange={e => setEditRoleName(e.target.value)}
+                                    placeholder="e.g. HR Manager"
+                                    className="w-full px-4 py-2.5 bg-slate-200/50 dark:bg-black/40 border border-slate-200 dark:border-[#334155] text-slate-800 dark:text-white text-sm outline-none focus:border-[#0078d4] focus:bg-white dark:bg-[#1e293b]/50 transition-all rounded-none placeholder:text-slate-600"
+                                    autoFocus
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">Description</label>
+                                <input
+                                    type="text"
+                                    value={editRoleDesc}
+                                    onChange={e => setEditRoleDesc(e.target.value)}
+                                    placeholder="Optional description"
+                                    className="w-full px-4 py-2.5 bg-slate-200/50 dark:bg-black/40 border border-slate-200 dark:border-[#334155] text-slate-800 dark:text-white text-sm outline-none focus:border-[#0078d4] focus:bg-white dark:bg-[#1e293b]/50 transition-all rounded-none placeholder:text-slate-600"
+                                />
+                            </div>
+                            <div className="mt-4 flex gap-3 justify-end">
+                                <button
+                                    onClick={() => setEditingUserRole(null)}
+                                    className="px-5 py-2.5 bg-white dark:bg-[#1e293b]/50 hover:bg-slate-200 dark:bg-white/10 text-slate-600 dark:text-slate-300 text-xs font-bold uppercase tracking-wider border border-slate-200 dark:border-[#334155] transition-all rounded-none"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={handleUpdateUserRole}
+                                    disabled={savingUserRole}
+                                    className="px-5 py-2.5 bg-[#0078d4] hover:bg-[#005a9e] text-white text-xs font-bold uppercase tracking-wider shadow-md transition-all rounded-none flex items-center gap-2 disabled:opacity-50"
+                                >
+                                    {savingUserRole ? (
+                                        <><Loader2 className="animate-spin" size={14} /> Updating...</>
+                                    ) : (
+                                        'Update Role'
+                                    )}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
 
 
+            {/* Confirm Modal */}
             <ConfirmModal
                 isOpen={confirmConfig.isOpen}
                 onClose={closeConfirm}
@@ -2078,7 +2098,7 @@ const SuperAdminDashboard = () => {
                 message={confirmConfig.message}
                 loading={confirmConfig.loading}
                 variant="danger"
-                confirmText="Yes, Delete"
+                confirmText={confirmConfig.confirmText || "Yes, Delete"}
             />
 
             <AlertModal
@@ -2087,28 +2107,6 @@ const SuperAdminDashboard = () => {
                 title={alertConfig.title}
                 message={alertConfig.message}
                 variant={alertConfig.variant}
-            />
-
-            {/* Password Confirm Modal for Permissions */}
-            <AdminVerificationModal
-                isOpen={showPasswordConfirmModal}
-                onClose={() => setShowPasswordConfirmModal(false)}
-                onVerify={confirmAndSavePermissions}
-                message="PLEASE CONFIRM YOUR PASSWORD TO APPLY PERMISSION CHANGES"
-                verifyButtonText="VERIFY & SAVE"
-                value={confirmPasswordInput}
-                onChange={setConfirmPasswordInput}
-            />
-
-            {/* Password Confirm Modal for Individual Toggle */}
-            <AdminVerificationModal
-                isOpen={showTogglePasswordModal}
-                onClose={() => { setShowTogglePasswordModal(false); setPendingToggleFunc(null); }}
-                onVerify={confirmAndTogglePermission}
-                message="PLEASE CONFIRM YOUR PASSWORD TO TOGGLE THIS PERMISSION"
-                verifyButtonText="VERIFY & TOGGLE"
-                value={togglePasswordInput}
-                onChange={setTogglePasswordInput}
             />
 
             {/* Password Confirm Modal for Role Updates */}
@@ -2122,6 +2120,17 @@ const SuperAdminDashboard = () => {
                 onChange={setRolePasswordInput}
             />
 
+            {/* Password Confirm Modal for Save Permissions */}
+            <AdminVerificationModal
+                isOpen={showSavePermissionsPasswordModal}
+                onClose={() => setShowSavePermissionsPasswordModal(false)}
+                onVerify={handleSavePermissions}
+                message="PLEASE CONFIRM YOUR PASSWORD TO SAVE ROLE PERMISSIONS"
+                verifyButtonText="VERIFY & SAVE"
+                value={savePermissionsPasswordInput}
+                onChange={setSavePermissionsPasswordInput}
+            />
+
             {/* Password Confirm Modal for Delete Actions */}
             <AdminVerificationModal
                 isOpen={showDeletePasswordModal}
@@ -2133,159 +2142,6 @@ const SuperAdminDashboard = () => {
                 onChange={setDeletePasswordInput}
             />
 
-            {/* Target Selection Sub-Modal for Role Features */}
-            {showPermTargetModal && (
-                <div className="fixed inset-0 z-[200] flex items-center justify-center bg-slate-900/30 backdrop-blur-sm backdrop-blur-sm p-4 font-sans">
-                    <div className="bg-white dark:bg-slate-800  shadow-2xl w-full max-w-md overflow-visible animate-in fade-in zoom-in-95 duration-200 flex flex-col">
-                        <div className="p-5 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between bg-slate-50 dark:bg-slate-700/50 ">
-                            <h3 className="text-sm font-bold tracking-wide uppercase text-slate-900 dark:text-white">Select Target Scope</h3>
-                            <button onClick={() => setShowPermTargetModal(false)} className="w-8 h-8 flex items-center justify-center  text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-[12px] transition-colors">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                            </button>
-                        </div>
-                        <div className="p-6 flex flex-col gap-5 h-full max-h-[70vh] overflow-visible">
-
-                            <div className="flex flex-col gap-4 relative z-20">
-                                <label className="block text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">Search & Select Employee</label>
-                                <div className="relative">
-                                    <Search className="absolute left-3 top-3.5 text-slate-400 dark:text-slate-500 w-4 h-4" />
-                                    <input
-                                        type="text"
-                                        placeholder="Search Employee..."
-                                        value={permEmpSearchText}
-                                        onChange={e => {
-                                            setPermEmpSearchText(e.target.value);
-                                            setPermEmpSearchTriggered(false);
-                                        }}
-                                        onKeyDown={e => e.key === 'Enter' && setPermEmpSearchTriggered(true)}
-                                        className="w-full pl-9 pr-24 p-2 border border-slate-300 dark:border-slate-600  text-sm bg-white dark:bg-slate-700 font-bold text-slate-700 dark:text-slate-300 outline-none focus:border-[#0078d4] focus:ring-1 focus:ring-[#0078d4] rounded-[12px] transition-all"
-                                    />
-                                    <button
-                                        onClick={() => setPermEmpSearchTriggered(true)}
-                                        className="absolute right-1 top-1 bottom-1 px-4 bg-[#0078d4] hover:bg-[#005a9e] text-white text-[11px] font-bold uppercase tracking-wider  rounded-[12px] transition-colors shadow-sm"
-                                    >
-                                        Load
-                                    </button>
-
-                                    {permEmpSearchTriggered && (
-                                        <div className="absolute top-[100%] mt-2 left-0 w-full z-50 bg-white dark:bg-slate-700 dark:border-slate-600  shadow-2xl max-h-[250px] overflow-y-auto flex flex-col">
-                                            <div
-                                                onClick={() => {
-                                                    setSelectedPermEmployee('');
-                                                    setPermEmpSearchText('-- All Employees (Global) --');
-                                                    setPermEmpSearchTriggered(false);
-                                                    setSelectedPermCompany('');
-                                                    setPermCompSearchText('-- All Companies (Global) --');
-                                                }}
-                                                className="p-3 border-b border-slate-100 dark:border-slate-600 text-sm cursor-pointer rounded-[12px] transition-all bg-[#0078d4]/5 text-[#0078d4] font-bold hover:bg-[#0078d4]/10"
-                                            >
-                                                -- All Employees (Global) --
-                                            </div>
-                                            {(() => {
-                                                const filteredEmployees = allEmployees.filter(e => (e.emp_Name || e.empName || '').toLowerCase().includes(permEmpSearchText.toLowerCase()) || (e.emp_Code || '').toLowerCase().includes(permEmpSearchText.toLowerCase()));
-                                                return (
-                                                    <>
-                                                        {filteredEmployees.map(e => {
-                                                            const roleName = systemRoles.find(r => r.id === e.userRole_Id || r.id === e.role)?.name || 'No Role';
-                                                            return (
-                                                                <div
-                                                                    key={e.emp_Code}
-                                                                    onClick={() => {
-                                                                        setSelectedPermEmployee(e.emp_Code);
-                                                                        setPermEmpSearchText(e.emp_Name || e.empName);
-                                                                        setPermEmpSearchTriggered(false);
-
-                                                                        // Auto-load & auto-select company
-                                                                        const empNode = hierarchy.find(h => h.empCode === e.emp_Code || h.emp_Code === e.emp_Code);
-                                                                        if (empNode && empNode.companies && empNode.companies.length === 1) {
-                                                                            setSelectedPermCompany(empNode.companies[0].companyCode || empNode.companies[0].company_Code);
-                                                                            setPermCompSearchText(empNode.companies[0].companyName || empNode.companies[0].company_Name);
-                                                                        } else {
-                                                                            setSelectedPermCompany('');
-                                                                            setPermCompSearchText('');
-                                                                        }
-                                                                    }}
-                                                                    className="p-3 border-b border-slate-100 dark:border-slate-600 text-sm cursor-pointer rounded-[12px] transition-all text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-600 font-medium"
-                                                                >
-                                                                    {e.emp_Name || e.empName} <span className="text-slate-400 dark:text-slate-500 font-normal ml-1">[{roleName}]</span>
-                                                                </div>
-                                                            );
-                                                        })}
-                                                    </>
-                                                );
-                                            })()}
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-
-                            <div className="flex flex-col gap-4 relative z-10 mt-2">
-                                <label className="block text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">Search & Select Company</label>
-                                <div className="relative">
-                                    <Search className="absolute left-3 top-3.5 text-slate-400 dark:text-slate-500 w-4 h-4" />
-                                    <input
-                                        type="text"
-                                        placeholder="Search Company..."
-                                        value={permCompSearchText}
-                                        onChange={e => {
-                                            setPermCompSearchText(e.target.value);
-                                            setPermCompSearchTriggered(false);
-                                        }}
-                                        onKeyDown={e => e.key === 'Enter' && setPermCompSearchTriggered(true)}
-                                        className="w-full pl-9 pr-24 p-2 border border-slate-300 dark:border-slate-600  text-sm bg-white dark:bg-slate-700 font-bold text-slate-700 dark:text-slate-300 outline-none focus:border-[#0078d4] focus:ring-1 focus:ring-[#0078d4] rounded-[12px] transition-all"
-                                    />
-                                    <button
-                                        onClick={() => setPermCompSearchTriggered(true)}
-                                        className="absolute right-1 top-1 bottom-1 px-4 bg-[#0078d4] hover:bg-[#005a9e] text-white text-[11px] font-bold uppercase tracking-wider  rounded-[12px] transition-colors shadow-sm"
-                                    >
-                                        Load
-                                    </button>
-
-                                    {permCompSearchTriggered && (
-                                        <div className="absolute top-[100%] mt-2 left-0 w-full z-50 bg-white dark:bg-slate-700 dark:border-slate-600  shadow-2xl max-h-[250px] overflow-y-auto flex flex-col">
-                                            <div
-                                                onClick={() => {
-                                                    setSelectedPermCompany('');
-                                                    setPermCompSearchText('-- All Companies (Global) --');
-                                                    setPermCompSearchTriggered(false);
-                                                }}
-                                                className="p-3 border-b border-slate-100 dark:border-slate-600 text-sm cursor-pointer rounded-[12px] transition-all bg-[#0078d4]/5 text-[#0078d4] font-bold hover:bg-[#0078d4]/10"
-                                            >
-                                                -- All Companies (Global) --
-                                            </div>
-                                            {(() => {
-                                                const filteredCompanies = availablePermCompanies.filter(c => (c.comp_Name || c.companyName || c.code || '').toLowerCase().includes(permCompSearchText.toLowerCase()));
-                                                return (
-                                                    <>
-                                                        {filteredCompanies.map(c => (
-                                                            <div
-                                                                key={c.code}
-                                                                onClick={() => {
-                                                                    setSelectedPermCompany(c.code);
-                                                                    setPermCompSearchText(c.comp_Name || c.companyName || c.code);
-                                                                    setPermCompSearchTriggered(false);
-                                                                }}
-                                                                className="p-3 border-b border-slate-100 dark:border-slate-600 text-sm cursor-pointer rounded-[12px] transition-all text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-600 font-medium"
-                                                            >
-                                                                {c.comp_Name || c.companyName || c.code}
-                                                            </div>
-                                                        ))}
-                                                    </>
-                                                );
-                                            })()}
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-
-                            <button onClick={() => setShowPermTargetModal(false)} className="w-full py-3 mt-4 bg-[#0078d4] hover:bg-[#005a9e] text-white text-sm font-bold uppercase tracking-wider  shadow-md rounded-[12px] transition-all active:scale-[0.98] rounded-[12px] shrink-0">
-                                Apply Target Configuration
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
             {/* System Log Report Modal */}
             <SystemLogReportModal
                 isOpen={showSystemLogReport}
@@ -2295,7 +2151,7 @@ const SuperAdminDashboard = () => {
             {/* Full Screen Image Modal */}
             {fullScreenImage && (
                 <div className="fixed inset-0 z-[10000] bg-black/90 flex items-center justify-center p-4 backdrop-blur-sm animate-in fade-in duration-200" onClick={() => setFullScreenImage(null)}>
-                    <button onClick={() => setFullScreenImage(null)} className="absolute top-6 right-6 text-white/70 hover:text-white bg-black/50 hover:bg-black/80 rounded-[12px] p-2 transition-all">
+                    <button onClick={() => setFullScreenImage(null)} className="absolute top-6 right-6 text-slate-800 dark:text-white/70 hover:text-slate-800 dark:text-white bg-black/50 hover:bg-black/80 rounded-[12px] p-2 transition-all">
                         <X className="w-8 h-8" />
                     </button>
                     <img src={fullScreenImage} alt="Full screen preview" className="max-w-full max-h-full object-contain shadow-2xl rounded-[12px]" onClick={(e) => e.stopPropagation()} />
@@ -2308,10 +2164,10 @@ const SuperAdminDashboard = () => {
                     <div className="absolute inset-0 bg-indigo-400 rounded-full animate-ping opacity-25"></div>
                     <button 
                         onClick={() => setShowAIChatbot(true)}
-                        className="relative w-14 h-14 bg-white rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.12)] flex items-center justify-center hover:scale-110 transition-all border border-slate-100"
+                        className="w-20 h-20 flex items-center justify-center hover:scale-110 transition-all"
                         title="Open Onimta Intelligence"
                     >
-                        <AIAsterisk size={28} />
+                        <DotLottiePlayer src="/lottiefile/AI loading.lottie" autoplay loop style={{ width: '120%', height: '120%' }} />
                     </button>
                 </div>
             )}
@@ -2323,3 +2179,15 @@ const SuperAdminDashboard = () => {
 };
 
 export default SuperAdminDashboard;
+
+
+
+
+
+
+
+
+
+
+
+

@@ -331,7 +331,7 @@ const ReportCustomizeModal = ({ isOpen, onClose, customizations, onApply, column
                                 <button onClick={() => toggleSection('cellSettings')} className="w-full flex items-center justify-between px-4 py-3 bg-[#f8f9fa] hover:bg-gray-50 text-left">
                                     <div className="flex items-center gap-2">
                                         <span className="text-[13px] font-bold text-gray-800">Cell settings</span>
-                                        <span className="bg-[#c80076] text-white text-[9px] font-bold px-1.5 py-0.5 rounded-sm tracking-wide">NEW</span>
+                                        <span className="bg-[#c80076] text-slate-800 dark:text-white text-[9px] font-bold px-1.5 py-0.5 rounded-sm tracking-wide">NEW</span>
                                     </div>
                                     {expandedSections.cellSettings ? <ChevronUp size={16} className="text-gray-500" /> : <ChevronDown size={16} className="text-gray-500" />}
                                 </button>
@@ -368,3 +368,7 @@ const ReportCustomizeModal = ({ isOpen, onClose, customizations, onApply, column
 };
 
 export default ReportCustomizeModal;
+
+
+
+

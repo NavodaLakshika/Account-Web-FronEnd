@@ -381,7 +381,7 @@ const SalesInvoiceBoard = ({ isOpen, onClose }) => {
                                 <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Document No</label>
                                 <div className="flex-1 flex gap-1 h-8">
                                     <input type="text" name="docNo" value={formData.docNo} onChange={handleInput} className="flex-1 border border-gray-300 px-3 text-[12px] font-bold text-blue-600 bg-gray-50 rounded-[3px] outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd]" />
-                                    <button onClick={handleSearch} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95">
+                                    <button onClick={handleSearch} className="w-10 h-8 bg-[#0285fd] text-slate-800 dark:text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95">
                                         <Search size={16} />
                                     </button>
                                 </div>
@@ -390,7 +390,7 @@ const SalesInvoiceBoard = ({ isOpen, onClose }) => {
                                 <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Date</label>
                                 <div className="flex-1 flex gap-1 h-8">
                                     <input type="text" readOnly value={formData.date} className="flex-1 border border-gray-300 rounded-[3px] px-3 text-[12px] font-bold text-gray-700 bg-white" />
-                                    <button onClick={() => { setDatePickerField('date'); setShowDatePicker(true); }} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] shadow-md active:scale-95">
+                                    <button onClick={() => { setDatePickerField('date'); setShowDatePicker(true); }} className="w-10 h-8 bg-[#0285fd] text-slate-800 dark:text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] shadow-md active:scale-95">
                                         <Calendar size={16} />
                                     </button>
                                 </div>
@@ -399,7 +399,7 @@ const SalesInvoiceBoard = ({ isOpen, onClose }) => {
                                 <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">S.O. Number</label>
                                 <div className="flex-1 flex gap-1 h-8">
                                     <input type="text" readOnly value={formData.soNumber} className="flex-1 border border-gray-300 px-3 text-[12px] font-bold text-gray-700 bg-white rounded-[3px]" />
-                                    <button onClick={() => setShowSOSearch(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] shadow-md active:scale-95">
+                                    <button onClick={() => setShowSOSearch(true)} className="w-10 h-8 bg-[#0285fd] text-slate-800 dark:text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] shadow-md active:scale-95">
                                         <Search size={16} />
                                     </button>
                                 </div>
@@ -410,7 +410,7 @@ const SalesInvoiceBoard = ({ isOpen, onClose }) => {
                                 <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Customer</label>
                                 <div className="flex-1 flex gap-1 h-8">
                                     <input type="text" readOnly value={lookups.customers.find(c => c.code === formData.customerId)?.name || ''} className="flex-1 border border-gray-300 px-3 text-[12px] font-bold text-red-600 bg-gray-50 rounded-[3px]" />
-                                    <button onClick={() => setShowCustomerSearch(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] shadow-md active:scale-95">
+                                    <button onClick={() => setShowCustomerSearch(true)} className="w-10 h-8 bg-[#0285fd] text-slate-800 dark:text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] shadow-md active:scale-95">
                                         <Search size={16} />
                                     </button>
                                 </div>
@@ -419,7 +419,7 @@ const SalesInvoiceBoard = ({ isOpen, onClose }) => {
                                 <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Sales Asst.</label>
                                 <div className="flex-1 flex gap-1 h-8">
                                     <input type="text" readOnly value={formData.salesAssistant} className="flex-1 border border-gray-300 px-3 text-[12px] font-bold text-gray-700 bg-white rounded-[3px]" />
-                                    <button onClick={() => setShowAssistantSearch(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] shadow-md active:scale-95">
+                                    <button onClick={() => setShowAssistantSearch(true)} className="w-10 h-8 bg-[#0285fd] text-slate-800 dark:text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] shadow-md active:scale-95">
                                         <Search size={16} />
                                     </button>
                                 </div>
@@ -430,7 +430,7 @@ const SalesInvoiceBoard = ({ isOpen, onClose }) => {
                                 <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Payment Type</label>
                                 <div className="flex-1 flex gap-1 h-8">
                                     <input type="text" readOnly value={lookups.paymentMethods.find(m => m.code === formData.payType)?.name || ''} className="flex-1 border border-gray-300 px-3 text-[12px] font-bold text-gray-700 bg-white rounded-[3px]" />
-                                    <button onClick={() => setShowPayMethodSearch(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] shadow-md active:scale-95">
+                                    <button onClick={() => setShowPayMethodSearch(true)} className="w-10 h-8 bg-[#0285fd] text-slate-800 dark:text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] shadow-md active:scale-95">
                                         <Search size={16} />
                                     </button>
                                 </div>
@@ -439,7 +439,7 @@ const SalesInvoiceBoard = ({ isOpen, onClose }) => {
                                 <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Tax Account</label>
                                 <div className="flex-1 flex gap-1 h-8">
                                     <input type="text" readOnly value={lookups.taxAccounts.find(a => a.code === formData.taxAccount)?.name || ''} className="flex-1 border border-gray-300 px-3 text-[12px] font-bold text-gray-700 bg-white rounded-[3px]" />
-                                    <button onClick={() => setShowTaxAccSearch(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] shadow-md active:scale-95">
+                                    <button onClick={() => setShowTaxAccSearch(true)} className="w-10 h-8 bg-[#0285fd] text-slate-800 dark:text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] shadow-md active:scale-95">
                                         <Search size={16} />
                                     </button>
                                 </div>
@@ -458,7 +458,7 @@ const SalesInvoiceBoard = ({ isOpen, onClose }) => {
                                 <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Due Date</label>
                                 <div className="flex-1 flex gap-1 h-8">
                                     <input type="text" readOnly value={formData.dueDate} className="flex-1 border border-gray-300 rounded-[3px] px-3 text-[12px] font-bold text-gray-700 bg-white" />
-                                    <button onClick={() => { setDatePickerField('dueDate'); setShowDatePicker(true); }} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] shadow-md active:scale-95">
+                                    <button onClick={() => { setDatePickerField('dueDate'); setShowDatePicker(true); }} className="w-10 h-8 bg-[#0285fd] text-slate-800 dark:text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] shadow-md active:scale-95">
                                         <Calendar size={16} />
                                     </button>
                                 </div>
@@ -471,7 +471,7 @@ const SalesInvoiceBoard = ({ isOpen, onClose }) => {
                         <div className="flex bg-slate-50/80 border-b border-gray-200 text-[10px] font-black text-gray-400 uppercase tracking-widest items-center">
                             <div className="flex-[3] py-2.5 px-4 border-r border-gray-200 flex items-center justify-between">
                                 <span>Product Identification</span>
-                                <button onClick={() => setShowAddProductModal(true)} className="w-8 h-7 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] shadow-md active:scale-95">
+                                <button onClick={() => setShowAddProductModal(true)} className="w-8 h-7 bg-[#0285fd] text-slate-800 dark:text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] shadow-md active:scale-95">
                                     <Plus size={14} />
                                 </button>
                             </div>
@@ -594,7 +594,7 @@ const SalesInvoiceBoard = ({ isOpen, onClose }) => {
                         <label className="text-[11px] font-black text-gray-400 uppercase tracking-widest">Product / Service</label>
                         <div className="flex gap-2">
                             <input type="text" readOnly value={entry.prodName} placeholder="Tap Search to Catalog..." className="flex-1 h-10 border border-gray-300 rounded-[3px] px-4 text-[13px] font-bold text-blue-600 bg-gray-50 outline-none" />
-                            <button onClick={() => setShowProductSearch(true)} className="w-12 h-10 bg-[#0285fd] text-white flex items-center justify-center rounded-[3px] shadow-md active:scale-95">
+                            <button onClick={() => setShowProductSearch(true)} className="w-12 h-10 bg-[#0285fd] text-slate-800 dark:text-white flex items-center justify-center rounded-[3px] shadow-md active:scale-95">
                                 <Search size={18} />
                             </button>
                         </div>
@@ -684,7 +684,7 @@ const LookupModal = ({ isOpen, onClose, title, items, onSelect }) => {
                                     <td className="px-5 py-3 font-mono text-[12px] text-gray-600">{item.code || item.Code || item.docNo || item.doc_No || item.Doc_No}</td>
                                     <td className="px-5 py-3 text-[12px] font-bold text-gray-700 uppercase">{item.name || item.Name || item.remarks || item.Remarks || item.vendorId || item.date}</td>
                                     {hasPrice && <td className="px-5 py-3 text-right font-mono text-[12px] font-bold text-blue-600">{parseFloat(item.selling || item.sellingPrice || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>}
-                                    <td className="px-5 py-3 text-right"><button className="bg-[#e49e1b] text-white text-[10px] px-4 py-1.5 rounded-[3px] font-black shadow-md transition-all active:scale-95">SELECT</button></td>
+                                    <td className="px-5 py-3 text-right"><button className="bg-[#e49e1b] text-slate-800 dark:text-white text-[10px] px-4 py-1.5 rounded-[3px] font-black shadow-md transition-all active:scale-95">SELECT</button></td>
                                 </tr>
                             ))}
                         </tbody>
@@ -696,3 +696,7 @@ const LookupModal = ({ isOpen, onClose, title, items, onSelect }) => {
 };
 
 export default SalesInvoiceBoard;
+
+
+
+

@@ -284,7 +284,7 @@ const ItemMasterBoard = ({ isOpen, onClose }) => {
                                 <label className="text-[12.5px] font-bold text-gray-700 w-28 shrink-0">Item ID & Title</label>
                                 <div className="flex-1 flex gap-1 h-8 min-w-0">
                                     <input name="code" value={formData.code} onChange={handleInput} className="w-[138px] min-w-0 h-8 border border-gray-300 rounded-[3px] px-3 font-mono text-[12px] font-black text-[#0285fd] bg-blue-50/20 outline-none shadow-sm focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd]" placeholder="ID" />
-                                    <button onClick={() => setShowSearchModal(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0"><Search size={16}/></button>
+                                    <button onClick={() => setShowSearchModal(true)} className="w-10 h-8 bg-[#0285fd] text-slate-800 dark:text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0"><Search size={16}/></button>
                                     <input name="prodName" value={formData.prodName} onChange={handleInput} className="flex ml-7 w-[300px] min-w-0 h-8 border border-gray-300 rounded-[3px] px-3 font-mono text-[12px] font-bold text-gray-800 outline-none shadow-sm focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd]" placeholder="Enter Product Name..." />
                              </div>
                             </div>
@@ -342,7 +342,7 @@ const ItemMasterBoard = ({ isOpen, onClose }) => {
                     <div className="w-[300px] flex flex-col gap-4">
                         <div className="w-full aspect-square bg-gray-50 border-2 border-dashed border-gray-300 rounded-[3px] flex flex-col items-center justify-center text-gray-400 overflow-hidden relative group">
                             {productImage ? <img src={productImage} alt="Product" className="w-full h-full object-cover" /> : <><ImageIcon size={48} strokeWidth={1} /><span className="text-xs mt-2 uppercase font-bold tracking-wider text-center">No Product Image</span></>}
-                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                            <div className="absolute inset-0 bg-slate-200/50 dark:bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                                 <button onClick={() => fileInputRef.current?.click()} className="p-3 bg-white rounded-full text-blue-600 hover:scale-110 transition-transform shadow-lg"><Camera size={20}/></button>
                             </div>
                         </div>
@@ -411,7 +411,7 @@ const ItemMasterBoard = ({ isOpen, onClose }) => {
                                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
                                     <input type="text" autoFocus placeholder="Enter item code, name, or properties..." className="w-full h-10 pl-10 pr-4 border border-gray-300 rounded-[3px] outline-none text-[13px] focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] shadow-sm bg-white" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleMainSearch()} />
                                 </div>
-                                <button onClick={handleMainSearch} className="px-8 h-9 bg-[#0285fd] text-white rounded-[3px] font-black hover:bg-[#0073ff] transition-all active:scale-95 shadow-md text-xs tracking-widest uppercase">Perform Query</button>
+                                <button onClick={handleMainSearch} className="px-8 h-9 bg-[#0285fd] text-slate-800 dark:text-white rounded-[3px] font-black hover:bg-[#0073ff] transition-all active:scale-95 shadow-md text-xs tracking-widest uppercase">Perform Query</button>
                             </div>
                             <div className="border border-gray-200 rounded-[3px] overflow-hidden shadow-sm">
                                 <div className="max-h-[400px] overflow-y-auto no-scrollbar">
@@ -484,7 +484,7 @@ const ModalField = ({ label, value, placeholder, onClick, displayValue }) => (
             />
             <button 
                 onClick={onClick} 
-                className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0"
+                className="w-10 h-8 bg-[#0285fd] text-slate-800 dark:text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0"
             >
                 <Search size={16}/>
             </button>
@@ -493,3 +493,7 @@ const ModalField = ({ label, value, placeholder, onClick, displayValue }) => (
 );
 
 export default ItemMasterBoard;
+
+
+
+

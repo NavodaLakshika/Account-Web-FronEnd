@@ -355,7 +355,7 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
                                 <label                                 className="text-[11px] font-bold text-gray-500 uppercase w-20 shrink-0">Doc No</label>
                                 <div className="flex-1 flex gap-1 h-8 min-w-0">
                                     <input type="text" value={formData.docNo} onChange={handleInputChange} name="docNo" className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-sm font-mono font-bold text-[#0285fd] bg-slate-50 rounded outline-none focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 transition-all" />
-                                    <button onClick={handleSearchClick} className="w-8 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0">
+                                    <button onClick={handleSearchClick} className="w-8 h-8 bg-[#0285fd] text-slate-800 dark:text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0">
                                         <Search size={14} />
                                     </button>
                                 </div>
@@ -366,7 +366,7 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
                                 <label className="text-[11px] font-bold text-gray-500 uppercase w-20 shrink-0">Date</label>
                                 <div className="flex-1 flex gap-1 h-8 min-w-0">
                                     <input type="text" readOnly value={formData.date} onClick={() => setShowDateModal(true)} className="flex-1 min-w-0 h-8 border border-slate-200 rounded px-3 text-sm font-mono outline-none bg-slate-50 text-gray-700 font-bold cursor-pointer transition-all" />
-                                    <button onClick={() => setShowDateModal(true)} className="w-8 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0">
+                                    <button onClick={() => setShowDateModal(true)} className="w-8 h-8 bg-[#0285fd] text-slate-800 dark:text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0">
                                         <Calendar size={14} />
                                     </button>
                                 </div>
@@ -377,7 +377,7 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
                                 <label className="text-[11px] font-bold text-gray-500 uppercase w-20 shrink-0 text-nowrap">Job No</label>
                                 <div className="flex-1 flex gap-1 h-8 min-w-0">
                                     <input type="text" readOnly value={formData.jobNo} onClick={() => setShowJobModal(true)} className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-sm font-mono font-bold text-gray-700 bg-slate-50 rounded outline-none cursor-pointer transition-all" />
-                                    <button onClick={() => setShowJobModal(true)} className="w-8 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0">
+                                    <button onClick={() => setShowJobModal(true)} className="w-8 h-8 bg-[#0285fd] text-slate-800 dark:text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0">
                                         <Search size={14} />
                                     </button>
                                 </div>
@@ -388,7 +388,7 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
                                 <label className="text-[11px] font-bold text-gray-500 uppercase w-20 shrink-0 text-nowrap">Sales Asst</label>
                                 <div className="flex-1 flex gap-1 h-8 min-w-0">
                                     <input type="text" readOnly value={lookups.salesAssistants.find(s => s.code === formData.salesRef)?.name || formData.salesRef || ''} onClick={() => setShowSalesAsstModal(true)} className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-sm font-mono font-bold text-gray-700 bg-slate-50 rounded outline-none cursor-pointer transition-all" placeholder="" />
-                                    <button onClick={() => setShowSalesAsstModal(true)} className="w-8 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0">
+                                    <button onClick={() => setShowSalesAsstModal(true)} className="w-8 h-8 bg-[#0285fd] text-slate-800 dark:text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0">
                                         <Search size={14} />
                                     </button>
                                 </div>
@@ -400,7 +400,7 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
                                 <div className="flex-1 flex gap-1 h-8 min-w-0">
                                     <input type="text" readOnly value={formData.custCode} placeholder="ID" className="w-20 min-w-0 h-8 border border-slate-200 px-2 text-sm font-mono font-bold text-[#0285fd] bg-slate-50 rounded outline-none transition-all" />
                                     <input type="text" readOnly value={formData.custName} onClick={() => setShowCustModal(true)} className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-sm font-mono font-bold rounded outline-none bg-slate-50 text-gray-700 cursor-pointer transition-all" placeholder=" " />
-                                    <button onClick={() => setShowCustModal(true)} className="w-8 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0">
+                                    <button onClick={() => setShowCustModal(true)} className="w-8 h-8 bg-[#0285fd] text-slate-800 dark:text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0">
                                         <Search size={14} />
                                     </button>
                                 </div>
@@ -417,7 +417,7 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
                                 <label className="text-[11px] font-bold text-gray-500 uppercase w-20 shrink-0">Pay Type</label>
                                 <div className="flex-1 flex gap-1 h-8 min-w-0">
                                     <input type="text" readOnly value={formData.payType} onClick={() => setShowPayTypeModal(true)} className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-sm font-mono font-bold text-gray-700 bg-slate-50 rounded outline-none cursor-pointer transition-all" />
-                                    <button onClick={() => setShowPayTypeModal(true)} className="w-8 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0">
+                                    <button onClick={() => setShowPayTypeModal(true)} className="w-8 h-8 bg-[#0285fd] text-slate-800 dark:text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0">
                                         <Search size={14} />
                                     </button>
                                 </div>
@@ -434,7 +434,7 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
                                 <label className="text-[11px] font-bold text-gray-500 uppercase w-20 shrink-0">Due Date</label>
                                 <div className="flex-1 flex gap-1 h-8 min-w-0">
                                     <input type="text" readOnly value={formData.dueDate} onClick={() => setShowDueDateModal(true)} className="flex-1 min-w-0 h-8 border border-slate-200 rounded px-3 text-sm font-mono outline-none bg-slate-50 text-gray-700 font-bold cursor-pointer transition-all" />
-                                    <button onClick={() => setShowDueDateModal(true)} className="w-8 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0">
+                                    <button onClick={() => setShowDueDateModal(true)} className="w-8 h-8 bg-[#0285fd] text-slate-800 dark:text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0">
                                         <Calendar size={14} />
                                     </button>
                                 </div>
@@ -468,7 +468,7 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
                                                 className="flex-1 min-w-0 h-7 border border-slate-200 px-2 text-sm font-mono font-bold text-[#0285fd] bg-slate-50 rounded outline-none focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 cursor-pointer transition-all"
                                                 placeholder="Select"
                                             />
-                                            <button onClick={() => { setProdIndex(idx); setShowProdModal(true); }} className="w-8 h-7 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0">
+                                            <button onClick={() => { setProdIndex(idx); setShowProdModal(true); }} className="w-8 h-7 bg-[#0285fd] text-slate-800 dark:text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0">
                                                 <Search size={14} />
                                             </button>
                                         </div>
@@ -514,7 +514,7 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
                                 </div>
                             ))}
                             <div className="h-10 border-b border-slate-100 flex items-center">
-                                <button onClick={addRow} className="w-full h-full text-[11px] font-bold text-slate-400 uppercase tracking-widest hover:bg-slate-50 hover:text-slate-800 transition-colors flex items-center justify-center gap-2">
+                                <button onClick={addRow} className="w-full h-full text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest hover:bg-slate-50 hover:text-slate-800 transition-colors flex items-center justify-center gap-2">
                                     <Plus size={14} /> Add Line Item
                                 </button>
                             </div>
@@ -567,7 +567,7 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
                             <div className="flex items-center gap-3">
                                 <span className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Adjustment</span>
                                 <div className="flex-1 flex gap-3 items-center justify-end">
-                                    <button onClick={() => setFormData({...formData, adjType: formData.adjType === 'Add' ? 'Less' : 'Add'})} className="w-28 shrink-0 h-7 text-[10px] font-black text-white bg-[#8c97ab] hover:bg-[#7a869a] rounded-[3px] uppercase shadow-sm transition-all active:scale-95">
+                                    <button onClick={() => setFormData({...formData, adjType: formData.adjType === 'Add' ? 'Less' : 'Add'})} className="w-28 shrink-0 h-7 text-[10px] font-black text-slate-800 dark:text-white bg-[#8c97ab] hover:bg-[#7a869a] rounded-[3px] uppercase shadow-sm transition-all active:scale-95">
                                         {formData.adjType}
                                     </button>
                                     <input type="number" name="adjValue" value={formData.adjValue} onChange={handleInputChange} className="w-[105px] h-7 text-right text-sm font-mono font-bold border border-slate-200 rounded outline-none focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 bg-slate-50 shrink-0 transition-all" />
@@ -846,3 +846,7 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
 };
 
 export default SalesOrderBoard;
+
+
+
+

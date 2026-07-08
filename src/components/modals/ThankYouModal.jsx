@@ -77,9 +77,9 @@ const ThankYouModal = ({ isOpen, onClose }) => {
                 authService.logout();
                 localStorage.removeItem('selectedCompany');
                 window.location.href = '/login';
-            }, 3200);
+            }, 3200000);
 
-            const duration = 5000;
+            const duration = 500000;
             const startTime = Date.now();
             let animationFrameId;
 

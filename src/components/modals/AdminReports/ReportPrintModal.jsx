@@ -224,7 +224,7 @@ const ReportPrintModal = ({ isOpen, onClose, companyName, title, subtitle, data 
             {PrintDocument}
 
             {/* Modal UI */}
-            <div className={`fixed inset-0 z-[1500] flex items-center justify-center bg-slate-900/50 backdrop-blur-sm ${isFullscreen ? 'p-0' : 'p-4'}`}>
+            <div className={`fixed inset-0 z-[1500] flex items-center justify-center bg-slate-100 dark:bg-slate-900/50 backdrop-blur-sm ${isFullscreen ? 'p-0' : 'p-4'}`}>
                 <div className={`bg-white ${isFullscreen ? 'w-full h-full rounded-none' : 'w-full max-w-[1320px] h-[90vh] rounded-sm'} shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95 duration-200`}>
                     {/* Header */}
                     <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-start shrink-0">
@@ -283,7 +283,7 @@ const ReportPrintModal = ({ isOpen, onClose, companyName, title, subtitle, data 
                                             onChange={(e) => setShowHeaders(e.target.checked)}
                                             className="peer appearance-none w-4 h-4 border border-gray-300 rounded-[2px] checked:bg-[#0077c5] checked:border-[#0077c5] cursor-pointer transition-colors"
                                         />
-                                        <div className="absolute text-white pointer-events-none opacity-0 peer-checked:opacity-100">
+                                        <div className="absolute text-slate-800 dark:text-white pointer-events-none opacity-0 peer-checked:opacity-100">
                                             <svg width="10" height="8" viewBox="0 0 10 8" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                 <path d="M1 4L3.5 6.5L9 1" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                                             </svg>
@@ -308,7 +308,7 @@ const ReportPrintModal = ({ isOpen, onClose, companyName, title, subtitle, data 
                             <div className="h-12 bg-[#323639] border-b border-gray-700 flex items-center justify-between px-4 shrink-0 text-gray-300 shadow-md z-10">
                                 <div className="flex items-center gap-4">
                                     <button 
-                                        className={`p-1.5 rounded transition-colors ${showSidebar ? 'bg-white/10 hover:bg-white/20' : 'hover:bg-white/10'}`}
+                                        className={`p-1.5 rounded transition-colors ${showSidebar ? 'bg-slate-200 dark:bg-white/10 hover:bg-white/20' : 'hover:bg-slate-200 dark:bg-white/10'}`}
                                         onClick={() => setShowSidebar(!showSidebar)}
                                         title="Toggle Sidebar"
                                     >
@@ -317,29 +317,29 @@ const ReportPrintModal = ({ isOpen, onClose, companyName, title, subtitle, data 
                                     <span className="text-[13px] font-medium truncate w-[240px] text-gray-200">{title}</span>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                    <div className="flex items-center bg-white/10 rounded px-2 h-7 text-[12px]">
-                                        <span className="font-bold text-white">1</span>
+                                    <div className="flex items-center bg-slate-200 dark:bg-white/10 rounded px-2 h-7 text-[12px]">
+                                        <span className="font-bold text-slate-800 dark:text-white">1</span>
                                         <span className="mx-1">/</span>
                                         <span>1</span>
                                     </div>
                                     <div className="w-px h-5 bg-gray-600 mx-1"></div>
-                                    <button onClick={handleZoomOut} className="hover:bg-white/10 p-1.5 rounded" title="Zoom Out"><Minus size={16} /></button>
+                                    <button onClick={handleZoomOut} className="hover:bg-slate-200 dark:bg-white/10 p-1.5 rounded" title="Zoom Out"><Minus size={16} /></button>
                                     <span className="text-[12px] font-bold w-10 text-center">{zoom}%</span>
-                                    <button onClick={handleZoomIn} className="hover:bg-white/10 p-1.5 rounded" title="Zoom In"><Plus size={16} /></button>
+                                    <button onClick={handleZoomIn} className="hover:bg-slate-200 dark:bg-white/10 p-1.5 rounded" title="Zoom In"><Plus size={16} /></button>
                                     <div className="w-px h-5 bg-gray-600 mx-1"></div>
-                                    <button onClick={toggleFullscreen} className={`p-1.5 rounded ${isFullscreen ? 'bg-white/20' : 'hover:bg-white/10'}`} title="Fullscreen"><Maximize size={16} /></button>
-                                    <button onClick={handleRotate} className="hover:bg-white/10 p-1.5 rounded" title="Rotate"><RotateCw size={16} /></button>
+                                    <button onClick={toggleFullscreen} className={`p-1.5 rounded ${isFullscreen ? 'bg-white/20' : 'hover:bg-slate-200 dark:bg-white/10'}`} title="Fullscreen"><Maximize size={16} /></button>
+                                    <button onClick={handleRotate} className="hover:bg-slate-200 dark:bg-white/10 p-1.5 rounded" title="Rotate"><RotateCw size={16} /></button>
                                     <div className="w-px h-5 bg-gray-600 mx-1"></div>
-                                    <button onClick={() => setIsPanning(!isPanning)} className={`p-1.5 rounded ${isPanning ? 'bg-[#0077c5] text-white' : 'hover:bg-white/10'}`} title="Pan Tool"><Hand size={16} /></button>
-                                    <button onClick={handleUndo} className="hover:bg-white/10 p-1.5 rounded" title="Reset View"><Undo size={16} /></button>
-                                    <button className="hover:bg-white/10 p-1.5 rounded opacity-50 cursor-not-allowed" title="Redo"><Redo size={16} /></button>
+                                    <button onClick={() => setIsPanning(!isPanning)} className={`p-1.5 rounded ${isPanning ? 'bg-[#0077c5] text-slate-800 dark:text-white' : 'hover:bg-slate-200 dark:bg-white/10'}`} title="Pan Tool"><Hand size={16} /></button>
+                                    <button onClick={handleUndo} className="hover:bg-slate-200 dark:bg-white/10 p-1.5 rounded" title="Reset View"><Undo size={16} /></button>
+                                    <button className="hover:bg-slate-200 dark:bg-white/10 p-1.5 rounded opacity-50 cursor-not-allowed" title="Redo"><Redo size={16} /></button>
                                 </div>
                                 <div className="flex items-center gap-2 relative">
-                                    <button className="hover:bg-white/10 p-1.5 rounded" onClick={() => window.print()}><Download size={16} /></button>
-                                    <button className="hover:bg-white/10 p-1.5 rounded" onClick={() => window.print()}><Printer size={16} /></button>
+                                    <button className="hover:bg-slate-200 dark:bg-white/10 p-1.5 rounded" onClick={() => window.print()}><Download size={16} /></button>
+                                    <button className="hover:bg-slate-200 dark:bg-white/10 p-1.5 rounded" onClick={() => window.print()}><Printer size={16} /></button>
                                     <button 
                                         onClick={() => setShowMoreMenu(!showMoreMenu)}
-                                        className={`p-1.5 rounded transition-colors ${showMoreMenu ? 'bg-white/20' : 'hover:bg-white/10'}`}
+                                        className={`p-1.5 rounded transition-colors ${showMoreMenu ? 'bg-white/20' : 'hover:bg-slate-200 dark:bg-white/10'}`}
                                     >
                                         <MoreVertical size={16} />
                                     </button>
@@ -529,7 +529,7 @@ const ReportPrintModal = ({ isOpen, onClose, companyName, title, subtitle, data 
                         <button onClick={() => window.print()} className="h-9 px-5 border-2 border-[#0077c5] text-[#0077c5] text-[13px] font-bold rounded-[3px] hover:bg-blue-50 transition-colors">
                             Save as PDF
                         </button>
-                        <button onClick={() => window.print()} className="h-9 px-5 bg-[#0077c5] hover:bg-[#005ca6] text-white text-[13px] font-bold rounded-[3px] transition-colors shadow-sm">
+                        <button onClick={() => window.print()} className="h-9 px-5 bg-[#0077c5] hover:bg-[#005ca6] text-slate-800 dark:text-white text-[13px] font-bold rounded-[3px] transition-colors shadow-sm">
                             Print
                         </button>
                     </div>
@@ -624,3 +624,7 @@ const ReportPrintModal = ({ isOpen, onClose, companyName, title, subtitle, data 
 };
 
 export default ReportPrintModal;
+
+
+
+

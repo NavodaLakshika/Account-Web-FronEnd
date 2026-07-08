@@ -325,6 +325,7 @@ const AIChatbot = ({ isOpen, onClose }) => {
                                 
                                 <div className="relative bg-white rounded-2xl flex flex-col min-h-[100px] p-1 shadow-sm">
                                     <textarea 
+                                        autoFocus
                                         value={input}
                                         onChange={(e) => setInput(e.target.value)}
                                         onKeyDown={(e) => {

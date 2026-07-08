@@ -10,6 +10,7 @@ import WelcomeModal from '../components/modals/WelcomeModal';
 import LegalTextModal from '../components/modals/LegalTextModal';
 import { Helmet } from 'react-helmet-async';
 import { DotLottiePlayer } from '@dotlottie/react-player';
+import AnimatedBackground from '../components/AnimatedBackground';
 
 const AuthPage = () => {
     const navigate = useNavigate();
@@ -201,8 +202,9 @@ const AuthPage = () => {
                 <link rel="canonical" href="https://onimta.com/login" />
             </Helmet>
 
-
-
+            <div className="absolute inset-0 pointer-events-none opacity-60">
+                <AnimatedBackground color="0, 172, 238" />
+            </div>
 
             <div className="relative z-10 w-full max-w-6xl px-12 flex items-center justify-center mt-16">
 

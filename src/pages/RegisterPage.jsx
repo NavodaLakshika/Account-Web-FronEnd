@@ -8,6 +8,7 @@ import '@dotlottie/react-player/dist/index.css';
 import AboutUsModal from '../components/modals/AboutUsModal';
 import HelpModal from '../components/modals/HelpModal';
 import LegalTextModal from '../components/modals/LegalTextModal';
+import AnimatedBackground from '../components/AnimatedBackground';
 
 const RegisterPage = () => {
     const navigate = useNavigate();
@@ -141,6 +142,11 @@ const RegisterPage = () => {
                 <meta name="description" content="Register a new account on the Onimta Accounting Web Application. Create secure access to enterprise financial management tools." />
                 <link rel="canonical" href="https://onimta.com/register" />
             </Helmet>
+
+            <div className="absolute inset-0 pointer-events-none opacity-60">
+                <AnimatedBackground color="0, 172, 238" />
+            </div>
+
             <style>{`
                 .otp-box { transition: border-color 0.2s, box-shadow 0.2s; }
                 .otp-box:focus { border-color: #00acee !important; box-shadow: 0 0 0 3px rgba(0,172,238,0.25); outline: none; }
@@ -180,7 +186,7 @@ const RegisterPage = () => {
                         </div>
                     </div>
 
-                    <div className="max-w-md mx-auto">
+                    <div className="max-w-2xl mx-auto">
 
                     {/* STEP 1 */}
                     {step === 1 && (
@@ -189,54 +195,57 @@ const RegisterPage = () => {
                                 {displayedRegisterText}<span className="animate-[pulse_1s_ease-in-out_infinite] opacity-70 font-light ml-1">_</span>
                             </h2>
                             <form onSubmit={handleSendOtp} className="space-y-4">
-                                <div className="space-y-1">
-                                    <label htmlFor="Emp_Name" className="block text-sm font-sans font-medium text-slate-700 ml-1">
-                                        Full Name
-                                    </label>
-                                    <input type="text" id="Emp_Name" name="Emp_Name" value={formData.Emp_Name} onChange={handleChange}
-                                        required
-                                        className="w-full px-4 py-3 bg-white font-mono text-slate-800 font-bold outline-none border border-slate-300 hover:border-[#00acee] focus:border-[#00acee] focus:ring-4 focus:ring-[#00acee]/30 transition-all" />
-                                </div>
-                                <div className="space-y-1">
-                                    <label htmlFor="Phone_Number" className="block text-sm font-sans font-medium text-slate-700 ml-1">
-                                        Phone Number
-                                    </label>
-                                    <input type="tel" id="Phone_Number" name="Phone_Number" value={formData.Phone_Number} onChange={handleChange}
-                                        required
-                                        className="w-full px-4 py-3 bg-white font-mono text-slate-800 font-bold outline-none border border-slate-300 hover:border-[#00acee] focus:border-[#00acee] focus:ring-4 focus:ring-[#00acee]/30 transition-all" />
-                                </div>
-                                <div className="space-y-1">
-                                    <label htmlFor="Email" className="block text-sm font-sans font-medium text-slate-700 ml-1">
-                                        Email Address
-                                    </label>
-                                    <input type="email" id="Email" name="Email" value={formData.Email} onChange={handleChange}
-                                        required
-                                        className="w-full px-4 py-3 bg-white font-mono text-slate-800 font-bold outline-none border border-slate-300 hover:border-[#00acee] focus:border-[#00acee] focus:ring-4 focus:ring-[#00acee]/30 transition-all" />
-                                </div>
-                                <div className="space-y-1">
-                                    <label htmlFor="Pass_Word" className="block text-sm font-sans font-medium text-slate-700 ml-1">
-                                        Password
-                                    </label>
-                                    <div className="relative">
-                                        <input type={showPassword ? "text" : "password"} id="Pass_Word" name="Pass_Word" value={formData.Pass_Word} onChange={handleChange}
-                                            onFocus={() => setPasswordFocused(true)}
-                                            onBlur={() => setPasswordFocused(false)}
+                                <div className="flex gap-4 items-start">
+                                    <div className="space-y-1 flex-1">
+                                        <label htmlFor="Emp_Name" className="block text-sm font-sans font-medium text-slate-700 ml-1">
+                                            Full Name
+                                        </label>
+                                        <input type="text" id="Emp_Name" name="Emp_Name" value={formData.Emp_Name} onChange={handleChange}
                                             required
-                                            className="w-full px-4 py-3 bg-white font-mono text-slate-800 font-bold outline-none border border-slate-300 hover:border-[#00acee] focus:border-[#00acee] focus:ring-4 focus:ring-[#00acee]/30 transition-all pr-12" />
-                                        <button type="button" onClick={() => setShowPassword(!showPassword)}
-                                            className="absolute right-1.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white hover:bg-[#00acee] bg-white border border-slate-200 hover:border-[#00acee] rounded-md p-1.5 transition-all shadow-sm">
-                                            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                                        </button>
+                                            className="w-full px-4 py-3 bg-white font-mono text-slate-800 font-bold outline-none border border-slate-300 hover:border-[#00acee] focus:border-[#00acee] focus:ring-4 focus:ring-[#00acee]/30 transition-all" />
                                     </div>
-                                    
+                                    <div className="space-y-1 flex-1">
+                                        <label htmlFor="Phone_Number" className="block text-sm font-sans font-medium text-slate-700 ml-1">
+                                            Phone Number
+                                        </label>
+                                        <input type="tel" id="Phone_Number" name="Phone_Number" value={formData.Phone_Number} onChange={handleChange}
+                                            required
+                                            className="w-full px-4 py-3 bg-white font-mono text-slate-800 font-bold outline-none border border-slate-300 hover:border-[#00acee] focus:border-[#00acee] focus:ring-4 focus:ring-[#00acee]/30 transition-all" />
+                                    </div>
+                                </div>
+                                <div className="flex gap-4 items-start">
+                                    <div className="space-y-1 flex-1">
+                                        <label htmlFor="Email" className="block text-sm font-sans font-medium text-slate-700 ml-1">
+                                            Email Address
+                                        </label>
+                                        <input type="email" id="Email" name="Email" value={formData.Email} onChange={handleChange}
+                                            required
+                                            className="w-full px-4 py-3 bg-white font-mono text-slate-800 font-bold outline-none border border-slate-300 hover:border-[#00acee] focus:border-[#00acee] focus:ring-4 focus:ring-[#00acee]/30 transition-all" />
+                                    </div>
+                                    <div className="space-y-1 flex-1 relative">
+                                        <label htmlFor="Pass_Word" className="block text-sm font-sans font-medium text-slate-700 ml-1">
+                                            Password
+                                        </label>
+                                        <div className="relative">
+                                            <input type={showPassword ? "text" : "password"} id="Pass_Word" name="Pass_Word" value={formData.Pass_Word} onChange={handleChange}
+                                                onFocus={() => setPasswordFocused(true)}
+                                                onBlur={() => setPasswordFocused(false)}
+                                                required
+                                                className="w-full px-4 py-3 bg-white font-mono text-slate-800 font-bold outline-none border border-slate-300 hover:border-[#00acee] focus:border-[#00acee] focus:ring-4 focus:ring-[#00acee]/30 transition-all pr-12" />
+                                            <button type="button" onClick={() => setShowPassword(!showPassword)}
+                                                className="absolute right-1.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white hover:bg-[#00acee] bg-white border border-slate-200 hover:border-[#00acee] rounded-md p-1.5 transition-all shadow-sm">
+                                                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                            </button>
+                                        </div>
+                                        
                                         {passwordFocused && (
-                                        <div className="mt-2 w-full bg-slate-50/50 rounded-[3px] border border-slate-200 p-4 animate-in fade-in">
+                                        <div className="absolute z-50 left-0 mt-2 w-full bg-slate-50 rounded-[3px] border border-slate-200 p-4 shadow-xl animate-in fade-in">
                                             <div className="mb-4">
                                                 <div className="flex justify-between items-center mb-1.5">
-                                                    <span className="text-[11px] font-bold text-slate-600 uppercase tracking-wider">Password Strength</span>
+                                                    <span className="text-[11px] font-bold text-slate-600 uppercase tracking-wider">Strength</span>
                                                     <span className={`text-[11px] font-bold uppercase tracking-wider ${strengthText === 'Weak' ? 'text-red-500' : strengthText === 'Good' ? 'text-yellow-600' : strengthText === 'Strong' ? 'text-blue-600' : 'text-slate-400'}`}>{strengthText}</span>
                                                 </div>
-                                                <div className="h-1.5 w-full bg-slate-100 rounded-[3px] overflow-hidden flex gap-1">
+                                                <div className="h-1.5 w-full bg-slate-200 rounded-[3px] overflow-hidden flex gap-1">
                                                     <div className={`h-full flex-1 rounded-full transition-all duration-300 ${strengthCount >= 1 ? strengthColor : 'bg-transparent'}`} />
                                                     <div className={`h-full flex-1 rounded-full transition-all duration-300 ${strengthCount >= 2 ? strengthColor : 'bg-transparent'}`} />
                                                     <div className={`h-full flex-1 rounded-full transition-all duration-300 ${strengthCount >= 3 ? strengthColor : 'bg-transparent'}`} />
@@ -244,27 +253,28 @@ const RegisterPage = () => {
                                                 </div>
                                             </div>
 
-                                            <p className="text-[12px] font-bold text-slate-700 mb-3">Your password must contain:</p>
-                                            <ul className="space-y-2">
-                                                <li className={`text-[12px] font-semibold flex items-center gap-3 transition-colors ${criteria.length ? 'text-blue-600' : 'text-slate-400'}`}>
-                                                    <span className="text-sm font-bold w-3 text-center">{criteria.length ? '✓' : '−'}</span>
-                                                    8 or more characters
+                                            <p className="text-[11px] font-bold text-slate-700 mb-2">Must contain:</p>
+                                            <ul className="space-y-1.5">
+                                                <li className={`text-[11px] font-semibold flex items-center gap-2 transition-colors ${criteria.length ? 'text-blue-600' : 'text-slate-400'}`}>
+                                                    <span className="font-bold w-3 text-center">{criteria.length ? '✓' : '−'}</span>
+                                                    8+ characters
                                                 </li>
-                                                <li className={`text-[12px] font-semibold flex items-center gap-3 transition-colors ${criteria.number ? 'text-blue-600' : 'text-slate-400'}`}>
-                                                    <span className="text-sm font-bold w-3 text-center">{criteria.number ? '✓' : '−'}</span>
+                                                <li className={`text-[11px] font-semibold flex items-center gap-2 transition-colors ${criteria.number ? 'text-blue-600' : 'text-slate-400'}`}>
+                                                    <span className="font-bold w-3 text-center">{criteria.number ? '✓' : '−'}</span>
                                                     Numbers
                                                 </li>
-                                                <li className={`text-[12px] font-semibold flex items-center gap-3 transition-colors ${criteria.letter ? 'text-blue-600' : 'text-slate-400'}`}>
-                                                    <span className="text-sm font-bold w-3 text-center">{criteria.letter ? '✓' : '−'}</span>
+                                                <li className={`text-[11px] font-semibold flex items-center gap-2 transition-colors ${criteria.letter ? 'text-blue-600' : 'text-slate-400'}`}>
+                                                    <span className="font-bold w-3 text-center">{criteria.letter ? '✓' : '−'}</span>
                                                     Letters
                                                 </li>
-                                                <li className={`text-[12px] font-semibold flex items-center gap-3 transition-colors ${criteria.special ? 'text-blue-600' : 'text-slate-400'}`}>
-                                                    <span className="text-sm font-bold w-3 text-center">{criteria.special ? '✓' : '−'}</span>
-                                                    Special characters
+                                                <li className={`text-[11px] font-semibold flex items-center gap-2 transition-colors ${criteria.special ? 'text-blue-600' : 'text-slate-400'}`}>
+                                                    <span className="font-bold w-3 text-center">{criteria.special ? '✓' : '−'}</span>
+                                                    Special chars
                                                 </li>
                                             </ul>
                                         </div>
                                         )}
+                                    </div>
                                 </div>
                                 <div className="space-y-1">
                                     <label htmlFor="Conpass_Word" className="block text-sm font-sans font-medium text-slate-700 ml-1">

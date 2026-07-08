@@ -7,6 +7,7 @@ const SecurityAuditBoard = ({ allEmployees = [], allCompanies = [], hierarchy = 
     const [loading, setLoading] = useState(true);
     const [scanning, setScanning] = useState(false);
     const [lastScanDate, setLastScanDate] = useState(new Date().toLocaleString());
+    const [searchQuery, setSearchQuery] = useState('');
 
     useEffect(() => {
         fetchLogs();
@@ -37,9 +38,7 @@ const SecurityAuditBoard = ({ allEmployees = [], allCompanies = [], hierarchy = 
 
     const runScan = async () => {
         setScanning(true);
-        // Fetch the real latest data
         await fetchLogs();
-        // Give the "scanning" UI a moment to be visible for UX
         setTimeout(() => {
             setScanning(false);
             setLastScanDate(new Date().toLocaleString());
@@ -53,26 +52,46 @@ const SecurityAuditBoard = ({ allEmployees = [], allCompanies = [], hierarchy = 
     const adminActions = logs.filter(l => l.action && l.action.toLowerCase().includes('admin')).length;
 
     const recentSecurityEvents = logs
-        .filter(l => l.status === 'Failed' || l.action?.toLowerCase().includes('password') || l.action?.toLowerCase().includes('role') || l.action?.toLowerCase().includes('permission') || l.action?.toLowerCase().includes('login'))
+        .filter(l => {
+            const q = searchQuery.toLowerCase();
+            if (!q) return l.status === 'Failed' || l.action?.toLowerCase().includes('password') || l.action?.toLowerCase().includes('role') || l.action?.toLowerCase().includes('permission') || l.action?.toLowerCase().includes('login');
+            return (l.user?.toLowerCase().includes(q) || l.action?.toLowerCase().includes(q) || l.ip?.toLowerCase().includes(q) || l.status?.toLowerCase().includes(q));
+        })
         .slice(0, 10);
 
+    const metrics = [
+        { title: 'Failed Logins', value: failedLogins, desc: 'Unauthorized access attempts', icon: Lock, severity: failedLogins > 5 ? 'high' : failedLogins > 0 ? 'medium' : 'low' },
+        { title: 'Unassigned Users', value: usersWithoutCompanies, desc: 'Users without company access', icon: Users, severity: usersWithoutCompanies > 0 ? 'medium' : 'low' },
+        { title: 'Inactive Accounts', value: inactiveUsers, desc: 'Dormant user accounts', icon: Key, severity: inactiveUsers > 10 ? 'high' : inactiveUsers > 0 ? 'medium' : 'low' },
+        { title: 'Admin Actions', value: adminActions, desc: 'Sensitive operations logged', icon: Activity, severity: 'info' },
+    ];
+
+    const severityColors = {
+        high: { text: 'text-red-400', bg: 'bg-red-600/20', border: 'border-red-500/50', icon: 'text-red-400' },
+        medium: { text: 'text-orange-400', bg: 'bg-orange-600/20', border: 'border-orange-500/50', icon: 'text-orange-400' },
+        low: { text: 'text-emerald-400', bg: 'bg-emerald-600/20', border: 'border-emerald-500/50', icon: 'text-emerald-400' },
+        info: { text: 'text-blue-400', bg: 'bg-blue-600/20', border: 'border-blue-500/50', icon: 'text-blue-400' },
+    };
+
     return (
-        <div className="flex flex-col gap-6 animate-in fade-in zoom-in-95 duration-200 h-full max-h-[82vh] overflow-y-auto no-scrollbar pb-10">
+        <div className="bg-white dark:bg-[#0f172a]/50 backdrop-blur-md shadow-lg border border-slate-200 dark:border-[#334155] flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-2 duration-300 pb-6 rounded-none-[12px] overflow-hidden mb-6">
             {/* Header */}
-            <div className="bg-white shadow-sm border border-slate-200/60 p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0">
-                <div>
-                    <h2 className="text-[15px] font-bold text-slate-800 flex items-center gap-2">
-                        <ShieldCheck className="text-emerald-500" size={18} />
-                        Security Audit & Posture
-                    </h2>
-                    <p className="text-[11px] text-slate-500 font-medium mt-1">Vulnerability scanning, access control audits, and threat detection.</p>
-                </div>
+            <div className="px-6 py-4 border-b border-slate-200 dark:border-[#334155] flex items-center justify-between bg-white dark:bg-[#0f172a]/50">
                 <div className="flex items-center gap-3">
-                    <span className="text-[11px] text-slate-400 font-medium mr-2">Last Scan: {lastScanDate}</span>
-                    <button 
+                    <div className="w-8 h-8 bg-purple-500/20 flex items-center justify-center rounded-none">
+                        <ShieldCheck className="w-4 h-4 text-purple-300" />
+                    </div>
+                    <div>
+                        <h2 className="text-[15px] font-bold text-slate-800 dark:text-white">Security Audit & Posture</h2>
+                        <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Vulnerability scanning, access control audits, and threat detection</p>
+                    </div>
+                </div>
+                <div className="flex items-center gap-3 self-start">
+                    <span className="text-[11px] text-slate-500 font-medium">Last Scan: {lastScanDate}</span>
+                    <button
                         onClick={runScan}
                         disabled={scanning}
-                        className="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold shadow-md transition-all active:scale-95 flex items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+                        className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-sm rounded-none transition-all flex items-center gap-2 disabled:opacity-50"
                     >
                         {scanning ? <RotateCw size={14} className="animate-spin" /> : <Scan size={14} />}
                         {scanning ? 'Analyzing Data...' : 'Run Security Scan'}
@@ -80,98 +99,108 @@ const SecurityAuditBoard = ({ allEmployees = [], allCompanies = [], hierarchy = 
                 </div>
             </div>
 
-            {/* Scanning Overlay (Light Theme) */}
+            {/* Scanning Overlay */}
             {scanning && (
-                <div className="bg-white rounded-2xl border border-emerald-200 shadow-lg p-8 shrink-0 relative overflow-hidden flex flex-col items-center justify-center text-center gap-4 animate-in fade-in zoom-in-95">
-                    <div className="absolute inset-0 bg-emerald-50/50"></div>
+                <div className="bg-white dark:bg-[#0f172a]/50 border border-emerald-500/30 mx-6 p-8 relative overflow-hidden flex flex-col items-center justify-center text-center gap-4 animate-in fade-in zoom-in-95">
+                    <div className="absolute inset-0 bg-emerald-900/10"></div>
                     <div className="relative z-10 flex flex-col items-center gap-3">
                         <div className="relative w-16 h-16 flex items-center justify-center">
-                            <ShieldCheck className="w-10 h-10 text-emerald-500 z-10" />
-                            <div className="absolute inset-0 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin opacity-50"></div>
-                            <div className="absolute inset-[-8px] border-2 border-emerald-300 border-b-transparent rounded-full animate-spin-slow opacity-30"></div>
+                            <ShieldCheck className="w-10 h-10 text-emerald-400 z-10" />
+                            <div className="absolute inset-0 border-4 border-emerald-500 border-t-transparent rounded-none-full animate-spin opacity-50"></div>
+                            <div className="absolute inset-[-8px] border-2 border-emerald-400 border-b-transparent rounded-none-full animate-spin opacity-30"></div>
                         </div>
-                        <h3 className="text-lg font-bold text-slate-900 tracking-widest uppercase">Executing Security Audit</h3>
-                        <p className="text-slate-600 text-sm">Fetching real-time logs, checking access controls, and analyzing vulnerabilities...</p>
-                        <div className="w-full max-w-md bg-slate-100 rounded-[3px] h-2 mt-2 overflow-hidden">
-                            <div className="bg-emerald-500 h-full rounded-full w-1/2 animate-pulse"></div>
+                        <h3 className="text-lg font-black text-slate-800 dark:text-white tracking-widest uppercase">Executing Security Audit</h3>
+                        <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">Fetching real-time logs, checking access controls, and analyzing vulnerabilities...</p>
+                        <div className="w-full max-w-md bg-slate-200 dark:bg-white/10 h-2 mt-2 overflow-hidden rounded-none">
+                            <div className="bg-emerald-500 h-full w-1/2 animate-pulse rounded-none"></div>
                         </div>
                     </div>
                 </div>
             )}
 
-            {/* Vulnerability Metrics (Real Data) */}
-            <div className={`grid grid-cols-1 md:grid-cols-4 gap-4 shrink-0 transition-opacity duration-300 ${scanning ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}>
-                {[
-                    { title: 'Failed Logins', value: failedLogins, desc: 'Unauthorized access attempts', icon: Lock, color: failedLogins > 5 ? 'text-red-500' : 'text-slate-700' },
-                    { title: 'Unassigned Users', value: usersWithoutCompanies, desc: 'Users without company access', icon: Users, color: usersWithoutCompanies > 0 ? 'text-orange-500' : 'text-slate-700' },
-                    { title: 'Inactive Accounts', value: inactiveUsers, desc: 'Dormant user accounts', icon: Key, color: inactiveUsers > 10 ? 'text-orange-500' : 'text-slate-700' },
-                    { title: 'Admin Actions', value: adminActions, desc: 'Sensitive operations logged', icon: Activity, color: 'text-blue-500' },
-                ].map((stat, i) => (
-                    <div key={i} className="bg-white p-5 border border-slate-200/60 shadow-sm flex flex-col relative overflow-hidden group">
-                        <div className="absolute -right-4 -top-4 w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center opacity-50 group-hover:scale-110 transition-transform">
-                            <stat.icon className={`w-8 h-8 ${stat.color} opacity-20`} />
+            {/* Vulnerability Metrics */}
+            <div className={`grid grid-cols-1 md:grid-cols-4 gap-4 mx-6 transition-opacity duration-300 ${scanning ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}>
+                {metrics.map((stat, i) => {
+                    const colors = severityColors[stat.severity];
+                    const Icon = stat.icon;
+                    return (
+                        <div key={i} className="bg-white dark:bg-[#0f172a]/50 border border-slate-200 dark:border-[#334155] p-5 flex flex-col relative overflow-hidden group">
+                            <div className="absolute -right-4 -top-4 w-16 h-16 bg-white dark:bg-[#0f172a]/50 flex items-center justify-center opacity-30 group-hover:scale-110 transition-transform">
+                                <Icon className={`w-8 h-8 ${colors.icon}`} />
+                            </div>
+                            <h3 className="text-slate-500 dark:text-slate-400 text-[10px] font-black uppercase tracking-widest mb-2 z-10">{stat.title}</h3>
+                            <div className="flex items-end gap-2 z-10">
+                                <p className={`text-3xl font-black ${colors.text}`}>{stat.value}</p>
+                            </div>
+                            <p className="text-[10px] font-bold text-slate-500 mt-2 z-10 uppercase tracking-wider">{stat.desc}</p>
                         </div>
-                        <h3 className="text-slate-500 text-[11px] font-bold uppercase tracking-widest mb-2 z-10">{stat.title}</h3>
-                        <div className="flex items-end gap-2 z-10">
-                            <p className={`text-3xl font-black ${stat.color}`}>{stat.value}</p>
-                        </div>
-                        <p className="text-[10px] font-bold text-slate-400 mt-2 z-10 uppercase tracking-wider">{stat.desc}</p>
-                    </div>
-                ))}
+                    );
+                })}
             </div>
 
-            {/* Recent Security Events Table */}
-            <div className={`bg-white shadow-sm border border-slate-200/60 flex flex-col overflow-hidden shrink-0 min-h-[300px] transition-opacity duration-300 ${scanning ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}>
-                <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
-                    <div>
-                        <h3 className="text-[13px] font-bold text-slate-900">Critical Security Events</h3>
-                        <p className="text-[11px] text-slate-500 font-medium mt-0.5">Filtered from real system audit trail</p>
+            {/* Critical Security Events Table */}
+            <div className={`border border-slate-200 dark:border-[#334155] overflow-hidden mx-6 bg-white dark:bg-[#0f172a]/50 rounded-none shadow-sm transition-opacity duration-300 ${scanning ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}>
+                <div className="px-4 py-3 bg-white dark:bg-[#1e293b]/80 border-b border-slate-200 dark:border-[#334155] flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                        <ShieldAlert className="w-3 h-3 text-purple-400" />
+                        <span className="text-xs font-black text-slate-600 dark:text-slate-300">Critical Security Events</span>
+                        <span className="text-[10px] text-slate-500 font-medium ml-2 uppercase tracking-widest">Filtered from real system audit trail</span>
+                    </div>
+                    <div className="relative w-56">
+                        <Search className="absolute left-3 top-2 text-slate-500 w-3.5 h-3.5" />
+                        <input
+                            type="text"
+                            placeholder="Filter events..."
+                            value={searchQuery}
+                            onChange={e => setSearchQuery(e.target.value)}
+                            className="pl-8 pr-3 py-1 border border-slate-200 dark:border-[#334155] bg-white dark:bg-[#0f172a]/50 text-slate-800 dark:text-white text-[11px] w-full outline-none focus:border-purple-500 focus:bg-slate-200 dark:bg-white/10 rounded-none transition-all placeholder:text-slate-600"
+                        />
                     </div>
                 </div>
-
-                <div className="flex-1 overflow-auto">
+                <div className="w-full overflow-x-auto">
                     {loading && !scanning ? (
-                        <div className="flex items-center justify-center h-48 text-slate-400">
-                            <Loader2 className="animate-spin text-emerald-500 w-8 h-8" />
+                        <div className="flex items-center justify-center py-16 text-slate-500">
+                            <Loader2 className="animate-spin text-purple-400 w-8 h-8" />
                         </div>
                     ) : recentSecurityEvents.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center h-48 text-slate-400">
-                            <CheckCircle className="w-12 h-12 text-emerald-300" />
-                            <p className="text-[13px] font-bold">No critical security events found.</p>
+                        <div className="flex flex-col items-center justify-center py-16 text-slate-500 gap-2">
+                            <CheckCircle className="w-10 h-10 text-emerald-400/60" />
+                            <p className="text-[13px] font-bold text-slate-500 dark:text-slate-400">No critical security events found.</p>
                         </div>
                     ) : (
                         <table className="w-full text-left border-collapse min-w-[800px]">
                             <thead>
-                                <tr className="border-b border-slate-100 bg-slate-50/50">
-                                    <th className="py-3.5 px-6 text-[11px] font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap w-48">Timestamp</th>
-                                    <th className="py-3.5 px-6 text-[11px] font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap w-40">User</th>
-                                    <th className="py-3.5 px-6 text-[11px] font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap">Event Description</th>
-                                    <th className="py-3.5 px-6 text-[11px] font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap w-36">IP Address</th>
-                                    <th className="py-3.5 px-6 text-[11px] font-bold tracking-wider uppercase text-slate-500 whitespace-nowrap w-32 text-center">Severity</th>
+                                <tr className="bg-white dark:bg-[#1e293b]/80 border-b border-slate-200 dark:border-[#334155] text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                                    <th className="px-4 py-3 w-48">Timestamp</th>
+                                    <th className="px-4 py-3 w-36">User</th>
+                                    <th className="px-4 py-3">Event Description</th>
+                                    <th className="px-4 py-3 w-32">IP Address</th>
+                                    <th className="px-4 py-3 w-28 text-center">Severity</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-slate-100">
+                            <tbody className="divide-y divide-slate-200 dark:divide-white/5">
                                 {recentSecurityEvents.map((log, idx) => {
                                     const isCritical = log.status === 'Failed' || log.action?.toLowerCase().includes('fail');
                                     const isMedium = log.action?.toLowerCase().includes('role') || log.action?.toLowerCase().includes('password');
+                                    const sevColors = isCritical ? severityColors.high : isMedium ? severityColors.medium : severityColors.low;
                                     return (
-                                        <tr key={log.id || idx} className="border-b border-slate-50 hover:bg-slate-50/80 transition-colors">
-                                            <td className="py-3.5 px-6 text-[13px] text-slate-500 font-medium whitespace-nowrap font-mono">
+                                        <tr key={log.id || idx} className="hover:bg-white dark:bg-[#0f172a]/50 transition-colors">
+                                            <td className="px-4 py-3 text-[12px] text-slate-500 dark:text-slate-400 font-mono whitespace-nowrap">
                                                 {log.date ? new Date(log.date).toLocaleString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true }) : 'N/A'}
                                             </td>
-                                            <td className="py-3.5 px-6 text-[13px] text-slate-900 font-bold">
+<td className="px-4 py-3 text-[13px] text-slate-800 dark:text-gray-200 font-bold">
                                                 {log.user || 'System'}
                                             </td>
-                                            <td className="py-3.5 px-6">
-                                                <span className="text-[13px] text-slate-700 font-medium">{log.action || 'Unknown Action'}</span>
+                                            <td className="px-4 py-3">
+                                                <span className="text-[12px] text-slate-600 dark:text-slate-300 font-medium">{log.action || 'Unknown Action'}</span>
                                             </td>
-                                            <td className="py-3.5 px-6 text-[13px] font-mono text-slate-400 font-medium">
+                                            <td className="px-4 py-3 text-[12px] font-mono text-slate-500 font-medium">
                                                 {log.ip || '0.0.0.0'}
                                             </td>
-                                            <td className="py-3 px-6">
+                                            <td className="px-4 py-3">
                                                 <div className="flex justify-center">
-                                                    <div className={`flex items-center gap-1.5 px-3 py-1 rounded-[3px] border text-[10px] font-bold uppercase tracking-wider ${isCritical ? 'bg-red-50 text-red-600 border-red-200' : isMedium ? 'bg-orange-50 text-orange-600 border-orange-200' : 'bg-blue-50 text-blue-600 border-blue-200'}`}>
-                                                        {isCritical ? <XCircle className="w-3 h-3" /> : isMedium ? <AlertTriangle className="w-3 h-3" /> : <ShieldCheck className="w-3 h-3" />}
+                                                    <div className={`flex items-center gap-1 px-2.5 py-1 border text-[9px] font-black uppercase tracking-widest ${sevColors.bg} ${sevColors.text} ${sevColors.border}`}>
+                                                        {isCritical ? <XCircle className="w-2.5 h-2.5" /> : isMedium ? <AlertTriangle className="w-2.5 h-2.5" /> : <ShieldCheck className="w-2.5 h-2.5" />}
                                                         {isCritical ? 'High' : isMedium ? 'Medium' : 'Low'}
                                                     </div>
                                                 </div>
@@ -189,3 +218,9 @@ const SecurityAuditBoard = ({ allEmployees = [], allCompanies = [], hierarchy = 
 };
 
 export default SecurityAuditBoard;
+
+
+
+
+
+

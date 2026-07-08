@@ -203,7 +203,7 @@ const MakeDepositBoard = ({ isOpen, onClose }) => {
                                 />
                                 <button
                                     onClick={() => { setDatePickerField('dateFrom'); setShowDatePicker(true); }}
-                                    className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0"
+                                    className="w-10 h-8 bg-[#0285fd] text-slate-800 dark:text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0"
                                 >
                                     <Calendar size={16} />
                                 </button>
@@ -222,7 +222,7 @@ const MakeDepositBoard = ({ isOpen, onClose }) => {
                                 />
                                 <button
                                     onClick={() => { setDatePickerField('dateTo'); setShowDatePicker(true); }}
-                                    className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0"
+                                    className="w-10 h-8 bg-[#0285fd] text-slate-800 dark:text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0"
                                 >
                                     <Calendar size={16} />
                                 </button>
@@ -246,7 +246,7 @@ const MakeDepositBoard = ({ isOpen, onClose }) => {
                         </div>
 
                         <div className="col-span-4 flex items-center gap-2 justify-end">
-                            <button onClick={loadFunds} disabled={isLoading} className="px-6 h-8 bg-[#0285fd] text-white text-[12px] font-black rounded-[3px] hover:bg-[#0073ff] transition-all shadow-md active:scale-95 flex items-center gap-2">
+                            <button onClick={loadFunds} disabled={isLoading} className="px-6 h-8 bg-[#0285fd] text-slate-800 dark:text-white text-[12px] font-black rounded-[3px] hover:bg-[#0073ff] transition-all shadow-md active:scale-95 flex items-center gap-2">
                                 <Search size={14} /> {isLoading ? 'LOADING...' : 'LOAD FUNDS'}
                             </button>
                         </div>
@@ -315,3 +315,7 @@ const MakeDepositBoard = ({ isOpen, onClose }) => {
 };
 
 export default MakeDepositBoard;
+
+
+
+

@@ -1572,7 +1572,7 @@ const GetThingsDoneBoard = ({ isOpen, onClose, user, selectedCompany, onAction, 
                           return (
                             <div className="flex flex-col gap-5 mt-2">
                               {displayedBanks.map((b, i) => (
-                                <div key={i} className="">
+                                <div key={i} className="flex items-center gap-3">
                                   <div className="w-9 h-9 rounded-full bg-white border border-[#eceef1] flex items-center justify-center shrink-0 p-1">
                                     {b.logo ? (
                                       <img src={b.logo} alt="" className="w-full h-full object-contain" />

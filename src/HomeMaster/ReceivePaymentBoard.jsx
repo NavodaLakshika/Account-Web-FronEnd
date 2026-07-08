@@ -434,7 +434,7 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
                                 <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Document ID</label>
                                 <div className="flex-1 flex gap-1 h-8 min-w-0">
                                     <input type="text" name="docNo" value={formData.docNo} onChange={handleInput} className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-sm font-mono font-bold text-blue-600 bg-slate-50 rounded outline-none focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 transition-all" />
-                                    <button onClick={handleSearch} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0">
+                                    <button onClick={handleSearch} className="w-10 h-8 bg-[#0285fd] text-slate-800 dark:text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0">
                                         <Search size={16} />
                                     </button>
                                 </div>
@@ -453,7 +453,7 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
                                     />
                                     <button
                                         onClick={() => { setDatePickerField('date'); setShowDatePicker(true); }}
-                                        className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0"
+                                        className="w-10 h-8 bg-[#0285fd] text-slate-800 dark:text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0"
                                     >
                                         <Calendar size={16} />
                                     </button>
@@ -478,7 +478,7 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
                                         onClick={() => setShowCustomerSearch(true)}
                                         placeholder="Click to select customer..."
                                     />
-                                    <button onClick={() => setShowCustomerSearch(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0">
+                                    <button onClick={() => setShowCustomerSearch(true)} className="w-10 h-8 bg-[#0285fd] text-slate-800 dark:text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0">
                                         <Search size={16} />
                                     </button>
                                 </div>
@@ -495,7 +495,7 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
                                         className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-sm font-mono font-bold text-gray-700 bg-slate-50 rounded outline-none cursor-pointer transition-all"
                                         onClick={() => setShowPayMethodSearch(true)}
                                     />
-                                    <button onClick={() => setShowPayMethodSearch(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0">
+                                    <button onClick={() => setShowPayMethodSearch(true)} className="w-10 h-8 bg-[#0285fd] text-slate-800 dark:text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0">
                                         <Search size={16} />
                                     </button>
                                 </div>
@@ -513,7 +513,7 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
                                         onClick={() => setShowBankSearch(true)}
                                         placeholder="Select Bank"
                                     />
-                                    <button onClick={() => setShowBankSearch(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0">
+                                    <button onClick={() => setShowBankSearch(true)} className="w-10 h-8 bg-[#0285fd] text-slate-800 dark:text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0">
                                         <Search size={16} />
                                     </button>
                                 </div>
@@ -531,7 +531,7 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
                                         className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-sm font-mono font-bold text-gray-700 bg-slate-50 rounded outline-none cursor-pointer transition-all"
                                         onClick={() => setShowCostCenterSearch(true)}
                                     />
-                                    <button onClick={() => setShowCostCenterSearch(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0">
+                                    <button onClick={() => setShowCostCenterSearch(true)} className="w-10 h-8 bg-[#0285fd] text-slate-800 dark:text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0">
                                         <Search size={16} />
                                     </button>
                                 </div>
@@ -556,7 +556,7 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
                                     />
                                     <button
                                         onClick={() => { setDatePickerField('chequeDate'); setShowDatePicker(true); }}
-                                        className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0"
+                                        className="w-10 h-8 bg-[#0285fd] text-slate-800 dark:text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0"
                                     >
                                         <Calendar size={16} />
                                     </button>
@@ -599,13 +599,13 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
                             ) : invoices.map((inv, idx) => (
                                 <div key={idx} className={`flex border-b border-slate-100 text-[11px] font-bold text-slate-700 hover:bg-blue-50/30 items-center transition-colors group ${inv.selected ? 'bg-blue-50/10' : ''}`}>
                                     <div className="w-12 py-2 px-3 border-r border-slate-100 text-center flex items-center justify-center">
-                                        <button onClick={() => handleInvoiceCheck(idx)} className={`w-5 h-5 rounded-[4px] border ${inv.selected ? 'bg-[#0285fd] border-[#0285fd] text-white' : 'bg-white border-slate-300 text-transparent'} flex items-center justify-center transition-all`}>
+                                        <button onClick={() => handleInvoiceCheck(idx)} className={`w-5 h-5 rounded-[4px] border ${inv.selected ? 'bg-[#0285fd] border-[#0285fd] text-slate-800 dark:text-white' : 'bg-white border-slate-300 text-transparent'} flex items-center justify-center transition-all`}>
                                             <Check size={12} strokeWidth={4} />
                                         </button>
                                     </div>
                                     <div className="w-24 py-2 px-3 border-r border-slate-100 font-mono text-[10px] text-slate-500">{inv.date_Due?.split('T')[0]}</div>
                                     <div className="w-32 py-2 px-3 border-r border-slate-100 font-mono text-blue-600">{inv.doc_No}</div>
-                                    <div className="flex-1 py-2 px-3 border-r border-slate-100 truncate italic text-slate-400">{inv.ref_No}</div>
+                                    <div className="flex-1 py-2 px-3 border-r border-slate-100 truncate italic text-slate-500 dark:text-slate-400">{inv.ref_No}</div>
                                     <div className="w-28 py-2 px-3 border-r border-slate-100 text-right font-mono">{inv.inv_Amount.toLocaleString(undefined, {minimumFractionDigits:2})}</div>
                                     <div className="w-24 py-1 px-1 border-r border-slate-100">
                                         <input type="text" disabled={!inv.selected} value={inv.discount} onChange={(e) => handleInvoiceChange(idx, 'discount', e.target.value)} className="w-full h-7 bg-transparent text-right font-mono text-[11px] text-red-500 outline-none focus:bg-white border-none px-1 disabled:opacity-30" />
@@ -634,7 +634,7 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
                                     <span className="text-[9px] font-mono font-bold text-[#b8860b] uppercase tracking-widest">Current Over Payment / Advance</span>
                                     <span className="text-[18px] font-black text-[#856404] font-mono leading-none">{advanceBalance.toLocaleString(undefined, {minimumFractionDigits:2})}</span>
                                 </div>
-                                <div className="w-10 h-10 bg-white/50 rounded-full flex items-center justify-center">
+                                <div className="w-10 h-10 bg-slate-100 dark:bg-white/50 rounded-full flex items-center justify-center">
                                     <Plus className="text-[#856404]" size={20} />
                                 </div>
                             </div>
@@ -915,3 +915,7 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
 };
 
 export default ReceivePaymentBoard;
+
+
+
+

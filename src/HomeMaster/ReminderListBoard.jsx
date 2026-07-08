@@ -102,7 +102,7 @@ const ReminderListBoard = ({ isOpen, onClose, onEditTask }) => {
         {/* Toolbar */}
         <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
            <div className="relative w-96">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400" size={16} />
               <input 
                 type="text" 
                 placeholder="Search tasks, dates..."
@@ -125,11 +125,11 @@ const ReminderListBoard = ({ isOpen, onClose, onEditTask }) => {
           <table className="w-full border-collapse">
             <thead className="sticky top-0 z-10 bg-[#f8faff] border-y border-slate-200">
               <tr>
-                <th className="px-4 py-3 text-[11px] font-black text-slate-400 uppercase tracking-widest text-left w-12 text-center">#</th>
-                <th className="px-4 py-3 text-[11px] font-black text-slate-400 uppercase tracking-widest text-left w-32 border-l border-slate-200">Date</th>
-                <th className="px-4 py-3 text-[11px] font-black text-slate-400 uppercase tracking-widest text-left w-32 border-l border-slate-200">Time</th>
-                <th className="px-4 py-3 text-[11px] font-black text-slate-400 uppercase tracking-widest text-left border-l border-slate-200">Task Details</th>
-                <th className="px-4 py-3 text-[11px] font-black text-slate-400 uppercase tracking-widest text-center w-32 border-l border-slate-200">Actions</th>
+                <th className="px-4 py-3 text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest text-left w-12 text-center">#</th>
+                <th className="px-4 py-3 text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest text-left w-32 border-l border-slate-200">Date</th>
+                <th className="px-4 py-3 text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest text-left w-32 border-l border-slate-200">Time</th>
+                <th className="px-4 py-3 text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest text-left border-l border-slate-200">Task Details</th>
+                <th className="px-4 py-3 text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest text-center w-32 border-l border-slate-200">Actions</th>
               <th className="text-right px-5 py-3">Action</th></tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -138,33 +138,33 @@ const ReminderListBoard = ({ isOpen, onClose, onEditTask }) => {
                   <td colSpan="5" className="py-20 text-center">
                     <div className="flex flex-col items-center gap-2">
                        <RefreshCcw size={32} className="text-blue-500 animate-spin" />
-                       <span className="text-sm font-bold text-slate-400 uppercase tracking-tight">Loading Tasks...</span>
+                       <span className="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-tight">Loading Tasks...</span>
                     </div>
                   </td>
                 </tr>
               ) : filteredReminders.length === 0 ? (
                 <tr>
                   <td colSpan="5" className="py-20 text-center">
-                    <span className="text-sm font-bold text-slate-400 uppercase tracking-tight">No tasks found</span>
+                    <span className="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-tight">No tasks found</span>
                   </td>
                 </tr>
               ) : filteredReminders.map((r, idx) => (
                 <tr key={r.id_No || r.Id_No} className="hover:bg-blue-50/30 transition-colors group">
-                  <td className="px-4 py-4 text-xs font-bold text-slate-400 text-center">{idx + 1}</td>
+                  <td className="px-4 py-4 text-xs font-bold text-slate-500 dark:text-slate-400 text-center">{idx + 1}</td>
                   <td className="px-4 py-4 border-l border-slate-100/50">
                      <div className="flex items-center gap-2 text-slate-600 font-bold text-xs uppercase">
-                        <CalendarIcon size={12} className="text-slate-400" />
+                        <CalendarIcon size={12} className="text-slate-500 dark:text-slate-400" />
                         {r.date || r.Date}
                      </div>
                   </td>
                   <td className="px-4 py-4 border-l border-slate-100/50">
                      <div className="flex items-center gap-2 text-slate-600 font-medium text-xs uppercase">
-                        <Clock size={12} className="text-slate-400" />
+                        <Clock size={12} className="text-slate-500 dark:text-slate-400" />
                         {r.time || r.Time}
                      </div>
                   </td>
                   <td className="px-4 py-4 border-l border-slate-100/50">
-                    <p className={`text-sm font-medium text-slate-600 leading-tight ${(r.expire || r.Expire) === 'T' ? 'line-through opacity-40 text-slate-400' : ''}`}>
+                    <p className={`text-sm font-medium text-slate-600 leading-tight ${(r.expire || r.Expire) === 'T' ? 'line-through opacity-40 text-slate-500 dark:text-slate-400' : ''}`}>
                       {r.task || r.Task}
                     </p>
                   </td>
@@ -216,3 +216,7 @@ const ReminderListBoard = ({ isOpen, onClose, onEditTask }) => {
 };
 
 export default ReminderListBoard;
+
+
+
+

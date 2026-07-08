@@ -52,7 +52,7 @@ const PrintChequeBoard = ({ isOpen, onClose }) => {
                     </div>
 
                     {/* Compact Filter Section */}
-                    <div className="bg-white/50 backdrop-blur-sm p-6 border border-gray-200 rounded-[8px] shadow-sm space-y-3">
+                    <div className="bg-slate-100 dark:bg-white/50 backdrop-blur-sm p-6 border border-gray-200 rounded-[8px] shadow-sm space-y-3">
                         
                         {/* Row 1: Payment A/C */}
                         <div className="flex items-center">
@@ -65,7 +65,7 @@ const PrintChequeBoard = ({ isOpen, onClose }) => {
                                     readOnly 
                                     className="flex-1 h-9 border border-gray-300 rounded-[3px] px-3 font-mono font-bold text-slate-800 text-[12.5px] outline-none shadow-sm bg-gray-50" 
                                 />
-                                <button className="w-10 h-9 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0">
+                                <button className="w-10 h-9 bg-[#0285fd] text-slate-800 dark:text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0">
                                     <Search size={16} />
                                 </button>
                             </div>
@@ -134,7 +134,7 @@ const PrintChequeBoard = ({ isOpen, onClose }) => {
                                     readOnly 
                                     className="flex-1 h-9 border border-gray-300 rounded-[3px] px-3 font-mono font-bold text-slate-800 text-[12.5px] outline-none shadow-sm bg-gray-50" 
                                 />
-                                <button className="w-10 h-9 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0">
+                                <button className="w-10 h-9 bg-[#0285fd] text-slate-800 dark:text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0">
                                     <Search size={16} />
                                 </button>
                             </div>
@@ -142,7 +142,7 @@ const PrintChequeBoard = ({ isOpen, onClose }) => {
 
                         {/* View Records Row */}
                         <div className="flex justify-end pt-2">
-                            <button className="px-10 h-10 bg-[#0285fd] text-white text-[12.5px] font-black rounded-[3px] hover:bg-[#0073ff] transition-all active:scale-95 shadow-md shadow-blue-100 uppercase tracking-widest flex items-center justify-center gap-2">
+                            <button className="px-10 h-10 bg-[#0285fd] text-slate-800 dark:text-white text-[12.5px] font-black rounded-[3px] hover:bg-[#0073ff] transition-all active:scale-95 shadow-md shadow-blue-100 uppercase tracking-widest flex items-center justify-center gap-2">
                                 <Search size={16} /> VIEW RECORDS / REFRESH
                             </button>
                         </div>
@@ -203,3 +203,7 @@ const PrintChequeBoard = ({ isOpen, onClose }) => {
 };
 
 export default PrintChequeBoard;
+
+
+
+

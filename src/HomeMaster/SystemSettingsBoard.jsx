@@ -281,11 +281,11 @@ const SystemSettingsBoard = ({ isOpen = true, onClose, isInline = false }) => {
     };
 
     const content = (
-        <div className="h-[80vh] flex flex-col bg-white dark:bg-slate-900 rounded-[3px] overflow-hidden relative">
+        <div className="h-[80vh] flex flex-col bg-white dark:bg-slate-100 dark:bg-slate-900 rounded-[3px] overflow-hidden relative">
             {/* Header */}
-            <div className="flex items-center justify-between p-6 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50">
+            <div className="flex items-center justify-between p-6 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-100 dark:bg-slate-900/50">
                 <div>
-                    <h2 className="text-xl font-bold text-slate-800 dark:text-white flex items-center gap-2">
+                    <h2 className="text-xl font-bold text-slate-800 dark:text-slate-800 dark:text-white flex items-center gap-2">
                         <Shield className="text-[#0078d4]" />
                         Security Profiles & Roles
                     </h2>
@@ -304,14 +304,14 @@ const SystemSettingsBoard = ({ isOpen = true, onClose, isInline = false }) => {
             <div className="flex border-b border-slate-200 dark:border-slate-800 px-6">
                 <button
                     onClick={() => setActiveTab('profiles')}
-                    className={`py-4 px-6 text-sm font-medium border-b-2 transition-all ${activeTab === 'profiles' ? 'border-[#0078d4] text-[#0078d4]' : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
+                    className={`py-4 px-6 text-sm font-medium border-b-2 transition-all ${activeTab === 'profiles' ? 'border-[#0078d4] text-[#0078d4]' : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-600 dark:text-slate-300'}`}
                 >
                     <Settings className="inline-block w-4 h-4 mr-2" />
                     Manage Profiles
                 </button>
                 <button
                     onClick={() => setActiveTab('assignments')}
-                    className={`py-4 px-6 text-sm font-medium border-b-2 transition-all ${activeTab === 'assignments' ? 'border-[#0078d4] text-[#0078d4]' : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
+                    className={`py-4 px-6 text-sm font-medium border-b-2 transition-all ${activeTab === 'assignments' ? 'border-[#0078d4] text-[#0078d4]' : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-600 dark:text-slate-300'}`}
                 >
                     <Users className="inline-block w-4 h-4 mr-2" />
                     Assign Profiles
@@ -319,7 +319,7 @@ const SystemSettingsBoard = ({ isOpen = true, onClose, isInline = false }) => {
             </div>
 
             {/* Main Content Area */}
-            <div className="flex-1 overflow-hidden flex bg-slate-50 dark:bg-slate-900">
+            <div className="flex-1 overflow-hidden flex bg-slate-50 dark:bg-slate-100 dark:bg-slate-900">
                 {isLoading ? (
                     <div className="w-full h-full flex items-center justify-center">
                         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#0078d4]"></div>
@@ -328,11 +328,11 @@ const SystemSettingsBoard = ({ isOpen = true, onClose, isInline = false }) => {
                     // Profiles Tab
                     <div className="flex w-full h-full">
                         {/* Sidebar: Profile List */}
-                        <div className="w-64 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-y-auto">
+                        <div className="w-64 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-100 dark:bg-slate-900 overflow-y-auto">
                             <div className="p-4">
                                 <button 
                                     onClick={handleCreateNewProfile}
-                                    className="w-full py-2 px-4 bg-[#0078d4] hover:bg-[#006cbd] text-white rounded-[3px] flex items-center justify-center gap-2 transition-colors text-sm font-medium"
+                                    className="w-full py-2 px-4 bg-[#0078d4] hover:bg-[#006cbd] text-slate-800 dark:text-white rounded-[3px] flex items-center justify-center gap-2 transition-colors text-sm font-medium"
                                 >
                                     <Plus size={16} /> New Profile
                                 </button>
@@ -342,7 +342,7 @@ const SystemSettingsBoard = ({ isOpen = true, onClose, isInline = false }) => {
                                     <div 
                                         key={p.id}
                                         onClick={() => handleSelectProfile(p.id)}
-                                        className={`p-3 mb-1 rounded-[3px] cursor-pointer flex items-center justify-between group ${selectedProfileId === p.id ? 'bg-[#0078d4]/10 text-[#0078d4]' : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300'}`}
+                                        className={`p-3 mb-1 rounded-[3px] cursor-pointer flex items-center justify-between group ${selectedProfileId === p.id ? 'bg-[#0078d4]/10 text-[#0078d4]' : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-600 dark:text-slate-300'}`}
                                     >
                                         <span className="font-medium text-sm truncate">{p.profileName}</span>
                                         <button 
@@ -357,9 +357,9 @@ const SystemSettingsBoard = ({ isOpen = true, onClose, isInline = false }) => {
                         </div>
 
                         {/* Main: Profile Editor */}
-                        <div className="flex-1 flex flex-col h-full bg-slate-50 dark:bg-slate-900 overflow-hidden">
-                            <div className="p-6 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
-                                <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-4">
+                        <div className="flex-1 flex flex-col h-full bg-slate-50 dark:bg-slate-100 dark:bg-slate-900 overflow-hidden">
+                            <div className="p-6 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-100 dark:bg-slate-900">
+                                <h3 className="text-lg font-bold text-slate-800 dark:text-slate-800 dark:text-white mb-4">
                                     {selectedProfileId ? 'Edit Profile' : 'Create New Profile'}
                                 </h3>
                                 <div className="grid grid-cols-2 gap-4">
@@ -388,7 +388,7 @@ const SystemSettingsBoard = ({ isOpen = true, onClose, isInline = false }) => {
                             
                             <div className="flex-1 overflow-y-auto p-6">
                                 <div className="flex items-center justify-between mb-4">
-                                    <h4 className="font-semibold text-slate-700 dark:text-slate-300">Module Restrictions</h4>
+                                    <h4 className="font-semibold text-slate-700 dark:text-slate-600 dark:text-slate-300">Module Restrictions</h4>
                                     <span className="text-xs text-slate-500">Toggle switch ON to <strong className="text-red-500">Lock</strong> the module.</span>
                                 </div>
                                 
@@ -399,7 +399,7 @@ const SystemSettingsBoard = ({ isOpen = true, onClose, isInline = false }) => {
                                             <div className="space-y-2">
                                                 {group.items.map(item => (
                                                     <div key={item.id} className="flex items-center justify-between p-2 rounded hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
-                                                        <span className="text-[13px] text-slate-700 dark:text-slate-300 flex items-center gap-2">
+                                                        <span className="text-[13px] text-slate-700 dark:text-slate-600 dark:text-slate-300 flex items-center gap-2">
                                                             {lockedModules[item.id] ? <Lock size={12} className="text-red-500"/> : <CheckCircle size={12} className="text-green-500"/>}
                                                             {item.label}
                                                         </span>
@@ -417,10 +417,10 @@ const SystemSettingsBoard = ({ isOpen = true, onClose, isInline = false }) => {
                                 </div>
                             </div>
 
-                            <div className="p-4 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex justify-end">
+                            <div className="p-4 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-100 dark:bg-slate-900 flex justify-end">
                                 <button 
                                     onClick={handleSaveProfile}
-                                    className="px-6 py-2 bg-[#0078d4] hover:bg-[#006cbd] text-white rounded-[3px] font-medium flex items-center gap-2 transition-colors shadow-lg shadow-[#0078d4]/20"
+                                    className="px-6 py-2 bg-[#0078d4] hover:bg-[#006cbd] text-slate-800 dark:text-white rounded-[3px] font-medium flex items-center gap-2 transition-colors shadow-lg shadow-[#0078d4]/20"
                                 >
                                     <Save size={16} /> Save Profile
                                 </button>
@@ -432,15 +432,15 @@ const SystemSettingsBoard = ({ isOpen = true, onClose, isInline = false }) => {
                     <div className="w-full h-full p-6 flex gap-6 overflow-hidden">
                         {/* Assignment Form */}
                         <div className="w-1/3 flex flex-col bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-[3px] shadow-sm p-6 overflow-y-auto">
-                            <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-6">Assign Profile</h3>
+                            <h3 className="text-lg font-bold text-slate-800 dark:text-slate-800 dark:text-white mb-6">Assign Profile</h3>
                             
                             <div className="space-y-5">
                                 <div>
-                                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Select Employee</label>
+                                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-600 dark:text-slate-300 mb-1">Select Employee</label>
                                     <select 
                                         value={assignEmpCode}
                                         onChange={e => setAssignEmpCode(e.target.value)}
-                                        className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-[3px] px-3 py-2.5 text-sm outline-none"
+                                        className="w-full bg-slate-50 dark:bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-[3px] px-3 py-2.5 text-sm outline-none"
                                     >
                                         <option value="">-- Choose Employee --</option>
                                         {employees.map(e => (
@@ -450,11 +450,11 @@ const SystemSettingsBoard = ({ isOpen = true, onClose, isInline = false }) => {
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Select Security Profile</label>
+                                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-600 dark:text-slate-300 mb-1">Select Security Profile</label>
                                     <select 
                                         value={assignProfileId}
                                         onChange={e => setAssignProfileId(e.target.value)}
-                                        className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-[3px] px-3 py-2.5 text-sm outline-none"
+                                        className="w-full bg-slate-50 dark:bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-[3px] px-3 py-2.5 text-sm outline-none"
                                     >
                                         <option value="">-- Choose Profile --</option>
                                         {profiles.map(p => (
@@ -464,7 +464,7 @@ const SystemSettingsBoard = ({ isOpen = true, onClose, isInline = false }) => {
                                 </div>
 
                                 <div className="pt-2">
-                                    <label className="flex items-center gap-3 p-3 border border-slate-200 dark:border-slate-700 rounded-[3px] bg-slate-50 dark:bg-slate-900/50 cursor-pointer">
+                                    <label className="flex items-center gap-3 p-3 border border-slate-200 dark:border-slate-700 rounded-[3px] bg-slate-50 dark:bg-slate-100 dark:bg-slate-900/50 cursor-pointer">
                                         <input 
                                             type="checkbox" 
                                             checked={assignIsGlobal}
@@ -474,16 +474,16 @@ const SystemSettingsBoard = ({ isOpen = true, onClose, isInline = false }) => {
                                             }}
                                             className="w-4 h-4 text-[#0078d4] rounded"
                                         />
-                                        <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Global Access (All Companies)</span>
+                                        <span className="text-sm font-medium text-slate-700 dark:text-slate-600 dark:text-slate-300">Global Access (All Companies)</span>
                                     </label>
                                 </div>
 
                                 {!assignIsGlobal && (
                                     <div className="flex-1 overflow-hidden flex flex-col">
-                                        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2 flex items-center gap-2">
+                                        <label className="block text-sm font-medium text-slate-700 dark:text-slate-600 dark:text-slate-300 mb-2 flex items-center gap-2">
                                             <Building size={14}/> Select Target Companies
                                         </label>
-                                        <div className="border border-slate-200 dark:border-slate-700 rounded-[3px] max-h-48 overflow-y-auto bg-slate-50 dark:bg-slate-900">
+                                        <div className="border border-slate-200 dark:border-slate-700 rounded-[3px] max-h-48 overflow-y-auto bg-slate-50 dark:bg-slate-100 dark:bg-slate-900">
                                             {companies.map(c => {
                                                 const code = c.company_Code || c.Code || c.code;
                                                 const name = c.company_Name || c.Comp_Name || c.comp_Name || code;
@@ -495,7 +495,7 @@ const SystemSettingsBoard = ({ isOpen = true, onClose, isInline = false }) => {
                                                         onChange={() => handleToggleCompanyForAssign(code)}
                                                         className="w-4 h-4 text-[#0078d4] rounded"
                                                     />
-                                                    <span className="text-[13px] text-slate-700 dark:text-slate-300">{name}</span>
+                                                    <span className="text-[13px] text-slate-700 dark:text-slate-600 dark:text-slate-300">{name}</span>
                                                 </label>
                                                 );
                                             })}
@@ -508,7 +508,7 @@ const SystemSettingsBoard = ({ isOpen = true, onClose, isInline = false }) => {
 
                                 <button 
                                     onClick={handleSaveAssignment}
-                                    className="w-full py-2.5 bg-[#0078d4] hover:bg-[#006cbd] text-white rounded-[3px] font-medium shadow-md transition-colors flex items-center justify-center gap-2 mt-4"
+                                    className="w-full py-2.5 bg-[#0078d4] hover:bg-[#006cbd] text-slate-800 dark:text-white rounded-[3px] font-medium shadow-md transition-colors flex items-center justify-center gap-2 mt-4"
                                 >
                                     <CheckCircle size={16} /> Assign Policy
                                 </button>
@@ -517,8 +517,8 @@ const SystemSettingsBoard = ({ isOpen = true, onClose, isInline = false }) => {
 
                         {/* Active Assignments List */}
                         <div className="flex-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-[3px] shadow-sm overflow-hidden flex flex-col">
-                            <div className="p-4 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50">
-                                <h3 className="font-bold text-slate-800 dark:text-white">Active Assignments</h3>
+                            <div className="p-4 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-100 dark:bg-slate-900/50">
+                                <h3 className="font-bold text-slate-800 dark:text-slate-800 dark:text-white">Active Assignments</h3>
                             </div>
                             <div className="flex-1 overflow-y-auto p-4">
                                 {assignments.length === 0 ? (
@@ -530,7 +530,7 @@ const SystemSettingsBoard = ({ isOpen = true, onClose, isInline = false }) => {
                                             const prof = profiles.find(p => p.id === a.profileId);
                                             
                                             return (
-                                                <div key={a.id} className="p-4 border border-slate-200 dark:border-slate-700 rounded-[3px] hover:border-[#0078d4] transition-colors flex items-start justify-between bg-slate-50 dark:bg-slate-900/50">
+                                                <div key={a.id} className="p-4 border border-slate-200 dark:border-slate-700 rounded-[3px] hover:border-[#0078d4] transition-colors flex items-start justify-between bg-slate-50 dark:bg-slate-100 dark:bg-slate-900/50">
                                                     <div>
                                                         <div className="flex items-center gap-2 mb-1">
                                                             {(() => { 
@@ -539,7 +539,7 @@ const SystemSettingsBoard = ({ isOpen = true, onClose, isInline = false }) => {
                                                                 const prof = profiles.find(p => p.id === a.profileId);
                                                                 return (
                                                                     <>
-                                                                        <span className="font-bold text-slate-800 dark:text-white">{empName}</span>
+                                                                        <span className="font-bold text-slate-800 dark:text-slate-800 dark:text-white">{empName}</span>
                                                                         <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-[#0078d4]/10 text-[#0078d4] uppercase tracking-wider border border-[#0078d4]/20">
                                                                             {prof ? prof.profileName : 'Unknown Profile'}
                                                                         </span>
@@ -582,3 +582,7 @@ const SystemSettingsBoard = ({ isOpen = true, onClose, isInline = false }) => {
 };
 
 export default SystemSettingsBoard;
+
+
+
+

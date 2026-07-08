@@ -535,21 +535,21 @@ const GRNBoard = ({ isOpen, onClose }) => {
                             <label className="text-[12px] font-bold text-gray-700 w-24 shrink-0">Document ID</label>
                             <div className="flex-1 flex gap-1 h-8 min-w-0">
                                 <input type="text" name="docNo" value={formData.docNo} onChange={handleInput} className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-blue-600 bg-gray-50 rounded-[3px] outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] shadow-sm" />
-                                <button onClick={handleSearchClick} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0"><Search size={16} /></button>
+                                <button onClick={handleSearchClick} className="w-10 h-8 bg-[#0285fd] text-slate-800 dark:text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0"><Search size={16} /></button>
                             </div>
                         </div>
                         <div className="col-span-4 flex items-center gap-2">
                             <label className="text-[12px] font-bold text-gray-700 w-24 shrink-0 text-center">Post Date</label>
                             <div className="flex-1 flex gap-1 h-8 min-w-0">
                                 <input type="text" readOnly value={formData.grnDate} onClick={() => { setDatePickerField('grnDate'); setShowDatePicker(true); }} className="flex-1 min-w-0 h-8 border border-gray-300 rounded-[3px] px-3 text-[12px] outline-none bg-white text-gray-700 font-bold cursor-pointer shadow-sm" />
-                                <button onClick={() => { setDatePickerField('grnDate'); setShowDatePicker(true); }} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0"><Calendar size={16} /></button>
+                                <button onClick={() => { setDatePickerField('grnDate'); setShowDatePicker(true); }} className="w-10 h-8 bg-[#0285fd] text-slate-800 dark:text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0"><Calendar size={16} /></button>
                             </div>
                         </div>
                         <div className="col-span-4 flex items-center gap-2">
                             <label className="text-[12px] font-bold text-gray-700 w-24 shrink-0 text-center">Exp. Date</label>
                             <div className="flex-1 flex gap-1 h-8 min-w-0">
                                 <input type="text" readOnly value={formData.expectedDate} onClick={() => { setDatePickerField('expectedDate'); setShowDatePicker(true); }} className="flex-1 min-w-0 h-8 border border-gray-300 rounded-[3px] px-3 text-[12px] outline-none bg-white text-gray-700 font-bold cursor-pointer shadow-sm" />
-                                <button onClick={() => { setDatePickerField('expectedDate'); setShowDatePicker(true); }} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0"><Calendar size={16} /></button>
+                                <button onClick={() => { setDatePickerField('expectedDate'); setShowDatePicker(true); }} className="w-10 h-8 bg-[#0285fd] text-slate-800 dark:text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0"><Calendar size={16} /></button>
                             </div>
                         </div>
 
@@ -558,14 +558,14 @@ const GRNBoard = ({ isOpen, onClose }) => {
                             <label className="text-[12px] font-bold text-gray-700 w-24 shrink-0">Supplier</label>
                             <div className="flex-1 flex gap-1 h-8 min-w-0">
                                 <input type="text" readOnly value={currentSupplierName} onClick={() => setShowSupplierSearch(true)} className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-red-600 bg-gray-50 rounded-[3px] outline-none shadow-sm cursor-pointer" />
-                                <button onClick={() => setShowSupplierSearch(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0"><Search size={16} /></button>
+                                <button onClick={() => setShowSupplierSearch(true)} className="w-10 h-8 bg-[#0285fd] text-slate-800 dark:text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0"><Search size={16} /></button>
                             </div>
                         </div>
                         <div className="col-span-4 flex items-center gap-2">
                             <label className="text-[12px] font-bold text-gray-700 w-24 shrink-0 text-center">PO Number</label>
                             <div className="flex-1 flex gap-1 h-8 min-w-0">
                                 <input type="text" readOnly value={formData.poNo || ''} onClick={() => setShowPOSearch(true)} className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-[#0285fd] bg-blue-50/20 rounded-[3px] outline-none cursor-pointer shadow-sm" />
-                                <button onClick={() => setShowPOSearch(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] shadow-md shrink-0"><ClipboardList size={16} /></button>
+                                <button onClick={() => setShowPOSearch(true)} className="w-10 h-8 bg-[#0285fd] text-slate-800 dark:text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] shadow-md shrink-0"><ClipboardList size={16} /></button>
                             </div>
                         </div>
 
@@ -588,7 +588,7 @@ const GRNBoard = ({ isOpen, onClose }) => {
                                     className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-gray-700 bg-white rounded-[3px] outline-none shadow-sm cursor-pointer"
                                     onClick={() => setShowPayMethodSearch(true)}
                                 />
-                                <button onClick={() => setShowPayMethodSearch(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0">
+                                <button onClick={() => setShowPayMethodSearch(true)} className="w-10 h-8 bg-[#0285fd] text-slate-800 dark:text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0">
                                     <Search size={16} />
                                 </button>
                             </div>
@@ -617,7 +617,7 @@ const GRNBoard = ({ isOpen, onClose }) => {
                                     grnService.getLookups(formData.company).then(data => setLookups(prev => ({ ...prev, products: data.products })));
                                     setShowAddProductModal(true);
                                 }}
-                                className="w-8 h-7 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0"
+                                className="w-8 h-7 bg-[#0285fd] text-slate-800 dark:text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0"
                                 title="Add Product"
                             ><Plus size={14} /></button>
                         </div>
@@ -696,7 +696,7 @@ const GRNBoard = ({ isOpen, onClose }) => {
                                 <label className="text-[12px] font-bold text-gray-700 w-24 shrink-0">Expense Ac.</label>
                                 <div className="flex-1 flex gap-1 h-8 min-w-0">
                                     <input type="text" readOnly value="" className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-gray-500 bg-gray-50 rounded-[3px] outline-none shadow-sm cursor-pointer" onClick={() => setShowExpenseSearch(true)} />
-                                    <button onClick={() => setShowExpenseSearch(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0"><Search size={16} /></button>
+                                    <button onClick={() => setShowExpenseSearch(true)} className="w-10 h-8 bg-[#0285fd] text-slate-800 dark:text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0"><Search size={16} /></button>
                                 </div>
                             </div>
                             <div className="flex items-center gap-3">
@@ -840,7 +840,7 @@ const GRNBoard = ({ isOpen, onClose }) => {
                     <div className="flex items-center justify-between gap-4 bg-slate-50/80 p-3 rounded-[3px] border border-gray-200 mb-2">
                         <div className="flex items-center gap-3 flex-1">
                             <div className="relative flex-1 max-w-[400px]">
-                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400" size={16} />
                                 <input
                                     type="text"
                                     placeholder="Search Inventory"
@@ -920,13 +920,13 @@ const GRNBoard = ({ isOpen, onClose }) => {
             >
                 <div className="space-y-4 px-1 py-1 font-['Tahoma']">
                     <div className="bg-slate-50/50 p-4 rounded-[3px] border border-slate-100 flex flex-col items-center text-center">
-                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1.5">Active Selection</span>
+                        <span className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] mb-1.5">Active Selection</span>
                         <h3 className="text-[18px] font-black text-slate-700 uppercase leading-[1.2] tracking-tight max-w-[90%] break-words">
                             {entry.prodName}
                         </h3>
                         <div className="flex items-center gap-2 mt-2">
                             <span className="text-[11px] font-mono font-bold text-blue-500 bg-white px-3 py-0.5 rounded-[3px] shadow-sm border border-slate-100">{entry.prodCode}</span>
-                            <span className="text-[10px] font-black text-slate-300 uppercase">Product Code</span>
+                            <span className="text-[10px] font-black text-slate-600 dark:text-slate-300 uppercase">Product Code</span>
                         </div>
                     </div>
 
@@ -996,7 +996,7 @@ const GRNBoard = ({ isOpen, onClose }) => {
                         </div>
                         <button
                             onClick={() => { addProduct(); setShowProductQtyModal(false); setShowAddProductModal(false); setProductSearchQuery(''); }}
-                            className="h-11 px-8 bg-[#0285fd] text-white text-[13px] font-bold rounded-[3px] hover:bg-[#0073ff] transition-all active:scale-95 flex items-center gap-2 border-none"
+                            className="h-11 px-8 bg-[#0285fd] text-slate-800 dark:text-white text-[13px] font-bold rounded-[3px] hover:bg-[#0073ff] transition-all active:scale-95 flex items-center gap-2 border-none"
                         >
                             <Plus size={16} /> ADD TO LIST
                         </button>
@@ -1033,7 +1033,7 @@ const GRNBoard = ({ isOpen, onClose }) => {
                                             <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{parseFloat(p.price || 0).toFixed(2)}</td>
                                             <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{parseFloat(p.sellingPrice || 0).toFixed(2)}</td>
                                             <td className="text-right px-5 py-3">
-                                                <button className="bg-[#0285fd] text-white text-[10px] px-5 py-2 rounded-[3px] font-black hover:bg-[#0073ff] shadow-md transition-all active:scale-95">SELECT</button>
+                                                <button className="bg-[#0285fd] text-slate-800 dark:text-white text-[10px] px-5 py-2 rounded-[3px] font-black hover:bg-[#0073ff] shadow-md transition-all active:scale-95">SELECT</button>
                                             </td>
                                         </tr>
                                     ))}
@@ -1268,3 +1268,7 @@ const GRNBoard = ({ isOpen, onClose }) => {
 };
 
 export default GRNBoard;
+
+
+
+

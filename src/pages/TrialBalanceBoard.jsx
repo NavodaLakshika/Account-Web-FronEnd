@@ -298,8 +298,8 @@ const TrialBalanceBoard = ({ isOpen, onClose, companyCodeProp, companyNameProp }
                                             <tr>
                                                 <td colSpan={5} className="py-32 text-center">
                                                     <div className="flex flex-col items-center gap-3 opacity-20">
-                                                        <Search size={48} className="text-gray-400" />
-                                                        <span className="text-[12px] font-black uppercase tracking-[0.3em] text-gray-500 italic">No discovery records found</span>
+                                                        <Search size={48} className="text-gray-400 ml-[300px]" />
+                                                        <span className="text-[10px]  font-black uppercase tracking-[0.3em] text-gray-500 item-center ml-[300px]">No discovery records found</span>
                                                     </div>
                                                 </td>
                                             </tr>

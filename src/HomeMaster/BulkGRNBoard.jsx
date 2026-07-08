@@ -284,7 +284,7 @@ const BulkGRNBoard = ({ isOpen, onClose }) => {
                         <RotateCcw size={14} /> CLEAR ALL
                     </button>
                     <div className="flex gap-3">
-                        <button onClick={handleSave} disabled={isSaving || isApplying || groupedGrns.length === 0} className="px-6 h-10 bg-slate-600 text-white text-sm font-black rounded-[3px] shadow-md shadow-slate-100 hover:bg-slate-700 transition-all active:scale-95 flex items-center gap-2 disabled:opacity-50">
+                        <button onClick={handleSave} disabled={isSaving || isApplying || groupedGrns.length === 0} className="px-6 h-10 bg-slate-600 text-slate-800 dark:text-white text-sm font-black rounded-[3px] shadow-md shadow-slate-100 hover:bg-slate-700 transition-all active:scale-95 flex items-center gap-2 disabled:opacity-50">
                             {isSaving ? <Search className="animate-spin" size={14} /> : <FileDown size={14} />} SAVE ALL ({groupedGrns.length})
                         </button>
                         <button onClick={handleApply} disabled={isSaving || isApplying || groupedGrns.length === 0} className="px-6 h-10 bg-white text-[#2bb744] border-2 border-[#2bb744] hover:bg-green-50 text-sm font-black rounded-[3px] shadow-md shadow-green-100 hover:bg-[#259b3a] transition-all active:scale-95 flex items-center gap-2 disabled:opacity-50">
@@ -363,3 +363,7 @@ const BulkGRNBoard = ({ isOpen, onClose }) => {
 };
 
 export default BulkGRNBoard;
+
+
+
+

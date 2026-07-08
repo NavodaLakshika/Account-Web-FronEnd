@@ -1443,39 +1443,38 @@ const Dashboard = () => {
             )}
 
             {/* 1. Modal Overlays */}
-            {/* Ad Block Alert Modal */}
-            <SimpleModal
-                isOpen={showAdBlockAlert}
-                onClose={() => setShowAdBlockAlert(false)}
-                title="Advertisement Settings"
-                maxWidth="max-w-[450px]"
-                footer={
-                    <div className="bg-slate-50 px-6 py-4 w-full flex justify-end items-center border-t border-slate-200 rounded-b-xl gap-3">
+            {/* Ad Block Alert Banner — Full-width top strip */}
+            {showAdBlockAlert && (
+                <div className="fixed top-0 left-0 right-0 z-[9999] h-9 flex items-center justify-between gap-4 px-5 bg-slate-900 border-b border-slate-700 shadow-lg animate-in slide-in-from-top-2 duration-300">
+                    {/* Left: Text only */}
+                    <div className="flex items-center gap-2 min-w-0">
+                        <span className="text-[12px] font-bold text-white">Hide Subscription Banner?</span>
+                        <span className="hidden sm:inline text-[11px] text-slate-400">If blocked, it will auto-reload after 30 minutes.</span>
+                    </div>
+                    {/* Right: Actions */}
+                    <div className="flex items-center gap-2 shrink-0">
                         <button
                             onClick={handleAllowAds}
-                            className="px-6 py-2.5 bg-white text-slate-700 border border-slate-300 hover:bg-slate-50 font-bold text-[12px] uppercase tracking-widest rounded-[3px] transition-all active:scale-95"
+                            className="px-3 py-1 bg-transparent text-slate-300 border border-slate-600 hover:bg-slate-700 hover:text-white font-bold text-[10px] uppercase tracking-widest rounded-[3px] transition-all"
                         >
                             Keep Banner
                         </button>
                         <button
                             onClick={handleBlockAds}
-                            className="px-6 py-2.5 bg-[#de212d] hover:bg-[#c91823] text-white font-bold text-[12px] uppercase tracking-widest rounded-[3px] shadow-sm transition-all active:scale-95"
+                            className="px-3 py-1 bg-[#de212d] hover:bg-[#c91823] text-white font-bold text-[10px] uppercase tracking-widest rounded-[3px] shadow-sm transition-all"
                         >
                             Block for 30m
                         </button>
+                        <button
+                            onClick={() => setShowAdBlockAlert(false)}
+                            className="p-1 text-slate-500 hover:text-white hover:bg-slate-700 rounded-[3px] transition-all"
+                            title="Dismiss"
+                        >
+                            <X size={12} />
+                        </button>
                     </div>
-                }
-            >
-                <div className="p-6 flex flex-col items-center text-center gap-4">
-                    <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center border-4 border-white shadow-sm mb-2">
-                        <X size={32} className="text-[#de212d]" />
-                    </div>
-                    <h2 className="text-[16px] font-extrabold text-slate-800 tracking-tight">Hide Subscription Banner?</h2>
-                    <p className="text-[13px] font-medium text-slate-500 leading-relaxed max-w-[350px]">
-                        Would you like to block the top subscription banner? If blocked, it will stay hidden and auto-reload after <strong>30 minutes</strong>.
-                    </p>
                 </div>
-            </SimpleModal>
+            )}
 
             <SubscriptionModal isOpen={showPricingPlansModal} onClose={() => setShowPricingPlansModal(false)} />
 

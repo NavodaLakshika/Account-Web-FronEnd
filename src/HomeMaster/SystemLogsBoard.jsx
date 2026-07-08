@@ -94,7 +94,7 @@ const SystemLogsBoard = () => {
                     <button 
                         onClick={fetchLogs}
                         disabled={loading}
-                        className="px-5 py-2.5 bg-[#00acee] hover:bg-[#009adb] text-white text-xs font-bold uppercase tracking-wider rounded-[3px] shadow-md transition-all active:scale-95 flex items-center gap-2 disabled:opacity-70"
+                        className="px-5 py-2.5 bg-[#00acee] hover:bg-[#009adb] text-slate-800 dark:text-white text-xs font-bold uppercase tracking-wider rounded-[3px] shadow-md transition-all active:scale-95 flex items-center gap-2 disabled:opacity-70"
                     >
                         {loading ? <Loader2 size={14} className="animate-spin" /> : null}
                         Refresh Logs
@@ -105,7 +105,7 @@ const SystemLogsBoard = () => {
             <div className="bg-white rounded-2xl shadow-sm border border-slate-200 flex flex-col overflow-hidden flex-1 max-h-[calc(100vh-220px)]">
                 <div className="p-4 border-b border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4 bg-slate-50/50 shrink-0">
                     <div className="relative w-full sm:w-80">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400 w-4 h-4" />
                         <input
                             type="text"
                             placeholder="Search user, action, or IP..."
@@ -115,7 +115,7 @@ const SystemLogsBoard = () => {
                         />
                     </div>
                     <div className="flex items-center gap-2 w-full sm:w-auto">
-                        <Filter className="w-4 h-4 text-slate-400" />
+                        <Filter className="w-4 h-4 text-slate-500 dark:text-slate-400" />
                         <select 
                             value={statusFilter}
                             onChange={(e) => setStatusFilter(e.target.value)}
@@ -131,16 +131,16 @@ const SystemLogsBoard = () => {
 
                 <div className="flex-1 overflow-auto relative">
                     {loading ? (
-                        <div className="absolute inset-0 bg-white/80 backdrop-blur-sm flex flex-col items-center justify-center z-10 gap-4 text-slate-400">
+                        <div className="absolute inset-0 bg-white/80 backdrop-blur-sm flex flex-col items-center justify-center z-10 gap-4 text-slate-500 dark:text-slate-400">
                             <Loader2 className="animate-spin text-[#00acee] w-8 h-8" />
                             <p className="text-sm font-bold tracking-wider uppercase">Loading Audit Logs...</p>
                         </div>
                     ) : null}
                     
                     {!loading && filteredLogs.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center h-full min-h-[300px] gap-4 text-slate-400">
+                        <div className="flex flex-col items-center justify-center h-full min-h-[300px] gap-4 text-slate-500 dark:text-slate-400">
                             <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mb-2 border border-slate-100">
-                                <FileText className="w-10 h-10 text-slate-300" />
+                                <FileText className="w-10 h-10 text-slate-600 dark:text-slate-300" />
                             </div>
                             <p className="text-sm font-bold">No logs found matching your criteria.</p>
                             <button onClick={() => {setSearchTerm(''); setStatusFilter('All');}} className="text-[#00acee] hover:underline text-xs font-bold uppercase tracking-wider">Clear Filters</button>
@@ -168,7 +168,7 @@ const SystemLogsBoard = () => {
                                         <td className="py-3 px-6">
                                             <span className="text-sm text-slate-700 font-medium">{log.action || 'Unknown Action'}</span>
                                         </td>
-                                        <td className="py-3 px-6 text-xs font-mono text-slate-400">
+                                        <td className="py-3 px-6 text-xs font-mono text-slate-500 dark:text-slate-400">
                                             {log.ip || '0.0.0.0'}
                                         </td>
                                         <td className="py-3 px-6">
@@ -191,3 +191,7 @@ const SystemLogsBoard = () => {
 };
 
 export default SystemLogsBoard;
+
+
+
+

@@ -27,7 +27,7 @@ const CustomerBoard = ({ isOpen, onClose }) => {
                 {/* 1. Integrated Ribbon Toolbar */}
                 <div className="flex items-center gap-1 p-1.5 bg-gradient-to-r from-[#e0f2fe] to-white border-b border-blue-100 mb-4 rounded-t-lg">
                     <button className="flex items-center gap-2 px-4 py-1.5 hover:bg-white/60 rounded transition-all group">
-                        <div className="p-1 bg-blue-500 rounded text-white shadow-sm group-hover:bg-blue-600">
+                        <div className="p-1 bg-blue-500 rounded text-slate-800 dark:text-white shadow-sm group-hover:bg-blue-600">
                             <UserPlus size={14} />
                         </div>
                         <span className="text-[12px] font-black text-[#0078d4] uppercase tracking-tighter flex items-center gap-1">
@@ -36,7 +36,7 @@ const CustomerBoard = ({ isOpen, onClose }) => {
                     </button>
                     <div className="w-[1px] h-6 bg-blue-200 mx-1" />
                     <button className="flex items-center gap-2 px-4 py-1.5 hover:bg-white/60 rounded transition-all group">
-                        <div className="p-1 bg-cyan-500 rounded text-white shadow-sm group-hover:bg-cyan-600">
+                        <div className="p-1 bg-cyan-500 rounded text-slate-800 dark:text-white shadow-sm group-hover:bg-cyan-600">
                             <FileText size={14} />
                         </div>
                         <span className="text-[12px] font-black text-[#0078d4] uppercase tracking-tighter flex items-center gap-1">
@@ -45,7 +45,7 @@ const CustomerBoard = ({ isOpen, onClose }) => {
                     </button>
                     <div className="w-[1px] h-6 bg-blue-200 mx-1" />
                     <button className="flex items-center gap-2 px-4 py-1.5 hover:bg-white/60 rounded transition-all group">
-                        <div className="p-1 bg-slate-500 rounded text-white shadow-sm group-hover:bg-slate-600">
+                        <div className="p-1 bg-slate-500 rounded text-slate-800 dark:text-white shadow-sm group-hover:bg-slate-600">
                             <Printer size={14} />
                         </div>
                         <span className="text-[12px] font-black text-[#0078d4] uppercase tracking-tighter">Printer</span>
@@ -200,3 +200,7 @@ const CustomerBoard = ({ isOpen, onClose }) => {
 };
 
 export default CustomerBoard;
+
+
+
+

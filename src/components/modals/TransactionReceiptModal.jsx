@@ -93,212 +93,194 @@ const TransactionReceiptModal = ({ selectedTx, onClose }) => {
   if (!selectedTx) return null;
 
   const modalContent = (
-      <div className="fixed inset-0 z-[9999] flex justify-end bg-[#2d3748]/60 backdrop-blur-[2px] transition-opacity print:p-0 print:bg-white">
-          <div className="relative w-full md:w-[350px] lg:w-1/3 h-full flex flex-col bg-white drop-shadow-2xl animate-in slide-in-from-right duration-300 receipt-printable print:shadow-none print:w-full print:h-auto overflow-y-auto font-['Tahoma'] select-none">
+      <div className="fixed inset-0 z-[9999] flex justify-center items-center bg-black/40 backdrop-blur-sm transition-opacity print:p-0 print:bg-white p-4">
+          <div className="relative w-full max-w-[700px] h-[95vh] flex flex-col bg-white shadow-xl animate-in fade-in zoom-in-95 duration-200 print:shadow-none print:w-full print:max-w-none print:h-auto overflow-hidden font-['Tahoma'] select-none">
             
             {/* Header / Actions */}
-            <div className="flex justify-between items-center px-4 py-3 border-b border-slate-200 bg-slate-50/50 print:hidden shrink-0">
+            <div className="flex justify-between items-center px-4 py-3 border-b border-gray-100 print:hidden shrink-0">
                 <div className="flex items-center gap-2">
-                    <FileText size={18} className="text-[#0285fd]" />
-                    <h2 className="text-[13px] font-bold text-slate-800 uppercase tracking-wide">Payment Receipt</h2>
+                    <h2 className="text-[13px] font-bold text-gray-800">Payment Receipt</h2>
                 </div>
                 <div className="flex items-center gap-2">
                     <button
                         onClick={handleDownloadPdf}
                         disabled={isPdfGenerating}
-                        className={`p-1.5 text-gray-500 hover:text-[#0285fd] hover:bg-blue-50 rounded-[3px] transition-colors ${isPdfGenerating ? 'opacity-50 cursor-not-allowed' : ''}`}
-                        title="Download PDF"
+                        className={`flex items-center gap-1.5 text-[12px] font-bold px-3 py-1.5 text-gray-600 hover:text-black hover:bg-gray-100 rounded-[3px] transition-colors ${isPdfGenerating ? 'opacity-50 cursor-not-allowed' : ''}`}
                     >
-                        {isPdfGenerating ? <Loader2 size={16} className="animate-spin" /> : <Download size={16} />}
+                        {isPdfGenerating ? <Loader2 size={14} className="animate-spin" /> : <Download size={14} />}
+                        <span className="hidden sm:inline">Download PDF</span>
                     </button>
                     <button
                         onClick={() => window.print()}
-                        className="p-1.5 text-gray-500 hover:text-[#0285fd] hover:bg-blue-50 rounded-[3px] transition-colors"
-                        title="Print"
+                        className="flex items-center gap-1.5 text-[12px] font-bold px-3 py-1.5 text-gray-600 hover:text-black hover:bg-gray-100 rounded-[3px] transition-colors"
                     >
-                        <Printer size={16} />
+                        <Printer size={14} />
+                        <span className="hidden sm:inline">Print</span>
                     </button>
-                    <div className="w-px h-4 bg-gray-300 mx-1"></div>
-                    <button onClick={onClose} className="p-1.5 text-gray-500 hover:text-red-500 hover:bg-red-50 rounded-[3px] transition-colors">
+                    <div className="w-px h-3 bg-gray-200 mx-1"></div>
+                    <button onClick={onClose} className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-[3px] transition-colors">
                         <X size={18} />
                     </button>
                 </div>
             </div>
 
             {/* Main Receipt Body */}
-            <div className="w-full bg-[#f4f5f8] p-4 relative flex-1 overflow-y-auto print:p-0 print:bg-white">
-              <div ref={receiptRef} className="bg-white border border-slate-200 flex-1 flex flex-col min-h-full print:border-none print:p-0 shadow-sm rounded-[3px] overflow-hidden">
+            <div className="w-full bg-white p-4 sm:p-6 relative flex-1 overflow-y-auto print:p-0 no-scrollbar">
+              <div ref={receiptRef} className="max-w-[800px] mx-auto bg-white flex flex-col min-h-full print:block text-slate-800">
                 
                 {/* Header Top: Title */}
-                <div className="flex justify-between items-start p-6 sm:p-8 pb-4 gap-4">
-                    <div className="flex-1 min-w-0">
-                        <div className="text-[18px] sm:text-[20px] font-black text-slate-800 tracking-tight uppercase leading-tight break-words">
+                <div className="flex flex-col-reverse sm:flex-row justify-between items-start gap-4 mb-6">
+                    <div className="flex-1 min-w-0 pr-4">
+                        <h1 className="text-lg sm:text-xl font-bold text-slate-900 tracking-tight leading-tight uppercase">
                             {companyName}
+                        </h1>
+                        <div className="mt-2 space-y-0.5">
+                            {(fullCompanyDetails.Address1 || fullCompanyDetails.address1) && (
+                                <div className="text-[11px] text-gray-500">{fullCompanyDetails.Address1 || fullCompanyDetails.address1}</div>
+                            )}
+                            {(fullCompanyDetails.Phone || fullCompanyDetails.phone) && (
+                                <div className="text-[11px] text-gray-500">Tel: {fullCompanyDetails.Phone || fullCompanyDetails.phone}</div>
+                            )}
+                            {(fullCompanyDetails.Email || fullCompanyDetails.email) && (
+                                <div className="text-[11px] text-gray-500">Email: {fullCompanyDetails.Email || fullCompanyDetails.email}</div>
+                            )}
                         </div>
                     </div>
-                    <div className="text-[20px] sm:text-[26px] font-black text-[#0285fd] uppercase tracking-widest shrink-0 text-right">
+                    <div className="text-2xl font-light text-gray-300 tracking-widest uppercase shrink-0">
                         RECEIPT
                     </div>
                 </div>
-                
-                <div className="mx-6 sm:mx-8 h-px bg-slate-200"></div>
 
                 {/* Metadata Block 1: DocNo, Date, Billed To */}
-                <div className="grid grid-cols-3 gap-4 sm:gap-8 p-6 sm:p-8 pt-5 pb-5 bg-slate-50/30">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6 pb-4 border-b border-gray-100">
                     <div>
-                        <div className="text-[10px] sm:text-[11px] font-bold text-slate-800 mb-1">Receipt no.</div>
-                        <div className="text-[11px] sm:text-[12px] font-bold text-gray-700 font-mono">#{selectedTx.docNo}</div>
-                    </div>
-                    <div>
-                        <div className="text-[10px] sm:text-[11px] font-bold text-slate-800 mb-1">Date</div>
-                        <div className="text-[11px] sm:text-[12px] font-bold text-gray-700 font-mono">{selectedTx?.date ? selectedTx.date.split('T')[0] : '---'}</div>
-                    </div>
-                    <div>
-                        <div className="text-[10px] sm:text-[11px] font-bold text-slate-800 mb-1">Receipt to:</div>
-                        <div className="text-[11px] sm:text-[12px] font-bold text-slate-800 uppercase">{selectedTx.payee || selectedTx.category || '---'}</div>
+                        <h3 className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Receipt To</h3>
+                        <div className="text-[12px] font-bold text-slate-900">{selectedTx.payee || selectedTx.category || '---'}</div>
                         {billDetails?.header?.address && (
-                            <div className="text-[10px] sm:text-[11px] text-gray-500 font-mono leading-tight mt-1">
+                            <div className="text-[11px] text-gray-500 mt-1 whitespace-pre-line">
                                 {billDetails.header.address}
                             </div>
                         )}
                     </div>
-                </div>
-                
-                <div className="mx-6 sm:mx-8 h-px bg-slate-200"></div>
-
-                {/* Metadata Block 2: Total Due & From Company Info */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8 p-6 sm:p-8 py-5 sm:py-6 bg-slate-50/60">
-                    <div>
-                        <div className="text-[10px] sm:text-[11px] font-bold text-slate-800 tracking-wide uppercase mb-1">TOTAL RECEIVED</div>
-                        <div className="text-[18px] sm:text-[22px] font-black text-slate-900 font-mono tracking-tighter">LKR {parseFloat(selectedTx.total || billDetails?.bills?.reduce((s, b) => s + (parseFloat(b.toPay) || 0), 0) || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
-                    </div>
-                    <div className="flex flex-col gap-1.5 justify-center sm:items-start lg:items-end">
-                        {(fullCompanyDetails.Address1 || fullCompanyDetails.address1) && (
-                            <div className="flex items-start gap-2 text-[9px] sm:text-[10px] text-gray-600 font-mono leading-tight">
-                                <MapPin size={12} className="shrink-0 text-slate-400 mt-0.5" />
-                                <span>{fullCompanyDetails.Address1 || fullCompanyDetails.address1}</span>
-                            </div>
-                        )}
-                        {(fullCompanyDetails.Phone || fullCompanyDetails.phone) && (
-                            <div className="flex items-center gap-2 text-[9px] sm:text-[10px] text-gray-600 font-mono">
-                                <Phone size={12} className="shrink-0 text-slate-400" />
-                                <span>{fullCompanyDetails.Phone || fullCompanyDetails.phone}</span>
-                            </div>
-                        )}
-                        {(fullCompanyDetails.Email || fullCompanyDetails.email) && (
-                            <div className="flex items-center gap-2 text-[9px] sm:text-[10px] text-gray-600 font-mono">
-                                <Mail size={12} className="shrink-0 text-slate-400" />
-                                <span>{fullCompanyDetails.Email || fullCompanyDetails.email}</span>
-                            </div>
-                        )}
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <h3 className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Receipt No</h3>
+                            <div className="text-[12px] font-bold text-slate-900">#{selectedTx.docNo}</div>
+                        </div>
+                        <div>
+                            <h3 className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Date</h3>
+                            <div className="text-[12px] font-bold text-slate-900">{selectedTx?.date ? selectedTx.date.split('T')[0] : '---'}</div>
+                        </div>
                     </div>
                 </div>
 
                 {/* Table Area */}
-                <div className="px-6 sm:px-8 pb-6 flex-1 flex flex-col">
+                <div className="mb-6 min-h-[100px]">
                     {loading ? (
-                        <div className="flex justify-center items-center py-12">
-                            <Loader2 size={24} className="text-[#0285fd] animate-spin" />
+                        <div className="flex justify-center items-center py-8">
+                            <Loader2 size={20} className="text-gray-400 animate-spin" />
                         </div>
                     ) : (
-                        <>
-                            <div className="overflow-hidden mb-8 mt-2">
-                                <table className="w-full text-sm text-left border-collapse">
-                                    <thead className="bg-[#0285fd] text-[10px] sm:text-[11px] font-bold text-white leading-8 sm:leading-10">
+                        <div className="overflow-hidden">
+                            <table className="w-full text-[11px] sm:text-[12px] text-left">
+                                <thead>
+                                    <tr className="border-b-2 border-gray-200">
                                         {billDetails?.bills && billDetails.bills.length > 0 ? (
-                                            <tr>
-                                                <th className="px-4 py-1 w-[40%]">Bill / Doc No</th>
-                                                <th className="px-4 py-1 w-[15%] text-right">Discount</th>
-                                                <th className="px-4 py-1 w-[20%] text-right">Set Offs</th>
-                                                <th className="px-4 py-1 w-[25%] text-right">Total</th>
-                                            </tr>
-                                        ) : (
-                                            <tr>
-                                                <th className="px-4 py-1 w-[60%]">Item Description</th>
-                                                <th className="px-4 py-1 w-[15%] text-center">Qty</th>
-                                                <th className="px-4 py-1 w-[25%] text-right">Total</th>
-                                            </tr>
-                                        )}
-                                    </thead>
-                                    <tbody>
-                                        {billDetails?.bills && billDetails.bills.length > 0 ? (
-                                            billDetails.bills.map((bill, idx) => (
-                                                <tr key={idx} className={`text-[11px] sm:text-[12px] font-bold text-gray-700 transition-colors ${idx % 2 === 0 ? 'bg-white' : 'bg-[#f8f9fa]'}`}>
-                                                    <td className="px-4 py-3 font-mono text-slate-800 align-middle">{String(bill.docNo || 'Unknown').replace(/^,\s*/, '')}</td>
-                                                    <td className="px-4 py-3 font-mono text-slate-800 text-right align-middle">{parseFloat(bill.discount || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-                                                    <td className="px-4 py-3 font-mono text-slate-800 text-right align-middle">{parseFloat(bill.setOfUse || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-                                                    <td className="px-4 py-3 font-mono text-slate-800 text-right align-middle">{parseFloat(bill.toPay || bill.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-                                                </tr>
-                                            ))
-                                        ) : billDetails?.expenses && billDetails.expenses.length > 0 ? (
-                                            billDetails.expenses.map((exp, idx) => (
-                                                <tr key={idx} className={`text-[11px] sm:text-[12px] font-bold text-gray-700 transition-colors ${idx % 2 === 0 ? 'bg-white' : 'bg-[#f8f9fa]'}`}>
-                                                    <td className="px-4 py-3 font-mono text-slate-800 align-middle">{String(exp.memo || exp.accCode || exp.acc_Code || 'Item').replace(/^,\s*/, '')}</td>
-                                                    <td className="px-4 py-3 font-mono text-slate-800 text-center align-middle">1</td>
-                                                    <td className="px-4 py-3 font-mono text-slate-800 text-right align-middle">{parseFloat(exp.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-                                                </tr>
-                                            ))
-                                        ) : (
-                                            <tr className="bg-white text-[11px] sm:text-[12px] font-bold text-gray-700">
-                                                <td className="px-4 py-3 font-mono text-slate-800 align-middle">{String(selectedTx.category || 'Payment').replace(/^,\s*/, '')}</td>
-                                                <td className="px-4 py-3 font-mono text-slate-800 text-center align-middle">1</td>
-                                                <td className="px-4 py-3 font-mono text-slate-800 text-right align-middle">{parseFloat(selectedTx.total || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-                                            </tr>
-                                        )}
-                                    </tbody>
-                                </table>
-                            </div>
-                            
-                            {/* Footer Bottom Block */}
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 mt-auto">
-                                {/* Left side: Payment Method & User */}
-                                <div>
-                                    <div className="text-[10px] sm:text-[11px] font-bold text-slate-800 mb-2">Payment Details</div>
-                                    <div className="mb-3">
-                                        <div className="text-[11px] sm:text-[12px] font-bold text-slate-700 italic">{selectedTx.payType || selectedTx.paymentMethod || billDetails?.payType || 'Payment'}</div>
-                                        <div className="text-[9px] sm:text-[10px] text-gray-500 font-mono">Ref: {selectedTx.chqNo || selectedTx.reference || billDetails?.chqNo || '---'}</div>
-                                    </div>
-                                    <div>
-                                        <div className="text-[10px] sm:text-[11px] font-bold text-slate-800 mb-1">Processed By</div>
-                                        <div className="text-[9px] sm:text-[10px] text-gray-500 font-mono">{selectedTx.createUser || userName || 'System'} • {selectedTx.accId || billDetails?.accId || 'Default Acc'}</div>
-                                    </div>
-                                    {(selectedTx.memo || billDetails?.memo) && (
-                                        <div className="mt-3 text-[10px] text-gray-500 font-mono italic">
-                                            {selectedTx.memo || billDetails?.memo}
-                                        </div>
-                                    )}
-                                </div>
-
-                                {/* Right side: Totals */}
-                                <div className="flex flex-col justify-end ml-auto w-full sm:w-[250px]">
-                                    <div className="space-y-2 mb-3 px-2 sm:px-4">
-                                        {billDetails?.bills && billDetails.bills.length > 0 && (
                                             <>
-                                                <div className="flex justify-between text-[10px] sm:text-[11px] font-bold text-slate-700">
-                                                    <span>Total Discount:</span>
-                                                    <span className="font-mono text-slate-600">{billDetails.bills.reduce((sum, b) => sum + (parseFloat(b.discount) || 0), 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                                                </div>
-                                                <div className="flex justify-between text-[10px] sm:text-[11px] font-bold text-slate-700">
-                                                    <span>Total Set Offs:</span>
-                                                    <span className="font-mono text-slate-600">{billDetails.bills.reduce((sum, b) => sum + (parseFloat(b.setOfUse) || 0), 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                                                </div>
+                                                <th className="py-2 font-bold text-gray-600 w-[40%]">Description</th>
+                                                <th className="py-2 font-bold text-gray-600 w-[15%] text-right">Discount</th>
+                                                <th className="py-2 font-bold text-gray-600 w-[20%] text-right">Set Offs</th>
+                                                <th className="py-2 font-bold text-gray-600 w-[25%] text-right">Amount</th>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <th className="py-2 font-bold text-gray-600 w-[60%]">Description</th>
+                                                <th className="py-2 font-bold text-gray-600 w-[15%] text-center">Qty</th>
+                                                <th className="py-2 font-bold text-gray-600 w-[25%] text-right">Amount</th>
                                             </>
                                         )}
-                                        <div className="flex justify-between text-[10px] sm:text-[11px] font-bold text-slate-700">
-                                            <span>Sub Total:</span>
-                                            <span className="font-mono text-slate-600">{parseFloat(selectedTx.total || billDetails?.bills?.reduce((s, b) => s + (parseFloat(b.toPay) || 0), 0) || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                                        </div>
-                                    </div>
-                                    
-                                    <div className="bg-[#0285fd] text-white px-2 sm:px-4 py-2.5 flex justify-between items-center rounded-[3px]">
-                                        <span className="text-[11px] sm:text-[12px] font-bold">Grand Total</span>
-                                        <span className="text-[13px] sm:text-[14px] font-bold font-mono tracking-tighter">LKR {parseFloat(selectedTx.total || billDetails?.bills?.reduce((s, b) => s + (parseFloat(b.toPay) || 0), 0) || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-gray-100">
+                                    {billDetails?.bills && billDetails.bills.length > 0 ? (
+                                        billDetails.bills.map((bill, idx) => (
+                                            <tr key={idx}>
+                                                <td className="py-2 text-slate-700">{String(bill.docNo || 'Unknown').replace(/^,\s*/, '')}</td>
+                                                <td className="py-2 text-slate-700 text-right">{parseFloat(bill.discount || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                                                <td className="py-2 text-slate-700 text-right">{parseFloat(bill.setOfUse || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                                                <td className="py-2 text-slate-700 text-right font-bold">{parseFloat(bill.toPay || bill.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                                            </tr>
+                                        ))
+                                    ) : billDetails?.expenses && billDetails.expenses.length > 0 ? (
+                                        billDetails.expenses.map((exp, idx) => (
+                                            <tr key={idx}>
+                                                <td className="py-2 text-slate-700">{String(exp.memo || exp.accCode || exp.acc_Code || 'Item').replace(/^,\s*/, '')}</td>
+                                                <td className="py-2 text-slate-700 text-center">1</td>
+                                                <td className="py-2 text-slate-700 text-right font-bold">{parseFloat(exp.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                                            </tr>
+                                        ))
+                                    ) : (
+                                        <tr>
+                                            <td className="py-2 text-slate-700">{String(selectedTx.category || 'Payment').replace(/^,\s*/, '')}</td>
+                                            <td className="py-2 text-slate-700 text-center">1</td>
+                                            <td className="py-2 text-slate-700 text-right font-bold">{parseFloat(selectedTx.total || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
                     )}
                 </div>
+                
+                {/* Footer Bottom Block */}
+                <div className="flex flex-col sm:flex-row justify-between gap-6 pt-4 mt-auto">
+                    {/* Left side: Payment Method & User */}
+                    <div className="flex-1">
+                        <h3 className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Payment Info</h3>
+                        <div className="text-[12px] font-bold text-slate-700 mb-0.5">{selectedTx.payType || selectedTx.paymentMethod || billDetails?.payType || 'Payment'}</div>
+                        <div className="text-[11px] text-gray-500 mb-2">Ref: {selectedTx.chqNo || selectedTx.reference || billDetails?.chqNo || '---'}</div>
+                        
+                        {(selectedTx.memo || billDetails?.memo) && (
+                            <div className="text-[11px] text-slate-600 italic mb-2">
+                                "{selectedTx.memo || billDetails?.memo}"
+                            </div>
+                        )}
+
+                        <div className="text-[10px] text-gray-400 mt-4">
+                            Processed by {selectedTx.createUser || userName || 'System'}
+                        </div>
+                    </div>
+
+                    {/* Right side: Totals */}
+                    <div className="w-full sm:w-[250px] bg-slate-50 border border-slate-100 p-4">
+                        <div className="space-y-2 mb-3">
+                            {billDetails?.bills && billDetails.bills.length > 0 && (
+                                <>
+                                    <div className="flex justify-between text-[11px] text-gray-600">
+                                        <span>Total Discount</span>
+                                        <span>{billDetails.bills.reduce((sum, b) => sum + (parseFloat(b.discount) || 0), 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                    </div>
+                                    <div className="flex justify-between text-[11px] text-gray-600">
+                                        <span>Total Set Offs</span>
+                                        <span>{billDetails.bills.reduce((sum, b) => sum + (parseFloat(b.setOfUse) || 0), 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                    </div>
+                                </>
+                            )}
+                            <div className="flex justify-between text-[12px] font-bold text-slate-700">
+                                <span>Subtotal</span>
+                                <span>{parseFloat(selectedTx.total || billDetails?.bills?.reduce((s, b) => s + (parseFloat(b.toPay) || 0), 0) || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                            </div>
+                        </div>
+                        
+                        <div className="flex justify-between items-center pt-3 border-t border-slate-200 mt-3">
+                            <span className="text-[13px] font-bold text-slate-900">Total Paid</span>
+                            <span className="text-[14px] font-bold text-slate-900">
+                                LKR {parseFloat(selectedTx.total || billDetails?.bills?.reduce((s, b) => s + (parseFloat(b.toPay) || 0), 0) || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
               </div>
             </div>
          </div>
