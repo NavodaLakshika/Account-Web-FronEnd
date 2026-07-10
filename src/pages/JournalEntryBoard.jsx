@@ -433,7 +433,8 @@ const JournalEntryBoard = ({ isOpen, onClose, onComplete }) => {
             const data = await journalService.loadForEdit({
                 docNo: journalObj.docNo,
                 company: companyCode,
-                createUser: currentUser
+                user: currentUser,
+                entryNo: header.entryNo
             });
             setHeader(prev => ({
                 ...prev,
@@ -442,7 +443,7 @@ const JournalEntryBoard = ({ isOpen, onClose, onComplete }) => {
                 date: data.date || journalObj.date,
                 lastEntryNo: data.lastEntryNo || prev.lastEntryNo
             }));
-            setTempEntries(data.entries || data.lines || []);
+            setTempEntries(Array.isArray(data) ? data : (data.entries || data.lines || []));
             showSuccessToast(`Loaded journal ${journalObj.docNo} for editing`);
             setActiveModal(null);
         } catch (error) {
@@ -905,12 +906,12 @@ const HistoryArchiveModal = ({ history, onClose, onSelectDateRange, selectedDate
                             <table className="w-full text-left">
                                 <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 shadow-sm z-10">
                                     <tr>
-                                        <th className=" px-5 py-3">Journal No</th>
-                                        <th className="text-center px-5 py-3">Post Date</th>
-                                        <th className=" px-5 py-3">General Narrative</th>
-                                        <th className="text-right px-5 py-3">Total Value</th>
-                                        <th className="text-center px-5 py-3">Entries</th>
-                                        <th className="text-right px-5 py-3">Action</th>
+                                        <th className=" px-5 py-3 whitespace-nowrap">Journal No</th>
+                                        <th className="text-center px-5 py-3 whitespace-nowrap">Post Date</th>
+                                        <th className=" px-5 py-3 whitespace-nowrap">General Narrative</th>
+                                        <th className="text-right px-5 py-3 whitespace-nowrap">Total Value</th>
+                                        <th className="text-center px-5 py-3 whitespace-nowrap">Entries</th>
+                                        <th className="text-right px-5 py-3 whitespace-nowrap">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-100">
@@ -929,13 +930,13 @@ const HistoryArchiveModal = ({ history, onClose, onSelectDateRange, selectedDate
                                             className="hover:bg-blue-50/50 transition-all  group cursor-pointer group border-b border-gray-50"
                                             onClick={() => setSelectedJournal(h)}
                                         >
-                                            <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{h.docNo}</td>
-                                            <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{h.date}</td>
+                                            <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3 whitespace-nowrap">{h.docNo}</td>
+                                            <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3 whitespace-nowrap text-center">{h.date}</td>
                                             <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">
                                                 <div className="text-[11px] font-bold text-slate-800 uppercase group-hover:text-blue-700 transition-colors truncate max-w-xs">{h.memo || 'General Ledger Entry'}</div>
                                                 <div className="text-[10px] font-bold text-slate-400 mt-0.5 italic">Consolidated View</div>
                                             </td>
-                                            <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">
+                                            <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3 whitespace-nowrap text-right">
                                                 Rs. {h.totalDebit.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                             </td>
                                             <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">
@@ -980,20 +981,20 @@ const HistoryArchiveModal = ({ history, onClose, onSelectDateRange, selectedDate
 const JournalDetailsModal = ({ journal, onClose }) => {
     return (
         <SimpleModal isOpen={true} onClose={onClose} title={`Journal Details - ${journal.docNo}`}>
-            <div className="space-y-4 p-1">
+            <div className="space-y-4 p-1 select-none font-['Tahoma']">
                 {/* Header Summary */}
-                <div className="grid grid-cols-3 gap-4 bg-slate-50 p-4 rounded-[3px] border border-gray-200">
+                <div className="grid grid-cols-3 gap-4 bg-white p-4 rounded-[3px] border border-gray-200">
                     <div className="space-y-1">
-                        <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Document No</span>
-                        <div className="text-[14px] font-bold text-blue-600 font-mono">{journal.docNo}</div>
+                        <span className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">Document No</span>
+                        <div className="text-[14px] font-bold text-[#0285fd] font-mono">{journal.docNo}</div>
                     </div>
                     <div className="space-y-1 border-x border-gray-200 px-4">
-                        <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Post Date</span>
+                        <span className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">Post Date</span>
                         <div className="text-[14px] font-bold text-slate-700">{journal.date}</div>
                     </div>
                     <div className="space-y-1 pl-4">
-                        <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Journal Status</span>
-                        <div className="flex items-center gap-2">
+                        <span className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">Journal Status</span>
+                        <div className="flex items-center gap-2 mt-1">
                             <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                             <span className="text-[11px] font-bold text-emerald-600 uppercase tracking-widest">Post Confirmed</span>
                         </div>
@@ -1003,38 +1004,38 @@ const JournalDetailsModal = ({ journal, onClose }) => {
                 {/* Details Table */}
                 <div className="border border-gray-200 rounded-[3px] overflow-hidden">
                     <table className="w-full text-left">
-                        <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 shadow-sm z-10">
+                        <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-200 shadow-sm z-10 leading-10">
                             <tr>
-                                <th className=" px-5 py-3">Account Descriptor</th>
-                                <th className=" px-5 py-3">Narrative / Memo</th>
-                                <th className="text-right px-5 py-3">Debit (DR)</th>
-                                <th className="text-right px-5 py-3">Credit (CR)</th>
-                            <th className="text-right px-5 py-3">Action</th></tr>
+                                <th className="px-5">Account Descriptor</th>
+                                <th className="px-5">Narrative / Memo</th>
+                                <th className="px-5 text-right">Debit (DR)</th>
+                                <th className="px-5 text-right">Credit (CR)</th>
+                            </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">
                             {journal.lines.map((line, idx) => (
-                                <tr key={idx} className="hover:bg-blue-50/50 transition-all cursor-pointer group border-b border-gray-50">
-                                    <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">
-                                        <div className="text-[11px] font-bold text-slate-800 uppercase">{line.accName}</div>
-                                        <div className="text-[10px] font-mono text-blue-500 mt-0.5">{line.accId}</div>
+                                <tr key={idx} className="hover:bg-slate-50/50 transition-colors border-b border-gray-50">
+                                    <td className="px-5 py-3">
+                                        <div className="text-[12px] font-bold text-gray-700 uppercase">{line.accName}</div>
+                                        <div className="text-[11px] font-mono text-[#0285fd] mt-0.5">{line.accId}</div>
                                     </td>
-                                    <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{line.memo || '-'}</td>
-                                    <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">
+                                    <td className="text-[12px] font-bold text-gray-700 uppercase px-5 py-3">{line.memo || '-'}</td>
+                                    <td className="font-mono text-[12px] font-bold text-gray-700 px-5 py-3 text-right">
                                         {line.debit > 0 ? line.debit.toLocaleString(undefined, { minimumFractionDigits: 2 }) : '-'}
                                     </td>
-                                    <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">
+                                    <td className="font-mono text-[12px] font-bold text-gray-700 px-5 py-3 text-right">
                                         {line.credit > 0 ? line.credit.toLocaleString(undefined, { minimumFractionDigits: 2 }) : '-'}
                                     </td>
                                 </tr>
                             ))}
                         </tbody>
-                        <tfoot className="bg-slate-50/50 border-t-2 border-gray-200">
+                        <tfoot className="bg-slate-50 border-t border-gray-200">
                             <tr>
-                                <td colSpan="2" className="text-center py-16 text-gray-400 text-[11px] font-bold uppercase tracking-widest">Balance check verified</td>
-                                <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">
+                                <td colSpan="2" className="text-right pr-4 py-4 text-gray-400 text-[11px] font-black uppercase tracking-widest">Balance check verified</td>
+                                <td className="font-mono text-[13px] font-bold text-gray-700 px-5 py-4 text-right">
                                     {journal.totalDebit.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                 </td>
-                                <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">
+                                <td className="font-mono text-[13px] font-bold text-gray-700 px-5 py-4 text-right">
                                     {journal.totalCredit.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                 </td>
                             </tr>
@@ -1045,7 +1046,7 @@ const JournalDetailsModal = ({ journal, onClose }) => {
                 <div className="flex justify-end pt-2">
                     <button
                         onClick={onClose}
-                        className="px-6 h-10 bg-[#0285fd] text-white font-semibold rounded-[3px] shadow-sm text-[13px] hover:bg-[#0073ff] transition-all uppercase"
+                        className="px-6 h-10 bg-white border border-gray-300 text-gray-700 font-semibold rounded-[3px] shadow-sm text-[13px] hover:bg-gray-50 transition-all flex items-center justify-center gap-2 uppercase tracking-wide"
                     >
                         DONE
                     </button>

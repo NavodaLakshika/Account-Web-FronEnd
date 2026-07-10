@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { ChevronLeft } from 'lucide-react';
 import { salesOrderService } from '../services/salesOrder.service';
 import SalesOrderDetailModal from '../components/SalesOrderDetailModal';
 import { showErrorToast } from '../utils/toastUtils';
@@ -8,6 +9,8 @@ const ReportSalesOrders = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedDocNo, setSelectedDocNo] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -57,7 +60,7 @@ const ReportSalesOrders = () => {
                   <td colSpan="3" className="text-center py-4 text-gray-500">No sales orders found</td>
                 </tr>
               ) : (
-                orders.map((o, i) => (
+                orders.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage).map((o, i) => (
                   <tr
                     key={i}
                     className="border-b hover:bg-gray-50 cursor-pointer transition-colors"
@@ -75,6 +78,52 @@ const ReportSalesOrders = () => {
               )}
             </tbody>
           </table>
+          {orders.length > 0 && (
+            <div className="flex items-center justify-between px-4 py-3 border-t border-gray-200 bg-white sm:px-6">
+              <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
+                <div>
+                  <p className="text-[12px] text-gray-700">
+                    Showing <span className="font-medium">{(currentPage - 1) * rowsPerPage + 1}</span> to <span className="font-medium">{Math.min(currentPage * rowsPerPage, orders.length)}</span> of <span className="font-medium">{orders.length}</span> results
+                  </p>
+                </div>
+                <div className="flex items-center gap-4">
+                  <select
+                    value={rowsPerPage}
+                    onChange={(e) => {
+                      setRowsPerPage(Number(e.target.value));
+                      setCurrentPage(1);
+                    }}
+                    className="border-gray-300 rounded-[3px] text-[12px] h-7 px-2 border focus:outline-none focus:border-[#0077c5]"
+                  >
+                    <option value={10}>10 per page</option>
+                    <option value={20}>20 per page</option>
+                    <option value={50}>50 per page</option>
+                  </select>
+                  <nav className="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
+                    <button
+                        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                        disabled={currentPage === 1}
+                        className="relative inline-flex items-center rounded-l-md px-2 py-1.5 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        <span className="sr-only">Previous</span>
+                        <ChevronLeft size={16} />
+                    </button>
+                    <span className="relative inline-flex items-center px-4 py-1.5 text-[12px] font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 focus:z-20 focus:outline-offset-0">
+                        Page {currentPage} of {Math.max(1, Math.ceil(orders.length / rowsPerPage))}
+                    </span>
+                    <button
+                        onClick={() => setCurrentPage(prev => Math.min(prev + 1, Math.ceil(orders.length / rowsPerPage)))}
+                        disabled={currentPage === Math.ceil(orders.length / rowsPerPage) || orders.length === 0}
+                        className="relative inline-flex items-center rounded-r-md px-2 py-1.5 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        <span className="sr-only">Next</span>
+                        <ChevronLeft size={16} className="rotate-180" />
+                    </button>
+                  </nav>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       )}
       {selectedDocNo && (

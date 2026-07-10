@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { ChevronLeft } from 'lucide-react';
 import { payBillService } from '../services/payBill.service';
 import PaymentDetailModal from '../components/PaymentDetailModal';
 import { showErrorToast } from '../utils/toastUtils';
@@ -8,6 +9,8 @@ const ReportBillPayments = () => {
   const [payments, setPayments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedPayDoc, setSelectedPayDoc] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
 
   useEffect(() => {
     const fetchPayments = async () => {
@@ -55,7 +58,7 @@ const ReportBillPayments = () => {
               <th className="text-right px-5 py-3">Action</th></tr>
             </thead>
             <tbody>
-              {payments.map((p) => (
+              {payments.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage).map((p) => (
                 <tr
                   key={p.payDoc}
                   className="border-b hover:bg-gray-50 cursor-pointer transition-colors"
@@ -75,6 +78,52 @@ const ReportBillPayments = () => {
               ))}
             </tbody>
           </table>
+          {payments.length > 0 && (
+            <div className="flex items-center justify-between px-4 py-3 border-t border-gray-200 bg-white sm:px-6">
+              <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
+                <div>
+                  <p className="text-[12px] text-gray-700">
+                    Showing <span className="font-medium">{(currentPage - 1) * rowsPerPage + 1}</span> to <span className="font-medium">{Math.min(currentPage * rowsPerPage, payments.length)}</span> of <span className="font-medium">{payments.length}</span> results
+                  </p>
+                </div>
+                <div className="flex items-center gap-4">
+                  <select
+                    value={rowsPerPage}
+                    onChange={(e) => {
+                      setRowsPerPage(Number(e.target.value));
+                      setCurrentPage(1);
+                    }}
+                    className="border-gray-300 rounded-[3px] text-[12px] h-7 px-2 border focus:outline-none focus:border-[#0077c5]"
+                  >
+                    <option value={10}>10 per page</option>
+                    <option value={20}>20 per page</option>
+                    <option value={50}>50 per page</option>
+                  </select>
+                  <nav className="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
+                    <button
+                        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                        disabled={currentPage === 1}
+                        className="relative inline-flex items-center rounded-l-md px-2 py-1.5 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        <span className="sr-only">Previous</span>
+                        <ChevronLeft size={16} />
+                    </button>
+                    <span className="relative inline-flex items-center px-4 py-1.5 text-[12px] font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 focus:z-20 focus:outline-offset-0">
+                        Page {currentPage} of {Math.max(1, Math.ceil(payments.length / rowsPerPage))}
+                    </span>
+                    <button
+                        onClick={() => setCurrentPage(prev => Math.min(prev + 1, Math.ceil(payments.length / rowsPerPage)))}
+                        disabled={currentPage === Math.ceil(payments.length / rowsPerPage) || payments.length === 0}
+                        className="relative inline-flex items-center rounded-r-md px-2 py-1.5 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        <span className="sr-only">Next</span>
+                        <ChevronLeft size={16} className="rotate-180" />
+                    </button>
+                  </nav>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       )}
       {selectedPayDoc && (
