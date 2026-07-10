@@ -424,8 +424,8 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
                                         <th className="px-3 text-right w-28">Unit Rate</th>
                                         <th className="px-2 text-center w-20">Usage</th>
                                         <th className="px-4 text-right w-36">Extended Net</th>
-                                        <th className="w-12"></th>
-                                    <th className="text-right px-5 py-3">Action</th></tr>
+                                        <th className="w-16 text-center">Action</th>
+                                    </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-50">
                                     {products.length === 0 ? (
@@ -632,6 +632,7 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
                                             <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{p.code}</td>
                                             <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3"><div className="text-[13px] font-bold text-gray-700 uppercase group-hover:text-blue-600 leading-snug line-clamp-2 max-w-[320px]">{p.name}</div></td>
                                             <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3"><span className="text-[10px] text-gray-300 mr-1">Rs.</span>{parseFloat(p.price || 0).toFixed(2)}</td>
+                                            <td className="text-right px-5 py-3"><button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button></td>
                                         </tr>
                                     ))}
                                 </tbody>

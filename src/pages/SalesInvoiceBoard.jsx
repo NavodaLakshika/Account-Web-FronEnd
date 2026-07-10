@@ -466,8 +466,8 @@ const SalesInvoiceBoard = ({ isOpen, onClose }) => {
                                         <th className="px-2 text-right w-20">QTY</th>
                                         <th className="px-2 text-right w-24">DISCOUNT</th>
                                         <th className="px-4 text-right w-32">AMOUNT</th>
-                                        <th className="w-12"></th>
-                                    <th className="text-right px-5 py-3">Action</th></tr>
+                                        <th className="w-16 text-center">Action</th>
+                                    </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-50">
                                     {products.length === 0 ? (

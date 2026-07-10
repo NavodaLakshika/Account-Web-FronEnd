@@ -307,6 +307,8 @@ const ReportTemplate = ({
     const [showMoreMenu, setShowMoreMenu] = useState(false);
     const [compactView, setCompactView] = useState(false);
     const [showCompactMenu, setShowCompactMenu] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [rowsPerPage, setRowsPerPage] = useState(50);
 
     useEffect(() => {
         if (!document.getElementById('compact-table-styles')) {
@@ -492,6 +494,10 @@ const ReportTemplate = ({
     };
     const [customizations, setCustomizations] = useState(defaultCustomizations);
 
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchQuery, columnFilters, reportPeriod, fromDate, toDate, customizations, apiData]);
+
     // Use API data if available, otherwise fallback to props
     const baseData = apiData || data;
 
@@ -597,8 +603,11 @@ const ReportTemplate = ({
             const headerLower = key.toLowerCase().replace(/[^a-z0-9]/g, '');
             const isCurrencyCol = columnsToTotal.some(c => headerLower.includes(c)) && !['qty', 'quantity', 'hours', 'code', 'date', 'id', 'name', 'type', 'status', 'no'].some(exclude => headerLower.includes(exclude));
             
+            // Format PascalCase/camelCase to Space Case
+            const formattedHeader = key.replace(/([A-Z])/g, ' $1').trim();
+            
             return {
-                header: (isCurrencyCol && !customizations.hideCurrency) ? `${key} (LKR)` : key,
+                header: (isCurrencyCol && !customizations.hideCurrency) ? `${formattedHeader} (LKR)` : formattedHeader,
                 accessor: key,
                 align: (columnsToTotal.some(c => headerLower.includes(c)) && !['code', 'date', 'id', 'name', 'type', 'status', 'no'].some(exclude => headerLower.includes(exclude))) ? 'right' : 'left',
                 format: isCurrencyCol ? (val) => {
@@ -1381,7 +1390,7 @@ const ReportTemplate = ({
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {apiLoading ? <tr><td colSpan="100%" className="text-center py-4">Loading data from database...</td><th className="text-right px-5 py-3">Action</th></tr> : displayData.map((row, i) => {
+                                    {apiLoading ? <tr><td colSpan="100%" className="text-center py-4">Loading data from database...</td><th className="text-right px-5 py-3">Action</th></tr> : displayData.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage).map((row, i) => {
                                         const isBillPaymentList = title === "Bill Payment List";
                                         const isQuotationSummary = title === "Quotation Summary";
                                         const isSalesOrderSummary = title === "Sales Order Summary";
@@ -1444,6 +1453,55 @@ const ReportTemplate = ({
                                     )}
                                 </tbody>
                             </table>
+                            
+                            {displayData.length > 0 && !apiLoading && (
+                                <div className="flex items-center justify-between px-4 py-3 border-t border-gray-200 bg-white sm:px-6">
+                                    <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
+                                        <div>
+                                            <p className="text-[12px] text-gray-700">
+                                                Showing <span className="font-medium">{displayData.length === 0 ? 0 : (currentPage - 1) * rowsPerPage + 1}</span> to <span className="font-medium">{Math.min(currentPage * rowsPerPage, displayData.length)}</span> of <span className="font-medium">{displayData.length}</span> results
+                                            </p>
+                                        </div>
+                                        <div className="flex items-center gap-4">
+                                            <select
+                                                value={rowsPerPage}
+                                                onChange={(e) => {
+                                                    setRowsPerPage(Number(e.target.value));
+                                                    setCurrentPage(1);
+                                                }}
+                                                className="border-gray-300 rounded-[3px] text-[12px] h-7 px-2 border focus:outline-none focus:border-[#0077c5]"
+                                            >
+                                                <option value={10}>10 per page</option>
+                                                <option value={20}>20 per page</option>
+                                                <option value={50}>50 per page</option>
+                                                <option value={100}>100 per page</option>
+                                                <option value={500}>500 per page</option>
+                                            </select>
+                                            <nav className="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
+                                                <button
+                                                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                                                    disabled={currentPage === 1}
+                                                    className="relative inline-flex items-center rounded-l-md px-2 py-1.5 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 disabled:opacity-50 disabled:cursor-not-allowed"
+                                                >
+                                                    <span className="sr-only">Previous</span>
+                                                    <ChevronLeft size={16} />
+                                                </button>
+                                                <span className="relative inline-flex items-center px-4 py-1.5 text-[12px] font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 focus:z-20 focus:outline-offset-0">
+                                                    Page {currentPage} of {Math.max(1, Math.ceil(displayData.length / rowsPerPage))}
+                                                </span>
+                                                <button
+                                                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, Math.ceil(displayData.length / rowsPerPage)))}
+                                                    disabled={currentPage === Math.ceil(displayData.length / rowsPerPage) || displayData.length === 0}
+                                                    className="relative inline-flex items-center rounded-r-md px-2 py-1.5 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 disabled:opacity-50 disabled:cursor-not-allowed"
+                                                >
+                                                    <span className="sr-only">Next</span>
+                                                    <ChevronLeft size={16} className="rotate-180" />
+                                                </button>
+                                            </nav>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                         )}
                     </div>

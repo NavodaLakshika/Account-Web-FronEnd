@@ -860,6 +860,9 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
                                                 <span className="text-[10px] text-gray-300 mr-1">Rs.</span>
                                                 {parseFloat(p.price || 0).toFixed(2)}
                                             </td>
+                                            <td className="text-right px-5 py-3">
+                                                <button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button>
+                                            </td>
                                         </tr>
                                     ))}
                                 </tbody>

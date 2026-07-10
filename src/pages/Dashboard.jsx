@@ -792,7 +792,7 @@ const Dashboard = () => {
                 setShowSubscriptionExpiredModal(true);
             } else {
                 // Show first-time onboarding guide (per-user — only once per employee)
-                const userId = currentUser?.EmpCode || currentUser?.empCode || currentUser?.emp_Code || currentUser?.id_No || currentUser?.Id_No || currentUser?.IdNo || currentUser?.username || currentUser?.EmpName;
+                const userId = currentUser?.EmpCode || currentUser?.empCode || currentUser?.emp_Code || currentUser?.id_No || currentUser?.Id_No || currentUser?.IdNo || currentUser?.username || currentUser?.EmpName || 'unknown';
                 const onboardKey = `onboardingDone_${userId}`;
                 if (!localStorage.getItem(onboardKey)) {
                     setTimeout(() => setShowFirstTimeGuide(true), 1000);
