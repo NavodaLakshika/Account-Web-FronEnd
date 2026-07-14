@@ -399,7 +399,7 @@ Remember: <<action:>> is ONLY for explicit page navigation requests. Never add i
                     
                     {/* Sidebar */}
                     {!sidebarCollapsed && (
-                        <div className="w-[260px] border-r border-slate-200 dark:border-gray-800/50 flex flex-col shrink-0 animate-in slide-in-from-left-4 duration-300">
+                        <div className="w-[200px] border-r border-slate-200 dark:border-gray-800/50 flex flex-col shrink-0 animate-in slide-in-from-left-4 duration-300">
                             <div className="p-4">
                                 <button 
                                     className="w-full flex items-center gap-3 px-4 py-2.5 text-[14px] text-slate-700 dark:text-gray-300 font-medium hover:bg-slate-100 dark:hover:bg-gray-800 rounded-[3px] transition-colors"
@@ -470,7 +470,7 @@ Remember: <<action:>> is ONLY for explicit page navigation requests. Never add i
                                         <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-in fade-in slide-in-from-bottom-2`}>
                                             {msg.role === 'user' ? (
                                                 <div className="flex flex-col items-end max-w-[85%]">
-                                                    <div className="bg-[#3b82f6] text-white px-5 py-3 rounded-2xl rounded-tr-sm text-[13px] shadow-sm">
+                                                    <div className="bg-slate-100 dark:bg-gray-800 text-slate-800 dark:text-white border border-slate-200 dark:border-gray-700 px-5 py-3 rounded-2xl rounded-tr-sm text-[13px] shadow-sm">
                                                         {msg.file && (
                                                             <div className="mb-3">
                                                                 {msg.file.isImage ? (

@@ -8,6 +8,7 @@ import { getSessionData } from '../utils/session';
 import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
 import TransactionReceiptModal from '../components/modals/TransactionReceiptModal';
 import TransactionFormWrapper from '../components/TransactionFormWrapper';
+import SearchableSelect from '../components/SearchableSelect';
 
 const formatDateToDMY = (dateStr) => {
     if (!dateStr) return '';

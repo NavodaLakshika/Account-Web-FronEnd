@@ -9,6 +9,7 @@ import { purchOrderService } from '../services/purchOrder.service';
 import { paymentMethodService } from '../services/paymentMethod.service';
 import { getSessionData } from '../utils/session';
 import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
+import SearchableSelect from '../components/SearchableSelect';
 
 const PurchaseOrderBoard = ({ isOpen, onClose }) => {
     const [lookups, setLookups] = useState({ suppliers: [], products: [], paymentMethods: [] });

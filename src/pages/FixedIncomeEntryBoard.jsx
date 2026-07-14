@@ -6,6 +6,7 @@ import { fixedIncomeService } from '../services/fixedIncome.service';
 import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
 import { getCompanyCode } from '../utils/session';
 import TransactionFormWrapper from '../components/TransactionFormWrapper';
+import SearchableSelect from '../components/SearchableSelect';
 
 const FixedIncomeEntryBoard = ({ isOpen, onClose }) => {
     const initialState = {

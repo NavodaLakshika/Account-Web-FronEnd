@@ -5,6 +5,7 @@ import { Search, RotateCcw, Save, Calendar } from 'lucide-react';
 import { fixedAssetService } from '../services/fixedAsset.service';
 import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
 import TransactionFormWrapper from '../components/TransactionFormWrapper';
+import SearchableSelect from '../components/SearchableSelect';
 
 const FixedAssetsProfileBoard = ({ isOpen, onClose }) => {
     const initialState = {

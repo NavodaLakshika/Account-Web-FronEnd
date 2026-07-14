@@ -257,3 +257,13 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 .sa-compact-mode .mb-8 {
   margin-bottom: 1rem !important;
 }
+@keyframes gradient-y {
+  0% { background-position: center bottom; }
+  50% { background-position: center top; }
+  100% { background-position: center bottom; }
+}
+
+.animate-gradient-y {
+  background-size: 100% 400%;
+  animation: gradient-y 4s ease infinite;
+}

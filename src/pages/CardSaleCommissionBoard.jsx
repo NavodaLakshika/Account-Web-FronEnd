@@ -5,6 +5,7 @@ import { cardCommissionService } from '../services/cardCommission.service';
 import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
 import { getCompanyCode } from '../utils/session';
 import TransactionFormWrapper from '../components/TransactionFormWrapper';
+import SearchableSelect from '../components/SearchableSelect';
 
 const CardSaleCommissionBoard = ({ isOpen, onClose }) => {
     const initialState = { BankAccCode: '', BankAccName: '', CardID: '', CardType: '', Rate: '0.0' };

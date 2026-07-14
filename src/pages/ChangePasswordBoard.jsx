@@ -4,6 +4,7 @@ import TransactionFormWrapper from '../components/TransactionFormWrapper';
 import SimpleModal from '../components/SimpleModal';
 import { userProfileService } from '../services/userProfile.service';
 import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
+import SearchableSelect from '../components/SearchableSelect';
 
 const ChangePasswordBoard = ({ isOpen, onClose }) => {
     const initialState = {

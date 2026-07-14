@@ -7,6 +7,7 @@ import { receivePaymentService } from '../services/receivePayment.service';
 import { getSessionData } from '../utils/session';
 import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
 import TransactionFormWrapper from '../components/TransactionFormWrapper';
+import SearchableSelect from '../components/SearchableSelect';
 
 const ReceivePaymentBoard = ({ isOpen, onClose }) => {
     const [lookups, setLookups] = useState({ 

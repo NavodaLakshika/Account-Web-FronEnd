@@ -88,7 +88,7 @@ const AVAILABLE_COLORS = [
     { name: 'Forest', value: '#064e3b', bg: 'bg-emerald-900/20', border: 'border-emerald-900/50', iconBg: 'bg-emerald-900' },
     { name: 'Chocolate', value: '#78350f', bg: 'bg-amber-900/20', border: 'border-amber-900/50', iconBg: 'bg-amber-900' },
     { name: 'Grape', value: '#581c87', bg: 'bg-purple-900/20', border: 'border-purple-900/50', iconBg: 'bg-purple-900' },
-    { name: 'Charcoal', value: '#0f172a', bg: 'bg-slate-100 dark:bg-slate-900/20', border: 'border-slate-900/50', iconBg: 'bg-slate-100 dark:bg-slate-900' },
+    { name: 'Charcoal', value: '#0f172a', bg: 'bg-slate-100', border: 'border-slate-900/50', iconBg: 'bg-slate-100' },
 ];
 
 const AVAILABLE_LOCATIONS = [
@@ -207,8 +207,8 @@ const EngagementAdminBoard = () => {
                 setColorObj({
                     name: 'Custom',
                     value: ad.accent || '#000000',
-                    bg: 'bg-white dark:bg-[#0f172a]/50',
-                    border: 'border-slate-200 dark:border-[#334155]',
+                    bg: 'bg-white',
+                    border: 'border-slate-200',
                     iconBg: 'custom'
                 });
             }
@@ -316,22 +316,22 @@ const EngagementAdminBoard = () => {
         <>
             <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-2 duration-300 pb-6 mb-6 min-h-[500px]">
                 {/* Header Container */}
-                <div className="bg-white dark:bg-[#0f172a]/50 border border-slate-200 dark:border-[#334155] shadow-sm rounded-none p-6">
+                <div className="bg-white border border-slate-200/80 shadow-sm rounded-[5px] p-6">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 bg-rose-500/20 flex items-center justify-center rounded-none">
-                            <Megaphone className="w-4 h-4 text-rose-300" />
+                        <div className="w-8 h-8 bg-rose-50 flex items-center justify-center rounded-[5px]">
+                            <Megaphone className="w-4 h-4 text-rose-500" />
                         </div>
                         <div>
-                            <h2 className="text-[15px] font-bold text-slate-800 dark:text-white">Employee Engagement Management</h2>
-                            <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Manage system reviews and promotional advertisements</p>
+                            <h2 className="text-[15px] font-bold text-slate-800">Employee Engagement Management</h2>
+                            <p className="text-[11px] text-slate-500 font-medium">Manage system reviews and promotional advertisements</p>
                         </div>
                     </div>
                         {activeTab === 'ads' && !isEditing && (
                             <div className="flex items-center gap-3 self-start">
                                 <button
                                     onClick={() => handleOpenForm()}
-                                    className="px-4 py-2.5 bg-emerald-600/20 border border-emerald-500/50 hover:bg-emerald-600/40 text-emerald-400 text-xs font-bold uppercase tracking-wider rounded-none transition-all flex items-center gap-2"
+                                    className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold uppercase tracking-wider rounded-[3px] transition-all flex items-center gap-2 shadow-sm"
                                 >
                                     <Plus size={14} />
                                     Create Advertisement
@@ -342,24 +342,24 @@ const EngagementAdminBoard = () => {
                 </div>
 
                 {/* Selector Bar */}
-                <div className="bg-white dark:bg-[#0f172a]/50 p-4 border border-slate-200 dark:border-[#334155] flex flex-col gap-4 rounded-none shadow-sm">
+                <div className="bg-white p-4 border border-slate-200/80 flex flex-col gap-4 rounded-[5px] shadow-sm">
                     <div className="flex flex-col md:flex-row justify-between items-center gap-4">
                         <div className="flex flex-wrap items-center gap-2">
-                            <span className="text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mr-2">Select View:</span>
+                            <span className="text-xs font-black text-slate-500 uppercase tracking-widest mr-2">Select View:</span>
                         <button
                             onClick={() => setActiveTab('reviews')}
-                            className={`px-3 py-1.5 text-xs font-bold rounded-none transition-all ${activeTab === 'reviews'
+                            className={`px-3 py-1.5 text-xs font-bold rounded-[3px] transition-all ${activeTab === 'reviews'
                                 ? 'bg-[#0078d4] text-white shadow-sm border border-[#0078d4]'
-                                : 'bg-white dark:bg-[#0f172a]/50 hover:bg-slate-200 dark:bg-white/10 border border-slate-200 dark:border-[#334155] text-slate-600 dark:text-slate-300'
+                                : 'bg-white hover:bg-slate-50 border border-slate-200 text-slate-600'
                             }`}
                         >
                             System Reviews
                         </button>
                         <button
                             onClick={() => setActiveTab('ads')}
-                            className={`px-3 py-1.5 text-xs font-bold rounded-none transition-all ${activeTab === 'ads'
+                            className={`px-3 py-1.5 text-xs font-bold rounded-[3px] transition-all ${activeTab === 'ads'
                                 ? 'bg-orange-600 text-white shadow-sm border border-orange-600'
-                                : 'bg-white dark:bg-[#0f172a]/50 hover:bg-slate-200 dark:bg-white/10 border border-slate-200 dark:border-[#334155] text-slate-600 dark:text-slate-300'
+                                : 'bg-white hover:bg-slate-50 border border-slate-200 text-slate-600'
                             }`}
                         >
                             Advertisements
@@ -373,7 +373,7 @@ const EngagementAdminBoard = () => {
                             placeholder={activeTab === 'reviews' ? "Search reviews..." : "Search ads..."}
                             value={activeTab === 'reviews' ? reviewSearch : adSearch}
                             onChange={e => activeTab === 'reviews' ? setReviewSearch(e.target.value) : setAdSearch(e.target.value)}
-                            className="pl-9 pr-4 py-1.5 border border-slate-200 dark:border-[#334155] bg-white dark:bg-[#0f172a]/50 text-slate-800 dark:text-white text-xs w-full outline-none focus:border-[#0078d4] focus:bg-slate-200 dark:bg-white/10 rounded-none transition-all placeholder:text-slate-600"
+                            className="pl-9 pr-4 py-1.5 border border-slate-200 bg-slate-50 text-slate-800 text-xs w-full outline-none focus:border-[#0078d4] rounded-[3px] transition-all placeholder:text-slate-400"
                         />
                     </div>
                 </div>
@@ -381,18 +381,18 @@ const EngagementAdminBoard = () => {
 
             {/* REVIEWS TAB */}
             {activeTab === 'reviews' && (
-                <div className="border border-slate-200 dark:border-[#334155] overflow-hidden bg-white dark:bg-[#0f172a]/50 rounded-none shadow-sm">
-                    <div className="px-4 py-3 bg-white dark:bg-[#1e293b]/80 border-b border-slate-200 dark:border-[#334155] flex items-center justify-between">
+                <div className="border border-slate-200 overflow-hidden bg-white rounded-[3px] shadow-sm">
+                    <div className="px-4 py-3 bg-slate-50/80 border-b border-slate-100 flex items-center justify-between">
                         <div className="flex items-center gap-1.5">
                             <Star className="w-3 h-3 text-yellow-500 fill-current" />
-                            <span className="text-xs font-black text-slate-600 dark:text-slate-300">{averageRating}</span>
+                            <span className="text-xs font-black text-slate-600">{averageRating}</span>
                             <span className="text-[10px] text-slate-500 font-medium ml-2 uppercase tracking-widest">{reviews.length} total reviews</span>
                         </div>
                     </div>
                     <div className="w-full overflow-x-auto">
                         <table className="w-full text-left border-collapse">
                             <thead>
-                                <tr className="bg-white dark:bg-[#1e293b]/80 border-b border-slate-200 dark:border-[#334155] text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                                <tr className="bg-slate-50/80 border-b border-slate-100 text-[10px] font-bold text-slate-500 uppercase tracking-wider">
                                     <th className="px-4 py-3">Employee</th>
                                     <th className="px-4 py-3">Rating</th>
                                     <th className="px-4 py-3">Comment</th>
@@ -401,7 +401,7 @@ const EngagementAdminBoard = () => {
                                     <th className="px-4 py-3 text-right">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-slate-200 dark:divide-white/5">
+                            <tbody className="divide-y divide-slate-100">
                                 {loadingReviews ? (
                                     <tr>
                                         <td colSpan="6" className="py-8 text-center text-slate-500">
@@ -414,9 +414,9 @@ const EngagementAdminBoard = () => {
                                     </tr>
                                 ) : (
                                     filteredReviews.map(review => (
-                                        <tr key={review.id} className="hover:bg-white dark:bg-[#0f172a]/50 transition-colors">
+                                        <tr key={review.id} className="hover:bg-slate-50 transition-colors border-b border-slate-100">
                                             <td className="px-4 py-3">
-                                                <div className="text-[13px] text-slate-800 dark:text-gray-200 font-bold">{review.empName}</div>
+                                                <div className="text-[13px] text-slate-800 font-bold">{review.empName}</div>
                                                 <div className="text-[11px] text-slate-500 font-medium">{review.empCode}</div>
                                             </td>
                                             <td className="px-4 py-3">
@@ -424,24 +424,24 @@ const EngagementAdminBoard = () => {
                                                     {[...Array(5)].map((_, i) => (
                                                         <Star
                                                             key={i}
-                                                            className={`w-3.5 h-3.5 ${i < review.rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-700 fill-gray-800'}`}
+                                                            className={`w-3.5 h-3.5 ${i < review.rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300 fill-gray-200'}`}
                                                         />
                                                     ))}
                                                 </div>
                                             </td>
                                             <td className="px-4 py-3 max-w-md">
-                                                <p className="text-[13px] text-slate-600 dark:text-slate-300 font-medium truncate" title={review.comment}>
+                                                <p className="text-[13px] text-slate-600 font-medium truncate" title={review.comment}>
                                                     {review.comment}
                                                 </p>
                                             </td>
-                                            <td className="px-4 py-3 text-[13px] text-slate-500 dark:text-slate-400 font-medium">
+                                            <td className="px-4 py-3 text-[13px] text-slate-500 font-medium">
                                                 {new Date(review.createdAt).toLocaleDateString()}
                                             </td>
                                             <td className="px-4 py-3 text-center">
-                                                <span className={`px-2 py-0.5 text-[9px] font-black uppercase tracking-widest border rounded-none ${
-                                                    review.status === 'Approved' ? 'bg-emerald-600/20 text-emerald-400 border-emerald-500/50' :
-                                                    review.status === 'Hidden' ? 'bg-slate-200 dark:bg-white/10 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-[#334155]' :
-                                                    'bg-amber-500/20 text-amber-400 border-amber-500/50'
+                                                <span className={`px-2 py-0.5 text-[9px] font-black uppercase tracking-widest border rounded-[3px] ${
+                                                    review.status === 'Approved' ? 'bg-emerald-50 text-emerald-600 border-emerald-200' :
+                                                    review.status === 'Hidden' ? 'bg-slate-50 text-slate-600 border-slate-200' :
+                                                    'bg-amber-50 text-amber-600 border-amber-200'
                                                 }`}>
                                                     {review.status}
                                                 </span>
@@ -451,7 +451,7 @@ const EngagementAdminBoard = () => {
                                                     {review.status !== 'Approved' && (
                                                         <button
                                                             onClick={() => handleReviewStatus(review.id, 'Approved')}
-                                                            className="px-3 py-1 text-[10px] font-black uppercase tracking-wider rounded-none transition-all bg-emerald-500/20 text-emerald-400 border border-emerald-500/50 hover:bg-emerald-500/30 flex items-center gap-1"
+                                                            className="w-[90px] justify-center px-3 py-1 text-[10px] font-black uppercase tracking-wider rounded-[3px] transition-all bg-emerald-600 hover:bg-emerald-500 text-white shadow-sm flex items-center gap-1"
                                                             title="Approve"
                                                         >
                                                             <CheckCircle size={10} /> Approve
@@ -460,7 +460,7 @@ const EngagementAdminBoard = () => {
                                                     {review.status !== 'Hidden' && (
                                                         <button
                                                             onClick={() => handleReviewStatus(review.id, 'Hidden')}
-                                                            className="px-3 py-1 text-[10px] font-black uppercase tracking-wider rounded-none transition-all bg-slate-500/20 text-slate-500 dark:text-slate-400 border border-slate-500/50 hover:bg-slate-500/30 flex items-center gap-1"
+                                                            className="w-[90px] justify-center px-3 py-1 text-[10px] font-black uppercase tracking-wider rounded-[3px] transition-all bg-slate-500 hover:bg-slate-400 text-white shadow-sm flex items-center gap-1"
                                                             title="Hide"
                                                         >
                                                             <EyeOff size={10} /> Hide
@@ -468,7 +468,7 @@ const EngagementAdminBoard = () => {
                                                     )}
                                                     <button
                                                         onClick={() => handleDeleteReview(review.id)}
-                                                        className="px-3 py-1 text-[10px] font-black uppercase tracking-wider rounded-none transition-all bg-red-500/20 text-red-400 border border-red-500/50 hover:bg-red-500/30 flex items-center gap-1"
+                                                        className="w-[90px] justify-center px-3 py-1 text-[10px] font-black uppercase tracking-wider rounded-[3px] transition-all bg-red-600 hover:bg-red-700 text-white shadow-sm flex items-center gap-1"
                                                         title="Delete"
                                                     >
                                                         <Trash2 size={10} /> Delete
@@ -488,15 +488,15 @@ const EngagementAdminBoard = () => {
             {activeTab === 'ads' && (
                 <>
                     {isEditing ? (
-                        <div className="border border-slate-200 dark:border-[#334155] bg-white dark:bg-[#0f172a]/50 rounded-none shadow-sm">
-                            <div className="px-6 py-4 border-b border-slate-200 dark:border-[#334155] flex items-center justify-between bg-white dark:bg-[#0f172a]/50">
-                                <h3 className="text-[15px] font-bold text-slate-800 dark:text-white">
+                        <div className="border border-slate-200 bg-white rounded-[5px] shadow-sm">
+                            <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+                                <h3 className="text-[15px] font-bold text-slate-800">
                                     {currentAd ? 'Edit Advertisement' : 'Create New Advertisement'}
                                 </h3>
                                 <button
                                     type="button"
                                     onClick={handleCloseForm}
-                                    className="px-4 py-2 bg-slate-200 dark:bg-white/10 hover:bg-white/20 text-slate-600 dark:text-slate-300 text-xs font-bold rounded-none transition-all flex items-center gap-1"
+                                    className="px-4 py-2 bg-slate-500 hover:bg-slate-400 text-white text-xs font-bold rounded-[3px] transition-all flex items-center gap-1 shadow-sm"
                                 >
                                     <Megaphone className="w-3.5 h-3.5" /> All Ads
                                 </button>
@@ -505,12 +505,12 @@ const EngagementAdminBoard = () => {
                                 <div className="p-6 space-y-6">
                                     <div className="space-y-4">
                                         <div>
-                                            <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">Title</label>
+                                            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Title</label>
                                             <input
                                                 type="text"
                                                 value={title}
                                                 onChange={e => setTitle(e.target.value)}
-                                                className="w-full px-4 py-2.5 bg-white dark:bg-[#0f172a]/50 border border-slate-200 dark:border-[#334155] text-slate-800 dark:text-white text-xs outline-none focus:border-orange-400 focus:bg-slate-200 dark:bg-white/10 transition-all placeholder:text-slate-600"
+                                                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 text-slate-800 text-xs outline-none focus:border-orange-400 rounded-[3px] transition-all placeholder:text-slate-400"
                                                 placeholder="e.g. Merit Plus Finance"
                                                 maxLength={40}
                                             />
@@ -518,11 +518,11 @@ const EngagementAdminBoard = () => {
                                         </div>
                                         
                                         <div>
-                                            <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">Description</label>
+                                            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Description</label>
                                             <textarea
                                                 value={desc}
                                                 onChange={e => setDesc(e.target.value)}
-                                                className="w-full px-4 py-2.5 bg-white dark:bg-[#0f172a]/50 border border-slate-200 dark:border-[#334155] text-slate-800 dark:text-white text-xs outline-none focus:border-orange-400 focus:bg-slate-200 dark:bg-white/10 transition-all resize-none h-24 placeholder:text-slate-600"
+                                                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 text-slate-800 text-xs outline-none focus:border-orange-400 rounded-[3px] transition-all resize-none h-24 placeholder:text-slate-400"
                                                 placeholder="Brief description of the promotion..."
                                                 maxLength={300}
                                             />
@@ -532,8 +532,8 @@ const EngagementAdminBoard = () => {
 
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
                                         <div>
-                                            <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Icon</label>
-                                            <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto p-2 bg-white dark:bg-[#0f172a]/50 border border-slate-200 dark:border-[#334155]">
+                                            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Icon</label>
+                                            <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto p-2 bg-white border border-slate-200">
                                                 {AVAILABLE_ICONS.map(iconOpt => {
                                                     const IconCmp = iconOpt.component;
                                                     return (
@@ -541,7 +541,7 @@ const EngagementAdminBoard = () => {
                                                             key={iconOpt.name}
                                                             type="button"
                                                             onClick={() => setIconName(iconOpt.name)}
-                                                            className={`p-2 transition-all ${iconName === iconOpt.name ? 'bg-orange-500/20 text-orange-400 ring-2 ring-orange-500/30 border border-orange-500' : 'border border-slate-200 dark:border-[#334155] bg-transparent text-slate-500 hover:bg-slate-200 dark:bg-white/10 hover:border-slate-200 dark:border-[#334155]'}`}
+                                                            className={`p-2 transition-all ${iconName === iconOpt.name ? 'bg-orange-500/20 text-orange-500 ring-2 ring-orange-500/30 border border-orange-500' : 'border border-slate-200 bg-transparent text-slate-500 hover:bg-slate-50'}`}
                                                             title={iconOpt.name}
                                                         >
                                                             <IconCmp size={18} />
@@ -552,15 +552,15 @@ const EngagementAdminBoard = () => {
                                         </div>
                                         
                                         <div>
-                                            <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Accent Color</label>
-                                            <div className="p-3 bg-white dark:bg-[#0f172a]/50 border border-slate-200 dark:border-[#334155] h-full flex flex-col justify-center">
+                                            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Accent Color</label>
+                                            <div className="p-3 bg-white border border-slate-200 h-full flex flex-col justify-center rounded-[3px]">
                                                 <div className="flex flex-wrap gap-2 items-center mb-3">
                                                     {AVAILABLE_COLORS.slice(0, 12).map(c => (
                                                         <button
                                                             key={c.name}
                                                             type="button"
                                                             onClick={() => setColorObj(c)}
-                                                            className={`w-7 h-7 rounded-none-full border-2 transition-all ${colorObj.name === c.name ? 'border-white scale-110 shadow-md ring-2 ring-gray-600 ring-offset-1 ring-offset-[#1a1a1a]' : 'border-transparent hover:scale-110 shadow-sm'}`}
+                                                            className={`w-7 h-7 rounded-[3px] border-2 transition-all ${colorObj.name === c.name ? 'border-slate-800 scale-110 shadow-md ring-2 ring-blue-500 ring-offset-1' : 'border-transparent hover:scale-110 shadow-sm'}`}
                                                             style={{ backgroundColor: c.value }}
                                                             title={c.name}
                                                         />
@@ -572,22 +572,22 @@ const EngagementAdminBoard = () => {
                                                             key={c.name}
                                                             type="button"
                                                             onClick={() => setColorObj(c)}
-                                                            className={`w-7 h-7 rounded-none-full border-2 transition-all ${colorObj.name === c.name ? 'border-white scale-110 shadow-md ring-2 ring-gray-600 ring-offset-1 ring-offset-[#1a1a1a]' : 'border-transparent hover:scale-110 shadow-sm'}`}
+                                                            className={`w-7 h-7 rounded-[3px] border-2 transition-all ${colorObj.name === c.name ? 'border-slate-800 scale-110 shadow-md ring-2 ring-blue-500 ring-offset-1' : 'border-transparent hover:scale-110 shadow-sm'}`}
                                                             style={{ backgroundColor: c.value }}
                                                             title={c.name}
                                                         />
                                                     ))}
-                                                    <div className="w-px h-6 bg-white/20 mx-1"></div>
+                                                    <div className="w-px h-6 bg-slate-200 mx-1"></div>
                                                     <label
-                                                        className={`w-7 h-7 rounded-none-full border-2 relative cursor-pointer transition-all overflow-hidden ${colorObj.name === 'Custom' ? 'border-white scale-110 shadow-md ring-2 ring-gray-600 ring-offset-1 ring-offset-[#1a1a1a]' : 'border-slate-200 dark:border-[#334155] hover:scale-110 shadow-sm'}`}
+                                                        className={`w-7 h-7 rounded-[3px] border-2 relative cursor-pointer transition-all overflow-hidden ${colorObj.name === 'Custom' ? 'border-slate-800 scale-110 shadow-md ring-2 ring-blue-500 ring-offset-1' : 'border-slate-200 hover:scale-110 shadow-sm'}`}
                                                         style={{ 
-                                                            backgroundColor: colorObj.name === 'Custom' ? colorObj.value : '#333333',
+                                                            backgroundColor: colorObj.name === 'Custom' ? colorObj.value : '#e2e8f0',
                                                             backgroundImage: colorObj.name !== 'Custom' ? 'conic-gradient(from 90deg, red, yellow, lime, aqua, blue, magenta, red)' : 'none'
                                                         }}
                                                         title="Custom Color"
                                                     >
                                                         <input type="color" value={colorObj.value}
-                                                            onChange={(e) => setColorObj({ name: 'Custom', value: e.target.value, bg: 'bg-white dark:bg-[#0f172a]/50', border: 'border-slate-200 dark:border-[#334155]', iconBg: 'custom' })}
+                                                            onChange={(e) => setColorObj({ name: 'Custom', value: e.target.value, bg: 'bg-white', border: 'border-slate-200', iconBg: 'custom' })}
                                                             className="opacity-0 absolute inset-0 w-full h-full cursor-pointer"
                                                         />
                                                     </label>
@@ -596,7 +596,7 @@ const EngagementAdminBoard = () => {
                                         </div>
                                     </div>
 
-                                    <div className="pt-2 border-t border-slate-200 dark:border-[#334155]">
+                                    <div className="pt-2 border-t border-slate-100">
                                         <div className="flex items-center justify-between mb-1.5">
                                             <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider">Show On Pages</label>
                                             <button type="button"
@@ -611,16 +611,16 @@ const EngagementAdminBoard = () => {
                                                 const isSelected = popupLocations.includes(loc);
                                                 return (
                                                     <label key={loc}
-                                                        className={`flex items-center gap-2 px-2.5 py-2 border cursor-pointer transition-all duration-200 ${
+                                                        className={`flex items-center gap-2 px-2.5 py-2 border cursor-pointer transition-all duration-200 rounded-[3px] ${
                                                             isSelected
-                                                                ? 'bg-orange-500/20 border-orange-500/50 text-orange-400 shadow-sm'
-                                                                : 'bg-transparent border-slate-200 dark:border-[#334155] text-slate-500 dark:text-slate-400 hover:border-slate-200 dark:border-[#334155] hover:bg-white dark:bg-[#0f172a]/50'
+                                                                ? 'bg-orange-500/20 border-orange-500/50 text-orange-600 shadow-sm'
+                                                                : 'bg-transparent border-slate-200 text-slate-500 hover:border-slate-300 hover:bg-slate-50'
                                                         }`}
                                                     >
-                                                        <div className={`w-3.5 h-3.5 flex items-center justify-center transition-all duration-200 ${
+                                                        <div className={`w-3.5 h-3.5 flex items-center justify-center transition-all duration-200 rounded-[2px] ${
                                                             isSelected
-                                                                ? 'bg-orange-500 text-slate-800 dark:text-white'
-                                                                : 'bg-white dark:bg-[#0f172a]/50 border border-slate-200 dark:border-[#334155]'
+                                                                ? 'bg-orange-500 text-white'
+                                                                : 'bg-white border border-slate-200'
                                                         }`}>
                                                             {isSelected && (
                                                                 <svg className="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
@@ -646,16 +646,16 @@ const EngagementAdminBoard = () => {
                                                 const isSelected = popupPlacement === opt.id;
                                                 return (
                                                     <button key={opt.id} type="button" onClick={() => setPopupPlacement(opt.id)}
-                                                        className={`flex flex-col items-center gap-0.5 px-2 py-2 border transition-all duration-200 ${
+                                                        className={`flex flex-col items-center gap-0.5 px-2 py-2 border transition-all duration-200 rounded-[3px] ${
                                                             isSelected
-                                                                ? 'border-orange-500/50 bg-orange-500/20 text-orange-400 shadow-sm'
-                                                                : 'border-slate-200 dark:border-[#334155] bg-transparent text-slate-500 hover:border-slate-200 dark:border-[#334155] hover:bg-white dark:bg-[#0f172a]/50'
+                                                                ? 'border-orange-500/50 bg-orange-500/20 text-orange-600 shadow-sm'
+                                                                : 'border-slate-200 bg-transparent text-slate-500 hover:border-slate-300 hover:bg-slate-50'
                                                         }`}
                                                     >
                                                         <span className="text-base leading-none">{opt.icon}</span>
                                                         <span className="text-[9px] font-bold whitespace-nowrap">{opt.label}</span>
                                                         {isSelected && (
-                                                            <div className="w-1 h-1 rounded-none-full bg-orange-500 mt-0.5" />
+                                                            <div className="w-1 h-1 rounded-[2px] bg-orange-500 mt-0.5" />
                                                         )}
                                                     </button>
                                                 )
@@ -663,15 +663,15 @@ const EngagementAdminBoard = () => {
                                         </div>
                                     </div>
 
-                                    <div className="pt-4 border-t border-slate-200 dark:border-[#334155]">
+                                    <div className="pt-4 border-t border-slate-100">
                                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                                             <div className="flex items-center gap-3">
                                                 <label className="relative inline-flex items-center cursor-pointer">
                                                     <input type="checkbox" checked={isActive} onChange={e => setIsActive(e.target.checked)} className="sr-only peer" />
-                                                    <div className="w-11 h-6 bg-white/20 peer-focus:outline-none rounded-none-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-none-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+                                                    <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-[3px] peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-slate-300 after:border after:rounded-[3px] after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
                                                 </label>
                                                 <div>
-                                                    <span className="text-sm font-bold text-slate-800 dark:text-gray-200">Active Advertisement</span>
+                                                    <span className="text-sm font-bold text-slate-800">Active Advertisement</span>
                                                     <p className="text-xs text-slate-500">Visible to users on selected pages</p>
                                                 </div>
                                             </div>
@@ -679,14 +679,14 @@ const EngagementAdminBoard = () => {
                                     </div>
                                 </div>
 
-                                <div className="px-6 py-4 bg-black/20 border-t border-slate-200 dark:border-[#334155] flex items-center justify-end gap-3">
+                                <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-end gap-3">
                                     <button type="button" onClick={handleCloseForm} disabled={isSubmitting}
-                                        className="px-5 py-2.5 bg-white dark:bg-[#0f172a]/50 text-slate-600 dark:text-slate-300 font-bold border border-slate-200 dark:border-[#334155] hover:bg-slate-200 dark:bg-white/10 text-xs transition-all rounded-none"
+                                        className="px-5 py-2.5 bg-slate-500 hover:bg-slate-400 text-white font-bold text-xs transition-all rounded-[3px] shadow-sm"
                                     >
                                         Cancel
                                     </button>
                                     <button type="submit" disabled={isSubmitting}
-                                        className="flex items-center justify-center gap-2 px-6 py-2.5 bg-[#0078d4] text-white font-bold hover:bg-[#005a9e] transition-all disabled:opacity-50 text-xs min-w-[140px] rounded-none shadow-sm"
+                                        className="flex items-center justify-center gap-2 px-6 py-2.5 bg-[#0078d4] hover:bg-[#005a9e] text-white font-bold transition-all disabled:opacity-50 text-xs min-w-[140px] rounded-[3px] shadow-sm"
                                     >
                                         {isSubmitting ? <><Loader2 size={16} className="animate-spin" /> Saving...</> : <><Save size={16} /> Save Advertisement</>}
                                     </button>
@@ -694,18 +694,18 @@ const EngagementAdminBoard = () => {
                             </form>
                         </div>
                     ) : (
-                        <div className="border border-slate-200 dark:border-[#334155] overflow-hidden bg-white dark:bg-[#0f172a]/50 rounded-none shadow-sm">
-                            <div className="px-4 py-3 bg-white dark:bg-[#1e293b]/80 border-b border-slate-200 dark:border-[#334155] flex items-center justify-between">
+                        <div className="border border-slate-200 overflow-hidden bg-white rounded-[3px] shadow-sm">
+                            <div className="px-4 py-3 bg-slate-50/80 border-b border-slate-100 flex items-center justify-between">
                                 <div className="flex items-center gap-1.5">
                                     <Megaphone className="w-3 h-3 text-orange-500" />
-                                    <span className="text-xs font-black text-slate-600 dark:text-slate-300">Promotional Ads</span>
+                                    <span className="text-xs font-black text-slate-600">Promotional Ads</span>
                                     <span className="text-[10px] text-slate-500 font-medium ml-2 uppercase tracking-widest">{ads.length} active ads</span>
                                 </div>
                             </div>
                             <div className="w-full overflow-x-auto">
                                 <table className="w-full text-left border-collapse">
                                     <thead>
-                                        <tr className="bg-white dark:bg-[#1e293b]/80 border-b border-slate-200 dark:border-[#334155] text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                                        <tr className="bg-slate-50/80 border-b border-slate-100 text-[10px] font-bold text-slate-500 uppercase tracking-wider">
                                             <th className="px-4 py-3">Advertisement</th>
                                             <th className="px-4 py-3">Locations</th>
                                             <th className="px-4 py-3">Accent</th>
@@ -713,7 +713,7 @@ const EngagementAdminBoard = () => {
                                             <th className="px-4 py-3 text-right">Actions</th>
                                         </tr>
                                     </thead>
-                                    <tbody className="divide-y divide-slate-200 dark:divide-white/5">
+                                    <tbody className="divide-y divide-slate-100">
                                         {loadingAds ? (
                                             <tr>
                                                 <td colSpan="5" className="py-8 text-center text-slate-500">
@@ -729,18 +729,18 @@ const EngagementAdminBoard = () => {
                                                 const iconOpt = AVAILABLE_ICONS.find(i => i.name === ad.iconName) || AVAILABLE_ICONS[3];
                                                 const IconCmp = iconOpt.component;
                                                 return (
-                                                    <tr key={ad.id} className="hover:bg-white dark:bg-[#0f172a]/50 transition-colors">
+                                                    <tr key={ad.id} className="hover:bg-slate-50 transition-colors border-b border-slate-100">
                                                         <td className="px-4 py-3">
                                                             <div className="flex items-center gap-3">
                                                                 <div 
-                                                                    className={`w-8 h-8 flex items-center justify-center shrink-0 ${ad.iconBg && ad.iconBg !== 'custom' ? ad.iconBg : 'bg-gray-700'}`}
+                                                                    className={`w-8 h-8 flex items-center justify-center shrink-0 ${ad.iconBg && ad.iconBg !== 'custom' ? ad.iconBg : 'bg-slate-100'}`}
                                                                     style={ad.iconBg === 'custom' ? { backgroundColor: ad.accent } : {}}
                                                                 >
-                                                                    <IconCmp size={14} className="text-slate-800 dark:text-white" />
+                                                                    <IconCmp size={14} className="text-slate-600" />
                                                                 </div>
                                                                 <div>
-                                                                    <div className="text-[13px] text-slate-800 dark:text-gray-200 font-bold">{ad.title}</div>
-                                                                    <div className="text-[11px] text-slate-500 dark:text-slate-400 font-medium truncate max-w-md">{ad.desc}</div>
+                                                                    <div className="text-[13px] text-slate-800 font-bold">{ad.title}</div>
+                                                                    <div className="text-[11px] text-slate-500 font-medium truncate max-w-md">{ad.desc}</div>
                                                                 </div>
                                                             </div>
                                                         </td>
@@ -749,10 +749,10 @@ const EngagementAdminBoard = () => {
                                                                 {ad.popupLocations ? (() => {
                                                                     const locs = ad.popupLocations.split(',').map(s => s.trim());
                                                                     if (locs.length === AVAILABLE_LOCATIONS.length) {
-                                                                        return <span className="px-2.5 py-1 bg-indigo-500/20 text-indigo-400 text-[10px] font-bold">All Pages</span>;
+                                                                        return <span className="px-2.5 py-1 bg-indigo-50 text-indigo-600 text-[10px] font-bold rounded-[3px]">All Pages</span>;
                                                                     }
                                                                     return locs.map((loc, i) => (
-                                                                        <span key={i} className="px-2 py-1 bg-slate-200 dark:bg-white/10 text-slate-600 dark:text-slate-300 text-[10px] font-bold">
+                                                                        <span key={i} className="px-2 py-1 bg-slate-50 text-slate-600 text-[10px] font-bold rounded-[3px]">
                                                                             {loc}
                                                                         </span>
                                                                     ));
@@ -761,13 +761,13 @@ const EngagementAdminBoard = () => {
                                                         </td>
                                                         <td className="px-4 py-3">
                                                             <div className="flex items-center gap-2">
-                                                                <div className="w-4 h-4 rounded-none-full border border-slate-200 dark:border-[#334155]" style={{ backgroundColor: ad.accent || '#78716c' }} />
-                                                                <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400">{ad.accent || '#78716c'}</span>
+                                                                <div className="w-4 h-4 rounded-[3px] border border-slate-200" style={{ backgroundColor: ad.accent || '#78716c' }} />
+                                                                <span className="text-[11px] font-medium text-slate-500">{ad.accent || '#78716c'}</span>
                                                             </div>
                                                         </td>
                                                         <td className="px-4 py-3 text-center">
-                                                            <span className={`px-2 py-0.5 text-[9px] font-black uppercase tracking-widest border rounded-none ${
-                                                                ad.isActive ? 'bg-emerald-600/20 text-emerald-400 border-emerald-500/50' : 'bg-slate-200 dark:bg-white/10 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-[#334155]'
+                                                            <span className={`px-2 py-0.5 text-[9px] font-black uppercase tracking-widest border rounded-[3px] ${
+                                                                ad.isActive ? 'bg-emerald-50 text-emerald-600 border-emerald-200' : 'bg-slate-50 text-slate-600 border-slate-200'
                                                             }`}>
                                                                 {ad.isActive ? 'Active' : 'Inactive'}
                                                             </span>
@@ -776,21 +776,21 @@ const EngagementAdminBoard = () => {
                                                             <div className="flex items-center justify-end gap-1.5">
                                                                 <button
                                                                     onClick={() => handleAdStatus(ad.id, !ad.isActive)}
-                                                                    className={`px-3 py-1 text-[10px] font-black uppercase tracking-wider rounded-none transition-all flex items-center gap-1 ${ad.isActive ? 'bg-amber-600 text-slate-800 dark:text-white shadow-sm border border-amber-500 hover:bg-amber-500' : 'bg-emerald-600 text-white shadow-sm border border-emerald-500 hover:bg-emerald-500'}`}
+                                                                    className={`px-3 py-1 text-[10px] font-black uppercase tracking-wider rounded-[3px] transition-all flex items-center gap-1 shadow-sm ${ad.isActive ? 'bg-amber-500 hover:bg-amber-600 text-white' : 'bg-emerald-600 hover:bg-emerald-500 text-white'}`}
                                                                     title={ad.isActive ? 'Deactivate' : 'Activate'}
                                                                 >
                                                                     {ad.isActive ? <><XCircle size={10} /> Deactivate</> : <><CheckCircle size={10} /> Activate</>}
                                                                 </button>
                                                                 <button
                                                                     onClick={() => handleOpenForm(ad)}
-                                                                    className="px-3 py-1 text-[10px] font-black uppercase tracking-wider rounded-none transition-all bg-blue-600 text-white shadow-sm border border-blue-500 hover:bg-blue-500 flex items-center gap-1"
+                                                                    className="px-3 py-1 text-[10px] font-black uppercase tracking-wider rounded-[3px] transition-all bg-[#0078d4] hover:bg-[#005a9e] text-white shadow-sm flex items-center gap-1"
                                                                     title="Edit"
                                                                 >
                                                                     <Edit size={10} /> Edit
                                                                 </button>
                                                                 <button
                                                                     onClick={() => handleDeleteAd(ad.id)}
-                                                                    className="px-3 py-1 text-[10px] font-black uppercase tracking-wider rounded-none transition-all bg-red-600 text-white shadow-sm border border-red-500 hover:bg-red-500 flex items-center gap-1"
+                                                                    className="px-3 py-1 text-[10px] font-black uppercase tracking-wider rounded-[3px] transition-all bg-red-600 hover:bg-red-700 text-white shadow-sm flex items-center gap-1"
                                                                     title="Delete"
                                                                 >
                                                                     <Trash2 size={10} /> Delete

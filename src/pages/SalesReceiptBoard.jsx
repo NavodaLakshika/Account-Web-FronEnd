@@ -7,6 +7,7 @@ import CalendarModal from '../components/CalendarModal';
 import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
 import SalesReceiptDetailModal from '../components/SalesReceiptDetailModal';
 import TransactionFormWrapper from '../components/TransactionFormWrapper';
+import SearchableSelect from '../components/SearchableSelect';
 
 const SalesReceiptBoard = ({ isOpen, onClose }) => {
     // --- State ---

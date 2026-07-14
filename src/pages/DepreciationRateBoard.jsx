@@ -4,6 +4,7 @@ import { Search, RotateCcw, Save } from 'lucide-react';
 import { depRateService } from '../services/depRate.service';
 import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
 import TransactionFormWrapper from '../components/TransactionFormWrapper';
+import SearchableSelect from '../components/SearchableSelect';
 
 const DepreciationRateBoard = ({ isOpen, onClose }) => {
     const initialState = { AccCode: '', AccountName: '', DepRate: '', CreateUser: 'SYSTEM' };

@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { 
     X, Moon, Sun, Sparkles, Bell, ShieldAlert,
     Save, KeyRound, LayoutDashboard, Clock, Monitor, RefreshCw,
-    Palette, Type, CalendarDays, CircleDollarSign, Activity
+    Palette, Type, CalendarDays, CircleDollarSign, Activity, Server
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import api from '../../services/api';
@@ -24,7 +24,51 @@ const SuperAdminSettingsModal = ({
     setDefaultView,
     autoRefresh,
     setAutoRefresh,
-    currentUserCode 
+    notificationsEnabled,
+    setNotificationsEnabled,
+    themeColor,
+    setThemeColor,
+    fontSize,
+    setFontSize,
+    dateFormat,
+    setDateFormat,
+    currencyFormat,
+    setCurrencyFormat,
+    auditLogEnabled,
+    setAuditLogEnabled,
+    currentUserCode,
+    transparentTables,
+    setTransparentTables,
+    maintenanceMode,
+    setMaintenanceMode,
+    debugLogging,
+    setDebugLogging,
+    dataRetention,
+    setDataRetention,
+    systemLanguage,
+    setSystemLanguage,
+    timezone,
+    setTimezone,
+    ipWhitelisting,
+    setIpWhitelisting,
+    strictPassword,
+    setStrictPassword,
+    sidebarLayout,
+    setSidebarLayout,
+    highContrast,
+    setHighContrast,
+    uiRounding,
+    setUiRounding,
+    buttonStyle,
+    setButtonStyle,
+    cardShadow,
+    setCardShadow,
+    metric1Color,
+    setMetric1Color,
+    metric2Color,
+    setMetric2Color,
+    metric3Color,
+    setMetric3Color
 }) => {
     const [activeTab, setActiveTab] = useState('appearance');
     const [currentPassword, setCurrentPassword] = useState('');
@@ -32,19 +76,7 @@ const SuperAdminSettingsModal = ({
     const [confirmPassword, setConfirmPassword] = useState('');
     const [isChangingPassword, setIsChangingPassword] = useState(false);
     
-    const [notificationsEnabled, setNotificationsEnabled] = useState(() => {
-        const saved = localStorage.getItem('saNotificationsEnabled');
-        return saved ? saved === 'true' : true;
-    });
-
-    const [themeColor, setThemeColor] = useState(() => localStorage.getItem('saThemeColor') || 'blue');
-    const [fontSize, setFontSize] = useState(() => localStorage.getItem('saFontSize') || 'normal');
-    const [dateFormat, setDateFormat] = useState(() => localStorage.getItem('saDateFormat') || 'DD/MM/YYYY');
-    const [currencyFormat, setCurrencyFormat] = useState(() => localStorage.getItem('saCurrencyFormat') || 'USD');
-    const [auditLogEnabled, setAuditLogEnabled] = useState(() => {
-        const saved = localStorage.getItem('saAuditLogEnabled');
-        return saved ? saved === 'true' : true;
-    });
+    // States lifted to dashboard: notificationsEnabled, themeColor, fontSize, dateFormat, currencyFormat, auditLogEnabled
     
     const [alertConfig, setAlertConfig] = useState({
         isOpen: false,
@@ -59,8 +91,8 @@ const SuperAdminSettingsModal = ({
     const [setupEmail, setSetupEmail] = useState('');
     const [is2FAMethodModalOpen, setIs2FAMethodModalOpen] = useState(false);
     const [is2FAEmailModalOpen, setIs2FAEmailModalOpen] = useState(false);
-    const [is2FAModalOpen, setIs2FAModalOpen] = useState(false); // Used for Email OTP verify
-    const [is2FAAppModalOpen, setIs2FAAppModalOpen] = useState(false); // Used for App OTP verify
+    const [is2FAModalOpen, setIs2FAModalOpen] = useState(false);
+    const [is2FAAppModalOpen, setIs2FAAppModalOpen] = useState(false);
     const [isDisable2FAModalOpen, setIsDisable2FAModalOpen] = useState(false);
     const [disable2FAPassword, setDisable2FAPassword] = useState('');
 
@@ -199,40 +231,45 @@ const SuperAdminSettingsModal = ({
 
     return (
         <div className="fixed inset-0 z-[99999] flex justify-end">
-            <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={onClose}></div>
+            <div className="absolute inset-0 bg-black/40" onClick={onClose}></div>
             
-            <div className="relative w-full md:w-[450px] lg:w-[450px] h-full bg-slate-50 dark:bg-[#0f172a] shadow-2xl flex flex-col animate-in slide-in-from-right duration-300 border-l border-slate-100 dark:border-gray-800">
+            <div className="relative w-full md:w-[450px] lg:w-[450px] h-full bg-white shadow-2xl flex flex-col animate-in slide-in-from-right duration-300 border-l border-slate-100 font-['Plus_Jakarta_Sans']">
                 
                 {/* Header */}
-                <div className="h-14 border-b border-slate-100 dark:border-gray-800 flex items-center justify-between px-4 shrink-0 bg-white dark:bg-[#1e293b] sticky top-0 z-10">
-                    <h2 className="text-[15px] font-semibold text-slate-800 dark:text-white flex items-center gap-2">
-                        <Sparkles size={18} className="text-[#0285fd]" />
+                <div className="h-14 border-b border-slate-100 flex items-center justify-between px-4 shrink-0 bg-white sticky top-0 z-10">
+                    <h2 className="text-[15px] font-semibold text-slate-800 flex items-center gap-2">
                         Settings
                     </h2>
-                    <button onClick={onClose} className="p-1.5 hover:bg-slate-100 dark:hover:bg-gray-800 text-slate-500 dark:text-gray-400 rounded-[3px] transition-colors ml-1">
+                    <button onClick={onClose} className="p-1.5 hover:bg-slate-100 text-slate-500 rounded-[3px] transition-colors ml-1">
                         <X size={20} />
                     </button>
                 </div>
 
                 {/* Tabs */}
-                <div className="flex bg-white dark:bg-[#1e293b] border-b border-slate-100 dark:border-gray-800 px-2 shrink-0 overflow-x-auto no-scrollbar">
+                <div className="flex bg-white border-b border-slate-100 px-2 shrink-0 overflow-x-auto no-scrollbar">
                     <button 
                         onClick={() => setActiveTab('appearance')}
-                        className={`flex items-center gap-2 px-4 py-3 text-[13px] font-semibold transition-all border-b-2 whitespace-nowrap ${activeTab === 'appearance' ? 'border-[#0285fd] text-[#0285fd]' : 'border-transparent text-slate-500 dark:text-gray-400 hover:text-slate-700 dark:hover:text-gray-300'}`}
+                        className={`flex items-center gap-2 px-4 py-3 text-[13px] font-semibold transition-all border-b-2 whitespace-nowrap ${activeTab === 'appearance' ? 'border-[#0285fd] text-[#0285fd]' : 'border-transparent text-slate-500 hover:text-slate-700'}`}
                     >
-                        <Sparkles size={16} /> Appearance
+                        Appearance
                     </button>
                     <button 
                         onClick={() => setActiveTab('security')}
-                        className={`flex items-center gap-2 px-4 py-3 text-[13px] font-semibold transition-all border-b-2 whitespace-nowrap ${activeTab === 'security' ? 'border-[#0285fd] text-[#0285fd]' : 'border-transparent text-slate-500 dark:text-gray-400 hover:text-slate-700 dark:hover:text-gray-300'}`}
+                        className={`flex items-center gap-2 px-4 py-3 text-[13px] font-semibold transition-all border-b-2 whitespace-nowrap ${activeTab === 'security' ? 'border-[#0285fd] text-[#0285fd]' : 'border-transparent text-slate-500 hover:text-slate-700'}`}
                     >
-                        <ShieldAlert size={16} /> Security
+                        Security
                     </button>
                     <button 
                         onClick={() => setActiveTab('preferences')}
-                        className={`flex items-center gap-2 px-4 py-3 text-[13px] font-semibold transition-all border-b-2 whitespace-nowrap ${activeTab === 'preferences' ? 'border-[#0285fd] text-[#0285fd]' : 'border-transparent text-slate-500 dark:text-gray-400 hover:text-slate-700 dark:hover:text-gray-300'}`}
+                        className={`flex items-center gap-2 px-4 py-3 text-[13px] font-semibold transition-all border-b-2 whitespace-nowrap ${activeTab === 'preferences' ? 'border-[#0285fd] text-[#0285fd]' : 'border-transparent text-slate-500 hover:text-slate-700'}`}
                     >
-                        <Bell size={16} /> Preferences
+                        Preferences
+                    </button>
+                    <button 
+                        onClick={() => setActiveTab('system')}
+                        className={`flex items-center gap-2 px-4 py-3 text-[13px] font-semibold transition-all border-b-2 whitespace-nowrap ${activeTab === 'system' ? 'border-[#0285fd] text-[#0285fd]' : 'border-transparent text-slate-500 hover:text-slate-700'}`}
+                    >
+                        System
                     </button>
                 </div>
 
@@ -240,27 +277,27 @@ const SuperAdminSettingsModal = ({
                 <div className="flex-1 p-5 md:p-6 overflow-y-auto">
                     {activeTab === 'appearance' && (
                         <div className="animate-in fade-in zoom-in-95 duration-300">
-                            <h3 className="text-[16px] font-bold text-slate-800 dark:text-white mb-4">Appearance</h3>
+                            <h3 className="text-[16px] font-bold text-slate-800 mb-4">Appearance</h3>
                             
                             <div className="space-y-0">
-                                <div className="flex items-center justify-between py-5 border-b border-slate-100 dark:border-gray-800 last:border-0">
+                                <div className="flex items-center justify-between py-5 border-b border-slate-100 last:border-0">
                                     <div className="flex items-center gap-4">
                                         <div>
-                                            <h4 className="text-[15px] font-semibold text-slate-800 dark:text-white">Dark Mode</h4>
-                                            <p className="text-[13px] text-slate-500 dark:text-gray-400">Toggle system theme</p>
+                                            <h4 className="text-[15px] font-semibold text-slate-800">Dark Mode</h4>
+                                            <p className="text-[13px] text-slate-500">Toggle system theme</p>
                                         </div>
                                     </div>
                                     <label className="relative inline-flex items-center cursor-pointer">
                                         <input type="checkbox" className="sr-only peer" checked={darkMode} onChange={() => setDarkMode(!darkMode)} />
-                                        <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-[#0285fd]"></div>
+                                        <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#0285fd]"></div>
                                     </label>
                                 </div>
 
-                                <div className="flex items-center justify-between py-5 border-b border-slate-100 dark:border-gray-800 last:border-0">
+                                <div className="flex items-center justify-between py-5 border-b border-slate-100 last:border-0">
                                     <div className="flex items-center gap-4">
                                         <div>
-                                            <h4 className="text-[15px] font-semibold text-slate-800 dark:text-white">Background Animations</h4>
-                                            <p className="text-[13px] text-slate-500 dark:text-gray-400">Animated particles in the background</p>
+                                            <h4 className="text-[15px] font-semibold text-slate-800">Background Animations</h4>
+                                            <p className="text-[13px] text-slate-500">Animated particles in the background</p>
                                         </div>
                                     </div>
                                     <label className="relative inline-flex items-center cursor-pointer">
@@ -268,15 +305,31 @@ const SuperAdminSettingsModal = ({
                                             setAnimationsEnabled(e.target.checked);
                                             localStorage.setItem('saAnimationsEnabled', e.target.checked);
                                         }} />
-                                        <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-[#0285fd]"></div>
+                                        <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#0285fd]"></div>
                                     </label>
                                 </div>
 
-                                <div className="flex items-center justify-between py-5 border-b border-slate-100 dark:border-gray-800 last:border-0">
+                                <div className="flex items-center justify-between py-5 border-b border-slate-100 last:border-0">
                                     <div className="flex items-center gap-4">
                                         <div>
-                                            <h4 className="text-[15px] font-semibold text-slate-800 dark:text-white">Compact Mode</h4>
-                                            <p className="text-[13px] text-slate-500 dark:text-gray-400">Tighter layout for tables</p>
+                                            <h4 className="text-[15px] font-semibold text-slate-800">Transparent Layouts</h4>
+                                            <p className="text-[13px] text-slate-500">Glassmorphism effects for tables</p>
+                                        </div>
+                                    </div>
+                                    <label className="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" className="sr-only peer" checked={transparentTables} onChange={(e) => {
+                                            setTransparentTables(e.target.checked);
+                                            localStorage.setItem('saTransparentTables', e.target.checked);
+                                        }} />
+                                        <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#0285fd]"></div>
+                                    </label>
+                                </div>
+
+                                <div className="flex items-center justify-between py-5 border-b border-slate-100 last:border-0">
+                                    <div className="flex items-center gap-4">
+                                        <div>
+                                            <h4 className="text-[15px] font-semibold text-slate-800">Compact Mode</h4>
+                                            <p className="text-[13px] text-slate-500">Tighter layout for tables</p>
                                         </div>
                                     </div>
                                     <label className="relative inline-flex items-center cursor-pointer">
@@ -284,15 +337,15 @@ const SuperAdminSettingsModal = ({
                                             setCompactMode(e.target.checked);
                                             localStorage.setItem('saCompactMode', e.target.checked);
                                         }} />
-                                        <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-[#0285fd]"></div>
+                                        <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#0285fd]"></div>
                                     </label>
                                 </div>
 
-                                <div className="flex items-center justify-between py-5 border-b border-slate-100 dark:border-gray-800 last:border-0">
+                                <div className="flex items-center justify-between py-5 border-b border-slate-100 last:border-0">
                                     <div className="flex items-center gap-4">
                                         <div>
-                                            <h4 className="text-[15px] font-semibold text-slate-800 dark:text-white">Theme Color</h4>
-                                            <p className="text-[13px] text-slate-500 dark:text-gray-400">Primary dashboard color</p>
+                                            <h4 className="text-[15px] font-semibold text-slate-800">Theme Color</h4>
+                                            <p className="text-[13px] text-slate-500">Primary dashboard color</p>
                                         </div>
                                     </div>
                                     <select 
@@ -301,7 +354,7 @@ const SuperAdminSettingsModal = ({
                                             setThemeColor(e.target.value);
                                             localStorage.setItem('saThemeColor', e.target.value);
                                         }}
-                                        className="bg-slate-50 dark:bg-[#0f172a] border border-slate-200 dark:border-gray-700 text-slate-800 dark:text-white text-[14px] rounded-none px-3 py-1.5 outline-none focus:border-[#0285fd] transition-colors"
+                                        className="bg-slate-50 border border-slate-200 text-slate-800 text-[14px] rounded-[3px] px-3 py-1.5 outline-none focus:border-[#0285fd] transition-colors"
                                     >
                                         <option value="blue">Blue (Default)</option>
                                         <option value="emerald">Emerald</option>
@@ -310,11 +363,11 @@ const SuperAdminSettingsModal = ({
                                     </select>
                                 </div>
 
-                                <div className="flex items-center justify-between py-5 border-b border-slate-100 dark:border-gray-800 last:border-0">
+                                <div className="flex items-center justify-between py-5 border-b border-slate-100 last:border-0">
                                     <div className="flex items-center gap-4">
                                         <div>
-                                            <h4 className="text-[15px] font-semibold text-slate-800 dark:text-white">Font Size</h4>
-                                            <p className="text-[13px] text-slate-500 dark:text-gray-400">Global text scaling</p>
+                                            <h4 className="text-[15px] font-semibold text-slate-800">Font Size</h4>
+                                            <p className="text-[13px] text-slate-500">Global text scaling</p>
                                         </div>
                                     </div>
                                     <select 
@@ -323,11 +376,182 @@ const SuperAdminSettingsModal = ({
                                             setFontSize(e.target.value);
                                             localStorage.setItem('saFontSize', e.target.value);
                                         }}
-                                        className="bg-slate-50 dark:bg-[#0f172a] border border-slate-200 dark:border-gray-700 text-slate-800 dark:text-white text-[14px] rounded-none px-3 py-1.5 outline-none focus:border-[#0285fd] transition-colors"
+                                        className="bg-slate-50 border border-slate-200 text-slate-800 text-[14px] rounded-[3px] px-3 py-1.5 outline-none focus:border-[#0285fd] transition-colors"
                                     >
                                         <option value="small">Small</option>
                                         <option value="normal">Normal</option>
                                         <option value="large">Large</option>
+                                    </select>
+                                </div>
+
+                                <div className="flex items-center justify-between py-5 border-b border-slate-100 last:border-0">
+                                    <div className="flex items-center gap-4">
+                                        <div>
+                                            <h4 className="text-[15px] font-semibold text-slate-800">Sidebar Layout</h4>
+                                            <p className="text-[13px] text-slate-500">Default sidebar state</p>
+                                        </div>
+                                    </div>
+                                    <select 
+                                        value={sidebarLayout}
+                                        onChange={(e) => {
+                                            setSidebarLayout(e.target.value);
+                                            localStorage.setItem('saSidebarLayout', e.target.value);
+                                        }}
+                                        className="bg-slate-50 border border-slate-200 text-slate-800 text-[14px] rounded-[3px] px-3 py-1.5 outline-none focus:border-[#0285fd] transition-colors"
+                                    >
+                                        <option value="expanded">Expanded</option>
+                                        <option value="collapsed">Collapsed</option>
+                                    </select>
+                                </div>
+
+                                <div className="flex items-center justify-between py-5 border-b border-slate-100 last:border-0">
+                                    <div className="flex items-center gap-4">
+                                        <div>
+                                            <h4 className="text-[15px] font-semibold text-slate-800">High Contrast Mode</h4>
+                                            <p className="text-[13px] text-slate-500">Increase visual contrast</p>
+                                        </div>
+                                    </div>
+                                    <label className="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" className="sr-only peer" checked={highContrast} onChange={(e) => {
+                                            setHighContrast(e.target.checked);
+                                            localStorage.setItem('saHighContrast', e.target.checked);
+                                        }} />
+                                        <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#0285fd]"></div>
+                                    </label>
+                                </div>
+
+                                <div className="flex items-center justify-between py-5 border-b border-slate-100 last:border-0">
+                                    <div className="flex items-center gap-4">
+                                        <div>
+                                            <h4 className="text-[15px] font-semibold text-slate-800">UI Element Rounding</h4>
+                                            <p className="text-[13px] text-slate-500">Global border radius</p>
+                                        </div>
+                                    </div>
+                                    <select 
+                                        value={uiRounding}
+                                        onChange={(e) => {
+                                            setUiRounding(e.target.value);
+                                            localStorage.setItem('saUiRounding', e.target.value);
+                                        }}
+                                        className="bg-slate-50 border border-slate-200 text-slate-800 text-[14px] rounded-[3px] px-3 py-1.5 outline-none focus:border-[#0285fd] transition-colors"
+                                    >
+                                        <option value="rounded-none">Sharp (Square)</option>
+                                        <option value="rounded-lg">Slightly Rounded</option>
+                                        <option value="rounded-full">Pill (Fully Rounded)</option>
+                                    </select>
+                                </div>
+
+                                <div className="flex items-center justify-between py-5 border-b border-slate-100 last:border-0">
+                                    <div className="flex items-center gap-4">
+                                        <div>
+                                            <h4 className="text-[15px] font-semibold text-slate-800">Global Button Style</h4>
+                                            <p className="text-[13px] text-slate-500">Appearance of action buttons</p>
+                                        </div>
+                                    </div>
+                                    <select 
+                                        value={buttonStyle}
+                                        onChange={(e) => {
+                                            setButtonStyle(e.target.value);
+                                            localStorage.setItem('saButtonStyle', e.target.value);
+                                        }}
+                                        className="bg-slate-50 border border-slate-200 text-slate-800 text-[14px] rounded-[3px] px-3 py-1.5 outline-none focus:border-[#0285fd] transition-colors"
+                                    >
+                                        <option value="solid">Solid (Classic)</option>
+                                        <option value="outline">Outline</option>
+                                        <option value="soft">Soft (Glass)</option>
+                                    </select>
+                                </div>
+
+                                <div className="flex items-center justify-between py-5 border-b border-slate-100 last:border-0">
+                                    <div className="flex items-center gap-4">
+                                        <div>
+                                            <h4 className="text-[15px] font-semibold text-slate-800">Card Elevation</h4>
+                                            <p className="text-[13px] text-slate-500">Depth of UI containers</p>
+                                        </div>
+                                    </div>
+                                    <select 
+                                        value={cardShadow}
+                                        onChange={(e) => {
+                                            setCardShadow(e.target.value);
+                                            localStorage.setItem('saCardShadow', e.target.value);
+                                        }}
+                                        className="bg-slate-50 border border-slate-200 text-slate-800 text-[14px] rounded-[3px] px-3 py-1.5 outline-none focus:border-[#0285fd] transition-colors"
+                                    >
+                                        <option value="shadow-none">Flat</option>
+                                        <option value="shadow-md">Soft Shadow</option>
+                                        <option value="shadow-2xl">Deep Shadow (Floating)</option>
+                                    </select>
+                                </div>
+
+                                <div className="flex items-center justify-between py-5 border-b border-slate-100 last:border-0">
+                                    <div className="flex items-center gap-4">
+                                        <div>
+                                            <h4 className="text-[15px] font-semibold text-slate-800">Metric Card 1 Color</h4>
+                                            <p className="text-[13px] text-slate-500">Total Employees Card Theme</p>
+                                        </div>
+                                    </div>
+                                    <select 
+                                        value={metric1Color}
+                                        onChange={(e) => {
+                                            setMetric1Color(e.target.value);
+                                            localStorage.setItem('saMetric1Color', e.target.value);
+                                        }}
+                                        className="bg-slate-50 border border-slate-200 text-slate-800 text-[14px] rounded-[3px] px-3 py-1.5 outline-none focus:border-[#0285fd] transition-colors"
+                                    >
+                                        <option value="blue">Blue</option>
+                                        <option value="emerald">Emerald</option>
+                                        <option value="amber">Amber</option>
+                                        <option value="rose">Rose</option>
+                                        <option value="purple">Purple</option>
+                                        <option value="indigo">Indigo</option>
+                                    </select>
+                                </div>
+
+                                <div className="flex items-center justify-between py-5 border-b border-slate-100 last:border-0">
+                                    <div className="flex items-center gap-4">
+                                        <div>
+                                            <h4 className="text-[15px] font-semibold text-slate-800">Metric Card 2 Color</h4>
+                                            <p className="text-[13px] text-slate-500">Total Companies Card Theme</p>
+                                        </div>
+                                    </div>
+                                    <select 
+                                        value={metric2Color}
+                                        onChange={(e) => {
+                                            setMetric2Color(e.target.value);
+                                            localStorage.setItem('saMetric2Color', e.target.value);
+                                        }}
+                                        className="bg-slate-50 border border-slate-200 text-slate-800 text-[14px] rounded-[3px] px-3 py-1.5 outline-none focus:border-[#0285fd] transition-colors"
+                                    >
+                                        <option value="blue">Blue</option>
+                                        <option value="emerald">Emerald</option>
+                                        <option value="amber">Amber</option>
+                                        <option value="rose">Rose</option>
+                                        <option value="purple">Purple</option>
+                                        <option value="indigo">Indigo</option>
+                                    </select>
+                                </div>
+
+                                <div className="flex items-center justify-between py-5 border-b border-slate-100 last:border-0">
+                                    <div className="flex items-center gap-4">
+                                        <div>
+                                            <h4 className="text-[15px] font-semibold text-slate-800">Metric Card 3 Color</h4>
+                                            <p className="text-[13px] text-slate-500">Total Entities Card Theme</p>
+                                        </div>
+                                    </div>
+                                    <select 
+                                        value={metric3Color}
+                                        onChange={(e) => {
+                                            setMetric3Color(e.target.value);
+                                            localStorage.setItem('saMetric3Color', e.target.value);
+                                        }}
+                                        className="bg-slate-50 border border-slate-200 text-slate-800 text-[14px] rounded-[3px] px-3 py-1.5 outline-none focus:border-[#0285fd] transition-colors"
+                                    >
+                                        <option value="blue">Blue</option>
+                                        <option value="emerald">Emerald</option>
+                                        <option value="amber">Amber</option>
+                                        <option value="rose">Rose</option>
+                                        <option value="purple">Purple</option>
+                                        <option value="indigo">Indigo</option>
                                     </select>
                                 </div>
                             </div>
@@ -336,14 +560,14 @@ const SuperAdminSettingsModal = ({
 
                     {activeTab === 'security' && (
                         <div className="animate-in fade-in zoom-in-95 duration-300 flex-1 flex flex-col overflow-y-auto pr-2 custom-scrollbar">
-                            <h3 className="text-xl font-bold text-slate-800 dark:text-white mb-6">Security</h3>
+                            <h3 className="text-xl font-bold text-slate-800 mb-6">Security</h3>
                             
                             <div className="space-y-0 mb-6">
-                                <div className="flex items-center justify-between py-5 border-b border-slate-100 dark:border-gray-800 last:border-0">
+                                <div className="flex items-center justify-between py-5 border-b border-slate-100 last:border-0">
                                     <div className="flex items-center gap-4">
                                         <div>
-                                            <h4 className="text-[15px] font-semibold text-slate-800 dark:text-white">Session Timeout</h4>
-                                            <p className="text-[13px] text-slate-500 dark:text-gray-400">Auto-logout duration</p>
+                                            <h4 className="text-[15px] font-semibold text-slate-800">Session Timeout</h4>
+                                            <p className="text-[13px] text-slate-500">Auto-logout duration</p>
                                         </div>
                                     </div>
                                     <select 
@@ -352,7 +576,7 @@ const SuperAdminSettingsModal = ({
                                             setSessionTimeout(e.target.value);
                                             localStorage.setItem('saSessionTimeout', e.target.value);
                                         }}
-                                        className="bg-slate-50 dark:bg-[#0f172a] border border-slate-200 dark:border-gray-700 text-slate-800 dark:text-white text-[14px] rounded-none px-3 py-1.5 outline-none focus:border-[#0285fd] transition-colors"
+                                        className="bg-slate-50 border border-slate-200 text-slate-800 text-[14px] rounded-[3px] px-3 py-1.5 outline-none focus:border-[#0285fd] transition-colors"
                                     >
                                         <option value="15">15 Minutes</option>
                                         <option value="30">30 Minutes</option>
@@ -361,24 +585,24 @@ const SuperAdminSettingsModal = ({
                                     </select>
                                 </div>
                                 
-                                <div className="flex items-center justify-between py-5 border-b border-slate-100 dark:border-gray-800 last:border-0">
+                                <div className="flex items-center justify-between py-5 border-b border-slate-100 last:border-0">
                                     <div className="flex items-center gap-4">
                                         <div>
-                                            <h4 className="text-[15px] font-semibold text-slate-800 dark:text-white">Two-Factor Auth</h4>
-                                            <p className="text-[13px] text-slate-500 dark:text-gray-400">Require 2FA for Super Admin</p>
+                                            <h4 className="text-[15px] font-semibold text-slate-800">Two-Factor Auth</h4>
+                                            <p className="text-[13px] text-slate-500">Require 2FA for Super Admin</p>
                                         </div>
                                     </div>
                                     <label className="relative inline-flex items-center cursor-pointer">
                                         <input type="checkbox" className="sr-only peer" checked={is2FAEnabled} onChange={handleToggle2FA} />
-                                        <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-[#0285fd]"></div>
+                                        <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#0285fd]"></div>
                                     </label>
                                 </div>
 
-                                <div className="flex items-center justify-between py-5 border-b border-slate-100 dark:border-gray-800 last:border-0">
+                                <div className="flex items-center justify-between py-5 border-b border-slate-100 last:border-0">
                                     <div className="flex items-center gap-4">
                                         <div>
-                                            <h4 className="text-[15px] font-semibold text-slate-800 dark:text-white">Activity Audit Log</h4>
-                                            <p className="text-[13px] text-slate-500 dark:text-gray-400">Track all admin actions</p>
+                                            <h4 className="text-[15px] font-semibold text-slate-800">Activity Audit Log</h4>
+                                            <p className="text-[13px] text-slate-500">Track all admin actions</p>
                                         </div>
                                     </div>
                                     <label className="relative inline-flex items-center cursor-pointer">
@@ -386,35 +610,67 @@ const SuperAdminSettingsModal = ({
                                             setAuditLogEnabled(e.target.checked);
                                             localStorage.setItem('saAuditLogEnabled', e.target.checked);
                                         }} />
-                                        <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-[#0285fd]"></div>
+                                        <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#0285fd]"></div>
+                                    </label>
+                                </div>
+
+                                <div className="flex items-center justify-between py-5 border-b border-slate-100 last:border-0">
+                                    <div className="flex items-center gap-4">
+                                        <div>
+                                            <h4 className="text-[15px] font-semibold text-slate-800">IP Whitelisting</h4>
+                                            <p className="text-[13px] text-slate-500">Restrict access to known IPs</p>
+                                        </div>
+                                    </div>
+                                    <label className="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" className="sr-only peer" checked={ipWhitelisting} onChange={(e) => {
+                                            setIpWhitelisting(e.target.checked);
+                                            localStorage.setItem('saIpWhitelisting', e.target.checked);
+                                        }} />
+                                        <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#0285fd]"></div>
+                                    </label>
+                                </div>
+
+                                <div className="flex items-center justify-between py-5 border-b border-slate-100 last:border-0">
+                                    <div className="flex items-center gap-4">
+                                        <div>
+                                            <h4 className="text-[15px] font-semibold text-slate-800">Strict Password Policy</h4>
+                                            <p className="text-[13px] text-slate-500">Require complex passwords globally</p>
+                                        </div>
+                                    </div>
+                                    <label className="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" className="sr-only peer" checked={strictPassword} onChange={(e) => {
+                                            setStrictPassword(e.target.checked);
+                                            localStorage.setItem('saStrictPassword', e.target.checked);
+                                        }} />
+                                        <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#0285fd]"></div>
                                     </label>
                                 </div>
                             </div>
                             
                             <form onSubmit={handlePasswordChange} className="space-y-4 flex-1 mt-4">
-                                <div className="py-5 border-t border-slate-100 dark:border-gray-800 space-y-4">
-                                    <div className="flex items-center gap-3 mb-4 text-slate-800 dark:text-white font-medium text-lg">
+                                <div className="py-5 border-t border-slate-100 space-y-4">
+                                    <div className="flex items-center gap-3 mb-4 text-slate-800 font-medium text-lg">
                                         <KeyRound size={20} className="text-[#0285fd]" /> Change Password
                                     </div>
                                     
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div className="md:col-span-2">
-                                            <label className="block text-[13px] font-medium text-slate-600 dark:text-gray-400 mb-1.5">Current Password</label>
-                                            <input type="password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} className="w-full bg-slate-50 dark:bg-[#0f172a] border border-slate-200 dark:border-gray-700 text-slate-800 dark:text-white text-[14px] rounded-none px-4 py-2.5 outline-none focus:border-[#0285fd] transition-colors" required />
+                                            <label className="block text-[13px] font-medium text-slate-600 mb-1.5">Current Password</label>
+                                            <input type="password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-[14px] rounded-[3px] px-4 py-2.5 outline-none focus:border-[#0285fd] transition-colors" required />
                                         </div>
                                         <div>
-                                            <label className="block text-[13px] font-medium text-slate-600 dark:text-gray-400 mb-1.5">New Password</label>
-                                            <input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} className="w-full bg-slate-50 dark:bg-[#0f172a] border border-slate-200 dark:border-gray-700 text-slate-800 dark:text-white text-[14px] rounded-none px-4 py-2.5 outline-none focus:border-[#0285fd] transition-colors" required />
+                                            <label className="block text-[13px] font-medium text-slate-600 mb-1.5">New Password</label>
+                                            <input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-[14px] rounded-[3px] px-4 py-2.5 outline-none focus:border-[#0285fd] transition-colors" required />
                                         </div>
                                         <div>
-                                            <label className="block text-[13px] font-medium text-slate-600 dark:text-gray-400 mb-1.5">Confirm New Password</label>
-                                            <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className="w-full bg-slate-50 dark:bg-[#0f172a] border border-slate-200 dark:border-gray-700 text-slate-800 dark:text-white text-[14px] rounded-none px-4 py-2.5 outline-none focus:border-[#0285fd] transition-colors" required />
+                                            <label className="block text-[13px] font-medium text-slate-600 mb-1.5">Confirm New Password</label>
+                                            <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-[14px] rounded-[3px] px-4 py-2.5 outline-none focus:border-[#0285fd] transition-colors" required />
                                         </div>
                                     </div>
                                 </div>
                                 
                                 <div className="flex justify-end pt-2">
-                                    <button type="submit" disabled={isChangingPassword} className="flex items-center gap-2 bg-[#0285fd] hover:bg-blue-600 disabled:opacity-50 text-white px-6 py-2.5 rounded-none text-[14px] font-bold transition-all shadow-md">
+                                    <button type="submit" disabled={isChangingPassword} className="flex items-center gap-2 bg-[#0285fd] hover:bg-blue-600 disabled:opacity-50 text-white px-6 py-2.5 rounded-[3px] text-[14px] font-bold transition-all shadow-md">
                                         {isChangingPassword ? 'Updating...' : 'Update Password'}
                                     </button>
                                 </div>
@@ -424,14 +680,14 @@ const SuperAdminSettingsModal = ({
 
                     {activeTab === 'preferences' && (
                         <div className="animate-in fade-in zoom-in-95 duration-300">
-                            <h3 className="text-xl font-bold text-slate-800 dark:text-white mb-6">Preferences</h3>
+                            <h3 className="text-xl font-bold text-slate-800 mb-6">Preferences</h3>
                             
                             <div className="space-y-0">
-                                <div className="flex items-center justify-between py-5 border-b border-slate-100 dark:border-gray-800 last:border-0">
+                                <div className="flex items-center justify-between py-5 border-b border-slate-100 last:border-0">
                                     <div className="flex items-center gap-4">
                                         <div>
-                                            <h4 className="text-[15px] font-semibold text-slate-800 dark:text-white">Default View</h4>
-                                            <p className="text-[13px] text-slate-500 dark:text-gray-400">Initial page after login</p>
+                                            <h4 className="text-[15px] font-semibold text-slate-800">Default View</h4>
+                                            <p className="text-[13px] text-slate-500">Initial page after login</p>
                                         </div>
                                     </div>
                                     <select 
@@ -440,7 +696,7 @@ const SuperAdminSettingsModal = ({
                                             setDefaultView(e.target.value);
                                             localStorage.setItem('saDefaultView', e.target.value);
                                         }}
-                                        className="bg-slate-50 dark:bg-[#0f172a] border border-slate-200 dark:border-gray-700 text-slate-800 dark:text-white text-[14px] rounded-none px-3 py-1.5 outline-none focus:border-[#0285fd] transition-colors"
+                                        className="bg-slate-50 border border-slate-200 text-slate-800 text-[14px] rounded-[3px] px-3 py-1.5 outline-none focus:border-[#0285fd] transition-colors"
                                     >
                                         <option value="Dashboard">Dashboard</option>
                                         <option value="Companies">Companies</option>
@@ -449,11 +705,11 @@ const SuperAdminSettingsModal = ({
                                     </select>
                                 </div>
 
-                                <div className="flex items-center justify-between py-5 border-b border-slate-100 dark:border-gray-800 last:border-0">
+                                <div className="flex items-center justify-between py-5 border-b border-slate-100 last:border-0">
                                     <div className="flex items-center gap-4">
                                         <div>
-                                            <h4 className="text-[15px] font-semibold text-slate-800 dark:text-white">Auto-Refresh Data</h4>
-                                            <p className="text-[13px] text-slate-500 dark:text-gray-400">Refresh every 5 minutes</p>
+                                            <h4 className="text-[15px] font-semibold text-slate-800">Auto-Refresh Data</h4>
+                                            <p className="text-[13px] text-slate-500">Refresh every 5 minutes</p>
                                         </div>
                                     </div>
                                     <label className="relative inline-flex items-center cursor-pointer">
@@ -461,15 +717,15 @@ const SuperAdminSettingsModal = ({
                                             setAutoRefresh(e.target.checked);
                                             localStorage.setItem('saAutoRefresh', e.target.checked);
                                         }} />
-                                        <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-[#0285fd]"></div>
+                                        <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#0285fd]"></div>
                                     </label>
                                 </div>
                                 
-                                <div className="flex items-center justify-between py-5 border-b border-slate-100 dark:border-gray-800 last:border-0">
+                                <div className="flex items-center justify-between py-5 border-b border-slate-100 last:border-0">
                                     <div className="flex items-center gap-4">
                                         <div>
-                                            <h4 className="text-[15px] font-semibold text-slate-800 dark:text-white">Push Notifications</h4>
-                                            <p className="text-[13px] text-slate-500 dark:text-gray-400">Receive alerts for important events</p>
+                                            <h4 className="text-[15px] font-semibold text-slate-800">Push Notifications</h4>
+                                            <p className="text-[13px] text-slate-500">Receive alerts for important events</p>
                                         </div>
                                     </div>
                                     <label className="relative inline-flex items-center cursor-pointer">
@@ -477,19 +733,24 @@ const SuperAdminSettingsModal = ({
                                             setNotificationsEnabled(e.target.checked);
                                             localStorage.setItem('saNotificationsEnabled', e.target.checked);
                                         }} />
-                                        <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-[#0285fd]"></div>
+                                        <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#0285fd]"></div>
                                     </label>
                                 </div>
                                 
-                                <div className="flex items-center justify-between py-5 border-b border-slate-100 dark:border-gray-800 last:border-0">
+                                <div className="flex items-center justify-between py-5 border-b border-slate-100 last:border-0">
                                     <div className="flex items-center gap-4">
                                         <div>
-                                            <h4 className="text-[15px] font-semibold text-slate-800 dark:text-white">Language</h4>
-                                            <p className="text-[13px] text-slate-500 dark:text-gray-400">Dashboard localization</p>
+                                            <h4 className="text-[15px] font-semibold text-slate-800">Language</h4>
+                                            <p className="text-[13px] text-slate-500">Dashboard localization</p>
                                         </div>
                                     </div>
                                     <select 
-                                        className="bg-slate-50 dark:bg-[#0f172a] border border-slate-200 dark:border-gray-700 text-slate-800 dark:text-white text-[14px] rounded-none px-3 py-1.5 outline-none focus:border-[#0285fd] transition-colors"
+                                        value={systemLanguage}
+                                        onChange={(e) => {
+                                            setSystemLanguage(e.target.value);
+                                            localStorage.setItem('saSystemLanguage', e.target.value);
+                                        }}
+                                        className="bg-slate-50 border border-slate-200 text-slate-800 text-[14px] rounded-[3px] px-3 py-1.5 outline-none focus:border-[#0285fd] transition-colors"
                                     >
                                         <option value="en">English</option>
                                         <option value="es">Spanish</option>
@@ -497,11 +758,11 @@ const SuperAdminSettingsModal = ({
                                     </select>
                                 </div>
 
-                                <div className="flex items-center justify-between py-5 border-b border-slate-100 dark:border-gray-800 last:border-0">
+                                <div className="flex items-center justify-between py-5 border-b border-slate-100 last:border-0">
                                     <div className="flex items-center gap-4">
                                         <div>
-                                            <h4 className="text-[15px] font-semibold text-slate-800 dark:text-white">Date Format</h4>
-                                            <p className="text-[13px] text-slate-500 dark:text-gray-400">System-wide date display</p>
+                                            <h4 className="text-[15px] font-semibold text-slate-800">Date Format</h4>
+                                            <p className="text-[13px] text-slate-500">System-wide date display</p>
                                         </div>
                                     </div>
                                     <select 
@@ -510,7 +771,7 @@ const SuperAdminSettingsModal = ({
                                             setDateFormat(e.target.value);
                                             localStorage.setItem('saDateFormat', e.target.value);
                                         }}
-                                        className="bg-slate-50 dark:bg-[#0f172a] border border-slate-200 dark:border-gray-700 text-slate-800 dark:text-white text-[14px] rounded-none px-3 py-1.5 outline-none focus:border-[#0285fd] transition-colors"
+                                        className="bg-slate-50 border border-slate-200 text-slate-800 text-[14px] rounded-[3px] px-3 py-1.5 outline-none focus:border-[#0285fd] transition-colors"
                                     >
                                         <option value="DD/MM/YYYY">DD/MM/YYYY</option>
                                         <option value="MM/DD/YYYY">MM/DD/YYYY</option>
@@ -518,11 +779,11 @@ const SuperAdminSettingsModal = ({
                                     </select>
                                 </div>
 
-                                <div className="flex items-center justify-between py-5 border-b border-slate-100 dark:border-gray-800 last:border-0">
+                                <div className="flex items-center justify-between py-5 border-b border-slate-100 last:border-0">
                                     <div className="flex items-center gap-4">
                                         <div>
-                                            <h4 className="text-[15px] font-semibold text-slate-800 dark:text-white">Currency</h4>
-                                            <p className="text-[13px] text-slate-500 dark:text-gray-400">Default currency symbol</p>
+                                            <h4 className="text-[15px] font-semibold text-slate-800">Currency</h4>
+                                            <p className="text-[13px] text-slate-500">Default currency symbol</p>
                                         </div>
                                     </div>
                                     <select 
@@ -531,12 +792,97 @@ const SuperAdminSettingsModal = ({
                                             setCurrencyFormat(e.target.value);
                                             localStorage.setItem('saCurrencyFormat', e.target.value);
                                         }}
-                                        className="bg-slate-50 dark:bg-[#0f172a] border border-slate-200 dark:border-gray-700 text-slate-800 dark:text-white text-[14px] rounded-none px-3 py-1.5 outline-none focus:border-[#0285fd] transition-colors"
+                                        className="bg-slate-50 border border-slate-200 text-slate-800 text-[14px] rounded-[3px] px-3 py-1.5 outline-none focus:border-[#0285fd] transition-colors"
                                     >
                                         <option value="USD">USD ($)</option>
                                         <option value="LKR">LKR (Rs)</option>
                                         <option value="EUR">EUR (€)</option>
                                         <option value="GBP">GBP (£)</option>
+                                    </select>
+                                </div>
+
+                                <div className="flex items-center justify-between py-5 border-b border-slate-100 last:border-0">
+                                    <div className="flex items-center gap-4">
+                                        <div>
+                                            <h4 className="text-[15px] font-semibold text-slate-800">Timezone</h4>
+                                            <p className="text-[13px] text-slate-500">System time display format</p>
+                                        </div>
+                                    </div>
+                                    <select 
+                                        value={timezone}
+                                        onChange={(e) => {
+                                            setTimezone(e.target.value);
+                                            localStorage.setItem('saTimezone', e.target.value);
+                                        }}
+                                        className="bg-slate-50 border border-slate-200 text-slate-800 text-[14px] rounded-[3px] px-3 py-1.5 outline-none focus:border-[#0285fd] transition-colors"
+                                    >
+                                        <option value="local">Local System Time</option>
+                                        <option value="UTC">UTC (Coordinated Universal Time)</option>
+                                        <option value="EST">EST (Eastern Standard Time)</option>
+                                        <option value="PST">PST (Pacific Standard Time)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {activeTab === 'system' && (
+                        <div className="animate-in fade-in zoom-in-95 duration-300">
+                            <h3 className="text-xl font-bold text-slate-800 mb-6">System & Advanced</h3>
+                            
+                            <div className="space-y-0">
+                                <div className="flex items-center justify-between py-5 border-b border-slate-100 last:border-0">
+                                    <div className="flex items-center gap-4">
+                                        <div>
+                                            <h4 className="text-[15px] font-semibold text-slate-800">Maintenance Mode</h4>
+                                            <p className="text-[13px] text-slate-500">Disable non-admin logins globally</p>
+                                        </div>
+                                    </div>
+                                    <label className="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" className="sr-only peer" checked={maintenanceMode} onChange={(e) => {
+                                            setMaintenanceMode(e.target.checked);
+                                            localStorage.setItem('saMaintenanceMode', e.target.checked);
+                                        }} />
+                                        <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-500"></div>
+                                    </label>
+                                </div>
+                                
+                                <div className="flex items-center justify-between py-5 border-b border-slate-100 last:border-0">
+                                    <div className="flex items-center gap-4">
+                                        <div>
+                                            <h4 className="text-[15px] font-semibold text-slate-800">Debug Logging</h4>
+                                            <p className="text-[13px] text-slate-500">Enable verbose frontend logging</p>
+                                        </div>
+                                    </div>
+                                    <label className="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" className="sr-only peer" checked={debugLogging} onChange={(e) => {
+                                            setDebugLogging(e.target.checked);
+                                            localStorage.setItem('saDebugLogging', e.target.checked);
+                                        }} />
+                                        <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-500"></div>
+                                    </label>
+                                </div>
+
+                                <div className="flex items-center justify-between py-5 border-b border-slate-100 last:border-0">
+                                    <div className="flex items-center gap-4">
+                                        <div>
+                                            <h4 className="text-[15px] font-semibold text-slate-800">Data Retention Policy</h4>
+                                            <p className="text-[13px] text-slate-500">Keep audit logs and backups for</p>
+                                        </div>
+                                    </div>
+                                    <select 
+                                        value={dataRetention}
+                                        onChange={(e) => {
+                                            setDataRetention(e.target.value);
+                                            localStorage.setItem('saDataRetention', e.target.value);
+                                        }}
+                                        className="bg-slate-50 border border-slate-200 text-slate-800 text-[14px] rounded-[3px] px-3 py-1.5 outline-none focus:border-[#0285fd] transition-colors"
+                                    >
+                                        <option value="30">30 Days</option>
+                                        <option value="60">60 Days</option>
+                                        <option value="90">90 Days</option>
+                                        <option value="180">6 Months</option>
+                                        <option value="365">1 Year</option>
                                     </select>
                                 </div>
                             </div>
@@ -556,10 +902,10 @@ const SuperAdminSettingsModal = ({
             {/* Enter Email for 2FA Sub-Modal */}
             {is2FAEmailModalOpen && (
                 <div className="fixed inset-0 z-[999999] flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setIs2FAEmailModalOpen(false)}></div>
-                    <div className="relative w-full max-w-sm bg-white dark:bg-[#0f172a] p-6 shadow-2xl animate-in zoom-in-95 duration-200 rounded-none">
-                        <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-4">Set up Email 2FA</h3>
-                        <p className="text-sm text-slate-600 dark:text-gray-400 mb-4">
+                    <div className="absolute inset-0 bg-slate-900/90" onClick={() => setIs2FAEmailModalOpen(false)}></div>
+                    <div className="relative w-full max-w-sm bg-white p-6 shadow-2xl animate-in zoom-in-95 duration-200 rounded-[5px]">
+                        <h3 className="text-lg font-bold text-slate-800 mb-4">Set up Email 2FA</h3>
+                        <p className="text-sm text-slate-600 mb-4">
                             Please enter your email address. We will send you a 6-digit verification code.
                         </p>
                         <div>
@@ -567,13 +913,13 @@ const SuperAdminSettingsModal = ({
                                 type="email" 
                                 value={setupEmail} 
                                 onChange={(e) => setSetupEmail(e.target.value)} 
-                                className="w-full bg-slate-50 dark:bg-[#1e293b] border border-slate-200 dark:border-gray-700 text-slate-800 dark:text-white text-[14px] rounded-none px-4 py-2 outline-none focus:border-[#0285fd] mb-4" 
+                                className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-[14px] rounded-[3px] px-4 py-2 outline-none focus:border-[#0285fd] mb-4" 
                                 placeholder="your.email@example.com"
                             />
                         </div>
                         <div className="flex gap-2 justify-end">
-                            <button onClick={() => setIs2FAEmailModalOpen(false)} className="px-4 py-2 bg-slate-200 dark:bg-gray-800 text-slate-700 dark:text-gray-300 rounded-none text-sm font-medium hover:bg-slate-300 dark:hover:bg-gray-700">Cancel</button>
-                            <button onClick={handleSendSetupEmail} disabled={!setupEmail || !setupEmail.includes('@')} className="px-4 py-2 bg-[#0285fd] text-white rounded-none text-sm font-medium hover:bg-blue-600 disabled:opacity-50">Send Code</button>
+                            <button onClick={() => setIs2FAEmailModalOpen(false)} className="px-4 py-2 bg-slate-200 text-slate-700 rounded-[3px] text-sm font-medium hover:bg-slate-300">Cancel</button>
+                            <button onClick={handleSendSetupEmail} disabled={!setupEmail || !setupEmail.includes('@')} className="px-4 py-2 bg-[#0285fd] text-white rounded-[3px] text-sm font-medium hover:bg-blue-600 disabled:opacity-50">Send Code</button>
                         </div>
                     </div>
                 </div>
@@ -582,26 +928,26 @@ const SuperAdminSettingsModal = ({
             {/* Enable 2FA Verify OTP Sub-Modal */}
             {is2FAModalOpen && (
                 <div className="fixed inset-0 z-[999999] flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setIs2FAModalOpen(false)}></div>
-                    <div className="relative w-full max-w-sm bg-white dark:bg-[#0f172a] p-6 shadow-2xl animate-in zoom-in-95 duration-200 rounded-none">
-                        <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-4">Verify Email</h3>
-                        <p className="text-sm text-slate-600 dark:text-gray-400 mb-4">
+                    <div className="absolute inset-0 bg-slate-900/90" onClick={() => setIs2FAModalOpen(false)}></div>
+                    <div className="relative w-full max-w-sm bg-white p-6 shadow-2xl animate-in zoom-in-95 duration-200 rounded-[5px]">
+                        <h3 className="text-lg font-bold text-slate-800 mb-4">Verify Email</h3>
+                        <p className="text-sm text-slate-600 mb-4">
                             We've sent a verification code to <span className="font-semibold">{setupEmail}</span>.
                         </p>
                         <div>
-                            <label className="block text-[13px] font-medium text-slate-600 dark:text-gray-400 mb-1.5">Enter 6-digit code</label>
+                            <label className="block text-[13px] font-medium text-slate-600 mb-1.5">Enter 6-digit code</label>
                             <input 
                                 type="text" 
                                 value={twoFAOTP} 
                                 onChange={(e) => setTwoFAOTP(e.target.value)} 
-                                className="w-full bg-slate-50 dark:bg-[#1e293b] border border-slate-200 dark:border-gray-700 text-slate-800 dark:text-white text-[14px] rounded-none px-4 py-2 outline-none focus:border-[#0285fd] text-center tracking-widest font-mono mb-4" 
+                                className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-[14px] rounded-[3px] px-4 py-2 outline-none focus:border-[#0285fd] text-center tracking-widest font-mono mb-4" 
                                 maxLength={6}
                                 placeholder="000000"
                             />
                         </div>
                         <div className="flex gap-2 justify-end">
-                            <button onClick={() => setIs2FAModalOpen(false)} className="px-4 py-2 bg-slate-200 dark:bg-gray-800 text-slate-700 dark:text-gray-300 rounded-none text-sm font-medium hover:bg-slate-300 dark:hover:bg-gray-700">Cancel</button>
-                            <button onClick={handleEnable2FAEmail} disabled={twoFAOTP.length !== 6} className="px-4 py-2 bg-[#0285fd] text-white rounded-none text-sm font-medium hover:bg-blue-600 disabled:opacity-50">Verify & Enable</button>
+                            <button onClick={() => setIs2FAModalOpen(false)} className="px-4 py-2 bg-slate-200 text-slate-700 rounded-[3px] text-sm font-medium hover:bg-slate-300">Cancel</button>
+                            <button onClick={handleEnable2FAEmail} disabled={twoFAOTP.length !== 6} className="px-4 py-2 bg-[#0285fd] text-white rounded-[3px] text-sm font-medium hover:bg-blue-600 disabled:opacity-50">Verify & Enable</button>
                         </div>
                     </div>
                 </div>
@@ -610,30 +956,30 @@ const SuperAdminSettingsModal = ({
             {/* Select 2FA Method Modal */}
             {is2FAMethodModalOpen && (
                 <div className="fixed inset-0 z-[999999] flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setIs2FAMethodModalOpen(false)}></div>
-                    <div className="relative w-full max-w-sm bg-white dark:bg-[#0f172a] p-6 shadow-2xl animate-in zoom-in-95 duration-200 rounded-none">
-                        <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-4">Choose 2FA Method</h3>
-                        <p className="text-sm text-slate-600 dark:text-gray-400 mb-6">
+                    <div className="absolute inset-0 bg-slate-900/90" onClick={() => setIs2FAMethodModalOpen(false)}></div>
+                    <div className="relative w-full max-w-sm bg-white p-6 shadow-2xl animate-in zoom-in-95 duration-200 rounded-[5px]">
+                        <h3 className="text-lg font-bold text-slate-800 mb-4">Choose 2FA Method</h3>
+                        <p className="text-sm text-slate-600 mb-6">
                             How would you like to receive your verification codes?
                         </p>
                         <div className="flex flex-col gap-3 mb-4">
                             <button 
                                 onClick={() => handleSelect2FAMethod('APP')} 
-                                className="w-full text-left px-4 py-3 bg-slate-50 hover:bg-slate-100 dark:bg-[#1e293b] dark:hover:bg-gray-800 border border-slate-200 dark:border-gray-700 rounded-none transition-colors"
+                                className="w-full text-left px-4 py-3 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-[3px] transition-colors"
                             >
-                                <span className="block font-bold text-slate-800 dark:text-white mb-1">Authenticator App</span>
+                                <span className="block font-bold text-slate-800 mb-1">Authenticator App</span>
                                 <span className="block text-xs text-slate-500">Google Authenticator, Authy, etc.</span>
                             </button>
                             <button 
                                 onClick={() => handleSelect2FAMethod('EMAIL')} 
-                                className="w-full text-left px-4 py-3 bg-slate-50 hover:bg-slate-100 dark:bg-[#1e293b] dark:hover:bg-gray-800 border border-slate-200 dark:border-gray-700 rounded-none transition-colors"
+                                className="w-full text-left px-4 py-3 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-[3px] transition-colors"
                             >
-                                <span className="block font-bold text-slate-800 dark:text-white mb-1">Email Verification</span>
+                                <span className="block font-bold text-slate-800 mb-1">Email Verification</span>
                                 <span className="block text-xs text-slate-500">Receive a 6-digit code via email.</span>
                             </button>
                         </div>
                         <div className="flex justify-end mt-4">
-                            <button onClick={() => setIs2FAMethodModalOpen(false)} className="px-4 py-2 bg-slate-200 dark:bg-gray-800 text-slate-700 dark:text-gray-300 rounded-none text-sm font-medium hover:bg-slate-300 dark:hover:bg-gray-700">Cancel</button>
+                            <button onClick={() => setIs2FAMethodModalOpen(false)} className="px-4 py-2 bg-slate-200 text-slate-700 rounded-[3px] text-sm font-medium hover:bg-slate-300">Cancel</button>
                         </div>
                     </div>
                 </div>
@@ -643,34 +989,34 @@ const SuperAdminSettingsModal = ({
             {is2FAAppModalOpen && twoFASetupData && (
                 <div className="fixed inset-0 z-[999999] flex items-center justify-center p-4">
                     <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setIs2FAAppModalOpen(false)}></div>
-                    <div className="relative w-full max-w-sm bg-white dark:bg-[#0f172a] p-6 shadow-2xl animate-in zoom-in-95 duration-200 rounded-none">
-                        <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-4">Set up Authenticator App</h3>
-                        <p className="text-sm text-slate-600 dark:text-gray-400 mb-4">
+                    <div className="relative w-full max-w-sm bg-white p-6 shadow-2xl animate-in zoom-in-95 duration-200 rounded-[5px]">
+                        <h3 className="text-lg font-bold text-slate-800 mb-4">Set up Authenticator App</h3>
+                        <p className="text-sm text-slate-600 mb-4">
                             Scan the QR code below with your authenticator app (like Google Authenticator).
                         </p>
                         <div className="flex justify-center mb-4 bg-white p-2 border border-slate-200">
                             <img src={twoFASetupData.qrCode} alt="2FA QR Code" className="w-48 h-48" />
                         </div>
                         <div className="mb-4 text-center">
-                            <span className="text-xs text-slate-500 dark:text-gray-400">Or enter this code manually:</span>
-                            <div className="font-mono bg-slate-100 dark:bg-gray-800 p-2 mt-1 text-slate-800 dark:text-white text-sm select-all">
+                            <span className="text-xs text-slate-500">Or enter this code manually:</span>
+                            <div className="font-mono bg-slate-100 p-2 mt-1 text-slate-800 text-sm select-all">
                                 {twoFASetupData.secret}
                             </div>
                         </div>
                         <div>
-                            <label className="block text-[13px] font-medium text-slate-600 dark:text-gray-400 mb-1.5">Enter 6-digit code</label>
+                            <label className="block text-[13px] font-medium text-slate-600 mb-1.5">Enter 6-digit code</label>
                             <input 
                                 type="text" 
                                 value={twoFAOTP} 
                                 onChange={(e) => setTwoFAOTP(e.target.value)} 
-                                className="w-full bg-slate-50 dark:bg-[#1e293b] border border-slate-200 dark:border-gray-700 text-slate-800 dark:text-white text-[14px] rounded-none px-4 py-2 outline-none focus:border-[#0285fd] text-center tracking-widest font-mono mb-4" 
+                                className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-[14px] rounded-[3px] px-4 py-2 outline-none focus:border-[#0285fd] text-center tracking-widest font-mono mb-4" 
                                 maxLength={6}
                                 placeholder="000000"
                             />
                         </div>
                         <div className="flex gap-2 justify-end">
-                            <button onClick={() => setIs2FAAppModalOpen(false)} className="px-4 py-2 bg-slate-200 dark:bg-gray-800 text-slate-700 dark:text-gray-300 rounded-none text-sm font-medium hover:bg-slate-300 dark:hover:bg-gray-700">Cancel</button>
-                            <button onClick={handleEnable2FAApp} disabled={twoFAOTP.length !== 6} className="px-4 py-2 bg-[#0285fd] text-white rounded-none text-sm font-medium hover:bg-blue-600 disabled:opacity-50">Verify & Enable</button>
+                            <button onClick={() => setIs2FAAppModalOpen(false)} className="px-4 py-2 bg-slate-200 text-slate-700 rounded-[3px] text-sm font-medium hover:bg-slate-300">Cancel</button>
+                            <button onClick={handleEnable2FAApp} disabled={twoFAOTP.length !== 6} className="px-4 py-2 bg-[#0285fd] text-white rounded-[3px] text-sm font-medium hover:bg-blue-600 disabled:opacity-50">Verify & Enable</button>
                         </div>
                     </div>
                 </div>
@@ -680,9 +1026,9 @@ const SuperAdminSettingsModal = ({
             {isDisable2FAModalOpen && (
                 <div className="fixed inset-0 z-[999999] flex items-center justify-center p-4">
                     <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setIsDisable2FAModalOpen(false)}></div>
-                    <div className="relative w-full max-w-sm bg-white dark:bg-[#0f172a] p-6 shadow-2xl animate-in zoom-in-95 duration-200 rounded-none">
-                        <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-4">Disable 2FA</h3>
-                        <p className="text-sm text-slate-600 dark:text-gray-400 mb-4">
+                    <div className="relative w-full max-w-sm bg-white p-6 shadow-2xl animate-in zoom-in-95 duration-200 rounded-[5px]">
+                        <h3 className="text-lg font-bold text-slate-800 mb-4">Disable 2FA</h3>
+                        <p className="text-sm text-slate-600 mb-4">
                             Please enter your password to disable Two-Factor Authentication.
                         </p>
                         <div>
@@ -690,13 +1036,13 @@ const SuperAdminSettingsModal = ({
                                 type="password" 
                                 value={disable2FAPassword} 
                                 onChange={(e) => setDisable2FAPassword(e.target.value)} 
-                                className="w-full bg-slate-50 dark:bg-[#1e293b] border border-slate-200 dark:border-gray-700 text-slate-800 dark:text-white text-[14px] rounded-none px-4 py-2 outline-none focus:border-[#0285fd] mb-4" 
+                                className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-[14px] rounded-[3px] px-4 py-2 outline-none focus:border-[#0285fd] mb-4" 
                                 placeholder="Your password"
                             />
                         </div>
                         <div className="flex gap-2 justify-end">
-                            <button onClick={() => setIsDisable2FAModalOpen(false)} className="px-4 py-2 bg-slate-200 dark:bg-gray-800 text-slate-700 dark:text-gray-300 rounded-none text-sm font-medium hover:bg-slate-300 dark:hover:bg-gray-700">Cancel</button>
-                            <button onClick={handleDisable2FA} disabled={!disable2FAPassword} className="px-4 py-2 bg-red-500 text-white rounded-none text-sm font-medium hover:bg-red-600 disabled:opacity-50">Disable 2FA</button>
+                            <button onClick={() => setIsDisable2FAModalOpen(false)} className="px-4 py-2 bg-slate-200 text-slate-700 rounded-[3px] text-sm font-medium hover:bg-slate-300">Cancel</button>
+                            <button onClick={handleDisable2FA} disabled={!disable2FAPassword} className="px-4 py-2 bg-red-500 text-white rounded-[3px] text-sm font-medium hover:bg-red-600 disabled:opacity-50">Disable 2FA</button>
                         </div>
                     </div>
                 </div>

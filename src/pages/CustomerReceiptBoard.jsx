@@ -9,6 +9,7 @@ import { salesOrderService } from '../services/salesOrder.service';
 import { getSessionData } from '../utils/session';
 import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
 import TransactionReceiptModal from '../components/modals/TransactionReceiptModal';
+import SearchableSelect from '../components/SearchableSelect';
 
 const SearchModal = ({ isOpen, onClose, title, items, searchQuery, setSearchQuery, onSelect, codeKey, nameKey, searchPlaceholder = '' }) => {
     if (!isOpen) return null;

@@ -6,6 +6,7 @@ import { Download, RotateCcw, Search, Calendar, Database, Filter, Loader2 } from
 import { inventoryDownloadService } from '../services/inventoryDownload.service';
 import { getSessionData } from '../utils/session';
 import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
+import SearchableSelect from '../components/SearchableSelect';
 
 
 const SearchModal = ({ isOpen, onClose, title, items, onSelect, searchPlaceholder = "Search by code or name..." }) => {

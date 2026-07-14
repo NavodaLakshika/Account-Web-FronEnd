@@ -72,6 +72,7 @@ const AIChatbotBoard = ({ isOpen, onClose, position = 'center', onAction }) => {
     const fileInputRef = useRef(null);
 
     const [showMenu, setShowMenu] = useState(false);
+    const [showRecentPopup, setShowRecentPopup] = useState(false);
 
     // Sync history to localStorage
     useEffect(() => {
@@ -445,7 +446,7 @@ When the user asks "show me", "list", "find", "search" for data, use the live da
                 
                 {/* Sidebar */}
                 {!sidebarCollapsed && (
-                    <div className="w-[260px] border-r border-slate-100 flex flex-col shrink-0 animate-in slide-in-from-left-4 duration-300">
+                    <div className="w-[10px] overflow-hidden border-r border-slate-100 flex flex-col shrink-0 animate-in slide-in-from-left-4 duration-300">
                         <div className="p-4">
                             <button 
                                 className="w-full flex items-center gap-3 px-4 py-2.5 text-[14px] text-slate-700 font-medium hover:bg-slate-50 rounded-[3px] transition-colors"
@@ -677,7 +678,7 @@ When the user asks "show me", "list", "find", "search" for data, use the live da
                                     >
                                         <Plus size={20} />
                                     </button>
-                                    <div className="">
+                                    <div className="flex items-center gap-2">
                                         <button 
                                             type="button"
                                             onClick={() => setIsRecording(!isRecording)}

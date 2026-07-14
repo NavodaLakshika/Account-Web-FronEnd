@@ -4,6 +4,7 @@ import { X, Save, RotateCcw, Search, Database, Folder, HardDrive, ArrowLeft, Che
 import { backupService } from '../services/backup.service';
 import { getSessionData } from '../utils/session';
 import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
+import SearchableSelect from '../components/SearchableSelect';
 
 
 const DatabaseSearchModal = ({ isOpen, onClose, items, onSelect }) => {
@@ -15,7 +16,8 @@ const DatabaseSearchModal = ({ isOpen, onClose, items, onSelect }) => {
     if (!isOpen) return null;
 
     return (
-        <SimpleModal isOpen={isOpen} onClose={onClose} title="Database Instance Lookup">
+        {/* TODO: Replaced with SearchableSelect 
+ <SimpleModal isOpen={isOpen} onClose={onClose} title="Database Instance Lookup">
             <div className="space-y-4 font-['Tahoma']">
                 <div className="flex items-center gap-4 bg-slate-50 p-4 border-b border-gray-100 mb-2">
                     <span className="text-[12px] font-bold text-gray-500 uppercase tracking-wider shrink-0">Search</span>
@@ -48,7 +50,8 @@ const DatabaseSearchModal = ({ isOpen, onClose, items, onSelect }) => {
                     </div>
                 </div>
             </div>
-        </SimpleModal>
+        </SimpleModal> 
+*/}
     );
 };
 
