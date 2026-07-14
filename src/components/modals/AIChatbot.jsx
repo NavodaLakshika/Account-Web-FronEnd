@@ -189,7 +189,7 @@ const AIChatbot = ({ isOpen, onClose }) => {
                     
                     {/* Sidebar (Only in Fullscreen mode) */}
                     {isFullscreen && showSidebar && (
-                        <div className="w-[260px] border-r border-slate-100 flex flex-col shrink-0 animate-in slide-in-from-left-4 duration-300">
+                        <div className="w-[200px] border-r border-slate-100 flex flex-col shrink-0 animate-in slide-in-from-left-4 duration-300">
                             <div className="p-4">
                                 <button 
                                     className="w-full flex items-center gap-3 px-4 py-2.5 text-[14px] text-slate-700 font-medium hover:bg-slate-50 rounded-[3px] transition-colors"

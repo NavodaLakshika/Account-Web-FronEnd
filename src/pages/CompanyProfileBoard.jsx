@@ -5,6 +5,7 @@ import CalendarModal from '../components/CalendarModal';
 import { authService } from '../services/auth.service';
 import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
 import TransactionFormWrapper from '../components/TransactionFormWrapper';
+import SearchableSelect from '../components/SearchableSelect';
 
 const orgTypes = [
     { code: 'CORP', name: 'Corporation' }, { code: 'PART', name: 'Partnership' }, { code: 'SOLE', name: 'Sole Proprietorship' }

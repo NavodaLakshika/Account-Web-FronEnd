@@ -405,7 +405,7 @@ const TransactionEditorModal = ({ isOpen, onClose }) => {
                                 <tbody>
                                     {rows.length === 0 ? (
                                         <tr>
-                                            <td colSpan="5" className="text-center py-12 text-gray-300 font-black italic text-[11px] uppercase tracking-widest">
+                                            <td colSpan="5" className="text-center h-[120px] align-middle text-gray-300 font-black text-[11px] uppercase tracking-widest">
                                                 No transaction lines available. Add a line below.
                                             </td>
                                         </tr>

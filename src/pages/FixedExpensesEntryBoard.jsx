@@ -6,6 +6,7 @@ import { fixedExpensesService } from '../services/fixedExpenses.service';
 import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
 import { getCompanyCode } from '../utils/session';
 import TransactionFormWrapper from '../components/TransactionFormWrapper';
+import SearchableSelect from '../components/SearchableSelect';
 
 const FixedExpensesEntryBoard = ({ isOpen, onClose }) => {
     const initialState = {

@@ -4,6 +4,7 @@ import TransactionFormWrapper from '../components/TransactionFormWrapper';
 import SimpleModal from '../components/SimpleModal';
 import { vendorTypeService } from '../services/vendorType.service';
 import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
+import SearchableSelect from '../components/SearchableSelect';
 
 const VendorTypesMasterBoard = ({ isOpen, onClose }) => {
     const initialState = { VendorType: '', PaybleAccCode: '', PaybleAccName: '', CurrentUser: '', Company: '', Loca: '01' };

@@ -12,6 +12,7 @@ import { getSessionData } from '../utils/session';
 import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
 import SalesInvoiceDetailModal from '../components/SalesInvoiceDetailModal';
 import TransactionFormWrapper from '../components/TransactionFormWrapper';
+import SearchableSelect from '../components/SearchableSelect';
 
 const SalesInvoiceBoard = ({ isOpen, onClose }) => {
     const [lookups, setLookups] = useState({ customers: [], products: [], paymentMethods: [], salesAssistants: [], salesOrders: [], taxAccounts: [] });

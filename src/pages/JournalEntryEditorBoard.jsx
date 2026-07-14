@@ -6,6 +6,7 @@ import { Search, RotateCcw, Calendar, Check, Trash2, Plus, Save, Loader2, FileEd
 import { journalEntryEditorService } from '../services/journalEntryEditor.service';
 import { getSessionData } from '../utils/session';
 import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
+import SearchableSelect from '../components/SearchableSelect';
 
 
 const SearchModal = ({ isOpen, onClose, title, items, onSelect, searchPlaceholder = "Search by code or name..." }) => {

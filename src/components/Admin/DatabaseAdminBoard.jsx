@@ -169,7 +169,7 @@ const DatabaseAdminBoard = () => {
 
     const getBackupStatusIcon = (status) => {
         const isFailed = status?.toLowerCase() === 'failed';
-        return isFailed ? 'bg-red-600/20 text-red-400 border-red-500/50' : 'bg-emerald-600/20 text-emerald-400 border-emerald-500/50';
+        return isFailed ? 'bg-red-50 text-red-600 border-red-200' : 'bg-emerald-50 text-emerald-600 border-emerald-200';
     };
 
     const maintenanceOps = [
@@ -198,23 +198,23 @@ const DatabaseAdminBoard = () => {
         .slice(0, 10);
 
     return (
-        <div className="bg-white dark:bg-[#0f172a]/50 backdrop-blur-md shadow-lg border border-slate-200 dark:border-[#334155] flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-2 duration-300 pb-6 rounded-none-[12px] overflow-hidden mb-6">
+        <div className="bg-white shadow-sm border border-slate-200/80 flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-2 duration-300 pb-6 rounded-[5px] overflow-hidden mb-6">
             {/* Header */}
-            <div className="px-6 py-4 border-b border-slate-200 dark:border-[#334155] flex items-center justify-between bg-white dark:bg-[#0f172a]/50">
+            <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-blue-500/20 flex items-center justify-center rounded-none">
-                        <Database className="w-4 h-4 text-blue-300" />
+                    <div className="w-8 h-8 bg-blue-50 flex items-center justify-center rounded-[5px]">
+                        <Database className="w-4 h-4 text-blue-600" />
                     </div>
                     <div>
-                        <h2 className="text-[15px] font-bold text-slate-800 dark:text-white">Database Management</h2>
-                        <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Manage system backups, optimize performance, and monitor database health</p>
+                        <h2 className="text-[15px] font-bold text-slate-800">Database Management</h2>
+                        <p className="text-[11px] text-slate-500 font-medium">Manage system backups, optimize performance, and monitor database health</p>
                     </div>
                 </div>
                 <div className="flex items-center gap-3 self-start">
                     <button
                         onClick={fetchBackups}
                         disabled={loadingHistory}
-                        className="px-4 py-2.5 bg-slate-200 dark:bg-white/10 hover:bg-white/20 text-slate-800 dark:text-white text-xs font-bold rounded-none transition-all flex items-center gap-2"
+                        className="px-4 py-2.5 bg-slate-500 hover:bg-slate-400 text-white text-xs font-bold rounded-[3px] transition-all flex items-center gap-2 shadow-sm"
                         title="Refresh backup history"
                     >
                         <RefreshCw size={14} className={loadingHistory ? 'animate-spin' : ''} />
@@ -223,7 +223,7 @@ const DatabaseAdminBoard = () => {
                     <button
                         onClick={handleCreateBackup}
                         disabled={creatingBackup}
-                        className="px-5 py-2.5 bg-[#0078d4] hover:bg-[#005a9e] text-white text-xs font-bold shadow-sm rounded-none transition-all flex items-center gap-2 disabled:opacity-50"
+                        className="px-5 py-2.5 bg-[#0078d4] hover:bg-[#005a9e] text-white text-xs font-bold shadow-sm rounded-[3px] transition-all flex items-center gap-2 disabled:opacity-50"
                     >
                         {creatingBackup ? (
                             <><Loader2 className="animate-spin" size={14} /> Creating...</>
@@ -236,49 +236,49 @@ const DatabaseAdminBoard = () => {
 
             {/* Metric Cards */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mx-6">
-                <div className="bg-white dark:bg-[#0f172a]/50 border border-slate-200 dark:border-[#334155] p-5 flex flex-col justify-between">
+                <div className="bg-white border border-slate-200 p-5 flex flex-col justify-between rounded-[5px]">
                     <div className="flex items-center justify-between mb-4">
-                        <div className="w-10 h-10 bg-blue-500/10 flex items-center justify-center border border-blue-500/20">
-                            <HardDrive className="w-5 h-5 text-blue-400" />
+                        <div className="w-10 h-10 bg-blue-50 flex items-center justify-center border border-blue-200 rounded-[3px]">
+                            <HardDrive className="w-5 h-5 text-blue-600" />
                         </div>
-                        <span className="px-2 py-1 bg-emerald-600/20 text-emerald-400 text-[9px] font-black uppercase tracking-widest border border-emerald-500/50">Healthy</span>
+                        <span className="px-2 py-1 bg-emerald-50 text-emerald-600 text-[9px] font-black uppercase tracking-widest border border-emerald-200 rounded-[3px]">Healthy</span>
                     </div>
                     <div>
-                        <h3 className="text-slate-500 dark:text-slate-400 text-[10px] font-black uppercase tracking-widest mb-1">Database Size</h3>
-                        <p className="text-2xl font-black text-slate-800 dark:text-white">{loadingMetrics ? <Loader2 className="w-5 h-5 animate-spin inline" /> : dbSize}</p>
+                        <h3 className="text-slate-500 text-[10px] font-black uppercase tracking-widest mb-1">Database Size</h3>
+                        <p className="text-2xl font-black text-slate-800">{loadingMetrics ? <Loader2 className="w-5 h-5 animate-spin inline" /> : dbSize}</p>
                     </div>
                 </div>
-                <div className="bg-white dark:bg-[#0f172a]/50 border border-slate-200 dark:border-[#334155] p-5 flex flex-col justify-between">
+                <div className="bg-white border border-slate-200 p-5 flex flex-col justify-between rounded-[5px]">
                     <div className="flex items-center justify-between mb-4">
-                        <div className="w-10 h-10 bg-purple-500/10 flex items-center justify-center border border-purple-500/20">
-                            <Users className="w-5 h-5 text-purple-400" />
+                        <div className="w-10 h-10 bg-purple-50 flex items-center justify-center border border-purple-200 rounded-[3px]">
+                            <Users className="w-5 h-5 text-purple-600" />
                         </div>
                     </div>
                     <div>
-                        <h3 className="text-slate-500 dark:text-slate-400 text-[10px] font-black uppercase tracking-widest mb-1">Total Records</h3>
-                        <p className="text-2xl font-black text-slate-800 dark:text-white">{totalRecords}</p>
+                        <h3 className="text-slate-500 text-[10px] font-black uppercase tracking-widest mb-1">Total Records</h3>
+                        <p className="text-2xl font-black text-slate-800">{totalRecords}</p>
                     </div>
                 </div>
-                <div className="bg-white dark:bg-[#0f172a]/50 border border-slate-200 dark:border-[#334155] p-5 flex flex-col justify-between">
+                <div className="bg-white border border-slate-200 p-5 flex flex-col justify-between rounded-[5px]">
                     <div className="flex items-center justify-between mb-4">
-                        <div className="w-10 h-10 bg-orange-500/10 flex items-center justify-center border border-orange-500/20">
-                            <Wifi className="w-5 h-5 text-orange-400" />
+                        <div className="w-10 h-10 bg-orange-50 flex items-center justify-center border border-orange-200 rounded-[3px]">
+                            <Wifi className="w-5 h-5 text-orange-600" />
                         </div>
                     </div>
                     <div>
-                        <h3 className="text-slate-500 dark:text-slate-400 text-[10px] font-black uppercase tracking-widest mb-1">Active Connections</h3>
-                        <p className="text-2xl font-black text-slate-800 dark:text-white">{activeConnections}</p>
+                        <h3 className="text-slate-500 text-[10px] font-black uppercase tracking-widest mb-1">Active Connections</h3>
+                        <p className="text-2xl font-black text-slate-800">{activeConnections}</p>
                     </div>
                 </div>
-                <div className="bg-white dark:bg-[#0f172a]/50 border border-slate-200 dark:border-[#334155] p-5 flex flex-col justify-between">
+                <div className="bg-white border border-slate-200 p-5 flex flex-col justify-between rounded-[5px]">
                     <div className="flex items-center justify-between mb-4">
-                        <div className="w-10 h-10 bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20">
-                            <CheckCircle className="w-5 h-5 text-emerald-400" />
+                        <div className="w-10 h-10 bg-emerald-50 flex items-center justify-center border border-emerald-200 rounded-[3px]">
+                            <CheckCircle className="w-5 h-5 text-emerald-600" />
                         </div>
                     </div>
                     <div>
-                        <h3 className="text-slate-500 dark:text-slate-400 text-[10px] font-black uppercase tracking-widest mb-1">Last Backup</h3>
-                        <p className="text-lg font-black text-slate-800 dark:text-white leading-tight">{lastBackupTime === 'No Backups' ? 'No Backups' : formatDate(lastBackupTime)}</p>
+                        <h3 className="text-slate-500 text-[10px] font-black uppercase tracking-widest mb-1">Last Backup</h3>
+                        <p className="text-lg font-black text-slate-800 leading-tight">{lastBackupTime === 'No Backups' ? 'No Backups' : formatDate(lastBackupTime)}</p>
                     </div>
                 </div>
             </div>
@@ -286,28 +286,28 @@ const DatabaseAdminBoard = () => {
             {/* Maintenance + Backup History */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mx-6">
                 {/* Maintenance Operations */}
-                <div className="bg-white dark:bg-[#0f172a]/50 border border-slate-200 dark:border-[#334155] p-6">
-                    <h3 className="text-sm font-black text-slate-800 dark:text-white uppercase tracking-widest mb-4 flex items-center gap-2">
-                        <Activity size={14} className="text-blue-400" />
+                <div className="bg-white border border-slate-200 p-6 rounded-[5px]">
+                    <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest mb-4 flex items-center gap-2">
+                        <Activity size={14} className="text-blue-600" />
                         Maintenance Operations
                     </h3>
                     <div className="flex flex-col gap-3">
                         {maintenanceOps.map(op => {
                             const Icon = op.icon;
                             return (
-                                <div key={op.id} className="flex items-center justify-between p-4 bg-slate-200/50 dark:bg-black/40 border border-slate-200 dark:border-[#334155]">
+                                <div key={op.id} className="flex items-center justify-between p-4 bg-slate-50 border border-slate-200 hover:bg-slate-100 transition-colors rounded-[3px]">
                                     <div className="flex items-start gap-3">
-                                        <div className="w-8 h-8 bg-blue-500/10 flex items-center justify-center border border-blue-500/20 shrink-0 mt-0.5">
-                                            <Icon size={14} className="text-blue-400" />
+                                        <div className="w-8 h-8 bg-blue-50 flex items-center justify-center border border-blue-200 shrink-0 mt-0.5 rounded-[3px]">
+                                            <Icon size={14} className="text-blue-600" />
                                         </div>
                                         <div>
-                                            <h4 className="text-xs font-bold text-slate-800 dark:text-white">{op.label}</h4>
-                                            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">{op.desc}</p>
+                                            <h4 className="text-xs font-bold text-slate-800">{op.label}</h4>
+                                            <p className="text-[11px] text-slate-500 mt-0.5">{op.desc}</p>
                                         </div>
                                     </div>
                                     <button
                                         onClick={() => handleRunMaintenance(op.label)}
-                                        className="px-4 py-2 bg-blue-600/20 hover:bg-blue-600/40 text-blue-400 border border-blue-500/50 text-xs font-bold transition-all rounded-none uppercase tracking-wider shrink-0 ml-4"
+                                        className="px-4 py-2 bg-[#0078d4] hover:bg-[#005a9e] text-white text-xs font-bold transition-all rounded-[3px] uppercase tracking-wider shrink-0 ml-4 shadow-sm"
                                     >
                                         Run Now
                                     </button>
@@ -318,9 +318,9 @@ const DatabaseAdminBoard = () => {
                 </div>
 
                 {/* Recent Backups */}
-                <div className="bg-white dark:bg-[#0f172a]/50 border border-slate-200 dark:border-[#334155] p-6">
-                    <h3 className="text-sm font-black text-slate-800 dark:text-white uppercase tracking-widest mb-4 flex items-center gap-2">
-                        <History size={14} className="text-emerald-400" />
+                <div className="bg-white border border-slate-200 p-6 rounded-[5px]">
+                    <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest mb-4 flex items-center gap-2">
+                        <History size={14} className="text-emerald-600" />
                         Recent Backups
                     </h3>
                     {loadingHistory ? (
@@ -329,40 +329,40 @@ const DatabaseAdminBoard = () => {
                         </div>
                     ) : recentBackups.length === 0 ? (
                         <div className="flex flex-col items-center justify-center py-12 text-slate-500 gap-2">
-                            <Database size={28} className="text-slate-600" />
+                            <Database size={28} className="text-slate-400" />
                             <p className="text-xs font-medium">No backups created yet.</p>
                             <button
                                 onClick={handleCreateBackup}
                                 disabled={creatingBackup}
-                                className="px-4 py-2 bg-[#0078d4] hover:bg-[#005a9e] text-slate-800 dark:text-white text-xs font-bold rounded-none transition-all mt-2"
+                                className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-[3px] transition-all mt-2 shadow-sm"
                             >
                                 Create First Backup
                             </button>
                         </div>
                     ) : (
-                        <div className="flex flex-col gap-0 border border-slate-200 dark:border-[#334155] overflow-hidden">
+                        <div className="flex flex-col gap-0 border border-slate-200 overflow-hidden rounded-[3px]">
                             {recentBackups.map((b, i) => {
                                 const isFailed = b.status?.toLowerCase() === 'failed';
                                 const createdAt = b.createdAt || b.created_At;
                                 return (
-                                    <div key={b.id || b.Id || i} className="flex items-center justify-between p-3 border-b border-slate-200 dark:border-[#334155] last:border-0 bg-black/20 hover:bg-white dark:bg-[#0f172a]/50 transition-colors">
+                                    <div key={b.id || b.Id || i} className="flex items-center justify-between p-3 border-b border-slate-100 last:border-0 bg-white hover:bg-slate-50 transition-colors">
                                         <div className="flex items-center gap-3 min-w-0 flex-1">
-                                            <div className={`w-8 h-8 flex items-center justify-center shrink-0 border ${getBackupStatusIcon(b.status)}`}>
+                                            <div className={`w-8 h-8 flex items-center justify-center shrink-0 border rounded-[3px] ${getBackupStatusIcon(b.status)}`}>
                                                 {isFailed ? <X size={14} /> : <CheckCircle size={14} />}
                                             </div>
                                             <div className="min-w-0">
-                                                <p className="text-xs font-bold text-slate-800 dark:text-white truncate" title={b.backupPath || b.backup_Path || b.BackupPath}>
+                                                <p className="text-xs font-bold text-slate-800 truncate" title={b.backupPath || b.backup_Path || b.BackupPath}>
                                                     {formatDate(createdAt)}
                                                 </p>
                                                 <p className="text-[10px] text-slate-500 uppercase tracking-wider">
-                                                    {b.createdBy || b.created_By || 'Manual'} <span className="text-gray-700 mx-1">•</span> {b.status || 'Success'}
+                                                    {b.createdBy || b.created_By || 'Manual'} <span className="text-slate-400 mx-1">•</span> {b.status || 'Success'}
                                                 </p>
                                             </div>
                                         </div>
                                         <button
                                             onClick={() => handleRestoreBackup(b)}
                                             disabled={restoringId === (b.id || b.Id)}
-                                            className="text-xs font-bold px-3 py-1 bg-[#0078d4]/20 hover:bg-[#0078d4]/40 text-blue-400 border border-blue-500/50 rounded-none transition-all shrink-0 ml-3 uppercase tracking-wider"
+                                            className="text-xs font-bold px-3 py-1 bg-orange-500 hover:bg-orange-600 text-white rounded-[3px] transition-all shrink-0 ml-3 uppercase tracking-wider shadow-sm"
                                         >
                                             {restoringId === (b.id || b.Id) ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Restore'}
                                         </button>

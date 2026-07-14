@@ -9,7 +9,7 @@ import {
     ChevronDown,
     Info,
     FileText,
-    Share, Camera,
+    Share, Camera, AlertTriangle,
     Sparkles, X, Search, Calendar, Check, Receipt
 } from 'lucide-react';
 import ReportPrintModal from './modals/AdminReports/ReportPrintModal';
@@ -1330,8 +1330,12 @@ const ReportTemplate = ({
                     {/* Report Data / Empty State */}
                     <div className="px-8 pb-10 flex-1 flex flex-col gap-4">
                         {apiError && (
-                            <div className="border border-red-300 bg-red-50 p-4 rounded-[3px] text-red-800 text-sm">
-                                <strong>API Error:</strong> {apiError}
+                            <div className="border border-red-300 bg-red-50 p-4 rounded-[3px] text-red-800 text-[13px] flex items-start gap-3 shadow-sm">
+                                <AlertTriangle size={18} className="text-red-500 shrink-0 mt-0.5" />
+                                <div>
+                                    <strong className="font-bold block mb-1">Unable to generate report</strong>
+                                    <p>We encountered an unexpected issue while retrieving the data for this report. Please verify your selected dates and filters, or try again later.</p>
+                                </div>
                             </div>
                         )}
                         {displayData.length === 0 && !apiError && !apiLoading && (

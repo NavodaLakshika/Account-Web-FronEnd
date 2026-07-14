@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
 import { X, ChevronDown, Menu, Minus, Plus, Maximize, RotateCw, Hand, Undo, Redo, Download, Printer, MoreVertical, Check } from 'lucide-react';
+import { getCompanyDetails, getCompanyName } from '../../../utils/session';
 
 const ReportPrintModal = ({ isOpen, onClose, companyName, title, subtitle, data = [], columns = [], totals = null }) => {
     const [orientation, setOrientation] = useState('Portrait');
@@ -86,20 +87,45 @@ const ReportPrintModal = ({ isOpen, onClose, companyName, title, subtitle, data 
         return String(val);
     };
 
+    const maxNormalRows = orientation === 'Portrait' ? 30 : 18;
+    const maxLastRows = orientation === 'Portrait' ? 25 : 14;
+
+    const chunks = [];
+    if (!data || data.length === 0) {
+        chunks.push([]);
+    } else {
+        let remaining = [...data];
+        while (remaining.length > 0) {
+            if (remaining.length <= maxLastRows) {
+                chunks.push(remaining);
+                remaining = [];
+            } else if (remaining.length <= maxNormalRows) {
+                const take = remaining.length - 1;
+                chunks.push(remaining.slice(0, take));
+                remaining = remaining.slice(take);
+            } else {
+                chunks.push(remaining.slice(0, maxNormalRows));
+                remaining = remaining.slice(maxNormalRows);
+            }
+        }
+    }
+
+    const compDetails = getCompanyDetails();
+    const finalCompanyName = getCompanyName() || companyName || 'ONIMTA INFORMATION TECHNOLOGY';
+    const finalTaxId = compDetails?.taxID || compDetails?.Tax_ID || compDetails?.TaxID || compDetails?.regNumber || compDetails?.Reg_Number || 'N/A';
+    const finalAddress = compDetails?.address1 ? `${compDetails.address1}${compDetails.address2 ? `, ${compDetails.address2}` : ''}${compDetails.country ? `, ${compDetails.country}` : ''}` : 'N/A';
+
     const HeaderContent = (
         <div style={{ marginBottom: showHeaders ? '0' : '20px', borderBottom: '2px solid #000', paddingBottom: '10px', paddingLeft: '20px', paddingRight: '20px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            {/* Top: Report Title (Full width to ensure one line) */}
             <div style={{ textAlign: 'center', width: '100%' }}>
                 <div style={{ fontSize: '20px', fontWeight: 'bold', color: '#000', textTransform: 'uppercase' }}>{title}</div>
                 <div style={{ fontSize: '12px', color: '#555', marginTop: '4px' }}>{subtitle}</div>
             </div>
-            
-            {/* Bottom: Company Info and Print Info */}
             <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'flex-end' }}>
                 <div style={{ textAlign: 'left' }}>
-                    <div style={{ fontSize: '14px', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.02em', color: '#000' }}>{companyName}</div>
-                    <div style={{ fontSize: '10px', color: '#444', marginTop: '2px' }}>Business Registration / Tax ID</div>
-                    <div style={{ fontSize: '10px', color: '#444' }}>Address Placeholder, City, Country</div>
+                    <div style={{ fontSize: '14px', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.02em', color: '#000' }}>{finalCompanyName}</div>
+                    <div style={{ fontSize: '10px', color: '#444', marginTop: '2px' }}>Business Registration / Tax ID: {finalTaxId}</div>
+                    <div style={{ fontSize: '10px', color: '#444' }}>{finalAddress}</div>
                 </div>
                 <div style={{ textAlign: 'right', fontSize: '10px', color: '#444' }}>
                     <div><strong>Printed:</strong> {new Date().toLocaleDateString()} {new Date().toLocaleTimeString()}</div>
@@ -118,7 +144,7 @@ const ReportPrintModal = ({ isOpen, onClose, companyName, title, subtitle, data 
             style={{
                 display: 'none',  // hidden in normal view; CSS makes it visible on print
                 backgroundColor: 'white',
-                fontFamily: "'Plus Jakarta Sans', Arial, sans-serif",
+                fontFamily: "'Tahoma', Arial, sans-serif",
             }}
         >
             <style>
@@ -143,108 +169,106 @@ const ReportPrintModal = ({ isOpen, onClose, companyName, title, subtitle, data 
                     tr { page-break-inside: avoid; page-break-after: auto; }
                     thead { display: table-header-group; }
                     tfoot { display: table-footer-group; }
-                    #report-print-document {
-                        counter-reset: print-page;
-                    }
-                    .css-page-number::before {
-                        counter-increment: print-page;
-                        content: "Page " counter(print-page);
-                    }
                 }
                 `}
             </style>
 
-            <div className="print-content-wrapper" style={{ padding: '10mm 10px' }}>
-                {!showHeaders && HeaderContent}
-                
-                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px', color: '#000' }}>
-                    <thead>
-                        {showHeaders && (
-                            <tr>
-                                <td colSpan={resolvedColumns.length} style={{ paddingBottom: '20px', borderBottom: 'none' }}>
-                                    {HeaderContent}
-                                </td>
-                            </tr>
-                        )}
-                        <tr>
-                            {resolvedColumns.map((col, i) => (
-                                <th key={i} style={{ padding: '8px 12px', textAlign: col.align || 'left', fontWeight: 'bold', color: '#000', borderBottom: '1px solid #000', borderTop: '1px solid #000', textTransform: 'uppercase' }}>
-                                    {col.header}
-                                </th>
-                            ))}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {data.length === 0 ? (
-                            <tr><td colSpan={resolvedColumns.length} style={{ padding: '30px', textAlign: 'center', color: '#666', fontStyle: 'italic' }}>No data available</td></tr>
-                        ) : data.map((row, i) => (
-                            <tr key={i} style={{ backgroundColor: i % 2 === 1 ? '#fafafa' : 'white' }}>
-                                {resolvedColumns.map((col, j) => (
-                                    <td key={j} style={{ padding: '6px 12px', textAlign: col.align || 'left', color: '#000', borderBottom: '1px solid #eee' }}>
-                                        {formatCell(col, row)}
-                                    </td>
-                                ))}
-                            </tr>
-                        ))}
-                    </tbody>
-                    {totals && (
-                        <tbody style={{ borderTop: '1px solid #000', borderBottom: '3px double #000' }}>
-                            <tr>
-                                {resolvedColumns.map((col, j) => {
-                                    const accessor = col.accessor || col.key;
-                                    const isFirstCol = j === 0;
-                                    return (
-                                        <td key={j} style={{ padding: '8px 12px', textAlign: col.align || 'left', fontWeight: 'bold', color: '#000' }}>
-                                            {isFirstCol ? 'TOTAL' : (totals[accessor] !== undefined ? col.format ? col.format(totals[accessor]) : totals[accessor] : '')}
+            <div className="print-content-wrapper">
+                {chunks.map((chunk, pageIndex) => (
+                    <div key={pageIndex} style={{ 
+                        position: 'relative',
+                        padding: '10mm 20px', 
+                        boxSizing: 'border-box',
+                        height: orientation === 'Portrait' ? '275mm' : '195mm',
+                        pageBreakAfter: pageIndex < chunks.length - 1 ? 'always' : 'auto' 
+                    }}>
+                        {(!showHeaders && pageIndex === 0) && HeaderContent}
+                        
+                        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px', color: '#000' }}>
+                            <thead>
+                                {(showHeaders || pageIndex === 0) && (
+                                    <tr>
+                                        <td colSpan={resolvedColumns.length} style={{ paddingBottom: '20px', borderBottom: 'none' }}>
+                                            {HeaderContent}
                                         </td>
-                                    );
-                                })}
-                            </tr>
-                        </tbody>
-                    )}
-                    {showPageInfo && (
-                        <tfoot>
-                            <tr>
-                                <td colSpan={resolvedColumns.length} style={{ padding: '15px 20px 0', borderTop: 'none', textAlign: 'right' }}>
-                                    <div className="css-page-number" style={{ fontSize: '11px', color: '#444', fontWeight: 'bold' }}></div>
-                                </td>
-                            </tr>
-                        </tfoot>
-                    )}
-                </table>
-            </div>
+                                    </tr>
+                                )}
+                                <tr>
+                                    {resolvedColumns.map((col, i) => (
+                                        <th key={i} style={{ padding: '6px 6px', textAlign: col.align || 'left', fontWeight: 'bold', color: '#000', borderBottom: '1px solid #000', borderTop: '1px solid #000', textTransform: 'uppercase' }}>
+                                            {col.header}
+                                        </th>
+                                    ))}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {chunk.length === 0 ? (
+                                    <tr><td colSpan={resolvedColumns.length} style={{ padding: '30px', textAlign: 'center', color: '#666', fontStyle: 'italic' }}>No data available</td></tr>
+                                ) : chunk.map((row, i) => (
+                                    <tr key={i} style={{ backgroundColor: i % 2 === 1 ? '#fafafa' : 'white' }}>
+                                        {resolvedColumns.map((col, j) => (
+                                            <td key={j} style={{ padding: '4px 6px', textAlign: col.align || 'left', color: '#000', borderBottom: '1px solid #eee' }}>
+                                                {formatCell(col, row)}
+                                            </td>
+                                        ))}
+                                    </tr>
+                                ))}
+                            </tbody>
+                            {totals && pageIndex === chunks.length - 1 && (
+                                <tbody style={{ borderTop: '1px solid #000', borderBottom: '3px double #000' }}>
+                                    <tr>
+                                        {resolvedColumns.map((col, j) => {
+                                            const accessor = col.accessor || col.key;
+                                            const isFirstCol = j === 0;
+                                            return (
+                                                <td key={j} style={{ padding: '6px 6px', textAlign: col.align || 'left', fontWeight: 'bold', color: '#000' }}>
+                                                    {isFirstCol ? 'TOTAL' : (totals[accessor] !== undefined ? col.format ? col.format(totals[accessor]) : totals[accessor] : '')}
+                                                </td>
+                                            );
+                                        })}
+                                    </tr>
+                                </tbody>
+                            )}
+                        </table>
 
-            {(showSignatures || showPageInfo) && (
-                <div className="print-footer-wrapper" style={{ paddingLeft: '20px', paddingRight: '20px' }}>
-                    <div style={{ width: '100%', borderTop: '2px solid #e2e8f0', fontSize: '12px', paddingTop: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
-                        <div style={{ width: '33%', textAlign: 'left' }}>
-                            {showSignatures && (
-                                <div style={{ width: '180px' }}>
-                                    <div style={{ borderBottom: '1px dashed #64748b', height: '40px', marginBottom: '8px', width: '100%' }}></div>
-                                    <span style={{ color: '#475569', display: 'block', textAlign: 'center', fontWeight: '600' }}>Prepared By</span>
+                        {(showSignatures || showPageInfo) && (
+                            <div className="print-footer-wrapper" style={{ position: 'absolute', bottom: '10mm', left: '20px', right: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', borderTop: '2px solid #e2e8f0', paddingTop: '10px', backgroundColor: '#fff' }}>
+                                <div style={{ width: '33%', textAlign: 'left' }}>
+                                    {showSignatures && pageIndex === chunks.length - 1 && (
+                                        <div style={{ width: '180px' }}>
+                                            <div style={{ borderBottom: '1px dashed #64748b', height: '40px', marginBottom: '8px', width: '100%' }}></div>
+                                            <span style={{ color: '#475569', display: 'block', textAlign: 'center', fontWeight: '600', fontSize: '10px' }}>Prepared By</span>
+                                        </div>
+                                    )}
                                 </div>
-                            )}
-                        </div>
-                        <div style={{ width: '33%', display: 'flex', justifyContent: 'center' }}>
-                            {showSignatures && (
-                                <div style={{ width: '180px' }}>
-                                    <div style={{ borderBottom: '1px dashed #64748b', height: '40px', marginBottom: '8px', width: '100%' }}></div>
-                                    <span style={{ color: '#475569', display: 'block', textAlign: 'center', fontWeight: '600' }}>Approved By</span>
+                                <div style={{ width: '33%', display: 'flex', justifyContent: 'center' }}>
+                                    {showSignatures && pageIndex === chunks.length - 1 && (
+                                        <div style={{ width: '180px' }}>
+                                            <div style={{ borderBottom: '1px dashed #64748b', height: '40px', marginBottom: '8px', width: '100%' }}></div>
+                                            <span style={{ color: '#475569', display: 'block', textAlign: 'center', fontWeight: '600', fontSize: '10px' }}>Approved By</span>
+                                        </div>
+                                    )}
                                 </div>
-                            )}
-                        </div>
-                        <div style={{ width: '33%', color: '#64748b', textAlign: 'right' }}>
-                            {showPageInfo && (
-                                <div style={{ fontWeight: '500' }}>
-                                    <span>Printed on {new Date().toLocaleDateString()}</span>
-                                    <br/>
-                                    <span style={{ marginTop: '4px', display: 'inline-block' }}>{data.length} record{data.length !== 1 ? 's' : ''}</span>
+                                <div style={{ width: '33%', color: '#64748b', textAlign: 'right' }}>
+                                    {showPageInfo && (
+                                        <div style={{ fontWeight: '500', fontSize: '10px' }}>
+                                            {pageIndex === chunks.length - 1 && (
+                                                <>
+                                                    <span>Printed on {new Date().toLocaleDateString()} {new Date().toLocaleTimeString()}</span>
+                                                    <br/>
+                                                    <span style={{ marginTop: '4px', display: 'inline-block' }}>{data.length} record{data.length !== 1 ? 's' : ''}</span>
+                                                    <br/>
+                                                </>
+                                            )}
+                                            <span style={{ marginTop: '8px', display: 'inline-block', color: '#444', fontWeight: 'bold' }}>Page {pageIndex + 1} of {chunks.length}</span>
+                                        </div>
+                                    )}
                                 </div>
-                            )}
-                        </div>
+                            </div>
+                        )}
                     </div>
-                </div>
-            )}
+                ))}
+            </div>
         </div>,
         document.body
     );
@@ -361,7 +385,7 @@ const ReportPrintModal = ({ isOpen, onClose, companyName, title, subtitle, data 
                                     <button onClick={toggleFullscreen} className={`p-1.5 rounded ${isFullscreen ? 'bg-white/20' : 'hover:bg-slate-200 dark:bg-white/10'}`} title="Fullscreen"><Maximize size={16} /></button>
                                     <button onClick={handleRotate} className="hover:bg-slate-200 dark:bg-white/10 p-1.5 rounded" title="Rotate"><RotateCw size={16} /></button>
                                     <div className="w-px h-5 bg-gray-600 mx-1"></div>
-                                    <button onClick={() => setIsPanning(!isPanning)} className={`p-1.5 rounded ${isPanning ? 'bg-[#0077c5] text-slate-800 dark:text-white' : 'hover:bg-slate-200 dark:bg-white/10'}`} title="Pan Tool"><Hand size={16} /></button>
+                                    <button onClick={() => setIsPanning(!isPanning)} className={`p-1.5 rounded ${isPanning ? 'bg-[#0077c5] text-white' : 'hover:bg-slate-200 dark:bg-white/10'}`} title="Pan Tool"><Hand size={16} /></button>
                                     <button onClick={handleUndo} className="hover:bg-slate-200 dark:bg-white/10 p-1.5 rounded" title="Reset View"><Undo size={16} /></button>
                                     <button className="hover:bg-slate-200 dark:bg-white/10 p-1.5 rounded opacity-50 cursor-not-allowed" title="Redo"><Redo size={16} /></button>
                                 </div>
@@ -426,7 +450,6 @@ const ReportPrintModal = ({ isOpen, onClose, companyName, title, subtitle, data 
                                 </div>
                             </div>
 
-                            {/* Scrollable preview */}
                             <div 
                                 ref={scrollContainerRef}
                                 onMouseDown={handleMouseDown}
@@ -434,6 +457,7 @@ const ReportPrintModal = ({ isOpen, onClose, companyName, title, subtitle, data 
                                 onMouseUp={handleMouseUp}
                                 onMouseLeave={handleMouseUp}
                                 className={`flex-1 overflow-auto bg-[#525659] p-8 flex ${isTwoPageView ? 'justify-start gap-8' : 'justify-center'} custom-scrollbar ${isPanning ? (isDragging ? 'cursor-grabbing' : 'cursor-grab') : ''}`}
+                                style={{ fontFamily: "'Tahoma', Arial, sans-serif" }}
                             >
                                 {/* This is a VISUAL PREVIEW only — the actual print comes from the Portal above */}
                                 <div 
@@ -447,18 +471,7 @@ const ReportPrintModal = ({ isOpen, onClose, companyName, title, subtitle, data 
                                         </div>
                                     )}
 
-                                    {/* Map through data chunks to create multiple pages for the preview */}
                                     {(() => {
-                                        const rowsPerPage = orientation === 'Portrait' ? 35 : 20;
-                                        const chunks = [];
-                                        if (!data || data.length === 0) {
-                                            chunks.push([]);
-                                        } else {
-                                            for (let i = 0; i < data.length; i += rowsPerPage) {
-                                                chunks.push(data.slice(i, i + rowsPerPage));
-                                            }
-                                        }
-
                                         return chunks.map((chunk, pageIndex) => (
                                             <div 
                                                 key={pageIndex}
@@ -478,7 +491,7 @@ const ReportPrintModal = ({ isOpen, onClose, companyName, title, subtitle, data 
                                                 <thead>
                                                     <tr className="border-t border-b border-gray-900">
                                                         {resolvedColumns.map((col, i) => (
-                                                            <th key={i} className="p-2 text-[10px] font-bold text-gray-900 uppercase tracking-wider" style={{ textAlign: col.align || 'left' }}>
+                                                            <th key={i} className="px-1.5 py-2 text-[10px] font-bold text-gray-900 uppercase tracking-wider" style={{ textAlign: col.align || 'left' }}>
                                                                 {col.header}
                                                             </th>
                                                         ))}
@@ -488,7 +501,7 @@ const ReportPrintModal = ({ isOpen, onClose, companyName, title, subtitle, data 
                                                     {chunk.map((row, i) => (
                                                         <tr key={i} className={`border-b border-gray-200 ${i % 2 === 1 ? 'bg-gray-50' : ''}`}>
                                                             {resolvedColumns.map((col, j) => (
-                                                                <td key={j} className="p-2 text-[11px] text-gray-900" style={{ textAlign: col.align || 'left' }}>
+                                                                <td key={j} className="px-1.5 py-1 text-[11px] text-gray-900" style={{ textAlign: col.align || 'left', wordBreak: 'break-word' }}>
                                                                     {formatCell(col, row)}
                                                                 </td>
                                                             ))}
@@ -502,7 +515,7 @@ const ReportPrintModal = ({ isOpen, onClose, companyName, title, subtitle, data 
                                                                 const accessor = col.accessor || col.key;
                                                                 const isFirstCol = j === 0;
                                                                 return (
-                                                                    <td key={j} className="p-2 text-[11px] font-bold text-gray-900 whitespace-nowrap" style={{ textAlign: col.align || 'left' }}>
+                                                                    <td key={j} className="px-1.5 py-2 text-[11px] font-bold text-gray-900 whitespace-nowrap" style={{ textAlign: col.align || 'left' }}>
                                                                         {isFirstCol ? 'TOTAL' : (totals[accessor] !== undefined ? col.format ? col.format(totals[accessor]) : totals[accessor] : '')}
                                                                     </td>
                                                                 );
@@ -514,12 +527,12 @@ const ReportPrintModal = ({ isOpen, onClose, companyName, title, subtitle, data 
                                         )}
                                     </div>
                                     {(showSignatures || showPageInfo) && (
-                                        <div className="mt-auto pt-8 border-t border-gray-200 flex justify-between items-end shrink-0 px-5">
+                                        <div className="mt-auto pt-4 border-t border-gray-200 flex justify-between items-end shrink-0 px-5">
                                             <div className="flex-1 flex justify-start">
                                                 {showSignatures && pageIndex === chunks.length - 1 && (
                                                     <div className="flex flex-col items-center w-36">
                                                         <div className="w-full border-b border-gray-400 mb-2"></div>
-                                                        <span className="text-[12px] text-gray-600 font-medium">Prepared By</span>
+                                                        <span className="text-[10px] text-gray-600 font-medium">Prepared By</span>
                                                     </div>
                                                 )}
                                             </div>
@@ -527,13 +540,21 @@ const ReportPrintModal = ({ isOpen, onClose, companyName, title, subtitle, data 
                                                 {showSignatures && pageIndex === chunks.length - 1 && (
                                                     <div className="flex flex-col items-center w-36">
                                                         <div className="w-full border-b border-gray-400 mb-2"></div>
-                                                        <span className="text-[12px] text-gray-600 font-medium">Approved By</span>
+                                                        <span className="text-[10px] text-gray-600 font-medium">Approved By</span>
                                                     </div>
                                                 )}
                                             </div>
                                             <div className="flex-1 flex justify-end">
                                                 {showPageInfo && (
-                                                    <span className="text-[12px] text-gray-400 font-medium">Page {pageIndex + 1} of {chunks.length}</span>
+                                                    <div className="flex flex-col items-end text-[10px] text-gray-400 font-medium text-right">
+                                                        {pageIndex === chunks.length - 1 && (
+                                                            <>
+                                                                <span>Printed on {new Date().toLocaleDateString()} {new Date().toLocaleTimeString()}</span>
+                                                                <span className="mt-1">{data.length} record{data.length !== 1 ? 's' : ''}</span>
+                                                            </>
+                                                        )}
+                                                        <span className="mt-2 text-gray-500 font-bold">Page {pageIndex + 1} of {chunks.length}</span>
+                                                    </div>
                                                 )}
                                             </div>
                                         </div>
@@ -569,7 +590,7 @@ const ReportPrintModal = ({ isOpen, onClose, companyName, title, subtitle, data 
                         <button onClick={() => window.print()} className="h-9 px-5 border-2 border-[#0077c5] text-[#0077c5] text-[13px] font-bold rounded-[3px] hover:bg-blue-50 transition-colors">
                             Save as PDF
                         </button>
-                        <button onClick={() => window.print()} className="h-9 px-5 bg-[#0077c5] hover:bg-[#005ca6] text-slate-800 dark:text-white text-[13px] font-bold rounded-[3px] transition-colors shadow-sm">
+                        <button onClick={() => window.print()} className="h-9 px-5 bg-[#0077c5] hover:bg-[#005ca6] text-white text-[13px] font-bold rounded-[3px] transition-colors shadow-sm">
                             Print
                         </button>
                     </div>

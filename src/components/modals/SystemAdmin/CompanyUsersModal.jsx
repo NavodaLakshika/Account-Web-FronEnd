@@ -246,12 +246,12 @@ const CompanyUsersModal = ({ isOpen, onClose }) => {
                             <tbody>
                                 {loading && (
                                     <tr>
-                                        <td colSpan="4" className="py-12 text-center text-gray-300 font-black italic text-[11px] uppercase tracking-widest animate-pulse">Loading Users...</td>
+                                        <td colSpan="4" className="h-[120px] align-middle text-center text-gray-300 font-black text-[11px] uppercase tracking-widest animate-pulse">Loading Users...</td>
                                     </tr>
                                 )}
                                 {!loading && employees.length === 0 && (
                                     <tr>
-                                        <td colSpan="4" className="py-12 text-center text-gray-300 font-black italic text-[11px] uppercase tracking-widest">No users found.</td>
+                                        <td colSpan="4" className="h-[120px] align-middle text-center text-gray-300 font-black text-[11px] uppercase tracking-widest">No users found.</td>
                                     </tr>
                                 )}
                                 {!loading && employees.map((emp) => {
