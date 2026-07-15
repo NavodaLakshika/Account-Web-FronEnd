@@ -3,6 +3,7 @@ import {
     X, Send, Trash2, Plus, ChevronLeft, ChevronRight, Paperclip, 
     File, Image as ImageIcon, Mic, Maximize2, Minimize2, Square, 
     Sparkles, Clock, MoreVertical, Edit, PanelLeftClose, PanelLeft, 
+    PanelRightClose, PanelRight, MessageCircle,
     ThumbsUp, ThumbsDown, Download, Copy, Check
 } from 'lucide-react';
 import { getUserName, getCompanyName } from '../utils/session';
@@ -56,6 +57,8 @@ const AIChatbotBoard = ({ isOpen, onClose, position = 'center', onAction }) => {
     const [messages, setMessages] = useState([]);
     const [inputValue, setInputValue] = useState('');
     const [isTyping, setIsTyping] = useState(false);
+    const [showHistoryModal, setShowHistoryModal] = useState(false);
+    const [historyExpanded, setHistoryExpanded] = useState(false);
     
     // We determine if we are showing the sidebar in the inline-right mode
     const [sidebarCollapsed, setSidebarCollapsed] = useState(position === 'right' || position === 'inline-right');
@@ -380,13 +383,6 @@ When the user asks "show me", "list", "find", "search" for data, use the live da
             {/* Header */}
             <div className="h-14 border-b border-slate-100 flex items-center justify-between px-4 shrink-0 bg-white z-20">
                 <div className="flex items-center gap-3">
-                    <button 
-                        onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-                        className="p-1.5 hover:bg-slate-100 text-slate-500 rounded-[3px] transition-colors mr-2 hidden md:block"
-                        title={sidebarCollapsed ? "Show sidebar" : "Hide sidebar"}
-                    >
-                        {sidebarCollapsed ? <PanelLeft size={20} /> : <PanelLeftClose size={20} />}
-                    </button>
                     <div className="w-6 h-6 flex items-center justify-center shrink-0">
                         <DotLottiePlayer src="/lottiefile/AI loading.lottie" autoplay loop style={{ width: '150%', height: '150%' }} />
                     </div>
@@ -433,6 +429,13 @@ When the user asks "show me", "list", "find", "search" for data, use the live da
                     )}
                     
                     <button 
+                        onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+                        className="p-1.5 hover:bg-slate-100 text-slate-500 rounded-[3px] transition-colors ml-1 hidden md:block"
+                        title={sidebarCollapsed ? "Show history bar" : "Hide history bar"}
+                    >
+                        {sidebarCollapsed ? <PanelRight size={20} /> : <PanelRightClose size={20} />}
+                    </button>
+                    <button 
                         onClick={onClose}
                         className="p-1.5 hover:bg-slate-100 text-slate-500 rounded-[3px] transition-colors ml-1"
                     >
@@ -442,51 +445,8 @@ When the user asks "show me", "list", "find", "search" for data, use the live da
             </div>
 
             {/* Main Content Area (Sidebar + Chat) */}
-            <div className="flex-1 flex overflow-hidden bg-white">
+            <div className="flex-1 flex overflow-hidden bg-white relative">
                 
-                {/* Sidebar */}
-                {!sidebarCollapsed && (
-                    <div className="w-[10px] overflow-hidden border-r border-slate-100 flex flex-col shrink-0 animate-in slide-in-from-left-4 duration-300">
-                        <div className="p-4">
-                            <button 
-                                className="w-full flex items-center gap-3 px-4 py-2.5 text-[14px] text-slate-700 font-medium hover:bg-slate-50 rounded-[3px] transition-colors"
-                                onClick={handleNewSession}
-                            >
-                                <Edit size={18} className="text-slate-500" /> New chat
-                            </button>
-                        </div>
-                        
-                        <div className="px-4 py-2 flex-1 overflow-y-auto">
-                            <div className="text-[12px] font-bold text-slate-400 uppercase tracking-wider flex items-center justify-between mb-3 px-2">
-                                <div className=""><Clock size={14} /> Recent</div>
-                            </div>
-                            
-                            {history.length === 0 ? (
-                                <div className="px-2 py-2 text-[13px] text-slate-500 bg-slate-50/50 rounded-[3px] border border-slate-100">
-                                    No conversations yet
-                                </div>
-                            ) : (
-                                <div className="space-y-1">
-                                    {history.map((item, idx) => (
-                                        <button
-                                            key={idx}
-                                            onClick={() => {
-                                                if (item.msgs) {
-                                                    setMessages(item.msgs);
-                                                    setActiveHistoryId(item.id);
-                                                }
-                                            }}
-                                            className={`w-full text-left px-3 py-2 text-[13px] rounded-[3px] transition-colors truncate ${activeHistoryId === item.id ? 'bg-indigo-50 text-indigo-700 font-medium' : 'text-slate-600 hover:bg-slate-50'}`}
-                                        >
-                                            {item.title}
-                                        </button>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                )}
-
                 {/* Chat Area */}
                 <div className="flex-1 flex flex-col relative">
                     
@@ -716,6 +676,80 @@ When the user asks "show me", "list", "find", "search" for data, use the live da
                     </div>
 
                 </div>
+
+                {/* History Bar (Right Side) */}
+                {!sidebarCollapsed && !historyExpanded && (
+                    <div className="w-[20px] transition-all duration-300 overflow-hidden border-l border-slate-100 flex flex-col items-center shrink-0 animate-in slide-in-from-right-4 relative bg-white">
+                        <style>{`
+                            @keyframes sidebarLoaderBg {
+                                0% { background-position: 0% 0%; }
+                                100% { background-position: 0% 200%; }
+                            }
+                            .sidebar-loader {
+                                background: linear-gradient(to bottom, #3b82f6, #10b981, #ffffff, #3b82f6);
+                                background-size: 100% 200%;
+                                animation: sidebarLoaderBg 2s linear infinite;
+                            }
+                        `}</style>
+                        <div className="absolute inset-0 sidebar-loader opacity-90 shadow-inner" />
+                        <div className="relative z-10 p-2 mt-4 cursor-pointer text-white/90 hover:text-white transition-colors drop-shadow-md hover:scale-110 transform" onClick={() => setHistoryExpanded(true)} title="View Chat History">
+                            <Clock size={16} />
+                        </div>
+                    </div>
+                )}
+
+                {/* Expanded History Overlay */}
+                {historyExpanded && (
+                    <div className="absolute inset-0 z-50 bg-white flex flex-col animate-in slide-in-from-right-2 duration-200">
+                        <div className="px-4 py-4 border-b border-slate-100 flex items-center justify-between bg-white shrink-0">
+                            <h3 className="font-bold text-slate-800 flex items-center gap-2">
+                                <Clock size={16} className="text-blue-500" /> Chat History
+                            </h3>
+                            <button onClick={() => setHistoryExpanded(false)} className="text-slate-400 hover:text-slate-600 p-1.5 rounded transition-colors" title="Close history">
+                                <X size={18} />
+                            </button>
+                        </div>
+                        <div className="p-3 flex-1 overflow-y-auto bg-slate-50/50">
+                            <div className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-3 px-1 mt-2">Recent Conversations</div>
+                            
+                            {history.length === 0 ? (
+                                <div className="text-center py-8 text-slate-400 text-sm font-medium">
+                                    No conversations yet.
+                                </div>
+                            ) : (
+                                <div className="space-y-1">
+                                    {history.map((item, idx) => (
+                                        <button
+                                            key={idx}
+                                            onClick={() => {
+                                                if (item.msgs) {
+                                                    setMessages(item.msgs);
+                                                    setActiveHistoryId(item.id);
+                                                    setHistoryExpanded(false);
+                                                }
+                                            }}
+                                            className={`w-full flex items-center gap-3 text-left px-3 py-2.5 text-sm rounded-[6px] transition-all border ${
+                                                activeHistoryId === item.id 
+                                                ? 'bg-white border-blue-200 shadow-sm ring-1 ring-blue-100' 
+                                                : 'bg-transparent border-transparent hover:bg-white hover:border-slate-200 hover:shadow-sm'
+                                            }`}
+                                        >
+                                            <div className={`p-1.5 rounded-full shrink-0 ${activeHistoryId === item.id ? 'bg-blue-50 text-blue-600' : 'bg-slate-100 text-slate-400'}`}>
+                                                <MessageCircle size={14} />
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <div className={`font-semibold text-[13px] truncate ${activeHistoryId === item.id ? 'text-blue-900' : 'text-slate-700'}`}>{item.title}</div>
+                                                <div className={`text-[10px] mt-0.5 ${activeHistoryId === item.id ? 'text-blue-500' : 'text-slate-400'}`}>
+                                                    {item.time || 'Previous session'}
+                                                </div>
+                                            </div>
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                )}
             </div>
 
             <HowWeUseAIModal isOpen={showAIInfoModal} onClose={() => setShowAIInfoModal(false)} />

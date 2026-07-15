@@ -241,18 +241,18 @@ const ExpensesDashboardBoard = ({
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
           {/* Card 1: Total Expenses */}
           <div className="relative overflow-hidden bg-gradient-to-br from-emerald-500 to-emerald-600 text-white p-6 rounded-[3px] shadow-lg border border-white/10 group hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col">
-            <div className="absolute -right-4 -bottom-4 p-8 opacity-10 transform group-hover:scale-110 group-hover:rotate-12 transition-all duration-500">
+            {/* <div className="absolute -right-4 -bottom-4 p-8 opacity-10 transform group-hover:scale-110 group-hover:rotate-12 transition-all duration-500">
               <DollarSign size={120} />
-            </div>
+            </div> */}
 
             <div className="flex justify-between items-start mb-6">
               <div className="flex flex-col">
                 <span className="text-[11px] font-black uppercase tracking-widest text-emerald-100/70 mb-1">Total Operating Spend</span>
                 <span className="text-[10px] font-bold text-emerald-50">Calculated from all bills & checks</span>
               </div>
-              <div className="w-10 h-10 rounded-full flex items-center justify-center bg-white/20 text-white group-hover:scale-110 transition-transform shadow-inner">
+              {/* <div className="w-10 h-10 rounded-full flex items-center justify-center bg-white/20 text-white group-hover:scale-110 transition-transform shadow-inner">
                 <DollarSign size={20} strokeWidth={2.5} />
-              </div>
+              </div> */}
             </div>
 
             <div className="mt-auto">
@@ -268,18 +268,18 @@ const ExpensesDashboardBoard = ({
 
           {/* Card 2: Open Payables */}
           <div className="relative overflow-hidden bg-gradient-to-br from-amber-500 to-orange-500 text-white p-6 rounded-[3px] shadow-lg border border-white/10 group hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col">
-            <div className="absolute -right-4 -bottom-4 p-8 opacity-10 transform group-hover:scale-110 group-hover:-rotate-12 transition-all duration-500">
+            {/* <div className="absolute -right-4 -bottom-4 p-8 opacity-10 transform group-hover:scale-110 group-hover:-rotate-12 transition-all duration-500">
               <FileText size={120} />
-            </div>
+            </div> */}
 
             <div className="flex justify-between items-start mb-6">
               <div className="flex flex-col">
                 <span className="text-[11px] font-black uppercase tracking-widest text-orange-100/70 mb-1">Unpaid / Open Bills</span>
                 <span className="text-[10px] font-bold text-orange-50">Outstanding vendor obligations</span>
               </div>
-              <div className="w-10 h-10 rounded-full flex items-center justify-center bg-white/20 text-white group-hover:scale-110 transition-transform shadow-inner">
+              {/* <div className="w-10 h-10 rounded-full flex items-center justify-center bg-white/20 text-white group-hover:scale-110 transition-transform shadow-inner">
                 <FileText size={20} strokeWidth={2.5} />
-              </div>
+              </div> */}
             </div>
 
             <div className="mt-auto flex items-end justify-between">
@@ -298,18 +298,18 @@ const ExpensesDashboardBoard = ({
 
           {/* Card 3: Overdue Liabilities */}
           <div className="relative overflow-hidden bg-gradient-to-br from-rose-500 to-red-600 text-white p-6 rounded-[3px] shadow-lg border border-white/10 group hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col">
-            <div className="absolute -right-4 -bottom-4 p-8 opacity-10 transform group-hover:scale-110 group-hover:rotate-12 transition-all duration-500">
+            {/* <div className="absolute -right-4 -bottom-4 p-8 opacity-10 transform group-hover:scale-110 group-hover:rotate-12 transition-all duration-500">
               <AlertCircle size={120} />
-            </div>
+            </div> */}
 
             <div className="flex justify-between items-start mb-6">
               <div className="flex flex-col">
                 <span className="text-[11px] font-black uppercase tracking-widest text-rose-100/70 mb-1">Overdue Bills</span>
                 <span className="text-[10px] font-bold text-rose-50">Past negotiated due dates</span>
               </div>
-              <div className="w-10 h-10 rounded-full flex items-center justify-center bg-white/20 text-white group-hover:scale-110 transition-transform shadow-inner">
+              {/* <div className="w-10 h-10 rounded-full flex items-center justify-center bg-white/20 text-white group-hover:scale-110 transition-transform shadow-inner">
                 <AlertCircle size={20} strokeWidth={2.5} />
-              </div>
+              </div> */}
             </div>
 
             <div className="mt-auto flex items-end justify-between">

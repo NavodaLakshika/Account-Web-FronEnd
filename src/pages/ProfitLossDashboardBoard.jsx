@@ -106,18 +106,18 @@ const ProfitLossDashboardBoard = ({
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
           {/* Net Profit */}
           <div className={`relative overflow-hidden bg-gradient-to-br ${profitBg} text-white p-6 rounded-[3px] shadow-lg border border-white/10 group hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col`}>
-            <div className="absolute -right-4 -bottom-4 p-8 opacity-10 transform group-hover:scale-110 group-hover:rotate-12 transition-all duration-500">
+            {/* <div className="absolute -right-4 -bottom-4 p-8 opacity-10 transform group-hover:scale-110 group-hover:rotate-12 transition-all duration-500">
               <TrendingUp size={120} />
-            </div>
+            </div> */}
 
             <div className="flex justify-between items-start mb-6">
               <div className="flex flex-col">
                 <span className="text-[11px] font-black uppercase tracking-widest text-white/70 mb-1">Net Profit (Loss)</span>
                 <span className="text-[12px] font-bold text-white/90">Current Period</span>
               </div>
-              <div className="w-10 h-10 rounded-full flex items-center justify-center bg-white/20 text-white group-hover:scale-110 transition-transform shadow-inner">
+              {/* <div className="w-10 h-10 rounded-full flex items-center justify-center bg-white/20 text-white group-hover:scale-110 transition-transform shadow-inner">
                 <TrendingUp size={20} strokeWidth={2.5} />
-              </div>
+              </div> */}
             </div>
 
             <div className="mt-auto">
@@ -133,18 +133,18 @@ const ProfitLossDashboardBoard = ({
 
           {/* Income */}
           <div className="relative overflow-hidden bg-gradient-to-br from-blue-500 to-blue-600 text-white p-6 rounded-[3px] shadow-lg border border-white/10 group hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col">
-            <div className="absolute -right-4 -bottom-4 p-8 opacity-10 transform group-hover:scale-110 group-hover:-rotate-12 transition-all duration-500">
+            {/* <div className="absolute -right-4 -bottom-4 p-8 opacity-10 transform group-hover:scale-110 group-hover:-rotate-12 transition-all duration-500">
               <DollarSign size={120} />
-            </div>
+            </div> */}
 
             <div className="flex justify-between items-start mb-6">
               <div className="flex flex-col">
                 <span className="text-[11px] font-black uppercase tracking-widest text-blue-100/70 mb-1">Total Income</span>
                 <span className="text-[12px] font-bold text-blue-50">Operating Revenue</span>
               </div>
-              <div className="w-10 h-10 rounded-full flex items-center justify-center bg-white/20 text-white group-hover:scale-110 transition-transform shadow-inner">
+              {/* <div className="w-10 h-10 rounded-full flex items-center justify-center bg-white/20 text-white group-hover:scale-110 transition-transform shadow-inner">
                 <ArrowUpRight size={20} strokeWidth={2.5} />
-              </div>
+              </div> */}
             </div>
 
             <div className="mt-auto">
@@ -160,18 +160,18 @@ const ProfitLossDashboardBoard = ({
 
           {/* Expenses */}
           <div className="relative overflow-hidden bg-gradient-to-br from-amber-500 to-orange-500 text-white p-6 rounded-[3px] shadow-lg border border-white/10 group hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col">
-            <div className="absolute -right-4 -bottom-4 p-8 opacity-10 transform group-hover:scale-110 group-hover:rotate-12 transition-all duration-500">
+            {/* <div className="absolute -right-4 -bottom-4 p-8 opacity-10 transform group-hover:scale-110 group-hover:rotate-12 transition-all duration-500">
               <Wallet size={120} />
-            </div>
+            </div> */}
 
             <div className="flex justify-between items-start mb-6">
               <div className="flex flex-col">
                 <span className="text-[11px] font-black uppercase tracking-widest text-orange-100/70 mb-1">Total Expenses</span>
                 <span className="text-[12px] font-bold text-orange-50">Operating Costs</span>
               </div>
-              <div className="w-10 h-10 rounded-full flex items-center justify-center bg-white/20 text-white group-hover:scale-110 transition-transform shadow-inner">
+              {/* <div className="w-10 h-10 rounded-full flex items-center justify-center bg-white/20 text-white group-hover:scale-110 transition-transform shadow-inner">
                 <AlertCircle size={20} strokeWidth={2.5} />
-              </div>
+              </div> */}
             </div>
 
             <div className="mt-auto">

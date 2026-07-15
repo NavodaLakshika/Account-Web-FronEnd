@@ -62,107 +62,109 @@ const PlanEditorModal = ({ isOpen, onClose, editingPlan, onSaveSuccess }) => {
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-[3000] flex items-center justify-center bg-[#000000]/70 backdrop-blur-sm p-4 font-sans">
-            <div className="bg-slate-50 dark:bg-[#0c0c0c] border border-slate-300 dark:border-white/10 shadow-2xl w-full max-w-md animate-in fade-in zoom-in-95 duration-200 flex flex-col rounded-none">
-                <div className="px-6 py-4 border-b border-slate-300 dark:border-white/10 flex items-center justify-between bg-slate-100 dark:bg-white/5">
-                    <h3 className="text-[15px] font-bold text-slate-800 dark:text-white">
+        <div className="fixed inset-0 z-[3000] flex items-center justify-center bg-black/50 p-4 font-sans">
+            <div className="bg-white border border-gray-200 shadow-2xl w-full max-w-md animate-in fade-in zoom-in-95 duration-200 flex flex-col rounded-[3px] overflow-hidden">
+                <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between bg-white">
+                    <h3 className="text-[15px] font-bold text-gray-800">
                         {editingPlan ? 'Edit Pricing Plan' : 'Create Pricing Plan'}
                     </h3>
-                    <button onClick={onClose} className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-300 hover:bg-slate-200 dark:bg-white/10 transition-colors rounded-none">
+                    <button onClick={onClose} className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-colors rounded-[3px]">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                     </button>
                 </div>
                 
-                <form onSubmit={handleSubmit} className="p-6 flex flex-col gap-4">
-                    <div>
-                        <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Plan Name *</label>
-                        <input
-                            type="text"
-                            required
-                            value={formData.planName}
-                            onChange={e => setFormData({...formData, planName: e.target.value})}
-                            placeholder="e.g. Professional"
-                            className="w-full px-4 py-2.5 bg-slate-200/50 dark:bg-black/40 border border-slate-300 dark:border-white/10 text-slate-800 dark:text-white text-sm outline-none focus:border-[#0078d4] focus:bg-slate-100 dark:bg-white/5 transition-all rounded-none placeholder:text-gray-600"
-                            autoFocus
-                        />
-                    </div>
-
-                    <div className="flex gap-4">
-                        <div className="flex-1">
-                            <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Price ($) *</label>
+                <form onSubmit={handleSubmit} className="p-6">
+                    <div className="bg-white border border-gray-200 rounded-[3px] p-4 space-y-5">
+                        <div>
+                            <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Plan Name *</label>
                             <input
-                                type="number"
-                                step="0.01"
+                                type="text"
                                 required
-                                value={formData.price}
-                                onChange={e => setFormData({...formData, price: parseFloat(e.target.value) || 0})}
-                                placeholder="0.00"
-                                className="w-full px-4 py-2.5 bg-slate-200/50 dark:bg-black/40 border border-slate-300 dark:border-white/10 text-slate-800 dark:text-white text-sm outline-none focus:border-[#0078d4] focus:bg-slate-100 dark:bg-white/5 transition-all rounded-none placeholder:text-gray-600"
+                                value={formData.planName}
+                                onChange={e => setFormData({...formData, planName: e.target.value})}
+                                placeholder="e.g. Professional"
+                                className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 transition-all placeholder:text-gray-400"
+                                autoFocus
                             />
                         </div>
-                        <div className="flex-1">
-                            <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Billing Cycle *</label>
-                            <select
-                                value={formData.billingCycle}
-                                onChange={e => setFormData({...formData, billingCycle: e.target.value})}
-                                className="w-full px-4 py-2.5 bg-slate-200/50 dark:bg-black/40 border border-slate-300 dark:border-white/10 text-slate-800 dark:text-white text-sm outline-none focus:border-[#0078d4] focus:bg-slate-100 dark:bg-white/5 transition-all rounded-none"
-                            >
-                                <option value="Monthly" className="bg-slate-50 dark:bg-[#0c0c0c]">Monthly</option>
-                                <option value="Yearly" className="bg-slate-50 dark:bg-[#0c0c0c]">Yearly</option>
-                            </select>
+
+                        <div className="flex gap-4">
+                            <div className="flex-1">
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Price ($) *</label>
+                                <input
+                                    type="number"
+                                    step="0.01"
+                                    required
+                                    value={formData.price}
+                                    onChange={e => setFormData({...formData, price: parseFloat(e.target.value) || 0})}
+                                    placeholder="0.00"
+                                    className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 transition-all placeholder:text-gray-400"
+                                />
+                            </div>
+                            <div className="flex-1">
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Billing Cycle *</label>
+                                <select
+                                    value={formData.billingCycle}
+                                    onChange={e => setFormData({...formData, billingCycle: e.target.value})}
+                                    className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 transition-all"
+                                >
+                                    <option value="Monthly">Monthly</option>
+                                    <option value="Yearly">Yearly</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div className="flex gap-4">
+                            <div className="flex-1">
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Max Users *</label>
+                                <input
+                                    type="number"
+                                    required
+                                    value={formData.maxUsers}
+                                    onChange={e => setFormData({...formData, maxUsers: parseInt(e.target.value) || 0})}
+                                    placeholder="5"
+                                    className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 transition-all placeholder:text-gray-400"
+                                />
+                            </div>
+                            <div className="flex-1">
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Max Companies *</label>
+                                <input
+                                    type="number"
+                                    required
+                                    value={formData.maxCompanies}
+                                    onChange={e => setFormData({...formData, maxCompanies: parseInt(e.target.value) || 0})}
+                                    placeholder="1"
+                                    className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 transition-all placeholder:text-gray-400"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="flex items-center gap-3 pt-2">
+                            <label className="relative inline-flex items-center cursor-pointer">
+                                <input
+                                    type="checkbox"
+                                    checked={formData.isActive}
+                                    onChange={e => setFormData({...formData, isActive: e.target.checked})}
+                                    className="sr-only peer"
+                                />
+                                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#0285fd]"></div>
+                            </label>
+                            <span className="text-[13px] font-medium text-gray-700">Plan is Active (Visible to users)</span>
                         </div>
                     </div>
 
-                    <div className="flex gap-4">
-                        <div className="flex-1">
-                            <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Max Users *</label>
-                            <input
-                                type="number"
-                                required
-                                value={formData.maxUsers}
-                                onChange={e => setFormData({...formData, maxUsers: parseInt(e.target.value) || 0})}
-                                placeholder="5"
-                                className="w-full px-4 py-2.5 bg-slate-200/50 dark:bg-black/40 border border-slate-300 dark:border-white/10 text-slate-800 dark:text-white text-sm outline-none focus:border-[#0078d4] focus:bg-slate-100 dark:bg-white/5 transition-all rounded-none placeholder:text-gray-600"
-                            />
-                        </div>
-                        <div className="flex-1">
-                            <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Max Companies *</label>
-                            <input
-                                type="number"
-                                required
-                                value={formData.maxCompanies}
-                                onChange={e => setFormData({...formData, maxCompanies: parseInt(e.target.value) || 0})}
-                                placeholder="1"
-                                className="w-full px-4 py-2.5 bg-slate-200/50 dark:bg-black/40 border border-slate-300 dark:border-white/10 text-slate-800 dark:text-white text-sm outline-none focus:border-[#0078d4] focus:bg-slate-100 dark:bg-white/5 transition-all rounded-none placeholder:text-gray-600"
-                            />
-                        </div>
-                    </div>
-
-                    <div className="flex items-center gap-3 pt-2">
-                        <label className="relative inline-flex items-center cursor-pointer">
-                            <input
-                                type="checkbox"
-                                checked={formData.isActive}
-                                onChange={e => setFormData({...formData, isActive: e.target.checked})}
-                                className="sr-only peer"
-                            />
-                            <div className="w-11 h-6 bg-white/20 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
-                        </label>
-                        <span className="text-xs font-bold text-gray-300">Plan is Active (Visible to users)</span>
-                    </div>
-
-                    <div className="mt-4 flex gap-3 justify-end">
+                    <div className="mt-6 flex gap-3 justify-end">
                         <button
                             type="button"
                             onClick={onClose}
-                            className="px-5 py-2.5 bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:bg-white/10 text-gray-300 text-xs font-bold uppercase tracking-wider border border-slate-300 dark:border-white/10 transition-all rounded-none"
+                            className="px-6 h-10 border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all"
                         >
                             Cancel
                         </button>
                         <button
                             type="submit"
                             disabled={saving}
-                            className="px-5 py-2.5 bg-[#0078d4] hover:bg-[#005a9e] text-white text-xs font-bold uppercase tracking-wider shadow-md transition-all rounded-none flex items-center gap-2 disabled:opacity-50"
+                            className="px-6 h-10 bg-[#0285fd] hover:bg-[#0073ff] text-white font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2 disabled:opacity-50"
                         >
                             {saving ? (
                                 <><Loader2 className="animate-spin" size={14} /> Saving...</>
