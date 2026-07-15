@@ -300,21 +300,21 @@ const SubscriptionAdminBoard = () => {
                     </div>
                   </div>
 
-                  <div className="mt-auto border-t border-slate-100 p-4 flex gap-2 bg-slate-50">
+                  <div className="mt-auto border-t border-slate-100 p-4 flex justify-end gap-2 bg-slate-50">
                     <button
                       onClick={() => {
                         setEditingPlan(plan);
                         setShowPlanEditor(true);
                       }}
-                      className="flex-1 flex items-center justify-center gap-2 bg-[#0078d4] hover:bg-[#005a9e] text-white py-2 text-xs font-bold transition-all rounded-[3px] uppercase tracking-wider shadow-sm"
+                      className="flex items-center justify-center gap-1.5 bg-[#0285fd] hover:bg-[#0073ff] text-white px-4 py-1.5 text-[11px] font-bold transition-all rounded-[3px] uppercase tracking-wider shadow-sm"
                     >
-                      <Edit size={12} /> Edit
+                      <Edit size={14} /> Edit
                     </button>
                     <button
                       onClick={() => handleDeletePlan(plan.id)}
-                      className="flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white px-3 py-2 text-xs font-bold transition-all rounded-[3px] uppercase tracking-wider shadow-sm"
+                      className="flex items-center justify-center gap-1.5 bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 text-[11px] font-bold transition-all rounded-[3px] uppercase tracking-wider shadow-sm"
                     >
-                      <Trash2 size={12} />
+                      <Trash2 size={14} />
                     </button>
                   </div>
                 </div>

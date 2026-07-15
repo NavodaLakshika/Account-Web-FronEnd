@@ -141,72 +141,78 @@ const EmployeeMessageDropdown = ({ allEmployees = [], onClose }) => {
             <div className="absolute inset-0 bg-black/40" onClick={onClose}></div>
             
             <div 
-                className="relative w-full md:w-[450px] h-full bg-white shadow-2xl flex flex-col animate-in slide-in-from-right duration-300 border-l border-slate-100 font-['Plus_Jakarta_Sans']"
+                className="relative w-full md:w-[450px] h-full bg-white shadow-2xl flex flex-col border-l border-gray-200 font-['Tahoma']"
                 onClick={(e) => e.stopPropagation()}
             >
                 {view === 'list' && (
                     <>
-                        <div className="h-14 border-b border-slate-100 flex items-center justify-between px-4 shrink-0 bg-white sticky top-0 z-10">
-                            <h3 className="text-[15px] font-semibold text-slate-800 flex items-center gap-2">
-                                <MessageSquare size={18} className="text-[#0285fd]" />
+                        <div className="h-14 border-b border-gray-200 flex items-center justify-between px-4 shrink-0 bg-white">
+                            <h3 className="text-[15px] font-semibold text-gray-800 flex items-center gap-2">
+                                <MessageSquare size={16} className="text-[#0285fd]" />
                                 Messaging Center
                             </h3>
                             <div className="flex items-center gap-1">
                                 <button
                                     onClick={openLogs}
-                                    className="p-1.5 hover:bg-slate-100 text-slate-500 rounded-[3px] transition-colors"
+                                    className="p-1.5 hover:bg-gray-100 text-gray-500 rounded-[3px] transition-colors"
                                     title="Message Logs"
                                 >
                                     <History size={18} />
                                 </button>
-                                <button onClick={onClose} className="p-1.5 hover:bg-slate-100 text-slate-500 rounded-[3px] transition-colors">
+                                <button onClick={onClose} className="p-1.5 hover:bg-gray-100 text-gray-500 rounded-[3px] transition-colors">
                                     <X size={20} />
                                 </button>
                             </div>
                         </div>
-                        <div className="p-4 border-b border-slate-100">
+                        <div className="p-4 border-b border-gray-200">
                             <div className="relative">
-                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                                 <input
                                     type="text"
                                     placeholder="Search employees..."
                                     value={search}
                                     onChange={e => setSearch(e.target.value)}
-                                    className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 text-slate-800 rounded-[3px] text-[13px] focus:outline-none focus:border-[#0285fd] transition-colors placeholder:text-slate-400"
+                                    className="w-full h-10 pl-9 pr-4 border border-gray-300 rounded-[3px] text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 placeholder:text-gray-400"
                                 />
                             </div>
                         </div>
-                        <div className="flex-1 overflow-y-auto p-3">
+                        <div className="flex-1 overflow-y-auto p-4">
                             {filtered.length === 0 ? (
-                                <div className="p-6 text-center text-slate-500 text-sm mt-10">No employees found.</div>
+                                <div className="flex flex-col items-center justify-center h-full text-center px-4">
+                                    <MessageSquare size={40} className="text-gray-300 mb-3" />
+                                    <p className="text-gray-800 font-bold text-sm mb-1">No employees found</p>
+                                    <p className="text-xs text-gray-500">Try adjusting your search.</p>
+                                </div>
                             ) : (
-                                filtered.map((emp, idx) => (
-                                    <div
-                                        key={emp.empCode || emp.emp_Code || emp.id || idx}
-                                        className="flex items-center justify-between p-3 mb-2 bg-white hover:bg-slate-50 border border-slate-200 rounded-[3px] transition-all shadow-sm"
-                                    >
-                                        <div className="flex items-center gap-3 flex-1 min-w-0">
-                                            <div className="w-9 h-9 rounded-[5px] bg-blue-50 text-[#0285fd] flex items-center justify-center font-bold text-sm shrink-0">
-                                                {(emp.emp_Name || emp.empName || emp.name || 'U')[0]}
+                                <div className="space-y-2">
+                                    {filtered.map((emp, idx) => (
+                                        <div
+                                            key={emp.empCode || emp.emp_Code || emp.id || idx}
+                                            className="flex items-center justify-between p-3 bg-white border border-gray-200 rounded-[3px] transition-colors hover:border-gray-300"
+                                        >
+                                            <div className="flex items-center gap-3 flex-1 min-w-0">
+                                                <div className="w-9 h-9 rounded-[3px] bg-blue-50 text-[#0285fd] flex items-center justify-center font-bold text-sm shrink-0 border border-blue-200">
+                                                    {(emp.emp_Name || emp.empName || emp.name || 'U')[0]}
+                                                </div>
+                                                <div className="min-w-0">
+                                                    <p className="font-bold text-gray-800 text-sm truncate">{emp.emp_Name || emp.empName || emp.name}</p>
+                                                    <p className="text-[11px] text-gray-500 flex items-center gap-1 mt-0.5">
+                                                        <Phone size={10} />
+                                                        {getPhone(emp) || <span className="text-gray-400 italic">No phone</span>}
+                                                        <span className="text-gray-400 ml-1">({emp.empCode || emp.emp_Code || ''})</span>
+                                                    </p>
+                                                </div>
                                             </div>
-                                            <div className="min-w-0">
-                                                <p className="font-bold text-slate-800 text-sm truncate">{emp.emp_Name || emp.empName || emp.name}</p>
-                                                <p className="text-[11px] text-slate-500 flex items-center gap-1 mt-1">
-                                                    <Phone size={10} />
-                                                    {getPhone(emp) || <span className="text-slate-400 italic">No phone</span>}
-                                                    <span className="text-slate-400 ml-1">({emp.empCode || emp.emp_Code || ''})</span>
-                                                </p>
+                                            <div className="shrink-0 ml-2">
+                                                {employeeActions(emp)}
                                             </div>
                                         </div>
-                                        <div className="shrink-0 ml-2">
-                                            {employeeActions(emp)}
-                                        </div>
-                                    </div>
-                                ))
+                                    ))}
+                                </div>
                             )}
                         </div>
-                        <div className="p-3 border-t border-slate-100">
-                            <p className="text-[10px] text-slate-500 text-center font-bold tracking-wider uppercase">
+                        <div className="p-3 border-t border-gray-200 bg-gray-50">
+                            <p className="text-[10px] text-gray-500 text-center font-bold tracking-wider uppercase">
                                 {allEmployees.length} EMPLOYEES • {allEmployees.filter(e => getPhone(e)).length} WITH PHONE
                             </p>
                         </div>
@@ -215,28 +221,28 @@ const EmployeeMessageDropdown = ({ allEmployees = [], onClose }) => {
 
                 {view === 'sms' && (
                     <div className="flex flex-col h-full">
-                        <div className="h-14 border-b border-slate-100 flex items-center gap-3 px-4 shrink-0 bg-white sticky top-0 z-10">
-                            <button onClick={() => { setView('list'); setSelectedEmp(null); }} className="p-1.5 hover:bg-slate-100 text-slate-500 rounded-[3px] transition-colors">
+                        <div className="h-14 border-b border-gray-200 flex items-center gap-3 px-4 shrink-0 bg-white">
+                            <button onClick={() => { setView('list'); setSelectedEmp(null); }} className="p-1.5 hover:bg-gray-100 text-gray-500 rounded-[3px] transition-colors">
                                 <ArrowLeft size={18} />
                             </button>
                             <div className="flex-1">
-                                <h3 className="text-[15px] font-semibold text-slate-800">{selectedEmp.emp_Name || selectedEmp.empName || selectedEmp.name}</h3>
-                                <p className="text-xs text-slate-500 flex items-center gap-1"><Phone size={12} /> {getPhone(selectedEmp)}</p>
+                                <h3 className="text-[15px] font-semibold text-gray-800">{selectedEmp.emp_Name || selectedEmp.empName || selectedEmp.name}</h3>
+                                <p className="text-xs text-gray-500 flex items-center gap-1"><Phone size={12} /> {getPhone(selectedEmp)}</p>
                             </div>
-                            <button onClick={onClose} className="p-1.5 hover:bg-slate-100 text-slate-500 rounded-[3px] transition-colors"><X size={20} /></button>
+                            <button onClick={onClose} className="p-1.5 hover:bg-gray-100 text-gray-500 rounded-[3px] transition-colors"><X size={20} /></button>
                         </div>
                         
                         <div className="flex-1 p-5 flex flex-col overflow-y-auto">
                             <div className="text-center mb-6">
-                                <div className="w-14 h-14 rounded-[5px] bg-blue-50 border border-blue-500/20 flex items-center justify-center mx-auto mb-3">
+                                <div className="w-14 h-14 rounded-[3px] bg-blue-50 border border-blue-200 flex items-center justify-center mx-auto mb-3">
                                     <Smartphone size={24} className="text-[#0285fd]" />
                                 </div>
-                                <h4 className="font-bold text-slate-800 text-sm">Send SMS Message</h4>
-                                <p className="text-xs text-slate-500 mt-1">Message will be sent instantly via SMS gateway</p>
+                                <h4 className="font-bold text-gray-800 text-sm">Send SMS Message</h4>
+                                <p className="text-xs text-gray-500 mt-1">Message will be sent instantly via SMS gateway</p>
                             </div>
 
                             <div className="mb-4">
-                                <div className="flex items-center gap-2 mb-2 text-xs font-bold text-slate-500 uppercase tracking-wider">
+                                <div className="flex items-center gap-2 mb-2 text-[11px] font-bold text-gray-500 uppercase tracking-wider">
                                     <FileText size={12} /> Quick Templates
                                 </div>
                                 <div className="flex flex-wrap gap-2">
@@ -244,7 +250,7 @@ const EmployeeMessageDropdown = ({ allEmployees = [], onClose }) => {
                                         <button 
                                             key={idx}
                                             onClick={() => applyTemplate(tmpl)}
-                                            className="text-left px-3 py-1.5 bg-slate-50 border border-slate-200 hover:border-[#0285fd] hover:text-[#0285fd] text-xs text-slate-600 rounded-[3px] transition-colors"
+                                            className="text-left px-3 py-1.5 bg-white border border-gray-300 hover:border-[#0285fd] hover:text-[#0285fd] text-xs text-gray-600 rounded-[3px] transition-colors"
                                         >
                                             {tmpl}
                                         </button>
@@ -258,19 +264,19 @@ const EmployeeMessageDropdown = ({ allEmployees = [], onClose }) => {
                                     onChange={e => setSmsText(e.target.value)}
                                     placeholder="Type your custom SMS message here..."
                                     maxLength={160}
-                                    className="flex-1 w-full bg-slate-50 border border-slate-200 text-slate-800 rounded-[3px] p-4 text-sm focus:outline-none focus:border-[#0285fd] resize-none placeholder:text-slate-400 min-h-[120px]"
+                                    className="flex-1 w-full border border-gray-300 rounded-[3px] p-4 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 placeholder:text-gray-400 resize-none min-h-[120px]"
                                 />
-                                <div className="absolute bottom-3 right-3 text-[10px] font-mono text-slate-500 font-medium">
+                                <div className="absolute bottom-3 right-3 text-[10px] font-mono text-gray-500 font-medium">
                                     {smsText.length}/160
                                 </div>
                             </div>
                         </div>
                         
-                        <div className="p-4 border-t border-slate-100">
+                        <div className="p-4 border-t border-gray-200">
                             <button
                                 onClick={handleSendSms}
                                 disabled={!smsText.trim() || sendingSms}
-                                className="w-full flex items-center justify-center gap-2 bg-[#0285fd] hover:bg-blue-600 disabled:opacity-50 text-white py-3 rounded-[3px] font-bold text-sm transition-all"
+                                className="w-full h-10 flex items-center justify-center gap-2 bg-[#0285fd] hover:bg-[#0073ff] disabled:opacity-50 text-white font-semibold rounded-[3px] shadow-sm text-[13px] transition-all"
                             >
                                 {sendingSms ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
                                 {sendingSms ? 'Sending SMS...' : 'Send Message Now'}
@@ -281,42 +287,45 @@ const EmployeeMessageDropdown = ({ allEmployees = [], onClose }) => {
 
                 {view === 'logs' && (
                     <div className="flex flex-col h-full">
-                        <div className="h-14 border-b border-slate-100 flex items-center justify-between px-4 shrink-0 bg-white sticky top-0 z-10">
+                        <div className="h-14 border-b border-gray-200 flex items-center justify-between px-4 shrink-0 bg-white">
                             <div className="flex items-center gap-3">
-                                <button onClick={() => setView('list')} className="p-1.5 hover:bg-slate-100 text-slate-500 rounded-[3px] transition-colors">
+                                <button onClick={() => setView('list')} className="p-1.5 hover:bg-gray-100 text-gray-500 rounded-[3px] transition-colors">
                                     <ArrowLeft size={18} />
                                 </button>
-                                <h3 className="text-[15px] font-semibold text-slate-800">Message History</h3>
+                                <h3 className="text-[15px] font-semibold text-gray-800">Message History</h3>
                             </div>
-                            <button onClick={onClose} className="p-1.5 hover:bg-slate-100 text-slate-500 rounded-[3px] transition-colors"><X size={20} /></button>
+                            <button onClick={onClose} className="p-1.5 hover:bg-gray-100 text-gray-500 rounded-[3px] transition-colors"><X size={20} /></button>
                         </div>
-                        <div className="flex-1 overflow-y-auto p-4">
+                        <div className="flex-1 overflow-y-auto p-5">
                             {loadingLogs ? (
                                 <div className="flex items-center justify-center h-full">
                                     <Loader2 size={24} className="animate-spin text-[#0285fd]" />
                                 </div>
                             ) : messageLogs.length === 0 ? (
-                                <div className="text-center text-slate-500 text-sm mt-20 flex flex-col items-center">
-                                    <History size={40} className="text-slate-300 mb-3" />
-                                    No message logs yet.
+                                <div className="flex flex-col items-center justify-center h-full text-center px-4">
+                                    <History size={40} className="text-gray-300 mb-3" />
+                                    <p className="text-gray-800 font-bold text-sm mb-1">No message logs</p>
+                                    <p className="text-xs text-gray-500">Sent messages will appear here.</p>
                                 </div>
                             ) : (
-                                messageLogs.map((log, idx) => (
-                                    <div key={log.id || idx} className="p-3 mb-3 bg-white border border-slate-200 rounded-[3px]">
-                                        <div className="flex items-center justify-between mb-2">
-                                            <div className="flex items-center gap-2">
-                                                <CheckCircle size={14} className="text-emerald-500" />
-                                                <span className="font-bold text-slate-800 text-sm">{log.receiverName || log.phoneNumber}</span>
+                                <div className="space-y-3">
+                                    {messageLogs.map((log, idx) => (
+                                        <div key={log.id || idx} className="bg-white border border-gray-200 rounded-[3px] p-4">
+                                            <div className="flex items-center justify-between mb-2">
+                                                <div className="flex items-center gap-2">
+                                                    <CheckCircle size={14} className="text-emerald-600" />
+                                                    <span className="font-bold text-gray-800 text-sm">{log.receiverName || log.phoneNumber}</span>
+                                                </div>
+                                                <span className="text-[10px] text-gray-500 bg-gray-100 px-2 py-0.5 rounded-[3px] font-medium">{log.sentAt ? new Date(log.sentAt).toLocaleString() : ''}</span>
                                             </div>
-                                            <span className="text-[10px] text-slate-500 bg-slate-100 px-2 py-0.5 rounded-[3px] font-medium">{log.sentAt ? new Date(log.sentAt).toLocaleString() : ''}</span>
+                                            <p className="text-[12px] text-gray-600 mb-2 leading-relaxed bg-gray-50 border border-gray-200 p-2 rounded-[3px]">{log.messageText}</p>
+                                            <div className="flex items-center gap-2 text-[10px] text-gray-500 font-medium">
+                                                <Phone size={10} /> {log.phoneNumber}
+                                                <span className="ml-auto text-[#0285fd]">Sent by: {log.senderName}</span>
+                                            </div>
                                         </div>
-                                        <p className="text-xs text-slate-600 mb-2 leading-relaxed bg-slate-50 p-2 rounded-[3px] border border-slate-200">{log.messageText}</p>
-                                        <div className="flex items-center gap-2 text-[10px] text-slate-500 font-medium">
-                                            <Phone size={10} /> {log.phoneNumber}
-                                            <span className="ml-auto text-[#0285fd]">Sent by: {log.senderName}</span>
-                                        </div>
-                                    </div>
-                                ))
+                                    ))}
+                                </div>
                             )}
                         </div>
                     </div>
