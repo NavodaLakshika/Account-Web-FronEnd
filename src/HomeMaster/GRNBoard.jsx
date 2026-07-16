@@ -643,7 +643,7 @@ const GRNBoard = ({ isOpen, onClose }) => {
                                     <input
                                         type="text"
                                         value={p.qty}
-                                        onChange={(e) => {
+                                        onChange={(ev) => {
                                             const newQty = e.target.value;
                                             const newAmount = (parseFloat(newQty) || 0) * (parseFloat(p.cost) || 0);
                                             setProducts(products.map((item, i) =>
@@ -657,7 +657,7 @@ const GRNBoard = ({ isOpen, onClose }) => {
                                     <input
                                         type="text"
                                         value={p.free}
-                                        onChange={(e) => {
+                                        onChange={(ev) => {
                                             setProducts(products.map((item, i) =>
                                                 i === idx ? { ...item, free: e.target.value } : item
                                             ));
@@ -841,7 +841,7 @@ const GRNBoard = ({ isOpen, onClose }) => {
                                     className="w-full h-10 pl-10 pr-4 border border-gray-300 rounded-[3px] outline-none text-[13px] focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] shadow-sm bg-white"
                                     value={productSearchQuery}
                                     onChange={async (e) => {
-                                        const val = e.target.value; setProductSearchQuery(val);
+                                        const val = ev.target.value; setProductSearchQuery(val);
                                         if (val.length >= 2) { try { const r = await grnService.searchProducts(val); setLookups(prev => ({ ...prev, products: r })); } catch (_) {} }
                                         else if (val.length === 0) { const init = await grnService.getLookups(formData.company); setLookups(prev => ({ ...prev, products: init.products })); }
                                     }}
@@ -1004,7 +1004,7 @@ const GRNBoard = ({ isOpen, onClose }) => {
                         <span className="text-[12px] font-bold text-gray-500 uppercase tracking-widest">Search Facility</span>
                         <div className="relative flex-1">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
-                            <input type="text" placeholder="Scan items by generic title or reference code..." className="w-full h-10 pl-10 pr-4 border border-gray-300 rounded-[3px] outline-none text-[13px] focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] shadow-sm bg-white" value={productSearchQuery} onChange={async (e) => { const val = e.target.value; setProductSearchQuery(val); if (val.length >= 2) { try { const results = await grnService.searchProducts(val); setLookups(prev => ({ ...prev, products: results })); } catch (err) { } } else if (val.length === 0) { const init = await grnService.getLookups(formData.company); setLookups(prev => ({ ...prev, products: init.products })); } }} autoFocus />
+                            <input type="text" placeholder="Scan items by generic title or reference code..." className="w-full h-10 pl-10 pr-4 border border-gray-300 rounded-[3px] outline-none text-[13px] focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] shadow-sm bg-white" value={productSearchQuery} onChange={async (e) => { const val = ev.target.value; setProductSearchQuery(val); if (val.length >= 2) { try { const results = await grnService.searchProducts(val); setLookups(prev => ({ ...prev, products: results })); } catch (err) { } } else if (val.length === 0) { const init = await grnService.getLookups(formData.company); setLookups(prev => ({ ...prev, products: init.products })); } }} autoFocus />
                         </div>
                     </div>
                     <div className="border border-gray-200 rounded-[3px] overflow-hidden shadow-sm">

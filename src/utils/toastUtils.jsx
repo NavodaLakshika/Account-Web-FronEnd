@@ -5,136 +5,69 @@ import { Check, X, AlertTriangle, Info, Clock, Copy, Pause } from 'lucide-react'
 
 const ToastLayout = ({
     t,
-    icon,
-    hugeIcon,
     title,
     subtitle,
     bgClass,
     btnClass,
-    duration = 4000,
-    glowColor,
+    hugeIcon,
+    options = {},
+    duration = 4000
 }) => {
-    const [isPaused, setIsPaused] = useState(duration === Infinity);
-    const [copied, setCopied] = useState(false);
-    const [isGlowActive, setIsGlowActive] = useState(false);
-
-    useEffect(() => {
-        if (glowColor && t.visible) {
-            setIsGlowActive(true);
-            const timer = setTimeout(() => {
-                setIsGlowActive(false);
-            }, 1000);
-            return () => clearTimeout(timer);
-        }
-    }, [glowColor, t.visible]);
-
-    const handleCopy = () => {
-        if (subtitle) {
-            navigator.clipboard.writeText(subtitle);
-            setCopied(true);
-            setTimeout(() => setCopied(false), 2000);
-        }
-    };
-
-    const handlePause = () => {
-        setIsPaused(true);
-        toast.custom(
-            (tRef) => (
-                <ToastLayout
-                    t={tRef}
-                    icon={icon}
-                    hugeIcon={hugeIcon}
-                    title={title}
-                    subtitle={subtitle}
-                    bgClass={bgClass}
-                    btnClass={btnClass}
-                    duration={Infinity}
-                    glowColor={glowColor}
-                />
-            ),
-            { id: t.id, duration: Infinity }
-        );
-    };
-
-    return (
-        <>
-            {glowColor && createPortal(
-                <div 
-                    className={`fixed inset-0 w-full h-full pointer-events-none z-[9998] transition-opacity duration-1000 ease-in-out ${isGlowActive ? 'opacity-100' : 'opacity-0'}`}
-                    style={{
-                        background: `linear-gradient(180deg, ${glowColor} 0%, rgba(255,255,255,0) 60%)`
-                    }}
-                />,
-                document.body
-            )}
-            <div className={`max-w-[420px] w-full rounded-[3px] shadow-2xl overflow-hidden pointer-events-auto flex flex-col relative ${t.visible ? 'animate-in fade-in slide-in-from-right-8 duration-200' : 'animate-out fade-out slide-out-to-right-8 duration-200'}`}>
-                
+    return createPortal(
+        <div className={`fixed inset-0 z-[9999] flex items-center justify-center p-4 font-['Plus_Jakarta_Sans'] ${t.visible ? 'pointer-events-auto animate-in fade-in' : 'pointer-events-none animate-out fade-out'} duration-200`}>
+            <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" onClick={() => toast.remove(t.id)} />
+            
+            <div className={`relative w-[600px] bg-white shadow-[0_10px_40px_rgb(0,0,0,0.3)] overflow-hidden ${t.visible ? 'animate-in fade-in zoom-in-95' : 'animate-out fade-out zoom-out-95'} duration-200 rounded-[3px]`}>
                 {/* Colored Area */}
-                <div className={`relative ${bgClass} overflow-hidden w-full flex flex-col`}>
-                    
-                    {/* Background Huge Icon */}
-                    {hugeIcon}
+                <div className={`relative ${bgClass} overflow-hidden w-full flex flex-col py-6`}>
+                    {/* Watermark Icon */}
+                    <div className="absolute right-0 top-1/2 -translate-y-1/2 pointer-events-none flex items-center justify-center">
+                        {hugeIcon}
+                    </div>
 
-                    {/* Header */}
-                    <div className="px-4 py-2 border-b border-black/10 flex justify-between items-center relative z-10">
-                        <h3 className="text-[16px] font-normal text-white tracking-wide">
-                            {title}
-                        </h3>
-                        <div className="flex items-center gap-3">
+                    <div className="max-w-7xl mx-auto w-full relative z-10 px-6">
+                        {/* Header */}
+                        <div className="pb-2 border-b border-black/10 flex justify-between items-center">
+                            <h3 className="text-[15px] font-mono font-bold text-white uppercase tracking-widest">{title}</h3>
+                        </div>
+                        
+                        {/* Content */}
+                        <div className="pt-3 pb-2">
                             {subtitle && (
-                                <button 
-                                    onClick={handleCopy} 
-                                    className="text-white hover:text-white/80 transition-colors flex items-center gap-1"
-                                    title="Copy message"
-                                >
-                                    {copied ? <Check size={14} strokeWidth={3} /> : <Copy size={14} strokeWidth={2.5} />}
-                                </button>
+                                <p className="text-white/95 text-[15px] leading-relaxed font-sans max-w-3xl">
+                                    {subtitle}
+                                </p>
                             )}
-                            {!isPaused && (
-                                <button 
-                                    onClick={handlePause} 
-                                    className="text-white hover:text-white/80 transition-colors"
-                                    title="Stop auto-close"
-                                >
-                                    <Pause size={14} strokeWidth={2.5} fill="currentColor" />
-                                </button>
-                            )}
-                            <button 
-                                onClick={() => toast.dismiss(t.id)} 
-                                className="text-white hover:text-white/80 transition-colors"
-                                title="Close"
-                            >
-                                <X size={16} strokeWidth={3} />
-                            </button>
                         </div>
                     </div>
+                </div>
 
-                    {/* Content Area */}
-                    <div className="px-4 py-3 relative z-10 pb-4">
-                        {subtitle && (
-                            <p className="text-[13px] text-white/95 leading-relaxed font-sans">
-                                {subtitle}
-                            </p>
-                        )}
-                    </div>
-                    
-                    {/* Progress Bar Loader */}
-                    <div className="w-full h-[3px] bg-white/20 relative z-10 mt-auto">
-                        {!isPaused && (
-                            <div
-                                className="h-full bg-white/90"
-                                style={{
-                                    animation: `toastProgress ${duration}ms linear forwards`
-                                }}
-                            />
-                        )}
-                        {isPaused && (
-                            <div className="h-full bg-white/50 w-full" />
-                        )}
+                {/* White Footer Area */}
+                <div className="bg-white py-3 w-full flex relative z-10">
+                    <div className="max-w-7xl mx-auto w-full px-6 flex justify-end gap-3">
+                        <button 
+                            onClick={() => {
+                                if (options.onCancel) options.onCancel();
+                                toast.remove(t.id);
+                            }}
+                            className="px-8 py-2 bg-[#cccccc] hover:bg-[#b3b3b3] text-white font-medium rounded-[3px] transition-colors text-[14px] uppercase"
+                        >
+                            Cancel
+                        </button>
+                        <button 
+                            onClick={() => {
+                                if (options.onConfirm) options.onConfirm();
+                                toast.remove(t.id);
+                            }}
+                            className={`px-8 py-2 ${btnClass} text-white font-medium rounded-[3px] hover:brightness-90 transition-all text-[14px] uppercase flex items-center justify-center gap-2 min-w-[100px] shadow-sm`}
+                        >
+                            OK
+                        </button>
                     </div>
                 </div>
             </div>
-        </>
+        </div>,
+        document.body
     );
 };
 
@@ -148,7 +81,7 @@ const parseArgs = (arg) => {
 /* SUCCESS */
 export const showSuccessToast = (message, subMessageOrOptions) => {
     const { subMessage, options } = parseArgs(subMessageOrOptions);
-    const duration = options.duration || 4000;
+    const duration = options.duration || Infinity;
     const displayTitle = subMessage ? message : "Success";
     const displaySubtitle = subMessage ? subMessage : (message || "Operation completed successfully");
     toast.custom(
@@ -158,16 +91,17 @@ export const showSuccessToast = (message, subMessageOrOptions) => {
                 title={displayTitle}
                 subtitle={displaySubtitle}
                 hugeIcon={(
-                    <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-6 pointer-events-none flex items-center justify-center">
-                        <svg width="220" height="220" viewBox="0 0 100 100" className="fill-black opacity-[0.08]">
+                    <>
+                        <svg width="200" height="200" viewBox="0 0 100 100" className="fill-black opacity-[0.05]">
                              <polygon points="25,0 75,0 100,25 100,75 75,100 25,100 0,75 0,25" />
                         </svg>
-                        <Check size={120} strokeWidth={4} className="text-black opacity-[0.12] absolute" />
-                    </div>
+                        <Check size={120} strokeWidth={4} className="text-black opacity-[0.08] absolute right-[40px]" />
+                    </>
                 )}
                 bgClass="bg-[#5cb85c]"
                 btnClass="bg-[#5cb85c]"
                 glowColor="rgba(92, 184, 92, 0.15)"
+                options={options}
                 duration={duration}
             />
         ),
@@ -182,7 +116,7 @@ export const showSuccessToast = (message, subMessageOrOptions) => {
 /* ERROR */
 export const showErrorToast = (message, subMessageOrOptions) => {
     const { subMessage, options } = parseArgs(subMessageOrOptions);
-    const duration = options.duration || 4000;
+    const duration = options.duration || Infinity;
     const displayTitle = subMessage ? message : "Error";
     const displaySubtitle = subMessage ? subMessage : (message || "An error occurred");
     toast.custom(
@@ -192,18 +126,19 @@ export const showErrorToast = (message, subMessageOrOptions) => {
                 title={displayTitle}
                 subtitle={displaySubtitle}
                 hugeIcon={(
-                    <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-6 pointer-events-none flex items-center justify-center">
-                        <svg width="220" height="220" viewBox="0 0 100 100" className="fill-black opacity-[0.08]">
+                    <>
+                        <svg width="200" height="200" viewBox="0 0 100 100" className="fill-black opacity-[0.05]">
                              <polygon points="25,0 75,0 100,25 100,75 75,100 25,100 0,75 0,25" />
                         </svg>
-                        <svg width="130" height="130" viewBox="0 0 100 100" className="fill-black opacity-[0.12] absolute">
+                        <svg width="120" height="120" viewBox="0 0 100 100" className="fill-black opacity-[0.08] absolute right-[40px]">
                              <path d="M20,5 L50,35 L80,5 L95,20 L65,50 L95,80 L80,95 L50,65 L20,95 L5,80 L35,50 L5,20 Z" />
                         </svg>
-                    </div>
+                    </>
                 )}
-                bgClass="bg-[#dc2626]"
-                btnClass="bg-[#dc2626]"
-                glowColor="rgba(220, 38, 38, 0.15)"
+                bgClass="bg-[#d9534f]"
+                btnClass="bg-[#d9534f]"
+                glowColor="rgba(217, 83, 79, 0.15)"
+                options={options}
                 duration={duration}
             />
         ),
@@ -218,7 +153,7 @@ export const showErrorToast = (message, subMessageOrOptions) => {
 /* INFO */
 export const showInfoToast = (message, subMessageOrOptions) => {
     const { subMessage, options } = parseArgs(subMessageOrOptions);
-    const duration = options.duration || 4000;
+    const duration = options.duration || Infinity;
     const displayTitle = subMessage ? message : "Information";
     const displaySubtitle = subMessage ? subMessage : (message || "Here is some information");
     toast.custom(
@@ -228,16 +163,17 @@ export const showInfoToast = (message, subMessageOrOptions) => {
                 title={displayTitle}
                 subtitle={displaySubtitle}
                 hugeIcon={(
-                    <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-6 pointer-events-none flex items-center justify-center">
-                        <svg width="220" height="220" viewBox="0 0 100 100" className="fill-black opacity-[0.08]">
+                    <>
+                        <svg width="200" height="200" viewBox="0 0 100 100" className="fill-black opacity-[0.05]">
                              <polygon points="25,0 75,0 100,25 100,75 75,100 25,100 0,75 0,25" />
                         </svg>
-                        <Info size={120} strokeWidth={4} className="text-black opacity-[0.12] absolute" />
-                    </div>
+                        <Info size={120} strokeWidth={4} className="text-black opacity-[0.08] absolute right-[40px]" />
+                    </>
                 )}
                 bgClass="bg-[#5bc0de]"
                 btnClass="bg-[#5bc0de]"
                 glowColor="rgba(91, 192, 222, 0.15)"
+                options={options}
                 duration={duration}
             />
         ),
@@ -252,7 +188,7 @@ export const showInfoToast = (message, subMessageOrOptions) => {
 /* PENDING / WAIT */
 export const showPendingToast = (message, subMessageOrOptions) => {
     const { subMessage, options } = parseArgs(subMessageOrOptions);
-    const duration = options.duration || 4000;
+    const duration = options.duration || Infinity;
     const displayTitle = subMessage ? message : "Pending";
     const displaySubtitle = subMessage ? subMessage : (message || "Processing your request");
     toast.custom(
@@ -262,16 +198,17 @@ export const showPendingToast = (message, subMessageOrOptions) => {
                 title={displayTitle}
                 subtitle={displaySubtitle}
                 hugeIcon={(
-                    <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-6 pointer-events-none flex items-center justify-center">
-                        <svg width="220" height="220" viewBox="0 0 100 100" className="fill-black opacity-[0.08]">
+                    <>
+                        <svg width="200" height="200" viewBox="0 0 100 100" className="fill-black opacity-[0.05]">
                              <polygon points="25,0 75,0 100,25 100,75 75,100 25,100 0,75 0,25" />
                         </svg>
-                        <Clock size={120} strokeWidth={4} className="text-black opacity-[0.12] absolute" />
-                    </div>
+                        <Clock size={120} strokeWidth={4} className="text-black opacity-[0.08] absolute right-[40px]" />
+                    </>
                 )}
                 bgClass="bg-[#f0ad4e]"
                 btnClass="bg-[#f0ad4e]"
                 glowColor="rgba(240, 173, 78, 0.15)"
+                options={options}
                 duration={duration}
             />
         ),

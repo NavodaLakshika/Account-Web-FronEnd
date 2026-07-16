@@ -200,8 +200,8 @@ const InventoryDownloadBoard = ({ isOpen, onClose }) => {
                                 <div className="relative">
                                     <select
                                         value={selectedLocation.code}
-                                        onChange={(e) => {
-                                            const val = e.target.value;
+                                        onChange={(ev) => {
+                                            const val = ev.target.value;
                                             const item = (locations || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || i === val);
                                             if (item) {
                                                 const handler = setSelectedLocation;
@@ -272,8 +272,8 @@ const InventoryDownloadBoard = ({ isOpen, onClose }) => {
                                 <div className="relative">
                                     <select
                                         value={selectedCostCenter.code}
-                                        onChange={(e) => {
-                                            const val = e.target.value;
+                                        onChange={(ev) => {
+                                            const val = ev.target.value;
                                             const item = (costCenters || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || i === val);
                                             if (item) {
                                                 const handler = setSelectedCostCenter;

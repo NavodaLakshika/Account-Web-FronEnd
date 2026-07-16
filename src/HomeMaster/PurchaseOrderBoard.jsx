@@ -553,7 +553,7 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
                                         <input
                                             type="text"
                                             value={p.purchasePrice}
-                                            onChange={(e) => {
+                                            onChange={(ev) => {
                                                 const newPrice = e.target.value;
                                                 const newAmount = (parseFloat(p.qty) || 0) * (parseFloat(newPrice) || 0);
                                                 setProducts(products.map((item, i) =>
@@ -567,7 +567,7 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
                                         <input
                                             type="text"
                                             value={p.qty}
-                                            onChange={(e) => {
+                                            onChange={(ev) => {
                                                 const newQty = e.target.value;
                                                 const newAmount = (parseFloat(newQty) || 0) * (parseFloat(p.purchasePrice) || 0);
                                                 setProducts(products.map((item, i) =>
@@ -796,7 +796,7 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
                                     className="w-full h-10 pl-10 pr-4 border border-gray-300 rounded-[3px] outline-none text-[13px] focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] shadow-sm bg-white"
                                     value={productSearchQuery}
                                     onChange={async (e) => {
-                                        const val = e.target.value; setProductSearchQuery(val);
+                                        const val = ev.target.value; setProductSearchQuery(val);
                                         if (val.length >= 2) { try { const r = await purchOrderService.searchProducts(val); setLookups(prev => ({ ...prev, products: r })); } catch (_) {} }
                                         else if (val.length === 0) { const init = await purchOrderService.getLookups(formData.company); setLookups(prev => ({ ...prev, products: init.products })); }
                                     }}
@@ -951,7 +951,7 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
                                 className="w-full h-10 pl-10 pr-4 border border-gray-300 rounded-[3px] outline-none text-[13px] focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] shadow-sm bg-white"
                                 value={productSearchQuery}
                                 onChange={async (e) => {
-                                    const val = e.target.value;
+                                    const val = ev.target.value;
                                     setProductSearchQuery(val);
                                     if (val.length >= 2) {
                                         try {

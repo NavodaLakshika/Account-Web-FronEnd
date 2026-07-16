@@ -411,25 +411,50 @@ const PayBillBoard = ({ isOpen, onClose }) => {
                                 <div className="">
                                     <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Vendor Name</label>
                                     <div className="relative">
-                                        <input
-                                            type="text"
-                                            readOnly
-                                            value={lookups.vendors.find(v => v.code === formData.vendorId)?.name || ''}
-                                            className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
-                                            onClick={() => setShowVendorModal(true)}
-                                         style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
+                                        <select
+                                        value={lookups.vendors}
+                                        onChange={(ev) => {
+                                            const val = ev.target.value;
+                                            const v = (lookups.vendors || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || (i.itemId && i.itemId.toString() === val) || (i.id && i.id.toString() === val) || i === val);
+                                            if (v) {
+                                                handleInput({ target: { name: 'vendorId', value: v.code } });
+                                            }
+                                        }}
+                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
+                                        style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
+                                    >
+                                        <option value="">Select...</option>
+                                        {(lookups.vendors || []).map((v, idx) => (
+                                            <option key={idx} value={v.code || v.itemId || v.id || v.name || v}>
+                                                {v.code ? `${v.code} - ${v.name}` : (v.itemId ? `${v.itemId} - ${v.itemName || v.name}` : (v.name || v))}
+                                            </option>
+                                        ))}
+                                    </select>
                                     </div>
                                 </div>
                                 <div className="">
                                     <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Cost Center</label>
                                     <div className="relative">
-                                        <input
-                                            type="text"
-                                            readOnly
-                                            value={lookups.costCenters.find(c => c.code === formData.costCenter)?.name || ''}
-                                            className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 appearance-none"
-                                            onClick={() => { setCcSource('header'); setShowCCModal(true); }}
-                                         style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
+                                        <select
+                                        value={lookups.costCenters}
+                                        onChange={(ev) => {
+                                            const val = ev.target.value;
+                                            const c = (lookups.costCenters || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || (i.itemId && i.itemId.toString() === val) || (i.id && i.id.toString() === val) || i === val);
+                                            if (c) {
+                                                const field = ccSource === 'header' ? 'costCenter' : 'payCostCenter';
+                                                setFormData(prev => ({ ...prev, [field]: c.code }));
+                                            }
+                                        }}
+                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 appearance-none"
+                                        style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
+                                    >
+                                        <option value="">Select...</option>
+                                        {(lookups.costCenters || []).map((c, idx) => (
+                                            <option key={idx} value={c.code || c.itemId || c.id || c.name || c}>
+                                                {c.code ? `${c.code} - ${c.name}` : (c.itemId ? `${c.itemId} - ${c.itemName || c.name}` : (c.name || c))}
+                                            </option>
+                                        ))}
+                                    </select>
                                     </div>
                                 </div>
                             </div>
@@ -593,13 +618,25 @@ const PayBillBoard = ({ isOpen, onClose }) => {
                                 <div className="">
                                     <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Payment Account</label>
                                     <div className="relative">
-                                        <input
-                                            type="text"
-                                            readOnly
-                                            value={availableAccounts.find(a => a.code === formData.accId)?.name ? `${formData.accId} - ${availableAccounts.find(a => a.code === formData.accId).name}` : ''}
-                                            className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
-                                            onClick={() => setShowAccModal(true)}
-                                         style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
+                                        <select
+                                        value={availableAccounts.find}
+                                        onChange={(ev) => {
+                                            const val = ev.target.value;
+                                            const a = (availableAccounts || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || (i.itemId && i.itemId.toString() === val) || (i.id && i.id.toString() === val) || i === val);
+                                            if (a) {
+                                                setFormData(prev => ({ ...prev, accId: a.code }));
+                                            }
+                                        }}
+                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
+                                        style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
+                                    >
+                                        <option value="">Select...</option>
+                                        {(availableAccounts || []).map((a, idx) => (
+                                            <option key={idx} value={a.code || a.itemId || a.id || a.name || a}>
+                                                {a.code ? `${a.code} - ${a.name}` : (a.itemId ? `${a.itemId} - ${a.itemName || a.name}` : (a.name || a))}
+                                            </option>
+                                        ))}
+                                    </select>
                                     </div>
                                 </div>
 
@@ -611,13 +648,26 @@ const PayBillBoard = ({ isOpen, onClose }) => {
                                 <div className="">
                                     <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Allocation Cost Center</label>
                                     <div className="relative">
-                                        <input
-                                            type="text"
-                                            readOnly
-                                            value={lookups.costCenters.find(c => c.code === formData.payCostCenter)?.name || ''}
-                                            className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 appearance-none"
-                                            onClick={() => { setCcSource('payment'); setShowCCModal(true); }}
-                                         style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
+                                        <select
+                                        value={lookups.costCenters}
+                                        onChange={(ev) => {
+                                            const val = ev.target.value;
+                                            const c = (lookups.costCenters || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || (i.itemId && i.itemId.toString() === val) || (i.id && i.id.toString() === val) || i === val);
+                                            if (c) {
+                                                const field = ccSource === 'header' ? 'costCenter' : 'payCostCenter';
+                                                setFormData(prev => ({ ...prev, [field]: c.code }));
+                                            }
+                                        }}
+                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 appearance-none"
+                                        style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
+                                    >
+                                        <option value="">Select...</option>
+                                        {(lookups.costCenters || []).map((c, idx) => (
+                                            <option key={idx} value={c.code || c.itemId || c.id || c.name || c}>
+                                                {c.code ? `${c.code} - ${c.name}` : (c.itemId ? `${c.itemId} - ${c.itemName || c.name}` : (c.name || c))}
+                                            </option>
+                                        ))}
+                                    </select>
                                     </div>
                                 </div>
 

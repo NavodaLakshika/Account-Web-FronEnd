@@ -252,8 +252,8 @@ const OpeningBalanceBoard = ({ isOpen, onClose }) => {
                                 <div className="relative">
                                     <select
                                         value={formData.accountName}
-                                        onChange={(e) => {
-                                            const val = e.target.value;
+                                        onChange={(ev) => {
+                                            const val = ev.target.value;
                                             const item = (getAccountItems() || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || i === val);
                                             if (item) {
                                                 const handler = (item) => { setFormData(prev => ({ ...prev, accountCode: item.code, accountName: item.name })); };
@@ -279,8 +279,8 @@ const OpeningBalanceBoard = ({ isOpen, onClose }) => {
                                 <div className="relative">
                                     <select
                                         value={formData.costCenter}
-                                        onChange={(e) => {
-                                            const val = e.target.value;
+                                        onChange={(ev) => {
+                                            const val = ev.target.value;
                                             const item = (getAccountItems() || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || i === val);
                                             if (item) {
                                                 const handler = (item) => { setFormData(prev => ({ ...prev, accountCode: item.code, accountName: item.name })); };
@@ -307,8 +307,8 @@ const OpeningBalanceBoard = ({ isOpen, onClose }) => {
                                     <div className="relative">
                                         <select
                                         value={formData.entityName}
-                                        onChange={(e) => {
-                                            const val = e.target.value;
+                                        onChange={(ev) => {
+                                            const val = ev.target.value;
                                             const item = (getEntityItems() || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || i === val);
                                             if (item) {
                                                 const handler = (item) => { setFormData(prev => ({ ...prev, entityId: item.code, entityName: item.name, address: item.address || '' })); };

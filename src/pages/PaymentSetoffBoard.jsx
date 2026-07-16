@@ -264,8 +264,8 @@ const PaymentSetoffBoard = ({ isOpen, onClose }) => {
                                 <div className="relative">
                                     <select
                                         value={formData.supplierName}
-                                        onChange={(e) => {
-                                            const val = e.target.value;
+                                        onChange={(ev) => {
+                                            const val = ev.target.value;
                                             const item = (lookups.suppliers || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || i === val);
                                             if (item) {
                                                 const handler = handleSupplierSelect;

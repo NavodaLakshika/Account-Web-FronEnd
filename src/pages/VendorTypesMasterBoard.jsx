@@ -15,7 +15,6 @@ const VendorTypesMasterBoard = ({ isOpen, onClose }) => {
     const [showAccModal, setShowAccModal] = useState(false);
     const [vendors, setVendors] = useState([]);
     const [accounts, setAccounts] = useState([]);
-    const [showSaveConfirm, setShowSaveConfirm] = useState(false);
     const [vendorSearchTerm, setVendorSearchTerm] = useState('');
     const [accSearchTerm, setAccSearchTerm] = useState('');
 
@@ -52,13 +51,9 @@ const VendorTypesMasterBoard = ({ isOpen, onClose }) => {
         setShowAccModal(false);
     };
 
-    const handleSave = () => {
+    const handleSave = async () => {
         if (!formData.VendorType.trim()) { showErrorToast('Vendor Type is required'); return; }
-        setShowSaveConfirm(true);
-    };
-
-    const confirmSave = async () => {
-        setShowSaveConfirm(false);
+        
         setLoading(true);
         try {
             await vendorTypeService.save(formData);
@@ -90,17 +85,54 @@ const VendorTypesMasterBoard = ({ isOpen, onClose }) => {
             >
                 <div className="space-y-3 overflow-y-auto no-scrollbar font-['Tahoma']">
                     <div className="bg-white p-4 border border-slate-200 rounded-[3px] space-y-4">
+                        <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Contextual Metadata</div>
+                        <p className="text-[12px] text-gray-500 font-medium leading-relaxed">
+                            Create and manage Vendor Type classifications. Ensure you assign the correct Payable Account to link these vendors to the general ledger.
+                        </p>
+                    </div>
+                    <div className="bg-white p-4 border border-slate-200 rounded-[3px] space-y-4">
                         <div className="grid grid-cols-12 gap-x-6 gap-y-3.5">
                             <div className="col-span-6">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Vendor Type</label>
                                 <div className="relative">
-                                    <input type="text" value={formData.VendorType} readOnly onClick={() => setShowVendorModal(true)} placeholder="Select vendor type" className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 cursor-pointer appearance-none"  style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
+                                    <input 
+                                        type="text"
+                                        list="vendorTypesList"
+                                        value={formData.VendorType} 
+                                        onChange={(e) => setFormData(prev => ({ ...prev, VendorType: e.target.value.toUpperCase() }))}
+                                        placeholder="Select or type vendor type..."
+                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 uppercase"
+                                    />
+                                    <datalist id="vendorTypesList">
+                                        {vendors.map((v, i) => (
+                                            <option key={i} value={v.vendorTypes}>
+                                                {(v.id || v.ID || '') ? `${v.id || v.ID} - ` : ''}{v.vendorTypes}
+                                            </option>
+                                        ))}
+                                    </datalist>
                                 </div>
                             </div>
                             <div className="col-span-6">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Payable Account</label>
                                 <div className="relative">
-                                    <input type="text" value={formData.PaybleAccName || formData.PaybleAccCode} readOnly onClick={() => setShowAccModal(true)} placeholder="Select account..." className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 cursor-pointer appearance-none"  style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
+                                    <select 
+                                        value={formData.PaybleAccCode} 
+                                        onChange={(e) => {
+                                            const acc = accounts.find(a => a.sub_Code === e.target.value);
+                                            if (acc) {
+                                                setFormData(prev => ({ ...prev, PaybleAccCode: acc.sub_Code, PaybleAccName: acc.sub_Acc_Name }));
+                                            } else {
+                                                setFormData(prev => ({ ...prev, PaybleAccCode: '', PaybleAccName: '' }));
+                                            }
+                                        }}
+                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 cursor-pointer appearance-none"  
+                                        style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
+                                    >
+                                        <option value="">Select account...</option>
+                                        {accounts.map((a, i) => (
+                                            <option key={i} value={a.sub_Code}>{a.sub_Code} - {a.sub_Acc_Name}</option>
+                                        ))}
+                                    </select>
                                 </div>
                             </div>
                         </div>
@@ -120,16 +152,17 @@ const VendorTypesMasterBoard = ({ isOpen, onClose }) => {
                     <div className="border border-gray-200 rounded-[3px] overflow-hidden shadow-sm max-h-[400px] overflow-y-auto no-scrollbar">
                         <table className="w-full text-left">
                             <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 shadow-sm z-10">
-                                <tr><th className=" px-5 py-3">VENDOR TYPE</th><th className="text-right px-5 py-3">Action</th></tr>
+                                <tr><th className=" px-5 py-3">CODE</th><th className=" px-5 py-3">VENDOR TYPE</th><th className="text-right px-5 py-3">Action</th></tr>
                             </thead>
                             <tbody className="divide-y divide-gray-50">
                                 {filteredVendors.map((v, i) => (
                                     <tr key={i} className="group hover:bg-blue-50/50  transition-all cursor-pointer group border-b border-gray-50" onClick={() => handleVendorSelect(v)}>
+                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{v.id || v.ID}</td>
                                         <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{v.vendorTypes}</td>
                                         <td className="text-right px-5 py-3"><button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button></td>
                                     </tr>
                                 ))}
-                                {filteredVendors.length === 0 && <tr><td colSpan="2" className="text-center py-16 text-gray-400 text-[11px] font-bold uppercase tracking-widest">No vendor types found.</td></tr>}
+                                {filteredVendors.length === 0 && <tr><td colSpan="3" className="text-center py-16 text-gray-400 text-[11px] font-bold uppercase tracking-widest">No vendor types found.</td></tr>}
                             </tbody>
                         </table>
                     </div>
@@ -165,26 +198,6 @@ const VendorTypesMasterBoard = ({ isOpen, onClose }) => {
                 </div>
             </SimpleModal>
 
-            {showSaveConfirm && (
-                <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-slate-900/30 backdrop-blur-sm" onClick={() => !loading && setShowSaveConfirm(false)} />
-                    <div className="relative w-full max-w-md bg-white rounded-sm shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
-                        <div className="p-8 text-center">
-                            <div className="w-20 h-20 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-6 border-4 border-white shadow-lg"><Building2 size={40} className="text-emerald-500" /></div>
-                            <h3 className="text-lg font-black text-slate-800 mb-2 uppercase tracking-wider">Confirm Save</h3>
-                            <p className="text-slate-500 text-[12px] font-medium leading-relaxed mb-8">
-                                Are you sure you want to save vendor type <span className="font-bold text-slate-800 uppercase">"{formData.VendorType}"</span>?
-                                <br />This will link it to account <span className="font-black text-[#0285fd]">{formData.PaybleAccCode}</span>.
-                            </p>
-                            <div className="flex gap-3">
-                                <button onClick={() => setShowSaveConfirm(false)} disabled={loading} className="flex-1 h-11 bg-slate-100 text-slate-600 text-[11px] font-black rounded-[3px] hover:bg-slate-200 transition-all uppercase tracking-widest disabled:opacity-50">Cancel</button>
-                                <button onClick={confirmSave} disabled={loading} className="flex-1 h-11 bg-[#0285fd] text-white text-[11px] font-black rounded-[3px] hover:bg-[#0073ff] shadow-lg shadow-green-200 transition-all flex items-center justify-center gap-2 uppercase tracking-widest disabled:opacity-50">{loading ? <Loader2 size={16} className="animate-spin" /> : 'Continue Save'}</button>
-                            </div>
-                        </div>
-                        <div className="bg-slate-50 py-3 border-t border-slate-100"><span className="text-[9px] text-slate-400 font-black uppercase tracking-[0.2em] block text-center">Transaction Integrity Guaranteed</span></div>
-                    </div>
-                </div>
-            )}
         </>
     );
 };

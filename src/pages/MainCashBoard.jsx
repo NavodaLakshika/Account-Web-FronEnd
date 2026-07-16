@@ -245,8 +245,8 @@ const MainCashBoard = ({ isOpen, onClose }) => {
                                     <div className="relative">
                                         <select
                                         value={formData.accountName}
-                                        onChange={(e) => {
-                                            const val = e.target.value;
+                                        onChange={(ev) => {
+                                            const val = ev.target.value;
                                             const item = (lookups.mainAccounts || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || i === val);
                                             if (item) {
                                                 const handler = (item) => setFormData(prev => ({ ...prev, accountId: item.code, accountName: item.name }));
@@ -271,8 +271,8 @@ const MainCashBoard = ({ isOpen, onClose }) => {
                                     <div className="relative">
                                         <select
                                         value={formData.costCenterName}
-                                        onChange={(e) => {
-                                            const val = e.target.value;
+                                        onChange={(ev) => {
+                                            const val = ev.target.value;
                                             const item = (lookups.mainAccounts || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || i === val);
                                             if (item) {
                                                 const handler = (item) => setFormData(prev => ({ ...prev, accountId: item.code, accountName: item.name }));
@@ -297,8 +297,8 @@ const MainCashBoard = ({ isOpen, onClose }) => {
                                     <div className="relative">
                                         <select
                                         value={formData.payeeName}
-                                        onChange={(e) => {
-                                            const val = e.target.value;
+                                        onChange={(ev) => {
+                                            const val = ev.target.value;
                                             const item = (lookups.payees || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || i === val);
                                             if (item) {
                                                 const handler = (item) => setFormData(prev => ({ ...prev, payeeId: item.code, payeeName: item.name, address: item.address || '' }));
@@ -399,8 +399,8 @@ const MainCashBoard = ({ isOpen, onClose }) => {
                                             <div className="relative">
                                                 <select
                                         value={row.expAccName}
-                                        onChange={(e) => {
-                                            const val = e.target.value;
+                                        onChange={(ev) => {
+                                            const val = ev.target.value;
                                             const item = (lookups.expenseAccounts || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || i === val);
                                             if (item) {
                                                 const handler = (item) => {
@@ -428,8 +428,8 @@ const MainCashBoard = ({ isOpen, onClose }) => {
                                             <div className="relative">
                                                 <select
                                         value={row.ccCode}
-                                        onChange={(e) => {
-                                            const val = e.target.value;
+                                        onChange={(ev) => {
+                                            const val = ev.target.value;
                                             const item = (lookups.costCenters || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || i === val);
                                             if (item) {
                                                 const handler = (item) => {

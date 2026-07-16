@@ -22,46 +22,55 @@ const ConfirmModal = ({
         <div className="fixed inset-0 z-[1200] flex items-center justify-center font-['Plus_Jakarta_Sans'] pointer-events-auto">
             <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" onClick={() => !loading && onClose()} />
             
-            <div className={`relative w-full shadow-[0_10px_40px_rgb(0,0,0,0.3)] rounded-none overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col`}>
+            <div className={`relative w-[600px] bg-white shadow-[0_10px_40px_rgb(0,0,0,0.3)] overflow-hidden animate-in fade-in zoom-in-95 duration-200 flex flex-col`}>
                 
-                {/* Top Section */}
-                <div className={`${bgClass} py-10 px-6 relative overflow-hidden`}>
-                    <WatermarkIcon className="absolute right-0 -top-8 w-48 h-48 text-black opacity-10 rotate-12 pointer-events-none" strokeWidth={4} />
-                    
-                    <div className="max-w-7xl mx-auto w-full relative z-10">
+                {/* Colored Area */}
+                <div className={`relative ${bgClass} overflow-hidden w-full flex flex-col py-6`}>
+                    {/* Watermark Icon */}
+                    <div className="absolute right-0 top-1/2 -translate-y-1/2 pointer-events-none flex items-center justify-center">
+                        <svg width="200" height="200" viewBox="0 0 100 100" className="fill-black opacity-[0.05]">
+                             <polygon points="25,0 75,0 100,25 100,75 75,100 25,100 0,75 0,25" />
+                        </svg>
+                        {isDanger ? (
+                            <svg width="120" height="120" viewBox="0 0 100 100" className="fill-black opacity-[0.08] absolute right-[40px]">
+                                 <path d="M20,5 L50,35 L80,5 L95,20 L65,50 L95,80 L80,95 L50,65 L20,95 L5,80 L35,50 L5,20 Z" />
+                            </svg>
+                        ) : (
+                            <Check size={120} strokeWidth={4} className="text-black opacity-[0.08] absolute right-[40px]" />
+                        )}
+                    </div>
+
+                    <div className="max-w-7xl mx-auto w-full relative z-10 px-6">
                         {/* Header */}
-                        <div className="flex justify-between items-start">
-                            <h2 className="text-white text-[18px] font-medium tracking-wide">{title}</h2>
-                            <button onClick={onClose} className="text-white/70 hover:text-white transition-colors">
-                                <X size={18} strokeWidth={2.5} />
-                            </button>
+                        <div className="pb-2 border-b border-black/10 flex justify-between items-center">
+                            <h3 className="text-[15px] font-mono font-bold text-white uppercase tracking-widest">{title}</h3>
                         </div>
                         
                         {/* Body Text */}
-                        <div className="mt-2 pr-4">
-                            <p className="text-white/90 text-[12px] leading-relaxed break-words font-['Tahoma'] whitespace-pre-wrap">
+                        <div className="pt-3 pb-2">
+                            <div className="text-white/95 text-[15px] leading-relaxed font-sans max-w-3xl whitespace-pre-wrap break-words">
                                 {message}
-                            </p>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                {/* Bottom Section */}
-                <div className="bg-white py-4 px-6 flex relative z-10">
-                    <div className="max-w-7xl mx-auto w-full flex justify-end gap-2">
+                {/* White Footer Area */}
+                <div className="bg-white py-3 w-full flex relative z-10">
+                    <div className="max-w-7xl mx-auto w-full px-6 flex justify-end gap-3">
                         <button 
                             onClick={onClose}
                             disabled={loading}
-                            className="px-5 py-1.5 bg-[#d1d5db] hover:bg-[#9ca3af] text-white uppercase text-[11px] font-bold tracking-widest transition-colors rounded-sm disabled:opacity-50"
+                            className="px-8 py-2 bg-[#cccccc] hover:bg-[#b3b3b3] text-white font-medium rounded-[3px] transition-colors text-[14px] uppercase"
                         >
                             {cancelText}
                         </button>
                         <button 
                             onClick={onConfirm}
                             disabled={loading}
-                            className={`px-6 py-1.5 text-white uppercase text-[11px] font-bold tracking-widest transition-colors rounded-sm flex items-center gap-2 disabled:opacity-50 ${btnClass}`}
+                            className={`px-8 py-2 ${btnClass} text-white font-medium rounded-[3px] hover:brightness-90 transition-all text-[14px] uppercase flex items-center justify-center gap-2 min-w-[100px] shadow-sm`}
                         >
-                            {loading ? <Loader2 size={14} className="animate-spin" /> : confirmText}
+                            {loading ? <Loader2 size={16} className="animate-spin" /> : confirmText}
                         </button>
                     </div>
                 </div>

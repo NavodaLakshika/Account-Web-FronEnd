@@ -392,7 +392,25 @@ const SalesInvoiceBoard = ({ isOpen, onClose }) => {
                                     <div className="flex gap-2">
                                         <input type="text" readOnly value={formData.customerId} className="w-24 h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none text-gray-700 font-mono shrink-0" />
                                         <div className="relative flex-1">
-                                            <input type="text" readOnly value={lookups.customers.find(c => c.code === formData.customerId)?.name || ''} onClick={() => setShowCustomerSearch(true)} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"  style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
+                                            <select
+                                        value={lookups.customers}
+                                        onChange={(ev) => {
+                                            const val = ev.target.value;
+                                            const c = (lookups.customers || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || (i.itemId && i.itemId.toString() === val) || (i.id && i.id.toString() === val) || i === val);
+                                            if (c) {
+                                                setFormData(prev => ({ ...prev, customerId: c.code }));
+                                            }
+                                        }}
+                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
+                                        style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
+                                    >
+                                        <option value="">Select...</option>
+                                        {(lookups.customers || []).map((c, idx) => (
+                                            <option key={idx} value={c.code || c.itemId || c.id || c.name || c}>
+                                                {c.code ? `${c.code} - ${c.name}` : (c.itemId ? `${c.itemId} - ${c.itemName || c.name}` : (c.name || c))}
+                                            </option>
+                                        ))}
+                                    </select>
                                         </div>
                                     </div>
                                 </div>
@@ -400,7 +418,25 @@ const SalesInvoiceBoard = ({ isOpen, onClose }) => {
                             <div className="col-span-3">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Sales Asst.</label>
                                 <div className="relative">
-                                    <input type="text" readOnly value={formData.salesAssistant} onClick={() => setShowAssistantSearch(true)} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"  style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
+                                    <select
+                                        value={formData.salesAssistant}
+                                        onChange={(ev) => {
+                                            const val = ev.target.value;
+                                            const s = (lookups.salesAssistants || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || (i.itemId && i.itemId.toString() === val) || (i.id && i.id.toString() === val) || i === val);
+                                            if (s) {
+                                                setFormData(prev => ({ ...prev, salesAssistant: s.name }));
+                                            }
+                                        }}
+                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
+                                        style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
+                                    >
+                                        <option value="">Select...</option>
+                                        {(lookups.salesAssistants || []).map((s, idx) => (
+                                            <option key={idx} value={s.code || s.itemId || s.id || s.name || s}>
+                                                {s.code ? `${s.code} - ${s.name}` : (s.itemId ? `${s.itemId} - ${s.itemName || s.name}` : (s.name || s))}
+                                            </option>
+                                        ))}
+                                    </select>
                                 </div>
                             </div>
                             <div className="col-span-3">
@@ -415,13 +451,49 @@ const SalesInvoiceBoard = ({ isOpen, onClose }) => {
                             <div className="col-span-4">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Payment Type</label>
                                 <div className="relative">
-                                    <input type="text" readOnly value={lookups.paymentMethods.find(m => m.code === formData.payType)?.name || ''} onClick={() => setShowPayMethodSearch(true)} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"  style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
+                                    <select
+                                        value={lookups.paymentMethods}
+                                        onChange={(ev) => {
+                                            const val = ev.target.value;
+                                            const m = (lookups.paymentMethods || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || (i.itemId && i.itemId.toString() === val) || (i.id && i.id.toString() === val) || i === val);
+                                            if (m) {
+                                                setFormData(prev => ({ ...prev, payType: m.code }));
+                                            }
+                                        }}
+                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
+                                        style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
+                                    >
+                                        <option value="">Select...</option>
+                                        {(lookups.paymentMethods || []).map((m, idx) => (
+                                            <option key={idx} value={m.code || m.itemId || m.id || m.name || m}>
+                                                {m.code ? `${m.code} - ${m.name}` : (m.itemId ? `${m.itemId} - ${m.itemName || m.name}` : (m.name || m))}
+                                            </option>
+                                        ))}
+                                    </select>
                                 </div>
                             </div>
                             <div className="col-span-4">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Tax Account</label>
                                 <div className="relative">
-                                    <input type="text" readOnly value={lookups.taxAccounts.find(a => a.code === formData.taxAccount)?.name || ''} onClick={() => setShowTaxAccSearch(true)} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"  style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
+                                    <select
+                                        value={lookups.taxAccounts}
+                                        onChange={(ev) => {
+                                            const val = ev.target.value;
+                                            const a = (lookups.taxAccounts || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || (i.itemId && i.itemId.toString() === val) || (i.id && i.id.toString() === val) || i === val);
+                                            if (a) {
+                                                setFormData(prev => ({ ...prev, taxAccount: a.code }));
+                                            }
+                                        }}
+                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
+                                        style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
+                                    >
+                                        <option value="">Select...</option>
+                                        {(lookups.taxAccounts || []).map((a, idx) => (
+                                            <option key={idx} value={a.code || a.itemId || a.id || a.name || a}>
+                                                {a.code ? `${a.code} - ${a.name}` : (a.itemId ? `${a.itemId} - ${a.itemName || a.name}` : (a.name || a))}
+                                            </option>
+                                        ))}
+                                    </select>
                                 </div>
                             </div>
                             <div className="col-span-4">
@@ -469,21 +541,21 @@ const SalesInvoiceBoard = ({ isOpen, onClose }) => {
                                             <td className="px-3 py-2.5 truncate">{p.prodName}</td>
                                             <td className="px-3 py-2.5 text-center text-gray-400">{p.unit}</td>
                                             <td className="px-1 py-1">
-                                                <input type="text" value={p.price} onChange={(e) => {
+                                                <input type="text" value={p.price} onChange={(ev) => {
                                                     const newPrice = e.target.value;
                                                     const newAmount = (parseFloat(p.qty) || 0) * (parseFloat(newPrice) || 0) - (parseFloat(p.discount) || 0);
                                                     setProducts(products.map((item, i) => i === idx ? { ...item, price: newPrice, amount: newAmount.toFixed(2) } : item));
                                                 }} className="w-full h-8 border border-gray-200 rounded-[3px] text-right text-[12px] font-mono bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] px-2" />
                                             </td>
                                             <td className="px-1 py-1">
-                                                <input type="text" value={p.qty} onChange={(e) => {
+                                                <input type="text" value={p.qty} onChange={(ev) => {
                                                     const newQty = e.target.value;
                                                     const newAmount = (parseFloat(newQty) || 0) * (parseFloat(p.price) || 0) - (parseFloat(p.discount) || 0);
                                                     setProducts(products.map((item, i) => i === idx ? { ...item, qty: newQty, amount: newAmount.toFixed(2) } : item));
                                                 }} className="w-full h-8 border border-gray-200 rounded-[3px] text-right text-[12px] font-mono bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] px-2" />
                                             </td>
                                             <td className="px-1 py-1">
-                                                <input type="text" value={p.discount} onChange={(e) => {
+                                                <input type="text" value={p.discount} onChange={(ev) => {
                                                     const newDisc = e.target.value;
                                                     const newAmount = (parseFloat(p.qty) || 0) * (parseFloat(p.price) || 0) - (parseFloat(newDisc) || 0);
                                                     setProducts(products.map((item, i) => i === idx ? { ...item, discount: newDisc, amount: newAmount.toFixed(2) } : item));

@@ -197,8 +197,8 @@ const ReversalEntryBoard = ({ isOpen, onClose }) => {
                                 <div className="relative max-w-[400px]">
                                     <select
                                         value={formData.transactionTypeName}
-                                        onChange={(e) => {
-                                            const val = e.target.value;
+                                        onChange={(ev) => {
+                                            const val = ev.target.value;
                                             const item = (lookups.transactionTypes || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || i === val);
                                             if (item) {
                                                 const handler = (item) => setFormData(prev => ({ ...prev, transactionType: item.code, transactionTypeName: item.name }));
@@ -261,8 +261,8 @@ const ReversalEntryBoard = ({ isOpen, onClose }) => {
                                 <div className="relative max-w-[400px]">
                                     <select
                                         value={formData.authUsername}
-                                        onChange={(e) => {
-                                            const val = e.target.value;
+                                        onChange={(ev) => {
+                                            const val = ev.target.value;
                                             const item = (lookups.users || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || i === val);
                                             if (item) {
                                                 const handler = (item) => setFormData(prev => ({ ...prev, authUsername: item.name }));

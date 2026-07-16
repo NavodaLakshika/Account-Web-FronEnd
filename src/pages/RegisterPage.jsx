@@ -154,7 +154,7 @@ const RegisterPage = () => {
 
             {/* Full-page Loading Overlay */}
             {loading && (
-                <div className="fixed inset-0 z-[60] flex items-center justify-center bg-white/80 animate-in fade-in duration-300">
+                <div className="fixed inset-0 z-[60] flex items-center justify-center bg-transparent animate-in fade-in duration-300">
                     <div className="w-[120px] h-[120px]">
                         <DotLottiePlayer
                             src="/lottiefile/DashboardLoader.lottie"
@@ -198,7 +198,7 @@ const RegisterPage = () => {
                                 <div className="flex gap-4 items-start">
                                     <div className="space-y-1 flex-1">
                                         <label htmlFor="Emp_Name" className="block text-sm font-sans font-medium text-slate-700 ml-1">
-                                            Full Name
+                                            User Name
                                         </label>
                                         <input type="text" id="Emp_Name" name="Emp_Name" value={formData.Emp_Name} onChange={handleChange}
                                             required
