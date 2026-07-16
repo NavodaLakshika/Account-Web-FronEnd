@@ -526,11 +526,19 @@ const ExpensesDashboardBoard = ({
                                 {tx.status}
                               </span>
                             </td>
+                            <td className="py-3 px-5 text-right">
+                                <button 
+                                    onClick={(e) => { e.stopPropagation(); setSelectedTx(tx); }}
+                                    className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-4 py-1.5 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase"
+                                >
+                                    VIEW
+                                </button>
+                            </td>
                           </tr>
                         ))}
                         {getFilteredTransactions().length === 0 && (
                           <tr>
-                            <td colSpan="7" className="py-16 text-center text-slate-300 font-bold italic text-xs uppercase tracking-wider">
+                            <td colSpan="8" className="py-16 text-center text-slate-300 font-bold italic text-xs uppercase tracking-wider">
                               No transactions match the selected filters.
                             </td>
                           </tr>
@@ -584,11 +592,28 @@ const ExpensesDashboardBoard = ({
                                 <span className="text-slate-300 font-sans font-bold">LKR 0.00</span>
                               )}
                             </td>
+                            <td className="py-3 px-5 text-right">
+                                {v.outstanding > 0 ? (
+                                    <button 
+                                        onClick={(e) => { e.stopPropagation(); onPayBill && onPayBill(); }}
+                                        className="bg-white text-rose-600 border border-rose-500 hover:bg-rose-50 text-[10px] px-4 py-1.5 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase whitespace-nowrap"
+                                    >
+                                        PAY BILL
+                                    </button>
+                                ) : (
+                                    <button 
+                                        onClick={(e) => { e.stopPropagation(); onEnterBill && onEnterBill(); }}
+                                        className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-4 py-1.5 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase whitespace-nowrap"
+                                    >
+                                        NEW BILL
+                                    </button>
+                                )}
+                            </td>
                           </tr>
                         ))}
                         {getVendorSummary().length === 0 && (
                           <tr>
-                            <td colSpan="4" className="py-16 text-center text-slate-300 font-bold italic text-xs uppercase tracking-wider">
+                            <td colSpan="5" className="py-16 text-center text-slate-300 font-bold italic text-xs uppercase tracking-wider">
                               No vendors match the search query.
                             </td>
                           </tr>

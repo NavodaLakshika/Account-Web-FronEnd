@@ -15,6 +15,16 @@ import { getSessionData } from '../utils/session';
 import * as XLSX from 'xlsx';
 import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
 import TransactionFormWrapper from '../components/TransactionFormWrapper';
+import ColumnSelectionModal from '../components/modals/ColumnSelectionModal';
+
+const JOURNAL_COLUMNS = [
+    { key: 'Account Code', label: 'Account Code', validation: true, desc: 'Ledger account unique code' },
+    { key: 'Account Name', label: 'Account Name', validation: false, desc: 'Name of the ledger account' },
+    { key: 'Cost Center', label: 'Cost Center', validation: false, desc: 'Strategic unit or department' },
+    { key: 'Debit', label: 'Debit', validation: false, desc: 'Debit amount (DR)' },
+    { key: 'Credit', label: 'Credit', validation: false, desc: 'Credit amount (CR)' },
+    { key: 'Memo', label: 'Memo', validation: false, desc: 'Brief narrative or description' }
+];
 
 const SearchModal = ({ isOpen, onClose, title, items, onSelect, searchPlaceholder = "Find record by legal name or code..." }) => {
     const [query, setQuery] = useState('');
@@ -123,6 +133,7 @@ const JournalEntryBoard = ({ isOpen, onClose, onComplete }) => {
 
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [activeModal, setActiveModal] = useState(null);
+    const [showColumnSelector, setShowColumnSelector] = useState(false);
 
     useEffect(() => {
         if (isOpen) {
@@ -268,22 +279,15 @@ const JournalEntryBoard = ({ isOpen, onClose, onComplete }) => {
 
     const fileInputRef = useRef(null);
 
-    const handleDownloadTemplate = useCallback(() => {
+    const handleDownloadTemplate = useCallback((selectedColumns) => {
         const wb = XLSX.utils.book_new();
 
-        const entryHeaders = [['Account Code', 'Account Name', 'Cost Center', 'Debit', 'Credit', 'Memo']];
-        const emptyRows = Array.from({ length: 20 }, () => ['', '', '', 0, 0, '']);
+        const entryHeaders = [selectedColumns];
+        const emptyRows = Array.from({ length: 20 }, () => selectedColumns.map(() => ''));
         const entryData = [...entryHeaders, ...emptyRows];
         const wsEntry = XLSX.utils.aoa_to_sheet(entryData);
 
-        wsEntry['!cols'] = [
-            { wch: 16 },
-            { wch: 35 },
-            { wch: 22 },
-            { wch: 14 },
-            { wch: 14 },
-            { wch: 35 },
-        ];
+        wsEntry['!cols'] = selectedColumns.map(() => ({ wch: 20 }));
         XLSX.utils.book_append_sheet(wb, wsEntry, 'Journal_Entries');
 
         const accHeaders = [['Account Code', 'Account Name']];
@@ -549,7 +553,7 @@ const JournalEntryBoard = ({ isOpen, onClose, onComplete }) => {
                                 onChange={handleLoadExcel}
                             />
                             <button
-                                onClick={handleDownloadTemplate}
+                                onClick={() => setShowColumnSelector(true)}
                                 className="h-8 px-4 bg-white text-emerald-600 border border-emerald-500 text-[10px] font-bold rounded-[3px] hover:bg-emerald-50 transition-all flex items-center gap-2 uppercase shadow-sm"
                             >
                                 <FileDown size={14} /> TEMPLATE
@@ -868,6 +872,13 @@ const JournalEntryBoard = ({ isOpen, onClose, onComplete }) => {
                 title="Confirm Removal"
                 message="Are you sure you want to delete this entry? This action will remove the record from the current journal session."
                 loading={isDeleting}
+            />
+
+            <ColumnSelectionModal 
+                isOpen={showColumnSelector}
+                onClose={() => setShowColumnSelector(false)}
+                onDownload={handleDownloadTemplate}
+                columns={JOURNAL_COLUMNS}
             />
         </>
     );

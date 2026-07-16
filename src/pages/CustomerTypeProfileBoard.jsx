@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, RotateCcw, Save, Users, Loader2, AlertTriangle } from 'lucide-react';
+import { Search, RotateCcw, Save, Users, Loader2, AlertTriangle, Trash2 } from 'lucide-react';
 import TransactionFormWrapper from '../components/TransactionFormWrapper';
 import SimpleModal from '../components/SimpleModal';
 import { customerTypeService } from '../services/customerType.service';
@@ -11,9 +11,7 @@ const CustomerTypeProfileBoard = ({ isOpen, onClose }) => {
     const [formData, setFormData] = useState(initialState);
     const [loading, setLoading] = useState(false);
     const [isEditMode, setIsEditMode] = useState(false);
-    const [showSearch, setShowSearch] = useState(false);
     const [typeList, setTypeList] = useState([]);
-    const [searchTerm, setSearchTerm] = useState('');
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
     useEffect(() => {
@@ -28,8 +26,18 @@ const CustomerTypeProfileBoard = ({ isOpen, onClose }) => {
             if (user) {
                 setFormData(prev => ({ ...prev, CurrentUser: user.empName || user.EmpName || user.Emp_Name || user.emp_Name || user.username || '', Company: companyCode }));
             }
+            fetchInitialData();
         }
     }, [isOpen]);
+
+    const fetchInitialData = async () => {
+        try {
+            const data = await customerTypeService.getAll();
+            setTypeList(data || []);
+        } catch (error) {
+            console.error('Failed to load customer types', error);
+        }
+    };
 
     const handleInputChange = (e) => { const { name, value } = e.target; setFormData(prev => ({ ...prev, [name]: value })); };
 
@@ -42,6 +50,7 @@ const CustomerTypeProfileBoard = ({ isOpen, onClose }) => {
             const data = await customerTypeService.save(formData);
             if (data.message === 'inserted') { showSuccessToast('Customer Type created'); setFormData(prev => ({ ...prev, Code: data.code })); setIsEditMode(true); }
             else { showSuccessToast('Customer Type updated'); }
+            fetchInitialData();
         } catch (err) { showErrorToast(err.error || err.message || (typeof err === 'string' ? err : 'Failed to save'), { duration: 5000 }); } finally { setLoading(false); }
     };
 
@@ -49,15 +58,10 @@ const CustomerTypeProfileBoard = ({ isOpen, onClose }) => {
 
     const confirmDelete = async () => {
         setLoading(true);
-        try { await customerTypeService.delete(formData.Code); showSuccessToast('Customer Type deleted'); handleClear(); setShowDeleteConfirm(false); } catch (err) { showErrorToast(err.message || err); } finally { setLoading(false); }
+        try { await customerTypeService.delete(formData.Code); showSuccessToast('Customer Type deleted'); handleClear(); setShowDeleteConfirm(false); fetchInitialData(); } catch (err) { showErrorToast(err.message || err); } finally { setLoading(false); }
     };
 
-    const openSearch = async () => {
-        setLoading(true);
-        try { const data = await customerTypeService.getAll(); setTypeList(data || []); setShowSearch(true); } catch (err) { showErrorToast('Failed to load customer types'); } finally { setLoading(false); }
-    };
 
-    const selectType = (type) => { setFormData(prev => ({ ...prev, Code: type.code, Type_Name: type.name })); setIsEditMode(true); setShowSearch(false); };
 
     return (
         <>
@@ -77,50 +81,51 @@ const CustomerTypeProfileBoard = ({ isOpen, onClose }) => {
             >
                 <div className="space-y-3 overflow-y-auto no-scrollbar font-['Tahoma']">
                     <div className="bg-white p-4 border border-slate-200 rounded-[3px] space-y-4">
+                        <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Contextual Metadata</div>
+                        <p className="text-[12px] text-gray-500 font-medium leading-relaxed">
+                            Create and manage Customer Type classifications to effectively categorize and organize your customer base.
+                        </p>
+                    </div>
+                    <div className="bg-white p-4 border border-slate-200 rounded-[3px] space-y-4">
                         <div className="grid grid-cols-12 gap-x-6 gap-y-3.5">
                             <div className="col-span-6">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Type ID</label>
                                 <div className="relative">
-                                    <input type="text" readOnly value={formData.Code || ''} onClick={openSearch} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 font-mono cursor-pointer appearance-none"  style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
+                                    <input type="text" readOnly value={formData.Code || ''} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-slate-50 outline-none text-gray-500 font-mono" />
                                 </div>
                             </div>
                             <div className="col-span-6">
-                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Type Name</label>
-                                <input type="text" name="Type_Name" value={formData.Type_Name} onChange={handleInputChange} placeholder="Enter customer type name" className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700" />
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Customer Type Name</label>
+                                <div className="relative">
+                                    <input 
+                                        type="text" 
+                                        list="customerTypesList"
+                                        name="Type_Name" 
+                                        value={formData.Type_Name} 
+                                        onChange={(e) => {
+                                            const val = e.target.value.toUpperCase();
+                                            const found = typeList.find(t => (t.name || t.Type_Name || t.Name || '').toUpperCase() === val);
+                                            setFormData(prev => ({ ...prev, Type_Name: val, Code: found ? (found.code || found.Code) : '' }));
+                                            setIsEditMode(!!found);
+                                        }} 
+                                        placeholder="Select or enter customer type name" 
+                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 uppercase" 
+                                    />
+                                    <datalist id="customerTypesList">
+                                        {typeList.map((t, i) => (
+                                            <option key={i} value={t.name || t.Type_Name || t.Name}>
+                                                {(t.code || t.Code || '') ? `${t.code || t.Code} - ` : ''}{t.name || t.Type_Name || t.Name}
+                                            </option>
+                                        ))}
+                                    </datalist>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </TransactionFormWrapper>
 
-            <SimpleModal isOpen={showSearch} onClose={() => setShowSearch(false)} title="Customer Types" maxWidth="max-w-[700px]">
-                <div className="space-y-4 font-['Tahoma']">
-                    <div className="flex items-center gap-4 bg-slate-50 p-4 border-b border-gray-100 mb-2">
-                        <span className="text-[12px] font-bold text-gray-500 uppercase tracking-wider">Search</span>
-                        <div className="relative flex-1">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
-                            <input type="text" placeholder="Find type..." className="w-full h-10 pl-10 pr-4 border border-gray-300 rounded-[3px] outline-none text-[13px] focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] shadow-sm bg-white" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} autoFocus />
-                        </div>
-                    </div>
-                    <div className="border border-gray-200 rounded-[3px] overflow-hidden shadow-sm max-h-[400px] overflow-y-auto no-scrollbar">
-                        <table className="w-full text-left">
-                            <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 shadow-sm z-10">
-                                <tr><th className=" px-5 py-3">CODE</th><th className=" px-5 py-3">TYPE NAME</th><th className="text-right px-5 py-3">Action</th></tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-50">
-                                {typeList.filter(t => (t.name || '').toLowerCase().includes(searchTerm.toLowerCase()) || (t.code || '').toLowerCase().includes(searchTerm.toLowerCase())).map((t, i) => (
-                                    <tr key={i} className="group hover:bg-blue-50/50  transition-all cursor-pointer group border-b border-gray-50" onClick={() => selectType(t)}>
-                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{t.code}</td>
-                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{t.name}</td>
-                                        <td className="text-right px-5 py-3"><button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button></td>
-                                    </tr>
-                                ))}
-                                {typeList.length === 0 && <tr><td colSpan="3" className="text-center py-16 text-gray-400 text-[11px] font-bold uppercase tracking-widest">No customer types found.</td></tr>}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </SimpleModal>
+
 
             {showDeleteConfirm && (
                 <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4">
