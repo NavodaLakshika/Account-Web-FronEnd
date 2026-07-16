@@ -259,15 +259,26 @@ const DirectBankTransactionBoard = ({ isOpen, onClose }) => {
                             <div className="col-span-8">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Bank Account</label>
                                 <div className="relative">
-                                    <input type="text" readOnly
-                                        value={formData.bankAccountName ? `${formData.bankAccount} - ${formData.bankAccountName}` : ''}
-                                        placeholder="Select bank account..."
-                                        onClick={() => setActiveModal('bank')}
-                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700 truncate" />
-                                    <button onClick={() => setActiveModal('bank')}
-                                        className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
-                                        <Search size={16} />
-                                    </button>
+                                    <select
+                                        value={formData.bankAccountName}
+                                        onChange={(e) => {
+                                            const val = e.target.value;
+                                            const item = (lookups.banks || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || i === val);
+                                            if (item) {
+                                                const handler = (item) => setFormData({ ...formData, bankAccount: item.code, bankAccountName: item.name });
+                                                handler(item);
+                                            }
+                                        }}
+                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
+                                        style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
+                                    >
+                                        <option value="">Select...</option>
+                                        {(lookups.banks || []).map((item, idx) => (
+                                            <option key={idx} value={item.code || item.name || item}>
+                                                {item.code ? `${item.code} - ${item.name}` : (item.name || item)}
+                                            </option>
+                                        ))}
+                                    </select>
                                 </div>
                             </div>
 
@@ -293,15 +304,26 @@ const DirectBankTransactionBoard = ({ isOpen, onClose }) => {
                             <div className="col-span-8">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">A/P Account</label>
                                 <div className="relative">
-                                    <input type="text" readOnly
-                                        value={formData.apAccountName ? `${formData.apAccount} - ${formData.apAccountName}` : ''}
-                                        placeholder="Select A/P account..."
-                                        onClick={() => setActiveModal('ap')}
-                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700 truncate" />
-                                    <button onClick={() => setActiveModal('ap')}
-                                        className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
-                                        <Search size={16} />
-                                    </button>
+                                    <select
+                                        value={formData.apAccountName}
+                                        onChange={(e) => {
+                                            const val = e.target.value;
+                                            const item = (lookups.accounts || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || i === val);
+                                            if (item) {
+                                                const handler = (item) => setFormData({ ...formData, apAccount: item.code, apAccountName: item.name });
+                                                handler(item);
+                                            }
+                                        }}
+                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
+                                        style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
+                                    >
+                                        <option value="">Select...</option>
+                                        {(lookups.accounts || []).map((item, idx) => (
+                                            <option key={idx} value={item.code || item.name || item}>
+                                                {item.code ? `${item.code} - ${item.name}` : (item.name || item)}
+                                            </option>
+                                        ))}
+                                    </select>
                                 </div>
                             </div>
 
@@ -309,15 +331,26 @@ const DirectBankTransactionBoard = ({ isOpen, onClose }) => {
                             <div className="col-span-4">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Cost Center</label>
                                 <div className="relative">
-                                    <input type="text" readOnly
-                                        value={formData.costCenterName || ''}
-                                        placeholder="Select cost center..."
-                                        onClick={() => setActiveModal('costCenter')}
-                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700 truncate" />
-                                    <button onClick={() => setActiveModal('costCenter')}
-                                        className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
-                                        <Search size={16} />
-                                    </button>
+                                    <select
+                                        value={formData.costCenterName}
+                                        onChange={(e) => {
+                                            const val = e.target.value;
+                                            const item = (lookups.costCenters || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || i === val);
+                                            if (item) {
+                                                const handler = (item) => setFormData({ ...formData, costCenter: item.code, costCenterName: item.name });
+                                                handler(item);
+                                            }
+                                        }}
+                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
+                                        style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
+                                    >
+                                        <option value="">Select...</option>
+                                        {(lookups.costCenters || []).map((item, idx) => (
+                                            <option key={idx} value={item.code || item.name || item}>
+                                                {item.code ? `${item.code} - ${item.name}` : (item.name || item)}
+                                            </option>
+                                        ))}
+                                    </select>
                                 </div>
                             </div>
 

@@ -221,11 +221,8 @@ const TransactionEditorModal = ({ isOpen, onClose }) => {
                                         value={transType}
                                         readOnly
                                         onClick={() => setShowLookup('transType')}
-                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700 truncate"
-                                    />
-                                    <button onClick={() => setShowLookup('transType')} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
-                                        <Search size={16} />
-                                    </button>
+                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
+                                     style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
                                 </div>
                             </div>
 
@@ -290,12 +287,9 @@ const TransactionEditorModal = ({ isOpen, onClose }) => {
                                                 type="text" 
                                                 value={vendor.name} 
                                                 readOnly 
-                                                className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700 truncate"
+                                                className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
                                                 onClick={() => setShowLookup('vendor')}
-                                            />
-                                            <button onClick={() => setShowLookup('vendor')} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
-                                                <Search size={16} />
-                                            </button>
+                                             style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
                                         </div>
                                     </div>
                                 </div>
@@ -359,12 +353,9 @@ const TransactionEditorModal = ({ isOpen, onClose }) => {
                                                 type="text" 
                                                 value={paymentAcc.name} 
                                                 readOnly 
-                                                className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700 truncate"
+                                                className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
                                                 onClick={() => setShowLookup('acc')}
-                                            />
-                                            <button onClick={() => setShowLookup('acc')} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
-                                                <Search size={16} />
-                                            </button>
+                                             style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
                                         </div>
                                     </div>
                                 </div>
@@ -439,11 +430,8 @@ const TransactionEditorModal = ({ isOpen, onClose }) => {
                                             value={currentRow.expAcc} 
                                             readOnly 
                                             onClick={() => setShowLookup('expAcc')}
-                                            className="w-full h-9 border border-gray-300 px-3 bg-white rounded-[3px] outline-none text-[12px] font-bold text-gray-700 cursor-pointer pr-10" 
-                                        />
-                                        <button onClick={() => setShowLookup('expAcc')} className="absolute right-1 top-1 bottom-1 w-7 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
-                                            <Search size={14} />
-                                        </button>
+                                            className="w-full h-9 border border-gray-300 px-3 bg-white rounded-[3px] outline-none text-[12px] font-bold text-gray-700 cursor-pointer appearance-none" 
+                                         style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
                                     </div>
                                 </div>
                                 <div className="col-span-3">
@@ -454,11 +442,8 @@ const TransactionEditorModal = ({ isOpen, onClose }) => {
                                             value={currentRow.costCenter} 
                                             readOnly 
                                             onClick={() => setShowLookup('costCenter')}
-                                            className="w-full h-9 border border-gray-300 px-3 bg-white rounded-[3px] outline-none text-[12px] font-bold text-gray-700 cursor-pointer pr-10" 
-                                        />
-                                        <button onClick={() => setShowLookup('costCenter')} className="absolute right-1 top-1 bottom-1 w-7 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
-                                            <Search size={14} />
-                                        </button>
+                                            className="w-full h-9 border border-gray-300 px-3 bg-white rounded-[3px] outline-none text-[12px] font-bold text-gray-700 cursor-pointer appearance-none" 
+                                         style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
                                     </div>
                                 </div>
                                 <div className="col-span-2">

@@ -221,15 +221,9 @@ const JournalEntryEditorModal = ({ isOpen, onClose }) => {
                                     type="text" 
                                     value={entryNo}
                                     onChange={(e) => setEntryNo(e.target.value)}
-                                    className="flex-1 h-9 border border-slate-200 px-3 bg-white rounded-[3px] outline-none font-bold text-slate-700 text-[13px] focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] transition-colors shadow-sm"
+                                    className="flex-1 h-9 border border-slate-200 px-3 bg-white rounded-[3px] outline-none font-bold text-slate-700 text-[13px] focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] transition-colors shadow-sm appearance-none"
                                     placeholder="JRN-00001"
-                                />
-                                <button 
-                                    onClick={handleJournalSearch}
-                                    className="w-9 h-9 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] shadow-md transition-all active:scale-90"
-                                >
-                                    <Search size={16} strokeWidth={3}/>
-                                </button>
+                                 style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
                             </div>
                         </div>
 
@@ -329,15 +323,9 @@ const JournalEntryEditorModal = ({ isOpen, onClose }) => {
                                     value={currentRow.accountCode} 
                                     readOnly
                                     onClick={() => setShowAccountLookup(true)}
-                                    className="flex-1 h-8 border border-slate-300 px-2 bg-white rounded-[4px] outline-none text-[11px] font-bold text-blue-600 cursor-pointer hover:border-[#0285fd] transition-colors"
+                                    className="flex-1 h-8 border border-slate-300 px-2 bg-white rounded-[4px] outline-none text-[11px] font-bold text-blue-600 cursor-pointer hover:border-[#0285fd] transition-colors appearance-none"
                                     placeholder="Search..."
-                                />
-                                <button 
-                                    onClick={() => setShowAccountLookup(true)}
-                                    className="w-8 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[4px] shadow-sm transition-all active:scale-90 shrink-0"
-                                >
-                                    <Search size={14} strokeWidth={3}/>
-                                </button>
+                                 style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
                             </div>
                         </div>
                         <div className="col-span-3 space-y-1.5">

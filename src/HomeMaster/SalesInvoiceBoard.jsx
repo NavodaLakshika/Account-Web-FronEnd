@@ -380,10 +380,7 @@ const SalesInvoiceBoard = ({ isOpen, onClose }) => {
                             <div className="col-span-4 flex items-center gap-2">
                                 <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Document No</label>
                                 <div className="flex-1 flex gap-1 h-8">
-                                    <input type="text" name="docNo" value={formData.docNo} onChange={handleInput} className="flex-1 border border-gray-300 px-3 text-[12px] font-bold text-blue-600 bg-gray-50 rounded-[3px] outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd]" />
-                                    <button onClick={handleSearch} className="w-10 h-8 bg-[#0285fd] text-slate-800 dark:text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95">
-                                        <Search size={16} />
-                                    </button>
+                                    <input type="text" name="docNo" value={formData.docNo} onChange={handleInput} className="flex-1 border border-gray-300 px-3 text-[12px] font-bold text-blue-600 bg-gray-50 rounded-[3px] outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] appearance-none"  style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
                                 </div>
                             </div>
                             <div className="col-span-4 flex items-center gap-2">
@@ -398,10 +395,7 @@ const SalesInvoiceBoard = ({ isOpen, onClose }) => {
                             <div className="col-span-4 flex items-center gap-2">
                                 <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">S.O. Number</label>
                                 <div className="flex-1 flex gap-1 h-8">
-                                    <input type="text" readOnly value={formData.soNumber} className="flex-1 border border-gray-300 px-3 text-[12px] font-bold text-gray-700 bg-white rounded-[3px]" />
-                                    <button onClick={() => setShowSOSearch(true)} className="w-10 h-8 bg-[#0285fd] text-slate-800 dark:text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] shadow-md active:scale-95">
-                                        <Search size={16} />
-                                    </button>
+                                    <input type="text" readOnly value={formData.soNumber} className="flex-1 border border-gray-300 px-3 text-[12px] font-bold text-gray-700 bg-white rounded-[3px] appearance-none"  style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
                                 </div>
                             </div>
 
@@ -409,19 +403,13 @@ const SalesInvoiceBoard = ({ isOpen, onClose }) => {
                             <div className="col-span-8 flex items-center gap-2">
                                 <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Customer</label>
                                 <div className="flex-1 flex gap-1 h-8">
-                                    <input type="text" readOnly value={lookups.customers.find(c => c.code === formData.customerId)?.name || ''} className="flex-1 border border-gray-300 px-3 text-[12px] font-bold text-red-600 bg-gray-50 rounded-[3px]" />
-                                    <button onClick={() => setShowCustomerSearch(true)} className="w-10 h-8 bg-[#0285fd] text-slate-800 dark:text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] shadow-md active:scale-95">
-                                        <Search size={16} />
-                                    </button>
+                                    <input type="text" readOnly value={lookups.customers.find(c => c.code === formData.customerId)?.name || ''} className="flex-1 border border-gray-300 px-3 text-[12px] font-bold text-red-600 bg-gray-50 rounded-[3px] appearance-none"  style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
                                 </div>
                             </div>
                             <div className="col-span-4 flex items-center gap-2">
                                 <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Sales Asst.</label>
                                 <div className="flex-1 flex gap-1 h-8">
-                                    <input type="text" readOnly value={formData.salesAssistant} className="flex-1 border border-gray-300 px-3 text-[12px] font-bold text-gray-700 bg-white rounded-[3px]" />
-                                    <button onClick={() => setShowAssistantSearch(true)} className="w-10 h-8 bg-[#0285fd] text-slate-800 dark:text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] shadow-md active:scale-95">
-                                        <Search size={16} />
-                                    </button>
+                                    <input type="text" readOnly value={formData.salesAssistant} className="flex-1 border border-gray-300 px-3 text-[12px] font-bold text-gray-700 bg-white rounded-[3px] appearance-none"  style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
                                 </div>
                             </div>
 
@@ -429,19 +417,13 @@ const SalesInvoiceBoard = ({ isOpen, onClose }) => {
                             <div className="col-span-4 flex items-center gap-2">
                                 <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Payment Type</label>
                                 <div className="flex-1 flex gap-1 h-8">
-                                    <input type="text" readOnly value={lookups.paymentMethods.find(m => m.code === formData.payType)?.name || ''} className="flex-1 border border-gray-300 px-3 text-[12px] font-bold text-gray-700 bg-white rounded-[3px]" />
-                                    <button onClick={() => setShowPayMethodSearch(true)} className="w-10 h-8 bg-[#0285fd] text-slate-800 dark:text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] shadow-md active:scale-95">
-                                        <Search size={16} />
-                                    </button>
+                                    <input type="text" readOnly value={lookups.paymentMethods.find(m => m.code === formData.payType)?.name || ''} className="flex-1 border border-gray-300 px-3 text-[12px] font-bold text-gray-700 bg-white rounded-[3px] appearance-none"  style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
                                 </div>
                             </div>
                             <div className="col-span-4 flex items-center gap-2">
                                 <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Tax Account</label>
                                 <div className="flex-1 flex gap-1 h-8">
-                                    <input type="text" readOnly value={lookups.taxAccounts.find(a => a.code === formData.taxAccount)?.name || ''} className="flex-1 border border-gray-300 px-3 text-[12px] font-bold text-gray-700 bg-white rounded-[3px]" />
-                                    <button onClick={() => setShowTaxAccSearch(true)} className="w-10 h-8 bg-[#0285fd] text-slate-800 dark:text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] shadow-md active:scale-95">
-                                        <Search size={16} />
-                                    </button>
+                                    <input type="text" readOnly value={lookups.taxAccounts.find(a => a.code === formData.taxAccount)?.name || ''} className="flex-1 border border-gray-300 px-3 text-[12px] font-bold text-gray-700 bg-white rounded-[3px] appearance-none"  style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
                                 </div>
                             </div>
                             <div className="col-span-4 flex items-center gap-2">
@@ -593,10 +575,7 @@ const SalesInvoiceBoard = ({ isOpen, onClose }) => {
                     <div className="space-y-1.5">
                         <label className="text-[11px] font-black text-gray-400 uppercase tracking-widest">Product / Service</label>
                         <div className="flex gap-2">
-                            <input type="text" readOnly value={entry.prodName} placeholder="Tap Search to Catalog..." className="flex-1 h-10 border border-gray-300 rounded-[3px] px-4 text-[13px] font-bold text-blue-600 bg-gray-50 outline-none" />
-                            <button onClick={() => setShowProductSearch(true)} className="w-12 h-10 bg-[#0285fd] text-slate-800 dark:text-white flex items-center justify-center rounded-[3px] shadow-md active:scale-95">
-                                <Search size={18} />
-                            </button>
+                            <input type="text" readOnly value={entry.prodName} placeholder="Tap Search to Catalog..." className="flex-1 h-10 border border-gray-300 rounded-[3px] px-4 text-[13px] font-bold text-blue-600 bg-gray-50 outline-none appearance-none"  style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
                         </div>
                     </div>
                     <div className="grid grid-cols-2 gap-4">

@@ -310,12 +310,9 @@ const InventoryDownloadModal = ({ isOpen, onClose }) => {
                                         type="text"
                                         readOnly
                                         value={selectedLocation.code ? `${selectedLocation.code} - ${selectedLocation.name}` : ''}
-                                        className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-bold text-blue-600 bg-gray-50 rounded-[3px] outline-none shadow-sm cursor-pointer truncate"
+                                        className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] font-bold text-blue-600 bg-gray-50 rounded-[3px] outline-none shadow-sm cursor-pointer truncate appearance-none"
                                         onClick={() => setShowLocationSearch(true)}
-                                    />
-                                    <button onClick={() => setShowLocationSearch(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0">
-                                        <Search size={16} />
-                                    </button>
+                                     style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
                                 </div>
                             </div>
 
@@ -378,12 +375,9 @@ const InventoryDownloadModal = ({ isOpen, onClose }) => {
                                         type="text"
                                         readOnly
                                         value={selectedCostCenter.code ? `${selectedCostCenter.code} - ${selectedCostCenter.name}` : ''}
-                                        className="flex-1 border border-gray-300 rounded-[3px] px-3 text-[12px] font-bold text-red-600 bg-gray-50 outline-none shadow-sm cursor-pointer truncate"
+                                        className="flex-1 border border-gray-300 rounded-[3px] px-3 text-[12px] font-bold text-red-600 bg-gray-50 outline-none shadow-sm cursor-pointer truncate appearance-none"
                                         onClick={() => setShowCostCenterSearch(true)}
-                                    />
-                                    <button onClick={() => setShowCostCenterSearch(true)} className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0">
-                                        <Search size={14} />
-                                    </button>
+                                     style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
                                 </div>
                             </div>
 

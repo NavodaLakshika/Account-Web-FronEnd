@@ -354,10 +354,7 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
                             <div className="col-span-3 flex items-center gap-2">
                                 <label                                 className="text-[11px] font-bold text-gray-500 uppercase w-20 shrink-0">Doc No</label>
                                 <div className="flex-1 flex gap-1 h-8 min-w-0">
-                                    <input type="text" value={formData.docNo} onChange={handleInputChange} name="docNo" className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-sm font-mono font-bold text-[#0285fd] bg-slate-50 rounded outline-none focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 transition-all" />
-                                    <button onClick={handleSearchClick} className="w-8 h-8 bg-[#0285fd] text-slate-800 dark:text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0">
-                                        <Search size={14} />
-                                    </button>
+                                    <input type="text" value={formData.docNo} onChange={handleInputChange} name="docNo" className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-sm font-mono font-bold text-[#0285fd] bg-slate-50 rounded outline-none focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 transition-all appearance-none"  style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
                                 </div>
                             </div>
 
@@ -376,10 +373,7 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
                             <div className="col-span-3 flex items-center gap-2">
                                 <label className="text-[11px] font-bold text-gray-500 uppercase w-20 shrink-0 text-nowrap">Job No</label>
                                 <div className="flex-1 flex gap-1 h-8 min-w-0">
-                                    <input type="text" readOnly value={formData.jobNo} onClick={() => setShowJobModal(true)} className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-sm font-mono font-bold text-gray-700 bg-slate-50 rounded outline-none cursor-pointer transition-all" />
-                                    <button onClick={() => setShowJobModal(true)} className="w-8 h-8 bg-[#0285fd] text-slate-800 dark:text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0">
-                                        <Search size={14} />
-                                    </button>
+                                    <input type="text" readOnly value={formData.jobNo} onClick={() => setShowJobModal(true)} className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-sm font-mono font-bold text-gray-700 bg-slate-50 rounded outline-none cursor-pointer transition-all appearance-none"  style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
                                 </div>
                             </div>
 
@@ -387,10 +381,7 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
                             <div className="col-span-3 flex items-center gap-2">
                                 <label className="text-[11px] font-bold text-gray-500 uppercase w-20 shrink-0 text-nowrap">Sales Asst</label>
                                 <div className="flex-1 flex gap-1 h-8 min-w-0">
-                                    <input type="text" readOnly value={lookups.salesAssistants.find(s => s.code === formData.salesRef)?.name || formData.salesRef || ''} onClick={() => setShowSalesAsstModal(true)} className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-sm font-mono font-bold text-gray-700 bg-slate-50 rounded outline-none cursor-pointer transition-all" placeholder="" />
-                                    <button onClick={() => setShowSalesAsstModal(true)} className="w-8 h-8 bg-[#0285fd] text-slate-800 dark:text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0">
-                                        <Search size={14} />
-                                    </button>
+                                    <input type="text" readOnly value={lookups.salesAssistants.find(s => s.code === formData.salesRef)?.name || formData.salesRef || ''} onClick={() => setShowSalesAsstModal(true)} className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-sm font-mono font-bold text-gray-700 bg-slate-50 rounded outline-none cursor-pointer transition-all appearance-none" placeholder=""  style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
                                 </div>
                             </div>
 
@@ -399,10 +390,7 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
                                 <label className="text-[11px] font-bold text-gray-500 uppercase w-20 shrink-0">Customer</label>
                                 <div className="flex-1 flex gap-1 h-8 min-w-0">
                                     <input type="text" readOnly value={formData.custCode} placeholder="ID" className="w-20 min-w-0 h-8 border border-slate-200 px-2 text-sm font-mono font-bold text-[#0285fd] bg-slate-50 rounded outline-none transition-all" />
-                                    <input type="text" readOnly value={formData.custName} onClick={() => setShowCustModal(true)} className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-sm font-mono font-bold rounded outline-none bg-slate-50 text-gray-700 cursor-pointer transition-all" placeholder=" " />
-                                    <button onClick={() => setShowCustModal(true)} className="w-8 h-8 bg-[#0285fd] text-slate-800 dark:text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0">
-                                        <Search size={14} />
-                                    </button>
+                                    <input type="text" readOnly value={formData.custName} onClick={() => setShowCustModal(true)} className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-sm font-mono font-bold rounded outline-none bg-slate-50 text-gray-700 cursor-pointer transition-all appearance-none" placeholder=" "  style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
                                 </div>
                             </div>
 
@@ -416,10 +404,7 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
                             <div className="col-span-3 flex items-center gap-2">
                                 <label className="text-[11px] font-bold text-gray-500 uppercase w-20 shrink-0">Pay Type</label>
                                 <div className="flex-1 flex gap-1 h-8 min-w-0">
-                                    <input type="text" readOnly value={formData.payType} onClick={() => setShowPayTypeModal(true)} className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-sm font-mono font-bold text-gray-700 bg-slate-50 rounded outline-none cursor-pointer transition-all" />
-                                    <button onClick={() => setShowPayTypeModal(true)} className="w-8 h-8 bg-[#0285fd] text-slate-800 dark:text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0">
-                                        <Search size={14} />
-                                    </button>
+                                    <input type="text" readOnly value={formData.payType} onClick={() => setShowPayTypeModal(true)} className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-sm font-mono font-bold text-gray-700 bg-slate-50 rounded outline-none cursor-pointer transition-all appearance-none"  style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
                                 </div>
                             </div>
 
@@ -465,12 +450,9 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
                                                 readOnly
                                                 value={row.prodCode}
                                                 onClick={() => { setProdIndex(idx); setShowProdModal(true); }}
-                                                className="flex-1 min-w-0 h-7 border border-slate-200 px-2 text-sm font-mono font-bold text-[#0285fd] bg-slate-50 rounded outline-none focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 cursor-pointer transition-all"
+                                                className="flex-1 min-w-0 h-7 border border-slate-200 px-2 text-sm font-mono font-bold text-[#0285fd] bg-slate-50 rounded outline-none focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 cursor-pointer transition-all appearance-none"
                                                 placeholder="Select"
-                                            />
-                                            <button onClick={() => { setProdIndex(idx); setShowProdModal(true); }} className="w-8 h-7 bg-[#0285fd] text-slate-800 dark:text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0">
-                                                <Search size={14} />
-                                            </button>
+                                             style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
                                         </div>
                                     </div>
                                     <div className="flex-1 py-1.5 px-2 border-r border-slate-100 truncate" title={row.prodName}>

@@ -244,16 +244,10 @@ const CustomerBoard = ({ isOpen, onClose }) => {
                                     name="Code"
                                     value={formData.Code}
                                     onChange={handleInputChange}
-                                    className="w-full h-8 border border-gray-300 px-2 text-sm bg-gray-50 font-bold"
+                                    className="w-full h-8 border border-gray-300 px-2 text-sm bg-gray-50 font-bold appearance-none"
                                     placeholder="AUTO"
                                     readOnly={isEditMode}
-                                />
-                                <button
-                                    onClick={openSearch}
-                                    className="w-8 h-8 bg-gray-100 border border-gray-300 flex items-center justify-center hover:bg-gray-200"
-                                >
-                                    <Search size={18} />
-                                </button>
+                                 style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
                             </div>
                         </div>
                         <div className="col-span-9">

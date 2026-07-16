@@ -250,15 +250,26 @@ const OpeningBalanceBoard = ({ isOpen, onClose }) => {
                             <div className="col-span-8">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">{activeTab === 'Vendor' ? 'A/P Account' : activeTab === 'Customer' ? 'A/R Account' : 'G/L Account'}</label>
                                 <div className="relative">
-                                    <input type="text" readOnly
-                                        value={formData.accountName ? `${formData.accountCode} - ${formData.accountName}` : ''}
-                                        placeholder={`Select ${activeTab} Account...`}
-                                        onClick={() => setActiveModal('account')}
-                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700 truncate" />
-                                    <button onClick={() => setActiveModal('account')}
-                                        className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
-                                        <Search size={16} />
-                                    </button>
+                                    <select
+                                        value={formData.accountName}
+                                        onChange={(e) => {
+                                            const val = e.target.value;
+                                            const item = (getAccountItems() || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || i === val);
+                                            if (item) {
+                                                const handler = (item) => { setFormData(prev => ({ ...prev, accountCode: item.code, accountName: item.name })); };
+                                                handler(item);
+                                            }
+                                        }}
+                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
+                                        style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
+                                    >
+                                        <option value="">Select...</option>
+                                        {(getAccountItems() || []).map((item, idx) => (
+                                            <option key={idx} value={item.code || item.name || item}>
+                                                {item.code ? `${item.code} - ${item.name}` : (item.name || item)}
+                                            </option>
+                                        ))}
+                                    </select>
                                 </div>
                             </div>
 
@@ -266,15 +277,26 @@ const OpeningBalanceBoard = ({ isOpen, onClose }) => {
                             <div className="col-span-4">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Cost Center</label>
                                 <div className="relative">
-                                    <input type="text" readOnly
-                                        value={formData.costCenter ? lookups.costCenters.find(c => c.code === formData.costCenter)?.name || formData.costCenter : ''}
-                                        placeholder="Select cost center..."
-                                        onClick={() => setActiveModal('cc')}
-                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700 truncate" />
-                                    <button onClick={() => setActiveModal('cc')}
-                                        className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
-                                        <Search size={16} />
-                                    </button>
+                                    <select
+                                        value={formData.costCenter}
+                                        onChange={(e) => {
+                                            const val = e.target.value;
+                                            const item = (getAccountItems() || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || i === val);
+                                            if (item) {
+                                                const handler = (item) => { setFormData(prev => ({ ...prev, accountCode: item.code, accountName: item.name })); };
+                                                handler(item);
+                                            }
+                                        }}
+                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
+                                        style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
+                                    >
+                                        <option value="">Select...</option>
+                                        {(getAccountItems() || []).map((item, idx) => (
+                                            <option key={idx} value={item.code || item.name || item}>
+                                                {item.code ? `${item.code} - ${item.name}` : (item.name || item)}
+                                            </option>
+                                        ))}
+                                    </select>
                                 </div>
                             </div>
 
@@ -283,15 +305,26 @@ const OpeningBalanceBoard = ({ isOpen, onClose }) => {
                                 <div className="col-span-8">
                                     <label className="block text-[13px] font-medium text-gray-700 mb-1.5">{activeTab}</label>
                                     <div className="relative">
-                                        <input type="text" readOnly
-                                            value={formData.entityName ? `${formData.entityId} - ${formData.entityName}` : ''}
-                                            placeholder={`Click search to select ${activeTab.toLowerCase()}...`}
-                                            onClick={() => setActiveModal('entity')}
-                                            className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700 truncate" />
-                                        <button onClick={() => setActiveModal('entity')}
-                                            className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
-                                            <Search size={16} />
-                                        </button>
+                                        <select
+                                        value={formData.entityName}
+                                        onChange={(e) => {
+                                            const val = e.target.value;
+                                            const item = (getEntityItems() || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || i === val);
+                                            if (item) {
+                                                const handler = (item) => { setFormData(prev => ({ ...prev, entityId: item.code, entityName: item.name, address: item.address || '' })); };
+                                                handler(item);
+                                            }
+                                        }}
+                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
+                                        style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
+                                    >
+                                        <option value="">Select...</option>
+                                        {(getEntityItems() || []).map((item, idx) => (
+                                            <option key={idx} value={item.code || item.name || item}>
+                                                {item.code ? `${item.code} - ${item.name}` : (item.name || item)}
+                                            </option>
+                                        ))}
+                                    </select>
                                     </div>
                                 </div>
                             )}

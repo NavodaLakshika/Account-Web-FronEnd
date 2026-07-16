@@ -451,27 +451,27 @@ const EngagementAdminBoard = () => {
                                                     {review.status !== 'Approved' && (
                                                         <button
                                                             onClick={() => handleReviewStatus(review.id, 'Approved')}
-                                                            className="w-[90px] justify-center px-3 py-1 text-[10px] font-black uppercase tracking-wider rounded-[3px] transition-all bg-emerald-600 hover:bg-emerald-500 text-white shadow-sm flex items-center gap-1"
+                                                            className="px-3 py-1.5 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-500 rounded-[3px] shadow-sm transition-all flex items-center justify-center w-[90px] gap-1.5"
                                                             title="Approve"
                                                         >
-                                                            <CheckCircle size={10} /> Approve
+                                                            <CheckCircle size={14} /> Approve
                                                         </button>
                                                     )}
                                                     {review.status !== 'Hidden' && (
                                                         <button
                                                             onClick={() => handleReviewStatus(review.id, 'Hidden')}
-                                                            className="w-[90px] justify-center px-3 py-1 text-[10px] font-black uppercase tracking-wider rounded-[3px] transition-all bg-slate-500 hover:bg-slate-400 text-white shadow-sm flex items-center gap-1"
+                                                            className="px-3 py-1.5 text-xs font-bold text-white bg-slate-500 hover:bg-slate-400 rounded-[3px] shadow-sm transition-all flex items-center justify-center w-[90px] gap-1.5"
                                                             title="Hide"
                                                         >
-                                                            <EyeOff size={10} /> Hide
+                                                            <EyeOff size={14} /> Hide
                                                         </button>
                                                     )}
                                                     <button
                                                         onClick={() => handleDeleteReview(review.id)}
-                                                        className="w-[90px] justify-center px-3 py-1 text-[10px] font-black uppercase tracking-wider rounded-[3px] transition-all bg-red-600 hover:bg-red-700 text-white shadow-sm flex items-center gap-1"
+                                                        className="px-3 py-1.5 text-xs font-bold text-white bg-red-600 hover:bg-red-700 rounded-[3px] shadow-sm transition-all flex items-center justify-center w-[90px] gap-1.5"
                                                         title="Delete"
                                                     >
-                                                        <Trash2 size={10} /> Delete
+                                                        <Trash2 size={14} /> Delete
                                                     </button>
                                                 </div>
                                             </td>
@@ -776,24 +776,24 @@ const EngagementAdminBoard = () => {
                                                             <div className="flex items-center justify-end gap-1.5">
                                                                 <button
                                                                     onClick={() => handleAdStatus(ad.id, !ad.isActive)}
-                                                                    className={`px-3 py-1 text-[10px] font-black uppercase tracking-wider rounded-[3px] transition-all flex items-center gap-1 shadow-sm ${ad.isActive ? 'bg-amber-500 hover:bg-amber-600 text-white' : 'bg-emerald-600 hover:bg-emerald-500 text-white'}`}
+                                                                    className={`px-3 py-1.5 text-xs font-bold text-white shadow-sm rounded-[3px] transition-all flex items-center justify-center w-[90px] gap-1.5 ${ad.isActive ? 'bg-amber-500 hover:bg-amber-600' : 'bg-emerald-600 hover:bg-emerald-500'}`}
                                                                     title={ad.isActive ? 'Deactivate' : 'Activate'}
                                                                 >
-                                                                    {ad.isActive ? <><XCircle size={10} /> Deactivate</> : <><CheckCircle size={10} /> Activate</>}
+                                                                    {ad.isActive ? <><XCircle size={14} /> Deactivate</> : <><CheckCircle size={14} /> Activate</>}
                                                                 </button>
                                                                 <button
                                                                     onClick={() => handleOpenForm(ad)}
-                                                                    className="px-3 py-1 text-[10px] font-black uppercase tracking-wider rounded-[3px] transition-all bg-[#0078d4] hover:bg-[#005a9e] text-white shadow-sm flex items-center gap-1"
+                                                                    className="px-3 py-1.5 text-xs font-bold text-white bg-[#0285fd] hover:bg-[#0073ff] rounded-[3px] shadow-sm transition-all flex items-center justify-center w-[90px] gap-1.5"
                                                                     title="Edit"
                                                                 >
-                                                                    <Edit size={10} /> Edit
+                                                                    <Edit size={14} /> Edit
                                                                 </button>
                                                                 <button
                                                                     onClick={() => handleDeleteAd(ad.id)}
-                                                                    className="px-3 py-1 text-[10px] font-black uppercase tracking-wider rounded-[3px] transition-all bg-red-600 hover:bg-red-700 text-white shadow-sm flex items-center gap-1"
+                                                                    className="px-3 py-1.5 text-xs font-bold text-white bg-red-600 hover:bg-red-700 rounded-[3px] shadow-sm transition-all flex items-center justify-center w-[90px] gap-1.5"
                                                                     title="Delete"
                                                                 >
-                                                                    <Trash2 size={10} /> Delete
+                                                                    <Trash2 size={14} /> Delete
                                                                 </button>
                                                             </div>
                                                         </td>

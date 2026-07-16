@@ -243,45 +243,78 @@ const MainCashBoard = ({ isOpen, onClose }) => {
                                 <div>
                                     <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Account</label>
                                     <div className="relative">
-                                        <input type="text" readOnly
-                                            value={formData.accountName ? `${formData.accountId} - ${formData.accountName}` : ''}
-                                            placeholder="Select account..."
-                                            onClick={() => setActiveModal('account')}
-                                            className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700 truncate" />
-                                        <button onClick={() => setActiveModal('account')}
-                                            className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
-                                            <Search size={16} />
-                                        </button>
+                                        <select
+                                        value={formData.accountName}
+                                        onChange={(e) => {
+                                            const val = e.target.value;
+                                            const item = (lookups.mainAccounts || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || i === val);
+                                            if (item) {
+                                                const handler = (item) => setFormData(prev => ({ ...prev, accountId: item.code, accountName: item.name }));
+                                                handler(item);
+                                            }
+                                        }}
+                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
+                                        style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
+                                    >
+                                        <option value="">Select...</option>
+                                        {(lookups.mainAccounts || []).map((item, idx) => (
+                                            <option key={idx} value={item.code || item.name || item}>
+                                                {item.code ? `${item.code} - ${item.name}` : (item.name || item)}
+                                            </option>
+                                        ))}
+                                    </select>
                                     </div>
                                 </div>
 
                                 <div>
                                     <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Cost Center</label>
                                     <div className="relative">
-                                        <input type="text" readOnly
-                                            value={formData.costCenterName ? `${formData.costCenterId} - ${formData.costCenterName}` : ''}
-                                            placeholder="Select cost center..."
-                                            onClick={() => setActiveModal('cc')}
-                                            className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700 truncate" />
-                                        <button onClick={() => setActiveModal('cc')}
-                                            className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
-                                            <Search size={16} />
-                                        </button>
+                                        <select
+                                        value={formData.costCenterName}
+                                        onChange={(e) => {
+                                            const val = e.target.value;
+                                            const item = (lookups.mainAccounts || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || i === val);
+                                            if (item) {
+                                                const handler = (item) => setFormData(prev => ({ ...prev, accountId: item.code, accountName: item.name }));
+                                                handler(item);
+                                            }
+                                        }}
+                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
+                                        style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
+                                    >
+                                        <option value="">Select...</option>
+                                        {(lookups.mainAccounts || []).map((item, idx) => (
+                                            <option key={idx} value={item.code || item.name || item}>
+                                                {item.code ? `${item.code} - ${item.name}` : (item.name || item)}
+                                            </option>
+                                        ))}
+                                    </select>
                                     </div>
                                 </div>
 
                                 <div>
                                     <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Pay to the Order</label>
                                     <div className="relative">
-                                        <input type="text" readOnly
-                                            value={formData.payeeName ? `${formData.payeeId} - ${formData.payeeName}` : ''}
-                                            placeholder="Select payee..."
-                                            onClick={() => setActiveModal('payee')}
-                                            className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700 truncate" />
-                                        <button onClick={() => setActiveModal('payee')}
-                                            className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
-                                            <Search size={16} />
-                                        </button>
+                                        <select
+                                        value={formData.payeeName}
+                                        onChange={(e) => {
+                                            const val = e.target.value;
+                                            const item = (lookups.payees || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || i === val);
+                                            if (item) {
+                                                const handler = (item) => setFormData(prev => ({ ...prev, payeeId: item.code, payeeName: item.name, address: item.address || '' }));
+                                                handler(item);
+                                            }
+                                        }}
+                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
+                                        style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
+                                    >
+                                        <option value="">Select...</option>
+                                        {(lookups.payees || []).map((item, idx) => (
+                                            <option key={idx} value={item.code || item.name || item}>
+                                                {item.code ? `${item.code} - ${item.name}` : (item.name || item)}
+                                            </option>
+                                        ))}
+                                    </select>
                                     </div>
                                 </div>
                             </div>
@@ -364,27 +397,59 @@ const MainCashBoard = ({ isOpen, onClose }) => {
                                         <div className="w-10 py-2.5 text-center text-[11px] font-bold text-gray-400">{idx + 1}</div>
                                         <div className="flex-[2] px-2 py-1.5">
                                             <div className="relative">
-                                                <input type="text" readOnly
-                                                    value={row.expAccName ? `${row.expAccCode} - ${row.expAccName}` : ''}
-                                                    placeholder="Search..."
-                                                    onClick={() => { setActiveRowIdx(idx); setActiveModal('row_acc'); }}
-                                                    className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[13px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700 truncate" />
-                                                <button onClick={() => { setActiveRowIdx(idx); setActiveModal('row_acc'); }}
-                                                    className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
-                                                    <Search size={15} />
-                                                </button>
+                                                <select
+                                        value={row.expAccName}
+                                        onChange={(e) => {
+                                            const val = e.target.value;
+                                            const item = (lookups.expenseAccounts || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || i === val);
+                                            if (item) {
+                                                const handler = (item) => {
+                    const newRows = [...rows];
+                    newRows[activeRowIdx].expAccCode = item.code;
+                    newRows[activeRowIdx].expAccName = item.name;
+                    setRows(newRows);
+                };
+                                                handler(item);
+                                            }
+                                        }}
+                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[13px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
+                                        style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
+                                    >
+                                        <option value="">Select...</option>
+                                        {(lookups.expenseAccounts || []).map((item, idx) => (
+                                            <option key={idx} value={item.code || item.name || item}>
+                                                {item.code ? `${item.code} - ${item.name}` : (item.name || item)}
+                                            </option>
+                                        ))}
+                                    </select>
                                             </div>
                                         </div>
                                         <div className="flex-[1.5] px-2 py-1.5">
                                             <div className="relative">
-                                                <input type="text" readOnly value={row.ccCode || ''}
-                                                    placeholder="CC..."
-                                                    onClick={() => { setActiveRowIdx(idx); setActiveModal('row_cc'); }}
-                                                    className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[13px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700 truncate" />
-                                                <button onClick={() => { setActiveRowIdx(idx); setActiveModal('row_cc'); }}
-                                                    className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
-                                                    <Search size={15} />
-                                                </button>
+                                                <select
+                                        value={row.ccCode}
+                                        onChange={(e) => {
+                                            const val = e.target.value;
+                                            const item = (lookups.costCenters || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || i === val);
+                                            if (item) {
+                                                const handler = (item) => {
+                    const newRows = [...rows];
+                    newRows[activeRowIdx].ccCode = item.code;
+                    setRows(newRows);
+                };
+                                                handler(item);
+                                            }
+                                        }}
+                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[13px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
+                                        style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
+                                    >
+                                        <option value="">Select...</option>
+                                        {(lookups.costCenters || []).map((item, idx) => (
+                                            <option key={idx} value={item.code || item.name || item}>
+                                                {item.code ? `${item.code} - ${item.name}` : (item.name || item)}
+                                            </option>
+                                        ))}
+                                    </select>
                                             </div>
                                         </div>
                                         <div className="w-32 px-2 py-1.5">

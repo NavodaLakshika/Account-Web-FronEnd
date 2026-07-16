@@ -306,15 +306,15 @@ const SubscriptionAdminBoard = () => {
                         setEditingPlan(plan);
                         setShowPlanEditor(true);
                       }}
-                      className="flex items-center justify-center gap-1.5 bg-[#0285fd] hover:bg-[#0073ff] text-white px-4 py-1.5 text-[11px] font-bold transition-all rounded-[3px] uppercase tracking-wider shadow-sm"
+                      className="px-3 py-1.5 text-xs font-bold text-white bg-[#0285fd] hover:bg-[#0073ff] rounded-[3px] shadow-sm transition-all flex items-center justify-center w-[90px] gap-1.5"
                     >
                       <Edit size={14} /> Edit
                     </button>
                     <button
                       onClick={() => handleDeletePlan(plan.id)}
-                      className="flex items-center justify-center gap-1.5 bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 text-[11px] font-bold transition-all rounded-[3px] uppercase tracking-wider shadow-sm"
+                      className="px-3 py-1.5 text-xs font-bold text-white bg-red-600 hover:bg-red-700 rounded-[3px] shadow-sm transition-all flex items-center justify-center w-[90px] gap-1.5"
                     >
-                      <Trash2 size={14} />
+                      <Trash2 size={14} /> Delete
                     </button>
                   </div>
                 </div>

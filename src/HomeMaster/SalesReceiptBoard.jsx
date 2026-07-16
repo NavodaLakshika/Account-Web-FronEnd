@@ -319,10 +319,7 @@ const SalesReceiptBoard = ({ isOpen, onClose }) => {
                             <div className="col-span-4 flex items-center gap-2">
                                 <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Document ID</label>
                                 <div className="flex-1 flex gap-1 h-8 min-w-0">
-                                    <input type="text" value={formData.docNo} onChange={(e) => setFormData(p => ({ ...p, docNo: e.target.value }))} className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-blue-600 bg-gray-50 rounded-[3px] outline-none shadow-sm" />
-                                    <button onClick={handleSearch} className="w-10 h-8 bg-[#0285fd] text-slate-800 dark:text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0">
-                                        <Search size={16} />
-                                    </button>
+                                    <input type="text" value={formData.docNo} onChange={(e) => setFormData(p => ({ ...p, docNo: e.target.value }))} className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-blue-600 bg-gray-50 rounded-[3px] outline-none shadow-sm appearance-none"  style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
                                 </div>
                             </div>
 
@@ -335,11 +332,8 @@ const SalesReceiptBoard = ({ isOpen, onClose }) => {
                                         readOnly 
                                         placeholder="Select customer..." 
                                         value={formData.customerName ? `${formData.customerId} - ${formData.customerName}` : ''}
-                                        className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-red-600 bg-gray-50 rounded-[3px] outline-none shadow-sm cursor-pointer" 
-                                    />
-                                    <button className="w-10 h-8 bg-[#0285fd] text-slate-800 dark:text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0">
-                                        <Search size={16} />
-                                    </button>
+                                        className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-red-600 bg-gray-50 rounded-[3px] outline-none shadow-sm cursor-pointer appearance-none" 
+                                     style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
                                 </div>
                             </div>
 

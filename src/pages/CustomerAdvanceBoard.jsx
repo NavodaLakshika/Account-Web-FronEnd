@@ -256,16 +256,28 @@ const CustomerAdvanceBoard = ({ isOpen, onClose }) => {
                             <div className="col-span-8">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Customer *</label>
                                 <div className="relative">
-                                    <input type="text" ref={inputRefs.creditAccCode} readOnly
-                                        value={formData.creditAccCode ? `${formData.creditAccCode} - ${formData.creditAccName}` : ''}
-                                        onClick={() => setActiveModal('customer')}
-                                        onKeyDown={e => handleKeyDown(e, 'creditAccCode')}
-                                        placeholder="Select customer..."
-                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 pr-10 cursor-pointer" />
-                                    <button onClick={() => setActiveModal('customer')}
-                                        className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
-                                        <Search size={16} />
-                                    </button>
+                                    <select
+                                        value={formData.creditAccCode}
+                                        onChange={(e) => {
+                                            const val = e.target.value;
+                                            const item = (lookups.customers || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || i === val);
+                                            if (item) {
+                                                const handler = handleSelectCustomer;
+                                                handler(item);
+                                            } else if (val === "") {
+                                                // If they select empty, clear it? Maybe. 
+                                                // Custom handlers usually expect an item.
+                                            }
+                                        }}
+                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700  cursor-pointer"
+                                    >
+                                        <option value="">Select...</option>
+                                        {(lookups.customers || []).map((item, idx) => (
+                                            <option key={idx} value={item.code || item.name || item}>
+                                                {item.code ? `${item.code} - ${item.name}` : (item.name || item)}
+                                            </option>
+                                        ))}
+                                    </select>
                                 </div>
                             </div>
 
@@ -273,16 +285,28 @@ const CustomerAdvanceBoard = ({ isOpen, onClose }) => {
                             <div className="col-span-4">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Pay Type</label>
                                 <div className="relative">
-                                    <input type="text" ref={inputRefs.payType} readOnly
-                                        value={lookups.payTypes?.find(m => m.code === formData.payType)?.name || formData.payType || ''}
-                                        onClick={() => setActiveModal('payType')}
-                                        onKeyDown={e => handleKeyDown(e, 'payType')}
-                                        placeholder="Select pay type..."
-                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 pr-10 cursor-pointer truncate" />
-                                    <button onClick={() => setActiveModal('payType')}
-                                        className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
-                                        <Search size={16} />
-                                    </button>
+                                    <select
+                                        value={formData.payType}
+                                        onChange={(e) => {
+                                            const val = e.target.value;
+                                            const item = (lookups.payTypes || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || i === val);
+                                            if (item) {
+                                                const handler = (item) => { handlePayTypeChange(item.code); setTimeout(() => { if (item.code === 'CHEQUE') { inputRefs.chequeNo.current?.focus(); } else { inputRefs.amount.current?.focus(); } }, 100); };
+                                                handler(item);
+                                            } else if (val === "") {
+                                                // If they select empty, clear it? Maybe. 
+                                                // Custom handlers usually expect an item.
+                                            }
+                                        }}
+                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700  cursor-pointer truncate"
+                                    >
+                                        <option value="">Select...</option>
+                                        {(lookups.payTypes || []).map((item, idx) => (
+                                            <option key={idx} value={item.code || item.name || item}>
+                                                {item.code ? `${item.code} - ${item.name}` : (item.name || item)}
+                                            </option>
+                                        ))}
+                                    </select>
                                 </div>
                             </div>
 
@@ -290,16 +314,28 @@ const CustomerAdvanceBoard = ({ isOpen, onClose }) => {
                             <div className="col-span-8">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Debit Acc *</label>
                                 <div className="relative">
-                                    <input type="text" ref={inputRefs.debitAccCode} readOnly
-                                        value={formData.debitAccCode ? `${formData.debitAccCode} - ${formData.debitAccName}` : ''}
-                                        onClick={() => setActiveModal('debitAcc')}
-                                        onKeyDown={e => handleKeyDown(e, 'debitAccCode')}
-                                        placeholder="Select debit account..."
-                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 pr-10 cursor-pointer" />
-                                    <button onClick={() => setActiveModal('debitAcc')}
-                                        className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
-                                        <Search size={16} />
-                                    </button>
+                                    <select
+                                        value={formData.debitAccCode}
+                                        onChange={(e) => {
+                                            const val = e.target.value;
+                                            const item = (lookups.drAccounts || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || i === val);
+                                            if (item) {
+                                                const handler = handleSelectDebitAccount;
+                                                handler(item);
+                                            } else if (val === "") {
+                                                // If they select empty, clear it? Maybe. 
+                                                // Custom handlers usually expect an item.
+                                            }
+                                        }}
+                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700  cursor-pointer"
+                                    >
+                                        <option value="">Select...</option>
+                                        {(lookups.drAccounts || []).map((item, idx) => (
+                                            <option key={idx} value={item.code || item.name || item}>
+                                                {item.code ? `${item.code} - ${item.name}` : (item.name || item)}
+                                            </option>
+                                        ))}
+                                    </select>
                                 </div>
                             </div>
 
