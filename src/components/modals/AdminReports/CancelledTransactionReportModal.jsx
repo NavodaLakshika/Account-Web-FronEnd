@@ -68,15 +68,8 @@ const CancelledTransactionReportModal = ({ isOpen, onClose }) => {
                                         value={transactionType}
                                         onChange={(e) => setTransactionType(e.target.value)}
                                         disabled={isAllTypes}
-                                        className="flex-1 h-8 px-2.5 border border-gray-300 bg-white rounded-[4px] outline-none font-bold text-[12px] text-slate-700 shadow-sm focus:border-blue-400 disabled:bg-slate-50 disabled:text-slate-500 dark:text-slate-400"
-                                    />
-                                    <button
-                                        onClick={() => setShowTypeLookup(true)}
-                                        disabled={isAllTypes}
-                                        className="w-9 h-8 bg-[#0285fd] text-slate-800 dark:text-white flex items-center justify-center hover:bg-[#0073ff] transition-all shadow-sm active:scale-95 ml-1.5 rounded-[4px] disabled:opacity-50"
-                                    >
-                                        <Search size={13} />
-                                    </button>
+                                        className="flex-1 h-8 px-2.5 border border-gray-300 bg-white rounded-[4px] outline-none font-bold text-[12px] text-slate-700 shadow-sm focus:border-blue-400 disabled:bg-slate-50 disabled:text-slate-500 dark:text-slate-400 appearance-none"
+                                     style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
                                 </div>
 
                                 <div

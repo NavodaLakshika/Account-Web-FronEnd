@@ -364,10 +364,7 @@ const SalesInvoiceBoard = ({ isOpen, onClose }) => {
                             <div className="col-span-3">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Document No</label>
                                 <div className="relative">
-                                    <input type="text" name="docNo" value={formData.docNo} onChange={handleInput} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] pr-10 text-gray-700" />
-                                    <button onClick={handleSearch} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
-                                        <Search size={16} />
-                                    </button>
+                                    <input type="text" name="docNo" value={formData.docNo} onChange={handleInput} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 appearance-none"  style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
                                 </div>
                             </div>
                             <div className="col-span-3">
@@ -382,10 +379,7 @@ const SalesInvoiceBoard = ({ isOpen, onClose }) => {
                             <div className="col-span-3">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">S.O. Number</label>
                                 <div className="relative">
-                                    <input type="text" readOnly value={formData.soNumber} onClick={() => setShowSOSearch(true)} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700 truncate" />
-                                    <button onClick={() => setShowSOSearch(true)} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
-                                        <Search size={16} />
-                                    </button>
+                                    <input type="text" readOnly value={formData.soNumber} onClick={() => setShowSOSearch(true)} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"  style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
                                 </div>
                             </div>
                             <div className="col-span-3">
@@ -398,10 +392,7 @@ const SalesInvoiceBoard = ({ isOpen, onClose }) => {
                                     <div className="flex gap-2">
                                         <input type="text" readOnly value={formData.customerId} className="w-24 h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none text-gray-700 font-mono shrink-0" />
                                         <div className="relative flex-1">
-                                            <input type="text" readOnly value={lookups.customers.find(c => c.code === formData.customerId)?.name || ''} onClick={() => setShowCustomerSearch(true)} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700 truncate" />
-                                            <button onClick={() => setShowCustomerSearch(true)} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
-                                                <Search size={16} />
-                                            </button>
+                                            <input type="text" readOnly value={lookups.customers.find(c => c.code === formData.customerId)?.name || ''} onClick={() => setShowCustomerSearch(true)} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"  style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
                                         </div>
                                     </div>
                                 </div>
@@ -409,10 +400,7 @@ const SalesInvoiceBoard = ({ isOpen, onClose }) => {
                             <div className="col-span-3">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Sales Asst.</label>
                                 <div className="relative">
-                                    <input type="text" readOnly value={formData.salesAssistant} onClick={() => setShowAssistantSearch(true)} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700 truncate" />
-                                    <button onClick={() => setShowAssistantSearch(true)} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
-                                        <Search size={16} />
-                                    </button>
+                                    <input type="text" readOnly value={formData.salesAssistant} onClick={() => setShowAssistantSearch(true)} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"  style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
                                 </div>
                             </div>
                             <div className="col-span-3">
@@ -427,19 +415,13 @@ const SalesInvoiceBoard = ({ isOpen, onClose }) => {
                             <div className="col-span-4">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Payment Type</label>
                                 <div className="relative">
-                                    <input type="text" readOnly value={lookups.paymentMethods.find(m => m.code === formData.payType)?.name || ''} onClick={() => setShowPayMethodSearch(true)} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700 truncate" />
-                                    <button onClick={() => setShowPayMethodSearch(true)} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
-                                        <Search size={16} />
-                                    </button>
+                                    <input type="text" readOnly value={lookups.paymentMethods.find(m => m.code === formData.payType)?.name || ''} onClick={() => setShowPayMethodSearch(true)} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"  style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
                                 </div>
                             </div>
                             <div className="col-span-4">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Tax Account</label>
                                 <div className="relative">
-                                    <input type="text" readOnly value={lookups.taxAccounts.find(a => a.code === formData.taxAccount)?.name || ''} onClick={() => setShowTaxAccSearch(true)} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700 truncate" />
-                                    <button onClick={() => setShowTaxAccSearch(true)} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
-                                        <Search size={16} />
-                                    </button>
+                                    <input type="text" readOnly value={lookups.taxAccounts.find(a => a.code === formData.taxAccount)?.name || ''} onClick={() => setShowTaxAccSearch(true)} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"  style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
                                 </div>
                             </div>
                             <div className="col-span-4">
@@ -787,10 +769,7 @@ const SalesInvoiceBoard = ({ isOpen, onClose }) => {
                         <label className="text-[11px] font-black text-gray-400 uppercase tracking-widest">Product / Service</label>
                         <div className="flex gap-2">
                             <div className="relative flex-1">
-                                <input type="text" readOnly value={entry.prodName} placeholder="Tap Search to Catalog..." className="w-full h-10 border border-gray-300 rounded-[3px] px-4 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] pr-10 text-gray-700 shadow-sm" />
-                                <button onClick={() => setShowProductSearch(true)} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
-                                    <Search size={16} />
-                                </button>
+                                <input type="text" readOnly value={entry.prodName} placeholder="Tap Search to Catalog..." className="w-full h-10 border border-gray-300 rounded-[3px] px-4 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 shadow-sm appearance-none"  style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
                             </div>
                         </div>
                     </div>

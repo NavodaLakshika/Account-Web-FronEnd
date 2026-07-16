@@ -11,8 +11,6 @@ import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
 const ChequeRegisterBoard = ({ isOpen, onClose }) => {
     const [loading, setLoading] = useState(false);
     const [accounts, setAccounts] = useState([]);
-    const [showAccountSearch, setShowAccountSearch] = useState(false);
-    const [accountSearchQuery, setAccountSearchQuery] = useState('');
     const [calendar, setCalendar] = useState({ isOpen: false, target: '' });
     
     const getInitialFormData = () => ({
@@ -70,7 +68,6 @@ const ChequeRegisterBoard = ({ isOpen, onClose }) => {
 
     const handleAccountSelect = (acc) => {
         setFormData({ ...formData, accCode: acc.code, accName: acc.name });
-        setShowAccountSearch(false);
         fetchLookups(formData.company, acc.code);
     };
 
@@ -117,10 +114,7 @@ const ChequeRegisterBoard = ({ isOpen, onClose }) => {
         }
     };
 
-    const filteredAccounts = accounts.filter(a => 
-        a.name.toLowerCase().includes(accountSearchQuery.toLowerCase()) || 
-        a.code.toLowerCase().includes(accountSearchQuery.toLowerCase())
-    );
+
 
     const footer = (
         <div className="bg-slate-50 px-6 py-4 w-full flex justify-end gap-3 border-t border-gray-200 mt-2 rounded-b-xl">
@@ -160,17 +154,27 @@ const ChequeRegisterBoard = ({ isOpen, onClose }) => {
                         {/* Row 1: Account */}
                         <div className="flex items-center">
                             <label className="w-32 font-bold text-gray-700 text-[12.5px] uppercase">Account</label>
-                            <div className="flex-1 flex gap-2">
-                                <input 
-                                    type="text" 
-                                    readOnly 
-                                    value={formData.accCode ? `${formData.accCode} - ${formData.accName}` : ''}
-                                    onClick={() => setShowAccountSearch(true)}
-                                    className="flex-1 h-9 border border-gray-300 rounded-[3px] px-3 font-mono font-bold text-slate-800 text-[12.5px] outline-none shadow-sm bg-gray-50 cursor-pointer" 
-                                />
-                                <button onClick={() => setShowAccountSearch(true)} className="w-10 h-9 bg-[#0285fd] text-slate-800 dark:text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0">
-                                    <Search size={16} />
-                                </button>
+                            <div className="flex-1">
+                                <select
+                                    value={formData.accCode}
+                                    onChange={(e) => {
+                                        const acc = accounts.find(a => a.code === e.target.value);
+                                        if (acc) {
+                                            handleAccountSelect(acc);
+                                        } else {
+                                            setFormData({ ...formData, accCode: '', accName: '', bookNo: '' });
+                                        }
+                                    }}
+                                    className="w-full h-9 border border-gray-300 rounded-[3px] px-3 font-mono font-bold text-slate-800 text-[12.5px] outline-none shadow-sm bg-white appearance-none cursor-pointer focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd]"
+                                    style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
+                                >
+                                    <option value="">Select account...</option>
+                                    {accounts.map(acc => (
+                                        <option key={acc.code} value={acc.code}>
+                                            {acc.code} - {acc.name}
+                                        </option>
+                                    ))}
+                                </select>
                             </div>
                         </div>
 
@@ -237,68 +241,7 @@ const ChequeRegisterBoard = ({ isOpen, onClose }) => {
                 </div>
             </SimpleModal>
 
-            {/* Account Search Modal */}
-            <SimpleModal
-                isOpen={showAccountSearch}
-                onClose={() => {
-                    setShowAccountSearch(false);
-                    setAccountSearchQuery('');
-                }}
-                title="Account Registration Lookup"
-                maxWidth="max-w-[700px]"
-            >
-                <div className="space-y-4 font-['Tahoma']">
-                    <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-[3px] border border-gray-200 mb-2">
-                        <span className="text-[12px] font-bold text-gray-500 uppercase tracking-widest shrink-0">Search Facility</span>
-                        <div className="relative flex-1">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
-                            <input
-                                type="text"
-                                placeholder="Scan account by descriptive title or reference code..."
-                                className="w-full h-10 pl-10 pr-4 border border-gray-300 rounded-[3px] outline-none text-[13px] focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] shadow-sm bg-white"
-                                value={accountSearchQuery}
-                                onChange={(e) => setAccountSearchQuery(e.target.value)}
-                                autoFocus
-                            />
-                        </div>
-                    </div>
-                    <div className="border border-gray-200 rounded-[3px] overflow-hidden shadow-sm bg-white">
-                        <div className="max-h-[400px] overflow-y-auto no-scrollbar">
-                            <table className="w-full text-left">
-                                <thead className="bg-[#f8fafd] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-200 z-10">
-                                    <tr>
-                                        <th className=" px-5 py-3">Code</th>
-                                        <th className=" px-5 py-3">Account Description</th>
-                                        <th className="text-right px-5 py-3">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-gray-50">
-                                    {filteredAccounts.map(acc => (
-                                        <tr 
-                                            key={acc.code} 
-                                            className="group hover:bg-blue-50/50  transition-all cursor-pointer group border-b border-gray-50" 
-                                            onClick={() => handleAccountSelect(acc)}
-                                        >
-                                            <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{acc.code}</td>
-                                            <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">
-                                                {acc.name}
-                                            </td>
-                                            <td className="text-right px-5 py-3">
-                                                 <button className="bg-[#0285fd] text-slate-800 dark:text-white text-[10px] px-5 py-2 rounded-[3px] font-black hover:bg-[#0073ff] shadow-md transition-all active:scale-95 uppercase tracking-tighter">SELECT</button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                    {filteredAccounts.length === 0 && (
-                                         <tr>
-                                             <td colSpan={3} className="py-12 text-center text-gray-300 font-bold uppercase tracking-widest text-[11px]">No matching accounts available in registry</td>
-                                         </tr>
-                                    )}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </SimpleModal>
+
 
             <CalendarModal 
                 isOpen={calendar.isOpen}

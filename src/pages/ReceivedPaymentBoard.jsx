@@ -188,10 +188,7 @@ const ReceivedPaymentBoard = ({ isOpen, onClose }) => {
                             <div className="col-span-4">
                                 <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Pay Type</label>
                                 <div className="relative">
-                                    <input type="text" readOnly value={formData.payType} onClick={() => { setActiveModal('payType'); setSearchTerm(''); }} className="flex-1 min-w-0 h-8 border border-gray-300 rounded-[3px] px-3 text-[12px] outline-none bg-white text-gray-700 font-bold cursor-pointer shadow-sm" />
-                                    <button onClick={() => { setActiveModal('payType'); setSearchTerm(''); }} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
-                                        <Search size={16} />
-                                    </button>
+                                    <input type="text" readOnly value={formData.payType} onClick={() => { setActiveModal('payType'); setSearchTerm(''); }} className="flex-1 min-w-0 h-8 border border-gray-300 rounded-[3px] px-3 text-[12px] outline-none bg-white text-gray-700 font-bold cursor-pointer shadow-sm appearance-none"  style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
                                 </div>
                             </div>
 
@@ -199,10 +196,7 @@ const ReceivedPaymentBoard = ({ isOpen, onClose }) => {
                             <div className="col-span-4">
                                 <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Debit A/C</label>
                                 <div className="relative">
-                                    <input type="text" readOnly value={lookups.accounts.find(a => a.Account_Code === formData.debitAccount)?.Account_Name ? `${formData.debitAccount} - ${lookups.accounts.find(a => a.Account_Code === formData.debitAccount)?.Account_Name}` : ''} placeholder="Select Debit..." onClick={() => { setActiveModal('debit'); setSearchTerm(''); }} className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-gray-700 bg-white rounded-[3px] outline-none shadow-sm cursor-pointer" />
-                                    <button onClick={() => { setActiveModal('debit'); setSearchTerm(''); }} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
-                                        <Search size={16} />
-                                    </button>
+                                    <input type="text" readOnly value={lookups.accounts.find(a => a.Account_Code === formData.debitAccount)?.Account_Name ? `${formData.debitAccount} - ${lookups.accounts.find(a => a.Account_Code === formData.debitAccount)?.Account_Name}` : ''} placeholder="Select Debit..." onClick={() => { setActiveModal('debit'); setSearchTerm(''); }} className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-gray-700 bg-white rounded-[3px] outline-none shadow-sm cursor-pointer appearance-none"  style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
                                 </div>
                             </div>
 
@@ -210,10 +204,7 @@ const ReceivedPaymentBoard = ({ isOpen, onClose }) => {
                             <div className="col-span-4">
                                 <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Credit A/C</label>
                                 <div className="relative">
-                                    <input type="text" readOnly value={lookups.accounts.find(a => a.Account_Code === formData.creditAccount)?.Account_Name ? `${formData.creditAccount} - ${lookups.accounts.find(a => a.Account_Code === formData.creditAccount)?.Account_Name}` : ''} placeholder="Select Credit..." onClick={() => { setActiveModal('credit'); setSearchTerm(''); }} className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-gray-700 bg-white rounded-[3px] outline-none shadow-sm cursor-pointer" />
-                                    <button onClick={() => { setActiveModal('credit'); setSearchTerm(''); }} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
-                                        <Search size={16} />
-                                    </button>
+                                    <input type="text" readOnly value={lookups.accounts.find(a => a.Account_Code === formData.creditAccount)?.Account_Name ? `${formData.creditAccount} - ${lookups.accounts.find(a => a.Account_Code === formData.creditAccount)?.Account_Name}` : ''} placeholder="Select Credit..." onClick={() => { setActiveModal('credit'); setSearchTerm(''); }} className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-gray-700 bg-white rounded-[3px] outline-none shadow-sm cursor-pointer appearance-none"  style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
                                 </div>
                             </div>
 
@@ -238,10 +229,7 @@ const ReceivedPaymentBoard = ({ isOpen, onClose }) => {
                             <div className="col-span-4">
                                 <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Bank</label>
                                 <div className="relative">
-                                    <input type="text" readOnly value={lookups.banks.find(b => b.Bank_Code === formData.bankId)?.Bank_Name || ''} placeholder="Select Bank..." disabled={formData.payType === 'Cash'} onClick={() => { if(formData.payType !== 'Cash') { setActiveModal('bank'); setSearchTerm(''); } }} className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-gray-700 bg-white disabled:bg-gray-100 rounded-[3px] outline-none shadow-sm cursor-pointer" />
-                                    <button onClick={() => { setActiveModal('bank'); setSearchTerm(''); }} disabled={formData.payType === 'Cash'} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
-                                        <Search size={16} />
-                                    </button>
+                                    <input type="text" readOnly value={lookups.banks.find(b => b.Bank_Code === formData.bankId)?.Bank_Name || ''} placeholder="Select Bank..." disabled={formData.payType === 'Cash'} onClick={() => { if(formData.payType !== 'Cash') { setActiveModal('bank'); setSearchTerm(''); } }} className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-gray-700 bg-white disabled:bg-gray-100 rounded-[3px] outline-none shadow-sm cursor-pointer appearance-none"  style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
                                 </div>
                             </div>
 

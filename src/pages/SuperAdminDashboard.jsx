@@ -45,7 +45,7 @@ import AdminVerificationModal from '../components/modals/AdminVerificationModal'
 import AdminConfigBoard from '../HomeMaster/AdminConfigBoard';
 import SystemAnalyticsBoard from '../HomeMaster/SystemAnalyticsBoard';
 import SecurityAuditBoard from '../HomeMaster/SecurityAuditBoard';
-import IntegrationsBoard from '../HomeMaster/IntegrationsBoard';
+
 
 import SystemAnalysisBoard from '../HomeMaster/SystemAnalysisBoard';
 import SystemLogReportModal from '../components/modals/AdminReports/SystemLogReportModal';
@@ -69,6 +69,7 @@ const SuperAdminDashboard = () => {
     
     const [showMessageDropdown, setShowMessageDropdown] = useState(false);
     const [currentUserCode, setCurrentUserCode] = useState('');
+    const [selectedEmpForCompanies, setSelectedEmpForCompanies] = useState(null);
 
     // Flat Lists State
     const [allCompanies, setAllCompanies] = useState([]);
@@ -195,6 +196,14 @@ const SuperAdminDashboard = () => {
     const [showSystemLogReport, setShowSystemLogReport] = useState(false);
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+
+    const getGreeting = () => {
+        const hour = new Date().getHours();
+        if (hour < 12) return 'Good Morning';
+        if (hour < 18) return 'Good Afternoon';
+        return 'Good Evening';
+    };
+    const currentDate = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
 
     const [isMobile, setIsMobile] = useState(window.innerWidth < 768);// Delete flow state (confirm → password → execute)
     const [showDeletePasswordModal, setShowDeletePasswordModal] = useState(false);
@@ -862,7 +871,7 @@ const SuperAdminDashboard = () => {
         { name: 'Subscriptions', icon: CalendarClock },
         { name: 'Database', icon: Database },
         { name: 'Security Audit', icon: ShieldCheck },
-        { name: 'Integrations', icon: Puzzle },
+
         { name: 'User Feedback', icon: MessageSquare }
     ];
 
@@ -890,7 +899,7 @@ const SuperAdminDashboard = () => {
                         {menuItems.map((item) => (
                             <li key={item.name}>
                                 <button
-                                    onClick={() => setActiveMenu(item.name)}
+                                    onClick={() => { setActiveMenu(item.name); setSelectedEmpForCompanies(null); }}
                                     className={`w-full flex items-center transition-all duration-300 px-3 py-3 rounded-[3px] group/btn ${activeMenu === item.name
                                         ? 'bg-[#0285fd] text-white font-bold shadow-md shadow-blue-500/20'
                                         : 'text-slate-900 hover:bg-[#0285fd] hover:text-white font-bold'
@@ -933,7 +942,7 @@ const SuperAdminDashboard = () => {
                             {menuItems.map((item) => (
                                 <button
                                     key={item.name}
-                                    onClick={() => { setActiveMenu(item.name); setSidebarOpen(false); }}
+                                    onClick={() => { setActiveMenu(item.name); setSelectedEmpForCompanies(null); setSidebarOpen(false); }}
                                     className={`w-full flex items-center gap-3 px-4 py-3 rounded-[3px] transition-all text-[13.5px] font-bold group/btn ${activeMenu === item.name
                                         ? 'bg-[#0285fd] text-white shadow-md shadow-blue-500/20'
                                         : 'text-slate-900 hover:bg-[#0285fd] hover:text-white'
@@ -955,10 +964,20 @@ const SuperAdminDashboard = () => {
                 <header className="bg-white shadow-[0_2px_15px_-3px_rgba(0,0,0,0.04)] shrink-0 relative z-30">
                     <div className="flex items-center justify-between px-8 h-[72px]">
                         {/* Left */}
-                        <div className="flex items-center gap-3 flex-1">
-                            <button onClick={() => setSidebarOpen(true)} className="md:hidden p-2 text-slate-500 hover:bg-slate-50 hover:text-blue-600 rounded-full transition-colors">
-                                <Menu className="w-5 h-5" />
-                            </button>
+                        <div className="flex flex-col justify-center flex-1">
+                            <div className="flex items-center gap-3">
+                                <button onClick={() => setSidebarOpen(true)} className="md:hidden p-2 text-slate-500 hover:bg-slate-50 hover:text-blue-600 rounded-full transition-colors">
+                                    <Menu className="w-5 h-5" />
+                                </button>
+                                <div className="hidden md:block">
+                                    <h1 className="text-[17px] font-bold text-gray-800 tracking-tight leading-none mb-1">
+                                        {getGreeting()}, Admin
+                                    </h1>
+                                    <p className="text-[11px] font-medium text-gray-500">
+                                        Here's your system overview for {currentDate}
+                                    </p>
+                                </div>
+                            </div>
                         </div>
 
                         {/* Center: Search */}
@@ -1139,20 +1158,7 @@ const SuperAdminDashboard = () => {
                     {/* DASHBOARD VIEW */}
                     {activeMenu === 'Dashboard' && (
                         <>
-                            {/* Greeting Header */}
-                            <div className="flex flex-col mb-6">
-                                <h1 className="text-[32px] font-bold text-gray-800 leading-tight tracking-tight">
-                                    {(() => {
-                                        const h = new Date().getHours();
-                                        if (h < 12) return 'Good Morning';
-                                        if (h < 18) return 'Good Afternoon';
-                                        return 'Good Evening';
-                                    })()}, Admin
-                                </h1>
-                                <p className="text-[14px] text-gray-500 mt-1">
-                                    Here's your system overview for {new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
-                                </p>
-                            </div>
+
 
                             {/* Metric Cards */}
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -1229,7 +1235,7 @@ const SuperAdminDashboard = () => {
                                         <tbody className="divide-y divide-gray-50">
                                             {filteredHierarchy.map((emp) => (
                                                 <React.Fragment key={emp.empCode}>
-                                                    <tr className="border-b border-gray-50 hover:bg-blue-50/50 transition-all cursor-pointer group" onClick={() => toggleEmp(emp.empCode)}>
+                                                    <tr className="border-b border-gray-50 hover:bg-blue-50/50 transition-all group cursor-pointer" onClick={() => { setActiveMenu('Companies'); setSelectedEmpForCompanies(emp); }}>
                                                     <td className="py-3.5 px-6">
                                                         <div className="flex items-center gap-3">
                                                             <div className="w-9 h-9 bg-gray-100 text-gray-700 flex items-center justify-center font-bold text-sm shadow-sm rounded-[3px] shrink-0">
@@ -1264,15 +1270,12 @@ const SuperAdminDashboard = () => {
                                                             <span className="w-7 h-7 bg-gray-100 border border-gray-300 text-gray-700 flex items-center justify-center text-[11px] font-bold rounded-[3px]">
                                                                 {emp.companies.length}
                                                             </span>
-                                                            {expandedEmps[emp.empCode]
-                                                                ? <ChevronDown className="w-[18px] h-[18px] text-gray-700" />
-                                                                : <ChevronRight className="w-[18px] h-[18px] text-gray-700" />}
                                                         </div>
                                                     </td>
                                                     <td className="py-3.5 px-6 text-right">
                                                         <div className="flex items-center justify-end gap-2">
                                                             <button
-                                                                className="px-3 py-1.5 text-xs font-bold text-white bg-[#0285fd] hover:bg-[#0073ff] rounded-[3px] shadow-sm transition-all flex items-center gap-1.5"
+                                                                className="px-3 py-1.5 text-xs font-bold text-white bg-[#0285fd] hover:bg-[#0073ff] rounded-[3px] shadow-sm transition-all flex items-center justify-center w-[90px] gap-1.5"
                                                                 onClick={(e) => {
                                                                     e.stopPropagation();
                                                                     setEditingEmp(emp);
@@ -1284,7 +1287,7 @@ const SuperAdminDashboard = () => {
                                                                 <Edit className="w-[14px] h-[14px]" /> Edit
                                                             </button>
                                                             <button
-                                                                className="px-3 py-1.5 text-xs font-bold text-white bg-red-600 hover:bg-red-700 rounded-[3px] shadow-sm transition-all flex items-center gap-1.5"
+                                                                className="px-3 py-1.5 text-xs font-bold text-white bg-red-600 hover:bg-red-700 rounded-[3px] shadow-sm transition-all flex items-center justify-center w-[90px] gap-1.5"
                                                                 onClick={(e) => { e.stopPropagation(); handleDeleteEmployee(e, emp.empCode); }}
                                                                 title="Delete Employee"
                                                             >
@@ -1293,71 +1296,6 @@ const SuperAdminDashboard = () => {
                                                         </div>
                                                     </td>
                                                 </tr>
-                                                {/* Nested Companies */}
-                                                {expandedEmps[emp.empCode] && (
-                                                    <tr className="bg-slate-100/50 shadow-inner">
-                                                        <td colSpan={7} className="p-0 border-b border-gray-200">
-                                                            <div className="px-8 py-6">
-                                                                <div className="flex items-center gap-2 mb-4">
-                                                                    <div className="w-1.5 h-4 bg-[#0285fd] rounded-full"></div>
-                                                                    <h3 className="text-[13px] font-black text-slate-700 uppercase tracking-widest">Assigned Companies ({emp.companies.length})</h3>
-                                                                </div>
-                                                                
-                                                                {emp.companies.length === 0 ? (
-                                                                    <div className="bg-white border border-slate-200 rounded-[3px] p-8 text-center shadow-sm">
-                                                                        <Building2 className="w-8 h-8 text-slate-300 mx-auto mb-3" />
-                                                                        <p className="text-[14px] font-bold text-slate-500">No companies assigned to this user.</p>
-                                                                    </div>
-                                                                ) : (
-                                                                    <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
-                                                                        {emp.companies.map((comp, idx) => (
-                                                                            <div key={comp.companyCode} onClick={(e) => { e.stopPropagation(); openTransactionsModal(comp); }} className="group relative bg-white border border-slate-200 rounded-[3px] p-5 shadow-sm hover:shadow-lg hover:shadow-blue-500/10 hover:border-[#0285fd] transition-all duration-300 cursor-pointer overflow-hidden">
-                                                                                {/* Left border accent on hover */}
-                                                                                <div className="absolute top-0 left-0 w-1 h-full bg-[#0285fd] opacity-0 group-hover:opacity-100 transition-opacity" />
-                                                                                
-                                                                                <div className="flex items-start justify-between">
-                                                                                    <div className="flex items-center gap-4">
-                                                                                        <div className="w-12 h-12 rounded-[3px] bg-slate-50 border border-slate-100 flex items-center justify-center group-hover:bg-blue-50 group-hover:border-blue-100 transition-all duration-300">
-                                                                                            <Building2 className="w-6 h-6 text-slate-400 group-hover:text-[#0285fd] transition-colors" />
-                                                                                        </div>
-                                                                                        <div>
-                                                                                            <h4 className="text-[15px] font-bold text-slate-800 group-hover:text-[#0285fd] transition-colors">{comp.companyName}</h4>
-                                                                                            <p className="text-[12px] font-mono text-slate-500 mt-0.5">{comp.companyCode}</p>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                </div>
-                                                                                
-                                                                                <div className="mt-5 pt-4 border-t border-slate-100 flex items-center justify-between">
-                                                                                    <div className="flex flex-col">
-                                                                                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Total Transactions</span>
-                                                                                        <span className="text-[18px] font-black text-slate-700">{comp.transactions.toLocaleString()}</span>
-                                                                                    </div>
-                                                                                    <div className="flex gap-2">
-                                                                                        <button
-                                                                                            className={`inline-flex items-center justify-center px-4 py-2 text-white text-[11px] font-bold rounded-[3px] shadow-sm transition-all w-[90px] ${comp.accDesable === 1 ? 'bg-red-600 hover:bg-red-700' : 'bg-emerald-600 hover:bg-emerald-700'}`}
-                                                                                            onClick={(e) => { e.stopPropagation(); handleToggleCompanyLock(e, comp.companyCode); }}
-                                                                                            title={comp.accDesable === 1 ? "Unlock Company" : "Lock Company"}
-                                                                                        >
-                                                                                            {comp.accDesable === 1 ? <Lock className="w-3.5 h-3.5 mr-1.5" /> : <Unlock className="w-3.5 h-3.5 mr-1.5" />}
-                                                                                            {comp.accDesable === 1 ? "Unlock" : "Lock"}
-                                                                                        </button>
-                                                                                        <button
-                                                                                            className="inline-flex items-center justify-center px-4 py-2 bg-slate-100 hover:bg-red-600 text-slate-600 hover:text-white text-[11px] font-bold rounded-[3px] transition-all w-[90px]"
-                                                                                            onClick={(e) => { e.stopPropagation(); handleDeleteCompany(e, comp.companyCode, emp.empCode); }}
-                                                                                            title="Remove Company Access"
-                                                                                        >
-                                                                                            <Trash2 className="w-3.5 h-3.5 mr-1.5" /> Remove
-                                                                                        </button>
-                                                                                    </div>
-                                                                                </div>
-                                                                            </div>
-                                                                        ))}
-                                                                    </div>
-                                                                )}
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                )}
                                                 </React.Fragment>
                                             ))}
                                         </tbody>
@@ -1376,11 +1314,18 @@ const SuperAdminDashboard = () => {
                                         <Building2 className="w-4 h-4 text-emerald-500" />
                                     </div>
                                     <div>
-                                        <h2 className="text-[15px] font-bold text-gray-800">All Registered Companies</h2>
+                                        <h2 className="text-[15px] font-bold text-gray-800">{selectedEmpForCompanies ? `Companies for ${selectedEmpForCompanies.empName}` : 'All Registered Companies'}</h2>
                                         <p className="text-[11px] text-gray-500 font-medium">Manage all company records</p>
                                     </div>
                                 </div>
-                                <span className="bg-emerald-50 border border-emerald-200 text-emerald-600 text-[10px] font-bold px-2.5 py-1 rounded-[3px]">{allCompanies.length} Companies</span>
+                                <div className="flex items-center gap-3">
+                                    {selectedEmpForCompanies && (
+                                        <button onClick={() => setSelectedEmpForCompanies(null)} className="flex items-center gap-1.5 px-3 py-1 bg-blue-50 hover:bg-blue-100 text-blue-600 border border-blue-200 text-[10px] font-bold rounded-[3px] transition-all">
+                                            <X className="w-3 h-3" /> Clear Employee Filter
+                                        </button>
+                                    )}
+                                    <span className="bg-emerald-50 border border-emerald-200 text-emerald-600 text-[10px] font-bold px-2.5 py-1 rounded-[3px]">{allCompanies.filter(c => selectedEmpForCompanies ? selectedEmpForCompanies.companies.some(ec => ec.companyCode === c.code) : true).length} Companies</span>
+                                </div>
                             </div>
                             <div className="w-full overflow-x-auto">
                                 <table className="w-full text-left border-collapse">
@@ -1394,19 +1339,20 @@ const SuperAdminDashboard = () => {
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-gray-50">
-                                        {allCompanies.filter(c =>
-                                            c.comp_Name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                                            c.code?.toLowerCase().includes(searchTerm.toLowerCase())
-                                        ).map(comp => (
+                                        {allCompanies.filter(c => {
+                                            const matchesSearch = c.comp_Name?.toLowerCase().includes(searchTerm.toLowerCase()) || c.code?.toLowerCase().includes(searchTerm.toLowerCase());
+                                            const matchesEmp = selectedEmpForCompanies ? selectedEmpForCompanies.companies.some(ec => ec.companyCode === c.code) : true;
+                                            return matchesSearch && matchesEmp;
+                                        }).map(comp => (
                                             <tr key={comp.code} onClick={() => setSelectedCompany(comp)} className="border-b border-gray-50 hover:bg-blue-50/50 transition-all cursor-pointer group">
                                                 <td className="py-3.5 px-6 text-[12px] text-blue-600 font-mono font-bold">{comp.code}</td>
                                                 <td className="py-3.5 px-6 text-[13px] text-slate-700 font-bold uppercase group-hover:text-blue-600 transition-colors">{comp.comp_Name || 'N/A'}</td>
                                                 <td className="py-3.5 px-6 text-[13px] text-gray-500 font-medium">{comp.email || 'N/A'}</td>
                                                 <td className="py-3.5 px-6 text-[13px] text-gray-500 font-medium">{comp.phone || 'N/A'}</td>
                                                 <td className="py-3.5 px-6 text-right">
-                                                    <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                    <div className="flex items-center justify-end gap-2">
                                                         <button
-                                                            className={`px-3 py-1.5 text-xs font-bold text-white shadow-sm rounded-[3px] transition-all flex items-center gap-1.5 ${comp.acc_Desable === 1 ? 'bg-red-600 hover:bg-red-700' : 'bg-emerald-600 hover:bg-emerald-500'}`}
+                                                            className={`px-3 py-1.5 text-xs font-bold text-white shadow-sm rounded-[3px] transition-all flex items-center justify-center w-[90px] gap-1.5 ${comp.acc_Desable === 1 ? 'bg-red-600 hover:bg-red-700' : 'bg-emerald-600 hover:bg-emerald-500'}`}
                                                             onClick={(e) => handleToggleCompanyLock(e, comp.code)}
                                                             title={comp.acc_Desable === 1 ? "Unlock Company" : "Lock Company"}
                                                         >
@@ -1414,7 +1360,7 @@ const SuperAdminDashboard = () => {
                                                             {comp.acc_Desable === 1 ? "Unlock" : "Lock"}
                                                         </button>
                                                         <button
-                                                            className="px-3 py-1.5 text-xs font-bold text-white bg-red-600 hover:bg-red-700 rounded-[3px] shadow-sm transition-all flex items-center gap-1.5"
+                                                            className="px-3 py-1.5 text-xs font-bold text-white bg-red-600 hover:bg-red-700 rounded-[3px] shadow-sm transition-all flex items-center justify-center w-[90px] gap-1.5"
                                                             onClick={(e) => { e.stopPropagation(); handleDeleteCompany(e, comp.code, null); }}
                                                             title="Delete Company"
                                                         >
@@ -1785,11 +1731,6 @@ const SuperAdminDashboard = () => {
                             allCompanies={allCompanies}
                             hierarchy={hierarchy}
                         />
-                    )}
-
-                    {/* INTEGRATIONS VIEW */}
-                    {activeMenu === 'Integrations' && (
-                        <IntegrationsBoard />
                     )}
 
                     {/* REPORTS VIEW */}

@@ -148,27 +148,27 @@ const ReviewAdminBoard = ({ isOpen, onClose, inlineView }) => {
                                             {review.status !== 'Approved' && (
                                                 <button 
                                                     onClick={() => handleUpdateStatus(review.id, 'Approved')}
-                                                    className="p-2 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 rounded-[3px] transition-colors"
+                                                    className="px-3 py-1.5 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-500 rounded-[3px] shadow-sm transition-all flex items-center justify-center w-[90px] gap-1.5"
                                                     title="Approve"
                                                 >
-                                                    <CheckCircle className="w-4 h-4" />
+                                                    <CheckCircle className="w-[14px] h-[14px]" /> Approve
                                                 </button>
                                             )}
                                             {review.status !== 'Hidden' && (
                                                 <button 
                                                     onClick={() => handleUpdateStatus(review.id, 'Hidden')}
-                                                    className="p-2 text-slate-600 dark:text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-[3px] transition-colors"
+                                                    className="px-3 py-1.5 text-xs font-bold text-white bg-slate-500 hover:bg-slate-400 rounded-[3px] shadow-sm transition-all flex items-center justify-center w-[90px] gap-1.5"
                                                     title="Hide"
                                                 >
-                                                    <EyeOff className="w-4 h-4" />
+                                                    <EyeOff className="w-[14px] h-[14px]" /> Hide
                                                 </button>
                                             )}
                                             <button 
                                                 onClick={() => handleDelete(review.id)}
-                                                className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-[3px] transition-colors"
+                                                className="px-3 py-1.5 text-xs font-bold text-white bg-red-600 hover:bg-red-700 rounded-[3px] shadow-sm transition-all flex items-center justify-center w-[90px] gap-1.5"
                                                 title="Delete"
                                             >
-                                                <Trash2 className="w-4 h-4" />
+                                                <Trash2 className="w-[14px] h-[14px]" /> Delete
                                             </button>
                                         </div>
                                     </td>

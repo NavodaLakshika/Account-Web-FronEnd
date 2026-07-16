@@ -254,17 +254,26 @@ const CustomerInvoiceBoard = ({ isOpen, onClose }) => {
                             <div className="col-span-8">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Customer <span className="text-red-500">*</span></label>
                                 <div className="relative">
-                                    <input ref={customerInputRef} type="text" readOnly
-                                        value={formData.customerId ? `${formData.customerId} — ${formData.customerName}` : ''}
-                                        onKeyDown={e => handleKeyDown(e, 'customerSearch')}
-                                        onClick={() => setActiveModal('customer')}
-                                        placeholder="Select customer..."
-                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-[#0285fd] font-mono pr-10 cursor-pointer"
-                                    />
-                                    <button ref={customerSearchBtnRef} onClick={() => setActiveModal('customer')}
-                                        className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
-                                        <Search size={16} />
-                                    </button>
+                                    <select
+                                        value={formData.customerId}
+                                        onChange={(e) => {
+                                            const val = e.target.value;
+                                            const item = (lookups.customers || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || i === val);
+                                            if (item) {
+                                                const handler = handleSelectCustomer;
+                                                handler(item);
+                                            }
+                                        }}
+                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-[#0285fd] font-mono cursor-pointer appearance-none"
+                                        style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
+                                    >
+                                        <option value="">Select...</option>
+                                        {(lookups.customers || []).map((item, idx) => (
+                                            <option key={idx} value={item.code || item.name || item}>
+                                                {item.code ? `${item.code} - ${item.name}` : (item.name || item)}
+                                            </option>
+                                        ))}
+                                    </select>
                                 </div>
                             </div>
 
@@ -279,17 +288,26 @@ const CustomerInvoiceBoard = ({ isOpen, onClose }) => {
                             <div className="col-span-8">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Account <span className="text-red-500">*</span></label>
                                 <div className="relative">
-                                    <input ref={accountInputRef} type="text" readOnly
-                                        value={formData.accountCode ? `${formData.accountCode} — ${formData.accountName}` : ''}
-                                        onKeyDown={e => handleKeyDown(e, 'accountSearch')}
-                                        onClick={() => setActiveModal('account')}
-                                        placeholder="Select account..."
-                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 pr-10 cursor-pointer"
-                                    />
-                                    <button ref={accountSearchBtnRef} onClick={() => setActiveModal('account')}
-                                        className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
-                                        <Search size={16} />
-                                    </button>
+                                    <select
+                                        value={formData.accountCode}
+                                        onChange={(e) => {
+                                            const val = e.target.value;
+                                            const item = (lookups.accounts || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || i === val);
+                                            if (item) {
+                                                const handler = handleSelectAccount;
+                                                handler(item);
+                                            }
+                                        }}
+                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 cursor-pointer appearance-none"
+                                        style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
+                                    >
+                                        <option value="">Select...</option>
+                                        {(lookups.accounts || []).map((item, idx) => (
+                                            <option key={idx} value={item.code || item.name || item}>
+                                                {item.code ? `${item.code} - ${item.name}` : (item.name || item)}
+                                            </option>
+                                        ))}
+                                    </select>
                                 </div>
                             </div>
 

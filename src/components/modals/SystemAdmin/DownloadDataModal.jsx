@@ -132,14 +132,8 @@ const DownloadDataModal = ({ isOpen, onClose }) => {
                                         value={location.name} 
                                         readOnly 
                                         placeholder="Select Location..."
-                                        className="flex-1 h-8 border border-gray-300 px-3 bg-gray-50 rounded-[3px] outline-none shadow-sm cursor-default font-mono text-gray-600 truncate" 
-                                    />
-                                    <button 
-                                        onClick={() => setShowLocationLookup(true)} 
-                                        className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95"
-                                    >
-                                        <Search size={16} />
-                                    </button>
+                                        className="flex-1 h-8 border border-gray-300 px-3 bg-gray-50 rounded-[3px] outline-none shadow-sm cursor-default font-mono text-gray-600 truncate appearance-none" 
+                                     style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
                                 </div>
                             </div>
                         </div>
@@ -153,14 +147,8 @@ const DownloadDataModal = ({ isOpen, onClose }) => {
                                     value={costCenter.name} 
                                     readOnly 
                                     placeholder="Select Cost Center Profile..."
-                                    className="flex-1 h-8 border border-gray-300 px-3 bg-gray-50 rounded-[3px] outline-none shadow-sm cursor-default font-mono text-gray-600" 
-                                />
-                                <button 
-                                    onClick={() => setShowCostCenterLookup(true)} 
-                                    className="w-10 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95"
-                                >
-                                    <Search size={16} />
-                                </button>
+                                    className="flex-1 h-8 border border-gray-300 px-3 bg-gray-50 rounded-[3px] outline-none shadow-sm cursor-default font-mono text-gray-600 appearance-none" 
+                                 style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
                             </div>
                         </div>
                     </div>

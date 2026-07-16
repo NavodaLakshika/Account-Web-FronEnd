@@ -289,10 +289,7 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
                             <div className="col-span-3">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Doc No</label>
                                 <div className="relative">
-                                    <input type="text" value={formData.docNo} onChange={handleInputChange} name="docNo" className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] pr-10 text-gray-700" />
-                                    <button onClick={handleSearchClick} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
-                                        <Search size={16} />
-                                    </button>
+                                    <input type="text" value={formData.docNo} onChange={handleInputChange} name="docNo" className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 appearance-none"  style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
                                 </div>
                             </div>
                             <div className="col-span-3">
@@ -307,19 +304,13 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
                             <div className="col-span-3">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Job No</label>
                                 <div className="relative">
-                                    <input type="text" readOnly value={formData.jobNo} onClick={() => setShowJobModal(true)} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700 truncate" />
-                                    <button onClick={() => setShowJobModal(true)} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
-                                        <Search size={16} />
-                                    </button>
+                                    <input type="text" readOnly value={formData.jobNo} onClick={() => setShowJobModal(true)} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"  style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
                                 </div>
                             </div>
                             <div className="col-span-3">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Sales Asst</label>
                                 <div className="relative">
-                                    <input type="text" readOnly value={lookups.salesAssistants.find(s => s.code === formData.salesRef)?.name || formData.salesRef || ''} onClick={() => setShowSalesAsstModal(true)} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700 truncate" />
-                                    <button onClick={() => setShowSalesAsstModal(true)} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
-                                        <Search size={16} />
-                                    </button>
+                                    <input type="text" readOnly value={lookups.salesAssistants.find(s => s.code === formData.salesRef)?.name || formData.salesRef || ''} onClick={() => setShowSalesAsstModal(true)} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"  style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
                                 </div>
                             </div>
                             <div className="col-span-6">
@@ -328,10 +319,7 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
                                     <div className="flex gap-2">
                                         <input type="text" readOnly value={formData.custCode} className="w-24 h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none text-gray-700 font-mono shrink-0" />
                                         <div className="relative flex-1">
-                                            <input type="text" readOnly value={formData.custName} onClick={() => setShowCustModal(true)} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700 truncate" />
-                                            <button onClick={() => setShowCustModal(true)} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
-                                                <Search size={16} />
-                                            </button>
+                                            <input type="text" readOnly value={formData.custName} onClick={() => setShowCustModal(true)} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"  style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
                                         </div>
                                     </div>
                                 </div>
@@ -343,10 +331,7 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
                             <div className="col-span-3">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Pay Type</label>
                                 <div className="relative">
-                                    <input type="text" readOnly value={formData.payType} onClick={() => setShowPayTypeModal(true)} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700 truncate" />
-                                    <button onClick={() => setShowPayTypeModal(true)} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
-                                        <Search size={16} />
-                                    </button>
+                                    <input type="text" readOnly value={formData.payType} onClick={() => setShowPayTypeModal(true)} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"  style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
                                 </div>
                             </div>
                             <div className="col-span-3">
@@ -391,10 +376,7 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
                                         <tr key={row.id} className="text-[12px] font-bold text-gray-700 border-b border-gray-50 hover:bg-slate-50/30 transition-colors">
                                             <td className="px-2 py-1">
                                                 <div className="flex gap-1 items-center">
-                                                    <input type="text" readOnly value={row.prodCode} onClick={() => { setProdIndex(idx); setShowProdModal(true); }} className="w-full h-8 border border-gray-200 rounded-[3px] px-2 text-[12px] font-mono text-blue-700 bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer" placeholder="Select" />
-                                                    <button onClick={() => { setProdIndex(idx); setShowProdModal(true); }} className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer shrink-0">
-                                                        <Search size={14} />
-                                                    </button>
+                                                    <input type="text" readOnly value={row.prodCode} onClick={() => { setProdIndex(idx); setShowProdModal(true); }} className="w-full h-8 border border-gray-200 rounded-[3px] px-2 text-[12px] font-mono text-blue-700 bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer appearance-none" placeholder="Select"  style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
                                                 </div>
                                             </td>
                                             <td className="px-3 py-2.5 truncate">{row.prodName}</td>

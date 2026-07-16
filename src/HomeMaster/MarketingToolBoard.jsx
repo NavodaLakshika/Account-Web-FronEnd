@@ -307,18 +307,9 @@ const MarketingToolBoard = ({ isOpen, onClose }) => {
                                                 type="text" 
                                                 value={commissionLevel.description}
                                                 onChange={(e) => setCommissionLevel({...commissionLevel, description: e.target.value})}
-                                                className="flex-1 min-w-0 h-8 font-mono border border-slate-200 px-3 text-[12px] font-bold rounded outline-none focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 bg-white transition-all text-gray-700" 
+                                                className="flex-1 min-w-0 h-8 font-mono border border-slate-200 px-3 text-[12px] font-bold rounded outline-none focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 bg-white transition-all text-gray-700 appearance-none" 
                                                 placeholder="Enter Level Description..." 
-                                            />
-                                            <button 
-                                                onClick={() => {
-                                                    setShowLevelSearch(true);
-                                                    handleLevelSearch();
-                                                }}
-                                                className="w-10 h-8 bg-[#0285fd] text-slate-800 dark:text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0"
-                                            >
-                                                <Search size={16} />
-                                            </button>
+                                             style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
                                         </div>
                                     </div>
                                     <div className="col-span-12 flex items-center gap-4">

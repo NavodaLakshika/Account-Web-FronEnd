@@ -448,12 +448,9 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
                                             type="text" 
                                             readOnly 
                                             value={lookups.banks.find(b => b.code === formData.bankAcc)?.name || ''} 
-                                            className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700 truncate"
+                                            className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
                                             onClick={() => setShowBankModal(true)}
-                                        />
-                                        <button onClick={() => setShowBankModal(true)} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
-                                            <Search size={16} />
-                                        </button>
+                                         style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
                                     </div>
                                     {formData.bankAcc && (
                                         <div className="mt-1.5 px-3 h-8 bg-blue-50 flex items-center justify-between rounded-[3px] border border-blue-100">
@@ -469,12 +466,9 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
                                             type="text" 
                                             readOnly 
                                             value={lookups.costCenters.find(cc => cc.costCenterCode === formData.costCenter)?.costCenterName || ''} 
-                                            className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700"
+                                            className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 appearance-none"
                                             onClick={() => { setCcSource('header'); setShowCCModal(true); }}
-                                        />
-                                        <button onClick={() => { setCcSource('header'); setShowCCModal(true); }} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
-                                            <Search size={16} />
-                                        </button>
+                                         style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
                                     </div>
                                 </div>
                                 <div className="">
@@ -504,13 +498,10 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
                                                 type="text" 
                                                 readOnly 
                                                 value={formData.payeeId} 
-                                                className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 cursor-pointer"
+                                                className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 cursor-pointer appearance-none"
                                                 onClick={() => setShowPayeeModal(true)}
                                                 placeholder="Payee ID"
-                                            />
-                                            <button onClick={() => setShowPayeeModal(true)} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
-                                                <Search size={16} />
-                                            </button>
+                                             style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
                                         </div>
                                         <div className="relative flex-1">
                                             <input 
@@ -646,13 +637,10 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
                                                                 type="text" 
                                                                 readOnly 
                                                                 value={lookups.accounts.find(a => a.code === line.accCode)?.name || ''} 
-                                                                className="flex-1 h-8 border border-gray-300 rounded-[3px] px-2 text-[12px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate" 
+                                                                className="flex-1 h-8 border border-gray-300 rounded-[3px] px-2 text-[12px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none" 
                                                                 onClick={() => { setAccIndex(idx); setShowAccModal(true); }}
                                                                 placeholder="Select account"
-                                                            />
-                                                            <button onClick={() => { setAccIndex(idx); setShowAccModal(true); }} className="h-8 w-7 flex items-center justify-center text-gray-400 hover:text-gray-700 bg-transparent border-none cursor-pointer shrink-0">
-                                                                <Search size={14} />
-                                                            </button>
+                                                             style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
                                                         </div>
                                                     </td>
                                                     <td className="px-2 py-2.5">
@@ -661,13 +649,10 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
                                                                 type="text" 
                                                                 readOnly 
                                                                 value={lookups.costCenters.find(cc => cc.costCenterCode === line.costCenter)?.costCenterName || ''} 
-                                                                className="flex-1 h-8 border border-gray-300 rounded-[3px] px-2 text-[12px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate" 
+                                                                className="flex-1 h-8 border border-gray-300 rounded-[3px] px-2 text-[12px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none" 
                                                                 onClick={() => { setCcSource('line'); setCcIndex(idx); setShowCCModal(true); }}
                                                                 placeholder="Cost center"
-                                                            />
-                                                            <button onClick={() => { setCcSource('line'); setCcIndex(idx); setShowCCModal(true); }} className="h-8 w-7 flex items-center justify-center text-gray-400 hover:text-gray-700 bg-transparent border-none cursor-pointer shrink-0">
-                                                                <Search size={14} />
-                                                            </button>
+                                                             style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
                                                         </div>
                                                     </td>
                                                     <td className="px-2 py-2.5">
@@ -736,13 +721,10 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
                                                                 type="text" 
                                                                 readOnly 
                                                                 value={lookups.products.find(p => p.code === line.itemCode)?.prod_Name || ''} 
-                                                                className="flex-1 h-8 border border-gray-300 rounded-[3px] px-2 text-[12px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate" 
+                                                                className="flex-1 h-8 border border-gray-300 rounded-[3px] px-2 text-[12px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none" 
                                                                 onClick={() => { setItemIndex(idx); setShowItemModal(true); }}
                                                                 placeholder="Select item"
-                                                            />
-                                                            <button onClick={() => { setItemIndex(idx); setShowItemModal(true); }} className="h-8 w-7 flex items-center justify-center text-gray-400 hover:text-gray-700 bg-transparent border-none cursor-pointer shrink-0">
-                                                                <Search size={14} />
-                                                            </button>
+                                                             style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
                                                         </div>
                                                     </td>
                                                     <td className="px-2 py-2.5">
