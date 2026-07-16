@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import SimpleModal from '../components/SimpleModal';
 import ConfirmModal from '../components/modals/ConfirmModal';
+import ColumnSelectionModal from '../components/modals/ColumnSelectionModal';
 import { Search, CheckCircle, RotateCcw, FileUp, FileDown, Trash2, X , FileText} from 'lucide-react';
 import * as XLSX from 'xlsx';
 import { grnService } from '../services/grn.service';
@@ -17,6 +18,7 @@ const BulkGRNBoard = ({ isOpen, onClose }) => {
     
     // An array of grouped GRNs
     const [groupedGrns, setGroupedGrns] = useState([]);
+    const [showColumnSelector, setShowColumnSelector] = useState(false);
     
     const excelInputRef = useRef(null);
 
@@ -48,14 +50,11 @@ const BulkGRNBoard = ({ isOpen, onClose }) => {
         }
     };
 
-    const downloadExcelTemplate = async () => {
+    const handleTemplateDownload = (selectedColumns) => {
         try {
-            const template = [{
-                'Supplier Code': '', 'Supplier Invoice': '', 'PO Number': '', 'Payment Method': '', 'Comment': '',
-                'Product Code': '', 'Product Name': '', 'Unit': '', 'Pack Size': '', 'Category': '', 'Department': '',
-                'Available Stock': '', 'Purchase Price': '', 'Selling Price': '', 'Qty': '', 'Free Qty': ''
-            }];
-
+            const row = {};
+            selectedColumns.forEach(col => row[col] = '');
+            const template = [row];
             const ws = XLSX.utils.json_to_sheet(template);
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, "Bulk_GRN_Template");
@@ -301,7 +300,7 @@ const BulkGRNBoard = ({ isOpen, onClose }) => {
                         Total GRNs to Process: <span className="text-blue-600">{groupedGrns.length}</span>
                     </div>
                     <div className="flex gap-2">
-                        <button onClick={downloadExcelTemplate} className="h-8 px-4 bg-white text-emerald-600 border-2 border-emerald-500 text-[10px] font-black rounded-[3px] hover:bg-emerald-50 transition-all flex items-center gap-2 uppercase active:scale-95 shadow-sm">
+                        <button onClick={() => setShowColumnSelector(true)} className="h-8 px-4 bg-white text-emerald-600 border-2 border-emerald-500 text-[10px] font-black rounded-[3px] hover:bg-emerald-50 transition-all flex items-center gap-2 uppercase active:scale-95 shadow-sm">
                             <FileDown size={14} /> BULK TEMPLATE
                         </button>
                         <button onClick={() => excelInputRef.current?.click()} className="h-8 px-4 bg-white text-blue-600 border-2 border-blue-500 text-[10px] font-black rounded-[3px] hover:bg-blue-50 transition-all flex items-center gap-2 uppercase active:scale-95 shadow-sm">
@@ -357,6 +356,12 @@ const BulkGRNBoard = ({ isOpen, onClose }) => {
             </div>
             
             <ConfirmModal isOpen={showConfirmModal} onClose={() => setShowConfirmModal(false)} onConfirm={confirmApply} title="Bulk Apply GRNs" message={`Are you sure you want to apply ${groupedGrns.length} GRN documents? This action cannot be undone.`} loading={isApplying} confirmText="Apply All GRNs" />
+
+            <ColumnSelectionModal
+                isOpen={showColumnSelector}
+                onClose={() => setShowColumnSelector(false)}
+                onDownload={handleTemplateDownload}
+            />
         </TransactionFormWrapper>
         </>
     );

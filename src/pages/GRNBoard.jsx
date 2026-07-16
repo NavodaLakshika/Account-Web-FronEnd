@@ -4,6 +4,7 @@ import TransactionFormWrapper from '../components/TransactionFormWrapper';
 import CalendarModal from '../components/CalendarModal';
 import ConfirmModal from '../components/modals/ConfirmModal';
 import FeatureLockedModal from '../components/modals/FeatureLockedModal';
+import ColumnSelectionModal from '../components/modals/ColumnSelectionModal';
 import { Search, Calendar, Plus, Trash2, Save, RotateCcw, Loader2, FileText, FileUp, FileDown, CheckCircle } from 'lucide-react';
 import { grnService } from '../services/grn.service';
 import { paymentMethodService } from '../services/paymentMethod.service';
@@ -42,6 +43,7 @@ const GRNBoard = ({ isOpen, onClose }) => {
     const [showPayMethodSearch, setShowPayMethodSearch] = useState(false);
     const [payMethodSearchQuery, setPayMethodSearchQuery] = useState('');
     const [orders, setOrders] = useState([]);
+    const [showColumnSelector, setShowColumnSelector] = useState(false);
     const excelInputRef = useRef(null);
 
     const getInitialFormData = () => ({
@@ -240,14 +242,11 @@ const GRNBoard = ({ isOpen, onClose }) => {
         } catch (error) { showErrorToast('Failed to fetch PO details.'); }
     };
 
-    const downloadExcelTemplate = async () => {
+    const handleTemplateDownload = (selectedColumns) => {
         try {
-            const template = [{
-                'Supplier Code': '', 'Supplier Invoice': '', 'PO Number': '', 'Payment Method': '', 'Comment': '',
-                'Product Code': '', 'Product Name': '', 'Unit': '', 'Pack Size': '', 'Category': '', 'Department': '',
-                'Available Stock': '', 'Purchase Price': '', 'Selling Price': '', 'Qty': '', 'Free Qty': ''
-            }];
-
+            const row = {};
+            selectedColumns.forEach(col => row[col] = '');
+            const template = [row];
             const ws = XLSX.utils.json_to_sheet(template);
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, "GRN_Template");
@@ -507,7 +506,7 @@ const GRNBoard = ({ isOpen, onClose }) => {
                             </label>
                         </div>
                         <div className="flex gap-2">
-                            <button onClick={downloadExcelTemplate} className="h-8 px-4 bg-white border-2 border-emerald-500 text-emerald-600 text-[10px] font-black rounded-[3px] hover:bg-emerald-50 transition-all flex items-center gap-2 uppercase active:scale-95 shadow-sm">
+                            <button onClick={() => setShowColumnSelector(true)} className="h-8 px-4 bg-white border-2 border-emerald-500 text-emerald-600 text-[10px] font-black rounded-[3px] hover:bg-emerald-50 transition-all flex items-center gap-2 uppercase active:scale-95 shadow-sm">
                                 <FileDown size={14} /> TEMPLATE
                             </button>
                             <button onClick={() => excelInputRef.current?.click()} className="h-8 px-4 bg-white border-2 border-blue-500 text-blue-600 text-[10px] font-black rounded-[3px] hover:bg-blue-50 transition-all flex items-center gap-2 uppercase active:scale-95 shadow-sm">
@@ -1264,6 +1263,12 @@ const GRNBoard = ({ isOpen, onClose }) => {
             <FeatureLockedModal
                 isOpen={showLockModal}
                 onClose={() => setShowLockModal(false)}
+            />
+
+            <ColumnSelectionModal
+                isOpen={showColumnSelector}
+                onClose={() => setShowColumnSelector(false)}
+                onDownload={handleTemplateDownload}
             />
         </>
     );

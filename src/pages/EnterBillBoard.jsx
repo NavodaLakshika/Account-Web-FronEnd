@@ -322,7 +322,7 @@ const EnterBillBoard = ({ isOpen, onClose }) => {
                                     <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Vendor Name</label>
                                     <div className="relative">
                                         <select
-                                        value={lookups.vendors}
+                                        value={formData.vendorId || ''}
                                         onChange={(ev) => {
                                             const val = ev.target.value;
                                             const v = (lookups.vendors || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || (i.itemId && i.itemId.toString() === val) || (i.id && i.id.toString() === val) || i === val);
@@ -370,7 +370,7 @@ const EnterBillBoard = ({ isOpen, onClose }) => {
                                     <label className="block text-[13px] font-medium text-gray-700 mb-1.5">A/P Account (GL)</label>
                                     <div className="relative">
                                         <select
-                                        value={lookups.payAccounts}
+                                        value={formData.accId || ''}
                                         onChange={(ev) => {
                                             const val = ev.target.value;
                                             const a = (lookups.payAccounts || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || (i.itemId && i.itemId.toString() === val) || (i.id && i.id.toString() === val) || i === val);
@@ -470,7 +470,7 @@ const EnterBillBoard = ({ isOpen, onClose }) => {
                                     <div className="mt-auto border-t border-slate-200 bg-slate-50 p-2 flex gap-3 items-center">
                                         <div className="flex-[2] relative">
                                             <select
-                                        value={lookups.expAccounts}
+                                        value={currentLine.accCode || ''}
                                         onChange={(ev) => {
                                             const val = ev.target.value;
                                             const a = (lookups.expAccounts || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || (i.itemId && i.itemId.toString() === val) || (i.id && i.id.toString() === val) || i === val);

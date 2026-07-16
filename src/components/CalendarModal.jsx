@@ -1,63 +1,101 @@
-import React, { useState } from 'react';
-import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, X } from 'lucide-react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+
+const parseDate = (dateStr) => {
+    if (!dateStr) return new Date();
+    if (typeof dateStr === 'string' && dateStr.includes('/')) {
+        const [day, month, year] = dateStr.split('/');
+        return new Date(year, month - 1, day);
+    }
+    if (typeof dateStr === 'string' && dateStr.includes('-')) {
+        const parts = dateStr.split('T')[0].split('-');
+        if (parts.length === 3) {
+            const p0 = parseInt(parts[0]);
+            const p1 = parseInt(parts[1]);
+            const p2 = parseInt(parts[2]);
+            if (parts[2].length === 4) return new Date(p2, p1 - 1, p0);
+            if (parts[0].length === 4) return new Date(p0, p1 - 1, p2);
+        }
+    }
+    const d = new Date(dateStr);
+    return isNaN(d.getTime()) ? new Date() : d;
+};
 
 const CalendarModal = ({ isOpen, onClose, onDateSelect, onDateChange, initialDate, currentDate }) => {
-    const activeCallback = (typeof onDateSelect === 'function' ? onDateSelect : null) || 
-                           (typeof onDateChange === 'function' ? onDateChange : null);
+    const activeCallback = (typeof onDateSelect === 'function' ? onDateSelect : null) ||
+        (typeof onDateChange === 'function' ? onDateChange : null);
     const activeDate = initialDate || currentDate;
-    const parseDate = (dateStr) => {
-        if (!dateStr) return new Date();
-        // Handle DD/MM/YYYY format
-        if (typeof dateStr === 'string' && dateStr.includes('/')) {
-            const [day, month, year] = dateStr.split('/');
-            return new Date(year, month - 1, day);
-        }
-        // Handle hyphenated formats (YYYY-MM-DD or DD-MM-YYYY)
-        if (typeof dateStr === 'string' && dateStr.includes('-')) {
-            const parts = dateStr.split('T')[0].split('-');
-            if (parts.length === 3) {
-                const p0 = parseInt(parts[0]);
-                const p1 = parseInt(parts[1]);
-                const p2 = parseInt(parts[2]);
-                
-                if (parts[2].length === 4) {
-                    // Confirmed DD-MM-YYYY (e.g. 10-05-2026)
-                    return new Date(p2, p1 - 1, p0);
-                } else if (parts[0].length === 4) {
-                    // Confirmed YYYY-MM-DD (e.g. 2026-05-10)
-                    return new Date(p0, p1 - 1, p2);
-                }
+
+    const [viewDate, setViewDate] = useState(() => parseDate(activeDate));
+    const [popupStyle, setPopupStyle] = useState({});
+    const [showYearPicker, setShowYearPicker] = useState(false);
+    const cardRef = useRef(null);
+
+    useEffect(() => {
+        if (isOpen) {
+            setViewDate(parseDate(activeDate));
+            setShowYearPicker(false);
+            const trigger = document.activeElement;
+            if (trigger && trigger.getBoundingClientRect) {
+                const rect = trigger.getBoundingClientRect();
+                const dropdownWidth = 240;
+                const centerX = rect.left + rect.width / 2;
+                const left = Math.max(4, Math.min(centerX - dropdownWidth / 2, window.innerWidth - dropdownWidth - 4));
+                setPopupStyle({
+                    top: `${rect.bottom + 6}px`,
+                    left: `${left}px`
+                });
+            } else {
+                setPopupStyle({
+                    top: '15vh',
+                    left: '50%',
+                    transform: 'translateX(-50%)'
+                });
             }
         }
-        const d = new Date(dateStr);
-        return isNaN(d.getTime()) ? new Date() : d;
-    };
+    }, [isOpen, activeDate]);
 
-    const [viewDate, setViewDate] = useState(parseDate(activeDate));
+    const handleClickOutside = useCallback((e) => {
+        if (cardRef.current && !cardRef.current.contains(e.target)) {
+            onClose();
+        }
+    }, [onClose]);
 
-    const daysOfWeek = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+    useEffect(() => {
+        if (!isOpen) return;
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, [isOpen, handleClickOutside]);
+
+    const daysOfWeek = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'];
     const months = [
         'JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE',
         'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER'
     ];
 
-    const getDaysInMonth = (year, month) => new Date(year, month + 1, 0).getDate();
-    const getFirstDayOfMonth = (year, month) => new Date(year, month, 1).getDay();
-
     const currentYear = viewDate.getFullYear();
     const currentMonth = viewDate.getMonth();
+    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+    const firstDay = new Date(currentYear, currentMonth, 1).getDay();
 
-    const daysInMonth = getDaysInMonth(currentYear, currentMonth);
-    const firstDay = getFirstDayOfMonth(currentYear, currentMonth);
+    const centuryStart = Math.floor(currentYear / 100) * 100;
 
     const prevMonth = () => setViewDate(new Date(currentYear, currentMonth - 1, 1));
     const nextMonth = () => setViewDate(new Date(currentYear, currentMonth + 1, 1));
+    const prevCentury = () => setViewDate(new Date(centuryStart - 1, currentMonth, 1));
+    const nextCentury = () => setViewDate(new Date(centuryStart + 100, currentMonth, 1));
 
-    React.useEffect(() => {
-        if (isOpen) {
-            setViewDate(parseDate(activeDate));
-        }
-    }, [isOpen, activeDate]);
+    const selectedDate = activeDate ? parseDate(activeDate) : null;
+
+    const isToday = (day) => {
+        const today = new Date();
+        return today.getDate() === day && today.getMonth() === currentMonth && today.getFullYear() === currentYear;
+    };
+
+    const isSelected = (day) => {
+        if (!selectedDate) return false;
+        return selectedDate.getDate() === day && selectedDate.getMonth() === currentMonth && selectedDate.getFullYear() === currentYear;
+    };
 
     const handleDateClick = (day, specificDate = null) => {
         const selected = specificDate || new Date(currentYear, currentMonth, day);
@@ -69,104 +107,116 @@ const CalendarModal = ({ isOpen, onClose, onDateSelect, onDateChange, initialDat
         onClose();
     };
 
-    const isToday = (day) => {
-        const today = new Date();
-        return today.getDate() === day && today.getMonth() === currentMonth && today.getFullYear() === currentYear;
+    const handleYearSelect = (year) => {
+        setViewDate(new Date(year, currentMonth, 1));
+        setShowYearPicker(false);
     };
 
     const calendarDays = [];
-    for (let i = 0; i < firstDay; i++) {
-        calendarDays.push(null);
-    }
-    for (let i = 1; i <= daysInMonth; i++) {
-        calendarDays.push(i);
-    }
-    // Pad the remaining cells to ensure a fixed height of 6 weeks (42 cells)
-    while (calendarDays.length < 42) {
-        calendarDays.push(null);
-    }
+    for (let i = 0; i < firstDay; i++) calendarDays.push(null);
+    for (let i = 1; i <= daysInMonth; i++) calendarDays.push(i);
+    while (calendarDays.length < 42) calendarDays.push(null);
 
     if (!isOpen) return null;
 
+    const selectedYear = selectedDate ? selectedDate.getFullYear() : null;
+
     return (
-        <div 
-            className="fixed inset-0 z-[2000] flex items-center justify-center p-4 backdrop-blur-sm bg-slate-900/10"
-            onClick={onClose}
-        >
-            <style>
-                {`
-                    @keyframes calendarSlideUp {
-                        from { opacity: 0; transform: translateY(20px) scale(0.98); }
-                        to { opacity: 1; transform: translateY(0) scale(1); }
-                    }
-                    .calendar-animate {
-                        animation: calendarSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-                    }
-                `}
-            </style>
-            
-            <div 
-                className="relative w-full max-w-[360px] bg-white shadow-2xl overflow-hidden calendar-animate font-['Tahoma',_sans-serif]"
+        <div className="fixed inset-0 z-[2000]" style={{ pointerEvents: 'none' }}>
+            <div
+                ref={cardRef}
+                className="calendar-dropdown-container w-[240px] bg-white border border-gray-300 rounded-[3px] shadow-[0_4px_20px_rgb(0,0,0,0.15)] overflow-hidden font-sans"
+                style={{ ...popupStyle, pointerEvents: 'auto', position: 'fixed' }}
                 onClick={(e) => e.stopPropagation()}
             >
-                {/* Blue Header */}
-                <div className="bg-[#0388cc] pt-8 pb-4 px-6 text-white relative">
-                    
-                    <div className="flex items-center justify-between mb-4">
-                        <button onClick={prevMonth} className="hover:bg-white/10 p-1 rounded-full transition-all active:scale-90"><ChevronLeft size={20} /></button>
-                        <h2 className="text-[30px] font-mono font-bold tracking-tighter uppercase">{months[currentMonth]}</h2>
-                        <button onClick={nextMonth} className="hover:bg-white/10 p-1 rounded-full transition-all active:scale-90"><ChevronRight size={20} /></button>
-                    </div>
-                    
-                    <div className="flex justify-between items-end">
-                        <div className="bg-white/10 px-3 py-1 border border-white/20">
-                            <span className="text-[16px]  font-mono font-bold tracking-widest">{currentYear}</span>
-                        </div>
-                        <span className="text-[11px] font-mono text-white/60 tracking-[0.2em]">ACCOUNTING REGISTER</span>
+                {/* Header */}
+                <div className="bg-[#0388cc] px-3 py-2">
+                    <div className="flex items-center justify-between">
+                        <button onClick={showYearPicker ? prevCentury : prevMonth} className="text-white/80 hover:text-white hover:bg-white/10 p-0.5 rounded transition-all">
+                            <ChevronLeft size={14} />
+                        </button>
+                        {showYearPicker ? (
+                            <h2 className="text-[11px] font-bold text-white uppercase tracking-wider">
+                                {centuryStart} - {centuryStart + 99}
+                            </h2>
+                        ) : (
+                            <h2 className="text-[11px] font-bold text-white uppercase tracking-wider cursor-pointer hover:text-white/80" onClick={() => setShowYearPicker(true)}>
+                                {months[currentMonth]} {currentYear}
+                            </h2>
+                        )}
+                        <button onClick={showYearPicker ? nextCentury : nextMonth} className="text-white/80 hover:text-white hover:bg-white/10 p-0.5 rounded transition-all">
+                            <ChevronRight size={14} />
+                        </button>
                     </div>
                 </div>
 
-                {/* Calendar Grid */}
-                <div className="p-4 bg-white">
-                    <div className="grid grid-cols-7 gap-1 mb-3">
-                        {daysOfWeek.map((day, idx) => (
-                            <div key={day} className={`h-8 flex items-center justify-center text-[13px] font-mono font-bold tracking-widest ${idx === 0 ? 'text-[#f04e3e]' : 'text-[#0388cc]'}`}>
-                                {day}
-                            </div>
-                        ))}
-                    </div>
-
-                    <div className="grid grid-cols-7 gap-1">
-                        {calendarDays.map((day, idx) => (
-                            <div key={idx} className="h-10 flex items-center justify-center">
-                                {day ? (
-                                    <button
-                                        onClick={() => handleDateClick(day)}
-                                        className={`w-9 h-9 flex items-center justify-center  text-[14px] font-mono font-bold transition-all relative group
-                                            ${idx % 7 === 0 ? 'text-[#f04e3e]' : 'text-[#0388cc]'}
-                                            ${isToday(day) ? 'bg-blue-50 text-[#0388cc] border border-[#0388cc]/30 shadow-sm' : 'hover:bg-slate-100'}
-                                            active:scale-90
-                                        `}
-                                    >
-                                        {day}
-                                        {isToday(day) && <div className="absolute bottom-1 w-1 h-1 bg-[#0388cc] rounded-full" />}
-                                    </button>
-                                ) : (
-                                    <div className="w-9 h-9 opacity-10" />
-                                )}
-                            </div>
-                        ))}
-                    </div>
-
-                    <div className="mt-6 pt-4 border-t border-gray-200 flex justify-between items-center px-2">
-                        <div className="flex items-center gap-2 text-[12px] font-mono text-slate-300 uppercase tracking-widest"> Onimta IT Solutions
+                {/* Body */}
+                <div className="p-2">
+                    {showYearPicker ? (
+                        <div className="grid grid-cols-4 gap-1 py-1 max-h-[200px] overflow-y-auto no-scrollbar">
+                            {Array.from({ length: 100 }, (_, i) => centuryStart + i).map(year => (
+                                <button
+                                    key={year}
+                                    onClick={() => handleYearSelect(year)}
+                                    className={`h-7 flex items-center justify-center text-[11px] font-medium rounded-[2px] transition-all
+                                        ${selectedYear === year
+                                            ? 'bg-[#0388cc] text-white'
+                                            : year === new Date().getFullYear()
+                                                ? 'border border-[#0388cc] text-[#0388cc]'
+                                                : 'text-gray-700 hover:bg-gray-100'
+                                        }`}
+                                >
+                                    {year}
+                                </button>
+                            ))}
                         </div>
-                        <button 
+                    ) : (
+                        <>
+                            {/* Day labels */}
+                            <div className="grid grid-cols-7 gap-0 mb-0.5">
+                                {daysOfWeek.map((day, idx) => (
+                                    <div key={day} className={`h-6 flex items-center justify-center text-[9px] font-bold tracking-wider ${idx === 0 || idx === 6 ? 'text-gray-400' : 'text-gray-500'}`}>
+                                        {day}
+                                    </div>
+                                ))}
+                            </div>
+
+                            {/* Day grid */}
+                            <div className="grid grid-cols-7 gap-0">
+                                {calendarDays.map((day, idx) => (
+                                    <div key={idx} className="h-7 flex items-center justify-center">
+                                        {day ? (
+                                            <button
+                                                onClick={() => handleDateClick(day)}
+                                                className={`w-7 h-7 flex items-center justify-center text-[11px] font-medium transition-all rounded-[2px]
+                                                    ${isSelected(day)
+                                                        ? 'bg-[#0388cc] text-white'
+                                                        : isToday(day)
+                                                            ? 'border border-[#0388cc] text-[#0388cc]'
+                                                            : (idx % 7 === 0 || idx % 7 === 6)
+                                                                ? 'text-gray-400 hover:bg-gray-100'
+                                                                : 'text-gray-700 hover:bg-gray-100'
+                                                    }`}
+                                            >
+                                                {day}
+                                            </button>
+                                        ) : (
+                                            <div className="w-7 h-7" />
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        </>
+                    )}
+
+                    <div className="mt-2 pt-1.5 border-t border-gray-200 flex justify-between items-center">
+                        <span className="text-[8px] text-gray-400 uppercase tracking-wider">Onimta IT</span>
+                        <button
                             onClick={() => handleDateClick(null, new Date())}
-                            className="text-[11px] font-black text-white bg-[#0388cc] hover:bg-[#0276a1] transition-colors uppercase tracking-widest px-4 py-1.5 shadow-md active:scale-95"
+                            className="text-[9px] font-bold text-white bg-[#0388cc] hover:bg-[#0276a1] transition-colors uppercase tracking-wider px-2 py-0.5 rounded-[2px] active:scale-95"
                         >
                             Today
-                        </button>   
+                        </button>
                     </div>
                 </div>
             </div>

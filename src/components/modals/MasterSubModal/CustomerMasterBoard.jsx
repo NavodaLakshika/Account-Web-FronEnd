@@ -48,8 +48,22 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
             if (user) {
                 setFormData(prev => ({ ...prev, CurrentUser: user.empName || user.username || 'SYSTEM', Company: companyCode }));
             }
+            fetchLookups(companyCode);
         }
     }, [isOpen]);
+
+    const fetchLookups = async (companyCode) => {
+        try {
+            const [types, areas] = await Promise.all([
+                customerService.getTypes(companyCode),
+                customerService.getAreas(companyCode)
+            ]);
+            setTypeList(types || []);
+            setAreaList(areas || []);
+        } catch (error) {
+            console.error('Failed to fetch lookups', error);
+        }
+    };
 
     const handleInput = (e) => {
         const { name, value, type, checked } = e.target;
@@ -136,21 +150,7 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
         } catch (error) { showErrorToast('Failed to load customers'); }
     };
 
-    const openTypeSearch = async () => {
-        try {
-            const data = await customerService.getTypes(formData.Company);
-            setTypeList(data);
-            setShowTypeModal(true);
-        } catch (error) { showErrorToast('Failed to load types'); }
-    };
 
-    const openAreaSearch = async () => {
-        try {
-            const data = await customerService.getAreas(formData.Company);
-            setAreaList(data);
-            setShowAreaModal(true);
-        } catch (error) { showErrorToast('Failed to load areas'); }
-    };
 
     const loadCustomer = async (item) => {
         try {
@@ -242,13 +242,20 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
                             <div className="col-span-4">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Customer Type</label>
                                 <div className="relative">
-                                    <input
-                                        type="text" readOnly
-                                        value={formData.Type_Name}
-                                        onClick={openTypeSearch}
+                                    <select
+                                        value={formData.Type_Code}
+                                        onChange={(e) => {
+                                            const t = typeList.find(x => (x.code || x.Code) === e.target.value);
+                                            setFormData(prev => ({ ...prev, Type_Code: e.target.value, Type_Name: t ? (t.name || t.Name) : '' }));
+                                        }}
                                         className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
-                                        placeholder="Select Type..."
-                                     style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
+                                     style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
+                                    >
+                                        <option value="">Select Type...</option>
+                                        {typeList.map((t, i) => (
+                                            <option key={i} value={t.code || t.Code}>{t.name || t.Name}</option>
+                                        ))}
+                                    </select>
                                 </div>
                             </div>
 
@@ -270,13 +277,20 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
                             <div className="col-span-4">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Area</label>
                                 <div className="relative">
-                                    <input
-                                        type="text" readOnly
-                                        value={formData.AreaName}
-                                        onClick={openAreaSearch}
+                                    <select
+                                        value={formData.Area}
+                                        onChange={(e) => {
+                                            const a = areaList.find(x => (x.code || x.Code) === e.target.value);
+                                            setFormData(prev => ({ ...prev, Area: e.target.value, AreaName: a ? (a.name || a.Name) : '' }));
+                                        }}
                                         className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
-                                        placeholder="Select Area..."
-                                     style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
+                                     style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
+                                    >
+                                        <option value="">Select Area...</option>
+                                        {areaList.map((a, i) => (
+                                            <option key={i} value={a.code || a.Code}>{a.name || a.Name}</option>
+                                        ))}
+                                    </select>
                                 </div>
                             </div>
 
@@ -366,99 +380,7 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
                 </div>
             </SimpleModal>
 
-            {/* Type Search */}
-            <SimpleModal
-                isOpen={showTypeModal}
-                onClose={() => setShowTypeModal(false)}
-                title="Customer Type Directory"
-            >
-                <div className="space-y-4">
-                    <div className="p-4 bg-slate-50 border-b border-gray-200">
-                        <div className="relative">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
-                            <input
-                                type="text"
-                                placeholder="Find customer type..."
-                                className="w-full h-10 pl-10 pr-4 border border-gray-300 rounded-[3px] outline-none text-[13px] focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] shadow-sm bg-white"
-                                value={typeSearch}
-                                onChange={(e) => setTypeSearch(e.target.value)}
-                                autoFocus
-                            />
-                        </div>
-                    </div>
-                    <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm">
-                        <div className="max-h-[300px] overflow-y-auto no-scrollbar">
-                            <table className="w-full text-left">
-                                <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 shadow-sm z-10">
-                                    <tr>
-                                        <th className=" px-5 py-3">Code</th>
-                                        <th className=" px-5 py-3">Type Name</th>
-                                    <th className="text-right px-5 py-3">Action</th></tr>
-                                </thead>
-                                <tbody className="divide-y divide-gray-100">
-                                    {typeList
-                                        .filter(t => ((t.name || t.Name) || '').toLowerCase().includes(typeSearch.toLowerCase()) || ((t.code || t.Code) || '').toLowerCase().includes(typeSearch.toLowerCase()))
-                                        .map((t, i) => (
-                                        <tr key={i} className="group hover:bg-blue-50/50  transition-all cursor-pointer group border-b border-gray-50" onClick={() => { setFormData(prev => ({ ...prev, Type_Code: t.code || t.Code, Type_Name: t.name || t.Name })); setShowTypeModal(false); setTypeSearch(''); }}>
-                                            <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{t.code || t.Code}</td>
-                                            <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{t.name || t.Name}</td>
-                                        
-                                            <td className="text-right px-5 py-3"><button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button></td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </SimpleModal>
 
-            {/* Area Search */}
-            <SimpleModal
-                isOpen={showAreaModal}
-                onClose={() => setShowAreaModal(false)}
-                title="Area Directory Lookup"
-            >
-                <div className="space-y-4">
-                    <div className="p-4 bg-slate-50 border-b border-gray-200">
-                        <div className="relative">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
-                            <input
-                                type="text"
-                                placeholder="Find area..."
-                                className="w-full h-10 pl-10 pr-4 border border-gray-300 rounded-[3px] outline-none text-[13px] focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] shadow-sm bg-white"
-                                value={areaSearch}
-                                onChange={(e) => setAreaSearch(e.target.value)}
-                                autoFocus
-                            />
-                        </div>
-                    </div>
-                    <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm">
-                        <div className="max-h-[300px] overflow-y-auto no-scrollbar">
-                            <table className="w-full text-left">
-                                <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 shadow-sm z-10">
-                                    <tr>
-                                        <th className=" px-5 py-3">Code</th>
-                                        <th className=" px-5 py-3">Area Name</th>
-                                    <th className="text-right px-5 py-3">Action</th></tr>
-                                </thead>
-                                <tbody className="divide-y divide-gray-100">
-                                    {areaList
-                                        .filter(a => ((a.name || a.Name) || '').toLowerCase().includes(areaSearch.toLowerCase()) || ((a.code || a.Code) || '').toLowerCase().includes(areaSearch.toLowerCase()))
-                                        .map((a, i) => (
-                                        <tr key={i} className="group hover:bg-blue-50/50  transition-all cursor-pointer group border-b border-gray-50" onClick={() => { setFormData(prev => ({ ...prev, Area: a.code || a.Code, AreaName: a.name || a.Name })); setShowAreaModal(false); setAreaSearch(''); }}>
-                                            <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{a.code || a.Code}</td>
-                                            <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{a.name || a.Name}</td>
-                                        
-                                            <td className="text-right px-5 py-3"><button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button></td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </SimpleModal>
 
             {showDeleteConfirm && (
                 <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4">
