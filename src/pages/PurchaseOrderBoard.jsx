@@ -428,14 +428,14 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
                                             <td className="px-4 py-2.5 uppercase">{p.prodName}</td>
                                             <td className="px-3 py-2.5 text-center text-gray-400">{p.unit}</td>
                                             <td className="px-1 py-1">
-                                                <input type="text" value={p.purchasePrice} onChange={(e) => {
+                                                <input type="text" value={p.purchasePrice} onChange={(ev) => {
                                                     const newPrice = e.target.value;
                                                     const newAmount = (parseFloat(p.qty) || 0) * (parseFloat(newPrice) || 0);
                                                     setProducts(products.map((item, i) => i === idx ? { ...item, purchasePrice: newPrice, amount: newAmount.toFixed(2) } : item));
                                                 }} className="w-full h-8 border border-gray-200 rounded-[3px] text-right text-[12px] font-mono bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] px-2" />
                                             </td>
                                             <td className="px-1 py-1">
-                                                <input type="text" value={p.qty} onChange={(e) => {
+                                                <input type="text" value={p.qty} onChange={(ev) => {
                                                     const newQty = e.target.value;
                                                     const newAmount = (parseFloat(newQty) || 0) * (parseFloat(p.purchasePrice) || 0);
                                                     setProducts(products.map((item, i) => i === idx ? { ...item, qty: newQty, amount: newAmount.toFixed(2) } : item));
@@ -597,7 +597,7 @@ const PurchaseOrderBoard = ({ isOpen, onClose }) => {
                             <div className="relative flex-1 max-w-[400px]">
                                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
                                 <input type="text" placeholder="Search Inventory.." className="w-full h-10 pl-10 pr-4 border border-gray-300 rounded-[3px] outline-none text-[13px] focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] shadow-sm bg-white" value={productSearchQuery} onChange={async (e) => {
-                                    const val = e.target.value; setProductSearchQuery(val);
+                                    const val = ev.target.value; setProductSearchQuery(val);
                                     if (val.length >= 2) { try { const r = await purchOrderService.searchProducts(val); setLookups(prev => ({ ...prev, products: r })); } catch (_) {} }
                                     else if (val.length === 0) { const init = await purchOrderService.getLookups(formData.company); setLookups(prev => ({ ...prev, products: init.products })); }
                                 }} autoFocus />

@@ -314,25 +314,49 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                                 <div className="">
                                     <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Petty Cash Account</label>
                                     <div className="relative">
-                                        <input
-                                            type="text"
-                                            readOnly
-                                            value={safePetty.find(a => a.code === form.pettyAccCode)?.name || ''}
-                                            className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
-                                            onClick={() => setShowPettyModal(true)}
-                                         style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
+                                        <select
+                                        value={safePetty.find}
+                                        onChange={(ev) => {
+                                            const val = ev.target.value;
+                                            const a = (safePetty || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || (i.itemId && i.itemId.toString() === val) || (i.id && i.id.toString() === val) || i === val);
+                                            if (a) {
+                                                setForm(f => ({ ...f, pettyAccCode: a.code, pettyAccName: a.name }));
+                                            }
+                                        }}
+                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
+                                        style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
+                                    >
+                                        <option value="">Select...</option>
+                                        {(safePetty || []).map((a, idx) => (
+                                            <option key={idx} value={a.code || a.itemId || a.id || a.name || a}>
+                                                {a.code ? `${a.code} - ${a.name}` : (a.itemId ? `${a.itemId} - ${a.itemName || a.name}` : (a.name || a))}
+                                            </option>
+                                        ))}
+                                    </select>
                                     </div>
                                 </div>
                                 <div className="">
                                     <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Cost Center (From)</label>
                                     <div className="relative">
-                                        <input
-                                            type="text"
-                                            readOnly
-                                            value={safeCC.find(c => c.code === form.costCenterFrom)?.name || ''}
-                                            className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 appearance-none"
-                                            onClick={() => setShowCCFromModal(true)}
-                                         style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
+                                        <select
+                                        value={safeCC.find}
+                                        onChange={(ev) => {
+                                            const val = ev.target.value;
+                                            const c = (safeCC || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || (i.itemId && i.itemId.toString() === val) || (i.id && i.id.toString() === val) || i === val);
+                                            if (c) {
+                                                setForm(f => ({ ...f, costCenterFrom: c.code }));
+                                            }
+                                        }}
+                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 appearance-none"
+                                        style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
+                                    >
+                                        <option value="">Select...</option>
+                                        {(safeCC || []).map((c, idx) => (
+                                            <option key={idx} value={c.code || c.itemId || c.id || c.name || c}>
+                                                {c.code ? `${c.code} - ${c.name}` : (c.itemId ? `${c.itemId} - ${c.itemName || c.name}` : (c.name || c))}
+                                            </option>
+                                        ))}
+                                    </select>
                                     </div>
                                 </div>
                                 <div className="">
@@ -356,14 +380,25 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                                     </div>
                                     {form.isVendor ? (
                                         <div className="relative">
-                                            <input
-                                                type="text"
-                                                readOnly
-                                                value={form.vendorName || form.vendorId}
-                                                className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
-                                                onClick={() => setShowVendorModal(true)}
-                                                placeholder="Select vendor"
-                                             style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
+                                            <select
+                                        value={form.vendorName}
+                                        onChange={(ev) => {
+                                            const val = ev.target.value;
+                                            const v = (safeSuppliers || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || (i.itemId && i.itemId.toString() === val) || (i.id && i.id.toString() === val) || i === val);
+                                            if (v) {
+                                                setForm(f => ({ ...f, vendorId: v.code, vendorName: v.name }));
+                                            }
+                                        }}
+                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
+                                        style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
+                                    >
+                                        <option value="">Select...</option>
+                                        {(safeSuppliers || []).map((v, idx) => (
+                                            <option key={idx} value={v.code || v.itemId || v.id || v.name || v}>
+                                                {v.code ? `${v.code} - ${v.name}` : (v.itemId ? `${v.itemId} - ${v.itemName || v.name}` : (v.name || v))}
+                                            </option>
+                                        ))}
+                                    </select>
                                         </div>
                                     ) : (
                                         <input value={form.payee} onChange={e => setForm(f => ({ ...f, payee: e.target.value }))} type="text" className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700" placeholder="Enter payee name" />
@@ -458,27 +493,49 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                                     {/* Add Expense Line Row */}
                                     <div className="mt-auto border-t border-slate-200 bg-slate-50 p-2 flex gap-3 items-center">
                                         <div className="flex-[2] relative">
-                                            <input
-                                                type="text"
-                                                readOnly
-                                                value={line.accName || line.accCode}
-                                                className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 appearance-none"
-                                                onClick={() => setShowAccModal(true)}
-                                                placeholder="Expense Account"
-                                             style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
+                                            <select
+                                        value={line.accName}
+                                        onChange={(ev) => {
+                                            const val = ev.target.value;
+                                            const a = (safeAccounts || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || (i.itemId && i.itemId.toString() === val) || (i.id && i.id.toString() === val) || i === val);
+                                            if (a) {
+                                                setLine(l => ({ ...l, accCode: a.code, accName: a.name }));
+                                            }
+                                        }}
+                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 appearance-none"
+                                        style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
+                                    >
+                                        <option value="">Select...</option>
+                                        {(safeAccounts || []).map((a, idx) => (
+                                            <option key={idx} value={a.code || a.itemId || a.id || a.name || a}>
+                                                {a.code ? `${a.code} - ${a.name}` : (a.itemId ? `${a.itemId} - ${a.itemName || a.name}` : (a.name || a))}
+                                            </option>
+                                        ))}
+                                    </select>
                                         </div>
                                         <div className="flex-1">
                                             <input type="number" value={line.amount} onChange={e => setLine(l => ({ ...l, amount: e.target.value }))} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 text-right" placeholder="Amount" />
                                         </div>
                                         <div className="flex-[1.5] relative">
-                                            <input
-                                                type="text"
-                                                readOnly
-                                                value={line.costName || line.costCode}
-                                                className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 appearance-none"
-                                                onClick={() => setShowCCModal(true)}
-                                                placeholder="Cost Center"
-                                             style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
+                                            <select
+                                        value={line.costName}
+                                        onChange={(ev) => {
+                                            const val = ev.target.value;
+                                            const c = (safeCC || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || (i.itemId && i.itemId.toString() === val) || (i.id && i.id.toString() === val) || i === val);
+                                            if (c) {
+                                                setLine(l => ({ ...l, costCode: c.code, costName: c.name }));
+                                            }
+                                        }}
+                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 appearance-none"
+                                        style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
+                                    >
+                                        <option value="">Select...</option>
+                                        {(safeCC || []).map((c, idx) => (
+                                            <option key={idx} value={c.code || c.itemId || c.id || c.name || c}>
+                                                {c.code ? `${c.code} - ${c.name}` : (c.itemId ? `${c.itemId} - ${c.itemName || c.name}` : (c.name || c))}
+                                            </option>
+                                        ))}
+                                    </select>
                                         </div>
                                         <div className="flex-[2] flex gap-2">
                                             <input value={line.memo} onChange={e => setLine(l => ({ ...l, memo: e.target.value }))} type="text" className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700" placeholder="Memo" />
@@ -532,14 +589,25 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                                     {/* Add Item Line Row */}
                                     <div className="mt-auto border-t border-slate-200 bg-slate-50 p-2 flex gap-3 items-center">
                                         <div className="flex-[2] relative">
-                                            <input
-                                                type="text"
-                                                readOnly
-                                                value={itemLine.itemName || itemLine.itemId}
-                                                className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 appearance-none"
-                                                onClick={() => setShowItemModal(true)}
-                                                placeholder="Select Item"
-                                             style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
+                                            <select
+                                        value={itemLine.itemName}
+                                        onChange={(ev) => {
+                                            const val = ev.target.value;
+                                            const p = ((lookups.products || []) || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || (i.itemId && i.itemId.toString() === val) || (i.id && i.id.toString() === val) || i === val);
+                                            if (p) {
+                                                setItemLine(l => ({ ...l, itemId: p.code, itemName: p.name, cost: p.price || '0.00', description: p.name }));
+                                            }
+                                        }}
+                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 appearance-none"
+                                        style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
+                                    >
+                                        <option value="">Select...</option>
+                                        {((lookups.products || []) || []).map((p, idx) => (
+                                            <option key={idx} value={p.code || p.itemId || p.id || p.name || p}>
+                                                {p.code ? `${p.code} - ${p.name}` : (p.itemId ? `${p.itemId} - ${p.itemName || p.name}` : (p.name || p))}
+                                            </option>
+                                        ))}
+                                    </select>
                                         </div>
                                         <div className="w-20">
                                             <input type="number" value={itemLine.qty} onChange={e => setItemLine(l => ({ ...l, qty: e.target.value }))} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 text-center" placeholder="Qty" />

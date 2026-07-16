@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import SimpleModal from '../../../components/SimpleModal';
 import TransactionFormWrapper from '../../../components/TransactionFormWrapper';
-import { Search, Save, RotateCcw, Trash2, CheckCircle, AlertTriangle, Loader2, FileText } from 'lucide-react';
+import { Search, Save, RotateCcw, Trash2, CheckCircle, AlertTriangle, Loader2, FileText, Plus } from 'lucide-react';
 import { supplierService } from '../../../services/supplier.service';
 import { showSuccessToast, showErrorToast } from '../../../utils/toastUtils';
+import ConfirmModal from '../../../components/modals/ConfirmModal';
+import VendorTypesMasterBoard from '../../../pages/VendorTypesMasterBoard';
 
 const SupplierMasterBoard = ({ isOpen, onClose }) => {
     const initialState = {
@@ -18,15 +20,8 @@ const SupplierMasterBoard = ({ isOpen, onClose }) => {
     const [loading, setLoading] = useState(false);
     const [isEditMode, setIsEditMode] = useState(false);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-
-    const [showSearchModal, setShowSearchModal] = useState(false);
     const [suppliersList, setSuppliersList] = useState([]);
-    const [showVTModal, setShowVTModal] = useState(false);
-    const [showBankModal, setShowBankModal] = useState(false);
-
-    const [supSearch, setSupSearch] = useState('');
-    const [bankSearch, setBankSearch] = useState('');
-    const [vtSearch, setVtSearch] = useState('');
+    const [showVendorTypeModal, setShowVendorTypeModal] = useState(false);
 
     useEffect(() => {
         if (isOpen) {
@@ -51,8 +46,22 @@ const SupplierMasterBoard = ({ isOpen, onClose }) => {
 
     const fetchLookups = async () => {
         try {
-            const [banksData, typesData] = await Promise.all([supplierService.getBanks(), supplierService.getVendorTypes()]);
-            setBanks(banksData); setVendorTypes(typesData);
+            const [banksData, typesData, suppliersData] = await Promise.all([
+                supplierService.getBanks(), 
+                supplierService.getVendorTypes(),
+                supplierService.getAll()
+            ]);
+            setBanks(banksData); 
+            setVendorTypes(typesData);
+            setSuppliersList(suppliersData);
+        } catch (error) { console.error('Lookup fetch error:', error); }
+    };
+
+    const handleVendorTypeModalClose = async () => {
+        setShowVendorTypeModal(false);
+        try {
+            const typesData = await supplierService.getVendorTypes();
+            setVendorTypes(typesData);
         } catch (error) { console.error('Lookup fetch error:', error); }
     };
 
@@ -81,9 +90,9 @@ const SupplierMasterBoard = ({ isOpen, onClose }) => {
                 showSuccessToast('Supplier updated successfully');
             } else {
                 const response = await supplierService.create(payload);
-                setFormData(prev => ({ ...prev, Code: response.code }));
                 showSuccessToast(`Supplier created: ${response.code}`);
-                setIsEditMode(true);
+                handleClear();
+                fetchLookups();
             }
         } catch (error) {
             showErrorToast(typeof error === 'string' ? error : (error.message || 'Operation failed'));
@@ -111,17 +120,7 @@ const SupplierMasterBoard = ({ isOpen, onClose }) => {
         }
     };
 
-    const openSearch = async () => {
-        setLoading(true);
-        try {
-            setSuppliersList(await supplierService.getAll());
-            setShowSearchModal(true);
-        } catch (err) {
-            showErrorToast('Failed to load suppliers');
-        } finally {
-            setLoading(false);
-        }
-    };
+
 
     const selectSupplier = async (code) => {
         setLoading(true);
@@ -150,7 +149,6 @@ const SupplierMasterBoard = ({ isOpen, onClose }) => {
                 CurrentUser: formData.CurrentUser
             });
             setIsEditMode(true);
-            setShowSearchModal(false);
         } catch (error) {
             showErrorToast(error.toString());
         } finally {
@@ -171,7 +169,7 @@ const SupplierMasterBoard = ({ isOpen, onClose }) => {
                             <button
                                 onClick={handleDelete}
                                 disabled={!isEditMode || loading}
-                                className={`px-6 h-10 border border-red-300 text-red-600 bg-white hover:bg-red-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center gap-2 ${(!isEditMode || loading) ? 'opacity-40 cursor-not-allowed' : ''}`}
+                                className={`px-6 h-10 border border-transparent text-white bg-[#ef4444] hover:bg-[#dc2626] font-semibold rounded-[3px] shadow-[0_2px_10px_rgba(239,68,68,0.2)] hover:shadow-[0_4px_15px_rgba(239,68,68,0.3)] text-[13px] transition-all flex items-center gap-2 ${(!isEditMode || loading) ? 'opacity-40 cursor-not-allowed' : ''}`}
                             >
                                 <Trash2 size={14} /> DELETE
                             </button>
@@ -199,15 +197,25 @@ const SupplierMasterBoard = ({ isOpen, onClose }) => {
                             <div className="col-span-4">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Supplier Code</label>
                                 <div className="relative">
-                                    <input
-                                        type="text" name="Code"
+                                    <select
                                         value={formData.Code}
-                                        onChange={handleInput}
+                                        onChange={(e) => {
+                                            if (e.target.value) {
+                                                selectSupplier(e.target.value);
+                                            } else {
+                                                handleClear();
+                                            }
+                                        }}
                                         className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-blue-600 font-bold cursor-pointer appearance-none"
-                                        placeholder="Auto Gen"
-                                        readOnly
-                                        onClick={openSearch}
-                                     style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
+                                        style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
+                                    >
+                                        <option value="">Auto Gen (New Supplier)</option>
+                                        {suppliersList.map((s, i) => (
+                                            <option key={i} value={s.code || s.Code}>
+                                                {s.code || s.Code} - {s.supplier_Name || s.Supplier_Name || s.name || s.Name}
+                                            </option>
+                                        ))}
+                                    </select>
                                 </div>
                             </div>
 
@@ -223,14 +231,30 @@ const SupplierMasterBoard = ({ isOpen, onClose }) => {
 
                             <div className="col-span-4">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Vendor Type</label>
-                                <div className="relative">
-                                    <input
-                                        type="text" readOnly
+                                <div className="flex gap-2 relative group">
+                                    <select
                                         value={formData.Vend_Typ}
-                                        onClick={() => setShowVTModal(true)}
-                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
-                                        placeholder="Select Type..."
-                                     style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
+                                        onChange={(e) => setFormData(prev => ({ ...prev, Vend_Typ: e.target.value }))}
+                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 uppercase cursor-pointer appearance-none"
+                                        style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
+                                    >
+                                        <option value="">Select Vendor Type...</option>
+                                        {vendorTypes.map((v, i) => {
+                                            const vtName = v.vendorTypes || v.VendorTypes || v.vend_Typ || v.Vend_Typ;
+                                            return (
+                                                <option key={i} value={vtName}>
+                                                    {(v.id || v.ID || '') ? `${v.id || v.ID} - ` : ''}{vtName}
+                                                </option>
+                                            );
+                                        })}
+                                    </select>
+                                    <button 
+                                        onClick={() => setShowVendorTypeModal(true)}
+                                        className="h-10 w-10 flex-shrink-0 bg-emerald-100 text-emerald-600 hover:bg-emerald-500 hover:text-white rounded-[3px] flex items-center justify-center transition-colors relative"
+                                        title="Create Vendor Type"
+                                    >
+                                        <Plus size={18} strokeWidth={3} />
+                                    </button>
                                 </div>
                             </div>
 
@@ -277,13 +301,27 @@ const SupplierMasterBoard = ({ isOpen, onClose }) => {
                             <div className="col-span-4">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Bank Name</label>
                                 <div className="relative">
-                                    <input
-                                        type="text" readOnly
+                                    <select
                                         value={formData.Bank_Name}
-                                        onClick={() => setShowBankModal(true)}
-                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
-                                        placeholder="Select Bank..."
-                                     style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
+                                        onChange={(e) => {
+                                            const v = e.target.value;
+                                            const bank = banks.find(b => (b.name || b.Name || '') === v);
+                                            if (bank) {
+                                                setFormData(prev => ({ ...prev, Bank_Name: (bank.name || bank.Name), Bank_Code: bank.code || bank.Code }));
+                                            } else {
+                                                setFormData(prev => ({ ...prev, Bank_Name: v, Bank_Code: '' }));
+                                            }
+                                        }}
+                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 uppercase cursor-pointer appearance-none"
+                                        style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
+                                    >
+                                        <option value="">Select Bank...</option>
+                                        {banks.map((b, i) => (
+                                            <option key={i} value={b.name || b.Name}>
+                                                {b.code || b.Code} - {b.name || b.Name}
+                                            </option>
+                                        ))}
+                                    </select>
                                 </div>
                             </div>
 
@@ -313,162 +351,25 @@ const SupplierMasterBoard = ({ isOpen, onClose }) => {
                 </div>
             </TransactionFormWrapper>
 
-            {/* Supplier Search */}
-            <SimpleModal
-                isOpen={showSearchModal}
-                onClose={() => setShowSearchModal(false)}
-                title="Supplier Directory Lookup"
-            >
-                <div className="space-y-4">
-                    <div className="p-4 bg-slate-50 border-b border-gray-200">
-                        <div className="relative">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
-                            <input
-                                type="text"
-                                placeholder="Find supplier..."
-                                className="w-full h-10 pl-10 pr-4 border border-gray-300 rounded-[3px] outline-none text-[13px] focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] shadow-sm bg-white"
-                                value={supSearch}
-                                onChange={(e) => setSupSearch(e.target.value)}
-                                autoFocus
-                            />
-                        </div>
-                    </div>
-                    <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm">
-                        <div className="max-h-[400px] overflow-y-auto no-scrollbar">
-                            <table className="w-full text-left">
-                                <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 shadow-sm z-10">
-                                    <tr>
-                                        <th className=" px-5 py-3">Code</th>
-                                        <th className=" px-5 py-3">Supplier Name</th>
-                                    <th className="text-right px-5 py-3">Action</th></tr>
-                                </thead>
-                                <tbody className="divide-y divide-gray-100">
-                                    {suppliersList
-                                        .filter(c => ((c.supplier_Name || c.Supplier_Name || c.name || c.Name) || '').toLowerCase().includes(supSearch.toLowerCase()) || ((c.code || c.Code) || '').toLowerCase().includes(supSearch.toLowerCase()))
-                                        .map((c, i) => (
-                                        <tr key={i} className="group hover:bg-blue-50/50  transition-all cursor-pointer group border-b border-gray-50" onClick={() => selectSupplier(c.code || c.Code)}>
-                                            <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{c.code || c.Code}</td>
-                                            <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{c.supplier_Name || c.Supplier_Name || c.name || c.Name}</td>
-                                        
-                                            <td className="text-right px-5 py-3"><button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button></td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </SimpleModal>
 
-            {/* Vendor Type Modal */}
-            <SimpleModal
-                isOpen={showVTModal}
-                onClose={() => setShowVTModal(false)}
-                title="Vendor Type Directory"
-            >
-                <div className="space-y-4">
-                    <div className="p-4 bg-slate-50 border-b border-gray-200">
-                        <div className="relative">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
-                            <input
-                                type="text"
-                                placeholder="Find vendor type..."
-                                className="w-full h-10 pl-10 pr-4 border border-gray-300 rounded-[3px] outline-none text-[13px] focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] shadow-sm bg-white"
-                                value={vtSearch}
-                                onChange={(e) => setVtSearch(e.target.value)}
-                                autoFocus
-                            />
-                        </div>
-                    </div>
-                    <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm">
-                        <div className="max-h-[300px] overflow-y-auto no-scrollbar">
-                            <table className="w-full text-left">
-                                <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 shadow-sm z-10">
-                                    <tr>
-                                        <th className=" px-5 py-3">Vendor Type</th>
-                                    <th className="text-right px-5 py-3">Action</th></tr>
-                                </thead>
-                                <tbody className="divide-y divide-gray-100">
-                                    {vendorTypes
-                                        .filter(c => ((c.vendorTypes || c.VendorTypes || c.vend_Typ || c.Vend_Typ) || '').toLowerCase().includes(vtSearch.toLowerCase()))
-                                        .map((v, i) => (
-                                        <tr key={i} className="group hover:bg-blue-50/50  transition-all cursor-pointer group border-b border-gray-50" onClick={() => { setFormData(prev => ({ ...prev, Vend_Typ: v.vendorTypes || v.VendorTypes || v.vend_Typ || v.Vend_Typ })); setShowVTModal(false); }}>
-                                            <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{v.vendorTypes || v.VendorTypes || v.vend_Typ || v.Vend_Typ}</td>
-                                        
-                                            <td className="text-right px-5 py-3"><button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button></td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </SimpleModal>
 
-            {/* Bank Modal */}
-            <SimpleModal
-                isOpen={showBankModal}
-                onClose={() => setShowBankModal(false)}
-                title="Bank Directory Lookup"
-            >
-                <div className="space-y-4">
-                    <div className="p-4 bg-slate-50 border-b border-gray-200">
-                        <div className="relative">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
-                            <input
-                                type="text"
-                                placeholder="Find bank..."
-                                className="w-full h-10 pl-10 pr-4 border border-gray-300 rounded-[3px] outline-none text-[13px] focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] shadow-sm bg-white"
-                                value={bankSearch}
-                                onChange={(e) => setBankSearch(e.target.value)}
-                                autoFocus
-                            />
-                        </div>
-                    </div>
-                    <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm">
-                        <div className="max-h-[300px] overflow-y-auto no-scrollbar">
-                            <table className="w-full text-left">
-                                <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 shadow-sm z-10">
-                                    <tr>
-                                        <th className=" px-5 py-3">Code</th>
-                                        <th className=" px-5 py-3">Bank Name</th>
-                                    <th className="text-right px-5 py-3">Action</th></tr>
-                                </thead>
-                                <tbody className="divide-y divide-gray-100">
-                                    {banks
-                                        .filter(c => ((c.name || c.Name) || '').toLowerCase().includes(bankSearch.toLowerCase()) || ((c.code || c.Code) || '').toLowerCase().includes(bankSearch.toLowerCase()))
-                                        .map((b, i) => (
-                                        <tr key={i} className="group hover:bg-blue-50/50  transition-all cursor-pointer group border-b border-gray-50" onClick={() => { setFormData(prev => ({ ...prev, Bank_Code: b.code || b.Code, Bank_Name: b.name || b.Name })); setShowBankModal(false); }}>
-                                            <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{b.code || b.Code}</td>
-                                            <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{b.name || b.Name}</td>
-                                        
-                                            <td className="text-right px-5 py-3"><button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button></td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </SimpleModal>
 
-            {showDeleteConfirm && (
-                <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" onClick={() => !loading && setShowDeleteConfirm(false)} />
-                    <div className="relative w-full max-w-md bg-white rounded-[3px] shadow-2xl overflow-hidden">
-                        <div className="p-8 text-center">
-                            <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6 border-4 border-white shadow-lg"><AlertTriangle size={40} className="text-red-500" /></div>
-                            <h3 className="text-lg font-bold text-slate-800 mb-2 uppercase tracking-wider">Confirm Deletion</h3>
-                            <p className="text-slate-500 text-[12px] font-medium leading-relaxed mb-8">Are you sure you want to delete <span className="font-bold text-slate-800 uppercase">"{formData.Supplier_Name || formData.Code}"</span>?<br />This action is permanent and cannot be undone.</p>
-                            <div className="flex gap-3">
-                                <button onClick={() => setShowDeleteConfirm(false)} disabled={loading} className="flex-1 h-11 bg-gray-100 text-gray-600 text-[11px] font-bold hover:bg-gray-200 transition-all uppercase tracking-widest rounded-full disabled:opacity-50">Cancel</button>
-                                <button onClick={confirmDelete} disabled={loading} className="flex-1 h-11 bg-red-500 text-white text-[11px] font-bold hover:bg-red-600 shadow-lg transition-all flex items-center justify-center gap-2 uppercase tracking-widest rounded-full disabled:opacity-50">{loading ? <Loader2 size={16} className="animate-spin" /> : 'Delete Now'}</button>
-                            </div>
-                        </div>
-                        <div className="bg-gray-50 py-3 border-t border-gray-200"><span className="text-[9px] text-gray-400 font-bold uppercase tracking-widest block text-center">Security Verification Required</span></div>
-                    </div>
-                </div>
-            )}
+
+            <ConfirmModal
+                isOpen={showDeleteConfirm}
+                onClose={() => setShowDeleteConfirm(false)}
+                onConfirm={confirmDelete}
+                title="Confirm Deletion"
+                message={`Are you sure you want to delete "${formData.Supplier_Name || formData.Code}"?\nThis action is permanent and cannot be undone.`}
+                loading={loading}
+                confirmText="Delete Now"
+                variant="danger"
+            />
+
+            <VendorTypesMasterBoard 
+                isOpen={showVendorTypeModal} 
+                onClose={handleVendorTypeModalClose} 
+            />
         </>
     );
 };

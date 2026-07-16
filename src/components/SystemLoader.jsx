@@ -18,7 +18,7 @@ const SystemLoader = ({ inline = false, message }) => {
     }
 
     return (
-        <div className="fixed inset-0 z-[999999] flex items-center justify-center bg-white/80">
+        <div className="fixed inset-0 z-[999999] flex items-center justify-center bg-transparent">
             <div className="w-[150px] h-[150px]">
                 <DotLottiePlayer
                     src="/lottiefile/DashboardLoader.lottie"

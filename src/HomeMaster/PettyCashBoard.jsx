@@ -422,13 +422,25 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                                 <div className="">
                                     <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Petty Cash Account</label>
                                     <div className="relative">
-                                        <input
-                                            type="text"
-                                            readOnly
-                                            value={formData.account ? `${formData.account} - ${safePetty.find(a => a.code === formData.account)?.name || ''}` : ''}
-                                            className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
-                                            onClick={() => setShowAccModal(true)}
-                                         style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
+                                        <select
+                                        value={formData.account}
+                                        onChange={(ev) => {
+                                            const val = ev.target.value;
+                                            const a = (safePetty || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || (i.itemId && i.itemId.toString() === val) || (i.id && i.id.toString() === val) || i === val);
+                                            if (a) {
+                                                setFormData({ ...formData, account: a.code });
+                                            }
+                                        }}
+                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
+                                        style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
+                                    >
+                                        <option value="">Select...</option>
+                                        {(safePetty || []).map((a, idx) => (
+                                            <option key={idx} value={a.code || a.itemId || a.id || a.name || a}>
+                                                {a.code ? `${a.code} - ${a.name}` : (a.itemId ? `${a.itemId} - ${a.itemName || a.name}` : (a.name || a))}
+                                            </option>
+                                        ))}
+                                    </select>
                                     </div>
                                 </div>
                                 <div className="">
@@ -464,14 +476,25 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                                     </div>
                                     {formData.isVendor ? (
                                         <div className="relative">
-                                            <input
-                                                type="text"
-                                                readOnly
-                                                value={formData.payee || formData.vendorId}
-                                                className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
-                                                onClick={() => setShowVendorModal(true)}
-                                                placeholder="Select vendor"
-                                             style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
+                                            <select
+                                        value={formData.payee}
+                                        onChange={(ev) => {
+                                            const val = ev.target.value;
+                                            const v = (safeSuppliers || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || (i.itemId && i.itemId.toString() === val) || (i.id && i.id.toString() === val) || i === val);
+                                            if (v) {
+                                                setFormData({ ...formData, vendorId: v.code, payee: v.name });
+                                            }
+                                        }}
+                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
+                                        style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
+                                    >
+                                        <option value="">Select...</option>
+                                        {(safeSuppliers || []).map((v, idx) => (
+                                            <option key={idx} value={v.code || v.itemId || v.id || v.name || v}>
+                                                {v.code ? `${v.code} - ${v.name}` : (v.itemId ? `${v.itemId} - ${v.itemName || v.name}` : (v.name || v))}
+                                            </option>
+                                        ))}
+                                    </select>
                                         </div>
                                     ) : (
                                         <input value={formData.payee} onChange={(e) => setFormData({ ...formData, payee: e.target.value })} type="text" className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700" placeholder="Enter payee name" />
@@ -547,14 +570,29 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                                                 <td className="px-4 py-2.5 font-mono text-gray-300">{idx + 1}</td>
                                                 <td className="px-2 py-2.5">
                                                     <div className="flex gap-1 items-center">
-                                                        <input
-                                                            type="text"
-                                                            readOnly
-                                                            value={safeExp.find(e => e.code === row.accCode)?.name || ''}
-                                                            className="flex-1 h-8 border border-gray-300 rounded-[3px] px-2 text-[12px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
-                                                            onClick={() => { setExpIndex(idx); setShowExpAccModal(true); }}
-                                                            placeholder="Select account"
-                                                         style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
+                                                        <select
+                                        value={safeExp.find}
+                                        onChange={(ev) => {
+                                            const val = ev.target.value;
+                                            const e = (safeExp || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || (i.itemId && i.itemId.toString() === val) || (i.id && i.id.toString() === val) || i === val);
+                                            if (e) {
+                                                if (expIndex !== null) {
+                                                    const newRows = [...expenseRows];
+                                                    newRows[expIndex].accCode = e.code;
+                                                    setExpenseRows(newRows);
+                                                }
+                                            }
+                                        }}
+                                        className="flex-1 h-8 border border-gray-300 rounded-[3px] px-2 text-[12px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
+                                        style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
+                                    >
+                                        <option value="">Select...</option>
+                                        {(safeExp || []).map((e, idx) => (
+                                            <option key={idx} value={e.code || e.itemId || e.id || e.name || e}>
+                                                {e.code ? `${e.code} - ${e.name}` : (e.itemId ? `${e.itemId} - ${e.itemName || e.name}` : (e.name || e))}
+                                            </option>
+                                        ))}
+                                    </select>
                                                     </div>
                                                 </td>
                                                 <td className="px-2 py-2.5">
@@ -609,14 +647,29 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                                                 <td className="px-4 py-2.5 font-mono text-gray-300">{idx + 1}</td>
                                                 <td className="px-2 py-2.5">
                                                     <div className="flex gap-1 items-center">
-                                                        <input
-                                                            type="text"
-                                                            readOnly
-                                                            value={lookups.products?.find(p => p.code === row.prodCode)?.name || ''}
-                                                            className="flex-1 h-8 border border-gray-300 rounded-[3px] px-2 text-[12px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
-                                                            onClick={() => { setProdIndex(idx); setShowProdModal(true); }}
-                                                            placeholder="Select product"
-                                                         style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
+                                                        <select
+                                        value={lookups.products}
+                                        onChange={(ev) => {
+                                            const val = ev.target.value;
+                                            const p = ((lookups.products || []) || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || (i.itemId && i.itemId.toString() === val) || (i.id && i.id.toString() === val) || i === val);
+                                            if (p) {
+                                                if (prodIndex !== null) {
+                                                    const newRows = [...itemRows];
+                                                    newRows[prodIndex].prodCode = p.code;
+                                                    setItemRows(newRows);
+                                                }
+                                            }
+                                        }}
+                                        className="flex-1 h-8 border border-gray-300 rounded-[3px] px-2 text-[12px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
+                                        style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
+                                    >
+                                        <option value="">Select...</option>
+                                        {((lookups.products || []) || []).map((p, idx) => (
+                                            <option key={idx} value={p.code || p.itemId || p.id || p.name || p}>
+                                                {p.code ? `${p.code} - ${p.name}` : (p.itemId ? `${p.itemId} - ${p.itemName || p.name}` : (p.name || p))}
+                                            </option>
+                                        ))}
+                                    </select>
                                                     </div>
                                                 </td>
                                                 <td className="px-2 py-2.5">

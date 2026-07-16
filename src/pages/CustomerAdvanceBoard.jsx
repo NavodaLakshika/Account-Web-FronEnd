@@ -258,8 +258,8 @@ const CustomerAdvanceBoard = ({ isOpen, onClose }) => {
                                 <div className="relative">
                                     <select
                                         value={formData.creditAccCode}
-                                        onChange={(e) => {
-                                            const val = e.target.value;
+                                        onChange={(ev) => {
+                                            const val = ev.target.value;
                                             const item = (lookups.customers || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || i === val);
                                             if (item) {
                                                 const handler = handleSelectCustomer;
@@ -287,8 +287,8 @@ const CustomerAdvanceBoard = ({ isOpen, onClose }) => {
                                 <div className="relative">
                                     <select
                                         value={formData.payType}
-                                        onChange={(e) => {
-                                            const val = e.target.value;
+                                        onChange={(ev) => {
+                                            const val = ev.target.value;
                                             const item = (lookups.payTypes || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || i === val);
                                             if (item) {
                                                 const handler = (item) => { handlePayTypeChange(item.code); setTimeout(() => { if (item.code === 'CHEQUE') { inputRefs.chequeNo.current?.focus(); } else { inputRefs.amount.current?.focus(); } }, 100); };
@@ -316,8 +316,8 @@ const CustomerAdvanceBoard = ({ isOpen, onClose }) => {
                                 <div className="relative">
                                     <select
                                         value={formData.debitAccCode}
-                                        onChange={(e) => {
-                                            const val = e.target.value;
+                                        onChange={(ev) => {
+                                            const val = ev.target.value;
                                             const item = (lookups.drAccounts || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || i === val);
                                             if (item) {
                                                 const handler = handleSelectDebitAccount;

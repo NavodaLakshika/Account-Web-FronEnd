@@ -247,8 +247,8 @@ const CustomerChequeReturnBoard = ({ isOpen, onClose }) => {
                                 <div className="relative">
                                     <select
                                         value={formData.customerName}
-                                        onChange={(e) => {
-                                            const val = e.target.value;
+                                        onChange={(ev) => {
+                                            const val = ev.target.value;
                                             const item = (lookups.customers || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || i === val);
                                             if (item) {
                                                 const handler = (item) => setFormData({ ...formData, customerCode: item.code, customerName: item.name });
@@ -298,8 +298,8 @@ const CustomerChequeReturnBoard = ({ isOpen, onClose }) => {
                                 <div className="relative">
                                     <select
                                         value={formData.bankName}
-                                        onChange={(e) => {
-                                            const val = e.target.value;
+                                        onChange={(ev) => {
+                                            const val = ev.target.value;
                                             const item = (lookups.banks || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || i === val);
                                             if (item) {
                                                 const handler = (item) => setFormData({ ...formData, bankCode: item.code, bankName: item.name });

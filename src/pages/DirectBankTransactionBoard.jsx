@@ -261,8 +261,8 @@ const DirectBankTransactionBoard = ({ isOpen, onClose }) => {
                                 <div className="relative">
                                     <select
                                         value={formData.bankAccountName}
-                                        onChange={(e) => {
-                                            const val = e.target.value;
+                                        onChange={(ev) => {
+                                            const val = ev.target.value;
                                             const item = (lookups.banks || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || i === val);
                                             if (item) {
                                                 const handler = (item) => setFormData({ ...formData, bankAccount: item.code, bankAccountName: item.name });
@@ -306,8 +306,8 @@ const DirectBankTransactionBoard = ({ isOpen, onClose }) => {
                                 <div className="relative">
                                     <select
                                         value={formData.apAccountName}
-                                        onChange={(e) => {
-                                            const val = e.target.value;
+                                        onChange={(ev) => {
+                                            const val = ev.target.value;
                                             const item = (lookups.accounts || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || i === val);
                                             if (item) {
                                                 const handler = (item) => setFormData({ ...formData, apAccount: item.code, apAccountName: item.name });
@@ -333,8 +333,8 @@ const DirectBankTransactionBoard = ({ isOpen, onClose }) => {
                                 <div className="relative">
                                     <select
                                         value={formData.costCenterName}
-                                        onChange={(e) => {
-                                            const val = e.target.value;
+                                        onChange={(ev) => {
+                                            const val = ev.target.value;
                                             const item = (lookups.costCenters || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || i === val);
                                             if (item) {
                                                 const handler = (item) => setFormData({ ...formData, costCenter: item.code, costCenterName: item.name });

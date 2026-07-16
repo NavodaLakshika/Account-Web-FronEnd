@@ -287,8 +287,8 @@ const BankReconciliationBoard = ({ isOpen, onClose }) => {
                                 <div className="relative">
                                     <select
                                         value={header.bankId}
-                                        onChange={(e) => {
-                                            const val = e.target.value;
+                                        onChange={(ev) => {
+                                            const val = ev.target.value;
                                             const item = (lookups.banks || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || i === val);
                                             if (item) {
                                                 const handler = item => setHeader({ ...header, bankId: item.code, bankName: item.name });

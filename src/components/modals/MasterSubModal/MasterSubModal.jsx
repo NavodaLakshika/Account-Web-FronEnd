@@ -23,7 +23,7 @@ import SupplierMasterBoard from './SupplierMasterBoard';
 import CustomerMasterBoard from './CustomerMasterBoard';
 import CardCommissionBoard from './CardCommissionBoard';
 import UserProfileBoard from './UserProfileBoard';
-import VendorTypesBoard from './VendorTypesBoard';
+import VendorTypesBoard from '../../../pages/VendorTypesMasterBoard';
 import CustomerTypeBoard from './CustomerTypeBoard';
 import ChangePasswordBoard from './ChangePasswordBoard';
 

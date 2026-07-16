@@ -634,8 +634,8 @@ const JournalEntryBoard = ({ isOpen, onClose, onComplete }) => {
                                 <div className="relative">
                                     <select
                                         value={currentLine.accName}
-                                        onChange={(e) => {
-                                            const val = e.target.value;
+                                        onChange={(ev) => {
+                                            const val = ev.target.value;
                                             const item = (lookups.accounts || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || i === val);
                                             if (item) {
                                                 const handler = handleAccountSelect;
@@ -660,8 +660,8 @@ const JournalEntryBoard = ({ isOpen, onClose, onComplete }) => {
                                 <div className="relative">
                                     <select
                                         value={currentLine.costCenterName}
-                                        onChange={(e) => {
-                                            const val = e.target.value;
+                                        onChange={(ev) => {
+                                            const val = ev.target.value;
                                             const item = (lookups.costCenters || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || i === val);
                                             if (item) {
                                                 const handler = item => setCurrentLine(prev => ({ ...prev, costCenter: item.code, costCenterName: item.name }));

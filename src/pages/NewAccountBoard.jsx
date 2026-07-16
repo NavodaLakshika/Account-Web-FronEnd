@@ -4,10 +4,13 @@ import AccountBoard from './AccountBoard';
 import { HelpCircle, PlusCircle, Search, ChevronRight, CheckCircle2 } from 'lucide-react';
 import { accountService } from '../services/account.service';
 import { toast } from 'react-hot-toast';
+import { getSessionData } from '../utils/session';
 
 const NewAccountBoard = ({ isOpen, onClose }) => {
     const [selectedType, setSelectedType] = useState('Expenses');
     const [showAccountBoard, setShowAccountBoard] = useState(false);
+    const [mainTypes, setMainTypes] = useState([]);
+    const [dynamicSubGroups, setDynamicSubGroups] = useState([]);
 
     const accountDetails = {
         Assets: {
@@ -60,8 +63,31 @@ const NewAccountBoard = ({ isOpen, onClose }) => {
         if (!isOpen) {
             setShowAccountBoard(false);
             setSelectedType('Expenses');
+        } else {
+            const { companyCode } = getSessionData();
+            accountService.getMainTypes(companyCode).then(data => {
+                setMainTypes(data);
+            }).catch(err => console.error("Failed to load main types", err));
         }
     }, [isOpen]);
+
+    useEffect(() => {
+        if (isOpen && mainTypes.length > 0) {
+            const { companyCode } = getSessionData();
+            const matched = mainTypes.find(t => 
+                t.main_Acc_Name.toLowerCase() === selectedType.toLowerCase() || 
+                t.main_Acc_Name.toLowerCase().includes(selectedType.toLowerCase())
+            );
+            
+            if (matched) {
+                accountService.getParentAccounts(matched.main_Acc_Name, companyCode).then(data => {
+                    setDynamicSubGroups(data);
+                }).catch(err => console.error("Failed to load parent accounts", err));
+            } else {
+                setDynamicSubGroups([]);
+            }
+        }
+    }, [selectedType, mainTypes, isOpen]);
 
     const handleCreateClick = () => {
         setShowAccountBoard(true);
@@ -144,16 +170,25 @@ const NewAccountBoard = ({ isOpen, onClose }) => {
                                 </p>
                             </div>
 
-                            {currentDetails.examples.length > 0 && (
+                            {(dynamicSubGroups.length > 0 || currentDetails.examples.length > 0) && (
                                 <div className="space-y-3">
                                     <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Sub-Groups</p>
                                     <div className="grid grid-cols-1 gap-2 ml-1">
-                                        {currentDetails.examples.map((ex, i) => (
-                                            <div key={i} className="flex gap-3 items-center">
-                                                <div className="w-2 h-2 rounded-full bg-[#0285fd] shrink-0"></div>
-                                                <span className="text-[12px] text-gray-600 font-bold uppercase">{ex}</span>
-                                            </div>
-                                        ))}
+                                        {dynamicSubGroups.length > 0 ? (
+                                            dynamicSubGroups.slice(0, 3).map((group, i) => (
+                                                <div key={i} className="flex gap-3 items-center">
+                                                    <div className="w-2 h-2 rounded-full bg-[#0285fd] shrink-0"></div>
+                                                    <span className="text-[12px] text-gray-600 font-bold uppercase">{group.code} - {group.name}</span>
+                                                </div>
+                                            ))
+                                        ) : (
+                                            currentDetails.examples.map((ex, i) => (
+                                                <div key={i} className="flex gap-3 items-center">
+                                                    <div className="w-2 h-2 rounded-full bg-[#0285fd] shrink-0"></div>
+                                                    <span className="text-[12px] text-gray-600 font-bold uppercase">{ex}</span>
+                                                </div>
+                                            ))
+                                        )}
                                     </div>
                                 </div>
                             )}
