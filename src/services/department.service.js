@@ -19,9 +19,9 @@ export const departmentService = {
     }
   },
 
-  async searchDepartments(locaId, company, query = '') {
+  async searchDepartments(company, query = '') {
     try {
-      const response = await api.get('/Department/search', { params: { locaId, company, query } });
+      const response = await api.get('/Department/search', { params: { company, query } });
       return response.data;
     } catch (error) {
       throw error.response?.data || 'Failed to search departments';
@@ -37,9 +37,9 @@ export const departmentService = {
     }
   },
 
-  async delete(code, locaId, company) {
+  async delete(code, company) {
     try {
-      const response = await api.delete('/Department/delete', { params: { code, locaId, company } });
+      const response = await api.delete('/Department/delete', { params: { code, company } });
       return response.data;
     } catch (error) {
       throw error.response?.data || 'Failed to delete department';

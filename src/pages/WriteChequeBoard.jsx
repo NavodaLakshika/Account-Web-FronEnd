@@ -445,25 +445,25 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
                                     <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Settlement Bank</label>
                                     <div className="relative">
                                         <select
-                                        value={lookups.banks}
-                                        onChange={(ev) => {
-                                            const val = ev.target.value;
-                                            const b = (lookups.banks || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || (i.itemId && i.itemId.toString() === val) || (i.id && i.id.toString() === val) || i === val);
-                                            if (b) {
-                                                setFormData({...formData, bankAcc: b.code});
-                                                fetchBankBalance(b.code);
-                                            }
-                                        }}
-                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
-                                        style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
-                                    >
-                                        <option value="">Select...</option>
-                                        {(lookups.banks || []).map((b, idx) => (
-                                            <option key={idx} value={b.code || b.itemId || b.id || b.name || b}>
-                                                {b.code ? `${b.code} - ${b.name}` : (b.itemId ? `${b.itemId} - ${b.itemName || b.name}` : (b.name || b))}
-                                            </option>
-                                        ))}
-                                    </select>
+                                            value={formData.bankAcc || ''}
+                                            onChange={(ev) => {
+                                                const val = ev.target.value;
+                                                const b = (lookups.banks || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || (i.itemId && i.itemId.toString() === val) || (i.id && i.id.toString() === val) || i === val);
+                                                if (b) {
+                                                    setFormData({...formData, bankAcc: b.code});
+                                                    fetchBankBalance(b.code);
+                                                }
+                                            }}
+                                            className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
+                                            style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
+                                        >
+                                            <option value="">Select...</option>
+                                            {(lookups.banks || []).map((b, idx) => (
+                                                <option key={idx} value={b.code || b.itemId || b.id || b.name || b}>
+                                                    {b.code ? `${b.code} - ${b.name}` : (b.itemId ? `${b.itemId} - ${b.itemName || b.name}` : (b.name || b))}
+                                                </option>
+                                            ))}
+                                        </select>
                                     </div>
                                     {formData.bankAcc && (
                                         <div className="mt-1.5 px-3 h-8 bg-blue-50 flex items-center justify-between rounded-[3px] border border-blue-100">
@@ -475,28 +475,35 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
                                 <div className="">
                                     <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Cost Center</label>
                                     <div className="relative">
-                                        <input 
-                                            type="text" 
-                                            readOnly 
-                                            value={lookups.costCenters.find(cc => cc.costCenterCode === formData.costCenter)?.costCenterName || ''} 
-                                            className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 appearance-none"
-                                            onClick={() => { setCcSource('header'); setShowCCModal(true); }}
-                                         style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
+                                        <select
+                                            value={formData.costCenter || ''}
+                                            onChange={(e) => setFormData({...formData, costCenter: e.target.value})}
+                                            className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 appearance-none"
+                                            style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
+                                        >
+                                            <option value="">Select...</option>
+                                            {(lookups.costCenters || []).map((c, idx) => (
+                                                <option key={idx} value={c.costCenterCode || c.code}>
+                                                    {c.costCenterCode || c.code} - {c.costCenterName || c.name}
+                                                </option>
+                                            ))}
+                                        </select>
                                     </div>
                                 </div>
                                 <div className="">
                                     <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Endorsement</label>
                                     <div className="relative">
-                                        <input 
-                                            type="text" 
-                                            readOnly 
-                                            value={formData.endorsement} 
-                                            className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700"
-                                            onClick={() => setShowEndorsementModal(true)}
-                                        />
-                                        <button onClick={() => setShowEndorsementModal(true)} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
-                                            <ChevronDown size={16} />
-                                        </button>
+                                        <select
+                                            value={formData.endorsement || ''}
+                                            onChange={(e) => setFormData({...formData, endorsement: e.target.value})}
+                                            className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 appearance-none"
+                                            style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
+                                        >
+                                            <option value="">Select...</option>
+                                            {lookups.endorsements.map((opt, idx) => (
+                                                <option key={idx} value={opt}>{opt}</option>
+                                            ))}
+                                        </select>
                                     </div>
                                 </div>
                             </div>
@@ -658,38 +665,47 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
                                                     <td className="px-2 py-2.5">
                                                         <div className="flex gap-1 items-center">
                                                             <select
-                                        value={lookups.accounts}
-                                        onChange={(ev) => {
-                                            const val = ev.target.value;
-                                            const a = (lookups.accounts || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || (i.itemId && i.itemId.toString() === val) || (i.id && i.id.toString() === val) || i === val);
-                                            if (a) {
-                                                const newExp = [...expenses];
-                                                newExp[accIndex].accCode = a.code;
-                                                setExpenses(newExp);
-                                            }
-                                        }}
-                                        className="flex-1 h-8 border border-gray-300 rounded-[3px] px-2 text-[12px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
-                                        style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
-                                    >
-                                        <option value="">Select...</option>
-                                        {(lookups.accounts || []).map((a, idx) => (
-                                            <option key={idx} value={a.code || a.itemId || a.id || a.name || a}>
-                                                {a.code ? `${a.code} - ${a.name}` : (a.itemId ? `${a.itemId} - ${a.itemName || a.name}` : (a.name || a))}
-                                            </option>
-                                        ))}
-                                    </select>
+                                                                value={line.accCode || ''}
+                                                                onChange={(ev) => {
+                                                                    const val = ev.target.value;
+                                                                    const a = (lookups.accounts || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || (i.itemId && i.itemId.toString() === val) || (i.id && i.id.toString() === val) || i === val);
+                                                                    if (a) {
+                                                                        const newExp = [...expenses];
+                                                                        newExp[idx].accCode = a.code;
+                                                                        setExpenses(newExp);
+                                                                    }
+                                                                }}
+                                                                className="flex-1 h-8 border border-gray-300 rounded-[3px] px-2 text-[12px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
+                                                                style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
+                                                            >
+                                                                <option value="">Select...</option>
+                                                                {(lookups.accounts || []).map((a, i) => (
+                                                                    <option key={i} value={a.code || a.itemId || a.id || a.name || a}>
+                                                                        {a.code ? `${a.code} - ${a.name}` : (a.itemId ? `${a.itemId} - ${a.itemName || a.name}` : (a.name || a))}
+                                                                    </option>
+                                                                ))}
+                                                            </select>
                                                         </div>
                                                     </td>
                                                     <td className="px-2 py-2.5">
                                                         <div className="flex gap-1 items-center">
-                                                            <input 
-                                                                type="text" 
-                                                                readOnly 
-                                                                value={lookups.costCenters.find(cc => cc.costCenterCode === line.costCenter)?.costCenterName || ''} 
-                                                                className="flex-1 h-8 border border-gray-300 rounded-[3px] px-2 text-[12px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none" 
-                                                                onClick={() => { setCcSource('line'); setCcIndex(idx); setShowCCModal(true); }}
-                                                                placeholder="Cost center"
-                                                             style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
+                                                            <select
+                                                                value={line.costCenter || ''}
+                                                                onChange={(e) => {
+                                                                    const newExp = [...expenses];
+                                                                    newExp[idx].costCenter = e.target.value;
+                                                                    setExpenses(newExp);
+                                                                }}
+                                                                className="flex-1 h-8 border border-gray-300 rounded-[3px] px-2 text-[12px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 appearance-none"
+                                                                style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
+                                                            >
+                                                                <option value="">Cost center</option>
+                                                                {(lookups.costCenters || []).map((c, i) => (
+                                                                    <option key={i} value={c.costCenterCode || c.code}>
+                                                                        {c.costCenterCode || c.code} - {c.costCenterName || c.name}
+                                                                    </option>
+                                                                ))}
+                                                            </select>
                                                         </div>
                                                     </td>
                                                     <td className="px-2 py-2.5">
@@ -887,82 +903,9 @@ const WriteChequeBoard = ({ isOpen, onClose }) => {
                 </div>
             </SimpleModal>
 
-            {/* Cost Center Search Modal */}
-            <SimpleModal isOpen={showCCModal} onClose={() => setShowCCModal(false)} title={`Cost Center Directory - ${lookups.costCenters.length} Found`}>
-                <div className="flex flex-col h-full font-['Tahoma']">
-                    <div className="flex items-center gap-4 bg-slate-50 p-4 border-b border-gray-100 mb-2">
-                        <span className="text-[12px] font-bold text-gray-500 uppercase tracking-wider">Search Facility</span>
-                        <input 
-                            type="text" 
-                            className="w-full h-10 px-4 border border-gray-300 rounded-[3px] outline-none text-sm focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white shadow-sm flex-1" 
-                            value={ccSearch} 
-                            onChange={(e) => setCcSearch(e.target.value)} 
-                        />
-                    </div>
-                    <div className="max-h-[50vh] overflow-y-auto no-scrollbar border border-gray-100 rounded-[5px] shadow-sm">
-                        <table className="w-full text-sm text-left">
-                            <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 z-10 shadow-sm">
-                                <tr>
-                                    <th className="border-b px-5 py-3">Code</th>
-                                    <th className="border-b px-5 py-3">Cost Center</th>
-                                    <th className="border-b text-center w-24 px-5 py-3">Select</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-100">
-                                {lookups.costCenters.filter(c => c.costCenterName.toLowerCase().includes(ccSearch.toLowerCase())).map((c, idx) => (
-                                    <tr key={idx} className="group hover:bg-blue-50/50  transition-all border-b border-gray-50 cursor-pointer group border-b border-gray-50">
-                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{c.costCenterCode}</td>
-                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{c.costCenterName}</td>
-                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">
-                                            <button onClick={() => {
-                                                if (ccSource === 'header') {
-                                                    setFormData({...formData, costCenter: c.costCenterCode});
-                                                } else {
-                                                    const newExp = [...expenses];
-                                                    newExp[ccIndex].costCenter = c.costCenterCode;
-                                                    setExpenses(newExp);
-                                                }
-                                                setShowCCModal(false);
-                                            }} className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </SimpleModal>
+            {/* Cost Center Search Modal removed */}
 
-            {/* Endorsement Modal */}
-            <SimpleModal isOpen={showEndorsementModal} onClose={() => setShowEndorsementModal(false)} title="Select Crossing Type" maxWidth="max-w-[700px]">
-                <div className="flex flex-col h-full font-['Tahoma']">
-                    <div className="max-h-[50vh] overflow-y-auto no-scrollbar border border-gray-100 rounded-[5px] shadow-sm">
-                        <table className="w-full text-sm text-left">
-                            <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 z-10 shadow-sm">
-                                <tr>
-                                    <th className="border-b px-5 py-3">ID</th>
-                                    <th className="border-b px-5 py-3">Endorsement Type</th>
-                                    <th className="border-b text-center w-24 px-5 py-3">Select</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-100">
-                                {lookups.endorsements.map((type, idx) => (
-                                    <tr key={idx} className="group hover:bg-blue-50/50  transition-all border-b border-gray-50 cursor-pointer group border-b border-gray-50">
-                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{idx + 1}</td>
-                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{type}</td>
-                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">
-                                            <button onClick={() => {
-                                                setFormData(prev => ({ ...prev, endorsement: type }));
-                                                setShowEndorsementModal(false);
-                                            }} className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </SimpleModal>
+            {/* Endorsement Modal removed */}
 
             {/* Account Search Modal */}
             <SimpleModal isOpen={showAccModal} onClose={() => setShowAccModal(false)} title={`Ledger Accounts - ${lookups.accounts.length} Found`}>

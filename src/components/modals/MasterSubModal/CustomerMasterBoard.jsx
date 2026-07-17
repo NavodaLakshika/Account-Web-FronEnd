@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import SimpleModal from '../../../components/SimpleModal';
 import TransactionFormWrapper from '../../../components/TransactionFormWrapper';
-import { Search, Save, RotateCcw, Trash2, CheckCircle, AlertTriangle, Loader2, FileText } from 'lucide-react';
+import { Search, Save, RotateCcw, Trash2, CheckCircle, AlertTriangle, Loader2, FileText, Plus } from 'lucide-react';
 import { customerService } from '../../../services/customer.service';
 import { authService } from '../../../services/auth.service';
 import { showSuccessToast, showErrorToast } from '../../../utils/toastUtils';
+import CustomerTypeProfileBoard from '../../../pages/CustomerTypeProfileBoard';
+import AreaProfileBoard from '../../../pages/AreaProfileBoard';
+import ConfirmModal from '../../../components/modals/ConfirmModal';
 
 const CustomerMasterBoard = ({ isOpen, onClose }) => {
     const initialState = {
@@ -19,9 +22,7 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
     // Lookups
-    const [showSearchModal, setShowSearchModal] = useState(false);
     const [customerList, setCustomerList] = useState([]);
-    const [custSearch, setCustSearch] = useState('');
 
     const [showTypeModal, setShowTypeModal] = useState(false);
     const [typeList, setTypeList] = useState([]);
@@ -54,12 +55,14 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
 
     const fetchLookups = async (companyCode) => {
         try {
-            const [types, areas] = await Promise.all([
+            const [types, areas, customers] = await Promise.all([
                 customerService.getTypes(companyCode),
-                customerService.getAreas(companyCode)
+                customerService.getAreas(companyCode),
+                customerService.getAll(companyCode)
             ]);
             setTypeList(types || []);
             setAreaList(areas || []);
+            setCustomerList(customers || []);
         } catch (error) {
             console.error('Failed to fetch lookups', error);
         }
@@ -68,6 +71,22 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
     const handleInput = (e) => {
         const { name, value, type, checked } = e.target;
         setFormData(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
+    };
+
+    const handleTypeModalClose = async () => {
+        setShowTypeModal(false);
+        try {
+            const types = await customerService.getTypes(formData.Company);
+            setTypeList(types || []);
+        } catch (error) { console.error('Lookup fetch error:', error); }
+    };
+
+    const handleAreaModalClose = async () => {
+        setShowAreaModal(false);
+        try {
+            const areas = await customerService.getAreas(formData.Company);
+            setAreaList(areas || []);
+        } catch (error) { console.error('Lookup fetch error:', error); }
     };
 
     const handleClear = () => {
@@ -113,8 +132,8 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
             } else {
                 const data = await customerService.create(payload);
                 showSuccessToast('Customer created successfully');
-                setFormData(prev => ({ ...prev, Code: data.code }));
-                setIsEditMode(true);
+                handleClear();
+                fetchLookups(formData.Company);
             }
         } catch (error) {
             showErrorToast(error.error || error.message || (typeof error === 'string' ? error : 'Failed to save'));
@@ -142,19 +161,10 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
         }
     };
 
-    const openCustomerSearch = async () => {
+    const selectCustomer = async (code) => {
+        setLoading(true);
         try {
-            const data = await customerService.getAll(formData.Company);
-            setCustomerList(data);
-            setShowSearchModal(true);
-        } catch (error) { showErrorToast('Failed to load customers'); }
-    };
-
-
-
-    const loadCustomer = async (item) => {
-        try {
-            const fullItem = await customerService.getByCode(item.code || item.Code);
+            const fullItem = await customerService.getByCode(code);
             setFormData({
                 Code: fullItem.code || fullItem.Code || '',
                 Name: fullItem.cust_Name || fullItem.Cust_Name || '',
@@ -175,9 +185,10 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
                 Company: formData.Company
             });
             setIsEditMode(true);
-            setShowSearchModal(false);
         } catch (error) {
             showErrorToast('Failed to load customer details');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -194,7 +205,7 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
                             <button
                                 onClick={handleDelete}
                                 disabled={!isEditMode || loading}
-                                className={`px-6 h-10 border border-red-300 text-red-600 bg-white hover:bg-red-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center gap-2 ${(!isEditMode || loading) ? 'opacity-40 cursor-not-allowed' : ''}`}
+                                className={`px-6 h-10 border border-transparent text-white bg-[#ef4444] hover:bg-[#dc2626] font-semibold rounded-[3px] shadow-[0_2px_10px_rgba(239,68,68,0.2)] hover:shadow-[0_4px_15px_rgba(239,68,68,0.3)] text-[13px] transition-all flex items-center gap-2 ${(!isEditMode || loading) ? 'opacity-40 cursor-not-allowed' : ''}`}
                             >
                                 <Trash2 size={14} /> DELETE
                             </button>
@@ -222,15 +233,25 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
                             <div className="col-span-4">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Cust Code</label>
                                 <div className="relative">
-                                    <input
-                                        type="text" name="Code"
+                                    <select
                                         value={formData.Code}
-                                        onChange={handleInput}
+                                        onChange={(e) => {
+                                            if (e.target.value) {
+                                                selectCustomer(e.target.value);
+                                            } else {
+                                                handleClear();
+                                            }
+                                        }}
                                         className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-blue-600 font-bold cursor-pointer appearance-none"
-                                        placeholder="Auto Gen"
-                                        readOnly
-                                        onClick={openCustomerSearch}
-                                     style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
+                                        style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
+                                    >
+                                        <option value="">Auto Gen (New Customer)</option>
+                                        {customerList.map((c, i) => (
+                                            <option key={i} value={c.code || c.Code}>
+                                                {c.code || c.Code} - {c.cust_Name || c.Cust_Name || c.name || c.Name}
+                                            </option>
+                                        ))}
+                                    </select>
                                 </div>
                             </div>
 
@@ -241,7 +262,7 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
 
                             <div className="col-span-4">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Customer Type</label>
-                                <div className="relative">
+                                <div className="flex gap-2 relative group">
                                     <select
                                         value={formData.Type_Code}
                                         onChange={(e) => {
@@ -256,6 +277,14 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
                                             <option key={i} value={t.code || t.Code}>{t.name || t.Name}</option>
                                         ))}
                                     </select>
+                                    <button 
+                                        type="button"
+                                        onClick={() => setShowTypeModal(true)}
+                                        className="h-10 w-10 flex-shrink-0 bg-emerald-100 text-emerald-600 hover:bg-emerald-500 hover:text-white rounded-[3px] flex items-center justify-center transition-colors relative"
+                                        title="Create Customer Type"
+                                    >
+                                        <Plus size={18} strokeWidth={3} />
+                                    </button>
                                 </div>
                             </div>
 
@@ -276,7 +305,7 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
 
                             <div className="col-span-4">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Area</label>
-                                <div className="relative">
+                                <div className="flex gap-2 relative group">
                                     <select
                                         value={formData.Area}
                                         onChange={(e) => {
@@ -291,6 +320,14 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
                                             <option key={i} value={a.code || a.Code}>{a.name || a.Name}</option>
                                         ))}
                                     </select>
+                                    <button 
+                                        type="button"
+                                        onClick={() => setShowAreaModal(true)}
+                                        className="h-10 w-10 flex-shrink-0 bg-emerald-100 text-emerald-600 hover:bg-emerald-500 hover:text-white rounded-[3px] flex items-center justify-center transition-colors relative"
+                                        title="Create Area"
+                                    >
+                                        <Plus size={18} strokeWidth={3} />
+                                    </button>
                                 </div>
                             </div>
 
@@ -330,75 +367,30 @@ const CustomerMasterBoard = ({ isOpen, onClose }) => {
                 </div>
             </TransactionFormWrapper>
 
-            {/* Customer Search */}
-            <SimpleModal
-                isOpen={showSearchModal}
-                onClose={() => setShowSearchModal(false)}
-                title="Customer Directory Lookup"
-            >
-                <div className="space-y-4">
-                    <div className="p-4 bg-slate-50 border-b border-gray-200">
-                        <div className="relative">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
-                            <input
-                                type="text"
-                                placeholder="Find customer by name or code..."
-                                className="w-full h-10 pl-10 pr-4 border border-gray-300 rounded-[3px] outline-none text-[13px] focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] shadow-sm bg-white"
-                                value={custSearch}
-                                onChange={(e) => setCustSearch(e.target.value)}
-                                autoFocus
-                            />
-                        </div>
-                    </div>
-                    <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm">
-                        <div className="max-h-[400px] overflow-y-auto no-scrollbar">
-                            <table className="w-full text-left">
-                                <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 shadow-sm z-10">
-                                    <tr>
-                                        <th className=" px-5 py-3">Code</th>
-                                        <th className=" px-5 py-3">Customer Name</th>
-                                    <th className="text-right px-5 py-3">Action</th></tr>
-                                </thead>
-                                <tbody className="divide-y divide-gray-100">
-                                    {customerList
-                                        .filter(c => ((c.cust_Name || c.Cust_Name || c.name || c.Name) || '').toLowerCase().includes(custSearch.toLowerCase()) || ((c.code || c.Code) || '').toLowerCase().includes(custSearch.toLowerCase()))
-                                        .map((c, i) => (
-                                        <tr key={i} className="group hover:bg-blue-50/50  transition-all cursor-pointer group border-b border-gray-50" onClick={() => loadCustomer(c)}>
-                                            <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{c.code || c.Code}</td>
-                                            <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{c.cust_Name || c.Cust_Name || c.name || c.Name}</td>
-                                        
-                                            <td className="text-right px-5 py-3"><button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button></td>
-                                        </tr>
-                                    ))}
-                                    {customerList.length === 0 && (
-                                        <tr><td colSpan="2" className="text-center py-16 text-gray-400 text-[11px] font-bold uppercase tracking-widest">No records found</td></tr>
-                                    )}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </SimpleModal>
+            {/* Search Modal Removed */}
 
 
 
-            {showDeleteConfirm && (
-                <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" onClick={() => !loading && setShowDeleteConfirm(false)} />
-                    <div className="relative w-full max-w-md bg-white rounded-[3px] shadow-2xl overflow-hidden">
-                        <div className="p-8 text-center">
-                            <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6 border-4 border-white shadow-lg"><AlertTriangle size={40} className="text-red-500" /></div>
-                            <h3 className="text-lg font-bold text-slate-800 mb-2 uppercase tracking-wider">Confirm Deletion</h3>
-                            <p className="text-slate-500 text-[12px] font-medium leading-relaxed mb-8">Are you sure you want to delete <span className="font-bold text-slate-800 uppercase">"{formData.Name || formData.Code}"</span>?<br />This action is permanent and cannot be undone.</p>
-                            <div className="flex gap-3">
-                                <button onClick={() => setShowDeleteConfirm(false)} disabled={loading} className="flex-1 h-11 bg-gray-100 text-gray-600 text-[11px] font-bold hover:bg-gray-200 transition-all uppercase tracking-widest rounded-full disabled:opacity-50">Cancel</button>
-                                <button onClick={confirmDelete} disabled={loading} className="flex-1 h-11 bg-red-500 text-white text-[11px] font-bold hover:bg-red-600 shadow-lg transition-all flex items-center justify-center gap-2 uppercase tracking-widest rounded-full disabled:opacity-50">{loading ? <Loader2 size={16} className="animate-spin" /> : 'Delete Now'}</button>
-                            </div>
-                        </div>
-                        <div className="bg-gray-50 py-3 border-t border-gray-200"><span className="text-[9px] text-gray-400 font-bold uppercase tracking-widest block text-center">Security Verification Required</span></div>
-                    </div>
-                </div>
-            )}
+            <ConfirmModal
+                isOpen={showDeleteConfirm}
+                onClose={() => setShowDeleteConfirm(false)}
+                onConfirm={confirmDelete}
+                title="Confirm Deletion"
+                message={`Are you sure you want to delete "${formData.Name || formData.Code}"?\nThis action is permanent and cannot be undone.`}
+                loading={loading}
+                confirmText="Delete Now"
+                variant="danger"
+            />
+
+            <CustomerTypeProfileBoard
+                isOpen={showTypeModal}
+                onClose={handleTypeModalClose}
+            />
+
+            <AreaProfileBoard
+                isOpen={showAreaModal}
+                onClose={handleAreaModalClose}
+            />
         </>
     );
 };

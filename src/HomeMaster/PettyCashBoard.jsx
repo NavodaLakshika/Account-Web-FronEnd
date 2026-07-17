@@ -143,15 +143,7 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
         }
     };
 
-    const handleSearchDocs = async () => {
-        try {
-            const docs = await pettyCashService.searchDocs(company);
-            setPastDocs(docs);
-            setShowDocSearchModal(true);
-        } catch (error) {
-            showErrorToast('Failed to fetch document history');
-        }
-    };
+    // Removed handleSearchDocs
 
     const handleLoadDoc = async (docNo) => {
         try {
@@ -199,10 +191,20 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
             
             fetchLookups(companyCode);
             handleGenerateDoc(companyCode);
+            fetchPastDocs(companyCode);
             setExpenseRows([{ id: Date.now(), accCode: '', costCode: '', amount: 0, memo: '' }]);
             setItemRows([{ id: Date.now(), prodCode: '', qty: 1, cost: 0, memo: '' }]);
         }
     }, [isOpen]);
+
+    const fetchPastDocs = async (compCode = company) => {
+        try {
+            const docs = await pettyCashService.searchDocs(compCode);
+            setPastDocs(docs || []);
+        } catch (error) {
+            // handle silently
+        }
+    };
 
     const handleExpenseRowUpdate = (id, field, value) => {
         setExpenseRows(prev => prev.map(row => row.id === id ? { ...row, [field]: value } : row));
@@ -321,6 +323,7 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
         setExpAccSearch('');
         setProdSearch('');
         handleGenerateDoc();
+        fetchPastDocs();
     };
 
     return (
@@ -342,21 +345,21 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                 footer={
                     <div className="bg-[#fcfcfc] px-6 py-4 w-full flex justify-between items-center border-t border-gray-200 rounded-b-[10px] shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]">
                         <div className="flex gap-3">
-                            <button onClick={() => setShowCustomerMasterBoard(true)} className="px-6 py-2 border border-indigo-300 text-indigo-600 bg-white hover:bg-indigo-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2">
+                            <button type="button" onClick={() => setShowCustomerMasterBoard(true)} className="px-6 h-10 border border-indigo-300 text-indigo-600 bg-white hover:bg-indigo-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2">
                                 <Users size={14} /> NEW CUSTOMER
                             </button>
-                            <button onClick={() => setShowAccountBoard(true)} className="px-6 py-2 border border-teal-300 text-teal-600 bg-white hover:bg-teal-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2">
+                            <button type="button" onClick={() => setShowAccountBoard(true)} className="px-6 h-10 border border-teal-300 text-teal-600 bg-white hover:bg-teal-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2">
                                 <Layers size={14} /> NEW ACCOUNT
                             </button>
                         </div>
                         <div className="flex gap-3">
-                            <button onClick={handleClear} className="px-6 py-2 border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2">
+                            <button type="button" onClick={handleClear} className="px-6 h-10 border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2">
                                 <RotateCcw size={14} /> CLEAR FORM
                             </button>
-                            <button onClick={handleSaveDraft} disabled={loading} className="px-6 py-2 border border-[#0285fd] text-[#0285fd] bg-white hover:bg-blue-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2">
+                            <button type="button" onClick={handleSaveDraft} disabled={loading} className="px-6 h-10 border border-[#0285fd] text-[#0285fd] bg-white hover:bg-blue-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2">
                                 {loading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />} SAVE DRAFT
                             </button>
-                            <button onClick={handleSave} disabled={loading} className={`px-6 py-2 bg-[#0285fd] hover:bg-[#0073ff] text-slate-800 dark:text-white font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                            <button type="button" onClick={handleSave} disabled={loading} className={`px-6 h-10 bg-[#0285fd] hover:bg-[#0073ff] text-white font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}>
                                 {loading ? <Loader2 size={14} className="animate-spin" /> : <CheckCircle size={14} />} APPLY
                             </button>
                         </div>
@@ -370,14 +373,28 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                             <div className="">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Doc No</label>
                                 <div className="relative">
-                                    <input
-                                        type="text"
+                                    <select
                                         name="docNo"
                                         value={formData.docNo}
-                                        readOnly
-                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
-                                        onClick={handleSearchDocs}
-                                     style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
+                                        onChange={(e) => {
+                                            const val = e.target.value;
+                                            if (val === 'NEW') {
+                                                handleClear();
+                                            } else if (val) {
+                                                handleLoadDoc(val);
+                                            }
+                                        }}
+                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 appearance-none font-bold"
+                                        style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
+                                    >
+                                        <option value={formData.docNo}>{formData.docNo} (Current)</option>
+                                        <option value="NEW">-- Create New Draft --</option>
+                                        {pastDocs.filter(d => d.docNo !== formData.docNo).map((d, i) => (
+                                            <option key={i} value={d.docNo}>
+                                                {d.docNo} - {d.payee || d.vendorId || '---'} - {parseFloat(d.billAmount || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                            </option>
+                                        ))}
+                                    </select>
                                 </div>
                             </div>
                             <div className="">
@@ -882,46 +899,7 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                 </div>
             </SimpleModal>
 
-            {/* Document Search Modal */}
-            <SimpleModal isOpen={showDocSearchModal} onClose={() => setShowDocSearchModal(false)} title={`Saved Drafts - ${pastDocs.length} Found`} maxWidth="max-w-[700px]">
-                <div className="flex flex-col h-full font-['Tahoma']">
-                    <div className="flex items-center gap-4 bg-slate-50 p-4 border-b border-gray-100 mb-2">
-                        <span className="text-[12px] font-bold text-gray-500 uppercase tracking-wider">Search Document / Payee</span>
-                        <input type="text" className="w-full h-10 px-4 border border-gray-300 rounded-[3px] outline-none text-sm focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white shadow-sm flex-1" value={docSearch} onChange={(e) => setDocSearch(e.target.value)} placeholder="Enter Doc No or Payee..." />
-                    </div>
-                    <div className="max-h-[50vh] overflow-y-auto no-scrollbar border border-gray-100 rounded-[5px] shadow-sm">
-                        <table className="w-full text-sm text-left">
-                            <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 z-10 shadow-sm">
-                                <tr>
-                                    <th className="border-b px-5 py-3">Doc No</th>
-                                    <th className="border-b px-5 py-3">Date</th>
-                                    <th className="border-b px-5 py-3">Payee / Vendor</th>
-                                    <th className="border-b text-right px-5 py-3">Amount</th>
-                                    <th className="border-b text-center w-24 px-5 py-3">Select</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-100">
-                                {pastDocs.filter(d => d.docNo?.toLowerCase().includes(docSearch.toLowerCase()) || d.payee?.toLowerCase().includes(docSearch.toLowerCase())).map((d, i) => (
-                                    <tr key={i} className="group hover:bg-blue-50/50  transition-all border-b border-gray-50 cursor-pointer group border-b border-gray-50">
-                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{d.docNo}</td>
-                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{formatDate(d.date)}</td>
-                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{d.payee || d.vendorId}</td>
-                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{d.billAmount?.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">
-                                            <button onClick={() => handleLoadDoc(d.docNo)} className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button>
-                                        </td>
-                                    </tr>
-                                ))}
-                                {pastDocs.length === 0 && (
-                                    <tr>
-                                        <td colSpan="5" className="text-center py-16 text-gray-400 text-[11px] font-bold uppercase tracking-widest">No saved drafts found.</td>
-                                    </tr>
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </SimpleModal>
+            {/* Document Search Modal removed */}
 
             {showDateModal && (
                 <CalendarModal

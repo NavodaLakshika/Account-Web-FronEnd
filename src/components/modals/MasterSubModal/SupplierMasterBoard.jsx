@@ -4,7 +4,6 @@ import TransactionFormWrapper from '../../../components/TransactionFormWrapper';
 import { Search, Save, RotateCcw, Trash2, CheckCircle, AlertTriangle, Loader2, FileText, Plus } from 'lucide-react';
 import { supplierService } from '../../../services/supplier.service';
 import { showSuccessToast, showErrorToast } from '../../../utils/toastUtils';
-import ConfirmModal from '../../../components/modals/ConfirmModal';
 import VendorTypesMasterBoard from '../../../pages/VendorTypesMasterBoard';
 
 const SupplierMasterBoard = ({ isOpen, onClose }) => {
@@ -169,7 +168,7 @@ const SupplierMasterBoard = ({ isOpen, onClose }) => {
                             <button
                                 onClick={handleDelete}
                                 disabled={!isEditMode || loading}
-                                className={`px-6 h-10 border border-transparent text-white bg-[#ef4444] hover:bg-[#dc2626] font-semibold rounded-[3px] shadow-[0_2px_10px_rgba(239,68,68,0.2)] hover:shadow-[0_4px_15px_rgba(239,68,68,0.3)] text-[13px] transition-all flex items-center gap-2 ${(!isEditMode || loading) ? 'opacity-40 cursor-not-allowed' : ''}`}
+                                className={`px-6 h-10 border-2 border-red-500 text-red-600 bg-white hover:bg-red-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2 ${(!isEditMode || loading) ? 'opacity-40 cursor-not-allowed' : ''}`}
                             >
                                 <Trash2 size={14} /> DELETE
                             </button>
@@ -355,16 +354,23 @@ const SupplierMasterBoard = ({ isOpen, onClose }) => {
 
 
 
-            <ConfirmModal
-                isOpen={showDeleteConfirm}
-                onClose={() => setShowDeleteConfirm(false)}
-                onConfirm={confirmDelete}
-                title="Confirm Deletion"
-                message={`Are you sure you want to delete "${formData.Supplier_Name || formData.Code}"?\nThis action is permanent and cannot be undone.`}
-                loading={loading}
-                confirmText="Delete Now"
-                variant="danger"
-            />
+            {showDeleteConfirm && (
+                <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4">
+                    <div className="absolute inset-0 bg-slate-900/30 backdrop-blur-sm" onClick={() => !loading && setShowDeleteConfirm(false)} />
+                    <div className="relative w-full max-w-md bg-white rounded-sm shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
+                        <div className="p-8 text-center">
+                            <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6 border-4 border-white shadow-lg"><AlertTriangle size={40} className="text-red-500" /></div>
+                            <h3 className="text-lg font-black text-slate-800 mb-2 uppercase tracking-wider">Confirm Deletion</h3>
+                            <p className="text-slate-500 text-[12px] font-medium leading-relaxed mb-8">Are you sure you want to delete <span className="font-bold text-slate-800 uppercase">"{formData.Supplier_Name || formData.Code}"</span>?<br />This action is permanent and cannot be undone.</p>
+                            <div className="flex gap-3">
+                                <button onClick={() => setShowDeleteConfirm(false)} disabled={loading} className="flex-1 h-11 bg-slate-100 text-slate-600 text-[11px] font-black rounded-[3px] hover:bg-slate-200 transition-all uppercase tracking-widest disabled:opacity-50">Cancel</button>
+                                <button onClick={confirmDelete} disabled={loading} className="flex-1 h-11 bg-red-500 text-white text-[11px] font-black rounded-[3px] hover:bg-red-600 shadow-lg shadow-red-200 transition-all flex items-center justify-center gap-2 uppercase tracking-widest disabled:opacity-50">{loading ? <Loader2 size={16} className="animate-spin" /> : 'Delete Now'}</button>
+                            </div>
+                        </div>
+                        <div className="bg-slate-50 py-3 border-t border-slate-100"><span className="text-[9px] text-slate-400 font-black uppercase tracking-[0.2em] block text-center">Security Verification Required</span></div>
+                    </div>
+                </div>
+            )}
 
             <VendorTypesMasterBoard 
                 isOpen={showVendorTypeModal} 

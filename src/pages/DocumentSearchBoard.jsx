@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
-import SimpleModal from '../components/SimpleModal';
 import ReportTemplate from '../components/ReportTemplate';
-import { Search, Calendar, X, User, List, RotateCcw, Play, MapPin , FileText} from 'lucide-react';
+import { Search, Calendar, RotateCcw, Play, FileText} from 'lucide-react';
 import { documentSearchService } from '../services/documentSearch.service';
 import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
 import CalendarModal from '../components/CalendarModal';
@@ -15,13 +14,11 @@ const DocumentSearchBoard = ({ isOpen, onClose }) => {
     const [results, setResults] = useState([]);
     
     const getInitialFormData = () => ({
-        allTransType: true,
         transType: '',
-        transLabel: 'ALL TYPES',
-        vendorType: 'customer',
+        vendorType: 'all',
         vendorId: '',
         vendorName: 'ALL ENTITIES',
-        payee: 'ALL PAYEES',
+        payee: '',
         useDate: false,
         dateFrom: new Date().toLocaleDateString('en-GB').split('/').reverse().join('-'),
         dateTo: new Date().toLocaleDateString('en-GB').split('/').reverse().join('-'),
@@ -34,14 +31,6 @@ const DocumentSearchBoard = ({ isOpen, onClose }) => {
     });
 
     const [formData, setFormData] = useState(getInitialFormData());
-
-    // Modals
-    const [showTransTypeModal, setShowTransTypeModal] = useState(false);
-    const [showVendorModal, setShowVendorModal] = useState(false);
-    const [showPayeeModal, setShowPayeeModal] = useState(false);
-    const [showCostCenterModal, setShowCostCenterModal] = useState(false);
-    
-    const [vendorSearch, setVendorSearch] = useState('');
     const [showCalFrom, setShowCalFrom] = useState(false);
     const [showCalTo, setShowCalTo] = useState(false);
     const [selectedDocReport, setSelectedDocReport] = useState(null);
@@ -82,17 +71,14 @@ const DocumentSearchBoard = ({ isOpen, onClose }) => {
         // Protect against accidental onClick={runSearch} event object passing
         const fd = (fdOrEvent && fdOrEvent.nativeEvent) ? formData : (fdOrEvent || formData);
         
-        if (!fd.transType && !fd.allTransType) return;
-        setResults([]); // Clear previous results immediately for visual feedback
+        setResults([]);
         setLoading(true);
         
-        // Add artificial delay so the UI loading state is visible (local API is too fast)
         await new Promise(r => setTimeout(r, 400));
         
         try {
             const searchParams = { ...fd, companyCode };
-            // Bypass strict ASP.NET validation if backend hasn't been recompiled yet
-            if (searchParams.allTransType && !searchParams.transType) {
+            if (!searchParams.transType) {
                 searchParams.transType = 'ALL';
             }
             const res = await documentSearchService.search(searchParams);
@@ -129,9 +115,12 @@ const DocumentSearchBoard = ({ isOpen, onClose }) => {
         setResults([]);
     };
 
-    const vendors = formData.vendorType === 'customer' ? (lookups.customers || []) : (lookups.suppliers || []);
-
-    // ── Shared style tokens are removed as we use direct classes ──
+    const dropdownStyle = {
+        backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`,
+        backgroundRepeat: 'no-repeat',
+        backgroundPosition: 'right 0.5rem center',
+        backgroundSize: '1em'
+    };
 
     return (
         <>
@@ -168,30 +157,34 @@ const DocumentSearchBoard = ({ isOpen, onClose }) => {
                             {/* Row 1 */}
                             <div className="col-span-4">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Trans Type</label>
-                                <div className="relative">
-                                    <input readOnly value={formData.allTransType ? 'ALL TYPES' : formData.transLabel} onClick={() => setShowTransTypeModal(true)} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700" />
-                                    <List className="absolute right-3 top-2.5 text-gray-500 pointer-events-none" size={18} />
-                                </div>
+                                <select value={formData.transType} onChange={e => set('transType', e.target.value)} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 appearance-none cursor-pointer" style={dropdownStyle}>
+                                    <option value="">ALL TYPES</option>
+                                    {lookups.transTypes.map((t, i) => (
+                                        <option key={i} value={t.iid || t.code || i}>{t.tr_Type || t.tr_type || t.tr_Name || t.name || t.iid}</option>
+                                    ))}
+                                </select>
                             </div>
                             <div className="col-span-4">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Vendor Type</label>
-                                <div className="flex items-center gap-6 h-10 px-4 border border-gray-300 rounded-[3px] bg-white">
-                                    <label className="flex items-center gap-2 cursor-pointer">
-                                        <input type="radio" checked={formData.vendorType === 'customer'} onChange={() => setFormData(p => ({ ...p, vendorType: 'customer', vendorId: '', vendorName: 'ALL ENTITIES' }))} className="w-4 h-4 text-[#0285fd] focus:ring-[#0285fd]" />
-                                        <span className="text-[14px] text-gray-700">Customer</span>
-                                    </label>
-                                    <label className="flex items-center gap-2 cursor-pointer">
-                                        <input type="radio" checked={formData.vendorType === 'supplier'} onChange={() => setFormData(p => ({ ...p, vendorType: 'supplier', vendorId: '', vendorName: 'ALL ENTITIES' }))} className="w-4 h-4 text-[#0285fd] focus:ring-[#0285fd]" />
-                                        <span className="text-[14px] text-gray-700">Supplier</span>
-                                    </label>
-                                </div>
+                                <select value={formData.vendorType} onChange={e => set('vendorType', e.target.value)} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 appearance-none cursor-pointer" style={dropdownStyle}>
+                                    <option value="all">ALL</option>
+                                    <option value="customer">CUSTOMER</option>
+                                    <option value="supplier">SUPPLIER</option>
+                                </select>
                             </div>
                             <div className="col-span-4">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Vendor</label>
-                                <div className="relative">
-                                    <input readOnly value={formData.vendorId ? `${formData.vendorId} — ${formData.vendorName}` : 'ALL ENTITIES'} onClick={() => setShowVendorModal(true)} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700 truncate" />
-                                    <Search className="absolute right-3 top-2.5 text-gray-500 pointer-events-none" size={18} />
-                                </div>
+                                <select value={formData.vendorId} onChange={e => {
+                                    const val = e.target.value;
+                                    const list = formData.vendorType === 'customer' ? lookups.customers : (formData.vendorType === 'supplier' ? lookups.suppliers : []);
+                                    const v = list.find(x => x.code === val);
+                                    setMultiple({ vendorId: val, vendorName: v ? v.name : 'ALL ENTITIES' });
+                                }} className={`w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] appearance-none cursor-pointer truncate ${formData.vendorType === 'all' ? 'bg-gray-100 text-gray-400' : 'bg-white text-gray-700'}`} style={dropdownStyle} disabled={formData.vendorType === 'all'}>
+                                    <option value="">ALL ENTITIES</option>
+                                    {(formData.vendorType === 'customer' ? lookups.customers : (formData.vendorType === 'supplier' ? lookups.suppliers : [])).map(v => (
+                                        <option key={v.code} value={v.code}>{v.code} - {v.name}</option>
+                                    ))}
+                                </select>
                             </div>
 
                             {/* Row 2 */}
@@ -209,19 +202,27 @@ const DocumentSearchBoard = ({ isOpen, onClose }) => {
                             </div>
                             <div className="col-span-3">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Cost Center</label>
-                                <div className="relative">
-                                    <input readOnly value={formData.costCenterName} onClick={() => setShowCostCenterModal(true)} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700 truncate" />
-                                    <MapPin className="absolute right-3 top-2.5 text-gray-500 pointer-events-none" size={18} />
-                                </div>
+                                <select value={formData.costCenter} onChange={e => {
+                                    const val = e.target.value;
+                                    const cc = lookups.costCenters.find(x => x.code === val);
+                                    setMultiple({ costCenter: val, costCenterName: cc ? cc.name : 'ALL CENTERS' });
+                                }} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 appearance-none cursor-pointer truncate" style={dropdownStyle}>
+                                    <option value="">ALL CENTERS</option>
+                                    {lookups.costCenters.map(cc => (
+                                        <option key={cc.code} value={cc.code}>{cc.code} - {cc.name}</option>
+                                    ))}
+                                </select>
                             </div>
 
                             {/* Row 3 */}
                             <div className="col-span-3">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Payee</label>
-                                <div className="relative">
-                                    <input readOnly value={formData.payee} onClick={() => setShowPayeeModal(true)} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700 truncate" />
-                                    <User className="absolute right-3 top-2.5 text-gray-500 pointer-events-none" size={18} />
-                                </div>
+                                <select value={formData.payee} onChange={e => set('payee', e.target.value)} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 appearance-none cursor-pointer truncate" style={dropdownStyle}>
+                                    <option value="">ALL PAYEES</option>
+                                    {lookups.payees.map(p => (
+                                        <option key={p} value={p}>{p}</option>
+                                    ))}
+                                </select>
                             </div>
                             <div className="col-span-3">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Period Filter</label>
@@ -316,156 +317,7 @@ const DocumentSearchBoard = ({ isOpen, onClose }) => {
                 </div>
             </TransactionFormWrapper>
 
-            {/* Vendor Modal */}
-            <SimpleModal isOpen={showVendorModal} onClose={() => setShowVendorModal(false)}
-                title={`${formData.vendorType === 'customer' ? 'Customer' : 'Supplier'} Directory Lookup`}
-                maxWidth="max-w-[700px]">
-                <div className="space-y-4 font-['Tahoma']">
-                    <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-[3px] border border-gray-200 mb-2">
-                        <span className="text-[12px] font-bold text-gray-500 uppercase tracking-widest shrink-0">Search Facility</span>
-                        <div className="relative flex-1">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
-                            <input
-                                type="text"
-                                placeholder={`Find ${formData.vendorType === 'customer' ? 'customer' : 'supplier'} by name or code...`}
-                                className="w-full h-10 pl-10 pr-4 border border-gray-300 rounded-[3px] outline-none text-[13px] focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] shadow-sm bg-white"
-                                value={vendorSearch}
-                                onChange={(e) => setVendorSearch(e.target.value)}
-                                autoFocus
-                            />
-                        </div>
-                    </div>
-                    <div className="border border-gray-200 rounded-[3px] overflow-hidden shadow-sm">
-                        <div className="max-h-[300px] overflow-y-auto no-scrollbar">
-                            <table className="w-full text-left">
-                                <thead className="bg-[#f8fafd] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-200">
-                                    <tr>
-                                        <th className="w-32 px-5 py-3">Code</th>
-                                        <th className=" px-5 py-3">Name</th>
-                                        <th className="text-right px-5 py-3">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-gray-50">
-                                    <tr className="group hover:bg-blue-50/50  transition-all cursor-pointer group border-b border-gray-50" onClick={() => { setMultiple({ vendorId: '', vendorName: 'ALL ENTITIES' }); setShowVendorModal(false); }}>
-                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3" colSpan={2}>-- ALL ENTITIES --</td>
-                                        <td className="text-right px-5 py-3">
-                                            <button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button>
-                                        </td>
-                                    </tr>
-                                    {vendors.filter(v => (v.name || '').toLowerCase().includes(vendorSearch.toLowerCase()) || (v.code || '').toLowerCase().includes(vendorSearch.toLowerCase()))
-                                        .map(v => (
-                                            <tr key={v.code} className="group hover:bg-blue-50/50  transition-all cursor-pointer group border-b border-gray-50" onClick={() => { setMultiple({ vendorId: v.code, vendorName: v.name }); setShowVendorModal(false); }}>
-                                                <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{v.code}</td>
-                                                <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{v.name}</td>
-                                                <td className="text-right px-5 py-3">
-                                                    <button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button>
-                                                </td>
-                                            </tr>
-                                        ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </SimpleModal>
 
-            {/* Trans Type Modal */}
-            <SimpleModal isOpen={showTransTypeModal} onClose={() => setShowTransTypeModal(false)} title="Select Category" maxWidth="max-w-[700px]">
-                <div className="border border-gray-200 rounded-[3px] overflow-hidden shadow-sm font-['Tahoma']">
-                    <div className="max-h-[300px] overflow-y-auto no-scrollbar">
-                        <table className="w-full text-left">
-                            <thead className="bg-[#f8fafd] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-200">
-                                <tr>
-                                    <th className=" px-5 py-3">Category Name</th>
-                                    <th className="text-right px-5 py-3">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-50">
-                                <tr key="all-types" className="group hover:bg-blue-50/50  transition-all cursor-pointer group border-b border-gray-50" onClick={() => { setMultiple({ transType: '', transLabel: 'ALL TYPES', allTransType: true }); setShowTransTypeModal(false); }}>
-                                    <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">ALL TYPES</td>
-                                    <td className="text-right px-5 py-3">
-                                        <button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button>
-                                    </td>
-                                </tr>
-                                {(lookups.transTypes || []).map((t, index) => (
-                                    <tr key={t.iid || index} className="group hover:bg-blue-50/50  transition-all cursor-pointer group border-b border-gray-50" onClick={() => { setMultiple({ transType: t.iid, transLabel: t.tr_Type || t.tr_type || t.tr_Name || t.name || t.iid, allTransType: false }); setShowTransTypeModal(false); }}>
-                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{t.tr_Type || t.tr_type || t.tr_Name || t.name || t.iid}</td>
-                                        <td className="text-right px-5 py-3">
-                                            <button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </SimpleModal>
-
-            {/* Payee Modal */}
-            <SimpleModal isOpen={showPayeeModal} onClose={() => setShowPayeeModal(false)} title="Select Payee" maxWidth="max-w-[700px]">
-                <div className="border border-gray-200 rounded-[3px] overflow-hidden shadow-sm font-['Tahoma']">
-                    <div className="max-h-[300px] overflow-y-auto no-scrollbar">
-                        <table className="w-full text-left">
-                            <thead className="bg-[#f8fafd] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-200">
-                                <tr>
-                                    <th className=" px-5 py-3">Payee Name</th>
-                                    <th className="text-right px-5 py-3">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-50">
-                                <tr className="group hover:bg-blue-50/50  transition-all cursor-pointer group border-b border-gray-50" onClick={() => { set('payee', 'ALL PAYEES'); setShowPayeeModal(false); }}>
-                                    <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">-- ALL PAYEES --</td>
-                                    <td className="text-right px-5 py-3">
-                                        <button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button>
-                                    </td>
-                                </tr>
-                                {(lookups.payees || []).map(p => (
-                                    <tr key={p} className="group hover:bg-blue-50/50  transition-all cursor-pointer group border-b border-gray-50" onClick={() => { set('payee', p); setShowPayeeModal(false); }}>
-                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{p}</td>
-                                        <td className="text-right px-5 py-3">
-                                            <button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </SimpleModal>
-
-            {/* Cost Center Modal */}
-            <SimpleModal isOpen={showCostCenterModal} onClose={() => setShowCostCenterModal(false)} title="Select Cost Center" maxWidth="max-w-[700px]">
-                <div className="border border-gray-200 rounded-[3px] overflow-hidden shadow-sm font-['Tahoma']">
-                    <div className="max-h-[300px] overflow-y-auto no-scrollbar">
-                        <table className="w-full text-left">
-                            <thead className="bg-[#f8fafd] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-200">
-                                <tr>
-                                    <th className="w-32 px-5 py-3">Code</th>
-                                    <th className=" px-5 py-3">Cost Center Name</th>
-                                    <th className="text-right px-5 py-3">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-50">
-                                <tr className="group hover:bg-blue-50/50  transition-all cursor-pointer group border-b border-gray-50" onClick={() => { setMultiple({ costCenter: '', costCenterName: 'ALL CENTERS' }); setShowCostCenterModal(false); }}>
-                                    <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3" colSpan={2}>-- ALL CENTERS --</td>
-                                    <td className="text-right px-5 py-3">
-                                        <button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button>
-                                    </td>
-                                </tr>
-                                {(lookups.costCenters || []).map(cc => (
-                                    <tr key={cc.code} className="group hover:bg-blue-50/50  transition-all cursor-pointer group border-b border-gray-50" onClick={() => { setMultiple({ costCenter: cc.code, costCenterName: cc.name }); setShowCostCenterModal(false); }}>
-                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{cc.code}</td>
-                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{cc.name}</td>
-                                        <td className="text-right px-5 py-3">
-                                            <button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </SimpleModal>
 
             <CalendarModal isOpen={showCalFrom} onClose={() => setShowCalFrom(false)} onDateSelect={d => { set('dateFrom', d); setShowCalFrom(false); }} initialDate={formData.dateFrom} />
             <CalendarModal isOpen={showCalTo} onClose={() => setShowCalTo(false)} onDateSelect={d => { set('dateTo', d); setShowCalTo(false); }} initialDate={formData.dateTo} />

@@ -47,15 +47,12 @@ const SalesInvoiceBoard = ({ isOpen, onClose }) => {
     const [isApplying, setIsApplying] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
     const [showCustomerSearch, setShowCustomerSearch] = useState(false);
-    const [showProductSearch, setShowProductSearch] = useState(false);
     const [showAddProductModal, setShowAddProductModal] = useState(false);
     const [customerSearchQuery, setCustomerSearchQuery] = useState('');
-    const [productSearchQuery, setProductSearchQuery] = useState('');
     const [showPayMethodSearch, setShowPayMethodSearch] = useState(false);
     const [showTaxAccSearch, setShowTaxAccSearch] = useState(false);
     const [payMethodSearchQuery, setPayMethodSearchQuery] = useState('');
-    const [showSOSearch, setShowSOSearch] = useState(false);
-    const [soSearchQuery, setSOSearchQuery] = useState('');
+
     const [showAssistantSearch, setShowAssistantSearch] = useState(false);
     const [assistantSearchQuery, setAssistantSearchQuery] = useState('');
     
@@ -131,7 +128,6 @@ const SalesInvoiceBoard = ({ isOpen, onClose }) => {
     const handleSelectSO = async (item) => {
         try {
             setFormData(prev => ({ ...prev, soNumber: item.docNo }));
-            setShowSOSearch(false);
             await salesInvoiceService.recallSO(formData.docNo, item.docNo, formData.company, formData.date);
             await handleSelectInvoice(formData.docNo);
             showSuccessToast(`Sales Order ${item.docNo} recalled.`);
@@ -379,7 +375,12 @@ const SalesInvoiceBoard = ({ isOpen, onClose }) => {
                             <div className="col-span-3">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">S.O. Number</label>
                                 <div className="relative">
-                                    <input type="text" readOnly value={formData.soNumber} onClick={() => setShowSOSearch(true)} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"  style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
+                                    <select value={formData.soNumber} onChange={e => { const item = lookups.salesOrders.find(o => o.docNo === e.target.value); if (item) handleSelectSO(item); }} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 appearance-none cursor-pointer truncate" style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}>
+                                        <option value="">-- Select SO --</option>
+                                        {(lookups.salesOrders || []).map((o, idx) => (
+                                            <option key={idx} value={o.docNo}>{o.docNo}</option>
+                                        ))}
+                                    </select>
                                 </div>
                             </div>
                             <div className="col-span-3">
@@ -789,60 +790,19 @@ const SalesInvoiceBoard = ({ isOpen, onClose }) => {
                 </div>
             </SimpleModal>
 
-            <SimpleModal isOpen={showSOSearch} onClose={() => setShowSOSearch(false)} title="Sales Order Archive" maxWidth="max-w-[700px]">
-                <div className="space-y-4 font-['Tahoma']">
-                    <div className="flex items-center gap-4 bg-slate-50 p-4 border-b border-gray-100 mb-2">
-                        <span className="text-[12px] font-bold text-gray-500 uppercase tracking-wider">Global Search</span>
-                        <div className="relative flex-1">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
-                            <input type="text" placeholder="Filter by document id or creation date..." className="w-full h-10 pl-10 pr-4 border border-gray-300 rounded-[3px] outline-none text-[13px] focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] shadow-sm bg-white" value={soSearchQuery} onChange={(e) => setSOSearchQuery(e.target.value)} />
-                        </div>
-                    </div>
-                    <div className="border border-gray-200 rounded-[3px] overflow-hidden shadow-sm max-h-[400px] overflow-y-auto no-scrollbar">
-                        <table className="w-full text-left">
-                            <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 shadow-sm z-10">
-                                <tr>
-                                    <th className=" px-5 py-3">Reference ID</th>
-                                    <th className=" px-5 py-3">Date</th>
-                                    <th className="text-center px-5 py-3">Status</th>
-                                    <th className="text-right px-5 py-3">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-50">
-                                {lookups.salesOrders
-                                    .filter(o => !soSearchQuery || o.docNo?.toLowerCase().includes(soSearchQuery.toLowerCase()) || o.date?.includes(soSearchQuery))
-                                    .length === 0 ? (
-                                    <tr><td colSpan="4" className="text-center py-16 text-gray-400 text-[11px] font-bold uppercase tracking-widest">Archive is currently empty</td></tr>
-                                ) : lookups.salesOrders
-                                    .filter(o => !soSearchQuery || o.docNo?.toLowerCase().includes(soSearchQuery.toLowerCase()) || o.date?.includes(soSearchQuery))
-                                    .map((order, i) => (
-                                    <tr key={i} className="group hover:bg-blue-50/50  transition-all cursor-pointer group border-b border-gray-50" onClick={() => handleSelectSO(order)}>
-                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{order.docNo}</td>
-                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{order.date?.split('T')[0]}</td>
-                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">
-                                            <span className={`px-2 py-0.5 rounded-[3px] text-[9px] font-black uppercase ${order.status === 'Applied' ? 'bg-blue-100 text-blue-600' : 'bg-orange-100 text-orange-600'}`}>
-                                                {order.status}
-                                            </span>
-                                        </td>
-                                        <td className="text-right px-5 py-3">
-                                            <button onClick={() => handleSelectSO(order)} className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">RECALL</button>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </SimpleModal>
+
 
             <SimpleModal isOpen={showAddProductModal} onClose={() => setShowAddProductModal(false)} title="Product Entry Terminal" maxWidth="max-w-[700px]">
                 <div className="space-y-4 font-['Tahoma']">
                     <div className="space-y-1.5">
                         <label className="text-[11px] font-black text-gray-400 uppercase tracking-widest">Product / Service</label>
-                        <div className="flex gap-2">
-                            <div className="relative flex-1">
-                                <input type="text" readOnly value={entry.prodName} placeholder="Tap Search to Catalog..." className="w-full h-10 border border-gray-300 rounded-[3px] px-4 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 shadow-sm appearance-none"  style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
-                            </div>
+                        <div className="relative">
+                            <select value={entry.prodCode} onChange={e => { const p = lookups.products.find(x => x.code === e.target.value); if (p) { setEntry({ ...entry, prodCode: p.code, prodName: p.name, unit: p.unit || '', price: (p.selling || '0').toString(), amount: (1 * (parseFloat(p.selling) || 0)).toFixed(2) }); setTimeout(() => qtyRef.current?.focus(), 50); } }} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 appearance-none cursor-pointer truncate shadow-sm" style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}>
+                                <option value="">-- Select Product --</option>
+                                {(lookups.products || []).map((p, idx) => (
+                                    <option key={idx} value={p.code}>{p.code} - {p.name}</option>
+                                ))}
+                            </select>
                         </div>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
@@ -863,56 +823,7 @@ const SalesInvoiceBoard = ({ isOpen, onClose }) => {
                 </div>
             </SimpleModal>
 
-            <SimpleModal isOpen={showProductSearch} onClose={() => setShowProductSearch(false)} title="Product Master File" maxWidth="max-w-[700px]">
-                <div className="space-y-4 font-['Tahoma']">
-                    <div className="flex items-center gap-4 bg-slate-50 p-4 border-b border-gray-100 mb-2">
-                        <span className="text-[12px] font-bold text-gray-500 uppercase tracking-wider">Search</span>
-                        <div className="relative flex-1">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
-                            <input type="text" className="w-full h-10 pl-10 pr-4 border border-gray-300 rounded-[3px] outline-none text-[13px] focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] shadow-sm bg-white" value={productSearchQuery} onChange={(e) => setProductSearchQuery(e.target.value)} autoFocus placeholder="Search by name or code..." />
-                        </div>
-                    </div>
-                    <div className="border border-gray-200 rounded-[3px] overflow-hidden shadow-sm max-h-[500px] overflow-y-auto no-scrollbar">
-                        <table className="w-full text-left">
-                            <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 shadow-sm z-10">
-                                <tr>
-                                    <th className=" px-5 py-3">Code</th>
-                                    <th className=" px-5 py-3">Name</th>
-                                    <th className="text-center px-5 py-3">Unit</th>
-                                    <th className="text-right px-5 py-3">Pur. Price</th>
-                                    <th className="text-right px-5 py-3">Sell. Price</th>
-                                    <th className="text-right px-5 py-3">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-50">
-                                {lookups.products.filter(p => !productSearchQuery || p.name?.toLowerCase().includes(productSearchQuery.toLowerCase()) || p.code?.toLowerCase().includes(productSearchQuery.toLowerCase())).map((p, i) => (
-                                    <tr key={i} className="group hover:bg-blue-50/50  transition-all cursor-pointer group border-b border-gray-50" onClick={() => {
-                                        setEntry({ 
-                                            ...entry, 
-                                            prodCode: p.code, 
-                                            prodName: p.name, 
-                                            unit: p.unit, 
-                                            price: p.selling || '0', 
-                                            amount: (1 * (p.selling || 0)).toFixed(2) 
-                                        });
-                                        setShowProductSearch(false);
-                                        setTimeout(() => qtyRef.current?.focus(), 50);
-                                    }}>
-                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{p.code}</td>
-                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{p.name}</td>
-                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{p.unit || 'Nos'}</td>
-                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{parseFloat(p.cost).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{parseFloat(p.selling).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                                        <td className="text-right px-5 py-3">
-                                            <button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </SimpleModal>
+
 
             <CalendarModal isOpen={showDatePicker} onClose={() => setShowDatePicker(false)} currentDate={formData[datePickerField]} onDateChange={(d) => { setFormData(prev => ({ ...prev, [datePickerField]: d })); setShowDatePicker(false); }} title="Select Date" />
             <ConfirmModal isOpen={showConfirmModal} onClose={() => setShowConfirmModal(false)} onConfirm={confirmApply} title="Confirm Final Application" message="Are you sure you want to apply this invoice to the ledger? This action will update inventory and accounting balances." isLoading={isApplying} />

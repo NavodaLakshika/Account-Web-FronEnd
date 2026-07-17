@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Search, RotateCcw, Save, Users, Loader2, AlertTriangle, Trash2 } from 'lucide-react';
+import { Search, RotateCcw, Save, Users, Loader2, Trash2, CheckCircle } from 'lucide-react';
 import TransactionFormWrapper from '../components/TransactionFormWrapper';
 import SimpleModal from '../components/SimpleModal';
 import { customerTypeService } from '../services/customerType.service';
 import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
+import ConfirmModal from '../components/modals/ConfirmModal';
 
 const CustomerTypeProfileBoard = ({ isOpen, onClose }) => {
     const initialState = { Code: '', Type_Name: '', Company: '', CurrentUser: '' };
@@ -68,14 +69,18 @@ const CustomerTypeProfileBoard = ({ isOpen, onClose }) => {
             <TransactionFormWrapper subtitle="Manage customer classification types" icon={null}
                 isOpen={isOpen} onClose={onClose} title="Customer Type Profile"
                 footer={
-                    <div className="bg-[#fcfcfc] px-6 py-5 w-full flex justify-between items-center border-t border-gray-200 rounded-b-[10px] shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]">
+                    <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-slate-200 rounded-b-[5px]">
                         <div className="flex gap-3">
-                            {isEditMode && <button onClick={handleDelete} className="px-6 h-10 border-2 border-red-500 text-red-600 bg-white hover:bg-red-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2"><Trash2 size={14} /> DELETE</button>}
-                            <button onClick={handleClear} className="px-6 h-10 border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2"><RotateCcw size={14} /> CLEAR</button>
+                            <button
+                                onClick={handleDelete}
+                                disabled={!isEditMode || loading}
+                                className={`px-6 h-10 border border-transparent text-white bg-[#ef4444] hover:bg-[#dc2626] font-semibold rounded-[3px] shadow-[0_2px_10px_rgba(239,68,68,0.2)] hover:shadow-[0_4px_15px_rgba(239,68,68,0.3)] text-[13px] transition-all flex items-center gap-2 ${(!isEditMode || loading) ? 'opacity-40 cursor-not-allowed' : ''}`}
+                            >
+                                <Trash2 size={14} /> DELETE
+                            </button>
+                            <button onClick={handleClear} className="px-6 h-10 border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center gap-2"><RotateCcw size={14} /> CLEAR</button>
                         </div>
-                        <div className="flex gap-3">
-                            <button onClick={handleSave} disabled={loading} className="px-6 h-10 bg-[#0285fd] hover:bg-[#0073ff] text-white font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2 disabled:opacity-50"><Save size={14} /> {isEditMode ? 'UPDATE' : 'SAVE'}</button>
-                        </div>
+                        <button onClick={handleSave} disabled={loading} className="px-6 h-10 bg-[#0285fd] hover:bg-[#0073ff] text-white font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center gap-2 disabled:opacity-50"><CheckCircle size={14} /> {isEditMode ? 'UPDATE & SAVE' : 'SAVE & APPLY'}</button>
                     </div>
                 }
             >
@@ -125,25 +130,16 @@ const CustomerTypeProfileBoard = ({ isOpen, onClose }) => {
                 </div>
             </TransactionFormWrapper>
 
-
-
-            {showDeleteConfirm && (
-                <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-slate-900/30 backdrop-blur-sm" onClick={() => !loading && setShowDeleteConfirm(false)} />
-                    <div className="relative w-full max-w-md bg-white rounded-sm shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
-                        <div className="p-8 text-center">
-                            <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6 border-4 border-white shadow-lg"><AlertTriangle size={40} className="text-red-500" /></div>
-                            <h3 className="text-lg font-black text-slate-800 mb-2 uppercase tracking-wider">Confirm Deletion</h3>
-                            <p className="text-slate-500 text-[12px] font-medium leading-relaxed mb-8">Are you sure you want to delete <span className="font-bold text-slate-800 uppercase">"{formData.Type_Name || formData.Code}"</span>?<br />This action is permanent and cannot be undone.</p>
-                            <div className="flex gap-3">
-                                <button onClick={() => setShowDeleteConfirm(false)} disabled={loading} className="flex-1 h-11 bg-slate-100 text-slate-600 text-[11px] font-black rounded-[3px] hover:bg-slate-200 transition-all uppercase tracking-widest disabled:opacity-50">Cancel</button>
-                                <button onClick={confirmDelete} disabled={loading} className="flex-1 h-11 bg-red-500 text-white text-[11px] font-black rounded-[3px] hover:bg-red-600 shadow-lg shadow-red-200 transition-all flex items-center justify-center gap-2 uppercase tracking-widest disabled:opacity-50">{loading ? <Loader2 size={16} className="animate-spin" /> : 'Delete Now'}</button>
-                            </div>
-                        </div>
-                        <div className="bg-slate-50 py-3 border-t border-slate-100"><span className="text-[9px] text-slate-400 font-black uppercase tracking-[0.2em] block text-center">Security Verification Required</span></div>
-                    </div>
-                </div>
-            )}
+            <ConfirmModal
+                isOpen={showDeleteConfirm}
+                onClose={() => setShowDeleteConfirm(false)}
+                onConfirm={confirmDelete}
+                title="Confirm Deletion"
+                message={`Are you sure you want to delete "${formData.Type_Name || formData.Code}"?\nThis action is permanent and cannot be undone.`}
+                loading={loading}
+                confirmText="Delete Now"
+                variant="danger"
+            />
         </>
     );
 };
