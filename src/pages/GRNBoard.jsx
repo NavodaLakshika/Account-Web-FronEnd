@@ -17,8 +17,6 @@ const GRNBoard = ({ isOpen, onClose }) => {
     const [showSearchModal, setShowSearchModal] = useState(false);
     const [showConfirmModal, setShowConfirmModal] = useState(false);
     const [isApplying, setIsApplying] = useState(false);
-    const [showSupplierSearch, setShowSupplierSearch] = useState(false);
-    const [showProductSearch, setShowProductSearch] = useState(false);
     const [showAddProductModal, setShowAddProductModal] = useState(false);
     const [showLockModal, setShowLockModal] = useState(false);
     const [isAddProductLocked, setIsAddProductLocked] = useState(false);
@@ -33,15 +31,10 @@ const GRNBoard = ({ isOpen, onClose }) => {
     }, [isOpen]);
 
     const [showItemMasterModal, setShowItemMasterModal] = useState(false);
-    const [showPOSearch, setShowPOSearch] = useState(false);
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [datePickerField, setDatePickerField] = useState('grnDate');
-    const [supplierSearchQuery, setSupplierSearchQuery] = useState('');
     const [productSearchQuery, setProductSearchQuery] = useState('');
-    const [poSearchQuery, setPOSearchQuery] = useState('');
     const [showExpenseSearch, setShowExpenseSearch] = useState(false);
-    const [showPayMethodSearch, setShowPayMethodSearch] = useState(false);
-    const [payMethodSearchQuery, setPayMethodSearchQuery] = useState('');
     const [orders, setOrders] = useState([]);
     const [showColumnSelector, setShowColumnSelector] = useState(false);
     const excelInputRef = useRef(null);
@@ -433,12 +426,6 @@ const GRNBoard = ({ isOpen, onClose }) => {
         }
     };
 
-    const currentSupplierName = useMemo(() => {
-        if (!formData.suppCode) return '';
-        const s = lookups.suppliers.find(x => x.code?.trim().toUpperCase() === formData.suppCode.trim().toUpperCase());
-        return s ? s.name : formData.suppCode;
-    }, [formData.suppCode, lookups.suppliers]);
-
     return (
         <>
             <style>
@@ -566,25 +553,23 @@ const GRNBoard = ({ isOpen, onClose }) => {
                             <div className="col-span-8">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Supplier</label>
                                 <div className="relative">
-                                    <input
-                                        type="text"
-                                        readOnly
-                                        value={currentSupplierName}
-                                        onClick={() => setShowSupplierSearch(true)}
-                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
-                                     style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
+                                    <select value={formData.suppCode} onChange={e => setFormData(prev => ({ ...prev, suppCode: e.target.value }))} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 appearance-none cursor-pointer truncate" style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}>
+                                        <option value="">-- Select Supplier --</option>
+                                        {lookups.suppliers.map(s => (
+                                            <option key={s.code} value={s.code?.trim()}>{s.code} - {s.name}</option>
+                                        ))}
+                                    </select>
                                 </div>
                             </div>
                             <div className="col-span-4">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">PO Number</label>
                                 <div className="relative">
-                                    <input
-                                        type="text"
-                                        readOnly
-                                        value={formData.poNo || ''}
-                                        onClick={() => setShowPOSearch(true)}
-                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
-                                     style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
+                                    <select value={formData.poNo || ''} onChange={e => handleSelectPO(e.target.value)} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 appearance-none cursor-pointer truncate" style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}>
+                                        <option value="">-- Select PO --</option>
+                                        {lookups.pos.map(p => (
+                                            <option key={p.docNo} value={p.docNo}>{p.docNo}</option>
+                                        ))}
+                                    </select>
                                 </div>
                             </div>
 
@@ -600,13 +585,12 @@ const GRNBoard = ({ isOpen, onClose }) => {
                             <div className="col-span-4">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Payment Method</label>
                                 <div className="relative">
-                                    <input
-                                        type="text"
-                                        readOnly
-                                        value={lookups.paymentMethods?.find(m => m.code === formData.payType)?.name || formData.payType || 'Select...'}
-                                        onClick={() => setShowPayMethodSearch(true)}
-                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
-                                     style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
+                                    <select value={formData.payType} onChange={e => setFormData(prev => ({ ...prev, payType: e.target.value }))} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 appearance-none cursor-pointer truncate" style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}>
+                                        <option value="">-- Select Payment Method --</option>
+                                        {(lookups.paymentMethods || []).map(m => (
+                                            <option key={m.code} value={m.code}>{m.code} - {m.name}</option>
+                                        ))}
+                                    </select>
                                 </div>
                             </div>
 
@@ -833,43 +817,7 @@ const GRNBoard = ({ isOpen, onClose }) => {
                 </div>
             </SimpleModal>
 
-            {/* Supplier Search Modal */}
-            <SimpleModal isOpen={showSupplierSearch} onClose={() => setShowSupplierSearch(false)} title="Supplier Directory Lookup" maxWidth="max-w-[700px]">
-                <div className="space-y-4 font-['Tahoma']">
-                    <div className="flex items-center gap-4 bg-slate-50 p-4 border-b border-gray-100 mb-2">
-                        <span className="text-[12px] font-bold text-gray-500 uppercase tracking-wider">Search Facility</span>
-                        <div className="relative flex-1">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
-                            <input type="text" placeholder="Find supplier by legal name or code..." className="w-full h-10 pl-10 pr-4 border border-gray-300 rounded-[3px] outline-none text-[13px] focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] shadow-sm bg-white" value={supplierSearchQuery} onChange={(e) => setSupplierSearchQuery(e.target.value)} autoFocus />
-                        </div>
-                    </div>
-                    <div className="border border-gray-200 rounded-[3px] overflow-hidden shadow-sm">
-                        <div className="max-h-[350px] overflow-y-auto no-scrollbar">
-                            <table className="w-full text-left">
-                                <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 shadow-sm z-10">
-                                    <tr>
-                                        <th className=" px-5 py-3">Code</th>
-                                        <th className=" px-5 py-3">Legal Name</th>
-                                        <th className="text-right px-5 py-3">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-gray-50">
-                                    {lookups.suppliers.filter(s => s.name?.toLowerCase().includes(supplierSearchQuery.toLowerCase()) || s.code?.toLowerCase().includes(supplierSearchQuery.toLowerCase())).map((s) => (
-                                        <tr key={s.code} className="group hover:bg-blue-50/50  transition-all cursor-pointer group border-b border-gray-50" onClick={() => { setFormData(prev => ({ ...prev, suppCode: s.code?.trim() })); setShowSupplierSearch(false); setSupplierSearchQuery(''); }}>
-                                            <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{s.code}</td>
-                                            <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{s.name}</td>
-                                            <td className="text-right px-5 py-3">
-                                                <button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                    {lookups.suppliers.filter(s => s.name?.toLowerCase().includes(supplierSearchQuery.toLowerCase()) || s.code?.toLowerCase().includes(supplierSearchQuery.toLowerCase())).length === 0 && <tr><td colSpan="3" className="text-center py-16 text-gray-400 text-[11px] font-bold uppercase tracking-widest">No suppliers found</td></tr>}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </SimpleModal>
+
 
             {/* Add Product Modal (Catalog) */}
             <SimpleModal isOpen={showAddProductModal} onClose={() => { setShowAddProductModal(false); setProductSearchQuery(''); }} title="Inventory Acquisition Portal" maxWidth="max-w-[700px]">
@@ -1043,102 +991,9 @@ const GRNBoard = ({ isOpen, onClose }) => {
                 </div>
             </SimpleModal>
 
-            {/* PO Search Modal */}
-            <SimpleModal isOpen={showPOSearch} onClose={() => setShowPOSearch(false)} title="Select Purchase Order Lookup" maxWidth="max-w-[700px]">
-                <div className="space-y-4 font-['Tahoma']">
-                    <div className="flex items-center gap-4 bg-slate-50 p-4 border-b border-gray-100 mb-2">
-                        <span className="text-[12px] font-bold text-gray-500 uppercase tracking-wider">Search Facility</span>
-                        <div className="relative flex-1">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
-                            <input type="text" placeholder="Filter active PO documents..." value={poSearchQuery} onChange={(e) => setPOSearchQuery(e.target.value)} className="w-full h-10 pl-10 pr-4 border border-gray-300 rounded-[3px] outline-none text-sm focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white shadow-sm" autoFocus />
-                        </div>
-                    </div>
-                    <div className="border border-gray-200 rounded-[3px] overflow-hidden shadow-sm">
-                        <div className="max-h-[350px] overflow-y-auto no-scrollbar">
-                            <table className="w-full text-left">
-                                <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 shadow-sm z-10">
-                                    <tr>
-                                        <th className=" px-5 py-3">Document ID</th>
-                                        <th className="text-right px-5 py-3">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-gray-50">
-                                    {lookups.pos.filter(p => p.docNo.toLowerCase().includes(poSearchQuery.toLowerCase())).map((p) => (
-                                        <tr key={p.docNo} className="group hover:bg-blue-50/50  transition-all cursor-pointer group border-b border-gray-50" onClick={() => handleSelectPO(p.docNo)}>
-                                            <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{p.docNo}</td>
-                                            <td className="text-right px-5 py-3">
-                                                <button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT ORDER</button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                    {lookups.pos.length === 0 && <tr><td colSpan="2" className="text-center py-16 text-gray-400 text-[11px] font-bold uppercase tracking-widest">No active orders available</td></tr>}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </SimpleModal>
 
-            {/* Payment Method Search Modal */}
-            <SimpleModal
-                isOpen={showPayMethodSearch}
-                onClose={() => {
-                    setShowPayMethodSearch(false);
-                    setPayMethodSearchQuery('');
-                }}
-                title="Payment Method Lookup"
-                maxWidth="max-w-[700px]"
-            >
-                <div className="space-y-4 font-['Tahoma']">
-                    <div className="flex items-center gap-4 bg-slate-50 p-4 border-b border-gray-100 mb-2">
-                        <span className="text-[12px] font-bold text-gray-500 uppercase tracking-wider">Search Facility</span>
-                        <div className="relative flex-1">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
-                            <input
-                                type="text"
-                                placeholder="Filter payment methods..."
-                                className="w-full h-10 pl-10 pr-4 border border-gray-300 rounded-[3px] outline-none text-[13px] focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] shadow-sm bg-white"
-                                value={payMethodSearchQuery}
-                                onChange={(e) => setPayMethodSearchQuery(e.target.value)}
-                                autoFocus
-                            />
-                        </div>
-                    </div>
-                    <div className="border border-gray-200 rounded-[3px] overflow-hidden shadow-sm">
-                        <div className="max-h-[300px] overflow-y-auto no-scrollbar">
-                            <table className="w-full text-left">
-                                <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 shadow-sm z-10">
-                                    <tr>
-                                        <th className=" px-5 py-3">Code</th>
-                                        <th className=" px-5 py-3">Method Title</th>
-                                    <th className="text-right px-5 py-3">Action</th></tr>
-                                </thead>
-                                <tbody className="divide-y divide-gray-50">
-                                    {(lookups.paymentMethods || [])
-                                        .filter(m => !payMethodSearchQuery || m.name.toLowerCase().includes(payMethodSearchQuery.toLowerCase()) || m.code.toLowerCase().includes(payMethodSearchQuery.toLowerCase()))
-                                        .map(m => (
-                                            <tr key={m.code} className="group hover:bg-blue-50/50  transition-all cursor-pointer group border-b border-gray-50" onClick={() => {
-                                                setFormData(prev => ({ ...prev, payType: m.code }));
-                                                setShowPayMethodSearch(false);
-                                                setPayMethodSearchQuery('');
-                                            }}>
-                                                <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{m.code}</td>
-                                                <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{m.name}</td>
-                                            
-                                            <td className="text-right px-5 py-3"><button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button></td>
-                                        </tr>
-                                        ))}
-                                    {(lookups.paymentMethods || []).length === 0 && (
-                                        <tr>
-                                            <td colSpan="2" className="text-center py-16 text-gray-400 text-[11px] font-bold uppercase tracking-widest">No methods found</td>
-                                        </tr>
-                                    )}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </SimpleModal>
+
+
 
             {/* Expense Account Search Modal */}
             <SimpleModal

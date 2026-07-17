@@ -1,63 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import SimpleModal from '../components/SimpleModal';
 import CalendarModal from '../components/CalendarModal';
-import { Search, X, RotateCcw, Loader2, Landmark, Calendar, CheckSquare, Square, Filter, Banknote, ListChecks, CheckCircle2, ChevronRight, CornerDownRight, CheckCircle, FileText } from 'lucide-react';
+import { Search, X, RotateCcw, Loader2, Landmark, Calendar, CheckSquare, Square, Filter, Banknote, ListChecks, CheckCircle2, ChevronRight, CornerDownRight, CheckCircle, FileText, Plus } from 'lucide-react';
 import { bankingService } from '../services/banking.service';
 
 import { getSessionData } from '../utils/session';
 import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
 import TransactionFormWrapper from '../components/TransactionFormWrapper';
+import DepartmentProfileBoard from './DepartmentProfileBoard';
 
-const SearchModal = ({ isOpen, onClose, title, items, onSelect }) => {
-  const [q, setQ] = useState('');
-  if (!isOpen) return null;
-  const filtered = (items || []).filter(i => (i.name || '').toLowerCase().includes(q.toLowerCase()) || (i.code || '').toLowerCase().includes(q.toLowerCase()));
-
-  return (
-    <SimpleModal isOpen={isOpen} onClose={onClose} title={title}>
-      <div className="space-y-4">
-        <div className="p-4 bg-slate-50 border-b border-gray-200">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
-            <input
-              autoFocus
-              value={q}
-              onChange={e => setQ(e.target.value)}
-              className="w-full h-10 pl-10 pr-4 border border-gray-300 rounded-[3px] outline-none text-[13px] focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] shadow-sm bg-white"
-            />
-          </div>
-        </div>
-        <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm">
-          <div className="max-h-[350px] overflow-y-auto no-scrollbar">
-            <table className="w-full text-left">
-              <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 shadow-sm z-10">
-                <tr>
-                  <th className=" px-5 py-3">Code</th>
-                  <th className=" px-5 py-3">Name</th>
-                  <th className="text-right px-5 py-3">Action</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {filtered.map((item, i) => (
-                  <tr key={i} onClick={() => { onSelect(item); onClose(); }} className="group hover:bg-blue-50/50  transition-all cursor-pointer group border-b border-gray-50">
-                    <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{item.code || 'N/A'}</td>
-                    <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{item.name}</td>
-                    <td className="text-right px-5 py-3">
-                      <button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button>
-                    </td>
-                  </tr>
-                ))}
-                {filtered.length === 0 && (
-                  <tr><td colSpan="3" className="text-center py-16 text-gray-400 text-[11px] font-bold uppercase tracking-widest">No matching records found</td></tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </SimpleModal>
-  );
-};
+// SearchModal removed
 
 const CollectionToDepositBoard = ({ isOpen, onClose, onComplete }) => {
   const [loading, setLoading] = useState(false);
@@ -86,6 +38,7 @@ const CollectionToDepositBoard = ({ isOpen, onClose, onComplete }) => {
   const [activeModal, setActiveModal] = useState(null);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [datePickerField, setDatePickerField] = useState('dateFrom');
+  const [showDeptBoard, setShowDeptBoard] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
@@ -254,36 +207,65 @@ const CollectionToDepositBoard = ({ isOpen, onClose, onComplete }) => {
               <div className="col-span-4">
                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Cost Center</label>
                 <div className="relative">
-                  <input
-                    type="text" readOnly
-                    value={formData.costCenterName || ''}
-                    onClick={() => setActiveModal('costCenter')}
+                  <select
+                    value={formData.costCenter || ''}
+                    onChange={(e) => {
+                      const sel = lookups.costCenters.find(c => c.code === e.target.value);
+                      setFormData({ ...formData, costCenter: sel?.code || '', costCenterName: sel?.name || '' });
+                    }}
                     className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
-                   style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
+                   style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
+                  >
+                    <option value="">Select cost center...</option>
+                    {(lookups.costCenters || []).map((c, i) => (
+                      <option key={i} value={c.code}>{c.code} - {c.name}</option>
+                    ))}
+                  </select>
                 </div>
               </div>
 
               <div className="col-span-4">
                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Pay Type</label>
                 <div className="relative">
-                  <input
-                    type="text" readOnly
+                  <select
                     value={formData.paymentMode || ''}
-                    onClick={() => setActiveModal('paymentMode')}
+                    onChange={(e) => setFormData({ ...formData, paymentMode: e.target.value })}
                     className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
-                   style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
+                   style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
+                  >
+                    <option value="">Select pay type...</option>
+                    {(lookups.paymentModes || []).map((p, i) => (
+                      <option key={i} value={p.name}>{p.name}</option>
+                    ))}
+                  </select>
                 </div>
               </div>
 
               <div className="col-span-4">
                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Dept Unit</label>
-                <div className="relative">
-                  <input
-                    type="text" readOnly
-                    value={formData.departmentName || ''}
-                    onClick={() => setActiveModal('dept')}
-                    className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
-                   style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
+                <div className="flex gap-2 relative">
+                  <select
+                    value={formData.department || ''}
+                    onChange={(e) => {
+                      const sel = lookups.departments.find(d => d.code === e.target.value);
+                      setFormData({ ...formData, department: sel?.code || '', departmentName: sel?.name || '' });
+                    }}
+                    className="flex-1 h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
+                   style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
+                  >
+                    <option value="">Select department...</option>
+                    {(lookups.departments || []).map((d, i) => (
+                      <option key={i} value={d.code}>{d.code} - {d.name}</option>
+                    ))}
+                  </select>
+                  <button 
+                    type="button" 
+                    onClick={() => setShowDeptBoard(true)} 
+                    className="h-10 w-10 flex-shrink-0 bg-emerald-100 text-emerald-600 hover:bg-emerald-500 hover:text-white rounded-[3px] flex items-center justify-center transition-colors relative"
+                    title="Create Department"
+                  >
+                    <Plus size={18} strokeWidth={3} />
+                  </button>
                 </div>
               </div>
 
@@ -292,16 +274,24 @@ const CollectionToDepositBoard = ({ isOpen, onClose, onComplete }) => {
                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Customer</label>
                 <div className="flex items-center gap-3">
                   <label className="flex items-center gap-2 cursor-pointer select-none">
-                    <input type="checkbox" id="chkCustomer" checked={formData.customerReceipt} onChange={e => setFormData({ ...formData, customerReceipt: e.target.checked })} className="w-4 h-4 rounded border-gray-300 text-[#0285fd] focus:ring-[#0285fd]" />
+                    <input type="checkbox" id="chkCustomer" checked={formData.customerReceipt} onChange={e => setFormData({ ...formData, customerReceipt: e.target.checked, customerId: '', customerName: '' })} className="w-4 h-4 rounded border-gray-300 text-[#0285fd] focus:ring-[#0285fd]" />
                     <span className="text-[13px] font-medium text-gray-700">Enable Customer Filter</span>
                   </label>
                   <div className={`relative flex-1 ${!formData.customerReceipt ? 'opacity-40 pointer-events-none' : ''}`}>
-                    <input
-                      type="text" readOnly
-                      value={formData.customerName || ''}
-                      onClick={() => setActiveModal('customer')}
+                    <select
+                      value={formData.customerId || ''}
+                      onChange={(e) => {
+                        const sel = lookups.customers.find(c => c.code === e.target.value);
+                        setFormData({ ...formData, customerId: sel?.code || '', customerName: sel?.name || '' });
+                      }}
                       className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
-                     style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
+                     style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
+                    >
+                      <option value="">Select customer...</option>
+                      {(lookups.customers || []).map((c, i) => (
+                        <option key={i} value={c.code}>{c.code} - {c.name}</option>
+                      ))}
+                    </select>
                   </div>
                 </div>
               </div>
@@ -403,25 +393,10 @@ const CollectionToDepositBoard = ({ isOpen, onClose, onComplete }) => {
         </div>
       </TransactionFormWrapper>
 
-      <SearchModal
-        isOpen={activeModal !== null}
-        onClose={() => setActiveModal(null)}
-        title={
-          activeModal === 'costCenter' ? 'Cost Center Registry Lookup' :
-            activeModal === 'paymentMode' ? 'Payment Method Directory' :
-              activeModal === 'customer' ? 'Client / Customer Master' :
-                'Departmental Unit Directory'
-        }
-        items={activeModal === 'costCenter' ? lookups.costCenters : activeModal === 'paymentMode' ? lookups.paymentModes : activeModal === 'customer' ? lookups.customers : lookups.departments}
-        onSelect={(item) => {
-          if (activeModal === 'costCenter') setFormData({ ...formData, costCenter: item.code, costCenterName: item.name });
-          if (activeModal === 'paymentMode') setFormData({ ...formData, paymentMode: item.name });
-          if (activeModal === 'customer') setFormData({ ...formData, customerId: item.code, customerName: item.name });
-          if (activeModal === 'dept') setFormData({ ...formData, department: item.code, departmentName: item.name });
-        }}
-      />
-
+      {/* Removed old SearchModal */}
+      
       <CalendarModal isOpen={showDatePicker} onClose={() => setShowDatePicker(false)} onDateSelect={handleDateSelect} initialDate={formData[datePickerField]} />
+      <DepartmentProfileBoard isOpen={showDeptBoard} onClose={() => { setShowDeptBoard(false); loadInitialData(companyCode); }} />
     </>
   );
 };

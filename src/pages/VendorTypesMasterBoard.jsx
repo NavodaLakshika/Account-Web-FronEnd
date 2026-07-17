@@ -1,16 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { Search, RotateCcw, Save, Building2, Loader2, AlertTriangle } from 'lucide-react';
+import { Search, RotateCcw, Save, Building2, Loader2, Trash2, CheckCircle } from 'lucide-react';
 import TransactionFormWrapper from '../components/TransactionFormWrapper';
 import SimpleModal from '../components/SimpleModal';
 import { vendorTypeService } from '../services/vendorType.service';
 import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
 import SearchableSelect from '../components/SearchableSelect';
+import ConfirmModal from '../components/modals/ConfirmModal';
 
 const VendorTypesMasterBoard = ({ isOpen, onClose }) => {
     const initialState = { VendorType: '', PaybleAccCode: '', PaybleAccName: '', CurrentUser: '', Company: '', Loca: '01' };
 
     const [formData, setFormData] = useState(initialState);
     const [loading, setLoading] = useState(false);
+    const [isEditMode, setIsEditMode] = useState(false);
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [showVendorModal, setShowVendorModal] = useState(false);
     const [showAccModal, setShowAccModal] = useState(false);
     const [vendors, setVendors] = useState([]);
@@ -43,6 +46,7 @@ const VendorTypesMasterBoard = ({ isOpen, onClose }) => {
             const details = await vendorTypeService.getDetails(vt.vendorTypes);
             setFormData(prev => ({ ...prev, PaybleAccName: details.paybleAccName }));
         } catch (e) { setFormData(prev => ({ ...prev, PaybleAccName: '' })); }
+        setIsEditMode(true);
         setShowVendorModal(false);
     };
 
@@ -63,7 +67,14 @@ const VendorTypesMasterBoard = ({ isOpen, onClose }) => {
         } catch (error) { showErrorToast(typeof error === 'string' ? error : (error.message || 'Failed to save')); } finally { setLoading(false); }
     };
 
-    const handleClear = () => { setFormData({ ...initialState, CurrentUser: formData.CurrentUser, Company: formData.Company }); };
+    const handleClear = () => { setFormData({ ...initialState, CurrentUser: formData.CurrentUser, Company: formData.Company }); setIsEditMode(false); };
+
+    const handleDelete = () => { if (!isEditMode || !formData.VendorType) return; setShowDeleteConfirm(true); };
+
+    const confirmDelete = async () => {
+        setLoading(true);
+        try { await vendorTypeService.delete(formData.VendorType); showSuccessToast('Vendor Type deleted'); handleClear(); setShowDeleteConfirm(false); fetchInitialData(); } catch (err) { showErrorToast(err.message || err); } finally { setLoading(false); }
+    };
 
     const filteredVendors = vendors.filter(v => (v.vendorTypes || '').toLowerCase().includes(vendorSearchTerm.toLowerCase()));
     const filteredAccounts = accounts.filter(a => (a.sub_Acc_Name || '').toLowerCase().includes(accSearchTerm.toLowerCase()) || (a.sub_Code || '').toLowerCase().includes(accSearchTerm.toLowerCase()));
@@ -73,13 +84,18 @@ const VendorTypesMasterBoard = ({ isOpen, onClose }) => {
             <TransactionFormWrapper subtitle="Manage vendor type classifications" icon={null}
                 isOpen={isOpen} onClose={onClose} title="Vendor Types Master"
                 footer={
-                    <div className="bg-[#fcfcfc] px-6 py-5 w-full flex justify-between items-center border-t border-gray-200 rounded-b-[10px] shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]">
+                    <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-slate-200 rounded-b-[5px]">
                         <div className="flex gap-3">
-                            <button onClick={handleClear} className="px-6 h-10 border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2"><RotateCcw size={14} /> CLEAR</button>
+                            <button
+                                onClick={handleDelete}
+                                disabled={!isEditMode || loading}
+                                className={`px-6 h-10 border border-transparent text-white bg-[#ef4444] hover:bg-[#dc2626] font-semibold rounded-[3px] shadow-[0_2px_10px_rgba(239,68,68,0.2)] hover:shadow-[0_4px_15px_rgba(239,68,68,0.3)] text-[13px] transition-all flex items-center gap-2 ${(!isEditMode || loading) ? 'opacity-40 cursor-not-allowed' : ''}`}
+                            >
+                                <Trash2 size={14} /> DELETE
+                            </button>
+                            <button onClick={handleClear} className="px-6 h-10 border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center gap-2"><RotateCcw size={14} /> CLEAR</button>
                         </div>
-                        <div className="flex gap-3">
-                            <button onClick={handleSave} disabled={loading} className="px-6 h-10 bg-[#0285fd] hover:bg-[#0073ff] text-white font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2 disabled:opacity-50"><Save size={14} /> SAVE</button>
-                        </div>
+                        <button onClick={handleSave} disabled={loading} className="px-6 h-10 bg-[#0285fd] hover:bg-[#0073ff] text-white font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center gap-2 disabled:opacity-50"><CheckCircle size={14} /> SAVE</button>
                     </div>
                 }
             >
@@ -99,7 +115,18 @@ const VendorTypesMasterBoard = ({ isOpen, onClose }) => {
                                         type="text"
                                         list="vendorTypesList"
                                         value={formData.VendorType} 
-                                        onChange={(e) => setFormData(prev => ({ ...prev, VendorType: e.target.value.toUpperCase() }))}
+                                        onChange={(e) => {
+                                            const val = e.target.value.toUpperCase();
+                                            const found = vendors.find(v => (v.vendorTypes || '').toUpperCase() === val);
+                                            setFormData(prev => ({ ...prev, VendorType: val }));
+                                            setIsEditMode(!!found);
+                                            if (found) {
+                                                setFormData(prev => ({ ...prev, VendorType: found.vendorTypes, PaybleAccCode: found.paybleAccCode }));
+                                                vendorTypeService.getDetails(found.vendorTypes).then(details => {
+                                                    setFormData(prev => ({ ...prev, PaybleAccName: details.paybleAccName }));
+                                                }).catch(() => {});
+                                            }
+                                        }}
                                         placeholder="Select or type vendor type..."
                                         className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 uppercase"
                                     />
@@ -198,6 +225,16 @@ const VendorTypesMasterBoard = ({ isOpen, onClose }) => {
                 </div>
             </SimpleModal>
 
+            <ConfirmModal
+                isOpen={showDeleteConfirm}
+                onClose={() => setShowDeleteConfirm(false)}
+                onConfirm={confirmDelete}
+                title="Confirm Deletion"
+                message={`Are you sure you want to delete "${formData.VendorType}"?\nThis action is permanent and cannot be undone.`}
+                loading={loading}
+                confirmText="Delete Now"
+                variant="danger"
+            />
         </>
     );
 };

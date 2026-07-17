@@ -4,6 +4,7 @@ import { Target, Search, Trash2, RotateCcw, Save } from 'lucide-react';
 import { costCenterService } from '../services/costcenter.service';
 import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
 import TransactionFormWrapper from '../components/TransactionFormWrapper';
+import ConfirmModal from '../components/modals/ConfirmModal';
 
 const CostCenterProfileBoard = ({ isOpen, onClose }) => {
     const initialState = {
@@ -13,9 +14,15 @@ const CostCenterProfileBoard = ({ isOpen, onClose }) => {
     const [formData, setFormData] = useState(initialState);
     const [loading, setLoading] = useState(false);
     const [isEditMode, setIsEditMode] = useState(false);
-    const [showSearchModal, setShowSearchModal] = useState(false);
     const [costCentersList, setCostCentersList] = useState([]);
-    const [searchQuery, setSearchQuery] = useState('');
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
+    const fetchLookups = async (compCode) => {
+        try {
+            const data = await costCenterService.getAll(compCode);
+            setCostCentersList(data);
+        } catch (error) { console.error('Failed to load cost centers:', error); }
+    };
 
     useEffect(() => {
         if (isOpen) {
@@ -27,6 +34,7 @@ const CostCenterProfileBoard = ({ isOpen, onClose }) => {
             if (user) {
                 setFormData(prev => ({ ...prev, CurrentUser: user.emp_Name || user.empName || 'SYSTEM', Company: companyCode }));
             }
+            fetchLookups(companyCode);
         }
     }, [isOpen]);
 
@@ -44,29 +52,18 @@ const CostCenterProfileBoard = ({ isOpen, onClose }) => {
         setIsEditMode(false);
     };
 
-    const handleSearch = async () => {
-        setLoading(true);
-        setShowSearchModal(true);
-        try {
-            const data = await costCenterService.getAll(formData.Company);
-            setCostCentersList(data);
-        } catch (error) {
-            showErrorToast('Failed to load cost centers');
-        } finally {
-            setLoading(false);
+    const selectCostCenter = (code) => {
+        const item = costCentersList.find(c => (c.code || c.Code) === code);
+        if (item) {
+            setFormData({
+                Code: item.code || item.Code,
+                Name: item.name || item.Name,
+                Inactive: item.inactive || item.Inactive,
+                CurrentUser: formData.CurrentUser,
+                Company: formData.Company
+            });
+            setIsEditMode(true);
         }
-    };
-
-    const handleSelect = (item) => {
-        setFormData({
-            Code: item.code || item.Code,
-            Name: item.name || item.Name,
-            Inactive: item.inactive || item.Inactive,
-            CurrentUser: formData.CurrentUser,
-            Company: formData.Company
-        });
-        setIsEditMode(true);
-        setShowSearchModal(false);
     };
 
     const handleSave = async () => {
@@ -81,8 +78,10 @@ const CostCenterProfileBoard = ({ isOpen, onClose }) => {
                 showSuccessToast('Cost Center added successfully');
                 setFormData(prev => ({ ...prev, Code: data.code }));
                 setIsEditMode(true);
+                fetchLookups(formData.Company);
             } else if (data.message === 'updated') {
                 showSuccessToast('Cost Center updated successfully');
+                fetchLookups(formData.Company);
             }
         } catch (error) {
             showErrorToast(error.error || error.message || (typeof error === 'string' ? error : 'Failed to save'), { duration: 5000 });
@@ -91,14 +90,19 @@ const CostCenterProfileBoard = ({ isOpen, onClose }) => {
         }
     };
 
-    const handleDelete = async () => {
+    const handleDelete = () => {
         if (!isEditMode || !formData.Code) return;
-        if (!window.confirm(`Are you sure you want to delete cost center "${formData.Name}"?`)) return;
+        setShowDeleteConfirm(true);
+    };
+
+    const confirmDelete = async () => {
         setLoading(true);
         try {
             await costCenterService.delete(formData.Code, formData.Company);
             showSuccessToast('Cost Center deleted');
             handleClear();
+            fetchLookups(formData.Company);
+            setShowDeleteConfirm(false);
         } catch (error) {
             showErrorToast(error.error || error.message || 'Deletion failed');
         } finally {
@@ -115,11 +119,13 @@ const CostCenterProfileBoard = ({ isOpen, onClose }) => {
                 footer={
                     <div className="bg-[#fcfcfc] px-6 py-5 w-full flex justify-between items-center border-t border-gray-200 rounded-b-[10px] shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]">
                         <div className="flex gap-3">
-                            {isEditMode && (
-                                <button onClick={handleDelete} className="px-6 h-10 border-2 border-red-500 text-red-600 bg-white hover:bg-red-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2">
-                                    <Trash2 size={14} /> DELETE
-                                </button>
-                            )}
+                            <button
+                                onClick={handleDelete}
+                                disabled={!isEditMode || loading}
+                                className={`px-6 h-10 border border-transparent text-white bg-[#ef4444] hover:bg-[#dc2626] font-semibold rounded-[3px] shadow-[0_2px_10px_rgba(239,68,68,0.2)] hover:shadow-[0_4px_15px_rgba(239,68,68,0.3)] text-[13px] transition-all flex items-center gap-2 ${(!isEditMode || loading) ? 'opacity-40 cursor-not-allowed' : ''}`}
+                            >
+                                <Trash2 size={14} /> DELETE
+                            </button>
                             <button type="button" onClick={handleClear} className="px-6 h-10 border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2">
                                 <RotateCcw size={14} /> CLEAR
                             </button>
@@ -144,7 +150,25 @@ const CostCenterProfileBoard = ({ isOpen, onClose }) => {
                             <div className="col-span-6">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Cost Center ID</label>
                                 <div className="relative">
-                                    <input type="text" readOnly value={formData.Code} onClick={handleSearch} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 font-mono cursor-pointer appearance-none"  style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
+                                    <select
+                                        value={formData.Code}
+                                        onChange={(e) => {
+                                            if (e.target.value) {
+                                                selectCostCenter(e.target.value);
+                                            } else {
+                                                handleClear();
+                                            }
+                                        }}
+                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-blue-600 font-bold cursor-pointer appearance-none"
+                                        style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
+                                    >
+                                        <option value="">Auto Gen (New Cost Center)</option>
+                                        {costCentersList.map((c, i) => (
+                                            <option key={i} value={c.code || c.Code}>
+                                                {c.code || c.Code} - {c.name || c.Name}
+                                            </option>
+                                        ))}
+                                    </select>
                                 </div>
                             </div>
                             <div className="col-span-6">
@@ -162,35 +186,16 @@ const CostCenterProfileBoard = ({ isOpen, onClose }) => {
                 </div>
             </TransactionFormWrapper>
 
-            <SimpleModal isOpen={showSearchModal} onClose={() => setShowSearchModal(false)} title="Cost Center Search" maxWidth="max-w-[700px]">
-                <div className="space-y-4 font-['Tahoma']">
-                    <div className="flex items-center gap-4 bg-slate-50 p-4 border-b border-gray-100 mb-2">
-                        <span className="text-[12px] font-bold text-gray-500 uppercase tracking-wider">Search</span>
-                        <div className="relative flex-1">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
-                            <input type="text" placeholder="Find cost center..." className="w-full h-10 pl-10 pr-4 border border-gray-300 rounded-[3px] outline-none text-[13px] focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] shadow-sm bg-white" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} autoFocus />
-                        </div>
-                    </div>
-                    <div className="border border-gray-200 rounded-[3px] overflow-hidden shadow-sm max-h-[400px] overflow-y-auto no-scrollbar">
-                        <table className="w-full text-left">
-                            <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 shadow-sm z-10">
-                                <tr><th className=" px-5 py-3">Code</th><th className=" px-5 py-3">Cost Center Name</th><th className="text-right px-5 py-3">Action</th></tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-50">
-                                {costCentersList.filter(c => ((c.name || c.Name) || '').toLowerCase().includes(searchQuery.toLowerCase()) || ((c.code || c.Code) || '').toLowerCase().includes(searchQuery.toLowerCase())).map((c, i) => (
-                                    <tr key={i} className="group hover:bg-blue-50/50  transition-all cursor-pointer group border-b border-gray-50" onClick={() => handleSelect(c)}>
-                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{c.code || c.Code}</td>
-                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{c.name || c.Name}</td>
-                                        <td className="text-right px-5 py-3">
-                                            <button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </SimpleModal>
+            <ConfirmModal
+                isOpen={showDeleteConfirm}
+                onClose={() => setShowDeleteConfirm(false)}
+                onConfirm={confirmDelete}
+                title="Confirm Deletion"
+                message={`Are you sure you want to delete "${formData.Name || formData.Code}"?\nThis action is permanent and cannot be undone.`}
+                loading={loading}
+                confirmText="Delete Now"
+                variant="danger"
+            />
         </>
     );
 };

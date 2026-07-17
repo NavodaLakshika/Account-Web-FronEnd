@@ -43,13 +43,8 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
     const [showCustModal, setShowCustModal] = useState(false);
     const [custSearch, setCustSearch] = useState('');
     const [showPayTypeModal, setShowPayTypeModal] = useState(false);
-    const [showJobModal, setShowJobModal] = useState(false);
-    const [jobSearch, setJobSearch] = useState('');
     const [showSalesAsstModal, setShowSalesAsstModal] = useState(false);
     const [salesAsstSearch, setSalesAsstSearch] = useState('');
-    const [showProdModal, setShowProdModal] = useState(false);
-    const [prodSearch, setProdSearch] = useState('');
-    const [prodIndex, setProdIndex] = useState(null);
     const [orderSearch, setOrderSearch] = useState('');
     const [showDateModal, setShowDateModal] = useState(false);
     const [showDueDateModal, setShowDueDateModal] = useState(false);
@@ -88,22 +83,7 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
         }
     };
 
-    useEffect(() => {
-        const fetchProducts = async () => {
-            if (!showProdModal) return;
-            if (!prodSearch || prodSearch.length < 2) return;
-            try {
-                const results = await grnService.searchProducts(prodSearch);
-                setLookups(prev => ({ ...prev, products: results.map(p => ({
-                    code: p.code, name: p.name, unit: p.unit || '', cost: p.price || 0, selling: p.sellingPrice || 0
-                })) }));
-            } catch (error) {
-                console.error("Search failed", error);
-            }
-        };
-        const timer = setTimeout(fetchProducts, 300);
-        return () => clearTimeout(timer);
-    }, [prodSearch, showProdModal, company]);
+
 
     const totals = useMemo(() => {
         const sumQty = rows.reduce((acc, row) => acc + (parseFloat(row.qty) || 0), 0);
@@ -304,7 +284,12 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
                             <div className="col-span-3">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Job No</label>
                                 <div className="relative">
-                                    <input type="text" readOnly value={formData.jobNo} onClick={() => setShowJobModal(true)} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"  style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
+                                    <select value={formData.jobNo} onChange={e => setFormData(prev => ({ ...prev, jobNo: e.target.value }))} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 appearance-none cursor-pointer truncate" style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}>
+                                        <option value="-NO-">-NO-</option>
+                                        {(lookups.jobs || []).map((j, idx) => (
+                                            <option key={idx} value={j}>{j}</option>
+                                        ))}
+                                    </select>
                                 </div>
                             </div>
                             <div className="col-span-3">
@@ -429,9 +414,12 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
                                     {rows.map((row, idx) => (
                                         <tr key={row.id} className="text-[12px] font-bold text-gray-700 border-b border-gray-50 hover:bg-slate-50/30 transition-colors">
                                             <td className="px-2 py-1">
-                                                <div className="flex gap-1 items-center">
-                                                    <input type="text" readOnly value={row.prodCode} onClick={() => { setProdIndex(idx); setShowProdModal(true); }} className="w-full h-8 border border-gray-200 rounded-[3px] px-2 text-[12px] font-mono text-blue-700 bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer appearance-none" placeholder="Select"  style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
-                                                </div>
+                                                <select value={row.prodCode} onChange={e => handleRowChange(row.id, 'prodCode', e.target.value)} className="w-full h-8 border border-gray-200 rounded-[3px] px-2 text-[12px] font-mono text-blue-700 bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] appearance-none cursor-pointer truncate" style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}>
+                                        <option value="">-- Select --</option>
+                                        {(lookups.products || []).map((p, idx) => (
+                                            <option key={idx} value={p.code}>{p.code} - {p.name}</option>
+                                        ))}
+                                    </select>
                                             </td>
                                             <td className="px-3 py-2.5 truncate">{row.prodName}</td>
                                             <td className="px-3 py-2.5 text-center text-gray-400">{row.unit}</td>
@@ -583,40 +571,7 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
                 </div>
             </SimpleModal>
 
-            <SimpleModal isOpen={showJobModal} onClose={() => setShowJobModal(false)} title="Job Directory" maxWidth="max-w-[700px]">
-                <div className="space-y-4 font-['Tahoma']">
-                    <div className="flex items-center gap-4 bg-slate-50 p-4 border-b border-gray-100 mb-2">
-                        <span className="text-[12px] font-bold text-gray-500 uppercase tracking-wider">Search Facility</span>
-                        <div className="relative flex-1">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
-                            <input type="text" className="w-full h-10 pl-10 pr-4 border border-gray-300 rounded-[3px] outline-none text-[13px] focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] shadow-sm bg-white" value={jobSearch} onChange={(e) => setJobSearch(e.target.value)} autoFocus placeholder="Search..." />
-                        </div>
-                    </div>
-                    <div className="border border-gray-200 rounded-[3px] overflow-hidden shadow-sm max-h-[300px] overflow-y-auto no-scrollbar">
-                        <table className="w-full text-left">
-                            <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 shadow-sm z-10">
-                                <tr><th className=" px-5 py-3">Job No</th><th className="text-right px-5 py-3">Action</th></tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-50">
-                                <tr className="group hover:bg-blue-50/50  transition-all cursor-pointer group border-b border-gray-50" onClick={() => { setFormData({ ...formData, jobNo: '-NO-' }); setShowJobModal(false); }}>
-                                    <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">-NO-</td>
-                                    <td className="text-right px-5 py-3">
-                                        <button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button>
-                                    </td>
-                                </tr>
-                                {lookups.jobs.filter(j => j.toLowerCase().includes(jobSearch.toLowerCase())).map((j, i) => (
-                                    <tr key={i} className="group hover:bg-blue-50/50  transition-all cursor-pointer group border-b border-gray-50" onClick={() => { setFormData({ ...formData, jobNo: j }); setShowJobModal(false); }}>
-                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{j}</td>
-                                        <td className="text-right px-5 py-3">
-                                            <button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </SimpleModal>
+
 
             <SimpleModal isOpen={showPayTypeModal} onClose={() => setShowPayTypeModal(false)} title="Payment Types" maxWidth="max-w-[700px]">
                 <div className="space-y-4 font-['Tahoma']">
@@ -641,48 +596,7 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
                 </div>
             </SimpleModal>
 
-            <SimpleModal isOpen={showProdModal} onClose={() => setShowProdModal(false)} title="Product Directory" maxWidth="max-w-[700px]">
-                <div className="space-y-4 font-['Tahoma']">
-                    <div className="flex items-center gap-4 bg-slate-50 p-4 border-b border-gray-100 mb-2">
-                        <span className="text-[12px] font-bold text-gray-500 uppercase tracking-wider">Search</span>
-                        <div className="relative flex-1">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
-                            <input type="text" className="w-full h-10 pl-10 pr-4 border border-gray-300 rounded-[3px] outline-none text-[13px] focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] shadow-sm bg-white" value={prodSearch} onChange={(e) => setProdSearch(e.target.value)} autoFocus placeholder="Search by name or code..." />
-                        </div>
-                    </div>
-                    <div className="border border-gray-200 rounded-[3px] overflow-hidden shadow-sm max-h-[500px] overflow-y-auto no-scrollbar">
-                        <table className="w-full text-left">
-                            <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 shadow-sm z-10">
-                                <tr>
-                                    <th className=" px-5 py-3">Code</th>
-                                    <th className=" px-5 py-3">Name</th>
-                                    <th className="text-center px-5 py-3">Unit</th>
-                                    <th className="text-right px-5 py-3">Pur. Price</th>
-                                    <th className="text-right px-5 py-3">Sell. Price</th>
-                                    <th className="text-right px-5 py-3">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-50">
-                                {lookups.products.map((p, i) => (
-                                    <tr key={i} className="group hover:bg-blue-50/50  transition-all cursor-pointer group border-b border-gray-50" onClick={() => {
-                                        if (prodIndex !== null) handleRowChange(rows[prodIndex].id, 'prodCode', p.code);
-                                        setShowProdModal(false);
-                                    }}>
-                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{p.code}</td>
-                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{p.name}</td>
-                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{p.unit || 'Nos'}</td>
-                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{parseFloat(p.cost).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{parseFloat(p.selling).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                                        <td className="text-right px-5 py-3">
-                                            <button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </SimpleModal>
+
 
             <SimpleModal isOpen={showSearchModal} onClose={() => { setShowSearchModal(false); setOrderSearch(''); }} title="Historical Document Directory" maxWidth="max-w-[700px]">
                 <div className="space-y-4 font-['Tahoma']">

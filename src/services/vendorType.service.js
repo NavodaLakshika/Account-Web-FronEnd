@@ -30,10 +30,19 @@ export const vendorTypeService = {
 
   async getDetails(vendorType) {
     try {
-      const response = await api.get(`/VendorTypeMaster/details/\${vendorType}`);
+      const response = await api.get(`/VendorTypeMaster/details/${vendorType}`);
       return response.data;
     } catch (error) {
       throw error.response?.data || 'Failed to fetch details';
+    }
+  },
+
+  async delete(vendorType) {
+    try {
+      const response = await api.delete(`/VendorTypeMaster/${vendorType}`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || 'Failed to delete vendor type';
     }
   }
 };

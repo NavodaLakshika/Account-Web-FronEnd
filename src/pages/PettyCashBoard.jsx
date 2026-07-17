@@ -65,8 +65,14 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
             const { companyCode } = getSessionData();
             loadLookups(companyCode); 
             generateDoc(companyCode); 
+            fetchSavedDocs(companyCode);
         }
     }, [isOpen]);
+
+    const fetchSavedDocs = async (cCode = company) => {
+        const docs = await pettyCashService.searchDocs(cCode).catch(()=>[]);
+        setSavedDocs(docs || []);
+    };
 
     const loadLookups = async (companyCode) => {
         try {
@@ -207,13 +213,11 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
         setLine({ accCode:'', accName:'', amount:'0.00', memo:'', costCode:'', costName:'', idNo:'0' });
         setItemLine({ itemId:'', itemName:'', qty:1, cost:'0.00', description:'', custJob:'', idNo:'0' });
         setForm(f => ({ ...f, isVendor:false, vendorId:'', vendorName:'', payee:'', location:'', memo:'', vouchNo:'', refNo:'', billAmount:'0.00', pettyAccCode:'', pettyAccName:'', costCenterFrom:'' }));
-        generateDoc();
+        generateDoc(company);
+        fetchSavedDocs(company);
     };
 
-    const openDocSearch = async () => {
-        const docs = await pettyCashService.searchDocs(company).catch(()=>[]);
-        setSavedDocs(docs || []); setShowDocSearch(true);
-    };
+    // Removed old openDocSearch
 
     const loadDraft = async (d) => {
         try {
@@ -279,14 +283,29 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                             <div className="">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Doc No</label>
                                 <div className="relative">
-                                    <input
-                                        type="text"
+                                    <select
                                         name="docNo"
                                         value={form.docNo}
-                                        readOnly
-                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
-                                        onClick={openDocSearch}
-                                     style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
+                                        onChange={(e) => {
+                                            const val = e.target.value;
+                                            if (val === 'NEW') {
+                                                handleClear();
+                                            } else if (val) {
+                                                const d = savedDocs.find(x => x.docNo === val);
+                                                if (d) loadDraft(d);
+                                            }
+                                        }}
+                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 appearance-none font-bold"
+                                        style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
+                                    >
+                                        <option value={form.docNo}>{form.docNo} (Current)</option>
+                                        <option value="NEW">-- Create New Draft --</option>
+                                        {savedDocs.filter(d => d.docNo !== form.docNo).map((d, idx) => (
+                                            <option key={idx} value={d.docNo}>
+                                                {d.docNo} - {d.payee || '---'} - {parseFloat(d.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                            </option>
+                                        ))}
+                                    </select>
                                 </div>
                             </div>
 
@@ -784,54 +803,7 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                 </div>
             </SimpleModal>
 
-            {/* Saved Drafts Search Modal */}
-            <SimpleModal isOpen={showDocSearch} onClose={() => setShowDocSearch(false)} title={`Saved Drafts - ${savedDocs.length} Found`} maxWidth="max-w-[700px]">
-                <div className="flex flex-col h-full font-['Tahoma']">
-                    <div className="flex items-center gap-4 bg-slate-50 p-4 border-b border-gray-100 mb-2">
-                        <span className="text-[12px] font-bold text-gray-500 uppercase tracking-wider">Search Facility</span>
-                        <input 
-                            type="text" 
-                            className="w-full h-10 px-4 border border-gray-300 rounded-[3px] outline-none text-sm focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white shadow-sm flex-1" 
-                            value={docSearchQuery} 
-                            onChange={(e) => setDocSearchQuery(e.target.value)} 
-                        />
-                    </div>
-                    <div className="max-h-[50vh] overflow-y-auto no-scrollbar border border-gray-100 rounded-[5px] shadow-sm">
-                        <table className="w-full text-sm text-left">
-                            <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 z-10 shadow-sm">
-                                <tr>
-                                    <th className="border-b px-5 py-3">Doc No</th>
-                                    <th className="border-b px-5 py-3">Payee</th>
-                                    <th className="border-b px-5 py-3">Date</th>
-                                    <th className="border-b text-right px-5 py-3">Amount</th>
-                                    <th className="border-b text-center w-24 px-5 py-3">Select</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-100">
-                                {savedDocs.filter(d => 
-                                    (d.docNo?.toLowerCase() || '').includes(docSearchQuery.toLowerCase()) || 
-                                    (d.payee?.toLowerCase() || '').includes(docSearchQuery.toLowerCase())
-                                ).map((d, idx) => (
-                                    <tr key={idx} className="group hover:bg-blue-50/50  transition-all border-b border-gray-50 cursor-pointer group border-b border-gray-50">
-                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{d.docNo}</td>
-                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{d.payee || '---'}</td>
-                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{d.date?.split('T')[0] || ''}</td>
-                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{parseFloat(d.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">
-                                            <button onClick={() => { loadDraft(d); setShowDocSearch(false); }} className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button>
-                                        </td>
-                                    </tr>
-                                ))}
-                                {savedDocs.length === 0 && (
-                                    <tr>
-                                        <td colSpan="5" className="text-center py-16 text-gray-400 text-[11px] font-bold uppercase tracking-widest">No saved drafts found.</td>
-                                    </tr>
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </SimpleModal>
+            {/* Saved Drafts Search Modal removed */}
         </>
     );
 };
