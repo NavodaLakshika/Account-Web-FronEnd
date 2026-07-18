@@ -263,7 +263,7 @@ const PaymentSetoffBoard = ({ isOpen, onClose }) => {
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Supplier</label>
                                 <div className="relative">
                                     <select
-                                        value={formData.supplierName}
+                                        value={formData.supplierId || ''}
                                         onChange={(ev) => {
                                             const val = ev.target.value;
                                             const item = (lookups.suppliers || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || i === val);

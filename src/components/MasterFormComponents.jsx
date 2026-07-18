@@ -43,7 +43,7 @@ export const MasterFormWrapper = ({
                             <button
                                 onClick={onDelete}
                                 disabled={loading}
-                                className="px-8 h-10 bg-white text-[#ff3b30] border-2 border-[#ff3b30] hover:bg-red-50 font-mono font-bold text-[13px] uppercase tracking-widest rounded-[3px] shadow-sm transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-50"
+                                className={`px-6 h-10 bg-red-50 text-red-600 text-sm font-bold rounded-[3px] hover:bg-red-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-red-100 ${(loading) ? 'opacity-50 cursor-not-allowed' : ''}`}
                             >
                                 {loading ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />} DELETE DOC
                             </button>
@@ -139,114 +139,46 @@ export const MasterInput = ({
     );
 };
 
-export const MasterLookupInput = ({
+export const MasterSelect = ({
     value,
-    onSearchClick,
-    placeholder,
-    readOnly = true,
-    isIdField = false,
-    className
+    onChange,
+    name,
+    options = [],
+    readOnly,
+    isIdField,
+    className,
+    placeholder = "Select...",
+    ...props
 }) => {
-    const baseClass = "flex-1 min-w-0 h-8 border border-slate-200 rounded px-3 text-[12px] font-bold outline-none shadow-sm transition-all cursor-pointer focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 ";
-    const stateClass = isIdField ? "w-32 text-center text-[#0285fd] bg-white flex-none" : "text-gray-700 bg-white";
+    const baseClass = "flex-1 min-w-0 h-8 border border-slate-200 rounded px-3 text-[12px] font-bold outline-none shadow-sm transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 appearance-none bg-no-repeat bg-right";
+    const bgImage = `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`;
+    
+    let stateClass = "";
+    if (readOnly && isIdField) {
+        stateClass = "w-32 text-[#0285fd] bg-slate-50 flex-none cursor-not-allowed";
+    } else if (readOnly) {
+        stateClass = "text-gray-700 bg-slate-50 cursor-not-allowed";
+    } else {
+        stateClass = "text-gray-700 bg-white cursor-pointer";
+    }
 
     return (
-        <>
-            <input
-                type="text"
-                readOnly={readOnly}
-                value={value || ''}
-                onClick={onSearchClick}
-                className={`${baseClass} ${stateClass} ${className || ''}`}
-                placeholder={placeholder}
-             style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
-        </>
+        <select
+            name={name}
+            value={value || ''}
+            onChange={onChange}
+            disabled={readOnly}
+            className={`${baseClass} ${stateClass} ${className || ''}`}
+            style={{ backgroundImage: bgImage, backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
+            {...props}
+        >
+            {placeholder && <option value="" disabled>{placeholder}</option>}
+            {options.map((opt, idx) => (
+                <option key={idx} value={opt.value}>
+                    {opt.label}
+                </option>
+            ))}
+        </select>
     );
 };
 
-export const MasterLookupModal = ({
-    isOpen,
-    onClose,
-    title,
-    columns,
-    items,
-    loading,
-    onSelect,
-    searchQuery,
-    setSearchQuery,
-    emptyMsg = "No records found"
-}) => {
-    return (
-        <SimpleModal isOpen={isOpen} onClose={onClose} title={title} maxWidth="max-w-[700px]">
-            <div className="space-y-4">
-                <div className="flex items-center gap-4 bg-slate-50 p-4 border-b border-gray-100 mb-2">
-                    <span className="text-[12px] font-bold text-gray-500 uppercase tracking-wider shrink-0">Search</span>
-                    <div className="relative flex-1">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
-                        <input
-                            type="text"
-                            className="w-full h-10 pl-10 pr-4 border border-gray-300 rounded-[3px] outline-none text-[13px] focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] shadow-sm bg-white"
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            autoFocus
-                            placeholder="Search..."
-                        />
-                    </div>
-                </div>
-                <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm">
-                    <div className="max-h-[350px] overflow-y-auto no-scrollbar">
-                        <table className="w-full text-left">
-                            <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 shadow-sm z-10">
-                                <tr>
-                                    {columns.map((col, i) => (
-                                        <th key={i} className={`px-5 py-3 ${col.align === 'right' ? 'text-right' : ''} ${col.width || ''}`}>
-                                            {col.label}
-                                        </th>
-                                    ))}
-                                    <th className="text-right px-5 py-3">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-100">
-                                {loading ? (
-                                    <tr>
-                                        <td colSpan={columns.length + 1} className="px-5 py-6 text-center">
-                                            <Loader2 size={18} className="animate-spin text-[#00D1FF] mx-auto mb-1.5" />
-                                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Loading...</p>
-                                        </td>
-                                    </tr>
-                                ) : items.length > 0 ? (
-                                    items.map((item, idx) => (
-                                        <tr
-                                            key={idx}
-                                            className="group hover:bg-blue-50/50 cursor-pointer transition-all border-b border-gray-50"
-                                            onClick={() => onSelect(item)}
-                                        >
-                                            {columns.map((col, i) => (
-                                                <td key={i} className={`px-5 py-3 ${col.align === 'right' ? 'text-right' : ''}`}>
-                                                    <span className={`text-[12px] font-bold ${col.isId ? 'font-mono text-blue-600' : 'text-slate-700 uppercase group-hover:text-blue-600 transition-colors'}`}>
-                                                        {col.render ? col.render(item) : item[col.key]}
-                                                    </span>
-                                            </td>
-                                        ))}
-                                        <td className="text-right px-5 py-3">
-                                            <button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">
-                                                Select
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))
-                            ) : (
-                                <tr>
-                                    <td colSpan={columns.length + 1} className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">
-                                        {emptyMsg}
-                                    </td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
-                    </div>
-                </div>
-            </div>
-        </SimpleModal>
-    );
-};

@@ -24,10 +24,11 @@ const SalesReceiptBoard = ({ isOpen, onClose }) => {
     });
 
     const [formData, setFormData] = useState(getInitialFormData());
-
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
     const [rows, setRows] = useState([]);
     const [entry, setEntry] = useState({ prodCode: '', prodName: '', qty: '', sellingPrice: '', amount: '0.00' });
-    
+
     const [lookups, setLookups] = useState({ customers: [], products: [] });
     const [existingDocs, setExistingDocs] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -42,7 +43,7 @@ const SalesReceiptBoard = ({ isOpen, onClose }) => {
     const [showCalendar, setShowCalendar] = useState(false);
     const [showConfirmModal, setShowConfirmModal] = useState(false);
     const [showQtyModal, setShowQtyModal] = useState(false);
-    
+
     const [custSearch, setCustSearch] = useState('');
     const [prodSearch, setProdSearch] = useState('');
 
@@ -65,15 +66,16 @@ const SalesReceiptBoard = ({ isOpen, onClose }) => {
             const initCompany = user?.company_Id || user?.companyId || 'COM001';
             const initUser = user?.emp_Name || user?.empName || 'Admin';
 
-            const [lookupData, docData] = await Promise.all([
+            const [lookupData, docData, docsData] = await Promise.all([
                 salesReceiptService.getLookups(),
-                salesReceiptService.generateDocNo(initCompany)
+                salesReceiptService.generateDocNo(initCompany),
+                salesReceiptService.searchDocs(initCompany)
             ]);
 
-            setLookups(lookupData);
-            setFormData(prev => ({ 
-                ...prev, 
-                docNo: docData.docNo, 
+            setLookups({ ...lookupData, documents: docsData || [] });
+            setFormData(prev => ({
+                ...prev,
+                docNo: docData.docNo,
                 company: initCompany,
                 createUser: initUser
             }));
@@ -115,26 +117,29 @@ const SalesReceiptBoard = ({ isOpen, onClose }) => {
             const header = data.header;
             const details = data.details;
 
-            const cust = lookups.customers.find(c => c.code === header.cust_Code);
+            // Field names from ACC_TransactionSave_Header model (camelCased from EF)
+            const custCode = header.vendor_Id || header.cust_Code || '';
+            const cust = lookups.customers.find(c => c.code === custCode);
 
             setFormData(prev => ({
                 ...prev,
-                docNo: header.doc_No,
-                date: header.cur_Date?.split('T')[0],
-                customerId: header.cust_Code,
-                customerName: cust?.name || header.cust_Code || '',
+                docNo: header.doc_No || docNo,
+                date: header.post_Date || header.cur_Date || new Date().toISOString().split('T')[0],
+                customerId: custCode,
+                customerName: cust?.name || custCode,
                 reference: header.reference || '',
-                subject: header.subject || '',
+                subject: header.remarks || header.subject || '',
                 comment: header.comment || ''
             }));
 
-            setRows(details.map(d => ({
-                prodCode: d.prod_Code,
-                prodName: d.prod_Name,
-                qty: d.qty.toString(),
-                sellingPrice: d.selling_Price.toString(),
-                amount: d.amount.toString()
-            })));
+            const mappedRows = (details || []).map(d => ({
+                prodCode: d.prod_Code || d.prodCode || '',
+                prodName: d.prod_Name || d.prodName || '',
+                qty: (d.qty ?? d.qty ?? 0).toString(),
+                sellingPrice: (d.selling_Price ?? d.sellingPrice ?? 0).toString(),
+                amount: (d.amount ?? 0).toString()
+            }));
+            setRows(mappedRows);
 
             setShowSearchModal(false);
             showSuccessToast("Document Retrieved Successfully.");
@@ -143,18 +148,39 @@ const SalesReceiptBoard = ({ isOpen, onClose }) => {
         }
     };
 
-    const handleDelete = async () => {
-        if (!formData.docNo) return;
-        if (!window.confirm("Are you sure you want to delete this draft document?")) return;
+    // const handleDelete = async () => {
+    //     if (!formData.docNo) return;
+    //     if (!window.confirm("Are you sure you want to delete this draft document?")) return;
 
+    //     try {
+    //         await salesReceiptService.deleteJob(formData.docNo, formData.company);
+    //         showSuccessToast("Document Deleted Successfully.");
+    //         handleClear();
+    //     } catch (error) {
+    //         showErrorToast("Failed to delete document.");
+    //     }
+    // };
+
+    const handleDelete = () => {
+        if (!formData.docNo) return;
+        setShowDeleteConfirm(true);
+    };
+
+    const confirmDelete = async () => {
+        setIsDeleting(true);
         try {
             await salesReceiptService.deleteJob(formData.docNo, formData.company);
             showSuccessToast("Document Deleted Successfully.");
             handleClear();
+            setShowDeleteConfirm(false);
+            if (onClose) onClose();
         } catch (error) {
             showErrorToast("Failed to delete document.");
+        } finally {
+            setIsDeleting(false);
         }
     };
+
 
     const handleSaveLine = async () => {
         if (!formData.customerId) return showErrorToast("Please select a customer first.");
@@ -164,15 +190,15 @@ const SalesReceiptBoard = ({ isOpen, onClose }) => {
         try {
             const payload = {
                 ...formData,
-                items: [{ 
-                    ...entry, 
+                items: [{
+                    ...entry,
                     qty: parseFloat(entry.qty),
                     sellingPrice: parseFloat(entry.sellingPrice),
                     amount: parseFloat(entry.amount)
                 }]
             };
             await salesReceiptService.saveLine(payload);
-            
+
             setRows(prev => {
                 const existing = prev.findIndex(r => r.prodCode === entry.prodCode);
                 if (existing >= 0) {
@@ -182,7 +208,7 @@ const SalesReceiptBoard = ({ isOpen, onClose }) => {
                 }
                 return [...prev, { ...entry }];
             });
-            
+
             setEntry({ prodCode: '', prodName: '', qty: '', sellingPrice: '', amount: '0.00' });
             showSuccessToast("Item Added to Receipt.");
             setShowQtyModal(false);
@@ -238,15 +264,15 @@ const SalesReceiptBoard = ({ isOpen, onClose }) => {
 
     // --- Lookups ---
     const filteredCustomers = useMemo(() => {
-        return lookups.customers.filter(c => 
-            c.code.toLowerCase().includes(custSearch.toLowerCase()) || 
+        return lookups.customers.filter(c =>
+            c.code.toLowerCase().includes(custSearch.toLowerCase()) ||
             c.name.toLowerCase().includes(custSearch.toLowerCase())
         );
     }, [lookups.customers, custSearch]);
 
     const filteredProducts = useMemo(() => {
-        return lookups.products.filter(p => 
-            p.code.toLowerCase().includes(prodSearch.toLowerCase()) || 
+        return lookups.products.filter(p =>
+            p.code.toLowerCase().includes(prodSearch.toLowerCase()) ||
             p.name.toLowerCase().includes(prodSearch.toLowerCase())
         );
     }, [lookups.products, prodSearch]);
@@ -254,6 +280,18 @@ const SalesReceiptBoard = ({ isOpen, onClose }) => {
     const totalAmount = useMemo(() => {
         return rows.reduce((sum, row) => sum + parseFloat(row.amount || 0), 0).toFixed(2);
     }, [rows]);
+
+    const loadDocuments = async (company) => {
+        try {
+            const docs = await salesReceiptService.searchDocs(company || formData.company);
+            setLookups(prev => ({
+                ...prev,
+                documents: docs || []
+            }));
+        } catch (error) {
+            console.error("Error loading documents:", error);
+        }
+    };
 
     return (
         <>
@@ -265,8 +303,8 @@ const SalesReceiptBoard = ({ isOpen, onClose }) => {
                 footer={
                     <div className="bg-[#fcfcfc] px-6 py-5 w-full flex justify-between items-center border-t border-gray-200 rounded-b-[10px] shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]">
                         <div className="flex gap-3">
-                            <button onClick={handleDelete} className="px-6 h-10 border-2 border-red-500 text-red-600 bg-white hover:bg-red-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2">
-                                <Trash2 size={14} /> DELETE DOC
+                            <button onClick={handleDelete} className="px-6 h-10 bg-red-50 text-red-600 text-sm font-bold rounded-[3px] hover:bg-red-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-red-100">
+                                <Trash2 size={16} strokeWidth={2.5} /> DELETE DOC
                             </button>
                             <button type="button" onClick={handleClear} className="px-6 h-10 border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2">
                                 <RefreshCw size={14} /> CLEAR FORM
@@ -288,9 +326,42 @@ const SalesReceiptBoard = ({ isOpen, onClose }) => {
                         <div className="grid grid-cols-12 gap-x-6 gap-y-3.5">
                             <div className="col-span-4">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Document ID</label>
-                                <div className="relative">
-                                    <input type="text" value={formData.docNo} onChange={(e) => setFormData(p => ({ ...p, docNo: e.target.value }))} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 appearance-none"  style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
+                                <div className="relative flex-1">
+                                    <select
+                                        value={formData.docNo || ""}
+                                        onChange={async (e) => {
+                                            const selectedDocNo = e.target.value;
+                                            if (!selectedDocNo) {
+                                                setFormData(prev => ({
+                                                    docNo: '',
+                                                    date: new Date().toISOString().split('T')[0],
+                                                    customerId: '',
+                                                    customerName: '',
+                                                    reference: '',
+                                                    subject: '',
+                                                    comment: '',
+                                                    company: '',
+                                                    createUser: ''
+                                                }));
+                                                setRows([]);
+                                                return;
+                                            }
+                                            await handleSelectJob(selectedDocNo);
+                                        }}
+                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 appearance-none" style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
+                                    >
+                                        <option value="">Select Receipt Number</option>
+                                        {lookups.documents?.map((doc) => (
+                                            <option key={doc.docNo} value={doc.docNo}>
+                                                {doc.docNo} — {doc.date ? doc.date.split('T')[0] : ''}
+                                            </option>
+                                        ))}
+                                    </select>
+
                                 </div>
+
+
+
                             </div>
                             <div className="col-span-4">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Post Date</label>
@@ -305,16 +376,39 @@ const SalesReceiptBoard = ({ isOpen, onClose }) => {
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Reference</label>
                                 <input type="text" value={formData.reference} onChange={(e) => setFormData(p => ({ ...p, reference: e.target.value }))} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700" />
                             </div>
-                            <div className="col-span-8">
+                            {/* <div className="col-span-8">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Customer</label>
                                 <div className="relative">
                                     <div className="flex gap-2">
                                         <input type="text" readOnly value={formData.customerId} className="w-24 h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none text-gray-700 font-mono shrink-0" />
                                         <div className="relative flex-1">
-                                            <input type="text" readOnly placeholder="Select customer..." value={formData.customerName} onClick={() => setShowCustLookup(true)} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"  style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
+                                            <input type="text" readOnly placeholder="Select customer..." value={formData.customerName} onClick={() => setShowCustLookup(true)} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none" style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
                                         </div>
                                     </div>
                                 </div>
+                            </div> */}
+                            <div className="col-span-8">
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Customer</label>
+                                <select
+                                    value={formData.customerId || ""}
+                                    onChange={(e) => {
+                                        const sel = lookups.customers.find(c => c.code === e.target.value);
+                                        setFormData(prev => ({
+                                            ...prev,
+                                            customerId: sel?.code || '',
+                                            customerName: sel?.name || ''
+                                        }));
+                                    }}
+                                    className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 appearance-none cursor-pointer"
+                                    style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
+                                >
+                                    <option value="">Select customer...</option>
+                                    {lookups.customers.map((c) => (
+                                        <option key={c.code} value={c.code}>
+                                            {c.code} — {c.name}
+                                        </option>
+                                    ))}
+                                </select>
                             </div>
                             <div className="col-span-4">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Subject</label>
@@ -340,7 +434,7 @@ const SalesReceiptBoard = ({ isOpen, onClose }) => {
                                         <th className="px-2 text-center w-20">USAGE</th>
                                         <th className="px-4 text-right w-36">EXTENDED NET</th>
                                         <th className="w-12"></th>
-                                    <th className="text-right px-5 py-3">Action</th></tr>
+                                        <th className="text-right px-5 py-3">Action</th></tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-50">
                                     {rows.length === 0 ? (
@@ -562,7 +656,7 @@ const SalesReceiptBoard = ({ isOpen, onClose }) => {
                 </SimpleModal>
 
                 <CalendarModal isOpen={showCalendar} onClose={() => setShowCalendar(false)} currentDate={formData.date} onDateChange={(d) => { setFormData(p => ({ ...p, date: d })); setShowCalendar(false); }} title="Select Date" />
-
+                <ConfirmModal isOpen={showDeleteConfirm} onClose={() => setShowDeleteConfirm(false)} onConfirm={confirmDelete} title="Confirm Deletion" message={`Are you sure you want to delete Sales Receipt ${formData.docNo}? This action cannot be undone.`} isLoading={isDeleting} />
                 <ConfirmModal isOpen={showConfirmModal} onClose={() => setShowConfirmModal(false)} onConfirm={confirmApply} title="Finalize Sales Receipt" message={`Are you sure you want to save and apply this Sales Receipt (${formData.docNo})? This action will update the ledger.`} isLoading={isApplying} />
 
                 {appliedDocNo && (

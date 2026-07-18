@@ -5,7 +5,6 @@ import { Search, RotateCcw, Save, Calendar } from 'lucide-react';
 import { longTermLiabService } from '../services/longTermLiab.service';
 import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
 import TransactionFormWrapper from '../components/TransactionFormWrapper';
-import SearchableSelect from '../components/SearchableSelect';
 
 const LongTermLiabilityProfileBoard = ({ isOpen, onClose }) => {
     const initialState = {
@@ -22,12 +21,7 @@ const LongTermLiabilityProfileBoard = ({ isOpen, onClose }) => {
     const [showSearchModal, setShowSearchModal] = useState(false);
     const [searchList, setSearchList] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
-    const [showAccountSearch, setShowAccountSearch] = useState(false);
-    const [accSearchQuery, setAccSearchQuery] = useState('');
-    const [showLenderSearch, setShowLenderSearch] = useState(false);
-    const [lenderSearchQuery, setLenderSearchQuery] = useState('');
     const [showOrgDateModal, setShowOrgDateModal] = useState(false);
-    const [showPayTypeSearch, setShowPayTypeSearch] = useState(false);
 
     useEffect(() => {
         if (isOpen) {
@@ -65,10 +59,7 @@ const LongTermLiabilityProfileBoard = ({ isOpen, onClose }) => {
         fetchNextDocNo(formData.Company);
     };
 
-    const handleAccountSelect = (item) => { setFormData(prev => ({ ...prev, LiabAccCode: item.code })); setShowAccountSearch(false); };
-    const handleLenderSelect = (item) => { setFormData(prev => ({ ...prev, LenderCode: item.code })); setShowLenderSearch(false); };
     const handleDateSelect = (field, date) => { setFormData(prev => ({ ...prev, [field]: date })); };
-    const handlePayTypeSelect = (type) => { setFormData(prev => ({ ...prev, PayType: typeof type === 'object' ? (type.name || type.Name) : type })); setShowPayTypeSearch(false); };
 
     const handleSave = async () => {
         if (!formData.LiabCode) { showErrorToast('Liability Number is required.'); return; }
@@ -154,15 +145,29 @@ const LongTermLiabilityProfileBoard = ({ isOpen, onClose }) => {
                         <div className="grid grid-cols-12 gap-x-6 gap-y-3.5">
                             <div className="col-span-6">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Linked Account</label>
-                                <div className="relative">
-                                    <input type="text" readOnly value={(() => { const acc = lookups.accounts.find(a => (a.code || a.Code) === formData.LiabAccCode); return acc ? (acc.name || acc.Name || '').trim() : formData.LiabAccCode; })()} onClick={() => setShowAccountSearch(true)} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 cursor-pointer appearance-none"  style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
-                                </div>
+                                <select
+                                    value={formData.LiabAccCode}
+                                    onChange={(e) => setFormData(prev => ({ ...prev, LiabAccCode: e.target.value }))}
+                                    className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 cursor-pointer"
+                                >
+                                    <option value="">Select account...</option>
+                                    {lookups.accounts.map((acc, idx) => (
+                                        <option key={idx} value={acc.code || acc.Code}>{acc.name || acc.Name}</option>
+                                    ))}
+                                </select>
                             </div>
                             <div className="col-span-6">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Lender / Institution</label>
-                                <div className="relative">
-                                    <input type="text" readOnly value={(() => { const lender = lookups.lenders.find(l => (l.code || l.Code) === formData.LenderCode); return lender ? (lender.name || lender.Name || lender.supplier_Name || '').trim() : formData.LenderCode; })()} onClick={() => setShowLenderSearch(true)} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 cursor-pointer appearance-none"  style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
-                                </div>
+                                <select
+                                    value={formData.LenderCode}
+                                    onChange={(e) => setFormData(prev => ({ ...prev, LenderCode: e.target.value }))}
+                                    className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 cursor-pointer"
+                                >
+                                    <option value="">Select lender...</option>
+                                    {lookups.lenders.map((lender, idx) => (
+                                        <option key={idx} value={lender.code || lender.Code}>{lender.name || lender.Name || lender.supplier_Name}</option>
+                                    ))}
+                                </select>
                             </div>
                         </div>
                     </div>
@@ -184,9 +189,16 @@ const LongTermLiabilityProfileBoard = ({ isOpen, onClose }) => {
                             </div>
                             <div className="col-span-4">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Payment Type</label>
-                                <div className="relative">
-                                    <input type="text" readOnly value={formData.PayType} onClick={() => setShowPayTypeSearch(true)} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 cursor-pointer appearance-none"  style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
-                                </div>
+                                <select
+                                    value={formData.PayType}
+                                    onChange={(e) => setFormData(prev => ({ ...prev, PayType: e.target.value }))}
+                                    className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 cursor-pointer"
+                                >
+                                    <option value="">Select type...</option>
+                                    {lookups.payTypes.map((type, idx) => (
+                                        <option key={idx} value={type.name || type.Name}>{type.name || type.Name}</option>
+                                    ))}
+                                </select>
                             </div>
                             <div className="col-span-4">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Origination Date</label>
@@ -246,78 +258,6 @@ const LongTermLiabilityProfileBoard = ({ isOpen, onClose }) => {
                             </tbody>
                         </table>
                     </div>
-                </div>
-            </SimpleModal>
-
-            <SimpleModal isOpen={showAccountSearch} onClose={() => setShowAccountSearch(false)} title="General Ledger Accounts Lookup" maxWidth="max-w-[700px]">
-                <div className="space-y-4 font-['Tahoma']">
-                    <div className="flex items-center gap-4 bg-slate-50 p-4 border-b border-gray-100 mb-2">
-                        <span className="text-[12px] font-bold text-gray-500 uppercase tracking-wider">Search</span>
-                        <div className="relative flex-1">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
-                            <input type="text" placeholder="Find by Account Name or Code..." className="w-full h-10 pl-10 pr-4 border border-gray-300 rounded-[3px] outline-none text-[13px] focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] shadow-sm bg-white" value={accSearchQuery} onChange={(e) => setAccSearchQuery(e.target.value)} autoFocus />
-                        </div>
-                    </div>
-                    <div className="border border-gray-200 rounded-[3px] overflow-hidden shadow-sm max-h-[400px] overflow-y-auto no-scrollbar">
-                        <table className="w-full text-left">
-                            <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 shadow-sm z-10">
-                                <tr><th className=" px-5 py-3">Account Code</th><th className=" px-5 py-3">Account Description</th><th className="text-right px-5 py-3">Action</th></tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-50">
-                                {lookups.accounts.filter(a => ((a.name || a.Name || '').toLowerCase().includes(accSearchQuery.toLowerCase()) || (a.code || a.Code || '').toLowerCase().includes(accSearchQuery.toLowerCase()))).map((acc, idx) => (
-                                    <tr key={idx} className="group hover:bg-blue-50/50  transition-all cursor-pointer group border-b border-gray-50" onClick={() => handleAccountSelect(acc)}>
-                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{acc.code || acc.Code}</td>
-                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{acc.name || acc.Name}</td>
-                                        <td className="text-right px-5 py-3">
-                                            <button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </SimpleModal>
-
-            <SimpleModal isOpen={showLenderSearch} onClose={() => setShowLenderSearch(false)} title="Service Providers Lookup" maxWidth="max-w-[700px]">
-                <div className="space-y-4 font-['Tahoma']">
-                    <div className="flex items-center gap-4 bg-slate-50 p-4 border-b border-gray-100 mb-2">
-                        <span className="text-[12px] font-bold text-gray-500 uppercase tracking-wider">Search</span>
-                        <div className="relative flex-1">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
-                            <input type="text" placeholder="Find by Lender Name or Code..." className="w-full h-10 pl-10 pr-4 border border-gray-300 rounded-[3px] outline-none text-[13px] focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] shadow-sm bg-white" value={lenderSearchQuery} onChange={(e) => setLenderSearchQuery(e.target.value)} autoFocus />
-                        </div>
-                    </div>
-                    <div className="border border-gray-200 rounded-[3px] overflow-hidden shadow-sm max-h-[400px] overflow-y-auto no-scrollbar">
-                        <table className="w-full text-left">
-                            <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 shadow-sm z-10">
-                                <tr><th className=" px-5 py-3">Provider Code</th><th className=" px-5 py-3">Institution Name</th><th className="text-right px-5 py-3">Action</th></tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-50">
-                                {lookups.lenders.filter(l => ((l.name || l.Name || '').toLowerCase().includes(lenderSearchQuery.toLowerCase()) || (l.code || l.Code || '').toLowerCase().includes(lenderSearchQuery.toLowerCase()))).map((lender, idx) => (
-                                    <tr key={idx} className="group hover:bg-blue-50/50  transition-all cursor-pointer group border-b border-gray-50" onClick={() => handleLenderSelect(lender)}>
-                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{lender.code || lender.Code}</td>
-                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{lender.name || lender.Name}</td>
-                                        <td className="text-right px-5 py-3">
-                                            <button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </SimpleModal>
-
-            <SimpleModal isOpen={showPayTypeSearch} onClose={() => setShowPayTypeSearch(false)} title="Payment Type" maxWidth="max-w-[700px]">
-                <div className="p-4 space-y-2 font-['Tahoma']">
-                    {(lookups.payTypes || []).map((type, idx) => (
-                        <button key={idx} onClick={() => handlePayTypeSelect(type)} className="w-full px-4 py-3 text-[12px] font-bold text-gray-700 hover:bg-slate-50 border border-slate-200 rounded-[3px] transition-all text-left flex justify-between items-center group shadow-sm">
-                            <span className="uppercase tracking-widest">{type.name || type.Name}</span>
-                            <span className="text-[#e49e1b] group-hover:text-[#0285fd] transition-colors font-black text-xs">SELECT</span>
-                        </button>
-                    ))}
-                    {(!lookups.payTypes || lookups.payTypes.length === 0) && <p className="text-center text-gray-400 text-xs py-4">No payment types found.</p>}
                 </div>
             </SimpleModal>
 

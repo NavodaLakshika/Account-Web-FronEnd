@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Save, RotateCcw, X, Loader2, Lock, User, Key, Eye, EyeOff, CheckCircle2, AlertTriangle } from 'lucide-react';
+import { Save, RotateCcw, Loader2, Lock, Key, Eye, EyeOff } from 'lucide-react';
 import { userProfileService } from '../../services/userProfile.service';
 import { showSuccessToast, showErrorToast } from '../../utils/toastUtils';
-import { MasterFormWrapper, MasterFieldRow, MasterInput, MasterLookupInput, MasterLookupModal } from '../MasterFormComponents';
+import { MasterFormWrapper, MasterFieldRow, MasterInput, MasterSelect } from '../MasterFormComponents';
 import ConfirmModal from './ConfirmModal';
-
 
 const ChangePasswordBoard = ({ isOpen, onClose }) => {
     const initialState = {
@@ -18,8 +17,6 @@ const ChangePasswordBoard = ({ isOpen, onClose }) => {
 
     const [formData, setFormData] = useState(initialState);
     const [loading, setLoading] = useState(false);
-    const [showUserModal, setShowUserModal] = useState(false);
-    const [userSearchQuery, setUserSearchQuery] = useState('');
     const [users, setUsers] = useState([]);
     const [showSaveConfirm, setShowSaveConfirm] = useState(false);
     const [showPass, setShowPass] = useState({ cur: false, new: false, con: false });
@@ -32,7 +29,6 @@ const ChangePasswordBoard = ({ isOpen, onClose }) => {
             if (companyData) {
                 try {
                     const parsed = JSON.parse(companyData);
-                    // Handle all potential property name variants
                     companyCode = parsed.companyCode || parsed.CompanyCode || parsed.company_Code || (typeof companyData === 'string' ? companyData : '');
                 } catch { 
                     companyCode = companyData; 
@@ -48,31 +44,29 @@ const ChangePasswordBoard = ({ isOpen, onClose }) => {
         }
     }, [isOpen]);
 
-
     const fetchUsers = async (companyCode) => {
         setLoading(true);
         try {
-            console.log('Fetching users for company:', companyCode);
             const data = await userProfileService.searchUsers(companyCode);
             setUsers(data);
             if (data.length === 0 && companyCode) {
                 showErrorToast(`No users found for company: ${companyCode}`);
             }
         } catch (error) {
-            console.error('Fetch users error:', error);
             showErrorToast('Error loading employees: ' + (error.message || error));
         } finally {
             setLoading(false);
         }
     };
 
-    const handleUserSelect = (u) => {
+    const handleUserChange = (e) => {
+        const code = e.target.value;
+        const user = users.find(u => u.emp_Code === code);
         setFormData(prev => ({
             ...prev,
-            EmpCode: u.emp_Code,
-            UserName: u.emp_Name
+            EmpCode: code,
+            UserName: user ? user.emp_Name : ''
         }));
-        setShowUserModal(false);
     };
 
     const handleSave = () => {
@@ -104,14 +98,6 @@ const ChangePasswordBoard = ({ isOpen, onClose }) => {
 
     return (
         <>
-            <style>
-                {`
-                    @keyframes toastProgress {
-                        0% { width: 100%; }
-                        100% { width: 0%; }
-                    }
-                `}
-            </style>
             <MasterFormWrapper
                 isOpen={isOpen}
                 onClose={onClose}
@@ -143,7 +129,13 @@ const ChangePasswordBoard = ({ isOpen, onClose }) => {
                 }
             >
                 <MasterFieldRow label="Target User" colSpan="col-span-6">
-                    <MasterLookupInput value={formData.UserName} onSearchClick={() => setShowUserModal(true)} placeholder="Search system user..." />
+                    <MasterSelect
+                        name="EmpCode"
+                        value={formData.EmpCode}
+                        onChange={handleUserChange}
+                        placeholder="Select user..."
+                        options={users.map(u => ({ value: u.emp_Code, label: `${u.emp_Code} - ${u.emp_Name}` }))}
+                    />
                 </MasterFieldRow>
 
                 <MasterFieldRow label="Current Password" colSpan="col-span-6">
@@ -194,21 +186,6 @@ const ChangePasswordBoard = ({ isOpen, onClose }) => {
                     </div>
                 </MasterFieldRow>
             </MasterFormWrapper>
-
-            <MasterLookupModal
-                isOpen={showUserModal}
-                onClose={() => setShowUserModal(false)}
-                title="System Users Lookup"
-                columns={[
-                    { label: 'EMPLOYEE ID', key: 'emp_Code', isId: true, width: 'w-[120px]', render: (item) => <span className="font-mono text-[11px] font-bold text-[#0285fd]">{item.emp_Code}</span> },
-                    { label: 'USER NAME', key: 'emp_Name', render: (item) => <span className="font-bold text-slate-700 uppercase text-[11px]">{item.emp_Name}</span> },
-                ]}
-                items={users.filter(u => (u?.emp_Name || '').toLowerCase().includes(userSearchQuery.toLowerCase()) || (u?.emp_Code || '').toLowerCase().includes(userSearchQuery.toLowerCase()))}
-                onSelect={handleUserSelect}
-                emptyMsg={users.length === 0 ? 'Synchronizing User Data...' : 'No matching records found'}
-                searchQuery={userSearchQuery}
-                setSearchQuery={setUserSearchQuery}
-            />
 
             <ConfirmModal
                 isOpen={showSaveConfirm}

@@ -276,7 +276,7 @@ const DeleteAccountModal = ({ isOpen, onClose }) => {
                         </button>
                     </div>
                     <div className="flex gap-3">
-                        <button onClick={handleDeleteClick} disabled={loading} className={`px-6 h-10 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                        <button onClick={handleDeleteClick} disabled={loading} className={`px-6 h-10 bg-red-50 text-red-600 text-sm font-bold rounded-[3px] hover:bg-red-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-red-100 ${(loading) ? 'opacity-50 cursor-not-allowed' : ''}`}>
                             <Trash2 size={14} /> DELETE ACCOUNT
                         </button>
                     </div>

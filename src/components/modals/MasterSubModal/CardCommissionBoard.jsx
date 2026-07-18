@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Save, RotateCcw, Loader2, AlertTriangle, CreditCard, Banknote, Percent } from 'lucide-react';
 import { cardCommissionService } from '../../../services/cardCommission.service';
 import { showSuccessToast, showErrorToast } from '../../../utils/toastUtils';
-import { MasterFormWrapper, MasterFieldRow, MasterInput, MasterLookupInput, MasterLookupModal } from '../../MasterFormComponents';
+import { MasterFormWrapper, MasterFieldRow, MasterInput, MasterSelect } from '../../MasterFormComponents';
 import { getCompanyCode } from '../../../utils/session';
 
 const CardCommissionBoard = ({ isOpen, onClose }) => {
@@ -28,20 +28,30 @@ const CardCommissionBoard = ({ isOpen, onClose }) => {
         } catch (error) { showErrorToast('Failed to load lookup data'); }
     };
 
-    const handleCardSelect = async (id, name) => {
-        setFormData(prev => ({ ...prev, CardID: id, CardType: name }));
-        if (id && formData.BankAccCode) {
-            try { const rate = await cardCommissionService.getRate(formData.BankAccCode, id, getCompanyCode()); setFormData(prev => ({ ...prev, CardID: id, CardType: name, Rate: rate.rate.toString() })); } catch { setFormData(prev => ({ ...prev, CardID: id, CardType: name, Rate: '0.0' })); }
+    const handleCardChange = async (e) => {
+        const id = e.target.value;
+        const card = cardTypes.find(c => c.cardID === id);
+        if (card) {
+            setFormData(prev => ({ ...prev, CardID: id, CardType: card.name }));
+            if (id && formData.BankAccCode) {
+                try { const rate = await cardCommissionService.getRate(formData.BankAccCode, id, getCompanyCode()); setFormData(prev => ({ ...prev, CardID: id, CardType: card.name, Rate: rate.rate.toString() })); } catch { setFormData(prev => ({ ...prev, CardID: id, CardType: card.name, Rate: '0.0' })); }
+            }
+        } else {
+            setFormData(prev => ({ ...prev, CardID: '', CardType: '' }));
         }
-        setShowCardModal(false);
     };
 
-    const handleBankSelect = async (code, name) => {
-        setFormData(prev => ({ ...prev, BankAccCode: code, BankAccName: name }));
-        if (formData.CardID && code) {
-            try { const rate = await cardCommissionService.getRate(code, formData.CardID, getCompanyCode()); setFormData(prev => ({ ...prev, BankAccCode: code, BankAccName: name, Rate: rate.rate.toString() })); } catch { setFormData(prev => ({ ...prev, BankAccCode: code, BankAccName: name, Rate: '0.0' })); }
+    const handleBankChange = async (e) => {
+        const code = e.target.value;
+        const bank = bankAccounts.find(b => b.code === code);
+        if (bank) {
+            setFormData(prev => ({ ...prev, BankAccCode: code, BankAccName: bank.name }));
+            if (formData.CardID && code) {
+                try { const rate = await cardCommissionService.getRate(code, formData.CardID, getCompanyCode()); setFormData(prev => ({ ...prev, BankAccCode: code, BankAccName: bank.name, Rate: rate.rate.toString() })); } catch { setFormData(prev => ({ ...prev, BankAccCode: code, BankAccName: bank.name, Rate: '0.0' })); }
+            }
+        } else {
+            setFormData(prev => ({ ...prev, BankAccCode: '', BankAccName: '' }));
         }
-        setShowBankModal(false);
     };
 
     const handleSave = () => {
@@ -81,10 +91,22 @@ const CardCommissionBoard = ({ isOpen, onClose }) => {
                 saveLabel="SAVE"
             >
                 <MasterFieldRow label="Bank Account" colSpan="col-span-12">
-                    <MasterLookupInput value={formData.BankAccName || formData.BankAccCode} onSearchClick={() => setShowBankModal(true)} placeholder="Select bank account..." />
+                    <MasterSelect
+                        name="BankAccCode"
+                        value={formData.BankAccCode || ''}
+                        onChange={handleBankChange}
+                        options={bankAccounts.map(b => ({ value: b.code, label: `${b.code} - ${b.name}` }))}
+                        placeholder="Select bank account..."
+                    />
                 </MasterFieldRow>
                 <MasterFieldRow label="Card Type" colSpan="col-span-12">
-                    <MasterLookupInput value={formData.CardType || formData.CardID} onSearchClick={() => setShowCardModal(true)} placeholder="Select card type..." />
+                    <MasterSelect
+                        name="CardID"
+                        value={formData.CardID || ''}
+                        onChange={handleCardChange}
+                        options={cardTypes.map(c => ({ value: c.cardID, label: `${c.cardID} - ${c.name}` }))}
+                        placeholder="Select card type..."
+                    />
                 </MasterFieldRow>
                 <MasterFieldRow label="Commission Rate" colSpan="col-span-12">
                     <div className="flex items-center gap-3 flex-1">
@@ -94,32 +116,6 @@ const CardCommissionBoard = ({ isOpen, onClose }) => {
                     </div>
                 </MasterFieldRow>
             </MasterFormWrapper>
-
-            <MasterLookupModal
-                isOpen={showBankModal}
-                onClose={() => setShowBankModal(false)}
-                title="Bank Account Lookup"
-                columns={[
-                    { label: 'CODE', key: 'code', isId: true, width: 'w-[100px]', render: (item) => <span className="font-mono text-[11px] font-bold text-[#0285fd]">{item.code}</span> },
-                    { label: 'ACCOUNT NAME', key: 'name', render: (item) => <span className="font-bold text-slate-700 uppercase text-[11px]">{item.name}</span> },
-                ]}
-                items={bankAccounts}
-                onSelect={(b) => handleBankSelect(b.code, b.name)}
-                emptyMsg="No bank accounts found"
-            />
-
-            <MasterLookupModal
-                isOpen={showCardModal}
-                onClose={() => setShowCardModal(false)}
-                title="Card Type Lookup"
-                columns={[
-                    { label: 'CARD ID', key: 'cardID', isId: true, width: 'w-[100px]', render: (item) => <span className="font-mono text-[11px] font-bold text-[#0285fd]">{item.cardID}</span> },
-                    { label: 'CARD NAME', key: 'name', render: (item) => <span className="font-bold text-slate-700 uppercase text-[11px]">{item.name}</span> },
-                ]}
-                items={cardTypes}
-                onSelect={(c) => handleCardSelect(c.cardID, c.name)}
-                emptyMsg="No card types found"
-            />
 
             {showSaveConfirm && (
                 <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4">

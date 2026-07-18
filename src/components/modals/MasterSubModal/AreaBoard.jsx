@@ -3,7 +3,7 @@ import { RotateCcw, Save, Trash2, Loader2, AlertTriangle, MapPin, Navigation } f
 import { areaService } from '../../../services/area.service';
 import { routeService } from '../../../services/route.service';
 import { showSuccessToast, showErrorToast } from '../../../utils/toastUtils';
-import { MasterFormWrapper, MasterFieldRow, MasterInput, MasterLookupInput, MasterLookupModal } from '../../MasterFormComponents';
+import { MasterFormWrapper, MasterFieldRow, MasterInput, MasterSelect } from '../../MasterFormComponents';
 
 const AreaBoard = ({ isOpen, onClose }) => {
     const initialState = { Code: '', Area_Name: '', Route_Code: '', Route_Name: '', Company: '', CurrentUser: '' };
@@ -28,6 +28,12 @@ const AreaBoard = ({ isOpen, onClose }) => {
             }
             if (user) {
                 setFormData(prev => ({ ...prev, CurrentUser: user.empName || user.EmpName || user.Emp_Name || user.emp_Name || user.username || '', Company: companyCode }));
+            }
+            
+            // Fetch dropdown lists
+            if (companyCode) {
+                routeService.getAll(companyCode).then(data => setRouteList(data || [])).catch(err => console.error(err));
+                areaService.getAll(companyCode).then(data => setAreaList(data || [])).catch(err => console.error(err));
             }
         }
     }, [isOpen]);
@@ -70,36 +76,27 @@ const AreaBoard = ({ isOpen, onClose }) => {
         } catch (err) { showErrorToast(err.message || err); } finally { setLoading(false); }
     };
 
-    const openRouteSearch = async () => {
-        if (!formData.Company) { showErrorToast('Company not identified'); return; }
-        setLoading(true);
-        try {
-            const data = await routeService.getAll(formData.Company);
-            setRouteList(data || []);
-            setShowRouteSearch(true);
-        } catch (err) { showErrorToast('Failed to load routes'); } finally { setLoading(false); }
+    const handleRouteChange = (e) => {
+        const routeCode = e.target.value;
+        const route = routeList.find(r => r.code === routeCode);
+        if (route) {
+            setFormData(prev => ({ ...prev, Route_Code: route.code, Route_Name: route.name, Code: '' }));
+            setIsEditMode(false);
+        } else {
+            setFormData(prev => ({ ...prev, Route_Code: '', Route_Name: '', Code: '' }));
+        }
     };
 
-    const selectRoute = (route) => {
-        setFormData(prev => ({ ...prev, Route_Code: route.code, Route_Name: route.name, Code: '' }));
-        setIsEditMode(false);
-        setShowRouteSearch(false);
-    };
-
-    const openAreaSearch = async () => {
-        if (!formData.Route_Code) { showErrorToast('Select a route first'); return; }
-        setLoading(true);
-        try {
-            const data = await areaService.searchAreas(formData.Route_Code, formData.Company, '');
-            setAreaList(data || []);
-            setShowAreaSearch(true);
-        } catch (err) { showErrorToast('Failed to load areas'); } finally { setLoading(false); }
-    };
-
-    const selectArea = (area) => {
-        setFormData(prev => ({ ...prev, Code: area.code, Area_Name: area.name }));
-        setIsEditMode(true);
-        setShowAreaSearch(false);
+    const handleAreaChange = (e) => {
+        const areaCode = e.target.value;
+        const area = areaList.find(a => a.code === areaCode);
+        if (area) {
+            setFormData(prev => ({ ...prev, Code: area.code, Area_Name: area.name, Route_Code: area.route_Code || area.routeCode || formData.Route_Code }));
+            setIsEditMode(true);
+        } else {
+            setFormData(prev => ({ ...prev, Code: '', Area_Name: '' }));
+            setIsEditMode(false);
+        }
     };
 
     return (
@@ -118,43 +115,28 @@ const AreaBoard = ({ isOpen, onClose }) => {
                 onDelete={handleDelete}
             >
                 <MasterFieldRow label="Route" colSpan="col-span-12">
-                    <MasterLookupInput value={formData.Route_Name || formData.Route_Code} onSearchClick={openRouteSearch} placeholder="Select route..." />
+                    <MasterSelect 
+                        name="Route_Code"
+                        value={formData.Route_Code || ''}
+                        onChange={handleRouteChange}
+                        options={routeList.map(r => ({ value: r.code, label: `${r.code} - ${r.name}` }))}
+                        placeholder="Select route..."
+                    />
                 </MasterFieldRow>
                 <MasterFieldRow label="Area ID" colSpan="col-span-12">
-                    <MasterLookupInput value={formData.Code || ''} onSearchClick={openAreaSearch} isIdField />
+                    <MasterSelect 
+                        name="Code"
+                        value={formData.Code || ''}
+                        onChange={handleAreaChange}
+                        options={areaList.filter(a => !formData.Route_Code || a.route_Code === formData.Route_Code || a.routeCode === formData.Route_Code).map(a => ({ value: a.code, label: `${a.code} - ${a.name}` }))}
+                        placeholder="Select area to edit..."
+                        isIdField
+                    />
                 </MasterFieldRow>
                 <MasterFieldRow label="Area Name" colSpan="col-span-12">
                     <MasterInput name="Area_Name" value={formData.Area_Name} onChange={handleInputChange} placeholder="Enter area name" />
                 </MasterFieldRow>
             </MasterFormWrapper>
-
-            <MasterLookupModal
-                isOpen={showRouteSearch}
-                onClose={() => setShowRouteSearch(false)}
-                title="Route Search"
-                columns={[
-                    { label: 'CODE', key: 'code', isId: true, width: 'w-[100px]', render: (item) => <span className="font-mono text-[11px] font-bold text-[#0285fd]">{item.code}</span> },
-                    { label: 'ROUTE NAME', key: 'name', render: (item) => <span className="font-bold text-slate-700 uppercase text-[11px]">{item.name}</span> },
-                ]}
-                items={routeList}
-                loading={loading}
-                onSelect={selectRoute}
-                emptyMsg="No routes found"
-            />
-
-            <MasterLookupModal
-                isOpen={showAreaSearch}
-                onClose={() => setShowAreaSearch(false)}
-                title="Area Search"
-                columns={[
-                    { label: 'CODE', key: 'code', isId: true, width: 'w-[100px]', render: (item) => <span className="font-mono text-[11px] font-bold text-[#0285fd]">{item.code}</span> },
-                    { label: 'AREA NAME', key: 'name', render: (item) => <span className="font-bold text-slate-700 uppercase text-[11px]">{item.name}</span> },
-                ]}
-                items={areaList}
-                loading={loading}
-                onSelect={selectArea}
-                emptyMsg="No areas found"
-            />
 
             {showDeleteConfirm && (
                 <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4">
@@ -165,8 +147,8 @@ const AreaBoard = ({ isOpen, onClose }) => {
                             <h3 className="text-lg font-black text-slate-800 mb-2 uppercase tracking-wider">Confirm Deletion</h3>
                             <p className="text-slate-500 text-[12px] font-medium leading-relaxed mb-8">Are you sure you want to delete area <span className="font-bold text-slate-800 uppercase">"{formData.Area_Name || formData.Code}"</span>?<br />This action cannot be undone.</p>
                             <div className="flex gap-3">
-                                <button onClick={() => setShowDeleteConfirm(false)} disabled={loading} className="flex-1 h-11 bg-slate-100 text-slate-600 text-[11px] font-black rounded-[3px] hover:bg-slate-200 transition-all uppercase tracking-widest disabled:opacity-50">Cancel</button>
-                                <button onClick={confirmDelete} disabled={loading} className="flex-1 h-11 bg-red-500 text-white text-[11px] font-black rounded-[3px] hover:bg-red-600 shadow-lg shadow-red-200 transition-all flex items-center justify-center gap-2 uppercase tracking-widest disabled:opacity-50">{loading ? <Loader2 size={16} className="animate-spin" /> : 'Delete Now'}</button>
+                                <button onClick={() => setShowDeleteConfirm(false)} disabled={loading} className={`px-6 h-10 bg-red-50 text-red-600 text-sm font-bold rounded-[3px] hover:bg-red-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-red-100 ${(loading) ? 'opacity-50 cursor-not-allowed' : ''}`}>Cancel</button>
+                                <button onClick={confirmDelete} disabled={loading} className={`px-6 h-10 bg-red-50 text-red-600 text-sm font-bold rounded-[3px] hover:bg-red-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-red-100 ${(loading) ? 'opacity-50 cursor-not-allowed' : ''}`}>{loading ? <Loader2 size={16} className="animate-spin" /> : 'Delete Now'}</button>
                             </div>
                         </div>
                         <div className="bg-slate-50 py-3 border-t border-slate-100"><span className="text-[9px] text-slate-400 font-black uppercase tracking-[0.2em] block text-center">Security Verification Required</span></div>

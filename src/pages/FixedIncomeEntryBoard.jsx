@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import SimpleModal from '../components/SimpleModal';
 import CalendarModal from '../components/CalendarModal';
-import { Search, RotateCcw, Save, Calendar } from 'lucide-react';
+import { RotateCcw, Save, Calendar } from 'lucide-react';
 import { fixedIncomeService } from '../services/fixedIncome.service';
 import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
 import { getCompanyCode } from '../utils/session';
 import TransactionFormWrapper from '../components/TransactionFormWrapper';
-import SearchableSelect from '../components/SearchableSelect';
 
 const FixedIncomeEntryBoard = ({ isOpen, onClose }) => {
     const initialState = {
@@ -19,10 +17,7 @@ const FixedIncomeEntryBoard = ({ isOpen, onClose }) => {
     const [payTypes, setPayTypes] = useState([]);
     const [incomeList, setIncomeList] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [showAccSearch, setShowAccSearch] = useState(false);
-    const [showPayTypeSearch, setShowPayTypeSearch] = useState(false);
     const [showCalendar, setShowCalendar] = useState(false);
-    const [searchTerm, setSearchTerm] = useState('');
 
     useEffect(() => {
         if (isOpen) {
@@ -49,9 +44,6 @@ const FixedIncomeEntryBoard = ({ isOpen, onClose }) => {
         const company = getCompanyCode() || '';
         setFormData({ ...initialState, Company: company, CreateUser: user?.emp_Name || user?.empName || '' });
     };
-
-    const handleAccountSelect = (acc) => { setFormData(prev => ({ ...prev, AccCode: acc.code, IncomeAccount: acc.name })); setShowAccSearch(false); };
-    const handlePayTypeSelect = (pay) => { setFormData(prev => ({ ...prev, PayType: pay.name })); setShowPayTypeSearch(false); };
 
     const handleSave = async () => {
         if (!formData.AccCode) { showErrorToast('Please select an account type.'); return; }
@@ -91,12 +83,19 @@ const FixedIncomeEntryBoard = ({ isOpen, onClose }) => {
                         <div className="grid grid-cols-12 gap-x-6 gap-y-3.5">
                             <div className="col-span-6">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Income Account</label>
-                                <div className="relative">
-                                    <input type="text" readOnly value={formData.IncomeAccount} onClick={() => setShowAccSearch(true)} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 cursor-pointer appearance-none"  style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
-                                    {formData.AccCode && (
-                                        <span className="absolute right-10 top-1/2 -translate-y-1/2 text-[10px] font-bold text-[#0285fd] bg-blue-50 border border-green-100 px-1.5 py-0.5 rounded">{formData.AccCode}</span>
-                                    )}
-                                </div>
+                                <select
+                                    value={formData.AccCode}
+                                    onChange={(e) => {
+                                        const acc = lookups.find(a => a.code === e.target.value);
+                                        setFormData(prev => ({ ...prev, AccCode: e.target.value, IncomeAccount: acc ? acc.name : '' }));
+                                    }}
+                                    className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 cursor-pointer"
+                                >
+                                    <option value="">Select account...</option>
+                                    {lookups.map((acc, idx) => (
+                                        <option key={idx} value={acc.code}>{acc.code} - {acc.name}</option>
+                                    ))}
+                                </select>
                             </div>
                             <div className="col-span-6">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Buyer Name</label>
@@ -113,9 +112,16 @@ const FixedIncomeEntryBoard = ({ isOpen, onClose }) => {
                             </div>
                             <div className="col-span-6">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Payment Type</label>
-                                <div className="relative">
-                                    <input type="text" readOnly value={formData.PayType} onClick={() => setShowPayTypeSearch(true)} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 cursor-pointer appearance-none"  style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
-                                </div>
+                                <select
+                                    value={formData.PayType}
+                                    onChange={(e) => setFormData(prev => ({ ...prev, PayType: e.target.value }))}
+                                    className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 cursor-pointer"
+                                >
+                                    <option value="">Select type...</option>
+                                    {payTypes.map((pay, idx) => (
+                                        <option key={idx} value={pay.name}>{pay.name}</option>
+                                    ))}
+                                </select>
                             </div>
                             <div className="col-span-12">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Credit Amount</label>
@@ -132,7 +138,7 @@ const FixedIncomeEntryBoard = ({ isOpen, onClose }) => {
                         <div className="max-h-[250px] overflow-y-auto no-scrollbar">
                             <table className="w-full text-left">
                                 <thead className="bg-slate-50 sticky top-0 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-200">
-                                    <tr><th className="px-4 py-2">Income Source</th><th className="px-4 py-2">Buyer</th><th className="px-4 py-2 text-center">Date</th><th className="px-4 py-2 text-right">Amount</th><th className="text-right px-5 py-3">Action</th></tr>
+                                    <tr><th className="px-4 py-2">Income Source</th><th className="px-4 py-2">Buyer</th><th className="px-4 py-2 text-center">Date</th><th className="px-4 py-2 text-right">Amount</th></tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-50">
                                     {incomeList.map((item, idx) => (
@@ -155,48 +161,6 @@ const FixedIncomeEntryBoard = ({ isOpen, onClose }) => {
                     </div>
                 </div>
             </TransactionFormWrapper>
-
-            <SimpleModal isOpen={showAccSearch} onClose={() => setShowAccSearch(false)} title="Income Accounts Lookup" maxWidth="max-w-[700px]">
-                <div className="space-y-4 font-['Tahoma']">
-                    <div className="flex items-center gap-4 bg-slate-50 p-4 border-b border-gray-100 mb-2">
-                        <span className="text-[12px] font-bold text-gray-500 uppercase tracking-wider">Search</span>
-                        <div className="relative flex-1">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
-                            <input type="text" placeholder="FIND BY NAME OR CODE..." className="w-full h-10 pl-10 pr-4 border border-gray-300 rounded-[3px] outline-none text-[13px] focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] shadow-sm bg-white" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} autoFocus />
-                        </div>
-                    </div>
-                    <div className="border border-gray-200 rounded-[3px] overflow-hidden shadow-sm max-h-[400px] overflow-y-auto no-scrollbar">
-                        <table className="w-full text-left">
-                            <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 shadow-sm z-10">
-                                <tr><th className=" px-5 py-3">Account Code</th><th className=" px-5 py-3">Account Name</th><th className="text-right px-5 py-3">Action</th></tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-50">
-                                {lookups.filter(a => (a.name || '').toLowerCase().includes(searchTerm.toLowerCase()) || (a.code || '').toLowerCase().includes(searchTerm.toLowerCase())).map((acc, idx) => (
-                                    <tr key={idx} className="group hover:bg-blue-50/50  transition-all cursor-pointer group border-b border-gray-50" onClick={() => handleAccountSelect(acc)}>
-                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{acc.code}</td>
-                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{acc.name}</td>
-                                        <td className="text-right px-5 py-3">
-                                            <button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </SimpleModal>
-
-            <SimpleModal isOpen={showPayTypeSearch} onClose={() => setShowPayTypeSearch(false)} title="Payment Type Lookup" maxWidth="max-w-[700px]">
-                <div className="p-4 space-y-2 font-['Tahoma']">
-                    {payTypes.map((pay, idx) => (
-                        <button key={idx} onClick={() => handlePayTypeSelect(pay)} className="w-full px-4 py-3 text-[12px] font-bold text-gray-700 hover:bg-slate-50 border border-slate-200 rounded-[3px] transition-all text-left flex justify-between items-center group shadow-sm">
-                            <span className="uppercase tracking-widest">{pay.name}</span>
-                            <span className="text-[#e49e1b] group-hover:text-[#0285fd] transition-colors font-black text-xs">SELECT</span>
-                        </button>
-                    ))}
-                    {payTypes.length === 0 && <p className="text-center text-gray-400 text-xs py-4">No payment types found.</p>}
-                </div>
-            </SimpleModal>
 
             <CalendarModal isOpen={showCalendar} onClose={() => setShowCalendar(false)} onDateSelect={(date) => { setFormData(prev => ({ ...prev, CreditDate: date })); setShowCalendar(false); }} initialDate={formData.CreditDate} />
         </>

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Target } from 'lucide-react';
 import { costCenterService } from '../../../services/costcenter.service';
 import { showSuccessToast, showErrorToast } from '../../../utils/toastUtils';
-import { MasterFormWrapper, MasterFieldRow, MasterInput, MasterLookupInput, MasterLookupModal } from '../../MasterFormComponents';
+import { MasterFormWrapper, MasterFieldRow, MasterInput, MasterSelect } from '../../MasterFormComponents';
 import ConfirmModal from '../../../components/modals/ConfirmModal';
 
 const CostCenterBoard = ({ isOpen, onClose }) => {
@@ -122,8 +122,9 @@ const CostCenterBoard = ({ isOpen, onClose }) => {
                 </div>
 
                 <MasterFieldRow label="Cost Center ID" colSpan="col-span-12">
-                    <select
-                        value={formData.Code}
+                    <MasterSelect
+                        name="Code"
+                        value={formData.Code || ''}
                         onChange={(e) => {
                             if (e.target.value) {
                                 selectCostCenter(e.target.value);
@@ -131,16 +132,13 @@ const CostCenterBoard = ({ isOpen, onClose }) => {
                                 handleClear();
                             }
                         }}
-                        className="flex-1 min-w-0 h-8 border border-slate-200 rounded-[3px] px-3 text-[12px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-blue-600 font-bold cursor-pointer appearance-none"
-                        style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
-                    >
-                        <option value="">Auto Gen (New Cost Center)</option>
-                        {costCentersList.map((c, i) => (
-                            <option key={i} value={c.code || c.Code}>
-                                {c.code || c.Code} - {c.name || c.Name}
-                            </option>
-                        ))}
-                    </select>
+                        placeholder=""
+                        options={[
+                            { value: '', label: 'Auto Gen (New Cost Center)' },
+                            ...costCentersList.map(c => ({ value: c.code || c.Code, label: `${c.code || c.Code} - ${c.name || c.Name}` }))
+                        ]}
+                        isIdField
+                    />
                 </MasterFieldRow>
                 <MasterFieldRow label="Cost Center Name" colSpan="col-span-12">
                     <MasterInput name="Name" value={formData.Name} onChange={handleInputChange} placeholder="Enter cost center name" />

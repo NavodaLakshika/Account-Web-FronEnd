@@ -251,7 +251,7 @@ const OpeningBalanceBoard = ({ isOpen, onClose }) => {
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">{activeTab === 'Vendor' ? 'A/P Account' : activeTab === 'Customer' ? 'A/R Account' : 'G/L Account'}</label>
                                 <div className="relative">
                                     <select
-                                        value={formData.accountName}
+                                        value={formData.accountCode || ''}
                                         onChange={(ev) => {
                                             const val = ev.target.value;
                                             const item = (getAccountItems() || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || i === val);
@@ -281,9 +281,9 @@ const OpeningBalanceBoard = ({ isOpen, onClose }) => {
                                         value={formData.costCenter}
                                         onChange={(ev) => {
                                             const val = ev.target.value;
-                                            const item = (getAccountItems() || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || i === val);
+                                            const item = (lookups.costCenters || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || i === val);
                                             if (item) {
-                                                const handler = (item) => { setFormData(prev => ({ ...prev, accountCode: item.code, accountName: item.name })); };
+                                                const handler = (item) => { setFormData(prev => ({ ...prev, costCenter: item.code, costCenterName: item.name })); };
                                                 handler(item);
                                             }
                                         }}

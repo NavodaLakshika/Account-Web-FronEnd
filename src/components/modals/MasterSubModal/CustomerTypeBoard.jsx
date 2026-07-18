@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { RotateCcw, Save, Trash2, Loader2, AlertTriangle, Users } from 'lucide-react';
 import { customerTypeService } from '../../../services/customerType.service';
 import { showSuccessToast, showErrorToast } from '../../../utils/toastUtils';
-import { MasterFormWrapper, MasterFieldRow, MasterInput, MasterLookupInput, MasterLookupModal } from '../../MasterFormComponents';
+import { MasterFormWrapper, MasterFieldRow, MasterInput, MasterSelect } from '../../MasterFormComponents';
 
 const CustomerTypeBoard = ({ isOpen, onClose }) => {
     const initialState = { Code: '', Type_Name: '', Company: '', CurrentUser: '' };
@@ -10,7 +10,6 @@ const CustomerTypeBoard = ({ isOpen, onClose }) => {
     const [formData, setFormData] = useState(initialState);
     const [loading, setLoading] = useState(false);
     const [isEditMode, setIsEditMode] = useState(false);
-    const [showSearch, setShowSearch] = useState(false);
     const [typeList, setTypeList] = useState([]);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
@@ -26,6 +25,7 @@ const CustomerTypeBoard = ({ isOpen, onClose }) => {
             if (user) {
                 setFormData(prev => ({ ...prev, CurrentUser: user.empName || user.EmpName || user.Emp_Name || user.emp_Name || user.username || '', Company: companyCode }));
             }
+            customerTypeService.getAll().then(data => setTypeList(data || [])).catch(err => console.error(err));
         }
     }, [isOpen]);
 
@@ -67,19 +67,16 @@ const CustomerTypeBoard = ({ isOpen, onClose }) => {
         } catch (err) { showErrorToast(err.message || err); } finally { setLoading(false); }
     };
 
-    const openSearch = async () => {
-        setLoading(true);
-        try {
-            const data = await customerTypeService.getAll();
-            setTypeList(data || []);
-            setShowSearch(true);
-        } catch (err) { showErrorToast('Failed to load customer types'); } finally { setLoading(false); }
-    };
-
-    const selectType = (type) => {
-        setFormData(prev => ({ ...prev, Code: type.code, Type_Name: type.name }));
-        setIsEditMode(true);
-        setShowSearch(false);
+    const handleTypeChange = (e) => {
+        const code = e.target.value;
+        const type = typeList.find(t => t.code === code);
+        if (type) {
+            setFormData(prev => ({ ...prev, Code: type.code, Type_Name: type.name }));
+            setIsEditMode(true);
+        } else {
+            setFormData(prev => ({ ...prev, Code: '', Type_Name: '' }));
+            setIsEditMode(false);
+        }
     };
 
     return (
@@ -98,26 +95,21 @@ const CustomerTypeBoard = ({ isOpen, onClose }) => {
                 onDelete={handleDelete}
             >
                 <MasterFieldRow label="Type ID" colSpan="col-span-12">
-                    <MasterLookupInput value={formData.Code || ''} onSearchClick={openSearch} isIdField />
+                    <MasterSelect
+                        name="Code"
+                        value={formData.Code || ''}
+                        onChange={handleTypeChange}
+                        options={typeList.map(t => ({ value: t.code, label: `${t.code} - ${t.name}` }))}
+                        placeholder="Select type to edit..."
+                        isIdField
+                    />
                 </MasterFieldRow>
                 <MasterFieldRow label="Type Name" colSpan="col-span-12">
                     <MasterInput name="Type_Name" value={formData.Type_Name} onChange={handleInputChange} placeholder="Enter customer type name" />
                 </MasterFieldRow>
             </MasterFormWrapper>
 
-            <MasterLookupModal
-                isOpen={showSearch}
-                onClose={() => setShowSearch(false)}
-                title="Customer Types"
-                columns={[
-                    { label: 'CODE', key: 'code', isId: true, width: 'w-[100px]', render: (item) => <span className="font-mono text-[11px] font-bold text-[#0285fd]">{item.code}</span> },
-                    { label: 'TYPE NAME', key: 'name', render: (item) => <span className="font-bold text-slate-700 uppercase text-[11px]">{item.name}</span> },
-                ]}
-                items={typeList}
-                loading={loading}
-                onSelect={selectType}
-                emptyMsg="No customer types found"
-            />
+
 
             {showDeleteConfirm && (
                 <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4">
@@ -128,8 +120,8 @@ const CustomerTypeBoard = ({ isOpen, onClose }) => {
                             <h3 className="text-lg font-black text-slate-800 mb-2 uppercase tracking-wider">Confirm Deletion</h3>
                             <p className="text-slate-500 text-[12px] font-medium leading-relaxed mb-8">Are you sure you want to delete <span className="font-bold text-slate-800 uppercase">"{formData.Type_Name || formData.Code}"</span>?<br />This action is permanent and cannot be undone.</p>
                             <div className="flex gap-3">
-                                <button onClick={() => setShowDeleteConfirm(false)} disabled={loading} className="flex-1 h-11 bg-slate-100 text-slate-600 text-[11px] font-black rounded-[3px] hover:bg-slate-200 transition-all uppercase tracking-widest disabled:opacity-50">Cancel</button>
-                                <button onClick={confirmDelete} disabled={loading} className="flex-1 h-11 bg-red-500 text-white text-[11px] font-black rounded-[3px] hover:bg-red-600 shadow-lg shadow-red-200 transition-all flex items-center justify-center gap-2 uppercase tracking-widest disabled:opacity-50">{loading ? <Loader2 size={16} className="animate-spin" /> : 'Delete Now'}</button>
+                                <button onClick={() => setShowDeleteConfirm(false)} disabled={loading} className={`px-6 h-10 bg-red-50 text-red-600 text-sm font-bold rounded-[3px] hover:bg-red-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-red-100 ${(loading) ? 'opacity-50 cursor-not-allowed' : ''}`}>Cancel</button>
+                                <button onClick={confirmDelete} disabled={loading} className={`px-6 h-10 bg-red-50 text-red-600 text-sm font-bold rounded-[3px] hover:bg-red-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-red-100 ${(loading) ? 'opacity-50 cursor-not-allowed' : ''}`}>{loading ? <Loader2 size={16} className="animate-spin" /> : 'Delete Now'}</button>
                             </div>
                         </div>
                         <div className="bg-slate-50 py-3 border-t border-slate-100"><span className="text-[9px] text-slate-400 font-black uppercase tracking-[0.2em] block text-center">Security Verification Required</span></div>

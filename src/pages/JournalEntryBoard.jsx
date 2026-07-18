@@ -637,7 +637,7 @@ const JournalEntryBoard = ({ isOpen, onClose, onComplete }) => {
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Ledger Account</label>
                                 <div className="relative">
                                     <select
-                                        value={currentLine.accName}
+                                        value={currentLine.accCode || ''}
                                         onChange={(ev) => {
                                             const val = ev.target.value;
                                             const item = (lookups.accounts || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || i === val);
@@ -663,7 +663,7 @@ const JournalEntryBoard = ({ isOpen, onClose, onComplete }) => {
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Strategic Unit</label>
                                 <div className="relative">
                                     <select
-                                        value={currentLine.costCenterName}
+                                        value={currentLine.costCenter || ''}
                                         onChange={(ev) => {
                                             const val = ev.target.value;
                                             const item = (lookups.costCenters || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || i === val);
@@ -796,7 +796,7 @@ const JournalEntryBoard = ({ isOpen, onClose, onComplete }) => {
                                     </div>
                                     <div className="flex-1 px-4 py-2 truncate text-gray-500 text-[11px]">{entry.memo}</div>
                                     <div className="w-9 flex justify-center">
-                                        <button onClick={() => handleDeleteClick(entry)} className="text-red-300 hover:text-red-500 p-1">
+                                        <button onClick={() => handleDeleteClick(entry)} className="px-6 h-10 bg-red-50 text-red-600 text-sm font-bold rounded-[3px] hover:bg-red-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-red-100">
                                             <Trash2 size={12} />
                                         </button>
                                     </div>

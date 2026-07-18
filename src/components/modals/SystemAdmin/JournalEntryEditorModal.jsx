@@ -436,13 +436,13 @@ const JournalEntryEditorModal = ({ isOpen, onClose }) => {
                         <div className="flex gap-3">
                             <button 
                                 onClick={() => setShowDeleteConfirm(false)}
-                                className="flex-1 h-10 bg-slate-100 text-slate-600 text-[11px] font-black rounded-[3px] uppercase tracking-widest hover:bg-slate-200 transition-colors"
+                                className="px-6 h-10 bg-red-50 text-red-600 text-sm font-bold rounded-[3px] hover:bg-red-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-red-100"
                             >
                                 Cancel
                             </button>
                             <button 
                                 onClick={confirmDelete}
-                                className="flex-1 h-10 bg-red-600 text-white text-[11px] font-black rounded-[3px] uppercase tracking-widest hover:bg-red-700 shadow-md shadow-red-200 transition-all active:scale-95"
+                                className="px-6 h-10 bg-red-50 text-red-600 text-sm font-bold rounded-[3px] hover:bg-red-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-red-100"
                             >
                                 Delete
                             </button>

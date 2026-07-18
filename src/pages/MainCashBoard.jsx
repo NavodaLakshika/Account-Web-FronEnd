@@ -244,7 +244,7 @@ const MainCashBoard = ({ isOpen, onClose }) => {
                                     <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Account</label>
                                     <div className="relative">
                                         <select
-                                        value={formData.accountName}
+                                        value={formData.accountId || ''}
                                         onChange={(ev) => {
                                             const val = ev.target.value;
                                             const item = (lookups.mainAccounts || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || i === val);
@@ -270,12 +270,12 @@ const MainCashBoard = ({ isOpen, onClose }) => {
                                     <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Cost Center</label>
                                     <div className="relative">
                                         <select
-                                        value={formData.costCenterName}
+                                        value={formData.costCenterId || ''}
                                         onChange={(ev) => {
                                             const val = ev.target.value;
-                                            const item = (lookups.mainAccounts || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || i === val);
+                                            const item = (lookups.costCenters || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || i === val);
                                             if (item) {
-                                                const handler = (item) => setFormData(prev => ({ ...prev, accountId: item.code, accountName: item.name }));
+                                                const handler = (item) => setFormData(prev => ({ ...prev, costCenterId: item.code, costCenterName: item.name }));
                                                 handler(item);
                                             }
                                         }}
@@ -283,7 +283,7 @@ const MainCashBoard = ({ isOpen, onClose }) => {
                                         style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
                                     >
                                         <option value="">Select...</option>
-                                        {(lookups.mainAccounts || []).map((item, idx) => (
+                                        {(lookups.costCenters || []).map((item, idx) => (
                                             <option key={idx} value={item.code || item.name || item}>
                                                 {item.code ? `${item.code} - ${item.name}` : (item.name || item)}
                                             </option>
@@ -296,7 +296,7 @@ const MainCashBoard = ({ isOpen, onClose }) => {
                                     <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Pay to the Order</label>
                                     <div className="relative">
                                         <select
-                                        value={formData.payeeName}
+                                        value={formData.payeeId || ''}
                                         onChange={(ev) => {
                                             const val = ev.target.value;
                                             const item = (lookups.payees || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || i === val);
@@ -398,7 +398,7 @@ const MainCashBoard = ({ isOpen, onClose }) => {
                                         <div className="flex-[2] px-2 py-1.5">
                                             <div className="relative">
                                                 <select
-                                        value={row.expAccName}
+                                        value={row.expAccCode || ''}
                                         onChange={(ev) => {
                                             const val = ev.target.value;
                                             const item = (lookups.expenseAccounts || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || i === val);
@@ -464,7 +464,7 @@ const MainCashBoard = ({ isOpen, onClose }) => {
                                         </div>
                                         <div className="w-12 flex justify-center">
                                             <button onClick={() => deleteRow(idx)}
-                                                className="text-red-300 hover:text-red-500 transition-all p-1.5 hover:bg-red-50 rounded-[3px]">
+                                                className="px-6 h-10 bg-red-50 text-red-600 text-sm font-bold rounded-[3px] hover:bg-red-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-red-100">
                                                 <Trash2 size={14} />
                                             </button>
                                         </div>

@@ -246,7 +246,7 @@ const CustomerChequeReturnBoard = ({ isOpen, onClose }) => {
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Customer</label>
                                 <div className="relative">
                                     <select
-                                        value={formData.customerName}
+                                        value={formData.customerCode || ''}
                                         onChange={(ev) => {
                                             const val = ev.target.value;
                                             const item = (lookups.customers || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || i === val);
@@ -297,7 +297,7 @@ const CustomerChequeReturnBoard = ({ isOpen, onClose }) => {
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Bank Account</label>
                                 <div className="relative">
                                     <select
-                                        value={formData.bankName}
+                                        value={formData.bankCode || ''}
                                         onChange={(ev) => {
                                             const val = ev.target.value;
                                             const item = (lookups.banks || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || i === val);

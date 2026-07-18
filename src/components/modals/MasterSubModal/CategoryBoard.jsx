@@ -3,7 +3,7 @@ import { RotateCcw, Save, Trash2, Loader2, AlertTriangle, Building2, FolderTree 
 import { categoryService } from '../../../services/category.service';
 import { departmentService } from '../../../services/department.service';
 import { showSuccessToast, showErrorToast } from '../../../utils/toastUtils';
-import { MasterFormWrapper, MasterFieldRow, MasterInput, MasterLookupInput, MasterLookupModal } from '../../MasterFormComponents';
+import { MasterFormWrapper, MasterFieldRow, MasterInput, MasterSelect } from '../../MasterFormComponents';
 
 const CategoryBoard = ({ isOpen, onClose }) => {
     const initialState = {
@@ -33,6 +33,10 @@ const CategoryBoard = ({ isOpen, onClose }) => {
                     CurrentUser: user.empName || user.EmpName || user.Emp_Name || user.emp_Name || user.username || '',
                     Company: companyCode
                 }));
+            }
+            if (companyCode) {
+                departmentService.getAll(companyCode).then(data => setDeptList(data || [])).catch(err => console.error(err));
+                categoryService.getAll(companyCode).then(data => setCatList(data || [])).catch(err => console.error(err));
             }
         }
     }, [isOpen]);
@@ -88,36 +92,27 @@ const CategoryBoard = ({ isOpen, onClose }) => {
         }
     };
 
-    const openDeptSearch = async () => {
-        if (!formData.Company) { showErrorToast('Company not identified'); return; }
-        setLoading(true);
-        try {
-            const data = await departmentService.getAll(formData.Company);
-            setDeptList(data || []);
-            setShowDeptSearch(true);
-        } catch (err) { showErrorToast('Failed to load departments'); } finally { setLoading(false); }
+    const handleDeptChange = (e) => {
+        const deptCode = e.target.value;
+        const dept = deptList.find(d => d.code === deptCode);
+        if (dept) {
+            setFormData(prev => ({ ...prev, Dept_Code: dept.code, Dept_Name: dept.name, Code: '' }));
+            setIsEditMode(false);
+        } else {
+            setFormData(prev => ({ ...prev, Dept_Code: '', Dept_Name: '', Code: '' }));
+        }
     };
 
-    const selectDept = (dept) => {
-        setFormData(prev => ({ ...prev, Dept_Code: dept.code, Dept_Name: dept.name, Code: '' }));
-        setIsEditMode(false);
-        setShowDeptSearch(false);
-    };
-
-    const openCatSearch = async () => {
-        if (!formData.Dept_Code) { showErrorToast('Select a department first'); return; }
-        setLoading(true);
-        try {
-            const data = await categoryService.searchCategories(formData.Dept_Code, formData.Company, '');
-            setCatList(data || []);
-            setShowCatSearch(true);
-        } catch (err) { showErrorToast('Failed to load categories'); } finally { setLoading(false); }
-    };
-
-    const selectCat = (cat) => {
-        setFormData(prev => ({ ...prev, Code: cat.code, Cat_Name: cat.name }));
-        setIsEditMode(true);
-        setShowCatSearch(false);
+    const handleCatChange = (e) => {
+        const catCode = e.target.value;
+        const cat = catList.find(c => c.code === catCode);
+        if (cat) {
+            setFormData(prev => ({ ...prev, Code: cat.code, Cat_Name: cat.name, Dept_Code: cat.dept_Code || cat.deptCode || formData.Dept_Code }));
+            setIsEditMode(true);
+        } else {
+            setFormData(prev => ({ ...prev, Code: '', Cat_Name: '' }));
+            setIsEditMode(false);
+        }
     };
 
     return (
@@ -136,43 +131,28 @@ const CategoryBoard = ({ isOpen, onClose }) => {
                 onDelete={handleDelete}
             >
                 <MasterFieldRow label="Department" colSpan="col-span-12">
-                    <MasterLookupInput value={formData.Dept_Name || formData.Dept_Code} onSearchClick={openDeptSearch} placeholder="Select department..." />
+                    <MasterSelect 
+                        name="Dept_Code"
+                        value={formData.Dept_Code || ''}
+                        onChange={handleDeptChange}
+                        options={deptList.map(d => ({ value: d.code, label: `${d.code} - ${d.name}` }))}
+                        placeholder="Select department..."
+                    />
                 </MasterFieldRow>
                 <MasterFieldRow label="Category ID" colSpan="col-span-12">
-                    <MasterLookupInput value={formData.Code || ''} onSearchClick={openCatSearch} isIdField />
+                    <MasterSelect 
+                        name="Code"
+                        value={formData.Code || ''}
+                        onChange={handleCatChange}
+                        options={catList.filter(c => !formData.Dept_Code || c.dept_Code === formData.Dept_Code || c.deptCode === formData.Dept_Code).map(c => ({ value: c.code, label: `${c.code} - ${c.name}` }))}
+                        placeholder="Select category to edit..."
+                        isIdField
+                    />
                 </MasterFieldRow>
                 <MasterFieldRow label="Category Name" colSpan="col-span-12">
                     <MasterInput name="Cat_Name" value={formData.Cat_Name} onChange={handleInputChange} placeholder="Enter category name" />
                 </MasterFieldRow>
             </MasterFormWrapper>
-
-            <MasterLookupModal
-                isOpen={showDeptSearch}
-                onClose={() => setShowDeptSearch(false)}
-                title="Department Search"
-                columns={[
-                    { label: 'CODE', key: 'code', isId: true, width: 'w-[100px]', render: (item) => <span className="font-mono text-[11px] font-bold text-[#0285fd]">{item.code}</span> },
-                    { label: 'DEPARTMENT NAME', key: 'name', render: (item) => <span className="font-bold text-slate-700 uppercase text-[11px]">{item.name}</span> },
-                ]}
-                items={deptList}
-                loading={loading}
-                onSelect={selectDept}
-                emptyMsg="No departments found"
-            />
-
-            <MasterLookupModal
-                isOpen={showCatSearch}
-                onClose={() => setShowCatSearch(false)}
-                title="Category Search"
-                columns={[
-                    { label: 'CODE', key: 'code', isId: true, width: 'w-[100px]', render: (item) => <span className="font-mono text-[11px] font-bold text-[#0285fd]">{item.code}</span> },
-                    { label: 'CATEGORY NAME', key: 'name', render: (item) => <span className="font-bold text-slate-700 uppercase text-[11px]">{item.name}</span> },
-                ]}
-                items={catList}
-                loading={loading}
-                onSelect={selectCat}
-                emptyMsg="No categories found"
-            />
 
             {showDeleteConfirm && (
                 <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4">
@@ -183,8 +163,8 @@ const CategoryBoard = ({ isOpen, onClose }) => {
                             <h3 className="text-lg font-black text-slate-800 mb-2 uppercase tracking-wider">Confirm Deletion</h3>
                             <p className="text-slate-500 text-[12px] font-medium leading-relaxed mb-8">Are you sure you want to delete category <span className="font-bold text-slate-800 uppercase">"{formData.Cat_Name || formData.Code}"</span>?<br />This action cannot be undone.</p>
                             <div className="flex gap-3">
-                                <button onClick={() => setShowDeleteConfirm(false)} disabled={loading} className="flex-1 h-11 bg-slate-100 text-slate-600 text-[11px] font-black rounded-[3px] hover:bg-slate-200 transition-all uppercase tracking-widest disabled:opacity-50">Cancel</button>
-                                <button onClick={confirmDelete} disabled={loading} className="flex-1 h-11 bg-red-500 text-white text-[11px] font-black rounded-[3px] hover:bg-red-600 shadow-lg shadow-red-200 transition-all flex items-center justify-center gap-2 uppercase tracking-widest disabled:opacity-50">{loading ? <Loader2 size={16} className="animate-spin" /> : 'Delete Now'}</button>
+                                <button onClick={() => setShowDeleteConfirm(false)} disabled={loading} className={`px-6 h-10 bg-red-50 text-red-600 text-sm font-bold rounded-[3px] hover:bg-red-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-red-100 ${(loading) ? 'opacity-50 cursor-not-allowed' : ''}`}>Cancel</button>
+                                <button onClick={confirmDelete} disabled={loading} className={`px-6 h-10 bg-red-50 text-red-600 text-sm font-bold rounded-[3px] hover:bg-red-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-red-100 ${(loading) ? 'opacity-50 cursor-not-allowed' : ''}`}>{loading ? <Loader2 size={16} className="animate-spin" /> : 'Delete Now'}</button>
                             </div>
                         </div>
                         <div className="bg-slate-50 py-3 border-t border-slate-100"><span className="text-[9px] text-slate-400 font-black uppercase tracking-[0.2em] block text-center">Security Verification Required</span></div>

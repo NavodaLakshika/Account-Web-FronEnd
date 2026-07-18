@@ -417,7 +417,7 @@ const PayBillBoard = ({ isOpen, onClose }) => {
                                     <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Vendor Name</label>
                                     <div className="relative">
                                         <select
-                                        value={lookups.vendors}
+                                        value={formData.vendorId || ''}
                                         onChange={(ev) => {
                                             const val = ev.target.value;
                                             const v = (lookups.vendors || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || (i.itemId && i.itemId.toString() === val) || (i.id && i.id.toString() === val) || i === val);
@@ -441,7 +441,7 @@ const PayBillBoard = ({ isOpen, onClose }) => {
                                     <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Cost Center</label>
                                     <div className="relative">
                                         <select
-                                        value={lookups.costCenters}
+                                        value={formData.costCenter || ''}
                                         onChange={(ev) => {
                                             const val = ev.target.value;
                                             const c = (lookups.costCenters || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || (i.itemId && i.itemId.toString() === val) || (i.id && i.id.toString() === val) || i === val);
@@ -625,7 +625,7 @@ const PayBillBoard = ({ isOpen, onClose }) => {
                                     <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Payment Account</label>
                                     <div className="relative">
                                         <select
-                                        value={availableAccounts.find}
+                                        value={formData.accId || ''}
                                         onChange={(ev) => {
                                             const val = ev.target.value;
                                             const a = (availableAccounts || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || (i.itemId && i.itemId.toString() === val) || (i.id && i.id.toString() === val) || i === val);
@@ -655,7 +655,7 @@ const PayBillBoard = ({ isOpen, onClose }) => {
                                     <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Allocation Cost Center</label>
                                     <div className="relative">
                                         <select
-                                        value={lookups.costCenters}
+                                        value={formData.costCenter || ''}
                                         onChange={(ev) => {
                                             const val = ev.target.value;
                                             const c = (lookups.costCenters || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || (i.itemId && i.itemId.toString() === val) || (i.id && i.id.toString() === val) || i === val);

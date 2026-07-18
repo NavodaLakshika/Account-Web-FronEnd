@@ -199,7 +199,7 @@ const ChequeInHandBoard = ({ isOpen, onClose }) => {
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Target Bank</label>
                                 <div className="relative">
                                     <select
-                                        value={header.bankName}
+                                        value={header.bankCode || ''}
                                         onChange={(ev) => {
                                             const val = ev.target.value;
                                             const item = (lookups.banks || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || i === val);
