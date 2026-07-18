@@ -196,7 +196,7 @@ const ReversalEntryBoard = ({ isOpen, onClose }) => {
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Transaction Type</label>
                                 <div className="relative max-w-[400px]">
                                     <select
-                                        value={formData.transactionTypeName}
+                                        value={formData.transactionType || ''}
                                         onChange={(ev) => {
                                             const val = ev.target.value;
                                             const item = (lookups.transactionTypes || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || i === val);
@@ -274,7 +274,7 @@ const ReversalEntryBoard = ({ isOpen, onClose }) => {
                                     >
                                         <option value="">Select...</option>
                                         {(lookups.users || []).map((item, idx) => (
-                                            <option key={idx} value={item.code || item.name || item}>
+                                            <option key={idx} value={item.name || item.code || item}>
                                                 {item.code ? `${item.code} - ${item.name}` : (item.name || item)}
                                             </option>
                                         ))}

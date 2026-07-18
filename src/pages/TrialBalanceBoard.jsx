@@ -174,27 +174,90 @@ const TrialBalanceBoard = ({ isOpen, onClose, companyCodeProp, companyNameProp }
                             </div>
 
                             <div className="col-span-4">
-                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Cost Center</label>
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">
+                                    Cost Center
+                                </label>
+
                                 <div className="relative">
-                                    <input
-                                        type="text" readOnly
-                                        value={formData.costCenterName}
-                                        onClick={() => setShowCCModal(true)}
+                                    <select
+                                        value={formData.costCenter || ""}
+                                        onChange={(e) => {
+                                            if (e.target.value === "all") {
+                                                setFormData({
+                                                    ...formData,
+                                                    costCenter: "all",
+                                                    costCenterCode: "all",
+                                                    costCenterName: "ALL COST CENTERS",
+                                                });
+                                                return;
+                                            }
+
+                                            const sel = lookups.costCenters.find(
+                                                (c) => c.code === e.target.value
+                                            );
+
+                                            setFormData({
+                                                ...formData,
+                                                costCenter: sel?.code || "",
+                                                costCenterCode: sel?.code || "",
+                                                costCenterName: sel?.name || "",
+                                            });
+                                        }}
                                         className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
-                                     style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
+                                        style={{
+                                            backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`,
+                                            backgroundRepeat: "no-repeat",
+                                            backgroundPosition: "right 0.5rem center",
+                                            backgroundSize: "1em",
+                                        }}
+                                    >
+                                        <option value="">Select cost center...</option>
+                                        <option value="all">All Cost Centers</option>
+
+                                        {(lookups.costCenters || []).map((c, i) => (
+                                            <option key={i} value={c.code}>
+                                                {c.code} - {c.name}
+                                            </option>
+                                        ))}
+                                    </select>
                                 </div>
                             </div>
 
                             <div className="col-span-2 flex items-end gap-4">
-                                <div className="flex items-center gap-2 cursor-pointer group" onClick={() => {
-                                    if (formData.costCenterCode !== 'all') {
-                                        setFormData({ ...formData, costCenterCode: 'all', costCenterName: 'ALL COST CENTERS' });
-                                    }
-                                }}>
-                                    <div className={`w-5 h-5 rounded flex items-center justify-center border-2 transition-all cursor-pointer ${formData.costCenterCode === 'all' ? 'bg-[#0285fd] border-[#0285fd]' : 'border-gray-300 bg-white'}`}>
-                                        {formData.costCenterCode === 'all' && <Save size={10} className="text-white" />}
+                                <div
+                                    className="flex items-center gap-2 cursor-pointer group"
+                                    onClick={() => {
+                                        if (formData.costCenter === "all") {
+                                            setFormData({
+                                                ...formData,
+                                                costCenter: "",
+                                                costCenterCode: "",
+                                                costCenterName: "",
+                                            });
+                                        } else {
+                                            setFormData({
+                                                ...formData,
+                                                costCenter: "all",
+                                                costCenterCode: "all",
+                                                costCenterName: "All Cost Centers",
+                                            });
+                                        }
+                                    }}
+                                >
+                                    <div
+                                        className={`w-5 h-5 rounded flex items-center justify-center border-2 transition-all cursor-pointer ${formData.costCenter === "all"
+                                                ? "bg-[#0285fd] border-[#0285fd]"
+                                                : "border-gray-300 bg-white"
+                                            }`}
+                                    >
+                                        {formData.costCenter === "all" && (
+                                            <Save size={10} className="text-white" />
+                                        )}
                                     </div>
-                                    <span className="text-[13px] font-medium text-gray-700">ALL</span>
+
+                                    <span className="text-[13px] font-medium text-gray-700">
+                                        ALL
+                                    </span>
                                 </div>
                                 <button
                                     onClick={runReport}
@@ -260,17 +323,16 @@ const TrialBalanceBoard = ({ isOpen, onClose, companyCodeProp, companyNameProp }
                                             <th className="px-4 border-r border-slate-100">Nomenclature</th>
                                             <th className="px-4 border-r border-slate-100 w-44 text-right">Debit Volume</th>
                                             <th className="px-4 w-44 text-right">Credit Volume</th>
-                                        <th className="text-right px-5 py-3">Action</th></tr>
+                                            <th className="text-right px-5 py-3">Action</th></tr>
                                     </thead>
                                     <tbody className="divide-y divide-slate-100">
                                         {reportResults.map((row, idx) => (
                                             <tr key={idx} className="hover:bg-gray-50 transition-colors group text-[12px]">
                                                 <td className="px-4 py-2.5 border-r border-slate-100 text-center">
-                                                    <span className={`text-[10px] font-black uppercase ${
-                                                        row.mainType === 'Assets' ? 'text-emerald-500' :
+                                                    <span className={`text-[10px] font-black uppercase ${row.mainType === 'Assets' ? 'text-emerald-500' :
                                                         row.mainType === 'Liability' ? 'text-rose-500' :
-                                                        'text-blue-400'
-                                                    }`}>
+                                                            'text-blue-400'
+                                                        }`}>
                                                         {row.mainType || 'ACC'}
                                                     </span>
                                                 </td>

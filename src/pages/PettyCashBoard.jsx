@@ -340,7 +340,7 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                                     <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Petty Cash Account</label>
                                     <div className="relative">
                                         <select
-                                        value={safePetty.find}
+                                        value={form.pettyAccCode || ''}
                                         onChange={(ev) => {
                                             const val = ev.target.value;
                                             const a = (safePetty || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || (i.itemId && i.itemId.toString() === val) || (i.id && i.id.toString() === val) || i === val);
@@ -398,14 +398,14 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                                     {form.isVendor ? (
                                         <div className="relative">
                                             <select
-                                        value={form.vendorName}
-                                        onChange={(ev) => {
-                                            const val = ev.target.value;
-                                            const v = (safeSuppliers || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || (i.itemId && i.itemId.toString() === val) || (i.id && i.id.toString() === val) || i === val);
-                                            if (v) {
-                                                setForm(f => ({ ...f, vendorId: v.code, vendorName: v.name }));
-                                            }
-                                        }}
+                                            value={form.vendorId || ''}
+                                            onChange={(ev) => {
+                                                const val = ev.target.value;
+                                                const v = (safeSuppliers || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || (i.itemId && i.itemId.toString() === val) || (i.id && i.id.toString() === val) || i === val);
+                                                if (v) {
+                                                    setForm(f => ({ ...f, vendorId: v.code, vendorName: v.name }));
+                                                }
+                                            }}
                                         className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
                                         style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
                                     >
@@ -495,7 +495,7 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                                                     <td className="px-4 py-2.5 font-mono text-gray-400">{exp.costName || exp.costCode || '---'}</td>
                                                     <td className="px-4 py-2.5 italic text-gray-400 font-medium">{exp.memo || '---'}</td>
                                                     <td className="px-2 py-2.5 text-center">
-                                                        <button onClick={() => handleDeleteExpense(exp)} className="text-red-300 hover:text-red-500 bg-red-50 p-1.5 rounded-[3px] transition-all active:scale-95"><Trash2 size={14} /></button>
+                                                        <button onClick={() => handleDeleteExpense(exp)} className="px-6 h-10 bg-red-50 text-red-600 text-sm font-bold rounded-[3px] hover:bg-red-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-red-100"><Trash2 size={14} /></button>
                                                     </td>
                                                 </tr>
                                             ))}
@@ -586,7 +586,7 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                                                     <td className="px-4 py-2.5 text-right font-mono font-black text-red-600 bg-red-50/10">{(parseFloat(itm.cost || 0) * parseInt(itm.qty || 0)).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
                                                     <td className="px-4 py-2.5 italic text-gray-400 font-medium">{itm.description || '---'}</td>
                                                     <td className="px-2 py-2.5 text-center">
-                                                        <button onClick={() => handleDeleteItem(itm)} className="text-red-300 hover:text-red-500 bg-red-50 p-1.5 rounded-[3px] transition-all active:scale-95"><Trash2 size={14} /></button>
+                                                        <button onClick={() => handleDeleteItem(itm)} className="px-6 h-10 bg-red-50 text-red-600 text-sm font-bold rounded-[3px] hover:bg-red-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-red-100"><Trash2 size={14} /></button>
                                                     </td>
                                                 </tr>
                                             ))}

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import SimpleModal from '../../SimpleModal';
-import { Search, RotateCcw, Save, Edit, Loader2, X, PlusCircle } from 'lucide-react';
+import { RotateCcw, Save, Edit, Loader2 } from 'lucide-react';
 import { depRateService } from '../../../services/depRate.service';
 import { showSuccessToast, showErrorToast } from '../../../utils/toastUtils';
 
@@ -17,8 +17,6 @@ const DepreciationBoard = ({ isOpen, onClose }) => {
     const [rateList, setRateList] = useState([]);
     const [loading, setLoading] = useState(false);
     const [isEditMode, setIsEditMode] = useState(false);
-    const [showAccountSearch, setShowAccountSearch] = useState(false);
-    const [accSearchQuery, setAccSearchQuery] = useState('');
 
     useEffect(() => {
         if (isOpen) {
@@ -64,23 +62,12 @@ const DepreciationBoard = ({ isOpen, onClose }) => {
         setIsEditMode(false);
     };
 
-    const handleAccountSelect = (item) => {
-        setFormData(prev => ({ 
-            ...prev, 
-            AccCode: item.code,
-            AccountName: item.name
-        }));
-        setShowAccountSearch(false);
-        
-        // Check if rate already exists for this account
-        const existing = rateList.find(r => r.accCode === item.code);
-        if (existing) {
-            setFormData(prev => ({ ...prev, DepRate: existing.depRate }));
-            setIsEditMode(true);
-        } else {
-            setFormData(prev => ({ ...prev, DepRate: '' }));
-            setIsEditMode(false);
-        }
+    const handleAccountSelect = (code) => {
+        const item = lookups.find(l => l.code === code);
+        if (!item) { setFormData(prev => ({ ...prev, AccCode: '', AccountName: '' })); setIsEditMode(false); return; }
+        const existing = rateList.find(r => r.accCode === code);
+        setFormData(prev => ({ ...prev, AccCode: item.code, AccountName: item.name, DepRate: existing ? existing.depRate : '' }));
+        setIsEditMode(!!existing);
     };
 
     const handleSave = async () => {
@@ -164,28 +151,16 @@ const DepreciationBoard = ({ isOpen, onClose }) => {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="space-y-1.5">
                                 <label className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">Asset Account</label>
-                                <div className="flex gap-1">
-                                    <div className="relative flex-1">
-                                        <input 
-                                            type="text" 
-                                            value={formData.AccountName} 
-                                            readOnly 
-                                            placeholder=""
-                                            className="w-full h-8 border border-slate-200 px-3 text-[12px] bg-slate-50 rounded outline-none font-bold text-gray-700 shadow-sm cursor-not-allowed"
-                                        />
-                                        {formData.AccCode && (
-                                            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-bold text-[#0285fd] bg-blue-50 border border-blue-100 px-1.5 py-0.5 rounded shadow-sm">
-                                                {formData.AccCode}
-                                            </span>
-                                        )}
-                                    </div>
-                                    <button 
-                                        onClick={() => setShowAccountSearch(true)} 
-                                        className="w-9 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded transition-all shadow-sm active:scale-95 shrink-0 border-none"
-                                    >
-                                        <Search size={14} />
-                                    </button>
-                                </div>
+                                <select
+                                    value={formData.AccCode}
+                                    onChange={(e) => handleAccountSelect(e.target.value)}
+                                    className="w-full h-8 border border-slate-200 px-3 text-[12px] font-bold outline-none shadow-sm focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 bg-white rounded text-gray-700 cursor-pointer"
+                                >
+                                    <option value="">Select account...</option>
+                                    {lookups.map((acc, idx) => (
+                                        <option key={idx} value={acc.code}>{acc.code} - {acc.name}</option>
+                                    ))}
+                                </select>
                             </div>
 
                             <div className="space-y-1.5">
@@ -246,70 +221,6 @@ const DepreciationBoard = ({ isOpen, onClose }) => {
                     </div>
                 </div>
             </SimpleModal>
-
-            {/* Account Search Modal */}
-            {showAccountSearch && (
-                <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4 font-['Tahoma']">
-                    <div className="absolute inset-0 bg-slate-900/30 backdrop-blur-sm" onClick={() => setShowAccountSearch(false)} />
- <div className="relative w-full max-w-2xl bg-white shadow-2xl rounded-sm overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
-                        {/* Header */}
-                        <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-200 select-none relative overflow-hidden">
-                            <div className="absolute left-0 top-0 bottom-0 w-1.5 transition-colors duration-500" style={{ backgroundColor: localStorage.getItem('topBarColor') || '#0285fd' }} />
-                            <div className="flex items-center gap-2">
-                                <Search size={16} className="text-[#0078d4]" />
-                                <span className="text-[15px] font-[700] text-slate-900 uppercase tracking-[3px] font-mono truncate">Asset Accounts Lookup</span>
-                            </div>
-                            <button onClick={() => setShowAccountSearch(false)} className="w-9 h-8 flex items-center justify-center bg-red-50 hover:bg-red-100 text-red-600 rounded-[8px] transition-all active:scale-90 outline-none border-none group">
-                                <X size={28} strokeWidth={1.5} className="group-hover:scale-110 transition-transform" />
-                            </button>
-                        </div>
-                        <div className="p-3 bg-slate-50 border-b border-gray-200 flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                                <Search size={14} className="text-gray-400" />
-                                <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Search Facility</span>
-                            </div>
-                            <input 
-                                type="text" 
-                                placeholder="Find by Account Name or Code..." 
-                                className="h-9 border border-slate-200 px-3 text-xs rounded-[3px] w-72 focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 outline-none shadow-sm transition-all" 
-                                value={accSearchQuery} 
-                                onChange={(e) => setAccSearchQuery(e.target.value)} 
-                            />
-                        </div>
-                        <div className="border border-gray-200 overflow-hidden bg-white">
-                            <div className="max-h-[400px] overflow-y-auto custom-scrollbar">
-                                <table className="w-full text-left border-collapse">
-                                    <thead className="bg-[#f8fafd] text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-slate-200 sticky top-0 z-10">
-                                        <tr>
-                                            <th className="px-5 py-3">Account Code</th>
-                                            <th className="px-5 py-3">Account Description</th>
-                                            <th className="px-5 py-3 text-right">Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-slate-100 bg-white">
-                                        {lookups.filter(a => 
-                                            ((a.name || '').toLowerCase().includes(accSearchQuery.toLowerCase())) || 
-                                            ((a.code || '').toLowerCase().includes(accSearchQuery.toLowerCase()))
-                                        ).map((acc, idx) => (
-                                            <tr 
-                                                key={idx} 
-                                                onClick={() => handleAccountSelect(acc)}
-                                                className="group hover:bg-blue-50/50 cursor-pointer transition-colors"
-                                            >
-                                                <td className="px-5 py-3 font-mono text-[13px] text-gray-600">{acc.code}</td>
-                                                <td className="px-5 py-3 text-[13px] font-mono text-gray-600 uppercase font-bold group-hover:text-blue-600 transition-colors">{acc.name}</td>
-                                                <td className="px-5 py-3 text-right">
-                                                    <button className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[3px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95 uppercase tracking-widest border-none">SELECT</button>
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
         </>
     );
 };

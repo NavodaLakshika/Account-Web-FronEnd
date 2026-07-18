@@ -468,7 +468,7 @@ const EngagementAdminBoard = () => {
                                                     )}
                                                     <button
                                                         onClick={() => handleDeleteReview(review.id)}
-                                                        className="px-3 py-1.5 text-xs font-bold text-white bg-red-600 hover:bg-red-700 rounded-[3px] shadow-sm transition-all flex items-center justify-center w-[90px] gap-1.5"
+                                                        className="px-6 h-10 bg-red-50 text-red-600 text-sm font-bold rounded-[3px] hover:bg-red-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-red-100"
                                                         title="Delete"
                                                     >
                                                         <Trash2 size={14} /> Delete
@@ -790,7 +790,7 @@ const EngagementAdminBoard = () => {
                                                                 </button>
                                                                 <button
                                                                     onClick={() => handleDeleteAd(ad.id)}
-                                                                    className="px-3 py-1.5 text-xs font-bold text-white bg-red-600 hover:bg-red-700 rounded-[3px] shadow-sm transition-all flex items-center justify-center w-[90px] gap-1.5"
+                                                                    className="px-6 h-10 bg-red-50 text-red-600 text-sm font-bold rounded-[3px] hover:bg-red-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-red-100"
                                                                     title="Delete"
                                                                 >
                                                                     <Trash2 size={14} /> Delete

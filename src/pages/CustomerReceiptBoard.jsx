@@ -274,7 +274,7 @@ const CustomerReceiptBoard = ({ isOpen, onClose }) => {
                     <div className="bg-[#fcfcfc] px-6 py-5 w-full flex justify-between items-center border-t border-gray-200 rounded-b-[10px] shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]">
                         <div className="flex gap-3">
                             <button onClick={handleDelete}
-                                className="px-5 h-10 border-2 border-red-500 text-red-600 bg-white hover:bg-red-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2">
+                                className="px-6 h-10 bg-red-50 text-red-600 text-sm font-bold rounded-[3px] hover:bg-red-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-red-100">
                                 <Trash2 size={14} /> DELETE DOC
                             </button>
                             <button onClick={handleClear}
@@ -556,9 +556,9 @@ const CustomerReceiptBoard = ({ isOpen, onClose }) => {
                             <p className="text-slate-500 text-[12px] font-medium leading-relaxed mb-8">Are you sure you want to delete this draft receipt?</p>
                             <div className="flex gap-3">
                                 <button onClick={() => setShowDeleteConfirm(false)} disabled={isDeleting}
-                                    className="flex-1 h-11 bg-slate-100 text-slate-600 text-[11px] font-black rounded-[3px] hover:bg-slate-200 transition-all uppercase tracking-widest disabled:opacity-50">Cancel</button>
+                                    className={`px-6 h-10 bg-red-50 text-red-600 text-sm font-bold rounded-[3px] hover:bg-red-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-red-100 ${(isDeleting) ? 'opacity-50 cursor-not-allowed' : ''}`}>Cancel</button>
                                 <button onClick={confirmDelete} disabled={isDeleting}
-                                    className="flex-1 h-11 bg-red-500 text-white text-[11px] font-black rounded-[3px] hover:bg-red-600 shadow-lg shadow-red-200 transition-all flex items-center justify-center gap-2 uppercase tracking-widest disabled:opacity-50">
+                                    className={`px-6 h-10 bg-red-50 text-red-600 text-sm font-bold rounded-[3px] hover:bg-red-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-red-100 ${(isDeleting) ? 'opacity-50 cursor-not-allowed' : ''}`}>
                                     {isDeleting ? <Loader2 size={16} className="animate-spin" /> : 'Delete Now'}
                                 </button>
                             </div>

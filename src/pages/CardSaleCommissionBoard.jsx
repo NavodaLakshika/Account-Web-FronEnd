@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import SimpleModal from '../components/SimpleModal';
-import { Search, RotateCcw, Save } from 'lucide-react';
+import { RotateCcw, Save } from 'lucide-react';
 import { cardCommissionService } from '../services/cardCommission.service';
 import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
 import { getCompanyCode } from '../utils/session';
 import TransactionFormWrapper from '../components/TransactionFormWrapper';
-import SearchableSelect from '../components/SearchableSelect';
 
 const CardSaleCommissionBoard = ({ isOpen, onClose }) => {
     const initialState = { BankAccCode: '', BankAccName: '', CardID: '', CardType: '', Rate: '0.0' };
@@ -14,10 +12,6 @@ const CardSaleCommissionBoard = ({ isOpen, onClose }) => {
     const [banks, setBanks] = useState([]);
     const [cardTypes, setCardTypes] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [showBankSearch, setShowBankSearch] = useState(false);
-    const [showCardSearch, setShowCardSearch] = useState(false);
-    const [bankSearchTerm, setBankSearchTerm] = useState('');
-    const [cardSearchTerm, setCardSearchTerm] = useState('');
 
     useEffect(() => {
         if (isOpen) { fetchLookups(); }
@@ -50,16 +44,6 @@ const CardSaleCommissionBoard = ({ isOpen, onClose }) => {
     };
 
     const handleClear = () => { setFormData(initialState); };
-
-    const handleBankSelect = (bank) => {
-        setFormData(prev => ({ ...prev, BankAccCode: bank.code || bank.Code || bank.sub_Code || bank.Sub_Code, BankAccName: bank.name || bank.Name || bank.sub_Acc_Name || bank.Sub_Acc_Name }));
-        setShowBankSearch(false);
-    };
-
-    const handleCardSelect = (card) => {
-        setFormData(prev => ({ ...prev, CardID: card.cardID || card.CardID, CardType: card.name || card.CardName }));
-        setShowCardSearch(false);
-    };
 
     const handleSave = async () => {
         if (!formData.BankAccCode) { showErrorToast('Please select a bank account.'); return; }
@@ -97,21 +81,37 @@ const CardSaleCommissionBoard = ({ isOpen, onClose }) => {
                         <div className="grid grid-cols-12 gap-x-6 gap-y-4">
                             <div className="col-span-12">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Bank Account</label>
-                                <div className="relative">
-                                    <input type="text" readOnly value={formData.BankAccName} onClick={() => setShowBankSearch(true)} placeholder="Select bank account..." className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 cursor-pointer appearance-none"  style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
-                                    {formData.BankAccCode && (
-                                        <span className="absolute right-10 top-1/2 -translate-y-1/2 text-[10px] font-bold text-[#0285fd] bg-blue-50 border border-green-100 px-1.5 py-0.5 rounded">{formData.BankAccCode}</span>
-                                    )}
-                                </div>
+                                <select
+                                    value={formData.BankAccCode}
+                                    onChange={(e) => {
+                                        const bank = banks.find(b => (b.code || b.Code || b.sub_Code || b.Sub_Code) === e.target.value);
+                                        setFormData(prev => ({ ...prev, BankAccCode: e.target.value, BankAccName: bank ? (bank.name || bank.Name || bank.sub_Acc_Name || bank.Sub_Acc_Name) : '' }));
+                                    }}
+                                    className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 cursor-pointer"
+                                >
+                                    <option value="">Select bank account...</option>
+                                    {banks.map((b, idx) => (
+                                        <option key={idx} value={b.code || b.Code || b.sub_Code || b.Sub_Code}>
+                                            {b.code || b.Code || b.sub_Code || b.Sub_Code} - {b.name || b.Name || b.sub_Acc_Name || b.Sub_Acc_Name}
+                                        </option>
+                                    ))}
+                                </select>
                             </div>
                             <div className="col-span-12">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Card Type</label>
-                                <div className="relative">
-                                    <input type="text" readOnly value={formData.CardType} onClick={() => setShowCardSearch(true)} placeholder="Select card type..." className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 cursor-pointer appearance-none"  style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
-                                    {formData.CardID && (
-                                        <span className="absolute right-10 top-1/2 -translate-y-1/2 text-[10px] font-bold text-[#0285fd] bg-blue-50 border border-green-100 px-1.5 py-0.5 rounded">ID: {formData.CardID}</span>
-                                    )}
-                                </div>
+                                <select
+                                    value={formData.CardID}
+                                    onChange={(e) => {
+                                        const card = cardTypes.find(c => (c.cardID || c.CardID) === e.target.value);
+                                        setFormData(prev => ({ ...prev, CardID: e.target.value, CardType: card ? (card.name || card.CardName) : '' }));
+                                    }}
+                                    className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 cursor-pointer"
+                                >
+                                    <option value="">Select card type...</option>
+                                    {cardTypes.map((c, idx) => (
+                                        <option key={idx} value={c.cardID || c.CardID}>{c.name || c.CardName}</option>
+                                    ))}
+                                </select>
                             </div>
                             <div className="col-span-12">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Commission Rate (%)</label>
@@ -125,58 +125,6 @@ const CardSaleCommissionBoard = ({ isOpen, onClose }) => {
                     </div>
                 </div>
             </TransactionFormWrapper>
-
-            <SimpleModal isOpen={showBankSearch} onClose={() => setShowBankSearch(false)} title="Bank Accounts Lookup" maxWidth="max-w-[700px]">
-                <div className="space-y-4 font-['Tahoma']">
-                    <div className="flex items-center gap-4 bg-slate-50 p-4 border-b border-gray-100 mb-2">
-                        <span className="text-[12px] font-bold text-gray-500 uppercase tracking-wider">Search</span>
-                        <div className="relative flex-1">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
-                            <input type="text" placeholder="SEARCH BANK..." className="w-full h-10 pl-10 pr-4 border border-gray-300 rounded-[3px] outline-none text-[13px] focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] shadow-sm bg-white" value={bankSearchTerm} onChange={(e) => setBankSearchTerm(e.target.value)} autoFocus />
-                        </div>
-                    </div>
-                    <div className="border border-gray-200 rounded-[3px] overflow-hidden shadow-sm max-h-[400px] overflow-y-auto no-scrollbar">
-                        <table className="w-full text-left">
-                            <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 shadow-sm z-10">
-                                <tr><th className=" px-5 py-3">Bank Code</th><th className=" px-5 py-3">Bank Name</th><th className="text-right px-5 py-3">Action</th></tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-50">
-                                {banks.filter(b => (b.name || b.Name || b.sub_Acc_Name || '').toString().toLowerCase().includes(bankSearchTerm.toLowerCase()) || (b.code || b.Code || b.sub_Code || '').toString().toLowerCase().includes(bankSearchTerm.toLowerCase())).map((bank, idx) => (
-                                    <tr key={idx} className="group hover:bg-blue-50/50  transition-all cursor-pointer group border-b border-gray-50" onClick={() => handleBankSelect(bank)}>
-                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{bank.code || bank.Code || bank.sub_Code || bank.Sub_Code}</td>
-                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{bank.name || bank.Name || bank.sub_Acc_Name || bank.Sub_Acc_Name}</td>
-                                        <td className="text-right px-5 py-3">
-                                            <button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button>
-                                        </td>
-                                    </tr>
-                                ))}
-                                {banks.length === 0 && <tr><td colSpan="3" className="text-center py-16 text-gray-400 text-[11px] font-bold uppercase tracking-widest">No bank accounts found.</td></tr>}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </SimpleModal>
-
-            <SimpleModal isOpen={showCardSearch} onClose={() => setShowCardSearch(false)} title="Card Types Lookup" maxWidth="max-w-[700px]">
-                <div className="space-y-4 font-['Tahoma']">
-                    <div className="flex items-center gap-4 bg-slate-50 p-4 border-b border-gray-100 mb-2">
-                        <span className="text-[12px] font-bold text-gray-500 uppercase tracking-wider">Search</span>
-                        <div className="relative flex-1">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
-                            <input type="text" placeholder="FILTER CARDS..." className="w-full h-10 pl-10 pr-4 border border-gray-300 rounded-[3px] outline-none text-[13px] focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] shadow-sm bg-white" value={cardSearchTerm} onChange={(e) => setCardSearchTerm(e.target.value)} autoFocus />
-                        </div>
-                    </div>
-                    <div className="p-2 space-y-2 max-h-[350px] overflow-y-auto no-scrollbar">
-                        {cardTypes.filter(c => (c.name || '').toLowerCase().includes(cardSearchTerm.toLowerCase())).map((card, idx) => (
-                            <button key={idx} onClick={() => handleCardSelect(card)} className="w-full px-4 py-3 text-[12px] font-bold text-gray-700 hover:bg-blue-50/50 border border-slate-200 rounded-[3px] transition-all text-left flex justify-between items-center group shadow-sm cursor-pointer group border-b border-gray-50">
-                                <span className="uppercase tracking-widest">{card.name}</span>
-                                <span className="text-[#e49e1b] group-hover:text-[#0285fd] transition-colors font-black text-xs">SELECT</span>
-                            </button>
-                        ))}
-                        {cardTypes.length === 0 && <p className="text-center text-gray-400 text-xs py-4">No card types found.</p>}
-                    </div>
-                </div>
-            </SimpleModal>
         </>
     );
 };

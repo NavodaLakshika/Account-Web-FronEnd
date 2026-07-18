@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Save, RotateCcw, Loader2, AlertTriangle, Key, User, Search, Eye, EyeOff } from 'lucide-react';
 import { showSuccessToast, showErrorToast } from '../../../utils/toastUtils';
 import api from '../../../services/api';
-import { MasterFormWrapper, MasterFieldRow, MasterInput, MasterLookupInput, MasterLookupModal } from '../../MasterFormComponents';
+import { MasterFormWrapper, MasterFieldRow, MasterInput, MasterSelect } from '../../MasterFormComponents';
 import ConfirmModal from '../ConfirmModal';
 
 
@@ -12,8 +12,6 @@ const ChangePasswordBoard = ({ isOpen, onClose }) => {
 
     const [formData, setFormData] = useState(initialState);
     const [loading, setLoading] = useState(false);
-    const [showUserModal, setShowUserModal] = useState(false);
-    const [userSearchQuery, setUserSearchQuery] = useState('');
     const [users, setUsers] = useState([]);
     const [showSaveConfirm, setShowSaveConfirm] = useState(false);
     const [showPass, setShowPass] = useState({ cur: false, new: false, con: false });
@@ -38,9 +36,14 @@ const ChangePasswordBoard = ({ isOpen, onClose }) => {
         } catch (err) { console.error('Load users failed:', err); showErrorToast('Could not load user list'); }
     };
 
-    const handleUserSelect = (u) => {
-        setFormData(prev => ({ ...prev, EmpCode: u.emp_Code, UserName: u.emp_Name }));
-        setShowUserModal(false);
+    const handleUserChange = (e) => {
+        const code = e.target.value;
+        const u = users.find(u => u.emp_Code === code);
+        if (u) {
+            setFormData(prev => ({ ...prev, EmpCode: u.emp_Code, UserName: u.emp_Name }));
+        } else {
+            setFormData(prev => ({ ...prev, EmpCode: '', UserName: '' }));
+        }
     };
 
     const handleSave = () => {
@@ -100,7 +103,13 @@ const ChangePasswordBoard = ({ isOpen, onClose }) => {
                 }
             >
                 <MasterFieldRow label="User Name" colSpan="col-span-6">
-                    <MasterLookupInput value={formData.UserName} onSearchClick={() => setShowUserModal(true)} placeholder="Select user..." />
+                    <MasterSelect
+                        name="EmpCode"
+                        value={formData.EmpCode || ''}
+                        onChange={handleUserChange}
+                        options={users.map(u => ({ value: u.emp_Code, label: `${u.emp_Code} - ${u.emp_Name}` }))}
+                        placeholder="Select user..."
+                    />
                 </MasterFieldRow>
                 <MasterFieldRow label="Current Password" colSpan="col-span-6">
                     <div className="relative flex-1 flex">
@@ -135,20 +144,7 @@ const ChangePasswordBoard = ({ isOpen, onClose }) => {
                 </MasterFieldRow>
             </MasterFormWrapper>
 
-            <MasterLookupModal
-                isOpen={showUserModal}
-                onClose={() => setShowUserModal(false)}
-                title="System Users Lookup"
-                columns={[
-                    { label: 'EMPLOYEE ID', key: 'emp_Code', isId: true, width: 'w-[120px]', render: (item) => <span className="font-mono text-[11px] font-bold text-[#0285fd]">{item.emp_Code}</span> },
-                    { label: 'USER NAME', key: 'emp_Name', render: (item) => <span className="font-bold text-slate-700 uppercase text-[11px]">{item.emp_Name}</span> },
-                ]}
-                items={users.filter(u => (u.emp_Name || '').toLowerCase().includes(userSearchQuery.toLowerCase()) || (u.emp_Code || '').toLowerCase().includes(userSearchQuery.toLowerCase()))}
-                onSelect={handleUserSelect}
-                emptyMsg={users.length === 0 ? 'Synchronizing User Data...' : 'No matching records found'}
-                searchQuery={userSearchQuery}
-                setSearchQuery={setUserSearchQuery}
-            />
+
 
             <ConfirmModal
                 isOpen={showSaveConfirm}

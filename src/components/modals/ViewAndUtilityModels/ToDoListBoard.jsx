@@ -233,7 +233,7 @@ const ToDoListBoard = ({ isOpen, onClose }) => {
                                                     </div>
                                                     <button
                                                         onClick={() => deleteTask(task)}
-                                                        className="w-8 h-8 rounded-[3px] text-slate-300 hover:text-red-500 hover:bg-red-50 flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 shrink-0"
+                                                        className="px-6 h-10 bg-red-50 text-red-600 text-sm font-bold rounded-[3px] hover:bg-red-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-red-100"
                                                     >
                                                         <Trash2 size={16} />
                                                     </button>

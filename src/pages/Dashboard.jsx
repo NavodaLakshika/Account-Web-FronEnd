@@ -133,6 +133,7 @@ import SubscriptionAdminBoard from '../components/Admin/SubscriptionAdminBoard';
 import { biDashboardService } from '../services/biDashboard.service';
 import GetThingsDoneBoard from './GetThingsDoneBoard';
 import SystemLoader from '../components/SystemLoader';
+import GlobalSearchModal from '../components/modals/GlobalSearchModal';
 
 // Master File specific boards
 import CompanyBoard from './CompanyProfileBoard';
@@ -320,6 +321,7 @@ const Dashboard = () => {
     const [showBankRecModal, setShowBankRecModal] = useState(false);
     const [showTrialBalanceModal, setShowTrialBalanceModal] = useState(false);
     const [showSearchModal, setShowSearchModal] = useState(false);
+    const [showGlobalSearchModal, setShowGlobalSearchModal] = useState(false);
     const [showExpensesDashboardModal, setShowExpensesDashboardModal] = useState(false);
     const [showMarketingToolModal, setShowMarketingToolModal] = useState(false);
     const [showPurchaseOrderModal, setShowPurchaseOrderModal] = useState(false);
@@ -1457,6 +1459,49 @@ const Dashboard = () => {
     const [showSettingsDropdown, setShowSettingsDropdown] = useState(false);
     const [showProfileDropdown, setShowProfileDropdown] = useState(false);
 
+    const globalSearchItems = [];
+    const _seenLabels = new Set();
+    
+    Object.entries(menuDropdownItems).forEach(([menuName, groups]) => {
+        groups.forEach(group => {
+            if (group.items) {
+                group.items.forEach(item => {
+                    if (!_seenLabels.has(item.label)) {
+                        _seenLabels.add(item.label);
+                        globalSearchItems.push({ label: item.label, path: `${menuName} > ${group.group}`, onClick: item.onClick });
+                    }
+                });
+            } else if (group.label) {
+                if (!_seenLabels.has(group.label)) {
+                    _seenLabels.add(group.label);
+                    globalSearchItems.push({ label: group.label, path: `${menuName}`, onClick: group.onClick });
+                }
+            }
+        });
+    });
+
+    dashboardGroups.forEach(group => {
+        if (group.items) {
+            group.items.forEach(item => {
+                if (!_seenLabels.has(item.label)) {
+                    _seenLabels.add(item.label);
+                    globalSearchItems.push({ label: item.label, path: `Overview > ${group.category}`, onClick: item.onClick });
+                }
+            });
+        }
+    });
+
+    settingsMenuItems.forEach(group => {
+        if (group.items) {
+            group.items.forEach(item => {
+                if (!_seenLabels.has(item.label)) {
+                    _seenLabels.add(item.label);
+                    globalSearchItems.push({ label: item.label, path: `Settings > ${group.group}`, onClick: item.onClick });
+                }
+            });
+        }
+    });
+
     return (
         <div className="h-screen w-screen flex flex-col font-['Plus_Jakarta_Sans'] bg-slate-50 select-none text-slate-800 overflow-hidden">
             {/* Top Subscription Banner OR Marquee Bar */}
@@ -1561,6 +1606,7 @@ const Dashboard = () => {
             <MarketingToolBoard isOpen={showMarketingToolModal} onClose={() => setShowMarketingToolModal(false)} />
             <AccountBalanceBoard isOpen={showAccountBalanceModal} onClose={() => setShowAccountBalanceModal(false)} />
 
+            <GlobalSearchModal isOpen={showGlobalSearchModal} onClose={() => setShowGlobalSearchModal(false)} items={globalSearchItems} />
             <DocumentSearchBoard isOpen={showSearchModal} onClose={() => setShowSearchModal(false)} />
             <MasterFileModal isOpen={showMasterFileModal} onClose={() => setShowMasterFileModal(false)} />
             <ViewUtilityModal
@@ -2364,7 +2410,7 @@ const Dashboard = () => {
                                             </button>
                                             <button
                                                 data-tour="global-search"
-                                                onClick={() => setShowSearchModal(true)}
+                                                onClick={() => setShowGlobalSearchModal(true)}
                                                 className="flex items-center gap-2 px-4 h-[40px] bg-white border border-slate-200/80 rounded-[8px] text-[13px] font-bold text-slate-500 hover:bg-slate-100 hover:text-slate-700 hover:shadow-sm active:scale-95 transition-all duration-200"
                                             >
                                                 <Search size={14} className="text-slate-400" />

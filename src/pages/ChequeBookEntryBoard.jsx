@@ -173,7 +173,7 @@ const ChequeBookEntryBoard = ({ isOpen, onClose }) => {
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Target Account</label>
                                 <div className="relative">
                                     <select
-                                        value={formData.accountName}
+                                        value={formData.accountCode || ''}
                                         onChange={(ev) => {
                                             const val = ev.target.value;
                                             const item = (lookups.accounts || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || i === val);

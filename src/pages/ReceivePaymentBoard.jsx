@@ -10,17 +10,12 @@ import TransactionFormWrapper from '../components/TransactionFormWrapper';
 import SearchableSelect from '../components/SearchableSelect';
 
 const ReceivePaymentBoard = ({ isOpen, onClose }) => {
-    const [lookups, setLookups] = useState({ 
-        customers: [], 
-        paymentMethods: [], 
-        banks: [], 
+    const [lookups, setLookups] = useState({
+        customers: [],
+        paymentMethods: [],
+        banks: [],
         costCenters: [],
-        accountTypes: [
-            { code: 'All', name: 'All Customers' },
-            { code: 'Medical Members', name: 'Medical Members' },
-            { code: 'Staff Credit', name: 'Staff Credit' },
-            { code: 'Other', name: 'Other Accounts' }
-        ]
+        accountTypes: []
     });
 
     const getInitialFormData = () => ({
@@ -38,31 +33,22 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
         reference: '',
         company: '',
         createUser: '',
-        accountType: 'Medical Members'
+        accountType: 'Medical Members',
+        docStatus: 'New'
     });
 
     const [formData, setFormData] = useState(getInitialFormData());
 
     const [invoices, setInvoices] = useState([]);
     const [orders, setOrders] = useState([]);
+    const [newDocNo, setNewDocNo] = useState('');
     const [advanceBalance, setAdvanceBalance] = useState(0);
-    
-    const [showCustomerSearch, setShowCustomerSearch] = useState(false);
-    const [showBankSearch, setShowBankSearch] = useState(false);
-    const [showPayMethodSearch, setShowPayMethodSearch] = useState(false);
-    const [showCostCenterSearch, setShowCostCenterSearch] = useState(false);
-    const [showAccountTypeSearch, setShowAccountTypeSearch] = useState(false);
+
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [datePickerField, setDatePickerField] = useState('date');
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [showConfirmModal, setShowConfirmModal] = useState(false);
     const [showSearchModal, setShowSearchModal] = useState(false);
-
-    const [customerSearchQuery, setCustomerSearchQuery] = useState('');
-    const [bankSearchQuery, setBankSearchQuery] = useState('');
-    const [payMethodSearchQuery, setPayMethodSearchQuery] = useState('');
-    const [costCenterSearchQuery, setCostCenterSearchQuery] = useState('');
-    const [accountTypeSearchQuery, setAccountTypeSearchQuery] = useState('');
 
     const [isSaving, setIsSaving] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
@@ -80,13 +66,23 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
     const fetchLookups = async (company, typeOverride) => {
         try {
             const currentType = typeOverride || formData.accountType || 'Medical Members';
-            const data = await receivePaymentService.getLookups(company, currentType);
+            const [data, historyData] = await Promise.all([
+                receivePaymentService.getLookups(company, currentType),
+                receivePaymentService.getHistory(company)
+            ]);
             setLookups(prev => ({
                 ...prev,
                 customers: data.customers || [],
                 paymentMethods: data.paymentMethods || [],
                 banks: data.banks || [],
-                costCenters: data.costCenters || []
+                costCenters: data.costCenters || [],
+                accountTypes: data.accountTypes?.length > 0 ? data.accountTypes : [
+                    { code: 'All', name: 'All Customers' },
+                    { code: 'Medical Members', name: 'Medical Members' },
+                    { code: 'Staff Credit', name: 'Staff Credit' },
+                    { code: 'Other', name: 'Other Accounts' }
+                ],
+                documents: historyData || []
             }));
         } catch (error) {
             console.error("Lookup Load Error:", error);
@@ -97,6 +93,7 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
         try {
             const data = await receivePaymentService.generateDocNo(company);
             setFormData(prev => ({ ...prev, docNo: data.docNo }));
+            setNewDocNo(data.docNo);
         } catch (error) {
             showErrorToast("Failed to generate Document Number");
         }
@@ -110,9 +107,7 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
     const handleCustomerSelect = async (customer) => {
         const custId = customer.code || customer.Code || customer.id;
         setFormData(prev => ({ ...prev, customerId: custId }));
-        setShowCustomerSearch(false);
-        setCustomerSearchQuery('');
-        
+
         try {
             const data = await receivePaymentService.getOutstanding(custId, formData.company, formData.docNo, formData.accountType, formData.createUser);
             setAdvanceBalance(data.advanceBalance || 0);
@@ -134,9 +129,10 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
     };
 
     const handleInvoiceCheck = async (idx) => {
+        if (formData.docStatus === 'Applied') return;
         const newInvoices = [...invoices];
         newInvoices[idx].selected = !newInvoices[idx].selected;
-        
+
         if (newInvoices[idx].selected) {
             const remainingToPay = parseFloat(formData.amount) - totalAllocated;
             const canPay = Math.min(newInvoices[idx].balance, Math.max(0, remainingToPay));
@@ -146,12 +142,13 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
             newInvoices[idx].discount = 0;
             newInvoices[idx].setOff = 0;
         }
-        
+
         setInvoices(newInvoices);
         await updateBackendRow(newInvoices[idx]);
     };
 
     const handleInvoiceChange = async (idx, field, value) => {
+        if (formData.docStatus === 'Applied') return;
         const newInvoices = [...invoices];
         newInvoices[idx][field] = parseFloat(value) || 0;
         setInvoices(newInvoices);
@@ -188,6 +185,7 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
     };
 
     const handleSelectAll = async () => {
+        if (formData.docStatus === 'Applied') return;
         let remaining = parseFloat(formData.amount);
         const newInvoices = [...invoices].map(inv => {
             let payment = 0;
@@ -204,6 +202,7 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
     };
 
     const handleClearSelections = async () => {
+        if (formData.docStatus === 'Applied') return;
         const newInvoices = invoices.map(inv => ({ ...inv, selected: false, payment: 0, discount: 0, setOff: 0 }));
         setInvoices(newInvoices);
         for (const inv of newInvoices) {
@@ -307,8 +306,8 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
     const filteredOrders = useMemo(() => {
         if (!archiveSearchQuery) return orders;
         const q = archiveSearchQuery.toLowerCase();
-        return orders.filter(o => 
-            (o.docNo || '').toLowerCase().includes(q) || 
+        return orders.filter(o =>
+            (o.docNo || '').toLowerCase().includes(q) ||
             (o.reference || '').toLowerCase().includes(q)
         );
     }, [orders, archiveSearchQuery]);
@@ -334,11 +333,12 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
                 remarks: header.memo,
                 reference: header.reference,
                 comment: header.comment,
-                accountType: header.acc_Type === 'Other' ? 'Other' : 'Medical Members'
+                accountType: header.acc_Type === 'Other' ? 'Other' : 'Medical Members',
+                docStatus: data.type || 'Applied'
             }));
 
             setInvoices(details.map(d => ({
-                doc_No: d.accountCode || d.docNo,
+                doc_No: d.docNo,
                 payment: d.amount || 0,
                 selected: true,
                 inv_Amount: d.amount || 0,
@@ -361,6 +361,15 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
         setShowDatePicker(false);
     };
 
+    const loadPaymentModes = async () => {
+        try {
+            const data = await paymentMethodService.getAll(formData.company);
+            setLookups(prev => ({ ...prev, paymentModes: data || [] }));
+        } catch (error) {
+            console.error("Error loading payment modes:", error);
+        }
+    };
+
     return (
         <>
             <style>{`@keyframes toastProgress { 0% { width: 100%; } 100% { width: 0%; } }`}</style>
@@ -371,7 +380,7 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
                 footer={
                     <div className="bg-[#fcfcfc] px-6 py-5 w-full flex justify-between items-center border-t border-gray-200 rounded-b-[10px] shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]">
                         <div className="flex gap-3">
-                            <button onClick={handleDelete} className="px-6 h-10 border-2 border-red-500 text-red-600 bg-white hover:bg-red-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2">
+                            <button type="button" onClick={handleDelete} className="px-6 h-10 bg-red-50 text-red-600 text-sm font-bold rounded-[3px] hover:bg-red-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-red-100">
                                 <Trash2 size={14} /> DELETE DOC
                             </button>
                             <button type="button" onClick={handleClear} className="px-6 h-10 border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2">
@@ -379,10 +388,10 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
                             </button>
                         </div>
                         <div className="flex gap-3">
-                            <button onClick={handleSaveDraft} disabled={isSaving} className="px-6 h-10 border-2 border-[#0285fd] text-[#0285fd] bg-white hover:bg-blue-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2 disabled:opacity-50">
+                            <button type="button" onClick={handleSaveDraft} disabled={isSaving || formData.docStatus === 'Applied'} className="px-6 h-10 border-2 border-[#0285fd] text-[#0285fd] bg-white hover:bg-blue-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2 disabled:opacity-50">
                                 <Save size={14} /> SAVE DRAFT
                             </button>
-                            <button onClick={handleApply} disabled={isSaving} className={`px-6 py-2 ${isSaving ? 'bg-gray-300 cursor-not-allowed' : 'bg-[#0285fd] hover:bg-[#0073ff]'} text-white font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2`}>
+                            <button type="button" onClick={handleApply} disabled={isSaving || formData.docStatus === 'Applied'} className={`px-6 py-2 ${isSaving || formData.docStatus === 'Applied' ? 'bg-gray-300 cursor-not-allowed' : 'bg-[#0285fd] hover:bg-[#0073ff]'} text-white font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2`}>
                                 <CheckCircle size={14} /> APPLY
                             </button>
                         </div>
@@ -395,7 +404,25 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
                             <div className="col-span-3">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Document ID</label>
                                 <div className="relative">
-                                    <input type="text" name="docNo" value={formData.docNo} onChange={handleInput} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 appearance-none"  style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
+                                    <select
+                                        name="docNo"
+                                        value={formData.docNo}
+                                        onChange={async (e) => {
+                                            const val = e.target.value;
+                                            if (val === newDocNo) {
+                                                handleClear();
+                                            } else {
+                                                await handleRetrieve(val);
+                                            }
+                                        }}
+                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 appearance-none cursor-pointer"
+                                        style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
+                                    >
+                                        {newDocNo && <option value={newDocNo}>{newDocNo} (New)</option>}
+                                        {lookups.documents?.map((doc, idx) => (
+                                            <option key={idx} value={doc.docNo || doc.doc_No}>{doc.docNo || doc.doc_No} - {doc.date?.split('T')[0]}</option>
+                                        ))}
+                                    </select>
                                 </div>
                             </div>
                             <div className="col-span-3">
@@ -412,9 +439,26 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
                                 <input type="text" name="amount" value={formData.amount} onChange={handleInput} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700" />
                             </div>
                             <div className="col-span-3">
-                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Account Type</label>
+                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Customer Type</label>
                                 <div className="relative">
-                                    <input type="text" readOnly value={formData.accountType} onClick={() => setShowAccountTypeSearch(true)} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"  style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
+                                    <select
+                                        value={formData.accountType}
+                                        onChange={(e) => {
+                                            const newType = e.target.value;
+                                            setFormData(prev => ({ ...prev, accountType: newType, customerId: '', customerName: '' }));
+                                            setInvoices([]);
+                                            setAdvanceBalance(0);
+                                            fetchLookups(formData.company, newType);
+                                        }}
+                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 appearance-none cursor-pointer"
+                                        style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
+                                    >
+                                        {lookups.accountTypes?.map((a) => (
+                                            <option key={a.code} value={a.code}>
+                                                {a.name}
+                                            </option>
+                                        ))}
+                                    </select>
                                 </div>
                             </div>
                             <div className="col-span-6">
@@ -422,8 +466,33 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
                                 <div className="relative">
                                     <div className="flex gap-2">
                                         <input type="text" readOnly value={formData.customerId} className="w-24 h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none text-gray-700 font-mono shrink-0" />
-                                        <div className="relative flex-1">
-                                            <input type="text" readOnly value={lookups.customers.find(c => (c.code || c.Code) === formData.customerId)?.name || lookups.customers.find(c => (c.code || c.Code) === formData.customerId)?.Name || lookups.customers.find(c => (c.code || c.Code) === formData.customerId)?.Cust_Name || ''} onClick={() => setShowCustomerSearch(true)} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none" placeholder="Click to select customer..."  style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
+                                        {/* <div className="relative flex-1">
+                                            <input type="text" readOnly value={lookups.customers.find(c => (c.code || c.Code) === formData.customerId)?.name || lookups.customers.find(c => (c.code || c.Code) === formData.customerId)?.Name || lookups.customers.find(c => (c.code || c.Code) === formData.customerId)?.Cust_Name || ''} onClick={() => setShowCustomerSearch(true)} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none" placeholder="Click to select customer..." style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
+                                        </div>  */}
+                                        <div className="flex-1">
+                                            <select
+                                                value={formData.customerId || ""}
+                                                onChange={async (e) => {
+                                                    const sel = lookups.customers.find(c => c.code === e.target.value);
+                                                    if (sel) {
+                                                        setFormData(prev => ({ ...prev, customerName: sel.name || '' }));
+                                                        await handleCustomerSelect(sel);
+                                                    } else {
+                                                        setFormData(prev => ({ ...prev, customerId: '', customerName: '' }));
+                                                        setInvoices([]);
+                                                        setAdvanceBalance(0);
+                                                    }
+                                                }}
+                                                className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 appearance-none cursor-pointer"
+                                                style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
+                                            >
+                                                <option value="">Select customer...</option>
+                                                {lookups.customers.map((c) => (
+                                                    <option key={c.code} value={c.code}>
+                                                        {c.code} — {c.name}
+                                                    </option>
+                                                ))}
+                                            </select>
                                         </div>
                                     </div>
                                 </div>
@@ -431,7 +500,26 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
                             <div className="col-span-3">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Pay Method</label>
                                 <div className="relative">
-                                    <input type="text" readOnly value={lookups.paymentMethods?.find(m => m.code === formData.payType)?.name || formData.payType || ''} onClick={() => setShowPayMethodSearch(true)} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"  style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
+                                    {/* <input type="text" readOnly value={lookups.paymentMethods?.find(m => m.code === formData.payType)?.name || formData.payType || ''} onClick={() => setShowPayMethodSearch(true)} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none" style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
+                                     */}
+                                    <select
+                                        value={formData.payType || ""}
+                                        onChange={(e) => {
+                                            setFormData(prev => ({
+                                                ...prev,
+                                                payType: e.target.value
+                                            }));
+                                        }}
+                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none" style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
+                                    >
+                                        <option value="">Select pay Mode</option>
+
+                                        {lookups.paymentMethods?.map((mode) => (
+                                            <option key={mode.code} value={mode.code}>
+                                                {mode.code} — {mode.name}
+                                            </option>
+                                        ))}
+                                    </select>
                                 </div>
                             </div>
                             <div className="col-span-3">
@@ -442,7 +530,32 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Bank / Branch</label>
                                 <div className="flex gap-2">
                                     <div className="relative flex-1">
-                                        <input type="text" readOnly value={lookups.banks?.find(b => (b.bank_Code || b.Bank_Code) === formData.bankCode)?.bank_Name || ''} onClick={() => setShowBankSearch(true)} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none" placeholder="Select Bank"  style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
+                                        {/* <input type="text" readOnly value={lookups.banks?.find(b => (b.bank_Code || b.Bank_Code) === formData.bankCode)?.bank_Name || ''} onClick={() => setShowBankSearch(true)} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none" placeholder="Select Bank" style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
+                                    </div> */}
+                                        <select
+                                            value={formData.bankCode
+                                                || ""}
+                                            onChange={(e) => {
+                                                setFormData(prev => ({
+                                                    ...prev,
+                                                    bankCode: e.target.value,
+
+                                                }));
+                                            }}
+                                            className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none" style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
+                                        >
+                                            <option value="">Select Bank</option>
+
+                                            {lookups.banks?.map((bank) => {
+                                                const code = bank.bank_Code || bank.Bank_Code;
+                                                const name = bank.bank_Name || bank_Name;
+                                                return (
+                                                    <option key={code} value={code}>
+                                                        {code} — {name}
+                                                    </option>
+                                                )
+                                            })}
+                                        </select>
                                     </div>
                                     <input type="text" name="branchCode" value={formData.branchCode} onChange={handleInput} placeholder="Branch" className="w-32 h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700" />
                                 </div>
@@ -450,7 +563,36 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
                             <div className="col-span-3">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Cost Center</label>
                                 <div className="relative">
-                                    <input type="text" readOnly value={lookups.costCenters?.find(c => (c.CostCenterCode || c.costCenterCode || c.Code || c.code) === formData.costCenter)?.CostCenterName || lookups.costCenters?.find(c => (c.CostCenterCode || c.costCenterCode || c.Code || c.code) === formData.costCenter)?.name || ''} onClick={() => setShowCostCenterSearch(true)} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"  style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
+                                    {/* <input type="text" readOnly value={lookups.costCenters?.find(c => 
+                                        (c.CostCenterCode || c.costCenterCode || c.Code || c.code) === formData.costCenter)?.CostCenterName || 
+                                        lookups.costCenters?.find(c => (c.CostCenterCode || c.costCenterCode || c.Code || c.code) === formData.costCenter)?.name || ''} onClick={() => 
+                                        setShowCostCenterSearch(true)} 
+                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none" 
+                                        style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} /> */}
+                                    <select
+                                        value={formData.costCenter
+                                            || ""}
+                                        onChange={(e) => {
+                                            setFormData(prev => ({
+                                                ...prev,
+                                                costCenter: e.target.value,
+
+                                            }));
+                                        }}
+                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none" style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
+                                    >
+                                        <option value="">Select Cost Center</option>
+
+                                        {lookups.costCenters?.map((costCenter) => {
+                                            const code = costCenter.CostCenterCode || costCenter.costCenterCode || costCenter.Code || costCenter.code;
+                                            const name = costCenter.CostCenterName || costCenter.CostCenterName || costCenter.Name || costCenter.name;
+                                            return (
+                                                <option key={code} value={code}>
+                                                    {code} — {name}
+                                                </option>
+                                            )
+                                        })}
+                                    </select>
                                 </div>
                             </div>
                             <div className="col-span-3">
@@ -490,7 +632,7 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
                                         <th className="w-24 px-2 text-right">SetOff</th>
                                         <th className="w-28 px-3 text-right">Balance</th>
                                         <th className="w-32 px-4 text-right">Payment</th>
-                                    <th className="text-right px-5 py-3">Action</th></tr>
+                                        <th className="text-right px-5 py-3">Action</th></tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-50">
                                     {invoices.length === 0 ? (
@@ -502,21 +644,26 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
                                     ) : invoices.map((inv, idx) => (
                                         <tr key={idx} className={`text-[11px] font-bold text-gray-700 border-b border-gray-50 hover:bg-slate-50/30 transition-colors ${inv.selected ? 'bg-blue-50/10' : ''}`}>
                                             <td className="w-12 px-3 py-2 text-center">
-                                                <input type="checkbox" checked={inv.selected} onChange={() => handleInvoiceCheck(idx)} className="text-[#0285fd] focus:ring-[#0285fd]" />
+                                                <input type="checkbox" disabled={formData.docStatus === 'Applied'} checked={inv.selected} onChange={() => handleInvoiceCheck(idx)} className="text-[#0285fd] focus:ring-[#0285fd]" />
                                             </td>
                                             <td className="w-24 px-3 py-2 font-mono text-[10px] text-gray-500">{inv.date_Due?.split('T')[0]}</td>
                                             <td className="w-32 px-3 py-2 font-mono text-blue-700">{inv.doc_No}</td>
                                             <td className="px-3 py-2 truncate italic text-gray-400">{inv.ref_No}</td>
-                                            <td className="w-28 px-3 py-2 text-right font-mono">{inv.inv_Amount.toLocaleString(undefined, {minimumFractionDigits:2})}</td>
+                                            <td className="w-28 px-3 py-2 text-right font-mono">{inv.inv_Amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
                                             <td className="w-24 px-1 py-1">
-                                                <input type="text" disabled={!inv.selected} value={inv.discount} onChange={(e) => handleInvoiceChange(idx, 'discount', e.target.value)} className="w-full h-7 border border-gray-200 rounded-[3px] text-right font-mono text-[11px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] px-2 disabled:opacity-30 disabled:bg-gray-50" />
+                                                <input type="text" disabled={!inv.selected || formData.docStatus === 'Applied'} value={inv.discount} onChange={(e) => handleInvoiceChange(idx, 'discount', e.target.value)} className="w-full h-7 border border-gray-200 rounded-[3px] text-right font-mono text-[11px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] px-2 disabled:opacity-30 disabled:bg-gray-50" />
                                             </td>
                                             <td className="w-24 px-1 py-1">
-                                                <input type="text" disabled={!inv.selected} value={inv.setOff} onChange={(e) => handleInvoiceChange(idx, 'setOff', e.target.value)} className="w-full h-7 border border-gray-200 rounded-[3px] text-right font-mono text-[11px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] px-2 disabled:opacity-30 disabled:bg-gray-50" />
+                                                <input type="text" disabled={!inv.selected || formData.docStatus === 'Applied'} value={inv.setOff} onChange={(e) => handleInvoiceChange(idx, 'setOff', e.target.value)} className="w-full h-7 border border-gray-200 rounded-[3px] text-right font-mono text-[11px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] px-2 disabled:opacity-30 disabled:bg-gray-50" />
                                             </td>
-                                            <td className="w-28 px-3 py-2 text-right font-mono text-gray-500">{inv.balance.toLocaleString(undefined, {minimumFractionDigits:2})}</td>
+                                            <td className="w-28 px-3 py-2 text-right font-mono text-gray-500">{inv.balance.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
                                             <td className="w-32 px-2 py-1 text-right">
-                                                <input type="text" disabled={!inv.selected} value={inv.payment} onChange={(e) => handleInvoiceChange(idx, 'payment', e.target.value)} className="w-full h-7 border border-gray-200 rounded-[3px] text-right font-mono font-black text-[12px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] px-2 disabled:opacity-30 disabled:bg-gray-50" />
+                                                <input type="text" disabled={!inv.selected || formData.docStatus === 'Applied'} value={inv.payment} onChange={(e) => handleInvoiceChange(idx, 'payment', e.target.value)} className="w-full h-7 border border-gray-200 rounded-[3px] text-right font-mono font-black text-[12px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] px-2 disabled:opacity-30 disabled:bg-gray-50" />
+                                            </td>
+                                            <td className="text-right px-5 py-2">
+                                                <button type="button" onClick={() => updateBackendRow(inv)} disabled={!inv.selected || formData.docStatus === 'Applied'} className="text-[#0285fd] hover:text-blue-700 bg-blue-50 hover:bg-blue-100 px-3 py-1 rounded-[3px] text-[10px] font-bold uppercase tracking-widest transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                                                    Update
+                                                </button>
                                             </td>
                                         </tr>
                                     ))}
@@ -529,13 +676,13 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
                         <div className="col-span-7 space-y-3">
                             <div className="flex gap-3 items-start">
                                 <div className="flex flex-col gap-2">
-                                    <button onClick={handleSelectAll} className="h-8 px-4 bg-white border-2 border-[#0285fd] hover:bg-blue-50 text-[#0285fd] text-[11px] font-bold uppercase tracking-widest rounded-[3px] transition-all active:scale-95 shadow-sm">SELECT ALL DUE</button>
-                                    <button onClick={handleClearSelections} className="h-8 px-4 bg-white border-2 border-gray-400 hover:bg-gray-50 text-gray-700 text-[11px] font-bold uppercase tracking-widest rounded-[3px] transition-all active:scale-95 shadow-sm">CLEAR ALL</button>
+                                    <button type="button" onClick={handleSelectAll} disabled={formData.docStatus === 'Applied'} className="h-8 px-4 bg-white border-2 border-[#0285fd] hover:bg-blue-50 text-[#0285fd] text-[11px] font-bold uppercase tracking-widest rounded-[3px] transition-all active:scale-95 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed">SELECT ALL DUE</button>
+                                    <button type="button" onClick={handleClearSelections} disabled={formData.docStatus === 'Applied'} className="h-8 px-4 bg-white border-2 border-gray-400 hover:bg-gray-50 text-gray-700 text-[11px] font-bold uppercase tracking-widest rounded-[3px] transition-all active:scale-95 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed">CLEAR ALL</button>
                                 </div>
                                 <div className="flex-1 bg-[#fff8e6] border border-[#ffe082] p-3 rounded-[3px] flex items-center justify-between">
                                     <div className="flex flex-col">
                                         <span className="text-[9px] font-black text-[#b8860b] uppercase tracking-widest">Current Over Payment / Advance</span>
-                                        <span className="text-[18px] font-black text-[#856404] font-mono leading-none">{advanceBalance.toLocaleString(undefined, {minimumFractionDigits:2})}</span>
+                                        <span className="text-[18px] font-black text-[#856404] font-mono leading-none">{advanceBalance.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                                     </div>
                                     <div className="w-10 h-10 bg-white/50 rounded-full flex items-center justify-center">
                                         <Plus className="text-[#856404]" size={20} />
@@ -547,33 +694,33 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
                             <div className="bg-white p-4 border border-slate-200 rounded-[3px] space-y-2.5">
                                 <div className="flex justify-between items-center text-gray-500 font-bold text-[10px] uppercase tracking-widest">
                                     <span>Total Amount Due</span>
-                                    <span className="text-[13px] text-gray-700">{totalDue.toLocaleString(undefined, {minimumFractionDigits:2})}</span>
+                                    <span className="text-[13px] text-gray-700">{totalDue.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                                 </div>
                                 <div className="flex justify-between items-center text-[#0285fd] font-bold text-[10px] uppercase tracking-widest">
                                     <span>Payment Received</span>
-                                    <span className="text-[14px] font-black">{parseFloat(formData.amount).toLocaleString(undefined, {minimumFractionDigits:2})}</span>
+                                    <span className="text-[14px] font-black">{parseFloat(formData.amount).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                                 </div>
                                 <div className="flex justify-between items-center text-purple-600 font-bold text-[10px] uppercase tracking-widest">
                                     <span>Total Allocated</span>
-                                    <span className="text-[13px]">{totalAllocated.toLocaleString(undefined, {minimumFractionDigits:2})}</span>
+                                    <span className="text-[13px]">{totalAllocated.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                                 </div>
                                 <div className="flex justify-between items-center text-orange-500 font-bold text-[10px] uppercase tracking-widest">
                                     <span>Over Payment</span>
-                                    <span className="text-[13px]">{Math.max(0, parseFloat(formData.amount) - totalAllocated).toLocaleString(undefined, {minimumFractionDigits:2})}</span>
+                                    <span className="text-[13px]">{Math.max(0, parseFloat(formData.amount) - totalAllocated).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                                 </div>
                                 <div className="flex justify-between items-center text-red-500 font-bold text-[10px] uppercase tracking-widest">
                                     <span>Discount Applied</span>
-                                    <span className="text-[13px]">{totalDiscount.toLocaleString(undefined, {minimumFractionDigits:2})}</span>
+                                    <span className="text-[13px]">{totalDiscount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                                 </div>
                                 <div className="flex justify-between items-center text-emerald-600 font-bold text-[10px] uppercase tracking-widest">
                                     <span>Debit / SetOff</span>
-                                    <span className="text-[13px]">{totalSetOff.toLocaleString(undefined, {minimumFractionDigits:2})}</span>
+                                    <span className="text-[13px]">{totalSetOff.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                                 </div>
                                 <div className="h-px bg-gray-200 my-1" />
                                 <div className="flex justify-between items-center bg-slate-50 p-2 rounded-[3px]">
                                     <span className="text-[13px] font-black text-gray-800 uppercase tracking-widest">Ending Balance</span>
                                     <span className="text-[18px] font-black text-[#0285fd] font-mono tracking-tight">
-                                        {(totalDue - totalAllocated - totalDiscount - totalSetOff).toLocaleString(undefined, {minimumFractionDigits:2})}
+                                        {(totalDue - totalAllocated - totalDiscount - totalSetOff).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                     </span>
                                 </div>
                             </div>
@@ -583,7 +730,7 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
             </TransactionFormWrapper>
 
             <CalendarModal isOpen={showDatePicker} onClose={() => setShowDatePicker(false)} currentDate={formData[datePickerField]} onDateChange={(d) => { setFormData(prev => ({ ...prev, [datePickerField]: d })); setShowDatePicker(false); }} title="Select Date" />
-            
+
             <ConfirmModal isOpen={showConfirmModal} onClose={() => setShowConfirmModal(false)} onConfirm={confirmApply} title="Confirm Transaction" message="Are you sure you want to apply this payment? This action will update ledger records." isLoading={isSaving} />
 
             <ConfirmModal isOpen={showDeleteConfirm} onClose={() => setShowDeleteConfirm(false)} onConfirm={confirmDelete} title="Delete Document" message="Are you sure you want to delete this document? This action cannot be undone." isLoading={isDeleting} variant="danger" />
@@ -610,166 +757,6 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
                                         <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{order.docNo}</td>
                                         <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{order.date?.split('T')[0]}</td>
                                         <td className="text-right px-5 py-3"><button onClick={() => handleRetrieve(order.docNo)} className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">RETRIEVE</button></td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </SimpleModal>
-
-            <SimpleModal isOpen={showCustomerSearch} onClose={() => setShowCustomerSearch(false)} title="Customer Directory Lookup" maxWidth="max-w-[700px]">
-                <div className="space-y-4 font-['Tahoma']">
-                    <div className="flex items-center gap-4 bg-slate-50 p-4 border-b border-gray-100 mb-2">
-                        <span className="text-[12px] font-bold text-gray-500 uppercase tracking-wider">Search</span>
-                        <div className="relative flex-1">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
-                            <input type="text" placeholder="Find customer by name or code..." className="w-full h-10 pl-10 pr-4 border border-gray-300 rounded-[3px] outline-none text-[13px] focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] shadow-sm bg-white" value={customerSearchQuery} onChange={(e) => setCustomerSearchQuery(e.target.value)} autoFocus />
-                        </div>
-                    </div>
-                    <div className="border border-gray-200 rounded-[3px] overflow-hidden shadow-sm max-h-[400px] overflow-y-auto no-scrollbar">
-                        <table className="w-full text-left">
-                            <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 shadow-sm z-10">
-                                <tr><th className=" px-5 py-3">Code</th><th className=" px-5 py-3">Customer Name</th><th className="text-right px-5 py-3">Action</th></tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-50">
-                                {lookups.customers.filter(c => {
-                                    const q = customerSearchQuery.toLowerCase();
-                                    return (c.name || c.Name || '').toLowerCase().includes(q) || (c.code || c.Code || '').toLowerCase().includes(q);
-                                }).map((c, i) => (
-                                    <tr key={i} className="group hover:bg-blue-50/50  transition-all cursor-pointer group border-b border-gray-50" onClick={() => handleCustomerSelect(c)}>
-                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{c.code || c.Code}</td>
-                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{c.name || c.Name}</td>
-                                        <td className="text-right px-5 py-3"><button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button></td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </SimpleModal>
-
-            <SimpleModal isOpen={showPayMethodSearch} onClose={() => setShowPayMethodSearch(false)} title="Payment Method Lookup" maxWidth="max-w-[700px]">
-                <div className="space-y-4 font-['Tahoma']">
-                    <div className="flex items-center gap-4 bg-slate-50 p-4 border-b border-gray-100 mb-2">
-                        <span className="text-[12px] font-bold text-gray-500 uppercase tracking-wider">Search</span>
-                        <div className="relative flex-1">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
-                            <input type="text" placeholder="Filter methods..." className="w-full h-10 pl-10 pr-4 border border-gray-300 rounded-[3px] outline-none text-[13px] focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] shadow-sm bg-white" value={payMethodSearchQuery} onChange={(e) => setPayMethodSearchQuery(e.target.value)} autoFocus />
-                        </div>
-                    </div>
-                    <div className="border border-gray-200 rounded-[3px] overflow-hidden shadow-sm max-h-[300px] overflow-y-auto no-scrollbar">
-                        <table className="w-full text-left">
-                            <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 shadow-sm z-10">
-                                <tr><th className=" px-5 py-3">Code</th><th className=" px-5 py-3">Method Title</th><th className="text-right px-5 py-3">Action</th></tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-50">
-                                {lookups.paymentMethods.filter(m => !payMethodSearchQuery || m.name.toLowerCase().includes(payMethodSearchQuery.toLowerCase()) || m.code.toLowerCase().includes(payMethodSearchQuery.toLowerCase())).map(m => (
-                                    <tr key={m.code} className="group hover:bg-blue-50/50  transition-all cursor-pointer group border-b border-gray-50" onClick={() => { setFormData(prev => ({ ...prev, payType: m.code })); setShowPayMethodSearch(false); }}>
-                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{m.code}</td>
-                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{m.name}</td>
-                                        <td className="text-right px-5 py-3"><button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button></td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </SimpleModal>
-
-            <SimpleModal isOpen={showBankSearch} onClose={() => setShowBankSearch(false)} title="Bank Directory Lookup" maxWidth="max-w-[700px]">
-                <div className="space-y-4 font-['Tahoma']">
-                    <div className="flex items-center gap-4 bg-slate-50 p-4 border-b border-gray-100 mb-2">
-                        <span className="text-[12px] font-bold text-gray-500 uppercase tracking-wider">Search</span>
-                        <div className="relative flex-1">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
-                            <input type="text" placeholder="Filter banks..." className="w-full h-10 pl-10 pr-4 border border-gray-300 rounded-[3px] outline-none text-[13px] focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] shadow-sm bg-white" value={bankSearchQuery} onChange={(e) => setBankSearchQuery(e.target.value)} autoFocus />
-                        </div>
-                    </div>
-                    <div className="border border-gray-200 rounded-[3px] overflow-hidden shadow-sm max-h-[300px] overflow-y-auto no-scrollbar">
-                        <table className="w-full text-left">
-                            <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 shadow-sm z-10">
-                                <tr><th className=" px-5 py-3">Code</th><th className=" px-5 py-3">Bank Name</th><th className="text-right px-5 py-3">Action</th></tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-50">
-                                {lookups.banks.filter(b => {
-                                    const q = bankSearchQuery.toLowerCase();
-                                    const code = (b.bank_Code || b.Bank_Code || '').toLowerCase();
-                                    const name = (b.bank_Name || b.Bank_Name || '').toLowerCase();
-                                    return code.includes(q) || name.includes(q);
-                                }).map((b, i) => (
-                                    <tr key={i} className="group hover:bg-blue-50/50  transition-all cursor-pointer group border-b border-gray-50" onClick={() => { setFormData(prev => ({ ...prev, bankCode: b.bank_Code || b.Bank_Code })); setShowBankSearch(false); }}>
-                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{b.bank_Code || b.Bank_Code}</td>
-                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{b.bank_Name || b.Bank_Name}</td>
-                                        <td className="text-right px-5 py-3"><button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button></td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </SimpleModal>
-
-            <SimpleModal isOpen={showCostCenterSearch} onClose={() => setShowCostCenterSearch(false)} title="Cost Center Lookup" maxWidth="max-w-[700px]">
-                <div className="space-y-4 font-['Tahoma']">
-                    <div className="flex items-center gap-4 bg-slate-50 p-4 border-b border-gray-100 mb-2">
-                        <span className="text-[12px] font-bold text-gray-500 uppercase tracking-wider">Search</span>
-                        <div className="relative flex-1">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
-                            <input type="text" placeholder="Filter cost centers..." className="w-full h-10 pl-10 pr-4 border border-gray-300 rounded-[3px] outline-none text-[13px] focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] shadow-sm bg-white" value={costCenterSearchQuery} onChange={(e) => setCostCenterSearchQuery(e.target.value)} autoFocus />
-                        </div>
-                    </div>
-                    <div className="border border-gray-200 rounded-[3px] overflow-hidden shadow-sm max-h-[300px] overflow-y-auto no-scrollbar">
-                        <table className="w-full text-left">
-                            <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 shadow-sm z-10">
-                                <tr><th className=" px-5 py-3">Code</th><th className=" px-5 py-3">Cost Center Name</th><th className="text-right px-5 py-3">Action</th></tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-50">
-                                {lookups.costCenters.filter(c => {
-                                    const q = costCenterSearchQuery.toLowerCase();
-                                    const code = (c.CostCenterCode || c.costCenterCode || c.Code || c.code || '').toLowerCase();
-                                    const name = (c.CostCenterName || c.costCenterName || c.Name || c.name || '').toLowerCase();
-                                    return code.includes(q) || name.includes(q);
-                                }).map((c, i) => (
-                                    <tr key={i} className="group hover:bg-blue-50/50  transition-all cursor-pointer group border-b border-gray-50" onClick={() => { setFormData(prev => ({ ...prev, costCenter: c.CostCenterCode || c.costCenterCode || c.Code || c.code })); setShowCostCenterSearch(false); }}>
-                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{c.CostCenterCode || c.costCenterCode || c.Code || c.code}</td>
-                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{c.CostCenterName || c.costCenterName || c.Name || c.name}</td>
-                                        <td className="text-right px-5 py-3"><button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button></td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </SimpleModal>
-
-            <SimpleModal isOpen={showAccountTypeSearch} onClose={() => setShowAccountTypeSearch(false)} title="Account Type Lookup" maxWidth="max-w-[700px]">
-                <div className="space-y-4 font-['Tahoma']">
-                    <div className="flex items-center gap-4 bg-slate-50 p-4 border-b border-gray-100 mb-2">
-                        <span className="text-[12px] font-bold text-gray-500 uppercase tracking-wider">Search</span>
-                        <div className="relative flex-1">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
-                            <input type="text" placeholder="Filter account types..." className="w-full h-10 pl-10 pr-4 border border-gray-300 rounded-[3px] outline-none text-[13px] focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] shadow-sm bg-white" value={accountTypeSearchQuery} onChange={(e) => setAccountTypeSearchQuery(e.target.value)} autoFocus />
-                        </div>
-                    </div>
-                    <div className="border border-gray-200 rounded-[3px] overflow-hidden shadow-sm max-h-[300px] overflow-y-auto no-scrollbar">
-                        <table className="w-full text-left">
-                            <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 shadow-sm z-10">
-                                <tr><th className=" px-5 py-3">Code</th><th className=" px-5 py-3">Account Type</th><th className="text-right px-5 py-3">Action</th></tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-50">
-                                {lookups.accountTypes?.filter(a => {
-                                    const q = accountTypeSearchQuery.toLowerCase();
-                                    return a.code.toLowerCase().includes(q) || a.name.toLowerCase().includes(q);
-                                }).map((a, i) => (
-                                    <tr key={i} className="group hover:bg-blue-50/50  transition-all cursor-pointer group border-b border-gray-50" onClick={() => {
-                                        setFormData(prev => ({ ...prev, accountType: a.code, customerId: '' }));
-                                        fetchLookups(formData.company, a.code);
-                                        setShowAccountTypeSearch(false);
-                                    }}>
-                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{a.code}</td>
-                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{a.name}</td>
-                                        <td className="text-right px-5 py-3"><button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button></td>
                                     </tr>
                                 ))}
                             </tbody>

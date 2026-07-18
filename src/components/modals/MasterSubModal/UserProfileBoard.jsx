@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { User, Key, Calendar, ShieldCheck, Save, Trash2, Search, RotateCcw, Loader2, Users, Eye, EyeOff, AlertTriangle } from 'lucide-react';
+import { User, Key, Calendar, ShieldCheck, Save, Trash2, RotateCcw, Loader2, Users, Eye, EyeOff, AlertTriangle } from 'lucide-react';
 import CalendarModal from '../../CalendarModal';
-import UserSearchModal from '../UserSearchModal';
-import UserGroupSearchModal from '../UserGroupSearchModal';
 import CostCenterAuthModal from './CostCenterAuthModal';
 import { userProfileService } from '../../../services/userProfile.service';
 import { showSuccessToast, showErrorToast } from '../../../utils/toastUtils';
-import { MasterFormWrapper, MasterFieldRow, MasterInput, MasterLookupInput } from '../../MasterFormComponents';
+import { MasterFormWrapper, MasterFieldRow, MasterInput, MasterSelect } from '../../MasterFormComponents';
 
 const UserProfileBoard = ({ isOpen, onClose }) => {
     const [emp_Code, setEmp_Code] = useState('');
@@ -20,8 +18,6 @@ const UserProfileBoard = ({ isOpen, onClose }) => {
     const [member_Id, setMember_Id] = useState('Administrators');
     const [last_Modified_User, setLast_Modified_User] = useState('SYSTEM');
 
-    const [showSearchModal, setShowSearchModal] = useState(false);
-    const [showGroupModal, setShowGroupModal] = useState(false);
     const [showCostCenterAuth, setShowCostCenterAuth] = useState(false);
     const [showCalendar, setShowCalendar] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
@@ -30,14 +26,34 @@ const UserProfileBoard = ({ isOpen, onClose }) => {
     const [deleting, setDeleting] = useState(false);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
+    const [usersList, setUsersList] = useState([]);
+    const [groupsList, setGroupsList] = useState([]);
+
     const isEditing = emp_Code !== '';
 
     useEffect(() => {
         if (isOpen) {
             const user = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null;
             if (user) setLast_Modified_User(user.empName || user.emp_Name || 'SYSTEM');
+            loadData();
         }
     }, [isOpen]);
+
+    const loadData = async () => {
+        const companyData = localStorage.getItem('selectedCompany');
+        let companyCode = '';
+        if (companyData) {
+            try { const p = JSON.parse(companyData); companyCode = p.companyCode || p.CompanyCode || p.code || p.Code || companyData; } catch (e) { companyCode = companyData; }
+        }
+        try {
+            const [users, groups] = await Promise.all([
+                userProfileService.searchUsers(companyCode, ''),
+                userProfileService.getUserGroups()
+            ]);
+            setUsersList(users || []);
+            setGroupsList(groups || []);
+        } catch (err) { showErrorToast('Failed to load user data'); }
+    };
 
     const handleClear = () => {
         setEmp_Code(''); setEmp_Name(''); setPass_Word(''); setConpass_Word('');
@@ -45,12 +61,11 @@ const UserProfileBoard = ({ isOpen, onClose }) => {
         setExp_Date(''); setMember_Id('Administrators'); setShowPassword(false);
     };
 
-    const handleUserSelect = async (user) => {
-        const selectedCode = user.emp_Code || user.Emp_Code;
-        if (!selectedCode) return;
+    const handleUserSelect = async (code) => {
+        if (!code) { handleClear(); return; }
         setFetching(true);
         try {
-            const profile = await userProfileService.getUserProfile(selectedCode);
+            const profile = await userProfileService.getUserProfile(code);
             setEmp_Code(profile.emp_Code); setEmp_Name(profile.emp_Name || '');
             setPass_Word(profile.pass_Word || ''); setConpass_Word(profile.pass_Word || '');
             setMust_Change(profile.must_Change || '0'); setCant_Change(profile.cant_Change || '0');
@@ -101,7 +116,7 @@ const UserProfileBoard = ({ isOpen, onClose }) => {
                             <RotateCcw size={14} /> CLEAR FORM
                         </button>
                         {isEditing && (
-                            <button onClick={handleDelete} disabled={!isEditing || deleting} className="px-6 py-3 bg-red-500 hover:bg-red-600 text-white font-mono font-bold text-sm uppercase tracking-widest rounded-[3px] transition-all active:scale-95 flex items-center justify-center gap-2 border-none disabled:opacity-50 shadow-md shadow-red-100">
+                            <button onClick={handleDelete} disabled={!isEditing || deleting} className={`px-6 h-10 bg-red-50 text-red-600 text-sm font-bold rounded-[3px] hover:bg-red-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-red-100 ${(!isEditing || deleting) ? 'opacity-50 cursor-not-allowed' : ''}`}>
                                 {deleting ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />} DELETE
                             </button>
                         )}
@@ -114,8 +129,17 @@ const UserProfileBoard = ({ isOpen, onClose }) => {
             >
                 <MasterFieldRow label="User Code" colSpan="col-span-6">
                     <div className="flex-1 flex gap-1 min-w-0 items-center">
-                        <div className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-sm font-mono font-bold text-[#0285fd] bg-slate-50 rounded outline-none flex items-center">{fetching ? 'LOADING...' : (emp_Code || '')}</div>
-                        <button onClick={() => setShowSearchModal(true)} className="w-8 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0"><Search size={14} /></button>
+                        {fetching ? (
+                            <div className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-sm font-mono font-bold text-gray-400 bg-slate-50 rounded outline-none flex items-center gap-2"><Loader2 size={14} className="animate-spin" /> LOADING...</div>
+                        ) : (
+                            <MasterSelect
+                                name="emp_Code"
+                                value={emp_Code}
+                                onChange={(e) => handleUserSelect(e.target.value)}
+                                placeholder="Select user..."
+                                options={usersList.map(u => ({ value: u.emp_Code, label: `${u.emp_Code} - ${u.emp_Name}` }))}
+                            />
+                        )}
                     </div>
                 </MasterFieldRow>
                 <MasterFieldRow label="User Name" colSpan="col-span-6">
@@ -131,10 +155,13 @@ const UserProfileBoard = ({ isOpen, onClose }) => {
                     <input type={showPassword ? "text" : "password"} value={conpass_Word} onChange={(e) => setConpass_Word(e.target.value)} className={`flex-1 min-w-0 h-8 border border-slate-200 px-3 text-sm font-mono font-bold text-slate-700 bg-slate-50 rounded outline-none focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 transition-all ${conpass_Word && pass_Word === conpass_Word ? 'border-green-400 bg-blue-50/20' : ''}`} placeholder="Confirm password" />
                 </MasterFieldRow>
                 <MasterFieldRow label="Member Group" colSpan="col-span-6">
-                    <div className="flex-1 flex gap-1 min-w-0 items-center">
-                        <input type="text" value={member_Id} readOnly className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-sm font-mono font-bold text-gray-700 bg-slate-50 rounded outline-none cursor-default" />
-                        <button onClick={() => setShowGroupModal(true)} className="w-8 h-8 bg-[#e49e1b] text-white flex items-center justify-center hover:bg-[#cb9b34] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0"><Users size={14} /></button>
-                    </div>
+                    <MasterSelect
+                        name="member_Id"
+                        value={member_Id}
+                        onChange={(e) => setMember_Id(e.target.value)}
+                        placeholder="Select group..."
+                        options={groupsList.map(g => ({ value: g.group_Name, label: `${g.group_Name}${g.description ? ` - ${g.description}` : ''}` }))}
+                    />
                 </MasterFieldRow>
                 <MasterFieldRow label="Expiry Date" colSpan="col-span-6">
                     <div className="flex-1 flex gap-1 min-w-0 items-center">
@@ -167,22 +194,20 @@ const UserProfileBoard = ({ isOpen, onClose }) => {
                 </div>
             </MasterFormWrapper>
 
-            <UserSearchModal isOpen={showSearchModal} onClose={() => setShowSearchModal(false)} onSelect={handleUserSelect} />
-            <UserGroupSearchModal isOpen={showGroupModal} onClose={() => setShowGroupModal(false)} onSelect={setMember_Id} />
             <CostCenterAuthModal isOpen={showCostCenterAuth} onClose={() => setShowCostCenterAuth(false)} empCode={emp_Code} empName={emp_Name} userRole={member_Id} />
             <CalendarModal isOpen={showCalendar} onClose={() => setShowCalendar(false)} onSelectDate={(date) => { setExp_Date(date); setShowCalendar(false); }} initialDate={exp_Date} />
 
             {showDeleteConfirm && (
                 <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4">
                     <div className="absolute inset-0 bg-slate-900/30 backdrop-blur-sm" onClick={() => !deleting && setShowDeleteConfirm(false)} />
- <div className="relative w-full max-w-md bg-white rounded-sm shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
+                    <div className="relative w-full max-w-md bg-white rounded-sm shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
                         <div className="p-8 text-center">
                             <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6 border-4 border-white shadow-lg"><AlertTriangle size={40} className="text-red-500" /></div>
                             <h3 className="text-lg font-black text-slate-800 mb-2 uppercase tracking-wider">Confirm Deletion</h3>
                             <p className="text-slate-500 text-[12px] font-medium leading-relaxed mb-8">Are you sure you want to delete user <span className="font-bold text-slate-800 uppercase">"{emp_Name || emp_Code}"</span>?<br />This action is permanent and cannot be undone.</p>
                             <div className="flex gap-3">
-                                <button onClick={() => setShowDeleteConfirm(false)} disabled={deleting} className="flex-1 h-11 bg-slate-100 text-slate-600 text-[11px] font-black rounded-[3px] hover:bg-slate-200 transition-all uppercase tracking-widest disabled:opacity-50">Cancel</button>
-                                <button onClick={confirmDelete} disabled={deleting} className="flex-1 h-11 bg-red-500 text-white text-[11px] font-black rounded-[3px] hover:bg-red-600 shadow-lg shadow-red-200 transition-all flex items-center justify-center gap-2 uppercase tracking-widest disabled:opacity-50">{deleting ? <Loader2 size={16} className="animate-spin" /> : 'Delete Now'}</button>
+                                <button onClick={() => setShowDeleteConfirm(false)} disabled={deleting} className={`px-6 h-10 bg-red-50 text-red-600 text-sm font-bold rounded-[3px] hover:bg-red-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-red-100 ${(deleting) ? 'opacity-50 cursor-not-allowed' : ''}`}>Cancel</button>
+                                <button onClick={confirmDelete} disabled={deleting} className={`px-6 h-10 bg-red-50 text-red-600 text-sm font-bold rounded-[3px] hover:bg-red-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-red-100 ${(deleting) ? 'opacity-50 cursor-not-allowed' : ''}`}>{deleting ? <Loader2 size={16} className="animate-spin" /> : 'Delete Now'}</button>
                             </div>
                         </div>
                         <div className="bg-slate-50 py-3 border-t border-slate-100"><span className="text-[9px] text-slate-400 font-black uppercase tracking-[0.2em] block text-center">Security Verification Required</span></div>

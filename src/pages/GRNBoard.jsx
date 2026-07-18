@@ -36,6 +36,7 @@ const GRNBoard = ({ isOpen, onClose }) => {
     const [productSearchQuery, setProductSearchQuery] = useState('');
     const [showExpenseSearch, setShowExpenseSearch] = useState(false);
     const [orders, setOrders] = useState([]);
+    const [newDocNo, setNewDocNo] = useState('');
     const [showColumnSelector, setShowColumnSelector] = useState(false);
     const excelInputRef = useRef(null);
 
@@ -98,6 +99,8 @@ const GRNBoard = ({ isOpen, onClose }) => {
         try {
             const data = await grnService.getLookups(company);
             const methods = await paymentMethodService.getAll(company);
+            const orderList = await grnService.searchDocs(company).catch(() => []);
+            setOrders(orderList || []);
             setLookups({ ...data, paymentMethods: methods });
         } catch (error) {
             showErrorToast('Failed to load lookups.');
@@ -108,6 +111,7 @@ const GRNBoard = ({ isOpen, onClose }) => {
         try {
             const data = await grnService.generateDocNo(company);
             setFormData(prev => ({ ...prev, docNo: data.docNo }));
+            setNewDocNo(data.docNo);
         } catch (error) {
             showErrorToast('Failed to generate document number.');
         }
@@ -509,13 +513,25 @@ const GRNBoard = ({ isOpen, onClose }) => {
                             <div className="col-span-4">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Document ID</label>
                                 <div className="relative">
-                                    <input
-                                        type="text"
+                                    <select
                                         name="docNo"
                                         value={formData.docNo}
-                                        onChange={handleInput}
-                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 appearance-none"
-                                     style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
+                                        onChange={(e) => {
+                                            const val = e.target.value;
+                                            if (val === newDocNo) {
+                                                handleClear();
+                                            } else {
+                                                handleSelectRow(val);
+                                            }
+                                        }}
+                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 appearance-none cursor-pointer"
+                                        style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
+                                    >
+                                        {newDocNo && <option value={newDocNo}>{newDocNo} (New)</option>}
+                                        {orders.map((o, idx) => (
+                                            <option key={idx} value={o.docNo || o.doc_No}>{o.docNo || o.doc_No} - {o.date?.split('T')[0] || o.post_Date?.split('T')[0]}</option>
+                                        ))}
+                                    </select>
                                 </div>
                             </div>
                             <div className="col-span-4">
@@ -683,7 +699,7 @@ const GRNBoard = ({ isOpen, onClose }) => {
                                                         setProductToDelete(p);
                                                         setShowDeleteConfirm(true);
                                                     }}
-                                                    className="text-red-300 hover:text-red-500 transition-all p-1.5 hover:bg-red-50 rounded-full"
+                                                    className="px-6 h-10 bg-red-50 text-red-600 text-sm font-bold rounded-[3px] hover:bg-red-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-red-100"
                                                 >
                                                     <Trash2 size={13} />
                                                 </button>

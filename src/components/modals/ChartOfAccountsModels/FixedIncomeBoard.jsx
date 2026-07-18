@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import SimpleModal from '../../SimpleModal';
-import { Search, RotateCcw, Save, Loader2, X, Calendar, DollarSign, User, PlusCircle } from 'lucide-react';
+import { RotateCcw, Save, Loader2, Calendar, PlusCircle } from 'lucide-react';
 import { fixedIncomeService } from '../../../services/fixedIncome.service';
 import { showSuccessToast, showErrorToast } from '../../../utils/toastUtils';
 import CalendarModal from '../../CalendarModal';
@@ -23,11 +23,7 @@ const FixedIncomeBoard = ({ isOpen, onClose }) => {
     const [payTypes, setPayTypes] = useState([]);
     const [incomeList, setIncomeList] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [showAccSearch, setShowAccSearch] = useState(false);
-    const [showPayTypeSearch, setShowPayTypeSearch] = useState(false);
     const [showCalendar, setShowCalendar] = useState(false);
-    const [searchTerm, setSearchTerm] = useState('');
-    const [paySearchTerm, setPaySearchTerm] = useState('');
 
     useEffect(() => {
         if (isOpen) {
@@ -78,23 +74,6 @@ const FixedIncomeBoard = ({ isOpen, onClose }) => {
             Company: company,
             CreateUser: user?.emp_Name || user?.empName || ''
         });
-    };
-
-    const handleAccountSelect = (acc) => {
-        setFormData(prev => ({
-            ...prev,
-            AccCode: acc.code,
-            IncomeAccount: acc.name
-        }));
-        setShowAccSearch(false);
-    };
-
-    const handlePayTypeSelect = (pay) => {
-        setFormData(prev => ({
-            ...prev,
-            PayType: pay.name
-        }));
-        setShowPayTypeSearch(false);
     };
 
     const handleSave = async () => {
@@ -158,27 +137,19 @@ const FixedIncomeBoard = ({ isOpen, onClose }) => {
                             {/* Account Selection */}
                             <div className="space-y-1.5">
                                 <label className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">Income Account</label>
-                                <div className="flex gap-1">
-                                    <div className="relative flex-1">
-                                        <input 
-                                            type="text" 
-                                            value={formData.IncomeAccount} 
-                                            readOnly 
-                                            className="w-full h-8 border border-slate-200 px-3 text-[12px] bg-slate-50 rounded outline-none font-bold text-blue-600 shadow-sm cursor-not-allowed"
-                                        />
-                                        {formData.AccCode && (
-                                            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-bold text-[#0285fd] bg-blue-50 border border-blue-100 px-1.5 py-0.5 rounded shadow-sm">
-                                                {formData.AccCode}
-                                            </span>
-                                        )}
-                                    </div>
-                                    <button 
-                                        onClick={() => setShowAccSearch(true)} 
-                                        className="w-9 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded transition-all shadow-sm active:scale-95 shrink-0 border-none"
-                                    >
-                                        <Search size={14} />
-                                    </button>
-                                </div>
+                                <select
+                                    value={formData.AccCode}
+                                    onChange={(e) => {
+                                        const acc = lookups.find(a => a.code === e.target.value);
+                                        setFormData(prev => ({ ...prev, AccCode: e.target.value, IncomeAccount: acc ? acc.name : '' }));
+                                    }}
+                                    className="w-full h-8 border border-slate-200 px-3 text-[12px] font-bold outline-none shadow-sm focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 bg-white rounded text-gray-700 cursor-pointer"
+                                >
+                                    <option value="">Select account...</option>
+                                    {lookups.map((acc, idx) => (
+                                        <option key={idx} value={acc.code}>{acc.code} - {acc.name}</option>
+                                    ))}
+                                </select>
                             </div>
 
                             {/* Buyer Name */}
@@ -195,7 +166,6 @@ const FixedIncomeBoard = ({ isOpen, onClose }) => {
                                         placeholder=""
                                         className="flex-1 min-w-0 h-8 border border-slate-200 rounded px-3 text-[12px] font-bold outline-none shadow-sm transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 text-gray-700 bg-white"
                                     />
-                                    <div className="w-9 h-8 shrink-0"></div>
                                 </div>
                             </div>
 
@@ -227,15 +197,16 @@ const FixedIncomeBoard = ({ isOpen, onClose }) => {
                                 <label className="text-[11px] font-bold text-gray-500 uppercase tracking-widest flex items-center gap-2">
                                     Payment Type
                                 </label>
-                                <div className="flex gap-1">
-                                    <input 
-                                        type="text" 
-                                        value={formData.PayType} 
-                                        readOnly 
-                                        placeholder=""
-                                        className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-[12px] bg-slate-50 rounded outline-none font-bold text-gray-700 shadow-sm cursor-not-allowed appearance-none"
-                                     style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
-                                </div>
+                                <select
+                                    value={formData.PayType}
+                                    onChange={(e) => setFormData(prev => ({ ...prev, PayType: e.target.value }))}
+                                    className="w-full h-8 border border-slate-200 px-3 text-[12px] font-bold outline-none shadow-sm focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 bg-white rounded text-gray-700 cursor-pointer"
+                                >
+                                    <option value="">Select type...</option>
+                                    {payTypes.map((pay, idx) => (
+                                        <option key={idx} value={pay.name}>{pay.name}</option>
+                                    ))}
+                                </select>
                             </div>
 
                             {/* Amount */}
@@ -301,100 +272,6 @@ const FixedIncomeBoard = ({ isOpen, onClose }) => {
                     </div>
                 </div>
             </SimpleModal>
-
-            {/* Account Search Modal */}
-            {showAccSearch && (
-                <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4 font-['Tahoma']">
-                    <div className="absolute inset-0 bg-slate-900/30 backdrop-blur-sm" onClick={() => setShowAccSearch(false)} />
- <div className="relative w-full max-w-2xl bg-white shadow-2xl rounded-sm overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
-                        <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-200 select-none relative overflow-hidden">
-                            <div className="absolute left-0 top-0 bottom-0 w-1.5 transition-colors duration-500" style={{ backgroundColor: localStorage.getItem('topBarColor') || '#0285fd' }} />
-                            <div className="flex items-center gap-2">
-                                <Search size={16} className="text-[#0078d4]" />
-                                <span className="text-[15px] font-[700] text-slate-900 uppercase tracking-[3px] font-mono truncate">Income Accounts Lookup</span>
-                            </div>
-                            <button onClick={() => setShowAccSearch(false)} className="w-9 h-8 flex items-center justify-center bg-red-50 hover:bg-red-100 text-red-600 rounded-[8px] transition-all active:scale-90 outline-none border-none group">
-                                <X size={28} strokeWidth={1.5} className="group-hover:scale-110 transition-transform" />
-                            </button>
-                        </div>
-                        <div className="p-3 bg-slate-50 border-b border-gray-200 flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                                <Search size={14} className="text-gray-400" />
-                                <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Search Facility</span>
-                            </div>
-                            <input 
-                                type="text" 
-                                placeholder="FIND BY NAME OR CODE..." 
-                                className="h-9 border border-slate-200 px-3 text-xs rounded-[3px] w-72 focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 outline-none shadow-sm transition-all uppercase" 
-                                value={searchTerm} 
-                                onChange={(e) => setSearchTerm(e.target.value)} 
-                            />
-                        </div>
-                        <div className="border border-gray-200 overflow-hidden bg-white">
-                            <div className="max-h-[400px] overflow-y-auto custom-scrollbar">
-                                <table className="w-full text-left border-collapse">
-                                    <thead className="bg-[#f8fafd] text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-slate-200 sticky top-0 z-10">
-                                        <tr>
-                                            <th className="px-5 py-3">Account Code</th>
-                                            <th className="px-5 py-3">Account Name</th>
-                                            <th className="px-5 py-3 text-right">Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-slate-100 bg-white">
-                                        {lookups.filter(a => 
-                                            (a.name || '').toLowerCase().includes(searchTerm.toLowerCase()) || 
-                                            (a.code || '').toLowerCase().includes(searchTerm.toLowerCase())
-                                        ).map((acc, idx) => (
-                                            <tr 
-                                                key={idx} 
-                                                onClick={() => handleAccountSelect(acc)}
-                                                className="group hover:bg-blue-50/50 cursor-pointer transition-colors"
-                                            >
-                                                <td className="px-5 py-3 font-mono text-[13px] text-gray-600">{acc.code}</td>
-                                                <td className="px-5 py-3 text-[13px] font-mono text-gray-600 uppercase font-bold group-hover:text-blue-600 transition-colors">{acc.name}</td>
-                                                <td className="px-5 py-3 text-right">
-                                                    <button className="bg-[#e49e1b] text-white text-[10px] px-5 py-2 rounded-[3px] font-black hover:bg-[#cb9b34] shadow-md transition-all active:scale-95 uppercase tracking-widest border-none">SELECT</button>
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* Payment Type Search Modal */}
-            {showPayTypeSearch && (
-                <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4 font-['Tahoma']">
-                    <div className="absolute inset-0 bg-slate-900/30 backdrop-blur-sm" onClick={() => setShowPayTypeSearch(false)} />
- <div className="relative w-full max-w-sm bg-white shadow-2xl rounded-sm overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
-                        <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-200 select-none relative overflow-hidden">
-                            <div className="absolute left-0 top-0 bottom-0 w-1.5 transition-colors duration-500" style={{ backgroundColor: localStorage.getItem('topBarColor') || '#0285fd' }} />
-                            <div className="flex items-center gap-2">
-                                <Search size={16} className="text-[#0078d4]" />
-                                <span className="text-[15px] font-[700] text-slate-900 uppercase tracking-[3px] font-mono truncate">Payment Type Lookup</span>
-                            </div>
-                            <button onClick={() => setShowPayTypeSearch(false)} className="w-9 h-8 flex items-center justify-center bg-red-50 hover:bg-red-100 text-red-600 rounded-[8px] transition-all active:scale-90 outline-none border-none group">
-                                <X size={28} strokeWidth={1.5} className="group-hover:scale-110 transition-transform" />
-                            </button>
-                        </div>
-                        <div className="p-4 space-y-2">
-                            {payTypes.map((pay, idx) => (
-                                <button 
-                                    key={idx} 
-                                    onClick={() => handlePayTypeSelect(pay)}
-                                    className="w-full px-4 py-3 text-[12px] font-bold text-gray-700 hover:bg-slate-50 border border-slate-200 rounded-[3px] transition-all text-left flex justify-between items-center group shadow-sm"
-                                >
-                                    <span className="uppercase tracking-widest">{pay.name}</span>
-                                    <PlusCircle size={16} className="text-gray-300 group-hover:text-[#0285fd] transition-colors" />
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-                </div>
-            )}
 
             <CalendarModal 
                 isOpen={showCalendar} 

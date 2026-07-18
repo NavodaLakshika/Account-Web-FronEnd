@@ -260,7 +260,7 @@ const DirectBankTransactionBoard = ({ isOpen, onClose }) => {
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Bank Account</label>
                                 <div className="relative">
                                     <select
-                                        value={formData.bankAccountName}
+                                        value={formData.bankAccount || ''}
                                         onChange={(ev) => {
                                             const val = ev.target.value;
                                             const item = (lookups.banks || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || i === val);
@@ -305,7 +305,7 @@ const DirectBankTransactionBoard = ({ isOpen, onClose }) => {
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">A/P Account</label>
                                 <div className="relative">
                                     <select
-                                        value={formData.apAccountName}
+                                        value={formData.apAccount || ''}
                                         onChange={(ev) => {
                                             const val = ev.target.value;
                                             const item = (lookups.accounts || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || i === val);
@@ -332,7 +332,7 @@ const DirectBankTransactionBoard = ({ isOpen, onClose }) => {
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Cost Center</label>
                                 <div className="relative">
                                     <select
-                                        value={formData.costCenterName}
+                                        value={formData.costCenter || ''}
                                         onChange={(ev) => {
                                             const val = ev.target.value;
                                             const item = (lookups.costCenters || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || i === val);

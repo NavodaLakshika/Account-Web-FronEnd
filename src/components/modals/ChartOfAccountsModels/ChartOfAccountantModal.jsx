@@ -19,33 +19,14 @@ const ChartOfAccountantModal = ({ isOpen, onClose, onCreateNewAccount, onOpenFix
     return (
         <>
             {/* Modal Container Logic */}
-            <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+            <div className="fixed inset-0 z-[1200] flex items-center justify-center p-4">
                 {/* Backdrop */}
                 <div className="absolute inset-0 bg-slate-900/30 backdrop-blur-sm" onClick={onClose} />
                 
                 {/* Modal Container */}
- <div className="relative w-full max-w-sm bg-white rounded-sm shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
+                <div className="relative w-full max-w-sm bg-white rounded-[3px] shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
                     
-                    {/* Header */}
-                    <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-200 select-none relative overflow-hidden">
-                        {/* System Color Left Accent */}
-                        <div 
-                            className="absolute left-0 top-0 bottom-0 w-1.5 transition-colors duration-500" 
-                            style={{ backgroundColor: currentTopBarColor }}
-                        />
-                        
-                        <div className="flex items-center gap-2">
-                            <PieChart size={14} className="text-[#0078d4]" />
-                            <span className="text-[15px] font-[700] text-slate-900 uppercase tracking-[3px] font-mono truncate">Chart of Accounts</span>
-                        </div>
-                        <button 
-                            onClick={onClose} 
-                            className="w-9 h-8 flex items-center justify-center bg-red-50 hover:bg-red-100 text-red-600 rounded-[8px] transition-all active:scale-90 outline-none border-none group"
-                            title="Close"
-                        >
-                            <X size={28} strokeWidth={1.5} className="group-hover:scale-110 transition-transform" />
-                        </button>
-                    </div>
+
 
                     {/* Menu Content */}
                     <div className="p-2 bg-white flex-1 overflow-y-auto max-h-[75vh] no-scrollbar">
@@ -58,7 +39,7 @@ const ChartOfAccountantModal = ({ isOpen, onClose, onCreateNewAccount, onOpenFix
                         return (
                             <button
                                 key={idx}
-                                onClick={item.onClick}
+                                onClick={() => { item.onClick && item.onClick(); onClose(); }}
                                 className="w-full flex items-center justify-between px-4 py-3 rounded-[3px] hover:bg-slate-50 group transition-all relative overflow-hidden text-left border border-transparent hover:border-slate-200"
                             >
                                 {/* Hover Indicator Bar */}

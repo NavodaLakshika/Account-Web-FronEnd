@@ -244,7 +244,7 @@ const FundsTransferBoard = ({ isOpen, onClose }) => {
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Source Account</label>
                                 <div className="relative">
                                     <select
-                                        value={formData.fromAccountName}
+                                        value={formData.fromAccount || ''}
                                         onChange={(ev) => {
                                             const val = ev.target.value;
                                             const item = (lookups.banks || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || i === val);
@@ -274,7 +274,7 @@ const FundsTransferBoard = ({ isOpen, onClose }) => {
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Cost Center</label>
                                 <div className="relative">
                                     <select
-                                        value={formData.fromCostCenterName}
+                                        value={formData.fromCostCenter || ''}
                                         onChange={(ev) => {
                                             const val = ev.target.value;
                                             const item = (lookups.costCenters || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || i === val);
@@ -304,7 +304,7 @@ const FundsTransferBoard = ({ isOpen, onClose }) => {
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Destination Account</label>
                                 <div className="relative">
                                     <select
-                                        value={formData.toAccountName}
+                                        value={formData.toAccount || ''}
                                         onChange={(ev) => {
                                             const val = ev.target.value;
                                             const item = (lookups.banks || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || i === val);
@@ -334,7 +334,7 @@ const FundsTransferBoard = ({ isOpen, onClose }) => {
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Cost Center</label>
                                 <div className="relative">
                                     <select
-                                        value={formData.toCostCenterName}
+                                        value={formData.toCostCenter || ''}
                                         onChange={(ev) => {
                                             const val = ev.target.value;
                                             const item = (lookups.costCenters || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || i === val);

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import SimpleModal from '../components/SimpleModal';
 import { Search, RotateCcw, Save, Trash2, Loader2, X } from 'lucide-react';
+import ConfirmModal from '../components/modals/ConfirmModal';
 import { supplierService } from '../services/supplier.service';
 
 import { getSessionData } from '../utils/session';
@@ -39,6 +40,8 @@ const VendorBoard = ({ isOpen, onClose }) => {
     const [showSearchModal, setShowSearchModal] = useState(false);
     const [suppliersList, setSuppliersList] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
 
     useEffect(() => {
         if (isOpen) {
@@ -119,19 +122,22 @@ const VendorBoard = ({ isOpen, onClose }) => {
         }
     };
 
-    const handleDelete = async () => {
+    const handleDelete = () => {
         if (!isEditMode || !formData.Code) return;
-        if (!window.confirm('Are you sure you want to delete this supplier?')) return;
+        setShowDeleteConfirm(true);
+    };
 
-        setLoading(true);
+    const confirmDelete = async () => {
+        setIsDeleting(true);
         try {
             await supplierService.delete(formData.Code);
             showSuccessToast('Supplier deleted');
+            setShowDeleteConfirm(false);
             handleClear();
         } catch (error) {
             showErrorToast(error);
         } finally {
-            setLoading(false);
+            setIsDeleting(false);
         }
     };
 
@@ -197,9 +203,9 @@ const VendorBoard = ({ isOpen, onClose }) => {
             <button 
                 onClick={handleDelete}
                 disabled={!isEditMode || loading}
-                className={`px-6 py-3 bg-white text-[#ff3b30] border-2 border-[#ff3b30] hover:bg-red-50 font-mono font-bold text-sm uppercase tracking-widest rounded-[3px] shadow-md shadow-red-100 transition-all active:scale-95 flex items-center justify-center gap-2 border-none ${(!isEditMode || loading) ? 'opacity-50' : ''}`}
+                className={`px-6 h-10 bg-red-50 text-red-600 text-sm font-bold rounded-[3px] hover:bg-red-100 transition-all active:scale-95 flex items-center gap-2 border border-red-100 ${(!isEditMode || loading) ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
-                <Trash2 size={14} /> DELETE
+                <Trash2 size={14} /> Delete
             </button>
             <button 
                 onClick={handleClear}
@@ -426,6 +432,17 @@ const VendorBoard = ({ isOpen, onClose }) => {
                     </div>
                 </div>
             )}
+
+            <ConfirmModal
+                isOpen={showDeleteConfirm}
+                onClose={() => setShowDeleteConfirm(false)}
+                onConfirm={confirmDelete}
+                title="Delete Supplier"
+                message={`Are you sure you want to delete this supplier (${formData.Supplier_Name})? This action cannot be undone.`}
+                loading={isDeleting}
+                confirmText="Delete"
+                variant="danger"
+            />
         </>
     );
 };
