@@ -227,7 +227,7 @@ return (
 <div className="w-full max-w-[40px] bg-[#0285fd] opacity-80 border-t-2 border-[#0285fd] group-hover:opacity-100 transition-all relative rounded-[3px]"
 style={{ height: `${heightPct}%` }}
 >
-<div className="absolute -top-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-white border border-gray-200 text-gray-700 text-[10px] font-bold px-2 py-1 rounded-[3px] whitespace-nowrap z-10 shadow-lg">
+<div className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">
 Rs {d.value.toLocaleString(undefined, {minimumFractionDigits: 2})}
 </div>
 </div>
@@ -271,7 +271,7 @@ className="bg-transparent text-xs font-bold text-gray-600 focus:outline-none cur
 <Loader2 className="w-8 h-8 text-[#0285fd] animate-spin" />
 </div>
 ) : filteredTransactions.length === 0 ? (
-<div className="flex flex-col items-center justify-center h-64 text-center px-4">
+<div className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
 <div className="w-16 h-16 bg-white border border-gray-200 flex items-center justify-center mb-4 rounded-[3px]">
 <Database className="w-8 h-8 text-gray-400" />
 </div>
@@ -282,21 +282,21 @@ className="bg-transparent text-xs font-bold text-gray-600 focus:outline-none cur
 <table className="w-full text-left border-collapse min-w-[800px]">
 <thead className="sticky top-0 z-10 bg-[#f8fafc] border-b border-gray-200">
 <tr>
-<th className="py-3 px-6 text-[10px] font-black tracking-widest uppercase text-gray-400">Doc No</th>
-<th className="py-3 px-6 text-[10px] font-black tracking-widest uppercase text-gray-400">Type</th>
-<th className="py-3 px-6 text-[10px] font-black tracking-widest uppercase text-gray-400">Account</th>
-<th className="py-3 px-6 text-[10px] font-black tracking-widest uppercase text-gray-400">Date</th>
-<th className="py-3 px-6 text-[10px] font-black tracking-widest uppercase text-gray-400 text-right">Amount</th>
-<th className="py-3 px-6 text-[10px] font-black tracking-widest uppercase text-gray-400 text-center">Actions</th>
+<th className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">Doc No</th>
+<th className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">Type</th>
+<th className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">Account</th>
+<th className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">Date</th>
+<th className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">Amount</th>
+<th className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">Actions</th>
 </tr>
 </thead>
 <tbody className="divide-y divide-gray-200">
 {filteredTransactions.map(tx => (
 <tr key={tx.docNo} className="hover:bg-gray-50 transition-colors group">
-<td className="py-3 px-6">
-<span className="font-mono text-xs font-bold text-gray-600 bg-gray-100 border border-gray-200 px-2 py-0.5 rounded-[3px]">{tx.docNo}</span>
+<td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
+<span className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">{tx.docNo}</span>
 </td>
-<td className="py-3 px-6">
+<td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
 <span className={`px-3 py-1 text-[9px] font-black uppercase tracking-widest rounded-[3px] border ${
 tx.payType === 'Cash' ? 'bg-emerald-50 text-emerald-700 border-emerald-300' :
 tx.payType === 'Credit' ? 'bg-blue-50 text-blue-700 border-blue-300' :
@@ -305,19 +305,19 @@ tx.payType === 'Credit' ? 'bg-blue-50 text-blue-700 border-blue-300' :
 {tx.payType || 'N/A'}
 </span>
 </td>
-<td className="py-3 px-6 text-xs text-gray-600 font-medium">{tx.account || 'System'}</td>
-<td className="py-3 px-6 text-xs text-gray-500">{tx.postDate || 'N/A'}</td>
-<td className="py-3 px-6 text-xs font-black text-gray-800 text-right">Rs {(tx.amount || 0).toFixed(2)}</td>
-<td className="py-3 px-6">
+<td className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">{tx.account || 'System'}</td>
+<td className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">{tx.postDate || 'N/A'}</td>
+<td className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">Rs {(tx.amount || 0).toFixed(2)}</td>
+<td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
 <div className="flex items-center justify-center gap-2">
 <button onClick={() => setSelectedTx(tx)}
-className="px-3 py-1 text-[10px] font-black uppercase tracking-wider rounded-[3px] transition-all bg-[#0285fd] text-white border border-[#0285fd] hover:bg-[#0073ff] flex items-center gap-1 shadow-sm"
+className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100"
 title="View Details"
 >
 <Eye size={10} /> View
 </button>
 <button onClick={() => handleDeleteTransaction(tx.docNo)}
-className="px-3 py-1 text-[10px] font-black uppercase tracking-wider rounded-[3px] transition-all bg-white text-red-600 border border-red-300 hover:bg-red-50 flex items-center gap-1 shadow-sm"
+className="px-6 h-10 bg-red-50 text-red-600 text-sm font-bold rounded-[3px] hover:bg-red-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-red-100"
 title="Delete"
 >
 <Trash2 size={10} /> Delete
@@ -354,7 +354,7 @@ className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-al
 </button>
 </div>
 {/* Horizontal Tab Navigation */}
-<div className="bg-white border-b border-gray-200 px-6 py-4 flex items-center gap-3 overflow-x-auto shrink-0 scrollbar-hide">
+<div className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">
 {tabs.map(tab => {
 const active = activeTab === tab.id;
 return (
@@ -390,7 +390,7 @@ active ? 'bg-[#0285fd] text-white shadow-sm border border-[#0285fd]' : 'bg-white
     {selectedTx && (
         <div className="fixed inset-0 z-[300] flex items-center justify-center bg-black/50 p-4">
             <div className="bg-white border border-gray-200 shadow-2xl w-full max-w-lg overflow-hidden rounded-[3px]">
-                <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between bg-white">
+                <div className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">
                     <div>
                         <h3 className="text-[15px] font-bold text-gray-800 flex items-center gap-2">
                             <ShieldAlert className="text-emerald-600" size={16} />
@@ -407,25 +407,25 @@ active ? 'bg-[#0285fd] text-white shadow-sm border border-[#0285fd]' : 'bg-white
                         <div className="grid grid-cols-2 gap-x-6 gap-y-4">
                             <div>
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Amount</label>
-                                <div className="w-full h-10 border border-gray-200 bg-gray-50/50 px-3 text-[14px] font-bold text-emerald-600 flex items-center rounded-[3px]">
+                                <div className="px-6 h-10 bg-emerald-50 text-emerald-600 text-sm font-bold rounded-[3px] hover:bg-emerald-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-emerald-100">
                                     Rs {(selectedTx.amount || 0).toFixed(2)}
                                 </div>
                             </div>
                             <div>
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Date</label>
-                                <div className="w-full h-10 border border-gray-200 bg-gray-50/50 px-3 text-[14px] font-bold text-gray-700 flex items-center rounded-[3px]">
+                                <div className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">
                                     {selectedTx.postDate || 'N/A'}
                                 </div>
                             </div>
                             <div>
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Account</label>
-                                <div className="w-full h-10 border border-gray-200 bg-gray-50/50 px-3 text-[14px] font-medium text-gray-700 flex items-center rounded-[3px]">
+                                <div className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">
                                     {selectedTx.account || 'System'}
                                 </div>
                             </div>
                             <div>
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Payment Type</label>
-                                <div className="w-full h-10 border border-gray-200 bg-gray-50/50 px-3 text-[14px] font-bold text-gray-700 flex items-center rounded-[3px]">
+                                <div className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">
                                     <span className={`inline-block px-3 py-0.5 text-[10px] font-black uppercase tracking-widest rounded-[3px] border ${
                                         selectedTx.payType === 'Cash' ? 'bg-emerald-50 text-emerald-700 border-emerald-300' :
                                         selectedTx.payType === 'Credit' ? 'bg-blue-50 text-blue-700 border-blue-300' :
@@ -444,7 +444,7 @@ active ? 'bg-[#0285fd] text-white shadow-sm border border-[#0285fd]' : 'bg-white
                             <Trash2 size={14} /> Delete Record
                         </button>
                         <button onClick={() => setSelectedTx(null)}
-                            className="px-6 h-10 bg-[#0285fd] hover:bg-[#0073ff] text-white font-semibold rounded-[3px] shadow-sm text-[13px] transition-all"
+                            className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100"
                         >
                             Close Details
                         </button>

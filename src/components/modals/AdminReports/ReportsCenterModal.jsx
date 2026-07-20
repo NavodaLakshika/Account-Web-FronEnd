@@ -63,7 +63,7 @@ export const menuGroups = [
         title: 'Taxes & Other Lists',
         icon: FileText,
         items: [
-            "Tax Liability Report", "Terms List", "Payment Method List", "Deposit Detail", "Recurring Template List", "Audit Log"
+            "Tax Liability Report", "Terms List", "Payment Method List", "Deposit Detail", "Recurring Template List"
         ]
     },
     {

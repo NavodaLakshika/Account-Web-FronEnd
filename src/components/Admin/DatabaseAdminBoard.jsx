@@ -200,7 +200,7 @@ const DatabaseAdminBoard = () => {
     return (
         <div className="bg-white shadow-sm border border-slate-200/80 flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-2 duration-300 pb-6 rounded-[5px] overflow-hidden mb-6">
             {/* Header */}
-            <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+            <div className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
                 <div className="flex items-center gap-3">
                     <div className="w-8 h-8 bg-blue-50 flex items-center justify-center rounded-[5px]">
                         <Database className="w-4 h-4 text-blue-600" />
@@ -241,7 +241,7 @@ const DatabaseAdminBoard = () => {
                         <div className="w-10 h-10 bg-blue-50 flex items-center justify-center border border-blue-200 rounded-[3px]">
                             <HardDrive className="w-5 h-5 text-blue-600" />
                         </div>
-                        <span className="px-2 py-1 bg-emerald-50 text-emerald-600 text-[9px] font-black uppercase tracking-widest border border-emerald-200 rounded-[3px]">Healthy</span>
+                        <span className="px-6 h-10 bg-emerald-50 text-emerald-600 text-sm font-bold rounded-[3px] hover:bg-emerald-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-emerald-100">Healthy</span>
                     </div>
                     <div>
                         <h3 className="text-slate-500 text-[10px] font-black uppercase tracking-widest mb-1">Database Size</h3>
@@ -307,7 +307,7 @@ const DatabaseAdminBoard = () => {
                                     </div>
                                     <button
                                         onClick={() => handleRunMaintenance(op.label)}
-                                        className="px-4 py-2 bg-[#0078d4] hover:bg-[#005a9e] text-white text-xs font-bold transition-all rounded-[3px] uppercase tracking-wider shrink-0 ml-4 shadow-sm"
+                                        className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100"
                                     >
                                         Run Now
                                     </button>
@@ -334,7 +334,7 @@ const DatabaseAdminBoard = () => {
                             <button
                                 onClick={handleCreateBackup}
                                 disabled={creatingBackup}
-                                className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-[3px] transition-all mt-2 shadow-sm"
+                                className="px-6 h-10 bg-emerald-50 text-emerald-600 text-sm font-bold rounded-[3px] hover:bg-emerald-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-emerald-100"
                             >
                                 Create First Backup
                             </button>
@@ -362,7 +362,7 @@ const DatabaseAdminBoard = () => {
                                         <button
                                             onClick={() => handleRestoreBackup(b)}
                                             disabled={restoringId === (b.id || b.Id)}
-                                            className="text-xs font-bold px-3 py-1 bg-orange-500 hover:bg-orange-600 text-white rounded-[3px] transition-all shrink-0 ml-3 uppercase tracking-wider shadow-sm"
+                                            className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100"
                                         >
                                             {restoringId === (b.id || b.Id) ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Restore'}
                                         </button>

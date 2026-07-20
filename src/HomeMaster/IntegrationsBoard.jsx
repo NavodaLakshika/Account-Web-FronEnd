@@ -77,7 +77,7 @@ const IntegrationsBoard = () => {
     return (
         <div className="bg-white dark:bg-[#0f172a]/50 backdrop-blur-md shadow-lg border border-slate-200 dark:border-[#334155] flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-2 duration-300 pb-6 rounded-none-[12px] overflow-hidden mb-6">
             {/* Header */}
-            <div className="px-6 py-4 border-b border-slate-200 dark:border-[#334155] flex items-center justify-between bg-white dark:bg-[#0f172a]/50">
+            <div className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
                 <div className="flex items-center gap-3">
                     <div className="w-8 h-8 bg-indigo-500/20 flex items-center justify-center rounded-none">
                         <Puzzle className="w-4 h-4 text-indigo-300" />
@@ -111,7 +111,7 @@ const IntegrationsBoard = () => {
 
             {/* API Documentation Card */}
             <div className="border border-slate-200 dark:border-[#334155] mx-6 bg-white dark:bg-[#0f172a]/50 rounded-none shadow-sm">
-                <div className="px-6 py-4 border-b border-slate-200 dark:border-[#334155] flex items-center gap-3 bg-white dark:bg-[#0f172a]/50">
+                <div className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
                     <div className="w-8 h-8 bg-blue-500/20 flex items-center justify-center rounded-none">
                         <Terminal className="w-4 h-4 text-blue-300" />
                     </div>
@@ -160,7 +160,7 @@ const IntegrationsBoard = () => {
                         const StatusIcon = st.icon;
                         return (
                             <div key={mod.id} className={`bg-white dark:bg-[#0f172a]/50 border ${st.border} transition-all hover:bg-white/[0.07]`}>
-                                <div className="px-5 py-4 border-b border-slate-200 dark:border-[#334155] flex items-center justify-between">
+                                <div className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
                                     <div className="flex items-center gap-3">
                                         <div className={`w-8 h-8 ${st.bg} flex items-center justify-center`}>
                                             <Icon className={`w-4 h-4 ${st.color}`} />
@@ -174,7 +174,7 @@ const IntegrationsBoard = () => {
                                         <StatusIcon size={10} /> {st.label}
                                     </span>
                                 </div>
-                                <div className="px-5 py-3 flex items-center justify-between">
+                                <div className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
                                     <span className="text-[11px] text-slate-500 font-medium">
                                         {st.status === 'active' ? 'Service is running' : st.status === 'locked' ? 'Access restricted by admin' : 'Configure in system settings'}
                                     </span>

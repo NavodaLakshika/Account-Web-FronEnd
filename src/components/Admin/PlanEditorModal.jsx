@@ -64,7 +64,7 @@ const PlanEditorModal = ({ isOpen, onClose, editingPlan, onSaveSuccess }) => {
     return (
         <div className="fixed inset-0 z-[3000] flex items-center justify-center bg-black/50 p-4 font-sans">
             <div className="bg-white border border-gray-200 shadow-2xl w-full max-w-md animate-in fade-in zoom-in-95 duration-200 flex flex-col rounded-[3px] overflow-hidden">
-                <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between bg-white">
+                <div className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">
                     <h3 className="text-[15px] font-bold text-gray-800">
                         {editingPlan ? 'Edit Pricing Plan' : 'Create Pricing Plan'}
                     </h3>
@@ -83,7 +83,7 @@ const PlanEditorModal = ({ isOpen, onClose, editingPlan, onSaveSuccess }) => {
                                 value={formData.planName}
                                 onChange={e => setFormData({...formData, planName: e.target.value})}
                                 placeholder="e.g. Professional"
-                                className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 transition-all placeholder:text-gray-400"
+                                className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100"
                                 autoFocus
                             />
                         </div>
@@ -98,7 +98,7 @@ const PlanEditorModal = ({ isOpen, onClose, editingPlan, onSaveSuccess }) => {
                                     value={formData.price}
                                     onChange={e => setFormData({...formData, price: parseFloat(e.target.value) || 0})}
                                     placeholder="0.00"
-                                    className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 transition-all placeholder:text-gray-400"
+                                    className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100"
                                 />
                             </div>
                             <div className="flex-1">
@@ -106,7 +106,7 @@ const PlanEditorModal = ({ isOpen, onClose, editingPlan, onSaveSuccess }) => {
                                 <select
                                     value={formData.billingCycle}
                                     onChange={e => setFormData({...formData, billingCycle: e.target.value})}
-                                    className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 transition-all"
+                                    className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100"
                                 >
                                     <option value="Monthly">Monthly</option>
                                     <option value="Yearly">Yearly</option>
@@ -123,7 +123,7 @@ const PlanEditorModal = ({ isOpen, onClose, editingPlan, onSaveSuccess }) => {
                                     value={formData.maxUsers}
                                     onChange={e => setFormData({...formData, maxUsers: parseInt(e.target.value) || 0})}
                                     placeholder="5"
-                                    className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 transition-all placeholder:text-gray-400"
+                                    className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100"
                                 />
                             </div>
                             <div className="flex-1">
@@ -134,7 +134,7 @@ const PlanEditorModal = ({ isOpen, onClose, editingPlan, onSaveSuccess }) => {
                                     value={formData.maxCompanies}
                                     onChange={e => setFormData({...formData, maxCompanies: parseInt(e.target.value) || 0})}
                                     placeholder="1"
-                                    className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 transition-all placeholder:text-gray-400"
+                                    className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100"
                                 />
                             </div>
                         </div>
@@ -157,7 +157,7 @@ const PlanEditorModal = ({ isOpen, onClose, editingPlan, onSaveSuccess }) => {
                         <button
                             type="button"
                             onClick={onClose}
-                            className="px-6 h-10 border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all"
+                            className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100"
                         >
                             Cancel
                         </button>

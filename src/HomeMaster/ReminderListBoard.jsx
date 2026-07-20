@@ -79,7 +79,7 @@ const ReminderListBoard = ({ isOpen, onClose, onEditTask }) => {
       title="Reminders"
       maxWidth="max-w-[700px]"
       footer={
-        <div className="flex items-center justify-end w-full px-6 h-16 bg-slate-50 border-t border-slate-200">
+        <div className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100">
           <button 
             onClick={onClose}
             className="px-8 h-10 bg-[#0078d4] text-white text-sm font-bold rounded-[3px] hover:bg-blue-600 transition-all active:scale-95 flex items-center gap-2"
@@ -125,12 +125,12 @@ const ReminderListBoard = ({ isOpen, onClose, onEditTask }) => {
           <table className="w-full border-collapse">
             <thead className="sticky top-0 z-10 bg-[#f8faff] border-y border-slate-200">
               <tr>
-                <th className="px-4 py-3 text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest text-left w-12 text-center">#</th>
-                <th className="px-4 py-3 text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest text-left w-32 border-l border-slate-200">Date</th>
-                <th className="px-4 py-3 text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest text-left w-32 border-l border-slate-200">Time</th>
-                <th className="px-4 py-3 text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest text-left border-l border-slate-200">Task Details</th>
-                <th className="px-4 py-3 text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest text-center w-32 border-l border-slate-200">Actions</th>
-              <th className="text-right px-5 py-3">Action</th></tr>
+                <th className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100">#</th>
+                <th className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100">Date</th>
+                <th className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100">Time</th>
+                <th className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100">Task Details</th>
+                <th className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100">Actions</th>
+              <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Action</th></tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
               {loading && !deleteConfirm.show ? (
@@ -150,25 +150,25 @@ const ReminderListBoard = ({ isOpen, onClose, onEditTask }) => {
                 </tr>
               ) : filteredReminders.map((r, idx) => (
                 <tr key={r.id_No || r.Id_No} className="hover:bg-blue-50/30 transition-colors group">
-                  <td className="px-4 py-4 text-xs font-bold text-slate-500 dark:text-slate-400 text-center">{idx + 1}</td>
-                  <td className="px-4 py-4 border-l border-slate-100/50">
+                  <td className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100">{idx + 1}</td>
+                  <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
                      <div className="flex items-center gap-2 text-slate-600 font-bold text-xs uppercase">
                         <CalendarIcon size={12} className="text-slate-500 dark:text-slate-400" />
                         {r.date || r.Date}
                      </div>
                   </td>
-                  <td className="px-4 py-4 border-l border-slate-100/50">
+                  <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
                      <div className="flex items-center gap-2 text-slate-600 font-medium text-xs uppercase">
                         <Clock size={12} className="text-slate-500 dark:text-slate-400" />
                         {r.time || r.Time}
                      </div>
                   </td>
-                  <td className="px-4 py-4 border-l border-slate-100/50">
+                  <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
                     <p className={`text-sm font-medium text-slate-600 leading-tight ${(r.expire || r.Expire) === 'T' ? 'line-through opacity-40 text-slate-500 dark:text-slate-400' : ''}`}>
                       {r.task || r.Task}
                     </p>
                   </td>
-                  <td className="px-4 py-4 border-l border-slate-100/50">
+                  <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
                     <div className="flex items-center justify-center gap-2">
                        <button 
                          onClick={() => onEditTask(r)}

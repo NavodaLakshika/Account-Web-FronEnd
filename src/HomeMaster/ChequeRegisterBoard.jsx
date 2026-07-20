@@ -117,7 +117,7 @@ const ChequeRegisterBoard = ({ isOpen, onClose }) => {
 
 
     const footer = (
-        <div className="bg-slate-50 px-6 py-4 w-full flex justify-end gap-3 border-t border-gray-200 mt-2 rounded-b-xl">
+        <div className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">
             <button 
                 onClick={handleSave}
                 disabled={loading}
@@ -165,7 +165,7 @@ const ChequeRegisterBoard = ({ isOpen, onClose }) => {
                                             setFormData({ ...formData, accCode: '', accName: '', bookNo: '' });
                                         }
                                     }}
-                                    className="w-full h-9 border border-gray-300 rounded-[3px] px-3 font-mono font-bold text-slate-800 text-[12.5px] outline-none shadow-sm bg-white appearance-none cursor-pointer focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd]"
+                                    className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100"
                                     style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
                                 >
                                     <option value="">Select account...</option>
@@ -186,7 +186,7 @@ const ChequeRegisterBoard = ({ isOpen, onClose }) => {
                                     type="text" 
                                     readOnly
                                     value={formData.bookNo}
-                                    className="w-full h-9 border border-gray-300 rounded-[3px] px-3 font-mono font-black text-[#0285fd] text-[13px] outline-none shadow-sm bg-gray-50" 
+                                    className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100" 
                                 />
                             </div>
                         </div>
@@ -199,7 +199,7 @@ const ChequeRegisterBoard = ({ isOpen, onClose }) => {
                                     type="text" 
                                     readOnly 
                                     value={formData.date}
-                                    className="flex-1 h-9 border border-gray-300 rounded-[3px] px-3 font-mono font-bold text-slate-800 text-[12.5px] outline-none bg-gray-50/50 shadow-sm" 
+                                    className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100" 
                                 />
                                 <button onClick={() => setCalendar({ isOpen: true, target: 'date' })} className="w-10 h-9 bg-[#0285fd] text-slate-800 dark:text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-sm active:scale-90 shrink-0">
                                     <Calendar size={15} />
@@ -215,7 +215,7 @@ const ChequeRegisterBoard = ({ isOpen, onClose }) => {
                                     type="number" 
                                     value={formData.startNo}
                                     onChange={e => setFormData({ ...formData, startNo: e.target.value })}
-                                    className="w-full h-9 border border-gray-300 rounded-[3px] px-3 font-mono font-black text-[#0285fd] text-[13px] outline-none shadow-sm bg-white focus:border-slate-400" 
+                                    className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100" 
                                 />
                             </div>
                         </div>
@@ -228,7 +228,7 @@ const ChequeRegisterBoard = ({ isOpen, onClose }) => {
                                     type="number" 
                                     value={formData.endNo}
                                     onChange={e => setFormData({ ...formData, endNo: e.target.value })}
-                                    className="w-full h-9 border border-gray-300 rounded-[3px] px-3 font-mono font-black text-[#0285fd] text-[13px] outline-none shadow-sm bg-white focus:border-slate-400" 
+                                    className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100" 
                                 />
                             </div>
                         </div>

@@ -119,7 +119,7 @@ const SystemLogsBoard = () => {
                         <select 
                             value={statusFilter}
                             onChange={(e) => setStatusFilter(e.target.value)}
-                            className="w-full sm:w-auto px-4 py-2 bg-white border border-slate-200 text-slate-600 text-sm font-bold rounded-[3px] outline-none focus:border-[#00acee] cursor-pointer"
+                            className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100"
                         >
                             <option value="All">All Statuses</option>
                             <option value="Success">Success</option>
@@ -149,29 +149,29 @@ const SystemLogsBoard = () => {
                         <table className="w-full text-left border-collapse min-w-[800px]">
                             <thead>
                                 <tr className="bg-white border-b border-slate-200 text-xs font-bold text-slate-500 uppercase tracking-wider sticky top-0 shadow-sm z-10">
-                                    <th className="py-4 px-6 w-48">Timestamp</th>
-                                    <th className="py-4 px-6 w-40">User</th>
-                                    <th className="py-4 px-6">Action Performed</th>
-                                    <th className="py-4 px-6 w-36">IP Address</th>
-                                    <th className="py-4 px-6 w-32 text-center">Status</th>
+                                    <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Timestamp</th>
+                                    <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">User</th>
+                                    <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Action Performed</th>
+                                    <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">IP Address</th>
+                                    <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Status</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-100">
                                 {filteredLogs.map((log, idx) => (
                                     <tr key={log.id || idx} className="hover:bg-slate-50/80 transition-colors">
-                                        <td className="py-3 px-6 text-xs text-slate-500 font-medium whitespace-nowrap font-mono">
+                                        <td className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100">
                                             {log.date ? new Date(log.date).toLocaleString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true }) : 'N/A'}
                                         </td>
-                                        <td className="py-3 px-6 text-sm text-slate-900 font-bold">
+                                        <td className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100">
                                             {log.user || 'System'}
                                         </td>
-                                        <td className="py-3 px-6">
+                                        <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
                                             <span className="text-sm text-slate-700 font-medium">{log.action || 'Unknown Action'}</span>
                                         </td>
-                                        <td className="py-3 px-6 text-xs font-mono text-slate-500 dark:text-slate-400">
+                                        <td className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100">
                                             {log.ip || '0.0.0.0'}
                                         </td>
-                                        <td className="py-3 px-6">
+                                        <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
                                             <div className="flex justify-center">
                                                 <div className={`flex items-center gap-1.5 px-3 py-1 rounded-[3px] border text-[10px] font-bold uppercase tracking-wider ${getStatusStyle(log.status)}`}>
                                                     {getStatusIcon(log.status)}

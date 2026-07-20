@@ -91,7 +91,6 @@ const allReportsList = [
     "Purchase List",
     "General Ledger List",
     "Purchases by Supplier Detail",
-    "Audit Log",
     "Expenses by Supplier Summary",
     "Transaction List by Supplier",
     "Supplier Contact List",
@@ -148,7 +147,7 @@ const OtherReportsDropdown = ({ onSelect }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [search, setSearch] = useState('');
 
-    const filtered = allReportsList.filter(r => r.toLowerCase().includes(search.toLowerCase()));
+    const filtered = allReportsList.filter(r => r.toLowerCase().includes(search.toLowerCase())).sort((a, b) => a.localeCompare(b));
 
     return (
         <div className="relative ml-8">
@@ -407,7 +406,13 @@ const ReportTemplate = ({
                     }
                 }
 
-                const response = await api.get(`/report/${endpoint}?companyId=${companyId}&startDate=${startStr}&endDate=${endStr}&accountingMethod=${accountingMethod}&displayColumnsBy=${displayColumnsBy}&compareTo=${compareToStr}`);
+                let backendDisplayColumnsBy = displayColumnsBy;
+                if (displayColumnsBy === 'Months') backendDisplayColumnsBy = 'Month';
+                else if (displayColumnsBy === 'Quarters') backendDisplayColumnsBy = 'Quarter';
+                else if (displayColumnsBy === 'Supplier') backendDisplayColumnsBy = 'Vendor';
+                else if (displayColumnsBy === 'Select') backendDisplayColumnsBy = '';
+
+                const response = await api.get(`/report/${endpoint}?companyId=${companyId}&startDate=${startStr}&endDate=${endStr}&accountingMethod=${accountingMethod}&displayColumnsBy=${backendDisplayColumnsBy}&compareTo=${compareToStr}`);
                 
                 let processedData = response.data;
                 if (processedData && processedData.length > 0 && processedData.some(r => 'PivotColumn' in r || 'pivotcolumn' in r)) {
@@ -415,6 +420,14 @@ const ReportTemplate = ({
                     const firstRow = processedData[0];
                     const standardKeys = Object.keys(firstRow).filter(k => !['Balance', 'PivotColumn', 'balance', 'pivotcolumn'].includes(k));
                     
+                    const uniquePivotVals = new Set();
+                    processedData.forEach(row => {
+                        const pivotVal = row['PivotColumn'] || row['pivotcolumn'] || 'Total';
+                        if (pivotVal !== 'Total') {
+                            uniquePivotVals.add(pivotVal);
+                        }
+                    });
+
                     processedData.forEach(row => {
                         const rowKey = standardKeys.map(k => row[k]).join('|');
                         const pivotVal = row['PivotColumn'] || row['pivotcolumn'] || 'Total';
@@ -423,12 +436,15 @@ const ReportTemplate = ({
                         if (!rowsMap.has(rowKey)) {
                             const newRow = {};
                             standardKeys.forEach(k => newRow[k] = row[k]);
+                            uniquePivotVals.forEach(k => newRow[k] = 0);
                             newRow['Total'] = 0;
                             rowsMap.set(rowKey, newRow);
                         }
                         
                         const existingRow = rowsMap.get(rowKey);
-                        existingRow[pivotVal] = (existingRow[pivotVal] || 0) + balance;
+                        if (pivotVal !== 'Total') {
+                            existingRow[pivotVal] = (existingRow[pivotVal] || 0) + balance;
+                        }
                         existingRow['Total'] += balance;
                     });
                     
@@ -438,11 +454,12 @@ const ReportTemplate = ({
                 setApiData(processedData);
                 setApiError(null);
             } catch (error) {
-                console.error("Failed to fetch report data", error);
-                if (error.response) {
-                    setApiError(`API returned ${error.response.status}: ${typeof error.response.data === 'string' ? error.response.data : JSON.stringify(error.response.data)}`);
+                console.error("API Error:", error);
+                if (error.response && error.response.status === 404) {
+                    setApiError("This report is not available in the API yet.");
                 } else {
-                    setApiError(`Fetch failed: ${error.message}. Is the API URL correct?`);
+                    setApiData(null);
+                    setApiError("Invalid endpoint");
                 }
             } finally {
                 setApiLoading(false);
@@ -466,7 +483,7 @@ const ReportTemplate = ({
         return () => {
             window.removeEventListener('reportDataChanged', handleDataChange);
         };
-    }, [title, reportPeriod, fromDate, toDate, accountingMethod, displayColumnsBy, compareTo]);
+    }, [title, reportPeriod, fromDate, toDate, accountingMethod, displayColumnsBy, compareTo, JSON.stringify(compareToState)]);
 
     const [searchQuery, setSearchQuery] = useState('');
     const [columnFilters, setColumnFilters] = useState({});
@@ -601,7 +618,7 @@ const ReportTemplate = ({
     let displayColumns = (apiData && apiData.length > 0 && columns.length === 0)
         ? Object.keys(apiData[0]).filter(key => key !== 'DocNoHidden' && key !== 'docnohidden').map(key => {
             const headerLower = key.toLowerCase().replace(/[^a-z0-9]/g, '');
-            const isCurrencyCol = columnsToTotal.some(c => headerLower.includes(c)) && !['qty', 'quantity', 'hours', 'code', 'date', 'id', 'name', 'type', 'status', 'no'].some(exclude => headerLower.includes(exclude));
+            const isCurrencyCol = columnsToTotal.some(c => headerLower.includes(c)) && !['code', 'date', 'id', 'name', 'type', 'status', 'no', 'phone', 'fax', 'email', 'contact'].some(exclude => headerLower.includes(exclude));
             
             // Format PascalCase/camelCase to Space Case
             const formattedHeader = key.replace(/([A-Z])/g, ' $1').trim();
@@ -609,9 +626,9 @@ const ReportTemplate = ({
             return {
                 header: (isCurrencyCol && !customizations.hideCurrency) ? `${formattedHeader} (LKR)` : formattedHeader,
                 accessor: key,
-                align: (columnsToTotal.some(c => headerLower.includes(c)) && !['code', 'date', 'id', 'name', 'type', 'status', 'no'].some(exclude => headerLower.includes(exclude))) ? 'right' : 'left',
+                align: (columnsToTotal.some(c => headerLower.includes(c)) && !['code', 'date', 'id', 'name', 'type', 'status', 'no', 'phone', 'fax', 'email', 'contact'].some(exclude => headerLower.includes(exclude))) ? 'right' : 'left',
                 format: isCurrencyCol ? (val) => {
-                    if (val === null || val === undefined || val === '') return '';
+                    if (val === null || val === undefined || val === '') return '-';
                     if (typeof val === 'string' && isNaN(parseFloat(val))) return val;
                     const num = parseFloat(val);
                     if (isNaN(num)) return val;
@@ -625,12 +642,12 @@ const ReportTemplate = ({
         : columns.map(col => {
             if (col.format) return col;
             const headerLower = (col.header || '').toLowerCase().replace(/[^a-z0-9]/g, '');
-            const isCurrencyCol = columnsToTotal.some(c => headerLower.includes(c)) && !['qty', 'quantity', 'hours', 'code', 'date', 'id', 'name', 'type', 'status', 'no'].some(exclude => headerLower.includes(exclude));
+            const isCurrencyCol = columnsToTotal.some(c => headerLower.includes(c)) && !['code', 'date', 'id', 'name', 'type', 'status', 'no', 'phone', 'fax', 'email', 'contact'].some(exclude => headerLower.includes(exclude));
             return {
                 ...col,
                 header: (isCurrencyCol && !customizations.hideCurrency) ? (!col.header.includes('(LKR)') ? `${col.header} (LKR)` : col.header) : col.header.replace(' (LKR)', ''),
                 format: isCurrencyCol ? (val) => {
-                    if (val === null || val === undefined || val === '') return '';
+                    if (val === null || val === undefined || val === '') return '-';
                     if (typeof val === 'string' && isNaN(parseFloat(val))) return val;
                     const num = parseFloat(val);
                     if (isNaN(num)) return val;
@@ -646,7 +663,7 @@ const ReportTemplate = ({
     const regularCols = [];
     displayColumns.forEach(col => {
         const headerLower = (col.header || '').toLowerCase().replace(/[^a-z0-9]/g, '');
-        const isCurrency = columnsToTotal.some(c => headerLower.includes(c)) && !['qty', 'quantity', 'hours', 'code', 'date', 'id', 'name', 'type', 'status', 'no'].some(exclude => headerLower.includes(exclude));
+        const isCurrency = columnsToTotal.some(c => headerLower.includes(c)) && !['code', 'date', 'id', 'name', 'type', 'status', 'no', 'phone', 'fax', 'email', 'contact'].some(exclude => headerLower.includes(exclude));
         if (isCurrency) {
             currencyCols.push(col);
         } else {
@@ -655,7 +672,7 @@ const ReportTemplate = ({
     });
     displayColumns = [...regularCols, ...currencyCols];
 
-    const nonTotalColumns = ['account_code', 'account_type', 'account_name', 'accountcode', 'accounttype', 'accountname', 'id', 'name', 'type', 'date', 'status', 'description', 'reference', 'memo'];
+    const nonTotalColumns = ['account_code', 'account_type', 'account_name', 'accountcode', 'accounttype', 'accountname', 'id', 'name', 'type', 'date', 'status', 'description', 'reference', 'memo', 'phone', 'fax', 'email', 'contact', 'person'];
     const totals = {};
     let hasTotals = false;
 
@@ -666,8 +683,8 @@ const ReportTemplate = ({
             const accessor = col.accessor || col.key;
             const accessorLower = String(accessor).toLowerCase().replace(/[^a-z0-9_]/g, '');
             
-            const isNonTotal = nonTotalColumns.some(c => headerLower === c || accessorLower === c || headerLower.includes('code') || headerLower.includes('name') || headerLower.includes('type') || headerLower.includes('date') || headerLower.includes('id') || headerLower.includes('status') || headerLower.includes('no'));
-            const isExplicitTotal = columnsToTotal.some(c => headerLower.includes(c)) && !['code', 'date', 'id', 'name', 'type', 'status', 'no'].some(exclude => headerLower.includes(exclude));
+            const isNonTotal = nonTotalColumns.some(c => headerLower === c || accessorLower === c || headerLower.includes('code') || headerLower.includes('name') || headerLower.includes('type') || headerLower.includes('date') || headerLower.includes('id') || headerLower.includes('status') || headerLower.includes('no') || headerLower.includes('phone') || headerLower.includes('fax') || headerLower.includes('email') || headerLower.includes('contact'));
+            const isExplicitTotal = columnsToTotal.some(c => headerLower.includes(c)) && !['code', 'date', 'id', 'name', 'type', 'status', 'no', 'phone', 'fax', 'email', 'contact'].some(exclude => headerLower.includes(exclude));
             
             if (isExplicitTotal || !isNonTotal) {
                 let sum = 0;
@@ -735,7 +752,7 @@ const ReportTemplate = ({
 
     const formatCellValue = (value, col) => {
         if (value === null || value === undefined || value === '') {
-            return customizations.showEmptyAs === 'dash' ? '-' : '';
+            return '-';
         }
 
         const colName = (col?.header || col?.accessor || '').toLowerCase();
@@ -785,7 +802,7 @@ const ReportTemplate = ({
     };
 
     const formatTotalValue = (value) => {
-        if (value === null || value === undefined) return '';
+        if (value === null || value === undefined) return '-';
 
         let num = parseFloat(value);
         if (isNaN(num)) return value;
@@ -1692,6 +1709,8 @@ const ReportTemplate = ({
 };
 
 export default ReportTemplate;
+
+
 
 
 

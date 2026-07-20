@@ -454,7 +454,7 @@ const GRNBoard = ({ isOpen, onClose }) => {
             title="Good Received Note"
             maxWidth="max-w-[700px]"
             footer={
-                <div className="bg-slate-50 px-6 py-3 w-full flex justify-between items-center border-t border-gray-200 rounded-b-xl">
+                <div className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">
                     <div className="flex gap-3">
                         <button
                             onClick={handleClear}
@@ -489,7 +489,7 @@ const GRNBoard = ({ isOpen, onClose }) => {
                 className="hidden" 
             />
             <div className="space-y-3 overflow-y-auto no-scrollbar font-['Tahoma']">
-                <div className="flex items-center justify-between mb-1 px-1">
+                <div className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
                     <div className="flex items-center gap-4">
                         <label className="flex items-center gap-2 cursor-pointer group">
                             <input
@@ -533,20 +533,20 @@ const GRNBoard = ({ isOpen, onClose }) => {
                         <div className="col-span-4 flex items-center gap-2">
                             <label className="text-[12px] font-bold text-gray-700 w-24 shrink-0">Document ID</label>
                             <div className="flex-1 flex gap-1 h-8 min-w-0">
-                                <input type="text" name="docNo" value={formData.docNo} onChange={handleInput} className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-blue-600 bg-gray-50 rounded-[3px] outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] shadow-sm appearance-none"  style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
+                                <input type="text" name="docNo" value={formData.docNo} onChange={handleInput} className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100"  style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
                             </div>
                         </div>
                         <div className="col-span-4 flex items-center gap-2">
                             <label className="text-[12px] font-bold text-gray-700 w-24 shrink-0 text-center">Post Date</label>
                             <div className="flex-1 flex gap-1 h-8 min-w-0">
-                                <input type="text" readOnly value={formData.grnDate} onClick={() => { setDatePickerField('grnDate'); setShowDatePicker(true); }} className="flex-1 min-w-0 h-8 border border-gray-300 rounded-[3px] px-3 text-[12px] outline-none bg-white text-gray-700 font-bold cursor-pointer shadow-sm" />
+                                <input type="text" readOnly value={formData.grnDate} onClick={() => { setDatePickerField('grnDate'); setShowDatePicker(true); }} className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100" />
                                 <button onClick={() => { setDatePickerField('grnDate'); setShowDatePicker(true); }} className="w-10 h-8 bg-[#0285fd] text-slate-800 dark:text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0"><Calendar size={16} /></button>
                             </div>
                         </div>
                         <div className="col-span-4 flex items-center gap-2">
                             <label className="text-[12px] font-bold text-gray-700 w-24 shrink-0 text-center">Exp. Date</label>
                             <div className="flex-1 flex gap-1 h-8 min-w-0">
-                                <input type="text" readOnly value={formData.expectedDate} onClick={() => { setDatePickerField('expectedDate'); setShowDatePicker(true); }} className="flex-1 min-w-0 h-8 border border-gray-300 rounded-[3px] px-3 text-[12px] outline-none bg-white text-gray-700 font-bold cursor-pointer shadow-sm" />
+                                <input type="text" readOnly value={formData.expectedDate} onClick={() => { setDatePickerField('expectedDate'); setShowDatePicker(true); }} className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100" />
                                 <button onClick={() => { setDatePickerField('expectedDate'); setShowDatePicker(true); }} className="w-10 h-8 bg-[#0285fd] text-slate-800 dark:text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0"><Calendar size={16} /></button>
                             </div>
                         </div>
@@ -555,13 +555,13 @@ const GRNBoard = ({ isOpen, onClose }) => {
                         <div className="col-span-8 flex items-center gap-2">
                             <label className="text-[12px] font-bold text-gray-700 w-24 shrink-0">Supplier</label>
                             <div className="flex-1 flex gap-1 h-8 min-w-0">
-                                <input type="text" readOnly value={currentSupplierName} onClick={() => setShowSupplierSearch(true)} className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-red-600 bg-gray-50 rounded-[3px] outline-none shadow-sm cursor-pointer appearance-none"  style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
+                                <input type="text" readOnly value={currentSupplierName} onClick={() => setShowSupplierSearch(true)} className="px-6 h-10 bg-red-50 text-red-600 text-sm font-bold rounded-[3px] hover:bg-red-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-red-100"  style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
                             </div>
                         </div>
                         <div className="col-span-4 flex items-center gap-2">
                             <label className="text-[12px] font-bold text-gray-700 w-24 shrink-0 text-center">PO Number</label>
                             <div className="flex-1 flex gap-1 h-8 min-w-0">
-                                <input type="text" readOnly value={formData.poNo || ''} onClick={() => setShowPOSearch(true)} className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-[#0285fd] bg-blue-50/20 rounded-[3px] outline-none cursor-pointer shadow-sm" />
+                                <input type="text" readOnly value={formData.poNo || ''} onClick={() => setShowPOSearch(true)} className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100" />
                                 <button onClick={() => setShowPOSearch(true)} className="w-10 h-8 bg-[#0285fd] text-slate-800 dark:text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] shadow-md shrink-0"><ClipboardList size={16} /></button>
                             </div>
                         </div>
@@ -569,11 +569,11 @@ const GRNBoard = ({ isOpen, onClose }) => {
                         {/* Row 3: Supp. Inv | Amount | Payment */}
                         <div className="col-span-4 flex items-center gap-2">
                             <label className="text-[12px] font-bold text-gray-700 w-24 shrink-0">Supp. Inv.</label>
-                            <input type="text" name="suppInv" value={formData.suppInv} onChange={handleInput} className="flex-1 min-w-0 h-8 border border-gray-300 rounded-[3px] px-3 font-mono text-[12px] outline-none bg-white text-gray-700 shadow-sm focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd]" />
+                            <input type="text" name="suppInv" value={formData.suppInv} onChange={handleInput} className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100" />
                         </div>
                         <div className="col-span-4 flex items-center gap-2">
                             <label className="text-[12px] font-bold text-gray-700 w-24 shrink-0 text-center">Inv. Amount</label>
-                            <input type="text" name="invAmount" value={formData.invAmount} onChange={handleInput} className="flex-1 min-w-0 h-8 border border-gray-300 rounded-[3px] px-3 font-mono text-[12px] font-black text-right outline-none bg-white text-gray-700 shadow-sm focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd]" />
+                            <input type="text" name="invAmount" value={formData.invAmount} onChange={handleInput} className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100" />
                         </div>
                         <div className="col-span-4 flex items-center gap-2">
                             <label className="text-[12px] font-bold text-gray-700 w-24 shrink-0 text-center">Pay Method</label>
@@ -582,7 +582,7 @@ const GRNBoard = ({ isOpen, onClose }) => {
                                     type="text"
                                     readOnly
                                     value={lookups.paymentMethods?.find(m => m.code === formData.payType)?.name || formData.payType || 'Select...'}
-                                    className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-gray-700 bg-white rounded-[3px] outline-none shadow-sm cursor-pointer appearance-none"
+                                    className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100"
                                     onClick={() => setShowPayMethodSearch(true)}
                                  style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
                             </div>
@@ -591,7 +591,7 @@ const GRNBoard = ({ isOpen, onClose }) => {
                         {/* Row 4: Comment (8) | Consignment/Other (4) */}
                         <div className="col-span-8 flex items-center gap-2">
                             <label className="text-[12px] font-bold text-gray-700 w-24 shrink-0">Comment</label>
-                            <input type="text" name="comment" value={formData.comment} onChange={handleInput} className="flex-1 min-w-0 h-8 border border-gray-300 rounded-[3px] px-3 text-[12px] outline-none bg-white text-gray-700 shadow-sm focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd]" />
+                            <input type="text" name="comment" value={formData.comment} onChange={handleInput} className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100" />
                         </div>
                     </div>
                 </div>
@@ -599,7 +599,7 @@ const GRNBoard = ({ isOpen, onClose }) => {
                 <div className="border border-gray-200 rounded-[3px] bg-white shadow-sm flex flex-col min-h-[200px] overflow-hidden">
                     {/* Table header */}
                     <div className="flex bg-slate-50/80 border-b border-gray-200 text-[10px] font-black text-gray-400 uppercase tracking-widest items-center">
-                        <div className="flex-[2.5] py-2.5 px-4 border-r border-gray-200 truncate flex items-center justify-between">
+                        <div className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">
                             <span>Inventory Allocation</span>
                             <button
                                 onClick={() => {
@@ -615,12 +615,12 @@ const GRNBoard = ({ isOpen, onClose }) => {
                                 title="Add Product"
                             ><Plus size={14} /></button>
                         </div>
-                        <div className="w-16 py-2.5 px-3 border-r border-gray-200 text-center">Unit</div>
-                        <div className="w-24 py-2.5 px-3 border-r border-gray-200 text-right">Cost</div>
-                        <div className="w-24 py-2.5 px-3 border-r border-gray-200 text-right">Selling</div>
-                        <div className="w-16 py-2.5 px-3 border-r border-gray-200 text-center">Qty</div>
-                        <div className="w-16 py-2.5 px-3 border-r border-gray-200 text-center">Free</div>
-                        <div className="w-32 py-2.5 px-4 text-right">Amount</div>
+                        <div className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">Unit</div>
+                        <div className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">Cost</div>
+                        <div className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">Selling</div>
+                        <div className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">Qty</div>
+                        <div className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">Free</div>
+                        <div className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Amount</div>
                         <div className="w-10"></div>
                     </div>
                     <div className="flex-1 bg-white overflow-y-auto max-h-[170px] divide-y divide-gray-50">
@@ -629,16 +629,16 @@ const GRNBoard = ({ isOpen, onClose }) => {
                             </div>
                         ) : products.map((p, idx) => (
                             <div key={idx} className="flex border-b border-gray-200 text-[11px] font-bold text-slate-700 hover:bg-blue-50/30 items-center transition-colors group">
-                                <div className="flex-[2.5] py-2 px-4 border-r border-gray-200 truncate">
+                                <div className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">
                                     <div className="flex flex-col">
                                         <span className="text-blue-600 font-mono text-[10px]">{p.prodCode}</span>
                                         <span className="truncate">{p.prodName}</span>
                                     </div>
                                 </div>
-                                <div className="w-16 py-2 px-3 border-r border-gray-200 text-center text-gray-400">{p.unit}</div>
-                                <div className="w-24 py-2 px-3 border-r border-gray-200 text-right font-mono text-gray-800">{parseFloat(p.cost).toFixed(2)}</div>
-                                <div className="w-24 py-2 px-3 border-r border-gray-200 text-right font-mono text-blue-600">{parseFloat(p.selling).toFixed(2)}</div>
-                                <div className="w-16 border-r border-gray-200 px-1 py-1 bg-white group-hover:bg-transparent">
+                                <div className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">{p.unit}</div>
+                                <div className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">{parseFloat(p.cost).toFixed(2)}</div>
+                                <div className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">{parseFloat(p.selling).toFixed(2)}</div>
+                                <div className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">
                                     <input
                                         type="text"
                                         value={p.qty}
@@ -649,10 +649,10 @@ const GRNBoard = ({ isOpen, onClose }) => {
                                                 i === idx ? { ...item, qty: newQty, amount: newAmount.toFixed(2) } : item
                                             ));
                                         }}
-                                        className="w-full h-7 bg-transparent text-center text-[12px] font-mono font-black text-slate-900 outline-none focus:bg-white border-none px-1"
+                                        className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100"
                                     />
                                 </div>
-                                <div className="w-16 border-r border-gray-200 px-1 py-1 bg-white group-hover:bg-transparent">
+                                <div className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">
                                     <input
                                         type="text"
                                         value={p.free}
@@ -661,10 +661,10 @@ const GRNBoard = ({ isOpen, onClose }) => {
                                                 i === idx ? { ...item, free: e.target.value } : item
                                             ));
                                         }}
-                                        className="w-full h-7 bg-transparent text-center text-[12px] font-mono font-bold text-blue-700 outline-none focus:bg-white border-none px-1"
+                                        className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100"
                                     />
                                 </div>
-                                <div className="w-32 py-1.5 px-4 text-right font-mono font-black text-slate-800">
+                                <div className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100">
                                     {parseFloat(p.amount).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                 </div>
                                 <div className="w-10 flex justify-center py-1">
@@ -689,12 +689,12 @@ const GRNBoard = ({ isOpen, onClose }) => {
                             <div className="flex items-center gap-3">
                                 <label className="text-[12px] font-bold text-gray-700 w-24 shrink-0">Expense Ac.</label>
                                 <div className="flex-1 flex gap-1 h-8 min-w-0">
-                                    <input type="text" readOnly value="" className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-gray-500 bg-gray-50 rounded-[3px] outline-none shadow-sm cursor-pointer appearance-none" onClick={() => setShowExpenseSearch(true)}  style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
+                                    <input type="text" readOnly value="" className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100" onClick={() => setShowExpenseSearch(true)}  style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
                                 </div>
                             </div>
                             <div className="flex items-center gap-3">
                                 <label className="text-[12px] font-bold text-gray-700 w-24 shrink-0 text-right">Other Chg.</label>
-                                <input type="text" defaultValue="0.00" className="flex-1 h-8 border border-gray-300 px-3 rounded-[3px] text-[12px] text-right font-mono font-bold shadow-sm outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd]" />
+                                <input type="text" defaultValue="0.00" className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100" />
                             </div>
                         </div>
                         <div className="space-y-1">
@@ -713,8 +713,8 @@ const GRNBoard = ({ isOpen, onClose }) => {
                         <div className="flex items-center justify-between gap-4">
                             <span className="text-[11px] font-bold text-gray-500 uppercase tracking-tight">Disc. Volume %</span>
                             <div className="flex items-center gap-2">
-                                <input type="text" name="discPer" value={formData.discPer} onChange={handleInput} className="w-12 h-7 bg-white border border-gray-200 px-2 text-center text-[12px] font-mono font-bold rounded-[3px] outline-none shadow-sm focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd]" />
-                                <div className="w-24 h-7 bg-gray-50 border border-gray-200 rounded-[3px] flex items-center justify-end px-2 text-[12px] font-mono text-gray-400">
+                                <input type="text" name="discPer" value={formData.discPer} onChange={handleInput} className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100" />
+                                <div className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">
                                     {totals.discAmt.toFixed(2)}
                                 </div>
                             </div>
@@ -722,9 +722,9 @@ const GRNBoard = ({ isOpen, onClose }) => {
                         <div className="flex items-center justify-between gap-4">
                             <span className="text-[11px] font-bold text-gray-500 uppercase tracking-tight">Tax / NBT Levies</span>
                             <div className="flex items-center gap-1">
-                                <input type="text" name="taxPer" value={formData.taxPer} onChange={handleInput} placeholder="T" className="w-10 h-7 bg-white border border-gray-200 px-1 text-center text-[11px] font-mono rounded-[3px] outline-none shadow-sm focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd]" />
-                                <input type="text" name="nbtPer" value={formData.nbtPer} onChange={handleInput} placeholder="N" className="w-10 h-7 bg-white border border-gray-200 px-1 text-center text-[11px] font-mono rounded-[3px] outline-none shadow-sm focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd]" />
-                                <div className="w-24 h-7 bg-gray-50 border border-gray-200 rounded-[3px] flex items-center justify-end px-2 text-[12px] font-mono text-gray-400">
+                                <input type="text" name="taxPer" value={formData.taxPer} onChange={handleInput} placeholder="T" className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100" />
+                                <input type="text" name="nbtPer" value={formData.nbtPer} onChange={handleInput} placeholder="N" className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100" />
+                                <div className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">
                                     {(totals.taxAmt + totals.nbtAmt).toFixed(2)}
                                 </div>
                             </div>
@@ -737,7 +737,7 @@ const GRNBoard = ({ isOpen, onClose }) => {
                                     <option value="Add">+</option>
                                     <option value="Less">-</option>
                                 </select>
-                                <input type="text" name="adjAmt" value={formData.adjAmt} onChange={handleInput} className="w-24 h-7 bg-white border border-gray-200 px-2 text-right text-[12px] font-mono font-bold rounded-[3px] outline-none shadow-sm focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd]" />
+                                <input type="text" name="adjAmt" value={formData.adjAmt} onChange={handleInput} className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100" />
                             </div>
                         </div>
                         <div className="h-[1px] bg-gray-100 my-1" />
@@ -765,20 +765,20 @@ const GRNBoard = ({ isOpen, onClose }) => {
                             <table className="w-full text-left">
                                 <thead className="bg-[#f8fafd] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-200">
                                     <tr>
-                                        <th className=" px-5 py-3">Doc No</th>
-                                        <th className=" px-5 py-3">Date</th>
-                                        <th className=" px-5 py-3">Supplier Name</th>
-                                        <th className="text-right px-5 py-3">Action</th>
+                                        <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Doc No</th>
+                                        <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Date</th>
+                                        <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Supplier Name</th>
+                                        <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-50">
                                     {orders.map((o, i) => (
                                         <tr key={i} className="group hover:bg-blue-50/50  transition-all cursor-pointer group border-b border-gray-50" onClick={() => handleSelectRow(o.docNo)}>
-                                            <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{o.docNo}</td>
-                                            <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{o.date?.split('T')[0]}</td>
-                                            <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{o.supplier}</td>
-                                            <td className="text-right px-5 py-3">
-                                                <button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">RETRIEVE</button>
+                                            <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">{o.docNo}</td>
+                                            <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">{o.date?.split('T')[0]}</td>
+                                            <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">{o.supplier}</td>
+                                            <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
+                                                <button className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">RETRIEVE</button>
                                             </td>
                                         </tr>
                                     ))}
@@ -804,18 +804,18 @@ const GRNBoard = ({ isOpen, onClose }) => {
                             <table className="w-full text-left">
                                 <thead className="bg-[#f8fafd] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-200">
                                     <tr>
-                                        <th className=" px-5 py-3">Code</th>
-                                        <th className=" px-5 py-3">Legal Name</th>
-                                        <th className="text-right px-5 py-3">Action</th>
+                                        <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Code</th>
+                                        <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Legal Name</th>
+                                        <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-50">
                                     {lookups.suppliers.filter(s => s.name?.toLowerCase().includes(supplierSearchQuery.toLowerCase()) || s.code?.toLowerCase().includes(supplierSearchQuery.toLowerCase())).map((s) => (
                                         <tr key={s.code} className="group hover:bg-blue-50/50  transition-all cursor-pointer group border-b border-gray-50" onClick={() => { setFormData(prev => ({ ...prev, suppCode: s.code?.trim() })); setShowSupplierSearch(false); setSupplierSearchQuery(''); }}>
-                                            <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{s.code}</td>
-                                            <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{s.name}</td>
-                                            <td className="text-right px-5 py-3">
-                                                <button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button>
+                                            <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">{s.code}</td>
+                                            <td className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100">{s.name}</td>
+                                            <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
+                                                <button className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">SELECT</button>
                                             </td>
                                         </tr>
                                     ))}
@@ -829,7 +829,7 @@ const GRNBoard = ({ isOpen, onClose }) => {
 
             {/* ── Add Product Modal (Catalog) ──────────────────────────────────── */}
             <SimpleModal isOpen={showAddProductModal} onClose={() => { setShowAddProductModal(false); setProductSearchQuery(''); }} title="Inventory Acquisition Portal" maxWidth="max-w-[700px]">
-                <div className="space-y-4 px-1 font-['Tahoma']">
+                <div className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
                     <div className="flex items-center justify-between gap-4 bg-slate-50/80 p-3 rounded-[3px] border border-gray-200 mb-2">
                         <div className="flex items-center gap-3 flex-1">
                             <div className="relative flex-1 max-w-[400px]">
@@ -861,10 +861,10 @@ const GRNBoard = ({ isOpen, onClose }) => {
                             <table className="w-full text-left border-collapse">
                                 <thead className="bg-[#f8fafd] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-200 z-10">
                                     <tr>
-                                        <th className=" px-5 py-3">Code</th>
-                                        <th className=" px-5 py-3">Item Description</th>
-                                        <th className="text-right px-5 py-3">Base Price</th>
-                                    <th className="text-right px-5 py-3">Action</th></tr>
+                                        <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Code</th>
+                                        <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Item Description</th>
+                                        <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Base Price</th>
+                                    <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Action</th></tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-50">
                                     {(lookups.products || []).map(p => (
@@ -885,13 +885,13 @@ const GRNBoard = ({ isOpen, onClose }) => {
                                                 entry.prodCode === p.code ? 'bg-blue-50/70' : ''
                                             }`}
                                         >
-                                            <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{p.code}</td>
-                                            <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">
+                                            <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">{p.code}</td>
+                                            <td className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100">
                                                 <div className="text-[13px] font-bold text-gray-700 uppercase group-hover:text-blue-600 transition-colors leading-snug line-clamp-2 max-w-[320px]">
                                                     {p.name}
                                                 </div>
                                             </td>
-                                            <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">
+                                            <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
                                                 <span className="text-[10px] text-gray-300 mr-1">Rs.</span>
                                                 {parseFloat(p.price || 0).toFixed(2)}
                                             </td>
@@ -911,14 +911,14 @@ const GRNBoard = ({ isOpen, onClose }) => {
                 title="Line Item Configuration"
                 maxWidth="max-w-[700px]"
             >
-                <div className="space-y-4 px-1 py-1 font-['Tahoma']">
+                <div className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
                     <div className="bg-slate-50/50 p-4 rounded-[3px] border border-slate-100 flex flex-col items-center text-center">
                         <span className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] mb-1.5">Active Selection</span>
                         <h3 className="text-[18px] font-black text-slate-700 uppercase leading-[1.2] tracking-tight max-w-[90%] break-words">
                             {entry.prodName}
                         </h3>
                         <div className="flex items-center gap-2 mt-2">
-                            <span className="text-[11px] font-mono font-bold text-blue-500 bg-white px-3 py-0.5 rounded-[3px] shadow-sm border border-slate-100">{entry.prodCode}</span>
+                            <span className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">{entry.prodCode}</span>
                             <span className="text-[10px] font-black text-slate-600 dark:text-slate-300 uppercase">Product Code</span>
                         </div>
                     </div>
@@ -934,7 +934,7 @@ const GRNBoard = ({ isOpen, onClose }) => {
                                     name="cost" 
                                     value={entry.cost} 
                                     onChange={handleEntryInput}
-                                    className="w-full h-12 border border-gray-300 px-5 text-right text-[16px] font-mono font-black rounded-[3px] outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-50 transition-all bg-white" 
+                                    className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100" 
                                 />
                             </div>
                             <div className="space-y-2">
@@ -946,7 +946,7 @@ const GRNBoard = ({ isOpen, onClose }) => {
                                     name="selling" 
                                     value={entry.selling} 
                                     onChange={handleEntryInput}
-                                    className="w-full h-12 border border-gray-300 px-5 text-right text-[16px] font-mono font-black text-blue-600 rounded-[3px] outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-50 transition-all bg-white" 
+                                    className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100" 
                                 />
                             </div>
                         </div>
@@ -960,7 +960,7 @@ const GRNBoard = ({ isOpen, onClose }) => {
                                     value={entry.qty} 
                                     onChange={handleEntryInput}
                                     onKeyDown={e => { if (e.key === 'Enter') { addProduct(); setShowProductQtyModal(false); setShowAddProductModal(false); setProductSearchQuery(''); } }}
-                                    className="w-full h-12 border border-blue-500 px-5 text-center text-[18px] font-mono font-black rounded-[3px] outline-none bg-blue-50/20 focus:ring-4 focus:ring-blue-100 transition-all shadow-inner" 
+                                    className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100" 
                                     autoFocus 
                                 />
                             </div>
@@ -971,7 +971,7 @@ const GRNBoard = ({ isOpen, onClose }) => {
                                     name="free" 
                                     value={entry.free} 
                                     onChange={handleEntryInput}
-                                    className="w-full h-12 border border-gray-300 px-5 text-center text-[18px] font-mono font-black text-blue-600 rounded-[3px] outline-none focus:border-blue-500 transition-all bg-white shadow-sm" 
+                                    className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100" 
                                 />
                             </div>
                         </div>
@@ -1011,22 +1011,22 @@ const GRNBoard = ({ isOpen, onClose }) => {
                             <table className="w-full text-left">
                                 <thead className="bg-[#f8fafd] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-200">
                                     <tr>
-                                        <th className=" px-5 py-3">Code</th>
-                                        <th className=" px-5 py-3">Acquisition Title</th>
-                                        <th className="text-right px-5 py-3">Cost</th>
-                                        <th className="text-right px-5 py-3">Selling</th>
-                                        <th className="text-right px-5 py-3">Action</th>
+                                        <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Code</th>
+                                        <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Acquisition Title</th>
+                                        <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Cost</th>
+                                        <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Selling</th>
+                                        <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-50">
                                     {(lookups.products || []).map(p => (
                                         <tr key={p.code} className="group hover:bg-blue-50/50  transition-all cursor-pointer group border-b border-gray-50" onClick={() => { handleEntryInput({ target: { name: 'prodCode', value: p.code } }); setShowProductSearch(false); setProductSearchQuery(''); }}>
-                                            <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{p.code}</td>
-                                            <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{p.name}</td>
-                                            <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{parseFloat(p.price || 0).toFixed(2)}</td>
-                                            <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{parseFloat(p.sellingPrice || 0).toFixed(2)}</td>
-                                            <td className="text-right px-5 py-3">
-                                                <button className="bg-[#0285fd] text-slate-800 dark:text-white text-[10px] px-5 py-2 rounded-[3px] font-black hover:bg-[#0073ff] shadow-md transition-all active:scale-95">SELECT</button>
+                                            <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">{p.code}</td>
+                                            <td className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100">{p.name}</td>
+                                            <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">{parseFloat(p.price || 0).toFixed(2)}</td>
+                                            <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">{parseFloat(p.sellingPrice || 0).toFixed(2)}</td>
+                                            <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
+                                                <button className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100">SELECT</button>
                                             </td>
                                         </tr>
                                     ))}
@@ -1052,16 +1052,16 @@ const GRNBoard = ({ isOpen, onClose }) => {
                             <table className="w-full text-left">
                                 <thead className="bg-[#f8fafd] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-200">
                                     <tr>
-                                        <th className=" px-5 py-3">Document ID</th>
-                                        <th className="text-right px-5 py-3">Action</th>
+                                        <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Document ID</th>
+                                        <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-50">
                                     {lookups.pos.filter(p => p.docNo.toLowerCase().includes(poSearchQuery.toLowerCase())).map((p) => (
                                         <tr key={p.docNo} className="group hover:bg-blue-50/50  transition-all cursor-pointer group border-b border-gray-50" onClick={() => handleSelectPO(p.docNo)}>
-                                            <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{p.docNo}</td>
-                                            <td className="text-right px-5 py-3">
-                                                <button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT ORDER</button>
+                                            <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">{p.docNo}</td>
+                                            <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
+                                                <button className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">SELECT ORDER</button>
                                             </td>
                                         </tr>
                                     ))}
@@ -1113,9 +1113,9 @@ const GRNBoard = ({ isOpen, onClose }) => {
                             <table className="w-full text-left">
                                 <thead className="bg-[#f8fafd] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-200">
                                     <tr>
-                                        <th className=" px-5 py-3">Code</th>
-                                        <th className=" px-5 py-3">Method Title</th>
-                                    <th className="text-right px-5 py-3">Action</th></tr>
+                                        <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Code</th>
+                                        <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Method Title</th>
+                                    <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Action</th></tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-50">
                                     {(lookups.paymentMethods || [])
@@ -1126,10 +1126,10 @@ const GRNBoard = ({ isOpen, onClose }) => {
                                                 setShowPayMethodSearch(false);
                                                 setPayMethodSearchQuery('');
                                             }}>
-                                                <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{m.code}</td>
-                                                <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{m.name}</td>
+                                                <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">{m.code}</td>
+                                                <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">{m.name}</td>
                                             
-                                            <td className="text-right px-5 py-3"><button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button></td>
+                                            <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100"><button className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">SELECT</button></td>
                                         </tr>
                                         ))}
                                     {(lookups.paymentMethods || []).length === 0 && (
@@ -1168,9 +1168,9 @@ const GRNBoard = ({ isOpen, onClose }) => {
                             <table className="w-full text-left">
                                 <thead className="bg-[#f8fafd] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-200">
                                     <tr>
-                                        <th className=" px-5 py-3">Code</th>
-                                        <th className=" px-5 py-3">Account Name</th>
-                                    <th className="text-right px-5 py-3">Action</th></tr>
+                                        <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Code</th>
+                                        <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Account Name</th>
+                                    <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Action</th></tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-50">
                                     <tr>
@@ -1192,41 +1192,41 @@ const GRNBoard = ({ isOpen, onClose }) => {
                 title="Product Master Creation"
                 maxWidth="max-w-[700px]"
                 footer={
-                    <div className="bg-slate-50 px-6 py-4 w-full flex justify-end gap-3 border-t border-gray-200 rounded-b-xl">
-                        <button onClick={() => setShowItemMasterModal(false)} className="px-6 h-9 bg-white text-gray-500 text-[13px] font-bold rounded-[3px] border border-gray-300 hover:bg-blue-50/50 transition-all active:scale-95 font-tahoma cursor-pointer group border-b border-gray-50">CANCEL</button>
+                    <div className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">
+                        <button onClick={() => setShowItemMasterModal(false)} className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">CANCEL</button>
                         <button onClick={handleCreateProduct} disabled={isCreatingProduct} className="px-8 h-9 bg-white text-[#2bb744] border-2 border-[#2bb744] hover:bg-green-50 text-[13px] font-bold rounded-[3px] shadow-md shadow-green-50 hover:bg-[#259b3a] transition-all active:scale-95 flex items-center gap-2 border-none font-tahoma">
                             {isCreatingProduct ? 'CREATING...' : 'CREATE PRODUCT'}
                         </button>
                     </div>
                 }
             >
-                <div className="py-2 px-1 font-['Tahoma'] space-y-4">
+                <div className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-1">
                             <label className="text-[12px] font-bold text-gray-600 uppercase tracking-widest pl-1">Product Code</label>
-                            <input type="text" value={productMasterData.code} onChange={e => setProductMasterData({...productMasterData, code: e.target.value})} className="w-full h-10 border border-gray-300 rounded-[3px] px-4 text-[13px] outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white font-mono uppercase shadow-sm" placeholder="" />
+                            <input type="text" value={productMasterData.code} onChange={e => setProductMasterData({...productMasterData, code: e.target.value})} className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100" placeholder="" />
                         </div>
                         <div className="space-y-1">
                             <label className="text-[12px] font-bold text-gray-600 uppercase tracking-widest pl-1">Unit of Measure</label>
-                            <input type="text" value={productMasterData.unit} onChange={e => setProductMasterData({...productMasterData, unit: e.target.value})} className="w-full h-10 border border-gray-300 rounded-[3px] px-4 text-[13px] outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white shadow-sm" placeholder="Nos" />
+                            <input type="text" value={productMasterData.unit} onChange={e => setProductMasterData({...productMasterData, unit: e.target.value})} className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100" placeholder="Nos" />
                         </div>
                     </div>
                     <div className="space-y-1">
                         <label className="text-[12px] font-bold text-gray-600 uppercase tracking-widest pl-1">Product Description</label>
-                        <input type="text" value={productMasterData.name} onChange={e => setProductMasterData({...productMasterData, name: e.target.value})} className="w-full h-10 border border-gray-300 rounded-[3px] px-4 text-[13px] outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white uppercase shadow-sm font-bold" placeholder="" />
+                        <input type="text" value={productMasterData.name} onChange={e => setProductMasterData({...productMasterData, name: e.target.value})} className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100" placeholder="" />
                     </div>
                     <div className="grid grid-cols-3 gap-4">
                         <div className="space-y-1">
                             <label className="text-[11px] font-bold text-gray-600 uppercase tracking-widest pl-1">Purchase Price</label>
-                            <input type="text" value={productMasterData.purchasePrice} onChange={e => setProductMasterData({...productMasterData, purchasePrice: e.target.value})} className="w-full h-10 border border-gray-300 rounded-[3px] px-4 text-right text-[13px] font-mono outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white shadow-sm" placeholder="0.00" />
+                            <input type="text" value={productMasterData.purchasePrice} onChange={e => setProductMasterData({...productMasterData, purchasePrice: e.target.value})} className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100" placeholder="0.00" />
                         </div>
                         <div className="space-y-1">
                             <label className="text-[11px] font-bold text-gray-600 uppercase tracking-widest pl-1">Selling Price</label>
-                            <input type="text" value={productMasterData.sellingPrice} onChange={e => setProductMasterData({...productMasterData, sellingPrice: e.target.value})} className="w-full h-10 border border-gray-300 rounded-[3px] px-4 text-right text-[13px] font-mono outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white shadow-sm" placeholder="0.00" />
+                            <input type="text" value={productMasterData.sellingPrice} onChange={e => setProductMasterData({...productMasterData, sellingPrice: e.target.value})} className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100" placeholder="0.00" />
                         </div>
                         <div className="space-y-1">
                             <label className="text-[11px] font-bold text-gray-600 uppercase tracking-widest pl-1">Pack Size</label>
-                            <input type="text" value={productMasterData.packSize} onChange={e => setProductMasterData({...productMasterData, packSize: e.target.value})} className="w-full h-10 border border-gray-300 rounded-[3px] px-4 text-center text-[13px] font-mono outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white shadow-sm" placeholder="1" />
+                            <input type="text" value={productMasterData.packSize} onChange={e => setProductMasterData({...productMasterData, packSize: e.target.value})} className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100" placeholder="1" />
                         </div>
                     </div>
                     <div className="bg-blue-50/50 p-3.5 rounded-[3px] border border-blue-100/50 flex items-start gap-3">

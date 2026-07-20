@@ -1287,7 +1287,7 @@ const SuperAdminDashboard = () => {
                                                                 <Edit className="w-[14px] h-[14px]" /> Edit
                                                             </button>
                                                             <button
-                                                                className="px-6 h-10 bg-red-50 text-red-600 text-sm font-bold rounded-[3px] hover:bg-red-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-red-100"
+                                                                className="px-3 py-1.5 text-xs font-bold text-white bg-red-600 hover:bg-red-700 rounded-[3px] shadow-sm transition-all flex items-center justify-center w-[90px] gap-1.5"
                                                                 onClick={(e) => { e.stopPropagation(); handleDeleteEmployee(e, emp.empCode); }}
                                                                 title="Delete Employee"
                                                             >
@@ -1360,7 +1360,7 @@ const SuperAdminDashboard = () => {
                                                             {comp.acc_Desable === 1 ? "Unlock" : "Lock"}
                                                         </button>
                                                         <button
-                                                            className="px-6 h-10 bg-red-50 text-red-600 text-sm font-bold rounded-[3px] hover:bg-red-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-red-100"
+                                                            className="px-3 py-1.5 text-xs font-bold text-white bg-red-600 hover:bg-red-700 rounded-[3px] shadow-sm transition-all flex items-center justify-center w-[90px] gap-1.5"
                                                             onClick={(e) => { e.stopPropagation(); handleDeleteCompany(e, comp.code, null); }}
                                                             title="Delete Company"
                                                         >
@@ -1439,7 +1439,7 @@ const SuperAdminDashboard = () => {
                                                             {(emp.acc_Desable === "1" || emp.accDesable === "1") ? "Unlock" : "Lock"}
                                                         </button>
                                                         <button
-                                                            className={`px-6 h-10 bg-red-50 text-red-600 text-sm font-bold rounded-[3px] hover:bg-red-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-red-100 ${(emp.userRole_Id == 99) ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                                            className={`px-3 py-1.5 text-xs font-bold text-white bg-red-600 hover:bg-red-700 rounded-[3px] shadow-sm transition-all flex items-center justify-center w-[90px] gap-1.5 ${(emp.userRole_Id == 99) ? 'opacity-50 cursor-not-allowed' : ''}`}
                                                             onClick={(e) => { 
                                                                 e.stopPropagation(); 
                                                                 if (emp.userRole_Id != 99) handleDeleteEmployee(e, emp.emp_Code); 
@@ -1550,7 +1550,7 @@ const SuperAdminDashboard = () => {
                                                 </button>
                                                 <button
                                                     onClick={(e) => handleDeleteUserRole(e, selectedRole)}
-                                                    className="px-6 h-10 bg-red-50 text-red-600 text-sm font-bold rounded-[3px] hover:bg-red-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-red-100"
+                                                    className="px-3 py-1.5 text-xs font-bold text-white bg-red-600 hover:bg-red-700 rounded-[3px] shadow-sm transition-all flex items-center justify-center w-[90px] gap-1.5"
                                                 >
                                                     <Trash2 size={12} /> Delete Role
                                                 </button>
@@ -1902,7 +1902,7 @@ const SuperAdminDashboard = () => {
                                                     <td className="px-4 py-3 text-right">
                                                         <div className="flex justify-end">
                                                             <button
-                                                                className="px-6 h-10 bg-red-50 text-red-600 text-sm font-bold rounded-[3px] hover:bg-red-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-red-100"
+                                                                className="px-3 py-1.5 text-xs font-bold text-white bg-red-600 hover:bg-red-700 rounded-[3px] shadow-sm transition-all flex items-center justify-center w-[90px] gap-1.5"
                                                                 onClick={() => handleDeleteFeedback(item.id)}
                                                                 title="Delete Feedback"
                                                             >

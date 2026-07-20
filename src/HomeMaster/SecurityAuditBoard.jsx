@@ -76,7 +76,7 @@ const SecurityAuditBoard = ({ allEmployees = [], allCompanies = [], hierarchy = 
     return (
         <div className="bg-white dark:bg-[#0f172a]/50 backdrop-blur-md shadow-lg border border-slate-200 dark:border-[#334155] flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-2 duration-300 pb-6 rounded-none-[12px] overflow-hidden mb-6">
             {/* Header */}
-            <div className="px-6 py-4 border-b border-slate-200 dark:border-[#334155] flex items-center justify-between bg-white dark:bg-[#0f172a]/50">
+            <div className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
                 <div className="flex items-center gap-3">
                     <div className="w-8 h-8 bg-purple-500/20 flex items-center justify-center rounded-none">
                         <ShieldCheck className="w-4 h-4 text-purple-300" />
@@ -140,7 +140,7 @@ const SecurityAuditBoard = ({ allEmployees = [], allCompanies = [], hierarchy = 
 
             {/* Critical Security Events Table */}
             <div className={`border border-slate-200 dark:border-[#334155] overflow-hidden mx-6 bg-white dark:bg-[#0f172a]/50 rounded-none shadow-sm transition-opacity duration-300 ${scanning ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}>
-                <div className="px-4 py-3 bg-white dark:bg-[#1e293b]/80 border-b border-slate-200 dark:border-[#334155] flex items-center justify-between">
+                <div className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
                     <div className="flex items-center gap-2">
                         <ShieldAlert className="w-3 h-3 text-purple-400" />
                         <span className="text-xs font-black text-slate-600 dark:text-slate-300">Critical Security Events</span>
@@ -171,11 +171,11 @@ const SecurityAuditBoard = ({ allEmployees = [], allCompanies = [], hierarchy = 
                         <table className="w-full text-left border-collapse min-w-[800px]">
                             <thead>
                                 <tr className="bg-white dark:bg-[#1e293b]/80 border-b border-slate-200 dark:border-[#334155] text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                                    <th className="px-4 py-3 w-48">Timestamp</th>
-                                    <th className="px-4 py-3 w-36">User</th>
-                                    <th className="px-4 py-3">Event Description</th>
-                                    <th className="px-4 py-3 w-32">IP Address</th>
-                                    <th className="px-4 py-3 w-28 text-center">Severity</th>
+                                    <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Timestamp</th>
+                                    <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">User</th>
+                                    <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Event Description</th>
+                                    <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">IP Address</th>
+                                    <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Severity</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-200 dark:divide-white/5">
@@ -185,19 +185,19 @@ const SecurityAuditBoard = ({ allEmployees = [], allCompanies = [], hierarchy = 
                                     const sevColors = isCritical ? severityColors.high : isMedium ? severityColors.medium : severityColors.low;
                                     return (
                                         <tr key={log.id || idx} className="hover:bg-white dark:bg-[#0f172a]/50 transition-colors">
-                                            <td className="px-4 py-3 text-[12px] text-slate-500 dark:text-slate-400 font-mono whitespace-nowrap">
+                                            <td className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100">
                                                 {log.date ? new Date(log.date).toLocaleString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true }) : 'N/A'}
                                             </td>
-<td className="px-4 py-3 text-[13px] text-slate-800 dark:text-gray-200 font-bold">
+<td className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">
                                                 {log.user || 'System'}
                                             </td>
-                                            <td className="px-4 py-3">
+                                            <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
                                                 <span className="text-[12px] text-slate-600 dark:text-slate-300 font-medium">{log.action || 'Unknown Action'}</span>
                                             </td>
-                                            <td className="px-4 py-3 text-[12px] font-mono text-slate-500 font-medium">
+                                            <td className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100">
                                                 {log.ip || '0.0.0.0'}
                                             </td>
-                                            <td className="px-4 py-3">
+                                            <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
                                                 <div className="flex justify-center">
                                                     <div className={`flex items-center gap-1 px-2.5 py-1 border text-[9px] font-black uppercase tracking-widest ${sevColors.bg} ${sevColors.text} ${sevColors.border}`}>
                                                         {isCritical ? <XCircle className="w-2.5 h-2.5" /> : isMedium ? <AlertTriangle className="w-2.5 h-2.5" /> : <ShieldCheck className="w-2.5 h-2.5" />}

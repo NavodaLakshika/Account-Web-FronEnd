@@ -200,7 +200,7 @@ const MarketingToolBoard = ({ isOpen, onClose }) => {
             title="Marketing Tool"
             maxWidth="max-w-[700px]"
             footer={
-                <div className="bg-slate-50 px-6 py-4 w-full flex justify-end gap-3 border-t border-slate-200 rounded-b-xl">
+                <div className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100">
                     <button 
                         onClick={handleSaveConfig} 
                         disabled={loading} 
@@ -260,7 +260,7 @@ const MarketingToolBoard = ({ isOpen, onClose }) => {
                                 <div key={idx} className="grid grid-cols-12 gap-4 items-center group hover:bg-slate-50/50 p-1.5 rounded-[3px] transition-colors border border-transparent hover:border-gray-200 shadow-sm mb-1 bg-white">
                                     <div className="col-span-5 flex items-center">
                                         <div className="w-32 font-bold text-slate-700 text-[12.5px] uppercase">Sales Target</div>
-                                        <div className="flex-1 flex items-center justify-center h-9 bg-slate-50 rounded-[3px] border border-gray-200 shadow-inner px-4">
+                                        <div className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">
                                             <span className="text-[12px] font-black text-[#0285fd] uppercase tracking-[0.2em]">{row.period}</span>
                                         </div>
                                     </div>
@@ -270,7 +270,7 @@ const MarketingToolBoard = ({ isOpen, onClose }) => {
                                             placeholder="0.00"
                                             value={row.targetValue}
                                             onChange={(e) => handleSalesTargetChange(idx, 'targetValue', e.target.value)}
-                                            className="w-full h-9 border border-gray-300 rounded-[3px] px-3 font-mono font-black text-slate-800 text-right text-[13px] outline-none shadow-sm bg-white focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] transition-all" 
+                                            className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100" 
                                         />
                                     </div>
                                     <div className="col-span-2">
@@ -279,7 +279,7 @@ const MarketingToolBoard = ({ isOpen, onClose }) => {
                                             placeholder="0.00"
                                             value={row.forecast}
                                             onChange={(e) => handleSalesTargetChange(idx, 'forecast', e.target.value)}
-                                            className="w-full h-9 border border-gray-300 rounded-[3px] px-3 font-mono font-black text-[#2bb744] text-right text-[13px] outline-none shadow-sm bg-gray-50/50 focus:border-[#2bb744] transition-all" 
+                                            className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100" 
                                         />
                                     </div>
                                     <div className="col-span-2">
@@ -302,12 +302,12 @@ const MarketingToolBoard = ({ isOpen, onClose }) => {
                                     <div className="col-span-12 flex items-center gap-4">
                                         <label className="text-[11px] font-bold text-gray-500 uppercase w-48 shrink-0">Sales Commission Level</label>
                                         <div className="flex-1 flex gap-1 h-8">
-                                            <input type="text" readOnly value={commissionLevel.levelCode} className="w-32 h-8 font-mono border border-slate-200 px-3 text-[12px] font-bold text-blue-600 bg-white rounded outline-none text-center transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 cursor-pointer" onClick={() => { setShowLevelSearch(true); handleLevelSearch(); }} />
+                                            <input type="text" readOnly value={commissionLevel.levelCode} className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100" onClick={() => { setShowLevelSearch(true); handleLevelSearch(); }} />
                                             <input 
                                                 type="text" 
                                                 value={commissionLevel.description}
                                                 onChange={(e) => setCommissionLevel({...commissionLevel, description: e.target.value})}
-                                                className="flex-1 min-w-0 h-8 font-mono border border-slate-200 px-3 text-[12px] font-bold rounded outline-none focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 bg-white transition-all text-gray-700 appearance-none" 
+                                                className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100" 
                                                 placeholder="Enter Level Description..." 
                                              style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
                                         </div>
@@ -317,7 +317,7 @@ const MarketingToolBoard = ({ isOpen, onClose }) => {
                                         <select 
                                             value={commissionLevel.associatedMilestone}
                                             onChange={(e) => setCommissionLevel({...commissionLevel, associatedMilestone: e.target.value})}
-                                            className="w-64 h-8 font-mono border border-slate-200 px-3 text-[12px] font-bold text-gray-700 bg-white rounded outline-none focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 cursor-pointer appearance-none transition-all"
+                                            className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100"
                                             style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
                                         >
                                             <option value="MONTHLY TARGET">MONTHLY TARGET</option>
@@ -353,7 +353,7 @@ const MarketingToolBoard = ({ isOpen, onClose }) => {
                                                         type="number" 
                                                         value={t.lowLevel}
                                                         onChange={(e) => handleCommissionTierChange(idx, 'lowLevel', e.target.value)}
-                                                        className="w-48 h-8 font-mono border border-slate-200 px-3 text-[12px] rounded outline-none font-bold text-gray-700 bg-white transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 text-center" 
+                                                        className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100" 
                                                         placeholder="0.00" 
                                                     />
                                                 )}
@@ -365,7 +365,7 @@ const MarketingToolBoard = ({ isOpen, onClose }) => {
                                     <div className="space-y-8">
                                         <div className="text-center text-[11px] font-bold text-gray-500 uppercase h-8 flex items-center justify-center"></div>
                                         {commissionLevel.tiers.map((t, idx) => (
-                                            <div key={idx} className="h-8 flex items-center justify-center text-[#0285fd] px-2 font-bold text-[14px]">
+                                            <div key={idx} className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
                                                 {idx === commissionLevel.tiers.length - 1 ? (
                                                     <span className="font-black text-[13px] uppercase tracking-widest">Max</span>
                                                 ) : "→"}
@@ -387,7 +387,7 @@ const MarketingToolBoard = ({ isOpen, onClose }) => {
                                                         type="number" 
                                                         value={t.highLevel}
                                                         onChange={(e) => handleCommissionTierChange(idx, 'highLevel', e.target.value)}
-                                                        className="w-48 h-8 font-mono border border-slate-200 px-3 text-[12px] rounded outline-none font-bold text-gray-700 bg-white transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 text-center" 
+                                                        className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100" 
                                                         placeholder="∞" 
                                                     />
                                                 )}
@@ -399,7 +399,7 @@ const MarketingToolBoard = ({ isOpen, onClose }) => {
                                     <div className="space-y-8">
                                         <div className="text-center text-[11px] font-bold text-gray-500 uppercase h-8 flex items-center justify-center"></div>
                                         {commissionLevel.tiers.map((t, idx) => (
-                                            <div key={idx} className="h-8 flex items-center justify-center text-gray-300 px-4">
+                                            <div key={idx} className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">
                                                 <X size={12} />
                                             </div>
                                         ))}
@@ -441,7 +441,7 @@ const MarketingToolBoard = ({ isOpen, onClose }) => {
                             onChange={(e) => setLevelSearchQuery(e.target.value)}
                             onKeyDown={(e) => { if(e.key === 'Enter') handleLevelSearch(); }}
                             placeholder="Find by Code or Description"
-                            className="w-full h-10 px-4 border border-gray-300 rounded-[3px] outline-none text-sm focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white shadow-sm flex-1"
+                            className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100"
                         />
                         <button onClick={handleLevelSearch} disabled={searching} className="px-4 h-9 bg-[#0285fd] text-slate-800 dark:text-white rounded-[3px] font-bold text-[12px] hover:bg-[#0073ff] transition-all flex items-center gap-2 disabled:opacity-50 shadow-md">
                             {searching ? <Loader2 size={16} className="animate-spin" /> : 'Search'}
@@ -452,10 +452,10 @@ const MarketingToolBoard = ({ isOpen, onClose }) => {
                     <table className="w-full text-sm text-left">
                         <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 z-10 shadow-sm">
                             <tr>
-                                <th className="border-b px-5 py-3">Level Code</th>
-                                <th className="border-b px-5 py-3">Description</th>
-                                <th className="border-b text-center w-24 px-5 py-3">Select</th>
-                            <th className="text-right px-5 py-3">Action</th></tr>
+                                <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Level Code</th>
+                                <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Description</th>
+                                <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Select</th>
+                            <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Action</th></tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">
                             {searching ? (
@@ -463,18 +463,18 @@ const MarketingToolBoard = ({ isOpen, onClose }) => {
                             ) : levelSearchResults.length > 0 ? (
                                 levelSearchResults.map((l, idx) => (
                                     <tr key={idx} className="group hover:bg-blue-50/50  transition-all border-b border-gray-50 cursor-pointer group border-b border-gray-50">
-                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{l.levelCode}</td>
-                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{l.description}</td>
-                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">
+                                        <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">{l.levelCode}</td>
+                                        <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">{l.description}</td>
+                                        <td className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100">
                                             <button 
                                                 onClick={() => handleSelectLevel(l.levelCode)}
-                                                className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase"
+                                                className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100"
                                             >
                                                 SELECT
                                             </button>
                                         </td>
                                     
-                                            <td className="text-right px-5 py-3"><button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button></td>
+                                            <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100"><button className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">SELECT</button></td>
                                         </tr>
                                 ))
                             ) : (
