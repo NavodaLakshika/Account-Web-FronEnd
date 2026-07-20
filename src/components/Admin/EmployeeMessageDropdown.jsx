@@ -146,7 +146,7 @@ const EmployeeMessageDropdown = ({ allEmployees = [], onClose }) => {
             >
                 {view === 'list' && (
                     <>
-                        <div className="h-14 border-b border-gray-200 flex items-center justify-between px-4 shrink-0 bg-white">
+                        <div className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">
                             <h3 className="text-[15px] font-semibold text-gray-800 flex items-center gap-2">
                                 <MessageSquare size={16} className="text-[#0285fd]" />
                                 Messaging Center
@@ -178,7 +178,7 @@ const EmployeeMessageDropdown = ({ allEmployees = [], onClose }) => {
                         </div>
                         <div className="flex-1 overflow-y-auto p-4">
                             {filtered.length === 0 ? (
-                                <div className="flex flex-col items-center justify-center h-full text-center px-4">
+                                <div className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
                                     <MessageSquare size={40} className="text-gray-300 mb-3" />
                                     <p className="text-gray-800 font-bold text-sm mb-1">No employees found</p>
                                     <p className="text-xs text-gray-500">Try adjusting your search.</p>
@@ -221,7 +221,7 @@ const EmployeeMessageDropdown = ({ allEmployees = [], onClose }) => {
 
                 {view === 'sms' && (
                     <div className="flex flex-col h-full">
-                        <div className="h-14 border-b border-gray-200 flex items-center gap-3 px-4 shrink-0 bg-white">
+                        <div className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">
                             <button onClick={() => { setView('list'); setSelectedEmp(null); }} className="p-1.5 hover:bg-gray-100 text-gray-500 rounded-[3px] transition-colors">
                                 <ArrowLeft size={18} />
                             </button>
@@ -250,7 +250,7 @@ const EmployeeMessageDropdown = ({ allEmployees = [], onClose }) => {
                                         <button 
                                             key={idx}
                                             onClick={() => applyTemplate(tmpl)}
-                                            className="text-left px-3 py-1.5 bg-white border border-gray-300 hover:border-[#0285fd] hover:text-[#0285fd] text-xs text-gray-600 rounded-[3px] transition-colors"
+                                            className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100"
                                         >
                                             {tmpl}
                                         </button>
@@ -287,7 +287,7 @@ const EmployeeMessageDropdown = ({ allEmployees = [], onClose }) => {
 
                 {view === 'logs' && (
                     <div className="flex flex-col h-full">
-                        <div className="h-14 border-b border-gray-200 flex items-center justify-between px-4 shrink-0 bg-white">
+                        <div className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">
                             <div className="flex items-center gap-3">
                                 <button onClick={() => setView('list')} className="p-1.5 hover:bg-gray-100 text-gray-500 rounded-[3px] transition-colors">
                                     <ArrowLeft size={18} />
@@ -302,7 +302,7 @@ const EmployeeMessageDropdown = ({ allEmployees = [], onClose }) => {
                                     <Loader2 size={24} className="animate-spin text-[#0285fd]" />
                                 </div>
                             ) : messageLogs.length === 0 ? (
-                                <div className="flex flex-col items-center justify-center h-full text-center px-4">
+                                <div className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
                                     <History size={40} className="text-gray-300 mb-3" />
                                     <p className="text-gray-800 font-bold text-sm mb-1">No message logs</p>
                                     <p className="text-xs text-gray-500">Sent messages will appear here.</p>
@@ -316,7 +316,7 @@ const EmployeeMessageDropdown = ({ allEmployees = [], onClose }) => {
                                                     <CheckCircle size={14} className="text-emerald-600" />
                                                     <span className="font-bold text-gray-800 text-sm">{log.receiverName || log.phoneNumber}</span>
                                                 </div>
-                                                <span className="text-[10px] text-gray-500 bg-gray-100 px-2 py-0.5 rounded-[3px] font-medium">{log.sentAt ? new Date(log.sentAt).toLocaleString() : ''}</span>
+                                                <span className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">{log.sentAt ? new Date(log.sentAt).toLocaleString() : ''}</span>
                                             </div>
                                             <p className="text-[12px] text-gray-600 mb-2 leading-relaxed bg-gray-50 border border-gray-200 p-2 rounded-[3px]">{log.messageText}</p>
                                             <div className="flex items-center gap-2 text-[10px] text-gray-500 font-medium">

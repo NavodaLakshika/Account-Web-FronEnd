@@ -388,7 +388,7 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
                 title="Receive Payment"
                 maxWidth="max-w-[700px]"
                 footer={
-                    <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-slate-200 rounded-b-[5px]">
+                    <div className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100">
                         <div className="flex gap-3">
                             <button
                                 onClick={handleDelete}
@@ -433,7 +433,7 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
                             <div className="col-span-4 flex items-center gap-2">
                                 <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Document ID</label>
                                 <div className="flex-1 flex gap-1 h-8 min-w-0">
-                                    <input type="text" name="docNo" value={formData.docNo} onChange={handleInput} className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-sm font-mono font-bold text-blue-600 bg-slate-50 rounded outline-none focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 transition-all appearance-none"  style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
+                                    <input type="text" name="docNo" value={formData.docNo} onChange={handleInput} className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100"  style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
                                 </div>
                             </div>
 
@@ -445,7 +445,7 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
                                         type="text"
                                         readOnly
                                         value={formData.date}
-                                        className="flex-1 min-w-0 h-8 border border-slate-200 rounded px-3 text-sm font-mono outline-none bg-slate-50 text-gray-700 font-bold cursor-pointer transition-all"
+                                        className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100"
                                         onClick={() => { setDatePickerField('date'); setShowDatePicker(true); }}
                                     />
                                     <button
@@ -460,7 +460,7 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
                             {/* Received Amount */}
                             <div className="col-span-4 flex items-center gap-2">
                                 <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Amount</label>
-                                <input type="text" name="amount" value={formData.amount} onChange={handleInput} className="flex-1 min-w-0 h-8 border border-slate-200 rounded px-3 font-black text-sm text-[#0285fd] outline-none bg-slate-50 transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" />
+                                <input type="text" name="amount" value={formData.amount} onChange={handleInput} className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100" />
                             </div>
 
                             {/* Customer */}
@@ -471,7 +471,7 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
                                         type="text"
                                         readOnly
                                         value={lookups.customers.find(c => (c.code || c.Code) === formData.customerId)?.name || lookups.customers.find(c => (c.code || c.Code) === formData.customerId)?.Name || lookups.customers.find(c => (c.code || c.Code) === formData.customerId)?.Cust_Name || ''}
-                                        className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-sm font-mono font-bold text-red-600 bg-slate-50 rounded outline-none cursor-pointer transition-all appearance-none"
+                                        className="px-6 h-10 bg-red-50 text-red-600 text-sm font-bold rounded-[3px] hover:bg-red-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-red-100"
                                         onClick={() => setShowCustomerSearch(true)}
                                         placeholder="Click to select customer..."
                                      style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
@@ -486,7 +486,7 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
                                         type="text"
                                         readOnly
                                         value={lookups.paymentMethods?.find(m => m.code === formData.payType)?.name || formData.payType || ''}
-                                        className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-sm font-mono font-bold text-gray-700 bg-slate-50 rounded outline-none cursor-pointer transition-all appearance-none"
+                                        className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100"
                                         onClick={() => setShowPayMethodSearch(true)}
                                      style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
                                 </div>
@@ -500,12 +500,12 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
                                         type="text"
                                         readOnly
                                         value={lookups.banks?.find(b => (b.bank_Code || b.Bank_Code) === formData.bankCode)?.bank_Name || ''}
-                                        className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-sm font-mono font-bold text-gray-700 bg-slate-50 rounded outline-none cursor-pointer transition-all appearance-none"
+                                        className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100"
                                         onClick={() => setShowBankSearch(true)}
                                         placeholder="Select Bank"
                                      style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
                                 </div>
-                                <input type="text" name="branchCode" value={formData.branchCode} onChange={handleInput} placeholder="Branch" className="w-32 h-8 border border-slate-200 rounded px-3 font-mono text-sm outline-none bg-slate-50 text-gray-700 transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" />
+                                <input type="text" name="branchCode" value={formData.branchCode} onChange={handleInput} placeholder="Branch" className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100" />
                             </div>
 
                             {/* Cost Center */}
@@ -516,7 +516,7 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
                                         type="text"
                                         readOnly
                                         value={lookups.costCenters?.find(c => (c.CostCenterCode || c.costCenterCode || c.Code || c.code || c.costCenterCode) === formData.costCenter)?.CostCenterName || lookups.costCenters?.find(c => (c.CostCenterCode || c.costCenterCode || c.Code || c.code || c.costCenterCode) === formData.costCenter)?.name || ''}
-                                        className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-sm font-mono font-bold text-gray-700 bg-slate-50 rounded outline-none cursor-pointer transition-all appearance-none"
+                                        className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100"
                                         onClick={() => setShowCostCenterSearch(true)}
                                      style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
                                 </div>
@@ -525,7 +525,7 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
                             {/* Cheque No */}
                             <div className="col-span-4 flex items-center gap-2">
                                 <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Cheque No</label>
-                                <input type="text" name="chequeNo" value={formData.chequeNo} onChange={handleInput} className="flex-1 min-w-0 h-8 border border-slate-200 rounded px-3 font-mono text-sm outline-none bg-slate-50 text-gray-700 transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" />
+                                <input type="text" name="chequeNo" value={formData.chequeNo} onChange={handleInput} className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100" />
                             </div>
 
                             {/* Cheque Date */}
@@ -536,7 +536,7 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
                                         type="text"
                                         readOnly
                                         value={formData.chequeDate}
-                                        className="flex-1 min-w-0 h-8 border border-slate-200 rounded px-3 text-sm font-mono outline-none bg-slate-50 text-gray-700 font-bold cursor-pointer transition-all"
+                                        className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100"
                                         onClick={() => { setDatePickerField('chequeDate'); setShowDatePicker(true); }}
                                     />
                                     <button
@@ -551,13 +551,13 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
                             {/* Remarks */}
                             <div className="col-span-8 flex items-center gap-2">
                                 <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">Brief Remarks</label>
-                                <input type="text" name="remarks" value={formData.remarks} onChange={handleInput} className="flex-1 min-w-0 h-8 border border-slate-200 rounded px-3 font-mono text-sm outline-none bg-slate-50 text-gray-700 transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" />
+                                <input type="text" name="remarks" value={formData.remarks} onChange={handleInput} className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100" />
                             </div>
 
                             {/* Reference */}
                             <div className="col-span-4 flex items-center gap-2">
                                 <label className="text-[11px] font-bold text-gray-500 uppercase w-24 shrink-0">B.Ref / Shift</label>
-                                <input type="text" name="reference" value={formData.reference} onChange={handleInput} className="flex-1 min-w-0 h-8 border border-slate-200 rounded px-3 font-mono text-sm outline-none bg-slate-50 text-gray-700 transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" />
+                                <input type="text" name="reference" value={formData.reference} onChange={handleInput} className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100" />
                             </div>
                         </div>
                     </div>
@@ -565,15 +565,15 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
                     {/* Invoice Grid Section */}
                     <div className="border border-slate-200 rounded-[3px] bg-white shadow-sm flex flex-col min-h-[250px] overflow-hidden">
                         <div className="flex bg-slate-50/80 border-b border-slate-200 text-[10px] font-mono font-bold text-gray-400 uppercase tracking-widest items-center">
-                            <div className="w-12 py-2.5 px-3 border-r border-slate-200 text-center">Chk</div>
-                            <div className="w-24 py-2.5 px-3 border-r border-slate-200">Due Date</div>
-                            <div className="w-32 py-2.5 px-3 border-r border-slate-200">Doc No</div>
-                            <div className="flex-1 py-2.5 px-3 border-r border-slate-200">Ref No</div>
-                            <div className="w-28 py-2.5 px-3 border-r border-slate-200 text-right">Inv Amount</div>
-                            <div className="w-24 py-2.5 px-3 border-r border-slate-200 text-right">Discount</div>
-                            <div className="w-24 py-2.5 px-3 border-r border-slate-200 text-right">SetOff</div>
-                            <div className="w-28 py-2.5 px-3 border-r border-slate-200 text-right">Balance</div>
-                            <div className="w-32 py-2.5 px-4 text-right">Payment</div>
+                            <div className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Chk</div>
+                            <div className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Due Date</div>
+                            <div className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Doc No</div>
+                            <div className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Ref No</div>
+                            <div className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Inv Amount</div>
+                            <div className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Discount</div>
+                            <div className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">SetOff</div>
+                            <div className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Balance</div>
+                            <div className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Payment</div>
                         </div>
 
                         <div className="flex-1 bg-white overflow-y-auto max-h-[220px] divide-y divide-slate-100">
@@ -583,24 +583,24 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
                                 </div>
                             ) : invoices.map((inv, idx) => (
                                 <div key={idx} className={`flex border-b border-slate-100 text-[11px] font-bold text-slate-700 hover:bg-blue-50/30 items-center transition-colors group ${inv.selected ? 'bg-blue-50/10' : ''}`}>
-                                    <div className="w-12 py-2 px-3 border-r border-slate-100 text-center flex items-center justify-center">
+                                    <div className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
                                         <button onClick={() => handleInvoiceCheck(idx)} className={`w-5 h-5 rounded-[4px] border ${inv.selected ? 'bg-[#0285fd] border-[#0285fd] text-slate-800 dark:text-white' : 'bg-white border-slate-300 text-transparent'} flex items-center justify-center transition-all`}>
                                             <Check size={12} strokeWidth={4} />
                                         </button>
                                     </div>
-                                    <div className="w-24 py-2 px-3 border-r border-slate-100 font-mono text-[10px] text-slate-500">{inv.date_Due?.split('T')[0]}</div>
-                                    <div className="w-32 py-2 px-3 border-r border-slate-100 font-mono text-blue-600">{inv.doc_No}</div>
-                                    <div className="flex-1 py-2 px-3 border-r border-slate-100 truncate italic text-slate-500 dark:text-slate-400">{inv.ref_No}</div>
-                                    <div className="w-28 py-2 px-3 border-r border-slate-100 text-right font-mono">{inv.inv_Amount.toLocaleString(undefined, {minimumFractionDigits:2})}</div>
-                                    <div className="w-24 py-1 px-1 border-r border-slate-100">
-                                        <input type="text" disabled={!inv.selected} value={inv.discount} onChange={(e) => handleInvoiceChange(idx, 'discount', e.target.value)} className="w-full h-7 bg-transparent text-right font-mono text-[11px] text-red-500 outline-none focus:bg-white border-none px-1 disabled:opacity-30" />
+                                    <div className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100">{inv.date_Due?.split('T')[0]}</div>
+                                    <div className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">{inv.doc_No}</div>
+                                    <div className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100">{inv.ref_No}</div>
+                                    <div className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">{inv.inv_Amount.toLocaleString(undefined, {minimumFractionDigits:2})}</div>
+                                    <div className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
+                                        <input type="text" disabled={!inv.selected} value={inv.discount} onChange={(e) => handleInvoiceChange(idx, 'discount', e.target.value)} className="px-6 h-10 bg-red-50 text-red-600 text-sm font-bold rounded-[3px] hover:bg-red-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-red-100" />
                                     </div>
-                                    <div className="w-24 py-1 px-1 border-r border-slate-100">
-                                        <input type="text" disabled={!inv.selected} value={inv.setOff} onChange={(e) => handleInvoiceChange(idx, 'setOff', e.target.value)} className="w-full h-7 bg-transparent text-right font-mono text-[11px] text-orange-500 outline-none focus:bg-white border-none px-1 disabled:opacity-30" />
+                                    <div className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
+                                        <input type="text" disabled={!inv.selected} value={inv.setOff} onChange={(e) => handleInvoiceChange(idx, 'setOff', e.target.value)} className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100" />
                                     </div>
-                                    <div className="w-28 py-2 px-3 border-r border-slate-100 text-right font-mono text-slate-500">{inv.balance.toLocaleString(undefined, {minimumFractionDigits:2})}</div>
-                                    <div className="w-32 py-1 px-2 text-right">
-                                        <input type="text" disabled={!inv.selected} value={inv.payment} onChange={(e) => handleInvoiceChange(idx, 'payment', e.target.value)} className="w-full h-7 bg-white border border-slate-200 rounded text-right font-mono font-black text-[12px] text-emerald-600 outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] px-2 transition-all disabled:bg-gray-50 disabled:opacity-50" />
+                                    <div className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100">{inv.balance.toLocaleString(undefined, {minimumFractionDigits:2})}</div>
+                                    <div className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
+                                        <input type="text" disabled={!inv.selected} value={inv.payment} onChange={(e) => handleInvoiceChange(idx, 'payment', e.target.value)} className="px-6 h-10 bg-emerald-50 text-emerald-600 text-sm font-bold rounded-[3px] hover:bg-emerald-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-emerald-100 disabled:opacity-50" />
                                     </div>
                                 </div>
                             ))}
@@ -611,8 +611,8 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
                     <div className="flex flex-row justify-between items-end gap-x-12 pt-2">
                         <div className="flex-1 flex gap-3 items-end">
                             <div className="flex flex-col gap-2">
-                                <button onClick={handleSelectAll} className="h-8 px-4 bg-white border-2 border-[#0285fd] hover:bg-blue-50 text-[#0285fd] text-[11px] font-mono font-bold uppercase tracking-widest rounded-[3px] transition-all active:scale-95">SELECT ALL DUE</button>
-                                <button onClick={handleClearSelections} className="h-8 px-4 bg-white border-2 border-slate-400 hover:bg-gray-50 text-slate-700 text-[11px] font-mono font-bold uppercase tracking-widest rounded-[3px] transition-all active:scale-95">CLEAR ALL</button>
+                                <button onClick={handleSelectAll} className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">SELECT ALL DUE</button>
+                                <button onClick={handleClearSelections} className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">CLEAR ALL</button>
                             </div>
                             <div className="flex-1 bg-[#fff8e6] border border-[#ffe082] p-3 rounded-[3px] flex items-center justify-between">
                                 <div className="flex flex-col">
@@ -703,16 +703,16 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
                     <div className="border border-slate-200 rounded-[3px] overflow-hidden">
                         <table className="w-full text-left">
                             <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 shadow-sm z-10">
-                                <tr><th className=" px-5 py-3">Reference ID</th><th className=" px-5 py-3">Posting Date</th><th className="text-right px-5 py-3">Action</th></tr>
+                                <tr><th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Reference ID</th><th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Posting Date</th><th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Action</th></tr>
                             </thead>
                             <tbody className="divide-y divide-slate-100">
                                 {filteredOrders.length === 0 ? (
                                     <tr><td colSpan="3" className="text-center py-16 text-gray-400 text-[11px] font-bold uppercase tracking-widest">Archive is empty</td></tr>
                                 ) : filteredOrders.map((order, i) => (
                                     <tr key={i} className="group hover:bg-blue-50/50  transition-all cursor-pointer group border-b border-gray-50">
-                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{order.docNo}</td>
-                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{order.date?.split('T')[0]}</td>
-                                        <td className="text-right px-5 py-3"><button onClick={() => handleRetrieve(order.docNo)} className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">RETRIEVE</button></td>
+                                        <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">{order.docNo}</td>
+                                        <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">{order.date?.split('T')[0]}</td>
+                                        <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100"><button onClick={() => handleRetrieve(order.docNo)} className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">RETRIEVE</button></td>
                                     </tr>
                                 ))}
                             </tbody>
@@ -735,7 +735,7 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
                         <div className="max-h-[400px] overflow-y-auto no-scrollbar">
                             <table className="w-full text-left">
                                 <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 shadow-sm z-10">
-                                    <tr><th className=" px-5 py-3">Code</th><th className=" px-5 py-3">Customer Name</th><th className="text-right px-5 py-3">Action</th></tr>
+                                    <tr><th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Code</th><th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Customer Name</th><th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Action</th></tr>
                                 </thead>
                                 <tbody className="divide-y divide-slate-100">
                                     {lookups.customers.filter(c => {
@@ -743,9 +743,9 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
                                         return (c.name || c.Name || '').toLowerCase().includes(q) || (c.code || c.Code || '').toLowerCase().includes(q);
                                     }).map((c, i) => (
                                         <tr key={i} className="group hover:bg-blue-50/50  transition-all cursor-pointer group border-b border-gray-50" onClick={() => handleCustomerSelect(c)}>
-                                            <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{c.code || c.Code}</td>
-                                            <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{c.name || c.Name}</td>
-                                            <td className="text-right px-5 py-3"><button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button></td>
+                                            <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">{c.code || c.Code}</td>
+                                            <td className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100">{c.name || c.Name}</td>
+                                            <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100"><button className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">SELECT</button></td>
                                         </tr>
                                     ))}
                                 </tbody>
@@ -769,14 +769,14 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
                         <div className="max-h-[300px] overflow-y-auto no-scrollbar">
                             <table className="w-full text-left">
                                 <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 shadow-sm z-10">
-                                    <tr><th className=" px-5 py-3">Code</th><th className=" px-5 py-3">Method Title</th><th className="text-right px-5 py-3">Action</th></tr>
+                                    <tr><th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Code</th><th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Method Title</th><th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Action</th></tr>
                                 </thead>
                                 <tbody className="divide-y divide-slate-100">
                                     {lookups.paymentMethods.filter(m => !payMethodSearchQuery || m.name.toLowerCase().includes(payMethodSearchQuery.toLowerCase()) || m.code.toLowerCase().includes(payMethodSearchQuery.toLowerCase())).map(m => (
                                         <tr key={m.code} className="group hover:bg-blue-50/50  transition-all cursor-pointer group border-b border-gray-50" onClick={() => { setFormData(prev => ({ ...prev, payType: m.code })); setShowPayMethodSearch(false); }}>
-                                            <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{m.code}</td>
-                                            <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{m.name}</td>
-                                            <td className="text-right px-5 py-3"><button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button></td>
+                                            <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">{m.code}</td>
+                                            <td className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100">{m.name}</td>
+                                            <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100"><button className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">SELECT</button></td>
                                         </tr>
                                     ))}
                                 </tbody>
@@ -800,7 +800,7 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
                         <div className="max-h-[300px] overflow-y-auto no-scrollbar">
                             <table className="w-full text-left">
                                 <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 shadow-sm z-10">
-                                    <tr><th className=" px-5 py-3">Code</th><th className=" px-5 py-3">Bank Name</th><th className="text-right px-5 py-3">Action</th></tr>
+                                    <tr><th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Code</th><th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Bank Name</th><th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Action</th></tr>
                                 </thead>
                                 <tbody className="divide-y divide-slate-100">
                                     {lookups.banks.filter(b => {
@@ -810,9 +810,9 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
                                         return code.includes(q) || name.includes(q);
                                     }).map((b, i) => (
                                         <tr key={i} className="group hover:bg-blue-50/50  transition-all cursor-pointer group border-b border-gray-50" onClick={() => { setFormData(prev => ({ ...prev, bankCode: b.bank_Code || b.Bank_Code })); setShowBankSearch(false); }}>
-                                            <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{b.bank_Code || b.Bank_Code}</td>
-                                            <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{b.bank_Name || b.Bank_Name}</td>
-                                            <td className="text-right px-5 py-3"><button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button></td>
+                                            <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">{b.bank_Code || b.Bank_Code}</td>
+                                            <td className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100">{b.bank_Name || b.Bank_Name}</td>
+                                            <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100"><button className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">SELECT</button></td>
                                         </tr>
                                     ))}
                                 </tbody>
@@ -836,7 +836,7 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
                         <div className="max-h-[300px] overflow-y-auto no-scrollbar">
                             <table className="w-full text-left">
                                 <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 shadow-sm z-10">
-                                    <tr><th className=" px-5 py-3">Code</th><th className=" px-5 py-3">Cost Center Name</th><th className="text-right px-5 py-3">Action</th></tr>
+                                    <tr><th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Code</th><th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Cost Center Name</th><th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Action</th></tr>
                                 </thead>
                                 <tbody className="divide-y divide-slate-100">
                                     {lookups.costCenters.filter(c => {
@@ -846,9 +846,9 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
                                         return code.includes(q) || name.includes(q);
                                     }).map((c, i) => (
                                         <tr key={i} className="group hover:bg-blue-50/50  transition-all cursor-pointer group border-b border-gray-50" onClick={() => { setFormData(prev => ({ ...prev, costCenter: c.CostCenterCode || c.costCenterCode || c.Code || c.code })); setShowCostCenterSearch(false); }}>
-                                            <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{c.CostCenterCode || c.costCenterCode || c.Code || c.code}</td>
-                                            <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{c.CostCenterName || c.costCenterName || c.Name || c.name}</td>
-                                            <td className="text-right px-5 py-3"><button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button></td>
+                                            <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">{c.CostCenterCode || c.costCenterCode || c.Code || c.code}</td>
+                                            <td className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100">{c.CostCenterName || c.costCenterName || c.Name || c.name}</td>
+                                            <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100"><button className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">SELECT</button></td>
                                         </tr>
                                     ))}
                                 </tbody>
@@ -871,7 +871,7 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
                         <div className="max-h-[300px] overflow-y-auto no-scrollbar">
                             <table className="w-full text-left">
                                 <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 shadow-sm z-10">
-                                    <tr><th className=" px-5 py-3">Code</th><th className=" px-5 py-3">Account Type</th><th className="text-right px-5 py-3">Action</th></tr>
+                                    <tr><th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Code</th><th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Account Type</th><th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Action</th></tr>
                                 </thead>
                                 <tbody className="divide-y divide-slate-100">
                                     {lookups.accountTypes?.filter(a => {
@@ -883,9 +883,9 @@ const ReceivePaymentBoard = ({ isOpen, onClose }) => {
                                             fetchLookups(formData.company, a.code);
                                             setShowAccountTypeSearch(false);
                                         }}>
-                                            <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{a.code}</td>
-                                            <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{a.name}</td>
-                                            <td className="text-right px-5 py-3"><button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button></td>
+                                            <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">{a.code}</td>
+                                            <td className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100">{a.name}</td>
+                                            <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100"><button className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">SELECT</button></td>
                                         </tr>
                                     ))}
                                 </tbody>

@@ -53,7 +53,7 @@ const CustomerBoard = ({ isOpen, onClose }) => {
                 </div>
 
                 {/* 2. Main Content Split Panel */}
-                <div className="flex flex-1 gap-4 px-1 min-h-0">
+                <div className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
                     
                     {/* Left Side: Search & List (30%) */}
                     <div className="w-[320px] flex flex-col border border-gray-200 rounded-[3px] bg-white shadow-sm overflow-hidden">
@@ -73,7 +73,7 @@ const CustomerBoard = ({ isOpen, onClose }) => {
                             <div className="flex items-center justify-between">
                                 <span className="text-[12px] font-bold text-gray-500">Display</span>
                                 <div className="relative w-40">
-                                    <select className="w-full h-8 border border-gray-300 rounded px-2 text-[12px] appearance-none outline-none bg-white">
+                                    <select className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">
                                         <option>All Customer</option>
                                     </select>
                                     <ChevronDown size={12} className="absolute right-2 top-2.5 text-gray-400 pointer-events-none" />
@@ -85,21 +85,21 @@ const CustomerBoard = ({ isOpen, onClose }) => {
                             <table className="w-full text-left border-collapse">
                                 <thead className="bg-[#f8faff] border-y border-blue-50 sticky top-0">
                                     <tr>
-                                        <th className="px-4 py-2 text-[11px] font-black text-gray-400 uppercase tracking-widest border-r border-blue-50/30">Customer</th>
-                                        <th className="px-4 py-2 text-[11px] font-black text-gray-400 uppercase tracking-widest text-right">Balance</th>
-                                    <th className="text-right px-5 py-3">Action</th></tr>
+                                        <th className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">Customer</th>
+                                        <th className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">Balance</th>
+                                    <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Action</th></tr>
                                 </thead>
                                 <tbody>
                                     <tr className="bg-cyan-50/50 border-b border-blue-50 group hover:bg-blue-50 transition-colors cursor-pointer">
-                                        <td className="px-4 py-3 text-[13px] font-bold text-[#0078d4] border-r border-blue-50/30">CASH SALES</td>
-                                        <td className="px-4 py-3 text-[13px] font-black text-right text-gray-600">0.00</td>
+                                        <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">CASH SALES</td>
+                                        <td className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">0.00</td>
                                     
-                                            <td className="text-right px-5 py-3"><button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button></td>
+                                            <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100"><button className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">SELECT</button></td>
                                         </tr>
                                     {[...Array(15)].map((_, i) => (
                                         <tr key={i} className="border-b border-gray-50">
-                                            <td className="px-4 py-3 border-r border-gray-50"></td>
-                                            <td className="px-4 py-3"></td>
+                                            <td className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100"></td>
+                                            <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100"></td>
                                         </tr>
                                     ))}
                                 </tbody>
@@ -150,7 +150,7 @@ const CustomerBoard = ({ isOpen, onClose }) => {
                                 <div className="flex items-center gap-3">
                                     <span className="text-[12px] font-bold text-gray-500">Show</span>
                                     <div className="relative w-48">
-                                        <select className="w-full h-8 border border-gray-300 rounded px-2 text-[12px] appearance-none outline-none bg-white font-bold text-gray-700">
+                                        <select className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">
                                             <option>All Transaction</option>
                                         </select>
                                         <ChevronDown size={12} className="absolute right-2 top-2.5 text-gray-400 pointer-events-none" />
@@ -158,7 +158,7 @@ const CustomerBoard = ({ isOpen, onClose }) => {
                                 </div>
                                 <div className="flex items-center gap-3">
                                     <span className="text-[12px] font-bold text-gray-500">Date</span>
-                                    <div className="flex items-center border border-gray-300 rounded h-8 px-2 bg-white shadow-sm w-40">
+                                    <div className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">
                                         <input type="text" defaultValue="17/03/2026" className="flex-1 text-[12px] font-bold text-gray-700 outline-none" />
                                         <button className="h-full pl-2 border-l border-gray-200 text-[#0078d4]">
                                             <Calendar size={13} />
@@ -171,21 +171,21 @@ const CustomerBoard = ({ isOpen, onClose }) => {
                                 <table className="w-full text-left border-collapse">
                                     <thead className="bg-[#f8faff] border-b border-blue-50 sticky top-0 group">
                                         <tr>
-                                            <th className="px-4 py-2 text-[11px] font-black text-gray-400 uppercase tracking-widest border-r border-blue-50/30">Doc No</th>
-                                            <th className="px-4 py-2 text-[11px] font-black text-gray-400 uppercase tracking-widest border-r border-blue-50/30">Type</th>
-                                            <th className="px-4 py-2 text-[11px] font-black text-gray-400 uppercase tracking-widest border-r border-blue-50/30">Date</th>
-                                            <th className="px-4 py-2 text-[11px] font-black text-gray-400 uppercase tracking-widest border-r border-blue-50/30">Account</th>
-                                            <th className="px-4 py-2 text-[11px] font-black text-gray-400 uppercase tracking-widest text-right">Amount</th>
-                                        <th className="text-right px-5 py-3">Action</th></tr>
+                                            <th className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">Doc No</th>
+                                            <th className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">Type</th>
+                                            <th className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">Date</th>
+                                            <th className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">Account</th>
+                                            <th className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">Amount</th>
+                                        <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Action</th></tr>
                                     </thead>
                                     <tbody>
                                         {[...Array(20)].map((_, i) => (
                                             <tr key={i} className="border-b border-gray-50 hover:bg-blue-50/20 transition-colors">
-                                                <td className="px-4 py-2.5 border-r border-gray-50 text-[12px]"></td>
-                                                <td className="px-4 py-2.5 border-r border-gray-50 text-[12px]"></td>
-                                                <td className="px-4 py-2.5 border-r border-gray-50 text-[12px]"></td>
-                                                <td className="px-4 py-2.5 border-r border-gray-50 text-[12px]"></td>
-                                                <td className="px-4 py-2.5 text-right font-bold text-gray-700"></td>
+                                                <td className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100"></td>
+                                                <td className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100"></td>
+                                                <td className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100"></td>
+                                                <td className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100"></td>
+                                                <td className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100"></td>
                                             </tr>
                                         ))}
                                     </tbody>

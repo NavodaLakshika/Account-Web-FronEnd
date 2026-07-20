@@ -181,7 +181,7 @@ const PromoAdminBoard = ({ isOpen, onClose, inlineView }) => {
                                         type="text" 
                                         value={title} 
                                         onChange={e => setTitle(e.target.value)} 
-                                        className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-[3px] focus:outline-none focus:border-[#00acee] focus:ring-1 focus:ring-[#00acee]/50 text-slate-900 dark:text-slate-800 dark:text-white"
+                                        className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100"
                                         placeholder="e.g. Merit Plus Finance"
                                         maxLength={40}
                                     />
@@ -192,7 +192,7 @@ const PromoAdminBoard = ({ isOpen, onClose, inlineView }) => {
                                     <textarea 
                                         value={desc} 
                                         onChange={e => setDesc(e.target.value)} 
-                                        className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-[3px] focus:outline-none focus:border-[#00acee] focus:ring-1 focus:ring-[#00acee]/50 resize-none h-24 text-slate-900 dark:text-slate-800 dark:text-white"
+                                        className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100"
                                         placeholder="Brief description of the promotion..."
                                         maxLength={100}
                                     />
@@ -261,7 +261,7 @@ const PromoAdminBoard = ({ isOpen, onClose, inlineView }) => {
                                         type="button" 
                                         onClick={handleCloseForm}
                                         disabled={isSubmitting}
-                                        className="flex-1 px-4 py-2.5 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-600 dark:text-slate-300 font-bold rounded-[3px] hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors"
+                                        className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100"
                                     >
                                         Cancel
                                     </button>
@@ -275,26 +275,26 @@ const PromoAdminBoard = ({ isOpen, onClose, inlineView }) => {
                                 <table className="w-full text-left border-collapse">
                                     <thead>
                                         <tr className="bg-slate-50/50 dark:bg-slate-800/30 border-b border-slate-100 dark:border-slate-700">
-                                            <th className="py-4 px-6 text-xs font-bold tracking-wider uppercase text-slate-500 dark:text-slate-500 dark:text-slate-400 whitespace-nowrap">Advertisement</th>
-                                            <th className="py-4 px-6 text-xs font-bold tracking-wider uppercase text-slate-500 dark:text-slate-500 dark:text-slate-400 whitespace-nowrap">Accent</th>
-                                            <th className="py-4 px-6 text-xs font-bold tracking-wider uppercase text-slate-500 dark:text-slate-500 dark:text-slate-400 whitespace-nowrap">Status</th>
-                                            <th className="py-4 px-6 text-xs font-bold tracking-wider uppercase text-slate-500 dark:text-slate-500 dark:text-slate-400 whitespace-nowrap text-right">Actions</th>
+                                            <th className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100">Advertisement</th>
+                                            <th className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100">Accent</th>
+                                            <th className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100">Status</th>
+                                            <th className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100">Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {loading ? (
                                             <tr>
-                                                <td colSpan="4" className="py-12 px-6 text-center text-slate-500 dark:text-slate-400">
+                                                <td colSpan="4" className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100">
                                                     <Loader2 className="w-8 h-8 animate-spin mx-auto mb-3 text-blue-500" />
                                                     Loading ads...
                                                 </td>
-                                            <th className="text-right px-5 py-3">Action</th></tr>
+                                            <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Action</th></tr>
                                         ) : ads.map(ad => {
                                             const iconOpt = AVAILABLE_ICONS.find(i => i.name === ad.iconName) || AVAILABLE_ICONS[3];
                                             const IconCmp = iconOpt.component;
                                             return (
                                             <tr key={ad.id} className="border-b border-slate-50 dark:border-slate-700 hover:bg-slate-50/80 dark:hover:bg-slate-700/50 transition-colors">
-                                                <td className="py-4 px-6">
+                                                <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
                                                     <div className="flex items-center gap-3">
                                                         <div className={`w-10 h-10 rounded-[3px] flex items-center justify-center shrink-0 shadow-sm ${ad.iconBg || 'bg-slate-500'}`}>
                                                             <IconCmp size={18} className="text-slate-800 dark:text-white" />
@@ -305,13 +305,13 @@ const PromoAdminBoard = ({ isOpen, onClose, inlineView }) => {
                                                         </div>
                                                     </div>
                                                 </td>
-                                                <td className="py-4 px-6">
+                                                <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
                                                     <div className="flex items-center gap-2">
                                                         <div className="w-4 h-4 rounded-full border border-slate-200 dark:border-slate-600" style={{ backgroundColor: ad.accent || '#78716c' }} />
                                                         <span className="text-xs font-medium text-slate-600 dark:text-slate-500 dark:text-slate-400">{ad.accent || '#78716c'}</span>
                                                     </div>
                                                 </td>
-                                                <td className="py-4 px-6">
+                                                <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
                                                     <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-[3px] text-[10px] font-bold uppercase tracking-wider ${
                                                         ad.isActive ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-500 dark:text-slate-400'
                                                     }`}>
@@ -319,7 +319,7 @@ const PromoAdminBoard = ({ isOpen, onClose, inlineView }) => {
                                                         {ad.isActive ? 'Active' : 'Inactive'}
                                                     </span>
                                                 </td>
-                                                <td className="py-4 px-6 text-right">
+                                                <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
                                                     <div className="flex items-center justify-end gap-2">
                                                         <button 
                                                             onClick={() => handleUpdateStatus(ad.id, !ad.isActive)}
@@ -348,7 +348,7 @@ const PromoAdminBoard = ({ isOpen, onClose, inlineView }) => {
                                         )})}
                                         {!loading && ads.length === 0 && (
                                             <tr>
-                                                <td colSpan="4" className="py-12 px-6 text-center text-slate-500 dark:text-slate-400 dark:text-slate-500 font-medium">
+                                                <td colSpan="4" className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100">
                                                     No advertisements found. Create one to get started.
                                                 </td>
                                             </tr>

@@ -343,7 +343,7 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                 subtitle="Petty Cash Management"
                 icon={Wallet}
                 footer={
-                    <div className="bg-[#fcfcfc] px-6 py-4 w-full flex justify-between items-center border-t border-gray-200 rounded-b-[10px] shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]">
+                    <div className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">
                         <div className="flex gap-3">
                             <button type="button" onClick={() => setShowCustomerMasterBoard(true)} className="px-6 h-10 border border-indigo-300 text-indigo-600 bg-white hover:bg-indigo-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center justify-center gap-2">
                                 <Users size={14} /> NEW CUSTOMER
@@ -384,7 +384,7 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                                                 handleLoadDoc(val);
                                             }
                                         }}
-                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 appearance-none font-bold"
+                                        className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100"
                                         style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
                                     >
                                         <option value={formData.docNo}>{formData.docNo} (Current)</option>
@@ -399,7 +399,7 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                             </div>
                             <div className="">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Account Balance</label>
-                                <div className="w-full h-10 border border-blue-200 bg-blue-50/50 px-3 text-[14px] font-bold text-blue-700 text-right flex items-center justify-end rounded-[3px] min-w-[140px]">
+                                <div className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
                                     {balance.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                 </div>
                             </div>
@@ -410,7 +410,7 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                                         type="text"
                                         readOnly
                                         value={formatDate(formData.date)}
-                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700 truncate"
+                                        className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100"
                                         onClick={() => setShowDateModal(true)}
                                     />
                                     <button onClick={() => setShowDateModal(true)} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
@@ -425,7 +425,7 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                                         type="text"
                                         readOnly
                                         value={formatDate(formData.dueDate)}
-                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer pr-10 text-gray-700 truncate"
+                                        className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100"
                                         onClick={() => setShowDueDateModal(true)}
                                     />
                                     <button onClick={() => setShowDueDateModal(true)} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
@@ -450,7 +450,7 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                                                 setFormData({ ...formData, account: a.code });
                                             }
                                         }}
-                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
+                                        className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100"
                                         style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
                                     >
                                         <option value="">Select...</option>
@@ -468,7 +468,7 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                                         <select
                                             value={formData.costCenter}
                                             onChange={(e) => setFormData({ ...formData, costCenter: e.target.value })}
-                                            className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 appearance-none cursor-pointer"
+                                            className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100"
                                             style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
                                         >
                                             <option value="">Select cost center...</option>
@@ -480,7 +480,7 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                                 </div>
                                 <div className="">
                                     <label className="block text-[13px] font-medium text-gray-700 mb-1.5">General Memo</label>
-                                    <input value={formData.memo} onChange={(e) => setFormData({ ...formData, memo: e.target.value })} type="text" className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700" />
+                                    <input value={formData.memo} onChange={(e) => setFormData({ ...formData, memo: e.target.value })} type="text" className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100" />
                                 </div>
                             </div>
 
@@ -508,7 +508,7 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                                                 setFormData({ ...formData, vendorId: v.code, payee: v.name });
                                             }
                                         }}
-                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
+                                        className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100"
                                         style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
                                     >
                                         <option value="">Select...</option>
@@ -520,23 +520,23 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                                     </select>
                                         </div>
                                     ) : (
-                                        <input value={formData.payee} onChange={(e) => setFormData({ ...formData, payee: e.target.value })} type="text" className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700" placeholder="Enter payee name" />
+                                        <input value={formData.payee} onChange={(e) => setFormData({ ...formData, payee: e.target.value })} type="text" className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100" placeholder="Enter payee name" />
                                     )}
                                 </div>
                                 <div className="grid grid-cols-2 gap-3">
                                     <div className="">
                                         <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Vouch No</label>
-                                        <input value={formData.vouchNo} onChange={(e) => setFormData({ ...formData, vouchNo: e.target.value })} type="text" className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700" />
+                                        <input value={formData.vouchNo} onChange={(e) => setFormData({ ...formData, vouchNo: e.target.value })} type="text" className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100" />
                                     </div>
                                     <div className="">
                                         <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Bill Amount</label>
-                                        <input type="number" value={formData.billAmount} onChange={(e) => setFormData({ ...formData, billAmount: e.target.value })} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 text-right" />
+                                        <input type="number" value={formData.billAmount} onChange={(e) => setFormData({ ...formData, billAmount: e.target.value })} className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100" />
                                     </div>
                                 </div>
                                 <div className="grid grid-cols-2 gap-3">
                                     <div className="">
                                         <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Voucher Amount</label>
-                                        <div className="w-full h-10 border border-blue-200 bg-blue-50/50 px-3 text-[14px] font-bold text-blue-700 text-right flex items-center justify-end rounded-[3px]">
+                                        <div className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
                                             {totalAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                         </div>
                                     </div>
@@ -553,7 +553,7 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
 
                     {/* Tabs: Expenses / Items Purchase */}
                     <div className="mt-4">
-                        <div className="flex items-center gap-3 mb-2 px-2 border-b border-gray-200 pb-2">
+                        <div className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">
                             <div className="flex gap-4">
                                 <button 
                                     onClick={() => setSelectedTab('Expenses')}
@@ -580,18 +580,18 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                                 <table className="w-full text-sm text-left border-collapse">
                                     <thead className="bg-slate-50 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-200 leading-10">
                                         <tr>
-                                            <th className="px-4 w-[5%]">#</th>
-                                            <th className="px-4 w-[30%]">Expense Account</th>
-                                            <th className="px-4 w-[20%]">Cost Center</th>
-                                            <th className="px-4 w-[15%] text-right">Amount</th>
-                                            <th className="px-4 w-[25%]">Memo</th>
-                                        <th className="text-right px-5 py-3">Action</th></tr>
+                                            <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">#</th>
+                                            <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Expense Account</th>
+                                            <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Cost Center</th>
+                                            <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Amount</th>
+                                            <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Memo</th>
+                                        <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Action</th></tr>
                                     </thead>
                                     <tbody>
                                         {expenseRows.map((row, idx) => (
                                             <tr key={row.id} className="border-b border-gray-50 text-[12px] font-bold text-gray-700 hover:bg-slate-50/50 transition-colors">
-                                                <td className="px-4 py-2.5 font-mono text-gray-300">{idx + 1}</td>
-                                                <td className="px-2 py-2.5">
+                                                <td className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">{idx + 1}</td>
+                                                <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
                                                     <div className="flex gap-1 items-center">
                                                         <select
                                         value={safeExp.find}
@@ -606,7 +606,7 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                                                 }
                                             }
                                         }}
-                                        className="flex-1 h-8 border border-gray-300 rounded-[3px] px-2 text-[12px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
+                                        className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100"
                                         style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
                                     >
                                         <option value="">Select...</option>
@@ -618,12 +618,12 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                                     </select>
                                                     </div>
                                                 </td>
-                                                <td className="px-2 py-2.5">
+                                                <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
                                                     <div className="flex gap-1 items-center">
                                                         <select
                                                             value={row.costCode}
                                                             onChange={(e) => handleExpenseRowUpdate(row.id, 'costCode', e.target.value)}
-                                                            className="flex-1 h-8 border border-gray-300 rounded-[3px] px-2 text-[12px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 truncate appearance-none cursor-pointer"
+                                                            className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100"
                                                             style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
                                                         >
                                                             <option value="">Select...</option>
@@ -633,11 +633,11 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                                                         </select>
                                                     </div>
                                                 </td>
-                                                <td className="px-2 py-2.5">
-                                                    <input type="number" value={row.amount} onChange={(e) => handleExpenseRowUpdate(row.id, 'amount', e.target.value)} className="w-full h-8 border border-gray-300 rounded-[3px] px-2 text-right text-[12px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 font-mono" />
+                                                <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
+                                                    <input type="number" value={row.amount} onChange={(e) => handleExpenseRowUpdate(row.id, 'amount', e.target.value)} className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100" />
                                                 </td>
-                                                <td className="px-2 py-2.5">
-                                                    <input type="text" value={row.memo} onChange={(e) => handleExpenseRowUpdate(row.id, 'memo', e.target.value)} className="w-full h-8 border border-gray-300 rounded-[3px] px-2 text-[12px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700" placeholder="Memo" />
+                                                <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
+                                                    <input type="text" value={row.memo} onChange={(e) => handleExpenseRowUpdate(row.id, 'memo', e.target.value)} className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100" placeholder="Memo" />
                                                 </td>
                                             </tr>
                                         ))}
@@ -659,19 +659,19 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                                 <table className="w-full text-sm text-left border-collapse">
                                     <thead className="bg-slate-50 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-200 leading-10">
                                         <tr>
-                                            <th className="px-4 w-[5%]">#</th>
-                                            <th className="px-4 w-[30%]">Item</th>
-                                            <th className="px-4 w-[10%] text-center">Qty</th>
-                                            <th className="px-4 w-[13%] text-right">Unit Cost</th>
-                                            <th className="px-4 w-[13%] text-right">Total</th>
-                                            <th className="px-4 w-[24%]">Memo</th>
-                                        <th className="text-right px-5 py-3">Action</th></tr>
+                                            <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">#</th>
+                                            <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Item</th>
+                                            <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Qty</th>
+                                            <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Unit Cost</th>
+                                            <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Total</th>
+                                            <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Memo</th>
+                                        <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Action</th></tr>
                                     </thead>
                                     <tbody>
                                         {itemRows.map((row, idx) => (
                                             <tr key={row.id} className="border-b border-gray-50 text-[12px] font-bold text-gray-700 hover:bg-slate-50/50 transition-colors">
-                                                <td className="px-4 py-2.5 font-mono text-gray-300">{idx + 1}</td>
-                                                <td className="px-2 py-2.5">
+                                                <td className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">{idx + 1}</td>
+                                                <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
                                                     <div className="flex gap-1 items-center">
                                                         <select
                                         value={lookups.products}
@@ -686,7 +686,7 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                                                 }
                                             }
                                         }}
-                                        className="flex-1 h-8 border border-gray-300 rounded-[3px] px-2 text-[12px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 truncate appearance-none"
+                                        className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100"
                                         style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
                                     >
                                         <option value="">Select...</option>
@@ -698,17 +698,17 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                                     </select>
                                                     </div>
                                                 </td>
-                                                <td className="px-2 py-2.5">
-                                                    <input type="number" value={row.qty} onChange={(e) => handleItemRowUpdate(row.id, 'qty', e.target.value)} className="w-full h-8 border border-gray-300 rounded-[3px] px-2 text-center text-[12px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 font-mono" />
+                                                <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
+                                                    <input type="number" value={row.qty} onChange={(e) => handleItemRowUpdate(row.id, 'qty', e.target.value)} className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100" />
                                                 </td>
-                                                <td className="px-2 py-2.5">
-                                                    <input type="number" value={row.cost} onChange={(e) => handleItemRowUpdate(row.id, 'cost', e.target.value)} className="w-full h-8 border border-gray-300 rounded-[3px] px-2 text-right text-[12px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 font-mono" />
+                                                <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
+                                                    <input type="number" value={row.cost} onChange={(e) => handleItemRowUpdate(row.id, 'cost', e.target.value)} className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100" />
                                                 </td>
-                                                <td className="px-4 py-2.5 text-right font-mono font-black text-gray-700 bg-gray-50/30">
+                                                <td className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">
                                                     {(Number(row.qty) * Number(row.cost)).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                                 </td>
-                                                <td className="px-2 py-2.5">
-                                                    <input type="text" value={row.memo} onChange={(e) => handleItemRowUpdate(row.id, 'memo', e.target.value)} className="w-full h-8 border border-gray-300 rounded-[3px] px-2 text-[12px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700" placeholder="Notes" />
+                                                <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
+                                                    <input type="text" value={row.memo} onChange={(e) => handleItemRowUpdate(row.id, 'memo', e.target.value)} className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100" placeholder="Notes" />
                                                 </td>
                                             </tr>
                                         ))}
@@ -762,24 +762,24 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                 <div className="flex flex-col h-full font-['Tahoma']">
                     <div className="flex items-center gap-4 bg-slate-50 p-4 border-b border-gray-100 mb-2">
                         <span className="text-[12px] font-bold text-gray-500 uppercase tracking-wider">Search Facility</span>
-                        <input type="text" className="w-full h-10 px-4 border border-gray-300 rounded-[3px] outline-none text-sm focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white shadow-sm flex-1" value={accSearch} onChange={(e) => setAccSearch(e.target.value)} />
+                        <input type="text" className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100" value={accSearch} onChange={(e) => setAccSearch(e.target.value)} />
                     </div>
                     <div className="max-h-[50vh] overflow-y-auto no-scrollbar border border-gray-100 rounded-[5px] shadow-sm">
                         <table className="w-full text-sm text-left">
                             <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 z-10 shadow-sm">
                                 <tr>
-                                    <th className="border-b px-5 py-3">Code</th>
-                                    <th className="border-b px-5 py-3">Account Name</th>
-                                    <th className="border-b text-center w-24 px-5 py-3">Select</th>
+                                    <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Code</th>
+                                    <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Account Name</th>
+                                    <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Select</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100">
                                 {safePetty.filter(a => a.name?.toLowerCase().includes(accSearch.toLowerCase()) || a.code?.toLowerCase().includes(accSearch.toLowerCase())).map((a, i) => (
                                     <tr key={i} className="group hover:bg-blue-50/50  transition-all border-b border-gray-50 cursor-pointer group border-b border-gray-50">
-                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{a.code}</td>
-                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{a.name}</td>
-                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">
-                                            <button onClick={() => { setFormData({ ...formData, account: a.code }); setShowAccModal(false); }} className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button>
+                                        <td className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100">{a.code}</td>
+                                        <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">{a.name}</td>
+                                        <td className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100">
+                                            <button onClick={() => { setFormData({ ...formData, account: a.code }); setShowAccModal(false); }} className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">SELECT</button>
                                         </td>
                                     </tr>
                                 ))}
@@ -794,24 +794,24 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                 <div className="flex flex-col h-full font-['Tahoma']">
                     <div className="flex items-center gap-4 bg-slate-50 p-4 border-b border-gray-100 mb-2">
                         <span className="text-[12px] font-bold text-gray-500 uppercase tracking-wider">Search Facility</span>
-                        <input type="text" className="w-full h-10 px-4 border border-gray-300 rounded-[3px] outline-none text-sm focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white shadow-sm flex-1" value={vendorSearch} onChange={(e) => setVendorSearch(e.target.value)} />
+                        <input type="text" className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100" value={vendorSearch} onChange={(e) => setVendorSearch(e.target.value)} />
                     </div>
                     <div className="max-h-[50vh] overflow-y-auto no-scrollbar border border-gray-100 rounded-[5px] shadow-sm">
                         <table className="w-full text-sm text-left">
                             <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 z-10 shadow-sm">
                                 <tr>
-                                    <th className="border-b px-5 py-3">Code</th>
-                                    <th className="border-b px-5 py-3">Vendor Name</th>
-                                    <th className="border-b text-center w-24 px-5 py-3">Select</th>
+                                    <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Code</th>
+                                    <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Vendor Name</th>
+                                    <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Select</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100">
                                 {safeSuppliers.filter(v => v.name?.toLowerCase().includes(vendorSearch.toLowerCase()) || v.code?.toLowerCase().includes(vendorSearch.toLowerCase())).map((v, i) => (
                                     <tr key={i} className="group hover:bg-blue-50/50  transition-all border-b border-gray-50 cursor-pointer group border-b border-gray-50">
-                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{v.code}</td>
-                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{v.name}</td>
-                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">
-                                            <button onClick={() => { setFormData({ ...formData, vendorId: v.code, payee: v.name }); setShowVendorModal(false); }} className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button>
+                                        <td className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100">{v.code}</td>
+                                        <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">{v.name}</td>
+                                        <td className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100">
+                                            <button onClick={() => { setFormData({ ...formData, vendorId: v.code, payee: v.name }); setShowVendorModal(false); }} className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">SELECT</button>
                                         </td>
                                     </tr>
                                 ))}
@@ -826,23 +826,23 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                 <div className="flex flex-col h-full font-['Tahoma']">
                     <div className="flex items-center gap-4 bg-slate-50 p-4 border-b border-gray-100 mb-2">
                         <span className="text-[12px] font-bold text-gray-500 uppercase tracking-wider">Search Facility</span>
-                        <input type="text" className="w-full h-10 px-4 border border-gray-300 rounded-[3px] outline-none text-sm focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white shadow-sm flex-1" value={expAccSearch} onChange={(e) => setExpAccSearch(e.target.value)} />
+                        <input type="text" className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100" value={expAccSearch} onChange={(e) => setExpAccSearch(e.target.value)} />
                     </div>
                     <div className="max-h-[50vh] overflow-y-auto no-scrollbar border border-gray-100 rounded-[5px] shadow-sm">
                         <table className="w-full text-sm text-left">
                             <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 z-10 shadow-sm">
                                 <tr>
-                                    <th className="border-b px-5 py-3">Code</th>
-                                    <th className="border-b px-5 py-3">Account Name</th>
-                                    <th className="border-b text-center w-24 px-5 py-3">Select</th>
+                                    <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Code</th>
+                                    <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Account Name</th>
+                                    <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Select</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100">
                                 {safeExp.filter(e => e.name?.toLowerCase().includes(expAccSearch.toLowerCase()) || e.code?.toLowerCase().includes(expAccSearch.toLowerCase())).map((e, i) => (
                                     <tr key={i} className="group hover:bg-blue-50/50  transition-all border-b border-gray-50 cursor-pointer group border-b border-gray-50">
-                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{e.code}</td>
-                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{e.name}</td>
-                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">
+                                        <td className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100">{e.code}</td>
+                                        <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">{e.name}</td>
+                                        <td className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100">
                                             <button onClick={() => {
                                                 if (expIndex !== null) {
                                                     const newRows = [...expenseRows];
@@ -850,7 +850,7 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                                                     setExpenseRows(newRows);
                                                 }
                                                 setShowExpAccModal(false);
-                                            }} className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button>
+                                            }} className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">SELECT</button>
                                         </td>
                                     </tr>
                                 ))}
@@ -865,23 +865,23 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                 <div className="flex flex-col h-full font-['Tahoma']">
                     <div className="flex items-center gap-4 bg-slate-50 p-4 border-b border-gray-100 mb-2">
                         <span className="text-[12px] font-bold text-gray-500 uppercase tracking-wider">Search Facility</span>
-                        <input type="text" className="w-full h-10 px-4 border border-gray-300 rounded-[3px] outline-none text-sm focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] bg-white shadow-sm flex-1" value={prodSearch} onChange={(e) => setProdSearch(e.target.value)} />
+                        <input type="text" className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100" value={prodSearch} onChange={(e) => setProdSearch(e.target.value)} />
                     </div>
                     <div className="max-h-[50vh] overflow-y-auto no-scrollbar border border-gray-100 rounded-[5px] shadow-sm">
                         <table className="w-full text-sm text-left">
                             <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 z-10 shadow-sm">
                                 <tr>
-                                    <th className="border-b px-5 py-3">Code</th>
-                                    <th className="border-b px-5 py-3">Product Name</th>
-                                    <th className="border-b text-center w-24 px-5 py-3">Select</th>
+                                    <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Code</th>
+                                    <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Product Name</th>
+                                    <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Select</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100">
                                 {(lookups.products || []).filter(p => p.name?.toLowerCase().includes(prodSearch.toLowerCase()) || p.code?.toLowerCase().includes(prodSearch.toLowerCase())).map((p, i) => (
                                     <tr key={i} className="group hover:bg-blue-50/50  transition-all border-b border-gray-50 cursor-pointer group border-b border-gray-50">
-                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{p.code}</td>
-                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{p.name}</td>
-                                        <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">
+                                        <td className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100">{p.code}</td>
+                                        <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">{p.name}</td>
+                                        <td className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100">
                                             <button onClick={() => {
                                                 if (prodIndex !== null) {
                                                     const newRows = [...itemRows];
@@ -889,7 +889,7 @@ const PettyCashBoard = ({ isOpen, onClose }) => {
                                                     setItemRows(newRows);
                                                 }
                                                 setShowProdModal(false);
-                                            }} className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button>
+                                            }} className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">SELECT</button>
                                         </td>
                                     </tr>
                                 ))}

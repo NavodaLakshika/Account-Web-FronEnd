@@ -244,7 +244,7 @@ const AdminConfigBoard = ({ hierarchy, allEmployees }) => {
                                     {selectedCompany ? selectedCompanyName : 'No Company Selected'}
                                 </span>
                                 {selectedEmployee && selectedCompany && (
-                                    <span className="ml-2 px-2 py-0.5 bg-red-50 text-red-600 border border-red-200 rounded-none text-[10px] font-bold uppercase tracking-wider">
+                                    <span className="px-6 h-10 bg-red-50 text-red-600 text-sm font-bold rounded-[3px] hover:bg-red-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-red-100">
                                         {lockedCount} / {totalModules} Locked
                                     </span>
                                 )}

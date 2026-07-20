@@ -264,7 +264,7 @@ const AdminCompanyReportsBoard = ({ hierarchy, allEmployees }) => {
             {showEmpModal && (
                 <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40 p-4">
  <div className="bg-white  border border-gray-200  rounded-[3px] shadow-2xl w-full max-w-md overflow-visible animate-in fade-in zoom-in-95 duration-200 flex flex-col">
-                        <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between bg-white">
+                        <div className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">
                             <h3 className="text-[15px] font-bold text-gray-800">Select Employee</h3>
                             <button onClick={() => setShowEmpModal(false)} className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-colors rounded-[3px]">
                                 <X className="w-4 h-4" />
@@ -336,7 +336,7 @@ const AdminCompanyReportsBoard = ({ hierarchy, allEmployees }) => {
             {showCompModal && (
                 <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40 p-4">
                     <div className="bg-white  border border-gray-200  rounded-[3px] shadow-2xl w-full max-w-md overflow-visible animate-in fade-in zoom-in-95 duration-200 flex flex-col">
-                        <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between bg-white">
+                        <div className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">
                             <h3 className="text-[15px] font-bold text-gray-800">Select Company</h3>
                             <button onClick={() => setShowCompModal(false)} className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-colors rounded-[3px]">
                                 <X className="w-4 h-4" />

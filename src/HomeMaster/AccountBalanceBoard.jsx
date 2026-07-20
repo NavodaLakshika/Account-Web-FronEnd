@@ -17,7 +17,7 @@ const AccountBalanceBoard = ({ isOpen, onClose }) => {
             title="Account Balance"
             maxWidth="max-w-[700px]"
             // footer={
-            //     <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-gray-200 rounded-b-xl gap-3">
+            //     <div className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">
             //         <div className="flex gap-3">
             //             <span className="text-[20px] font-black italic text-[#0285fd]/30 tracking-tighter select-none">onimta IT</span>
             //         </div>
@@ -34,15 +34,15 @@ const AccountBalanceBoard = ({ isOpen, onClose }) => {
                     <table className="w-full text-left border-collapse">
                         <thead className="bg-[#f8fafd] border-b border-gray-200">
                             <tr>
-                                <th className="px-4 py-3 text-[12px] font-bold text-gray-500 uppercase tracking-wider border-r border-gray-200 w-1/2">Name</th>
-                                <th className="px-4 py-3 text-[12px] font-bold text-gray-500 uppercase tracking-wider text-right w-1/2">Balance</th>
-                            <th className="text-right px-5 py-3">Action</th></tr>
+                                <th className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">Name</th>
+                                <th className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">Balance</th>
+                            <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Action</th></tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">
                             {data.map((row, idx) => (
                                 <tr key={idx} className={`${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'} hover:bg-blue-50/30 transition-colors`}>
-                                    <td className="px-4 py-3 text-[12.5px] font-bold text-gray-700 border-r border-gray-200">{row.name}</td>
-                                    <td className="px-4 py-3 text-[12.5px] font-bold text-right text-[#0285fd] font-mono">{row.balance}</td>
+                                    <td className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">{row.name}</td>
+                                    <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">{row.balance}</td>
                                 </tr>
                             ))}
                             {/* Empty rows to match the style */}

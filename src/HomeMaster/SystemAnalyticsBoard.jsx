@@ -164,7 +164,7 @@ const SystemAnalyticsBoard = ({ allEmployees = [], allCompanies = [], hierarchy 
                                     return (
                                         <div key={i} className="flex-1 flex flex-col items-center justify-end gap-2 group h-full">
                                             <div className="w-full bg-emerald-100 rounded-none-t-md relative group-hover:bg-emerald-500 transition-colors" style={{ height: `${h}%` }}>
-                                                <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[10px] font-bold px-2 py-1 rounded-none opacity-0 group-hover:opacity-100 transition-opacity z-10 pointer-events-none shadow-md whitespace-nowrap">
+                                                <div className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100">
                                                     {day.count} events
                                                 </div>
                                             </div>
@@ -237,29 +237,29 @@ const SystemAnalyticsBoard = ({ allEmployees = [], allCompanies = [], hierarchy 
                         <table className="w-full text-left border-collapse min-w-[800px]">
                             <thead>
                                 <tr className="bg-white border-b border-slate-200 text-xs font-bold text-slate-500 uppercase tracking-wider sticky top-0 shadow-sm z-10">
-                                    <th className="py-4 px-6 w-56">Timestamp</th>
-                                    <th className="py-4 px-6 w-56">User</th>
-                                    <th className="py-4 px-6 ">Action Performed</th>
-                                    <th className="py-4 px-6 w-60">IP Address</th>
-                                    <th className="py-4 px-6 w-36">Status</th>
+                                    <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Timestamp</th>
+                                    <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">User</th>
+                                    <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Action Performed</th>
+                                    <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">IP Address</th>
+                                    <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Status</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-100">
                                 {filteredLogs.map((log, idx) => (
                                     <tr key={log.id || idx} className="hover:bg-slate-50/80 transition-colors">
-                                        <td className="py-3 px-6 text-xs text-slate-500 font-medium whitespace-nowrap font-mono">
+                                        <td className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100">
                                             {log.date ? new Date(log.date).toLocaleString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true }) : 'N/A'}
                                         </td>
-                                        <td className="py-3 px-6 text-sm text-slate-900 font-bold">
+                                        <td className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100">
                                             {log.user || 'System'}
                                         </td>
-                                        <td className="py-3 px-6">
+                                        <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
                                             <span className="text-sm text-slate-700 font-medium">{log.action || 'Unknown Action'}</span>
                                         </td>
-                                        <td className="py-3 px-6 text-xs font-mono text-slate-500 dark:text-slate-400">
+                                        <td className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100">
                                             {log.ip || '0.0.0.0'}
                                         </td>
-                                        <td className="py-3 px-6">
+                                        <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
                                             <div className="flex justify-center">
                                                 <div className={`flex items-center gap-1.5 px-3 py-1 rounded-none border text-[10px] font-bold uppercase tracking-wider ${getStatusStyle(log.status)}`}>
                                                     {getStatusIcon(log.status)}

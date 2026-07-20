@@ -266,7 +266,7 @@ const ItemMasterBoard = ({ isOpen, onClose }) => {
         <>
             <TransactionFormWrapper subtitle="Transaction Management" icon={FileText} isOpen={isOpen} onClose={onClose} title="Item Master" maxWidth="max-w-[700px]"
                 footer={
-                    <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-gray-200 rounded-b-xl">
+                    <div className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">
                         <div className="flex gap-3">
                             <button onClick={handleDelete} className="px-6 h-10 bg-white text-[#ff3b30] border-2 border-[#ff3b30] hover:bg-red-50 text-sm font-black rounded-[3px] shadow-md shadow-red-100 hover:bg-[#e03127] transition-all active:scale-95 flex items-center gap-2 border-none"><Trash2 size={14} /> DELETE ITEM</button>
                             <button onClick={handleClear} className="px-6 h-10 bg-white text-[#00adff] border-2 border-[#00adff] hover:bg-blue-50 text-sm font-black rounded-[3px] hover:bg-[#0099e6] transition-all active:scale-95 flex items-center gap-2 border-none"><RotateCcw size={14} /> CLEAR FORM</button>
@@ -283,8 +283,8 @@ const ItemMasterBoard = ({ isOpen, onClose }) => {
                             <div className="flex items-center gap-2 col-span-2">
                                 <label className="text-[12.5px] font-bold text-gray-700 w-28 shrink-0">Item ID & Title</label>
                                 <div className="flex-1 flex gap-1 h-8 min-w-0">
-                                    <input name="code" value={formData.code} onChange={handleInput} className="w-[138px] min-w-0 h-8 border border-gray-300 rounded-[3px] px-3 font-mono text-[12px] font-black text-[#0285fd] bg-blue-50/20 outline-none shadow-sm focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] appearance-none" placeholder="ID"  style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
-                                    <input name="prodName" value={formData.prodName} onChange={handleInput} className="flex ml-7 w-[300px] min-w-0 h-8 border border-gray-300 rounded-[3px] px-3 font-mono text-[12px] font-bold text-gray-800 outline-none shadow-sm focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd]" placeholder="Enter Product Name..." />
+                                    <input name="code" value={formData.code} onChange={handleInput} className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100" placeholder="ID"  style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
+                                    <input name="prodName" value={formData.prodName} onChange={handleInput} className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100" placeholder="Enter Product Name..." />
                              </div>
                             </div>
                             <ModalField label="Category Group" value={formData.categoryCode} displayValue={lookups.categories.find(c => c.code === formData.categoryCode)?.name} onClick={() => setActiveLookup({ title: 'Select Category', field: 'categoryCode', data: lookups.categories })}  />
@@ -371,9 +371,9 @@ const ItemMasterBoard = ({ isOpen, onClose }) => {
                                     <table className="w-full text-left">
                                         <thead className="bg-[#f8fafd] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-200">
                                             <tr>
-                                                <th className=" px-5 py-3">Reference Code</th>
-                                                <th className=" px-5 py-3">Detailed Description</th>
-                                                <th className="text-right px-5 py-3">Action</th>
+                                                <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Reference Code</th>
+                                                <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Detailed Description</th>
+                                                <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Action</th>
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-gray-50">
@@ -382,10 +382,10 @@ const ItemMasterBoard = ({ isOpen, onClose }) => {
                                                 item.code?.toLowerCase().includes(lookupQuery.toLowerCase())
                                             ).map((item, idx) => (
                                                 <tr key={idx} className="group hover:bg-blue-50/50  transition-all cursor-pointer group border-b border-gray-50" onClick={() => handleInputPick(activeLookup.field, item)}>
-                                                    <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{item.code}</td>
-                                                    <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{item.name}</td>
-                                                    <td className="text-right px-5 py-3">
-                                                        <button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button>
+                                                    <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">{item.code}</td>
+                                                    <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">{item.name}</td>
+                                                    <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
+                                                        <button className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">SELECT</button>
                                                     </td>
                                                 </tr>
                                             ))}
@@ -410,27 +410,27 @@ const ItemMasterBoard = ({ isOpen, onClose }) => {
                                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
                                     <input type="text" autoFocus placeholder="Enter item code, name, or properties..." className="w-full h-10 pl-10 pr-4 border border-gray-300 rounded-[3px] outline-none text-[13px] focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] shadow-sm bg-white" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleMainSearch()} />
                                 </div>
-                                <button onClick={handleMainSearch} className="px-8 h-9 bg-[#0285fd] text-slate-800 dark:text-white rounded-[3px] font-black hover:bg-[#0073ff] transition-all active:scale-95 shadow-md text-xs tracking-widest uppercase">Perform Query</button>
+                                <button onClick={handleMainSearch} className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100">Perform Query</button>
                             </div>
                             <div className="border border-gray-200 rounded-[3px] overflow-hidden shadow-sm">
                                 <div className="max-h-[400px] overflow-y-auto no-scrollbar">
                                     <table className="w-full text-left">
                                         <thead className="bg-[#f8fafd] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-200">
                                             <tr>
-                                                <th className=" px-5 py-3">Item Code</th>
-                                                <th className=" px-5 py-3">Technical Title</th>
-                                                <th className="text-right px-5 py-3">Standard M.R.P</th>
-                                                <th className="text-right px-5 py-3">Action</th>
+                                                <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Item Code</th>
+                                                <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Technical Title</th>
+                                                <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Standard M.R.P</th>
+                                                <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Action</th>
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-gray-50">
                                             {searchResults.map((item, idx) => (
                                                 <tr key={idx} className="group hover:bg-blue-50/50  transition-all cursor-pointer group border-b border-gray-50" onClick={() => handleSelectResult(item)}>
-                                                    <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{item.code}</td>
-                                                    <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{item.prod_Name}</td>
-                                                    <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">Rs. {(item.selling_Price || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                                                    <td className="text-right px-5 py-3">
-                                                        <button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">RETRIEVE ITEM</button>
+                                                    <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">{item.code}</td>
+                                                    <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">{item.prod_Name}</td>
+                                                    <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Rs. {(item.selling_Price || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                                                    <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
+                                                        <button className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">RETRIEVE ITEM</button>
                                                     </td>
                                                 </tr>
                                             ))}
@@ -478,7 +478,7 @@ const ModalField = ({ label, value, placeholder, onClick, displayValue }) => (
                 type="text" 
                 readOnly 
                 value={displayValue || value || placeholder || ''} 
-                className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-mono font-bold text-gray-600 bg-gray-50 rounded-[3px] outline-none shadow-sm cursor-pointer hover:border-gray-400 transition-colors truncate appearance-none" 
+                className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100" 
                 onClick={onClick} 
              style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
         </div>

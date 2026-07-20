@@ -156,7 +156,7 @@ const MakeDepositBoard = ({ isOpen, onClose }) => {
             title="Collection to Deposit"
             maxWidth="max-w-[700px]"
             footer={
-                <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-gray-200 rounded-b-xl">
+                <div className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">
                     <div className="flex gap-3">
                         <button
                             onClick={handleClear}
@@ -188,7 +188,7 @@ const MakeDepositBoard = ({ isOpen, onClose }) => {
 
                         <div className="col-span-4 flex items-center gap-2">
                             <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Cost Center</label>
-                            <input type="text" name="costCenter" value={formData.costCenter} onChange={handleInput} className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-gray-700 bg-white rounded-[3px] outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] shadow-sm" />
+                            <input type="text" name="costCenter" value={formData.costCenter} onChange={handleInput} className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100" />
                         </div>
 
                         <div className="col-span-4 flex items-center gap-2">
@@ -198,7 +198,7 @@ const MakeDepositBoard = ({ isOpen, onClose }) => {
                                     type="text"
                                     readOnly
                                     value={formData.dateFrom}
-                                    className="flex-1 min-w-0 h-8 border border-gray-300 rounded-[3px] px-3 text-[12px] outline-none bg-white text-gray-700 font-bold cursor-pointer shadow-sm"
+                                    className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100"
                                     onClick={() => { setDatePickerField('dateFrom'); setShowDatePicker(true); }}
                                 />
                                 <button
@@ -217,7 +217,7 @@ const MakeDepositBoard = ({ isOpen, onClose }) => {
                                     type="text"
                                     readOnly
                                     value={formData.dateTo}
-                                    className="flex-1 min-w-0 h-8 border border-gray-300 rounded-[3px] px-3 text-[12px] outline-none bg-white text-gray-700 font-bold cursor-pointer shadow-sm"
+                                    className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100"
                                     onClick={() => { setDatePickerField('dateTo'); setShowDatePicker(true); }}
                                 />
                                 <button
@@ -231,7 +231,7 @@ const MakeDepositBoard = ({ isOpen, onClose }) => {
 
                         <div className="col-span-4 flex items-center gap-2">
                             <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Pay Mode</label>
-                            <select name="payMode" value={formData.payMode} onChange={handleInput} className="flex-1 min-w-0 h-8 border border-gray-300 px-3 text-[12px] font-bold text-gray-700 bg-white rounded-[3px] outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] shadow-sm">
+                            <select name="payMode" value={formData.payMode} onChange={handleInput} className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">
                                 <option value="Cash">Cash</option>
                                 <option value="Cheque">Cheque</option>
                                 <option value="Direct Deposit">Direct Deposit</option>
@@ -242,7 +242,7 @@ const MakeDepositBoard = ({ isOpen, onClose }) => {
 
                         <div className="col-span-4 flex items-center gap-2">
                             <label className="text-[12.5px] font-bold text-gray-700 w-24 shrink-0">Department</label>
-                            <input type="text" name="department" value={formData.department} onChange={handleInput} className="flex-1 min-w-0 h-8 border border-gray-300 rounded-[3px] px-3 text-[12px] outline-none bg-white text-gray-700 shadow-sm focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd]" />
+                            <input type="text" name="department" value={formData.department} onChange={handleInput} className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100" />
                         </div>
 
                         <div className="col-span-4 flex items-center gap-2 justify-end">
@@ -255,16 +255,16 @@ const MakeDepositBoard = ({ isOpen, onClose }) => {
 
                 <div className="border border-gray-200 rounded-[3px] bg-white shadow-sm flex flex-col min-h-[350px] overflow-hidden">
                     <div className="flex bg-slate-50/80 border-b border-gray-200 text-[10px] font-black text-gray-400 uppercase tracking-widest items-center">
-                        <div className="w-12 py-2.5 px-3 border-r border-gray-200 text-center flex justify-center">
+                        <div className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">
                             <input type="checkbox" checked={funds.length > 0 && selectedDocNos.size === funds.length} onChange={toggleAll} className="w-3.5 h-3.5 rounded border-gray-300 text-blue-600 focus:ring-blue-600" />
                         </div>
-                        <div className="flex-[1.5] py-2.5 px-4 border-r border-gray-200">Document No</div>
-                        <div className="w-28 py-2.5 px-3 border-r border-gray-200 text-center">Date</div>
-                        <div className="w-24 py-2.5 px-3 border-r border-gray-200 text-center">Type</div>
-                        <div className="w-28 py-2.5 px-3 border-r border-gray-200 text-center">Pay Mode</div>
-                        <div className="flex-1 py-2.5 px-3 border-r border-gray-200">Reference</div>
-                        <div className="w-32 py-2.5 px-4 text-right">Amount</div>
-                        <div className="w-32 py-2.5 px-4 text-right">Balance</div>
+                        <div className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">Document No</div>
+                        <div className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">Date</div>
+                        <div className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">Type</div>
+                        <div className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">Pay Mode</div>
+                        <div className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">Reference</div>
+                        <div className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Amount</div>
+                        <div className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Balance</div>
                     </div>
 
                     <div className="flex-1 bg-white overflow-y-auto max-h-[320px] divide-y divide-gray-50">
@@ -275,16 +275,16 @@ const MakeDepositBoard = ({ isOpen, onClose }) => {
                             </div>
                         ) : funds.map((f, idx) => (
                             <div key={idx} onClick={() => toggleDocSelection(f.docNo)} className={`flex border-b border-gray-200 text-[11px] font-bold text-slate-700 hover:bg-blue-50/30 items-center transition-colors cursor-pointer ${selectedDocNos.has(f.docNo) ? 'bg-blue-50/50' : ''}`}>
-                                <div className="w-12 py-2 px-3 border-r border-gray-200 flex justify-center">
+                                <div className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">
                                     <input type="checkbox" checked={selectedDocNos.has(f.docNo)} readOnly className="w-3.5 h-3.5 rounded border-gray-300 text-blue-600 focus:ring-blue-600" />
                                 </div>
-                                <div className="flex-[1.5] py-2 px-4 border-r border-gray-200 text-blue-600 font-mono">{f.docNo}</div>
-                                <div className="w-28 py-2 px-3 border-r border-gray-200 text-center font-mono">{f.date?.split('T')[0] || ''}</div>
-                                <div className="w-24 py-2 px-3 border-r border-gray-200 text-center">{f.type || ''}</div>
-                                <div className="w-28 py-2 px-3 border-r border-gray-200 text-center">{f.payType || ''}</div>
-                                <div className="flex-1 py-2 px-3 border-r border-gray-200 font-mono text-gray-500 truncate">{f.reference || '-'}</div>
-                                <div className="w-32 py-2 px-4 text-right font-mono font-black text-slate-600">{parseFloat(f.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
-                                <div className="w-32 py-2 px-4 text-right font-mono font-black text-slate-800">{parseFloat(f.balance || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
+                                <div className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">{f.docNo}</div>
+                                <div className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">{f.date?.split('T')[0] || ''}</div>
+                                <div className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">{f.type || ''}</div>
+                                <div className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">{f.payType || ''}</div>
+                                <div className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">{f.reference || '-'}</div>
+                                <div className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100">{parseFloat(f.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
+                                <div className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100">{parseFloat(f.balance || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
                             </div>
                         ))}
                     </div>

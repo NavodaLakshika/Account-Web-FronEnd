@@ -108,7 +108,7 @@ const SubscriptionAdminBoard = () => {
   return (
     <div className="bg-white shadow-sm border border-slate-200/80 flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-2 duration-300 pb-6 rounded-[5px] overflow-hidden mb-6 min-h-[500px]">
       {/* Header */}
-      <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+      <div className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 bg-amber-50 flex items-center justify-center rounded-[5px]">
             <CalendarClock className="w-4 h-4 text-amber-600" />
@@ -181,12 +181,12 @@ const SubscriptionAdminBoard = () => {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-slate-50/80 border-b border-slate-100 text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-                  <th className="px-4 py-3">Emp Code</th>
-                  <th className="px-4 py-3">Name</th>
-                  <th className="px-4 py-3">First Login</th>
-                  <th className="px-4 py-3">Expiry Date</th>
-                  <th className="px-4 py-3 text-center">Status</th>
-                  <th className="px-4 py-3 text-right">Actions</th>
+                  <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Emp Code</th>
+                  <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Name</th>
+                  <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">First Login</th>
+                  <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Expiry Date</th>
+                  <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Status</th>
+                  <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -203,15 +203,15 @@ const SubscriptionAdminBoard = () => {
                 ) : (
                   filteredUsers.map(user => (
                     <tr key={user.emp_Code} className="hover:bg-slate-50 transition-colors border-b border-slate-100">
-                      <td className="px-4 py-3 font-mono text-[13px] text-slate-800 font-bold">{user.emp_Code}</td>
-                      <td className="px-4 py-3 text-[13px] text-slate-800 font-bold">{user.emp_Name}</td>
-                      <td className="px-4 py-3 text-[13px] text-slate-500 font-medium">
+                      <td className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100">{user.emp_Code}</td>
+                      <td className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100">{user.emp_Name}</td>
+                      <td className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100">
                         {user.first_Login_Date ? new Date(user.first_Login_Date).toLocaleDateString() : <span className="text-slate-400">Never</span>}
                       </td>
-                      <td className="px-4 py-3 text-[13px] text-slate-500 font-medium">
+                      <td className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100">
                         {user.subscription_End_Date ? new Date(user.subscription_End_Date).toLocaleDateString() : <span className="text-slate-400">N/A</span>}
                       </td>
-                      <td className="px-4 py-3 text-center">
+                      <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
                         <span className={`px-2 py-0.5 text-[9px] font-black uppercase tracking-widest border rounded-[3px] ${
                           user.subscription_Status === 'Trial' ? 'bg-blue-50 text-blue-600 border-blue-200' :
                           user.subscription_Status === 'Active' ? 'bg-emerald-50 text-emerald-600 border-emerald-200' :
@@ -220,14 +220,14 @@ const SubscriptionAdminBoard = () => {
                           {user.subscription_Status || 'Trial'}
                         </span>
                       </td>
-                      <td className="px-4 py-3 text-right">
+                      <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
                         <button
                           onClick={() => {
                             setSelectedUser(user);
                             setExtendMonths(1);
                             setNewStatus(user.subscription_Status || 'Active');
                           }}
-                          className="px-3 py-1 text-[10px] font-black uppercase tracking-wider rounded-[3px] transition-all bg-[#0078d4] hover:bg-[#005a9e] text-white shadow-sm flex items-center gap-1 ml-auto"
+                          className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100"
                         >
                           <CreditCard size={10} /> Manage
                         </button>
@@ -271,7 +271,7 @@ const SubscriptionAdminBoard = () => {
               {plans.map((plan) => (
                 <div key={plan.id} className="bg-white border border-slate-200 shadow-sm flex flex-col relative transition-all hover:shadow-md rounded-[5px] overflow-hidden">
                   {!plan.isActive && (
-                    <div className="absolute top-4 right-4 bg-red-50 text-red-600 text-[10px] font-bold px-2 py-1 border border-red-200 uppercase tracking-widest rounded-[3px]">
+                    <div className="px-6 h-10 bg-red-50 text-red-600 text-sm font-bold rounded-[3px] hover:bg-red-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-red-100">
                       Inactive
                     </div>
                   )}
@@ -328,7 +328,7 @@ const SubscriptionAdminBoard = () => {
             {selectedUser && (
         <div className="fixed inset-0 z-[200] flex items-center justify-center bg-slate-900/30 backdrop-blur-sm p-4">
           <div className="bg-white border border-slate-200 shadow-2xl w-full max-w-md animate-in fade-in zoom-in-95 duration-200 flex flex-col rounded-[5px]">
-            <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+            <div className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
               <h3 className="text-[15px] font-bold text-slate-800">Manage Subscription</h3>
               <button onClick={() => setSelectedUser(null)} className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors rounded-[3px]">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
@@ -348,7 +348,7 @@ const SubscriptionAdminBoard = () => {
                   min="0"
                   value={extendMonths}
                   onChange={e => setExtendMonths(parseInt(e.target.value) || 0)}
-                  className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 text-slate-800 text-sm outline-none focus:border-[#0078d4] rounded-[3px] transition-all"
+                  className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100"
                 />
               </div>
 
@@ -378,7 +378,7 @@ const SubscriptionAdminBoard = () => {
                 <button
                   type="button"
                   onClick={() => setSelectedUser(null)}
-                  className="flex-1 px-5 py-2.5 bg-slate-500 hover:bg-slate-400 text-white text-xs font-bold uppercase tracking-wider rounded-[3px] transition-all shadow-sm"
+                  className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100"
                 >
                   Cancel
                 </button>

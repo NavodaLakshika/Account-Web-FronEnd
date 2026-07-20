@@ -155,7 +155,7 @@ const SystemAnalysisBoard = () => {
                             return (
                                 <div key={i} className="flex-1 flex flex-col items-center justify-end gap-2 group h-full">
                                     <div className={`w-full rounded-none-t-sm relative transition-colors ${h > 80 ? 'bg-red-200 group-hover:bg-red-500' : 'bg-blue-100 group-hover:bg-blue-500'}`} style={{ height: `${h}%` }}>
-                                        <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[10px] font-bold px-2 py-1 rounded-none opacity-0 group-hover:opacity-100 transition-opacity z-10 pointer-events-none shadow-md whitespace-nowrap">
+                                        <div className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100">
                                             {snapshot.cpuUsagePercentage}%
                                         </div>
                                     </div>
@@ -178,7 +178,7 @@ const SystemAnalysisBoard = () => {
                             return (
                                 <div key={i} className="flex-1 flex flex-col items-center justify-end gap-2 group h-full">
                                     <div className={`w-full rounded-none-t-sm relative transition-colors ${h > 80 ? 'bg-orange-200 group-hover:bg-orange-500' : 'bg-purple-100 group-hover:bg-purple-500'}`} style={{ height: `${h}%` }}>
-                                        <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[10px] font-bold px-2 py-1 rounded-none opacity-0 group-hover:opacity-100 transition-opacity z-10 pointer-events-none shadow-md whitespace-nowrap">
+                                        <div className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100">
                                             {(snapshot.memoryUsageMB / 1024).toFixed(1)}GB
                                         </div>
                                     </div>

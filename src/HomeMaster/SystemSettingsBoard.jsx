@@ -301,7 +301,7 @@ const SystemSettingsBoard = ({ isOpen = true, onClose, isInline = false }) => {
             </div>
 
             {/* Tabs */}
-            <div className="flex border-b border-slate-200 dark:border-slate-800 px-6">
+            <div className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
                 <button
                     onClick={() => setActiveTab('profiles')}
                     className={`py-4 px-6 text-sm font-medium border-b-2 transition-all ${activeTab === 'profiles' ? 'border-[#0078d4] text-[#0078d4]' : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-600 dark:text-slate-300'}`}
@@ -337,7 +337,7 @@ const SystemSettingsBoard = ({ isOpen = true, onClose, isInline = false }) => {
                                     <Plus size={16} /> New Profile
                                 </button>
                             </div>
-                            <div className="px-2 pb-4">
+                            <div className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
                                 {profiles.map(p => (
                                     <div 
                                         key={p.id}
@@ -370,7 +370,7 @@ const SystemSettingsBoard = ({ isOpen = true, onClose, isInline = false }) => {
                                             value={profileName}
                                             onChange={e => setProfileName(e.target.value)}
                                             placeholder="e.g. Branch Manager"
-                                            className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-[3px] px-3 py-2 text-sm focus:ring-2 focus:ring-[#0078d4] outline-none"
+                                            className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100"
                                         />
                                     </div>
                                     <div>
@@ -380,7 +380,7 @@ const SystemSettingsBoard = ({ isOpen = true, onClose, isInline = false }) => {
                                             value={profileDesc}
                                             onChange={e => setProfileDesc(e.target.value)}
                                             placeholder="Optional description..."
-                                            className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-[3px] px-3 py-2 text-sm focus:ring-2 focus:ring-[#0078d4] outline-none"
+                                            className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100"
                                         />
                                     </div>
                                 </div>
@@ -440,7 +440,7 @@ const SystemSettingsBoard = ({ isOpen = true, onClose, isInline = false }) => {
                                     <select 
                                         value={assignEmpCode}
                                         onChange={e => setAssignEmpCode(e.target.value)}
-                                        className="w-full bg-slate-50 dark:bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-[3px] px-3 py-2.5 text-sm outline-none"
+                                        className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100"
                                     >
                                         <option value="">-- Choose Employee --</option>
                                         {employees.map(e => (
@@ -454,7 +454,7 @@ const SystemSettingsBoard = ({ isOpen = true, onClose, isInline = false }) => {
                                     <select 
                                         value={assignProfileId}
                                         onChange={e => setAssignProfileId(e.target.value)}
-                                        className="w-full bg-slate-50 dark:bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-[3px] px-3 py-2.5 text-sm outline-none"
+                                        className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100"
                                     >
                                         <option value="">-- Choose Profile --</option>
                                         {profiles.map(p => (
@@ -540,7 +540,7 @@ const SystemSettingsBoard = ({ isOpen = true, onClose, isInline = false }) => {
                                                                 return (
                                                                     <>
                                                                         <span className="font-bold text-slate-800 dark:text-slate-800 dark:text-white">{empName}</span>
-                                                                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-[#0078d4]/10 text-[#0078d4] uppercase tracking-wider border border-[#0078d4]/20">
+                                                                        <span className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
                                                                             {prof ? prof.profileName : 'Unknown Profile'}
                                                                         </span>
                                                                     </>

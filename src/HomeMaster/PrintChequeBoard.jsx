@@ -10,7 +10,7 @@ const PrintChequeBoard = ({ isOpen, onClose }) => {
     ]);
 
     const footer = (
-        <div className="bg-slate-50 px-6 py-4 w-full flex justify-end gap-3 border-t border-gray-200 mt-2 rounded-b-xl">
+        <div className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">
             <button className="px-6 h-10 bg-white text-[#2bb744] border-2 border-[#2bb744] hover:bg-green-50 text-sm font-black rounded-[3px] shadow-md shadow-green-100 hover:bg-[#259b3a] transition-all active:scale-95 flex items-center justify-center gap-2 uppercase tracking-tight">
                 <Printer size={16} /> PRINT SELECTED
             </button>
@@ -63,7 +63,7 @@ const PrintChequeBoard = ({ isOpen, onClose }) => {
                                 <input 
                                     type="text" 
                                     readOnly 
-                                    className="flex-1 h-9 border border-gray-300 rounded-[3px] px-3 font-mono font-bold text-slate-800 text-[12.5px] outline-none shadow-sm bg-gray-50 appearance-none" 
+                                    className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100" 
                                  style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
                             </div>
                         </div>
@@ -88,9 +88,9 @@ const PrintChequeBoard = ({ isOpen, onClose }) => {
                             </div>
                             <div className="w-12 text-[10px] font-black text-gray-400 text-center pr-2">FROM</div>
                             <div className="flex-1 flex items-center gap-3">
-                                <input type="text" className="flex-1 h-9 border border-gray-300 rounded-[3px] px-3 font-mono font-black text-[#0285fd] text-[13px] outline-none shadow-sm bg-white focus:border-slate-400" />
+                                <input type="text" className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100" />
                                 <span className="w-6 text-[10px] font-black text-gray-400 text-center uppercase tracking-tighter">TO</span>
-                                <input type="text" className="flex-1 h-9 border border-gray-300 rounded-[3px] px-3 font-mono font-black text-[#0285fd] text-[13px] outline-none shadow-sm bg-white focus:border-slate-400" />
+                                <input type="text" className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100" />
                             </div>
                         </div>
 
@@ -103,14 +103,14 @@ const PrintChequeBoard = ({ isOpen, onClose }) => {
                             <div className="w-12 text-[10px] font-black text-gray-400 text-center pr-2">FROM</div>
                             <div className="flex-1 flex items-center gap-4">
                                 <div className="flex-1 flex gap-2">
-                                    <input type="text" readOnly value={dates.from} className="flex-1 h-9 border border-gray-300 rounded-[3px] px-3 font-mono font-bold text-slate-800 text-[12.5px] outline-none bg-gray-50/50 shadow-sm" />
+                                    <input type="text" readOnly value={dates.from} className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100" />
                                     <button onClick={() => openCalendar('from')} className="w-10 h-9 bg-white border border-gray-300 text-slate-600 flex items-center justify-center hover:bg-slate-50 rounded-[3px] transition-all shadow-sm active:scale-90 shrink-0">
                                         <Calendar size={15} />
                                     </button>
                                 </div>
                                 <span className="w-4 text-[10px] font-black text-gray-400 text-center uppercase tracking-tighter">TO</span>
                                 <div className="flex-1 flex gap-2">
-                                    <input type="text" readOnly value={dates.to} className="flex-1 h-9 border border-gray-300 rounded-[3px] px-3 font-mono font-bold text-slate-800 text-[12.5px] outline-none bg-gray-50/50 shadow-sm" />
+                                    <input type="text" readOnly value={dates.to} className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100" />
                                     <button onClick={() => openCalendar('to')} className="w-10 h-9 bg-white border border-gray-300 text-slate-600 flex items-center justify-center hover:bg-slate-50 rounded-[3px] transition-all shadow-sm active:scale-90 shrink-0">
                                         <Calendar size={15} />
                                     </button>
@@ -129,7 +129,7 @@ const PrintChequeBoard = ({ isOpen, onClose }) => {
                                 <input 
                                     type="text" 
                                     readOnly 
-                                    className="flex-1 h-9 border border-gray-300 rounded-[3px] px-3 font-mono font-bold text-slate-800 text-[12.5px] outline-none shadow-sm bg-gray-50 appearance-none" 
+                                    className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100" 
                                  style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
                             </div>
                         </div>
@@ -153,27 +153,27 @@ const PrintChequeBoard = ({ isOpen, onClose }) => {
                                 <table className="w-full text-left border-collapse">
                                     <thead className="bg-[#f8fafd] border-b border-gray-200 text-slate-500 font-black uppercase text-[10.5px] tracking-widest z-10 sticky top-0">
                                         <tr>
-                                            <th className="px-3 py-3 border-r border-gray-200 w-12 text-center select-none">SEL.</th>
-                                            <th className="px-3 py-3 border-r border-gray-200 w-28">CHQ. NO</th>
-                                            <th className="px-4 py-3 border-r border-gray-200 w-36 text-center">ISSUE DATE</th>
-                                            <th className="px-4 py-3 border-r border-gray-200">PAYEE / ENTITY TRANSCRIPT</th>
-                                            <th className="px-4 py-3 w-32 text-right">VALUE (LKR)</th>
-                                        <th className="text-right px-5 py-3">Action</th></tr>
+                                            <th className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">SEL.</th>
+                                            <th className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">CHQ. NO</th>
+                                            <th className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">ISSUE DATE</th>
+                                            <th className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">PAYEE / ENTITY TRANSCRIPT</th>
+                                            <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">VALUE (LKR)</th>
+                                        <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Action</th></tr>
                                     </thead>
                                     <tbody className="divide-y divide-gray-50">
                                         {rows.map((row, idx) => (
                                             <tr key={idx} className="hover:bg-blue-50/50 transition-colors group">
-                                                <td className="px-1 py-1.5 border-r border-gray-50 text-center">
+                                                <td className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">
                                                     <input type="checkbox" className="w-[15px] h-[15px] rounded-sm border-gray-300 text-[#0078d4]" />
                                                 </td>
-                                                <td className="px-3 py-1.5 border-r border-gray-50">
-                                                    <input type="text" className="w-full h-8 px-1 font-mono font-black text-[#0285fd] text-[12.5px] outline-none bg-transparent" defaultValue={row.chqNo} />
+                                                <td className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">
+                                                    <input type="text" className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100" defaultValue={row.chqNo} />
                                                 </td>
-                                                <td className="px-3 py-1.5 border-r border-gray-50 text-center text-[12px] font-mono font-bold text-slate-500 uppercase tracking-tighter">17-MAR-2026</td>
-                                                <td className="px-3 py-1.5 border-r border-gray-50">
-                                                    <input type="text" className="w-full h-8 px-1 font-mono font-black text-slate-700 text-[12.5px] outline-none bg-transparent" defaultValue={row.payee} />
+                                                <td className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">17-MAR-2026</td>
+                                                <td className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">
+                                                    <input type="text" className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100" defaultValue={row.payee} />
                                                 </td>
-                                                <td className="px-4 py-1.5 text-right font-mono font-black text-slate-900 text-[13px] tabular-nums tracking-tighter">0.00</td>
+                                                <td className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100">0.00</td>
                                             </tr>
                                         ))}
                                         <tr className="bg-gray-50/10 h-16">

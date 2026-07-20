@@ -354,7 +354,7 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
                             <div className="col-span-3 flex items-center gap-2">
                                 <label                                 className="text-[11px] font-bold text-gray-500 uppercase w-20 shrink-0">Doc No</label>
                                 <div className="flex-1 flex gap-1 h-8 min-w-0">
-                                    <input type="text" value={formData.docNo} onChange={handleInputChange} name="docNo" className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-sm font-mono font-bold text-[#0285fd] bg-slate-50 rounded outline-none focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 transition-all appearance-none"  style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
+                                    <input type="text" value={formData.docNo} onChange={handleInputChange} name="docNo" className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100"  style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
                                 </div>
                             </div>
 
@@ -362,7 +362,7 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
                             <div className="col-span-3 flex items-center gap-2">
                                 <label className="text-[11px] font-bold text-gray-500 uppercase w-20 shrink-0">Date</label>
                                 <div className="flex-1 flex gap-1 h-8 min-w-0">
-                                    <input type="text" readOnly value={formData.date} onClick={() => setShowDateModal(true)} className="flex-1 min-w-0 h-8 border border-slate-200 rounded px-3 text-sm font-mono outline-none bg-slate-50 text-gray-700 font-bold cursor-pointer transition-all" />
+                                    <input type="text" readOnly value={formData.date} onClick={() => setShowDateModal(true)} className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100" />
                                     <button onClick={() => setShowDateModal(true)} className="w-8 h-8 bg-[#0285fd] text-slate-800 dark:text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0">
                                         <Calendar size={14} />
                                     </button>
@@ -373,7 +373,7 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
                             <div className="col-span-3 flex items-center gap-2">
                                 <label className="text-[11px] font-bold text-gray-500 uppercase w-20 shrink-0 text-nowrap">Job No</label>
                                 <div className="flex-1 flex gap-1 h-8 min-w-0">
-                                    <input type="text" readOnly value={formData.jobNo} onClick={() => setShowJobModal(true)} className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-sm font-mono font-bold text-gray-700 bg-slate-50 rounded outline-none cursor-pointer transition-all appearance-none"  style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
+                                    <input type="text" readOnly value={formData.jobNo} onClick={() => setShowJobModal(true)} className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100"  style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
                                 </div>
                             </div>
 
@@ -390,7 +390,7 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
                                                 setFormData({ ...formData, salesRef: s.code });
                                             }
                                         }}
-                                        className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-sm font-mono font-bold text-gray-700 bg-slate-50 rounded outline-none cursor-pointer transition-all appearance-none"
+                                        className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100"
                                         style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
                                     >
                                         <option value="">Select...</option>
@@ -407,7 +407,7 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
                             <div className="col-span-6 flex items-center gap-2">
                                 <label className="text-[11px] font-bold text-gray-500 uppercase w-20 shrink-0">Customer</label>
                                 <div className="flex-1 flex gap-1 h-8 min-w-0">
-                                    <input type="text" readOnly value={formData.custCode} placeholder="ID" className="w-20 min-w-0 h-8 border border-slate-200 px-2 text-sm font-mono font-bold text-[#0285fd] bg-slate-50 rounded outline-none transition-all" />
+                                    <input type="text" readOnly value={formData.custCode} placeholder="ID" className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100" />
                                     <select
                                         value={formData.custName}
                                         onChange={(ev) => {
@@ -417,7 +417,7 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
                                                 setFormData({ ...formData, custCode: c.code, custName: c.name });
                                             }
                                         }}
-                                        className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-sm font-mono font-bold rounded outline-none bg-slate-50 text-gray-700 cursor-pointer transition-all appearance-none"
+                                        className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100"
                                         style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
                                     >
                                         <option value="">Select...</option>
@@ -433,7 +433,7 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
                             {/* Ref No */}
                             <div className="col-span-3 flex items-center gap-2">
                                 <label className="text-[11px] font-bold text-gray-500 uppercase w-20 shrink-0">Ref. No</label>
-                                <input type="text" name="refNo" value={formData.refNo} onChange={handleInputChange} className="flex-1 min-w-0 h-8 border border-slate-200 rounded px-3 font-mono text-sm outline-none bg-slate-50 text-gray-700 transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" />
+                                <input type="text" name="refNo" value={formData.refNo} onChange={handleInputChange} className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100" />
                             </div>
 
                             {/* Payment Type */}
@@ -449,7 +449,7 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
                                                 setFormData({ ...formData, payType: t.name });
                                             }
                                         }}
-                                        className="flex-1 min-w-0 h-8 border border-slate-200 px-3 text-sm font-mono font-bold text-gray-700 bg-slate-50 rounded outline-none cursor-pointer transition-all appearance-none"
+                                        className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100"
                                         style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
                                     >
                                         <option value="">Select...</option>
@@ -465,14 +465,14 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
                             {/* Credit Period */}
                             <div className="col-span-3 flex items-center gap-2">
                                 <label className="text-[11px] font-bold text-gray-500 uppercase w-20 shrink-0">Crd. Period</label>
-                                <input type="text" name="creditPeriod" value={formData.creditPeriod} onChange={handleInputChange} className="flex-1 min-w-0 h-8 border border-slate-200 rounded px-3 font-mono text-sm outline-none bg-slate-50 text-gray-700 transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20" />
+                                <input type="text" name="creditPeriod" value={formData.creditPeriod} onChange={handleInputChange} className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100" />
                             </div>
 
                             {/* Due Date */}
                             <div className="col-span-3 flex items-center gap-2">
                                 <label className="text-[11px] font-bold text-gray-500 uppercase w-20 shrink-0">Due Date</label>
                                 <div className="flex-1 flex gap-1 h-8 min-w-0">
-                                    <input type="text" readOnly value={formData.dueDate} onClick={() => setShowDueDateModal(true)} className="flex-1 min-w-0 h-8 border border-slate-200 rounded px-3 text-sm font-mono outline-none bg-slate-50 text-gray-700 font-bold cursor-pointer transition-all" />
+                                    <input type="text" readOnly value={formData.dueDate} onClick={() => setShowDueDateModal(true)} className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100" />
                                     <button onClick={() => setShowDueDateModal(true)} className="w-8 h-8 bg-[#0285fd] text-slate-800 dark:text-white flex items-center justify-center hover:bg-[#0073ff] rounded-[3px] transition-all shadow-md active:scale-95 shrink-0">
                                         <Calendar size={14} />
                                     </button>
@@ -484,62 +484,62 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
                     {/* 2. Grid */}
                     <div className="border border-slate-200 rounded-[3px] bg-white shadow-sm flex flex-col min-h-[250px] overflow-hidden">
                         <div className="flex bg-slate-50/80 border-b border-slate-200 text-[10px] font-black text-gray-400 uppercase tracking-widest items-center">
-                            <div className="w-40 py-2.5 px-3 border-r border-slate-200">PROD. ID</div>
-                            <div className="flex-1 py-2.5 px-3 border-r border-slate-200">PRODUCT NAME</div>
-                            <div className="w-20 py-2.5 px-3 border-r border-slate-200 text-center">UNIT</div>
-                            <div className="w-24 py-2.5 px-3 border-r border-slate-200 text-right">SELLING</div>
-                            <div className="w-20 py-2.5 px-3 border-r border-slate-200 text-right">QTY</div>
-                            <div className="w-20 py-2.5 px-3 border-r border-slate-200 text-right">DIS %</div>
-                            <div className="w-28 py-2.5 px-3 text-right">AMOUNT</div>
+                            <div className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">PROD. ID</div>
+                            <div className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">PRODUCT NAME</div>
+                            <div className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">UNIT</div>
+                            <div className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">SELLING</div>
+                            <div className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">QTY</div>
+                            <div className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">DIS %</div>
+                            <div className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">AMOUNT</div>
                             <div className="w-10"></div>
                         </div>
                         
                         <div className="flex-1 bg-white overflow-y-auto max-h-[220px] divide-y divide-slate-100">
                             {rows.map((row, idx) => (
                                 <div key={row.id} className="flex border-b border-slate-100 text-[11px] font-bold text-slate-700 hover:bg-blue-50/30 items-center transition-colors group">
-                                    <div className="w-40 py-1.5 px-2 border-r border-slate-100">
+                                    <div className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
                                         <div className="flex gap-1 items-center h-7">
                                             <input
                                                 type="text"
                                                 readOnly
                                                 value={row.prodCode}
                                                 onClick={() => { setProdIndex(idx); setShowProdModal(true); }}
-                                                className="flex-1 min-w-0 h-7 border border-slate-200 px-2 text-sm font-mono font-bold text-[#0285fd] bg-slate-50 rounded outline-none focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 cursor-pointer transition-all appearance-none"
+                                                className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100"
                                                 placeholder="Select"
                                              style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }} />
                                         </div>
                                     </div>
-                                    <div className="flex-1 py-1.5 px-2 border-r border-slate-100 truncate" title={row.prodName}>
+                                    <div className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100" title={row.prodName}>
                                         {row.prodName}
                                     </div>
-                                    <div className="w-20 py-1.5 px-2 border-r border-slate-100 text-center text-gray-500">
+                                    <div className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">
                                         {row.unit}
                                     </div>
-                                    <div className="w-24 border-r border-slate-100 px-2 py-1.5 bg-white group-hover:bg-transparent">
+                                    <div className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
                                         <input
                                             type="number"
                                             value={row.selling}
                                             onChange={(e) => handleRowChange(row.id, 'selling', e.target.value)}
-                                            className="w-full h-7 bg-transparent text-right text-[12px] font-mono font-bold text-slate-800 outline-none focus:bg-white border-none px-2 tabular-nums"
+                                            className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100"
                                         />
                                     </div>
-                                    <div className="w-20 border-r border-slate-100 px-2 py-1.5 bg-white group-hover:bg-transparent">
+                                    <div className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
                                         <input
                                             type="number"
                                             value={row.qty}
                                             onChange={(e) => handleRowChange(row.id, 'qty', e.target.value)}
-                                            className="w-full h-7 bg-transparent text-right text-[12px] font-mono font-bold text-[#0285fd] outline-none focus:bg-white border-none px-2 tabular-nums"
+                                            className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100"
                                         />
                                     </div>
-                                    <div className="w-20 border-r border-slate-100 px-2 py-1.5 bg-white group-hover:bg-transparent">
+                                    <div className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
                                         <input
                                             type="number"
                                             value={row.discPer}
                                             onChange={(e) => handleRowChange(row.id, 'discPer', e.target.value)}
-                                            className="w-full h-7 bg-transparent text-right text-[12px] font-mono font-bold text-slate-800 outline-none focus:bg-white border-none px-2 tabular-nums"
+                                            className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100"
                                         />
                                     </div>
-                                    <div className="w-28 py-1.5 px-4 text-right font-mono font-black text-slate-800">
+                                    <div className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100">
                                         {row.amount.toFixed(2)}
                                     </div>
                                     <div className="w-10 flex justify-center py-1">
@@ -571,7 +571,7 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
                                     <div className="w-28 h-7 text-center text-[11px] font-mono font-bold border border-slate-200 rounded bg-slate-50 flex items-center justify-center shrink-0 text-slate-500">
                                         Qty: {totals.sumQty}
                                     </div>
-                                    <input type="text" readOnly value={totals.sumAmount.toFixed(2)} className="w-[105px] h-7 text-right text-[12px] font-mono font-bold border border-slate-200 rounded bg-slate-50 px-2 text-slate-800 outline-none shrink-0" />
+                                    <input type="text" readOnly value={totals.sumAmount.toFixed(2)} className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100" />
                                 </div>
                             </div>
 
@@ -583,7 +583,7 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
                                         <input type="number" name="discPer" value={formData.discPer} onChange={handleInputChange} className="w-full h-7 text-center text-[11px] font-mono font-bold border border-slate-200 rounded outline-none focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 bg-slate-50" />
                                         <span className="absolute right-1.5 top-1/2 -translate-y-1/2 text-[9px] font-black text-gray-400">%</span>
                                     </div>
-                                    <input type="text" readOnly value={totals.headerDiscount.toFixed(2)} className="w-[105px] h-7 text-right text-[12px] font-mono font-bold border border-slate-200 rounded bg-slate-50 px-2 outline-none shrink-0" />
+                                    <input type="text" readOnly value={totals.headerDiscount.toFixed(2)} className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100" />
                                 </div>
                             </div>
 
@@ -595,7 +595,7 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
                                         <input type="number" name="taxPer" value={formData.taxPer} onChange={handleInputChange} className="w-full h-7 text-center text-[11px] font-mono font-bold border border-slate-200 rounded outline-none focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 bg-slate-50" />
                                         <span className="absolute right-1.5 top-1/2 -translate-y-1/2 text-[9px] font-black text-gray-400">%</span>
                                     </div>
-                                    <input type="text" readOnly value={totals.taxVal.toFixed(2)} className="w-[105px] h-7 text-right text-[12px] font-mono font-bold border border-slate-200 rounded bg-slate-50 px-2 outline-none shrink-0" />
+                                    <input type="text" readOnly value={totals.taxVal.toFixed(2)} className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100" />
                                 </div>
                             </div>
 
@@ -628,24 +628,24 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
                     <div className="space-y-4">
                         <div className="flex items-center gap-4 p-3 rounded-[3px] border border-slate-200 bg-white">
                             <Search className="text-gray-400 shrink-0" size={15} />
-                            <input type="text" className="w-full h-8 border border-slate-200 px-3 text-sm bg-slate-50 rounded outline-none focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 transition-all" value={custSearch} onChange={(e) => setCustSearch(e.target.value)} autoFocus placeholder="Search customer..." />
+                            <input type="text" className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100" value={custSearch} onChange={(e) => setCustSearch(e.target.value)} autoFocus placeholder="Search customer..." />
                         </div>
                         <div className="border border-slate-200 rounded-[3px] overflow-hidden max-h-[300px] overflow-y-auto no-scrollbar">
                             <table className="w-full text-left">
                                 <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 shadow-sm z-10">
                                     <tr>
-                                        <th className=" px-5 py-3">Code</th>
-                                        <th className=" px-5 py-3">Name</th>
-                                        <th className="text-right px-5 py-3">Action</th>
+                                        <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Code</th>
+                                        <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Name</th>
+                                        <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-slate-100">
                                     {lookups.customers.filter(c => c.name?.toLowerCase().includes(custSearch.toLowerCase()) || c.code?.toLowerCase().includes(custSearch.toLowerCase())).map((c, i) => (
                                         <tr key={i} className="group hover:bg-slate-50 cursor-pointer transition-colors" onClick={() => { setFormData({ ...formData, custCode: c.code, custName: c.name }); setShowCustModal(false); }}>
-                                            <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{c.code}</td>
-                                            <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{c.name}</td>
-                                            <td className="text-right px-5 py-3">
-                                                <button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button>
+                                            <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">{c.code}</td>
+                                            <td className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100">{c.name}</td>
+                                            <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
+                                                <button className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">SELECT</button>
                                             </td>
                                         </tr>
                                     ))}
@@ -660,24 +660,24 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
                     <div className="space-y-4">
                         <div className="flex items-center gap-4 p-3 rounded-[3px] border border-slate-200 bg-white">
                             <Search className="text-gray-400 shrink-0" size={15} />
-                            <input type="text" className="w-full h-8 border border-slate-200 px-3 text-sm bg-slate-50 rounded outline-none focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 transition-all" value={salesAsstSearch} onChange={(e) => setSalesAsstSearch(e.target.value)} autoFocus placeholder="Search..." />
+                            <input type="text" className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100" value={salesAsstSearch} onChange={(e) => setSalesAsstSearch(e.target.value)} autoFocus placeholder="Search..." />
                         </div>
                         <div className="border border-slate-200 rounded-[3px] overflow-hidden max-h-[300px] overflow-y-auto no-scrollbar">
                             <table className="w-full text-left">
                                 <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 shadow-sm z-10">
                                     <tr>
-                                        <th className=" px-5 py-3">Code</th>
-                                        <th className=" px-5 py-3">Name</th>
-                                        <th className="text-right px-5 py-3">Action</th>
+                                        <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Code</th>
+                                        <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Name</th>
+                                        <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-slate-100">
                                     {lookups.salesAssistants.filter(s => s.name?.toLowerCase().includes(salesAsstSearch.toLowerCase()) || s.code?.toLowerCase().includes(salesAsstSearch.toLowerCase())).map((s, i) => (
                                         <tr key={i} className="group hover:bg-slate-50 cursor-pointer transition-colors" onClick={() => { setFormData({ ...formData, salesRef: s.code }); setShowSalesAsstModal(false); }}>
-                                            <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{s.code}</td>
-                                            <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{s.name}</td>
-                                            <td className="text-right px-5 py-3">
-                                                <button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button>
+                                            <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">{s.code}</td>
+                                            <td className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100">{s.name}</td>
+                                            <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
+                                                <button className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">SELECT</button>
                                             </td>
                                         </tr>
                                     ))}
@@ -692,28 +692,28 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
                     <div className="space-y-4">
                         <div className="flex items-center gap-4 p-3 rounded-[3px] border border-slate-200 bg-white">
                             <Search className="text-gray-400 shrink-0" size={15} />
-                            <input type="text" className="w-full h-8 border border-slate-200 px-3 text-sm bg-slate-50 rounded outline-none focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 transition-all" value={jobSearch} onChange={(e) => setJobSearch(e.target.value)} autoFocus placeholder="Search..." />
+                            <input type="text" className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100" value={jobSearch} onChange={(e) => setJobSearch(e.target.value)} autoFocus placeholder="Search..." />
                         </div>
                         <div className="border border-slate-200 rounded-[3px] overflow-hidden max-h-[300px] overflow-y-auto no-scrollbar">
                             <table className="w-full text-left">
                                 <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 shadow-sm z-10">
                                     <tr>
-                                        <th className=" px-5 py-3">Job No</th>
-                                        <th className="text-right px-5 py-3">Action</th>
+                                        <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Job No</th>
+                                        <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-slate-100">
                                     <tr className="group hover:bg-slate-50 cursor-pointer transition-colors" onClick={() => { setFormData({ ...formData, jobNo: '-NO-' }); setShowJobModal(false); }}>
-                                        <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">-NO-</td>
-                                        <td className="text-right px-5 py-3">
-                                            <button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button>
+                                        <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">-NO-</td>
+                                        <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
+                                            <button className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">SELECT</button>
                                         </td>
                                     </tr>
                                     {lookups.jobs.filter(j => j.toLowerCase().includes(jobSearch.toLowerCase())).map((j, i) => (
                                         <tr key={i} className="group hover:bg-slate-50 cursor-pointer transition-colors" onClick={() => { setFormData({ ...formData, jobNo: j }); setShowJobModal(false); }}>
-                                            <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{j}</td>
-                                            <td className="text-right px-5 py-3">
-                                                <button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button>
+                                            <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">{j}</td>
+                                            <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
+                                                <button className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">SELECT</button>
                                             </td>
                                         </tr>
                                     ))}
@@ -730,18 +730,18 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
                             <table className="w-full text-left">
                                 <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 shadow-sm z-10">
                                     <tr>
-                                        <th className=" px-5 py-3">Code</th>
-                                        <th className=" px-5 py-3">Type</th>
-                                        <th className="text-right px-5 py-3">Action</th>
+                                        <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Code</th>
+                                        <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Type</th>
+                                        <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-slate-100">
                                     {lookups.paymentTypes.map((t, i) => (
                                         <tr key={i} className="group hover:bg-slate-50 cursor-pointer transition-colors" onClick={() => { setFormData({ ...formData, payType: t.name }); setShowPayTypeModal(false); }}>
-                                            <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{t.code}</td>
-                                            <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{t.name}</td>
-                                            <td className="text-right px-5 py-3">
-                                                <button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button>
+                                            <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">{t.code}</td>
+                                            <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">{t.name}</td>
+                                            <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
+                                                <button className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">SELECT</button>
                                             </td>
                                         </tr>
                                     ))}
@@ -772,12 +772,12 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
                             <table className="w-full text-left">
                                 <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 shadow-sm z-10">
                                     <tr>
-                                        <th className=" px-5 py-3">Code</th>
-                                        <th className=" px-5 py-3">Name</th>
-                                        <th className="text-center px-5 py-3">Unit</th>
-                                        <th className="text-right px-5 py-3">Pur. Price</th>
-                                        <th className="text-right px-5 py-3">Sell. Price</th>
-                                        <th className="text-right px-5 py-3">Action</th>
+                                        <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Code</th>
+                                        <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Name</th>
+                                        <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Unit</th>
+                                        <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Pur. Price</th>
+                                        <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Sell. Price</th>
+                                        <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-slate-100">
@@ -786,13 +786,13 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
                                             if (prodIndex !== null) handleRowChange(rows[prodIndex].id, 'prodCode', p.code);
                                             setShowProdModal(false); 
                                         }}>
-                                            <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{p.code}</td>
-                                            <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{p.name}</td>
-                                            <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">{p.unit || 'Nos'}</td>
-                                            <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{parseFloat(p.cost).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                                            <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{parseFloat(p.selling).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                                            <td className="text-right px-5 py-3">
-                                                <button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">SELECT</button>
+                                            <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">{p.code}</td>
+                                            <td className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100">{p.name}</td>
+                                            <td className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100">{p.unit || 'Nos'}</td>
+                                            <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">{parseFloat(p.cost).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                                            <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">{parseFloat(p.selling).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                                            <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
+                                                <button className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">SELECT</button>
                                             </td>
                                         </tr>
                                     ))}
@@ -824,10 +824,10 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
                                 <table className="w-full text-left">
                                     <thead className="bg-[#f8fafc] sticky top-0 text-[11px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100 shadow-sm z-10">
                                         <tr>
-                                            <th className=" px-5 py-3">Reference ID</th>
-                                            <th className=" px-5 py-3">Ledger Posting Date</th>
-                                            <th className="text-center px-5 py-3">Status</th>
-                                            <th className="text-right px-5 py-3">Action</th>
+                                            <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Reference ID</th>
+                                            <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Ledger Posting Date</th>
+                                            <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Status</th>
+                                            <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-slate-100">
@@ -841,15 +841,15 @@ const SalesOrderBoard = ({ isOpen, onClose }) => {
                                             .filter(o => !orderSearch || o.docNo.toLowerCase().includes(orderSearch.toLowerCase()) || o.date?.includes(orderSearch))
                                             .map((order, i) => (
                                             <tr key={i} className="group hover:bg-slate-50 cursor-pointer transition-colors" onClick={() => loadOrder(order.docNo)}>
-                                                <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{order.docNo}</td>
-                                                <td className="font-mono text-[12px] font-bold text-blue-600 px-5 py-3">{order.date?.split('T')[0]}</td>
-                                                <td className="text-[12px] font-bold text-slate-700 uppercase group-hover:text-blue-600 transition-colors px-5 py-3">
+                                                <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">{order.docNo}</td>
+                                                <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">{order.date?.split('T')[0]}</td>
+                                                <td className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100">
                                                     <span className={`px-2 py-0.5 rounded-[3px] text-[9px] font-black uppercase ${order.status === 'Applied' ? 'bg-blue-100 text-blue-600' : 'bg-orange-100 text-orange-600'}`}>
                                                         {order.status}
                                                     </span>
                                                 </td>
-                                                <td className="text-right px-5 py-3">
-                                                    <button className="bg-white text-[#0285fd] border border-[#0285fd] hover:bg-blue-50 text-[10px] px-5 py-2 rounded-[3px] font-black shadow-sm transition-all active:scale-95 uppercase">RETRIEVE</button>
+                                                <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
+                                                    <button className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">RETRIEVE</button>
                                                 </td>
                                             </tr>
                                         ))}

@@ -278,7 +278,7 @@ const BulkGRNBoard = ({ isOpen, onClose }) => {
             title="Bulk GRN"
             maxWidth="max-w-[700px]"
             footer={
-                <div className="bg-slate-50 px-6 py-3 w-full flex justify-between items-center border-t border-gray-200 rounded-b-xl">
+                <div className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">
                     <button onClick={handleClear} className="px-6 h-10 bg-white text-[#00adff] border-2 border-[#00adff] hover:bg-blue-50 text-sm font-black rounded-[3px] hover:bg-[#0099e6] transition-all active:scale-95 flex items-center gap-2 border-none">
                         <RotateCcw size={14} /> CLEAR ALL
                     </button>
@@ -295,7 +295,7 @@ const BulkGRNBoard = ({ isOpen, onClose }) => {
         >
             <input type="file" ref={excelInputRef} onChange={handleExcelUpload} accept=".xlsx, .xls, .csv" className="hidden" />
             <div className="space-y-4 overflow-y-auto no-scrollbar font-['Tahoma']">
-                <div className="flex items-center justify-between mb-1 px-1">
+                <div className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
                     <div className="text-sm font-bold text-gray-600">
                         Total GRNs to Process: <span className="text-blue-600">{groupedGrns.length}</span>
                     </div>
@@ -311,11 +311,11 @@ const BulkGRNBoard = ({ isOpen, onClose }) => {
 
                 <div className="border border-gray-200 rounded-[3px] bg-white shadow-sm flex flex-col min-h-[400px] overflow-hidden">
                     <div className="flex bg-slate-50/80 border-b border-gray-200 text-[10px] font-black text-gray-400 uppercase tracking-widest items-center">
-                        <div className="flex-[1.5] py-2.5 px-4 border-r border-gray-200">Supplier</div>
-                        <div className="w-32 py-2.5 px-3 border-r border-gray-200 text-center">Inv No</div>
-                        <div className="w-32 py-2.5 px-3 border-r border-gray-200 text-center">PO No</div>
-                        <div className="w-24 py-2.5 px-3 border-r border-gray-200 text-center">Items</div>
-                        <div className="w-32 py-2.5 px-4 text-right">Total Amount</div>
+                        <div className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">Supplier</div>
+                        <div className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">Inv No</div>
+                        <div className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">PO No</div>
+                        <div className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">Items</div>
+                        <div className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Total Amount</div>
                         <div className="w-12"></div>
                     </div>
                     <div className="flex-1 bg-white overflow-y-auto max-h-[350px] divide-y divide-gray-50">
@@ -329,18 +329,18 @@ const BulkGRNBoard = ({ isOpen, onClose }) => {
                             
                             return (
                                 <div key={g.id} className="flex border-b border-gray-200 text-[11px] font-bold text-slate-700 hover:bg-blue-50/30 items-center transition-colors group">
-                                    <div className="flex-[1.5] py-2 px-4 border-r border-gray-200 truncate">
+                                    <div className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">
                                         <div className="flex flex-col">
                                             <span className="text-blue-600 font-mono text-[10px]">{g.suppCode}</span>
                                             <span className="truncate">{supplierName}</span>
                                         </div>
                                     </div>
-                                    <div className="w-32 py-2 px-3 border-r border-gray-200 text-center font-mono">{g.suppInv || '-'}</div>
-                                    <div className="w-32 py-2 px-3 border-r border-gray-200 text-center font-mono text-gray-500">{g.poNo || '-'}</div>
-                                    <div className="w-24 py-2 px-3 border-r border-gray-200 text-center bg-white group-hover:bg-transparent">
-                                        <span className="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-[3px]">{g.products.length} Items</span>
+                                    <div className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">{g.suppInv || '-'}</div>
+                                    <div className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">{g.poNo || '-'}</div>
+                                    <div className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">
+                                        <span className="px-6 h-10 bg-emerald-50 text-emerald-600 text-sm font-bold rounded-[3px] hover:bg-emerald-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-emerald-100">{g.products.length} Items</span>
                                     </div>
-                                    <div className="w-32 py-1.5 px-4 text-right font-mono font-black text-slate-800">
+                                    <div className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100">
                                         {totalAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                     </div>
                                     <div className="w-12 flex justify-center py-1">
