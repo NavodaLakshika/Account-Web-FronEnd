@@ -796,10 +796,11 @@ const Dashboard = () => {
                 // Only show the subscription expired modal — do NOT show the onboarding guide
                 setShowSubscriptionExpiredModal(true);
             } else {
-                // Show first-time onboarding guide (per-user — only once per employee)
-                const userId = currentUser?.EmpCode || currentUser?.empCode || currentUser?.emp_Code || currentUser?.id_No || currentUser?.Id_No || currentUser?.IdNo || currentUser?.username || currentUser?.EmpName || 'unknown';
-                const onboardKey = `onboardingDone_${userId}`;
-                if (!localStorage.getItem(onboardKey)) {
+                // Show first-time onboarding guide based on DB login count
+                const loginCount = currentUser?.loginCount || currentUser?.LoginCount || 0;
+                
+                // If it's exactly 1, it's their very first time logging into the system
+                if (loginCount === 1) {
                     setTimeout(() => setShowFirstTimeGuide(true), 1000);
                 }
             }

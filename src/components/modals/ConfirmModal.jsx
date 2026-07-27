@@ -19,10 +19,10 @@ const ConfirmModal = ({
     const WatermarkIcon = isDanger ? X : Check;
 
     return (
-        <div className="fixed inset-0 z-[1200] flex items-center justify-center font-['Plus_Jakarta_Sans'] pointer-events-auto">
+        <div className="fixed inset-0 z-[1200] flex items-center justify-center p-4 sm:p-6 font-['Plus_Jakarta_Sans'] pointer-events-auto">
             <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" onClick={() => !loading && onClose()} />
             
-            <div className={`relative w-[600px] bg-white shadow-[0_10px_40px_rgb(0,0,0,0.3)] overflow-hidden animate-in fade-in zoom-in-95 duration-200 flex flex-col`}>
+            <div className={`relative w-full max-w-[600px] bg-white rounded-[3px] shadow-[0_10px_40px_rgb(0,0,0,0.3)] overflow-hidden animate-in fade-in zoom-in-95 duration-200 flex flex-col`}>
                 
                 {/* Colored Area */}
                 <div className={`relative ${bgClass} overflow-hidden w-full flex flex-col py-6`}>

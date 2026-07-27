@@ -1713,9 +1713,10 @@ const SuperAdminDashboard = () => {
                                                 </button>
                                                 <button
                                                     onClick={(e) => handleDeleteUserRole(e, selectedRole)}
-                                                    className="px-3 py-1.5 text-xs font-bold text-white bg-red-600 hover:bg-red-700 rounded-[3px] shadow-sm transition-all flex items-center justify-center w-[90px] gap-1.5"
+                                                    className="px-3 py-1.5 text-xs font-bold bg-blue-50 border border-red-200 text-white bg-red-600 hover:bg-red-700 rounded-[3px] transition-all flex items-center gap-1"
+                                                    
                                                 >
-                                                    <Trash2 size={12} /> Delete Role
+                                                    <Trash2 size={12} /> Delete
                                                 </button>
                                             </>
                                         )}
