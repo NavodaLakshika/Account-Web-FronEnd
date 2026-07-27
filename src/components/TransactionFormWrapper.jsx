@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { X, MessageSquare, Settings, HelpCircle, History } from 'lucide-react';
 import SubmitReviewModal from './modals/SubmitReviewModal';
 import FormHelpModal from './modals/FormHelpModal';
@@ -25,6 +26,9 @@ const TransactionFormWrapper = ({ isOpen, onClose, title, subtitle, icon: Icon, 
 
   return (
     <div className={`fixed inset-0 z-[500] flex bg-[#f4f5f8] overflow-hidden text-gray-800 ${formSettings.monoFont ? 'font-mono' : 'font-sans'} ${formSettings.darkMode ? 'bg-slate-900' : ''}`}>
+      <Helmet>
+        <title>{title ? `Onimta Accounting | ${title}` : 'Onimta Accounting'}</title>
+      </Helmet>
       {formSettings.disableAnimations && (
         <style>{`
           *, *::before, *::after {
@@ -50,16 +54,6 @@ const TransactionFormWrapper = ({ isOpen, onClose, title, subtitle, icon: Icon, 
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 bg-white shrink-0 border-b border-gray-200 shadow-sm z-20">
           <div className="flex items-center gap-4">
-            <button 
-              onClick={() => {
-                setLockedMessage("Transaction history is restricted for this module. Please contact your system administrator.");
-                setShowLockedModal(true);
-              }}
-              className="text-gray-400 hover:text-gray-700 transition-colors bg-transparent border-none p-1"
-              title="View History"
-            >
-              <History size={20} strokeWidth={2} />
-            </button>
             <div className="flex items-center gap-3">
               {Icon && (
                 <div className="flex items-center justify-center text-gray-600">
