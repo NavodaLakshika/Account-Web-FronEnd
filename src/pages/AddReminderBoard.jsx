@@ -107,7 +107,6 @@ const AddReminderBoard = ({ isOpen, onClose, editTask }) => {
                                 <input type="time" value={time} onChange={(e) => setTime(e.target.value)}
                                     className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700"
                                 />
-                                <Clock size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
                             </div>
                         </div>
                     </div>
