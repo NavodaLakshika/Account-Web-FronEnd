@@ -344,22 +344,21 @@ const EngagementAdminBoard = () => {
                 {/* Selector Bar */}
                 <div className="bg-white p-4 border border-slate-200/80 flex flex-col gap-4 rounded-[5px] shadow-sm">
                     <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-                        <div className="flex flex-wrap items-center gap-2">
-                            <span className="text-xs font-black text-slate-500 uppercase tracking-widest mr-2">Select View:</span>
+                        <div className="flex flex-wrap items-center bg-slate-100/50 p-1 rounded-[5px] border border-slate-200/60">
                         <button
                             onClick={() => setActiveTab('reviews')}
-                            className={`px-3 py-1.5 text-xs font-bold rounded-[3px] transition-all ${activeTab === 'reviews'
-                                ? 'bg-[#0078d4] text-white shadow-sm border border-[#0078d4]'
-                                : 'bg-white hover:bg-slate-50 border border-slate-200 text-slate-600'
+                            className={`px-5 py-2 text-[11px] font-bold uppercase tracking-widest rounded-[3px] transition-all flex-1 md:flex-none text-center ${activeTab === 'reviews'
+                                ? 'bg-white text-blue-600 shadow-sm border border-slate-200/60'
+                                : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50/50 border border-transparent'
                             }`}
                         >
                             System Reviews
                         </button>
                         <button
                             onClick={() => setActiveTab('ads')}
-                            className={`px-3 py-1.5 text-xs font-bold rounded-[3px] transition-all ${activeTab === 'ads'
-                                ? 'bg-orange-600 text-white shadow-sm border border-orange-600'
-                                : 'bg-white hover:bg-slate-50 border border-slate-200 text-slate-600'
+                            className={`px-5 py-2 text-[11px] font-bold uppercase tracking-widest rounded-[3px] transition-all flex-1 md:flex-none text-center ${activeTab === 'ads'
+                                ? 'bg-white text-blue-600 shadow-sm border border-slate-200/60'
+                                : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50/50 border border-transparent'
                             }`}
                         >
                             Advertisements
@@ -392,16 +391,16 @@ const EngagementAdminBoard = () => {
                     <div className="w-full overflow-x-auto">
                         <table className="w-full text-left border-collapse">
                             <thead>
-                                <tr className="bg-slate-50/80 border-b border-slate-100 text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-                                    <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Employee</th>
-                                    <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Rating</th>
-                                    <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Comment</th>
-                                    <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Date</th>
-                                    <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Status</th>
-                                    <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Actions</th>
+                                <tr className="bg-[#f8fafc] border-b border-gray-100">
+                                    <th className="py-3.5 px-6 text-[11px] font-black tracking-widest uppercase text-gray-400 whitespace-nowrap">Employee</th>
+                                    <th className="py-3.5 px-6 text-[11px] font-black tracking-widest uppercase text-gray-400 whitespace-nowrap">Rating</th>
+                                    <th className="py-3.5 px-6 text-[11px] font-black tracking-widest uppercase text-gray-400 whitespace-nowrap">Comment</th>
+                                    <th className="py-3.5 px-6 text-[11px] font-black tracking-widest uppercase text-gray-400 whitespace-nowrap">Date</th>
+                                    <th className="py-3.5 px-6 text-[11px] font-black tracking-widest uppercase text-gray-400 whitespace-nowrap">Status</th>
+                                    <th className="py-3.5 px-6 text-[11px] font-black tracking-widest uppercase text-gray-400 whitespace-nowrap text-right">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-slate-100">
+                            <tbody className="divide-y divide-gray-50">
                                 {loadingReviews ? (
                                     <tr>
                                         <td colSpan="6" className="py-8 text-center text-slate-500">
@@ -414,12 +413,12 @@ const EngagementAdminBoard = () => {
                                     </tr>
                                 ) : (
                                     filteredReviews.map(review => (
-                                        <tr key={review.id} className="hover:bg-slate-50 transition-colors border-b border-slate-100">
-                                            <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
+                                        <tr key={review.id} className="border-b border-gray-50 hover:bg-blue-50/50 transition-all group">
+                                            <td className="py-3.5 px-6">
                                                 <div className="text-[13px] text-slate-800 font-bold">{review.empName}</div>
                                                 <div className="text-[11px] text-slate-500 font-medium">{review.empCode}</div>
                                             </td>
-                                            <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
+                                            <td className="py-3.5 px-6">
                                                 <div className="flex items-center gap-0.5">
                                                     {[...Array(5)].map((_, i) => (
                                                         <Star
@@ -429,16 +428,16 @@ const EngagementAdminBoard = () => {
                                                     ))}
                                                 </div>
                                             </td>
-                                            <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
+                                            <td className="py-3.5 px-6 max-w-[250px]">
                                                 <p className="text-[13px] text-slate-600 font-medium truncate" title={review.comment}>
                                                     {review.comment}
                                                 </p>
                                             </td>
-                                            <td className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100">
+                                            <td className="py-3.5 px-6 text-[13px] text-slate-500">
                                                 {new Date(review.createdAt).toLocaleDateString()}
                                             </td>
-                                            <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
-                                                <span className={`px-2 py-0.5 text-[9px] font-black uppercase tracking-widest border rounded-[3px] ${
+                                            <td className="py-3.5 px-6">
+                                                <span className={`inline-flex items-center gap-1 px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest border rounded-[3px] shadow-sm ${
                                                     review.status === 'Approved' ? 'bg-emerald-50 text-emerald-600 border-emerald-200' :
                                                     review.status === 'Hidden' ? 'bg-slate-50 text-slate-600 border-slate-200' :
                                                     'bg-amber-50 text-amber-600 border-amber-200'
@@ -446,32 +445,32 @@ const EngagementAdminBoard = () => {
                                                     {review.status}
                                                 </span>
                                             </td>
-                                            <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
+                                            <td className="py-3.5 px-6 text-right">
                                                 <div className="flex items-center justify-end gap-1.5">
                                                     {review.status !== 'Approved' && (
                                                         <button
                                                             onClick={() => handleReviewStatus(review.id, 'Approved')}
-                                                            className="px-3 py-1.5 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-500 rounded-[3px] shadow-sm transition-all flex items-center justify-center w-[90px] gap-1.5"
+                                                            className="px-3 py-1.5 text-[10px] font-bold text-white bg-emerald-600 hover:bg-emerald-500 rounded-[3px] shadow-sm transition-all flex items-center justify-center gap-1.5 uppercase tracking-widest"
                                                             title="Approve"
                                                         >
-                                                            <CheckCircle size={14} /> Approve
+                                                            <CheckCircle size={12} /> Approve
                                                         </button>
                                                     )}
                                                     {review.status !== 'Hidden' && (
                                                         <button
                                                             onClick={() => handleReviewStatus(review.id, 'Hidden')}
-                                                            className="px-3 py-1.5 text-xs font-bold text-white bg-slate-500 hover:bg-slate-400 rounded-[3px] shadow-sm transition-all flex items-center justify-center w-[90px] gap-1.5"
+                                                            className="px-3 py-1.5 text-[10px] font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 border border-slate-200 rounded-[3px] shadow-sm transition-all flex items-center justify-center gap-1.5 uppercase tracking-widest"
                                                             title="Hide"
                                                         >
-                                                            <EyeOff size={14} /> Hide
+                                                            <EyeOff size={12} /> Hide
                                                         </button>
                                                     )}
                                                     <button
                                                         onClick={() => handleDeleteReview(review.id)}
-                                                        className="px-6 h-10 bg-red-50 text-red-600 text-sm font-bold rounded-[3px] hover:bg-red-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-red-100"
+                                                        className="px-3 py-1.5 text-[10px] font-bold text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 rounded-[3px] shadow-sm transition-all flex items-center justify-center gap-1.5 uppercase tracking-widest"
                                                         title="Delete"
                                                     >
-                                                        <Trash2 size={14} /> Delete
+                                                        <Trash2 size={12} /> Delete
                                                     </button>
                                                 </div>
                                             </td>

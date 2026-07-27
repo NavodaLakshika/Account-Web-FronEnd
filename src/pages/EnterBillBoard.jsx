@@ -224,6 +224,7 @@ const EnterBillBoard = ({ isOpen, onClose }) => {
     };
 
     const handleSave = async () => {
+        if (!formData.docNo) return showErrorToast('Document Number is required. Please reload if it failed to generate.');
         if (!formData.vendorId) return showErrorToast('Vendor is required.');
         if (!formData.accId) return showErrorToast('A/P Account (Payable) is required.');
         if (expenses.length === 0) return showErrorToast('At least one expense line is required.');
@@ -515,59 +516,59 @@ const EnterBillBoard = ({ isOpen, onClose }) => {
                                                     <td colSpan="5" className="py-12 text-center text-gray-300 font-black italic text-[11px] uppercase tracking-widest">No expense items added.</td>
                                                 </tr>
                                             )}
+                                            {/* Entry Input Row */}
+                                            <tr className="bg-slate-50 border-t border-slate-200">
+                                                <td className="p-2 relative">
+                                                    <select
+                                                        value={currentLine.accCode || ''}
+                                                        onChange={(ev) => {
+                                                            const val = ev.target.value;
+                                                            const a = (lookups.expAccounts || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || (i.itemId && i.itemId.toString() === val) || (i.id && i.id.toString() === val) || i === val);
+                                                            if (a) {
+                                                                setCurrentLine(prev => ({ ...prev, accCode: a.code }));
+                                                            }
+                                                        }}
+                                                        className="w-full h-8 border border-gray-300 rounded-[3px] px-2 text-[12px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 appearance-none"
+                                                        style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
+                                                    >
+                                                        <option value="">Select...</option>
+                                                        {(lookups.expAccounts || []).map((a, idx) => (
+                                                            <option key={idx} value={a.code || a.itemId || a.id || a.name || a}>
+                                                                {a.code ? `${a.code} - ${a.name}` : (a.itemId ? `${a.itemId} - ${a.itemName || a.name}` : (a.name || a))}
+                                                            </option>
+                                                        ))}
+                                                    </select>
+                                                </td>
+                                                <td className="p-2 relative">
+                                                    <select
+                                                        value={currentLine.costCenter || ''}
+                                                        onChange={(e) => setCurrentLine(prev => ({ ...prev, costCenter: e.target.value }))}
+                                                        className="w-full h-8 border border-gray-300 rounded-[3px] px-2 text-[12px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 appearance-none"
+                                                        style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
+                                                    >
+                                                        <option value="">Cost Center</option>
+                                                        {(lookups.costCenters || []).map((c, idx) => (
+                                                            <option key={idx} value={c.code}>{c.code} - {c.name}</option>
+                                                        ))}
+                                                    </select>
+                                                </td>
+                                                <td className="p-2">
+                                                    <input name="amount" value={currentLine.amount} onChange={handleLineChange} onKeyDown={handleAddLine} type="number" className="w-full h-8 border border-gray-300 rounded-[3px] px-2 text-[12px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 text-right" placeholder="Amount" />
+                                                </td>
+                                                <td className="p-2">
+                                                    <input name="memo" value={currentLine.memo} onChange={handleLineChange} onKeyDown={handleAddLine} type="text" className="w-full h-8 border border-gray-300 rounded-[3px] px-2 text-[12px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700" placeholder="Memo" />
+                                                </td>
+                                                <td className="p-2 text-center">
+                                                    <button onClick={handleAddLine} className="w-full h-8 bg-white border border-[#0285fd] text-[#0285fd] font-bold rounded-[3px] text-[9px] hover:bg-blue-50 transition-all flex items-center justify-center whitespace-nowrap gap-1">
+                                                        ADD
+                                                    </button>
+                                                </td>
+                                            </tr>
                                         </tbody>
                                     </table>
-
-                                    {/* Entry Input Row */}
-                                    <div className="mt-auto border-t border-slate-200 bg-slate-50 p-2 flex gap-3 items-center">
-                                        <div className="flex-[2] relative">
-                                            <select
-                                        value={currentLine.accCode || ''}
-                                        onChange={(ev) => {
-                                            const val = ev.target.value;
-                                            const a = (lookups.expAccounts || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || (i.itemId && i.itemId.toString() === val) || (i.id && i.id.toString() === val) || i === val);
-                                            if (a) {
-                                                setCurrentLine(prev => ({ ...prev, accCode: a.code }));
-                                            }
-                                        }}
-                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 appearance-none"
-                                        style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
-                                    >
-                                        <option value="">Select...</option>
-                                        {(lookups.expAccounts || []).map((a, idx) => (
-                                            <option key={idx} value={a.code || a.itemId || a.id || a.name || a}>
-                                                {a.code ? `${a.code} - ${a.name}` : (a.itemId ? `${a.itemId} - ${a.itemName || a.name}` : (a.name || a))}
-                                            </option>
-                                        ))}
-                                    </select>
-                                        </div>
-                                        <div className="flex-[1.5] relative">
-                                            <select
-                                                value={currentLine.costCenter || ''}
-                                                onChange={(e) => setCurrentLine(prev => ({ ...prev, costCenter: e.target.value }))}
-                                                className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 appearance-none"
-                                                style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
-                                            >
-                                                <option value="">Cost Center</option>
-                                                {(lookups.costCenters || []).map((c, idx) => (
-                                                    <option key={idx} value={c.code}>{c.code} - {c.name}</option>
-                                                ))}
-                                            </select>
-                                        </div>
-                                        <div className="flex-1">
-                                            <input name="amount" value={currentLine.amount} onChange={handleLineChange} onKeyDown={handleAddLine} type="number" className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700" placeholder="Amount" />
-                                        </div>
-                                        <div className="flex-[2] flex gap-2">
-                                            <input name="memo" value={currentLine.memo} onChange={handleLineChange} onKeyDown={handleAddLine} type="text" className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700" placeholder="Memo" />
-                                            <button onClick={handleAddLine} className="h-10 px-6 bg-white border border-[#0285fd] text-[#0285fd] font-semibold rounded-[3px] text-[13px] hover:bg-blue-50 transition-all flex items-center justify-center whitespace-nowrap">
-                                                ADD LINE
-                                            </button>
-                                        </div>
-                                        <div className="w-10" />
-                                    </div>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </div>
             </TransactionFormWrapper>
 
             {/* Vendor Search Modal */}

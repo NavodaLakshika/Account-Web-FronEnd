@@ -243,7 +243,8 @@ const ProfitLossDashboardBoard = ({
                           <th className="px-6 w-[20%]">Doc No</th>
                           <th className="px-6 w-[30%]">Details</th>
                           <th className="px-6 w-[20%] text-right">Amount</th>
-                        <th className="text-right px-5 py-3">Action</th></tr>
+                        {/* <th className="text-right px-5 py-3">Action</th> */}
+                        </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-100 text-xs font-bold text-slate-700">
                         {data.recentTransactions.map((tx, idx) => (

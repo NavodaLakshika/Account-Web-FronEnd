@@ -198,6 +198,10 @@ const BankReconciliationBoard = ({ isOpen, onClose }) => {
     };
 
     const handleDateSelect = (date) => {
+        if (date && date.includes('-')) {
+            const [yyyy, mm, dd] = date.split('-');
+            date = `${dd}/${mm}/${yyyy}`;
+        }
         setHeader(prev => ({ ...prev, [datePickerField]: date }));
         setShowDatePicker(false);
     };
@@ -266,7 +270,7 @@ const BankReconciliationBoard = ({ isOpen, onClose }) => {
                             <button onClick={handleReset} className="px-6 h-10 border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center gap-2">
                                 <RotateCcw size={14} /> RESET
                             </button>
-                            <button onClick={loadData} disabled={loading} className="px-6 h-10 border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center gap-2">
+                            <button onClick={loadData} disabled={loading} className="px-6 h-10 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center gap-2">
                                 {loading ? <Loader2 size={14} className="animate-spin" /> : <Search size={14} />} SYNC RECORDS
                             </button>
                         </div>

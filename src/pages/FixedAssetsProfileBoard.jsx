@@ -139,38 +139,37 @@ const FixedAssetsProfileBoard = ({ isOpen, onClose }) => {
                     </div>
                 }
             >
-                <div className="space-y-3 overflow-y-auto no-scrollbar font-['Tahoma']">
-                    <div className="bg-[#f0f9ff] border border-[#bae6fd] p-3 rounded-[3px]">
-                        <p className="text-[12px] font-bold text-[#0369a1] text-center">Use for property you purchase, track, and may eventually sell. Fixed assets are long-lived assets, such as land, buildings, furniture, equipment, and vehicles.</p>
+                <div className="py-2 select-none font-['Tahoma'] space-y-4 overflow-y-auto no-scrollbar">
+                    {/* Info Header */}
+                    <div className="bg-[#f0f9ff] border border-[#bae6fd] p-3 rounded-[3px] shadow-sm">
+                        <p className="text-[12px] font-bold text-[#0369a1] text-center leading-relaxed">
+                            Use for property you purchase, track, and may eventually sell. Fixed assets are
+                            long-lived assets, such as land, buildings, furniture, equipment, and vehicles.
+                        </p>
                     </div>
 
-                    <div className="bg-white p-4 border border-slate-200 rounded-[3px] space-y-4">
-                        <div className="grid grid-cols-12 gap-x-6 gap-y-3.5">
-                            <div className="col-span-3">
-                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Asset Number</label>
-                                <input type="text" name="AssetsCode" value={formData.AssetsCode} readOnly className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-slate-50 outline-none text-gray-700 font-mono" />
-                            </div>
-                            <div className="col-span-6">
-                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Asset Name</label>
-                                <input type="text" name="AssetsName" value={formData.AssetsName} onChange={handleInputChange} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700" />
-                            </div>
-                            <div className="col-span-3 flex items-end">
-                                <button onClick={openSearch} className="w-full h-10 bg-[#0285fd] hover:bg-[#0073ff] text-white font-semibold rounded-[3px] text-[13px] transition-all flex items-center justify-center gap-2 border-none">
-                                    <Search size={16} /> SEARCH
+                    {/* Top Section */}
+                    <div className="bg-white p-4 border border-slate-200 rounded-[3px] space-y-4 shadow-sm">
+                        <div className="flex items-center gap-2">
+                            <label className="text-[11px] font-bold text-gray-500 w-[140px] shrink-0 uppercase tracking-widest">Asset Number / Name</label>
+                            <div className="flex flex-1 gap-2">
+                                <input type="text" name="AssetsCode" value={formData.AssetsCode} onChange={handleInputChange} readOnly className="w-32 h-8 border border-slate-200 px-3 text-[12px] bg-slate-50 font-bold text-[#0285fd] rounded outline-none text-center cursor-not-allowed shadow-sm flex-none" />
+                                <div className="flex-1 flex gap-1 items-center">
+                                    <input type="text" name="AssetsName" value={formData.AssetsName} onChange={handleInputChange} className="flex-1 min-w-0 h-8 border border-slate-200 rounded px-3 text-[12px] font-bold outline-none shadow-sm transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 text-gray-700 bg-white" placeholder="" />
+                                </div>
+                                <button onClick={openSearch} className="h-8 px-4 bg-[#0285fd] hover:bg-[#0073ff] text-white font-bold rounded shadow-sm text-[11px] transition-all flex items-center justify-center gap-2 border-none active:scale-95 uppercase tracking-widest shrink-0">
+                                    <Search size={14} /> SEARCH
                                 </button>
                             </div>
                         </div>
-                    </div>
 
-                    <div className="bg-white p-4 border border-slate-200 rounded-[3px] space-y-4">
-                        <span className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">Account & Condition</span>
-                        <div className="grid grid-cols-12 gap-x-6 gap-y-3.5">
-                            <div className="col-span-6">
-                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Asset Account</label>
+                        <div className="flex items-center gap-2">
+                            <label className="text-[11px] font-bold text-gray-500 w-[140px] shrink-0 uppercase tracking-widest">Asset Accounts of</label>
+                            <div className="flex-1">
                                 <select
                                     value={formData.AccCode}
                                     onChange={(e) => setFormData(prev => ({ ...prev, AccCode: e.target.value }))}
-                                    className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 cursor-pointer"
+                                    className="w-full h-8 border border-slate-200 px-3 text-[12px] font-bold outline-none shadow-sm focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 bg-white rounded text-gray-700 cursor-pointer"
                                 >
                                     <option value="">Select account...</option>
                                     {accounts.map((acc, idx) => (
@@ -178,115 +177,149 @@ const FixedAssetsProfileBoard = ({ isOpen, onClose }) => {
                                     ))}
                                 </select>
                             </div>
-                            <div className="col-span-6">
-                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Condition</label>
-                                <div className="flex items-center gap-6 h-10">
-                                    <label className="flex items-center gap-2 cursor-pointer">
-                                        <input type="radio" name="Condition" value="New" checked={formData.Condition === 'New'} onChange={handleInputChange} className="w-4 h-4 text-[#0285fd] border-gray-300 focus:ring-[#0285fd]" />
-                                        <span className="text-[13px] text-gray-700">New</span>
-                                    </label>
-                                    <label className="flex items-center gap-2 cursor-pointer">
-                                        <input type="radio" name="Condition" value="Used" checked={formData.Condition === 'Used'} onChange={handleInputChange} className="w-4 h-4 text-[#0285fd] border-gray-300 focus:ring-[#0285fd]" />
-                                        <span className="text-[13px] text-gray-700">Used</span>
-                                    </label>
-                                </div>
-                            </div>
                         </div>
                     </div>
 
+                    {/* Middle Grid */}
                     <div className="grid grid-cols-2 gap-4">
-                        <div className="bg-white p-4 border border-slate-200 rounded-[3px] space-y-4">
-                            <span className="text-[11px] font-bold text-[#0285fd] uppercase tracking-widest">Purchase Information</span>
-                            <div className="space-y-3.5">
+                        {/* Purchase Information */}
+                        <div className="border border-slate-200 rounded-[3px] p-4 relative pt-6 bg-white shadow-sm">
+                            <span className="absolute -top-3 left-3 bg-white px-2 py-0.5 border border-slate-200 rounded text-[10px] font-bold text-[#0285fd] uppercase tracking-widest shadow-sm">Purchase Information</span>
+                            <div className="space-y-4">
                                 <div>
-                                    <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Purchase Description</label>
-                                    <input type="text" name="PurchDescription" value={formData.PurchDescription} onChange={handleInputChange} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700" />
+                                    <label className="text-[11px] font-bold text-gray-500 uppercase block mb-1 tracking-widest">Purchase Description</label>
+                                    <input type="text" name="PurchDescription" value={formData.PurchDescription} onChange={handleInputChange} className="w-full h-8 border border-slate-200 px-3 text-[12px] font-bold outline-none shadow-sm transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 text-gray-700 bg-white rounded" />
+                                </div>
+                                <div className="flex items-center gap-6">
+                                    <label className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">Asset is</label>
+                                    <div className="flex gap-4">
+                                        <label className="flex items-center gap-2 cursor-pointer group">
+                                            <input type="radio" name="Condition" value="New" checked={formData.Condition === 'New'} onChange={handleInputChange} className="w-4 h-4 text-[#0285fd] border-slate-200 focus:ring-[#00D1FF]" />
+                                            <span className="text-[11px] font-bold text-gray-700 uppercase tracking-widest group-hover:text-[#0285fd] transition-colors">New</span>
+                                        </label>
+                                        <label className="flex items-center gap-2 cursor-pointer group">
+                                            <input type="radio" name="Condition" value="Used" checked={formData.Condition === 'Used'} onChange={handleInputChange} className="w-4 h-4 text-[#0285fd] border-slate-200 focus:ring-[#00D1FF]" />
+                                            <span className="text-[11px] font-bold text-gray-700 uppercase tracking-widest group-hover:text-[#0285fd] transition-colors">Used</span>
+                                        </label>
+                                    </div>
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
-                                        <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Date</label>
-                                        <div className="relative">
-                                            <input type="text" readOnly value={formData.PurchDate} onClick={() => setShowPurchDateModal(true)} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] pr-10 text-gray-700 cursor-pointer" />
-                                            <button onClick={() => setShowPurchDateModal(true)} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
-                                                <Calendar size={16} />
+                                        <label className="text-[11px] font-bold text-gray-500 uppercase block mb-1 tracking-widest">Date</label>
+                                        <div className="flex gap-1 items-center">
+                                            <input 
+                                                type="text" 
+                                                value={formData.PurchDate} 
+                                                readOnly 
+                                                className="min-w-0 flex-1 h-8 border border-slate-200 px-3 text-[12px] bg-slate-50 rounded outline-none font-bold text-gray-700 shadow-sm cursor-not-allowed" 
+                                            />
+                                            <button 
+                                                onClick={() => setShowPurchDateModal(true)} 
+                                                className="w-9 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded transition-all shadow-sm active:scale-95 shrink-0 border-none"
+                                            >
+                                                <Calendar size={14} />
                                             </button>
                                         </div>
                                     </div>
                                     <div>
-                                        <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Cost</label>
-                                        <input type="number" name="PurchCost" value={formData.PurchCost} onChange={handleInputChange} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 text-right" step="0.01" />
+                                        <label className="text-[11px] font-bold text-gray-500 uppercase block mb-1 tracking-widest">Cost</label>
+                                        <input type="number" name="PurchCost" value={formData.PurchCost} onChange={handleInputChange} className="w-full h-8 border border-slate-200 px-3 text-[12px] font-bold outline-none shadow-sm transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 bg-white text-right text-blue-600 rounded" step="0.01" />
                                     </div>
                                 </div>
                                 <div>
-                                    <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Vendor / Payee</label>
-                                    <input type="text" name="Vendor" value={formData.Vendor} onChange={handleInputChange} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700" />
+                                    <label className="text-[11px] font-bold text-gray-500 uppercase block mb-1 tracking-widest">Vendor / Payee</label>
+                                    <input type="text" name="Vendor" value={formData.Vendor} onChange={handleInputChange} className="w-full h-8 border border-slate-200 px-3 text-[12px] font-bold outline-none shadow-sm transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 text-gray-700 bg-white rounded" />
                                 </div>
                             </div>
                         </div>
 
-                        <div className="bg-white p-4 border border-slate-200 rounded-[3px] space-y-4">
-                            <span className="text-[11px] font-bold text-red-500 uppercase tracking-widest">Sales Information</span>
-                            <div className="space-y-3.5">
+                        {/* Sales Information */}
+                        <div className="border border-slate-200 rounded-[3px] p-4 relative pt-6 bg-white shadow-sm">
+                            <span className="absolute -top-3 left-3 bg-white px-2 py-0.5 border border-slate-200 rounded text-[10px] font-bold text-red-500 uppercase tracking-widest shadow-sm">Sales Information</span>
+                            <div className="space-y-4">
                                 <div>
-                                    <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Sales Description</label>
-                                    <input type="text" name="SalesDescription" value={formData.SalesDescription} onChange={handleInputChange} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700" />
+                                    <label className="text-[11px] font-bold text-gray-500 uppercase block mb-1 tracking-widest">Sales Description</label>
+                                    <input type="text" name="SalesDescription" value={formData.SalesDescription} onChange={handleInputChange} className="w-full h-8 border border-slate-200 px-3 text-[12px] font-bold outline-none shadow-sm transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 text-gray-700 bg-white rounded" />
                                 </div>
-                                <div className="flex items-center gap-3">
-                                    <label className="flex items-center gap-2 cursor-pointer">
-                                        <input type="checkbox" name="AssetSold" checked={formData.AssetSold === 'Sold'} onChange={handleInputChange} className="w-4 h-4 text-red-500 border-gray-300 rounded focus:ring-red-500" />
-                                        <span className="text-[13px] font-medium text-red-600">Asset is Sold</span>
+                                <div className="flex items-center justify-between">
+                                    <label className="flex items-center gap-2 cursor-pointer group h-[22px]">
+                                        <input type="checkbox" name="AssetSold" checked={formData.AssetSold === 'Sold'} onChange={handleInputChange} className="w-4 h-4 rounded border-slate-300 text-red-500 focus:ring-red-500" />
+                                        <span className="text-[11px] font-bold text-red-500 group-hover:underline uppercase tracking-widest">Asset is Sold</span>
                                     </label>
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
-                                        <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Sales Date</label>
-                                        <div className="relative">
-                                            <input type="text" readOnly value={formData.SalesDate} onClick={() => setShowSalesDateModal(true)} disabled={formData.AssetSold !== 'Sold'} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] pr-10 text-gray-700 cursor-pointer disabled:bg-gray-100 disabled:cursor-not-allowed" />
-                                            <button onClick={() => setShowSalesDateModal(true)} disabled={formData.AssetSold !== 'Sold'} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer disabled:opacity-50">
-                                                <Calendar size={16} />
+                                        <label className="text-[11px] font-bold text-gray-500 uppercase block mb-1 tracking-widest">Sales Date</label>
+                                        <div className="flex gap-1 items-center">
+                                            <input 
+                                                type="text" 
+                                                value={formData.SalesDate} 
+                                                readOnly 
+                                                disabled={formData.AssetSold !== 'Sold'}
+                                                className="min-w-0 flex-1 h-8 border border-slate-200 px-3 text-[12px] bg-slate-50 disabled:bg-gray-100 rounded outline-none font-bold text-gray-700 shadow-sm cursor-not-allowed" 
+                                            />
+                                            <button 
+                                                onClick={() => setShowSalesDateModal(true)} 
+                                                disabled={formData.AssetSold !== 'Sold'}
+                                                className="w-9 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded transition-all shadow-sm active:scale-95 disabled:opacity-50 shrink-0 border-none"
+                                            >
+                                                <Calendar size={14} />
                                             </button>
                                         </div>
                                     </div>
                                     <div>
-                                        <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Sales Price</label>
-                                        <input type="number" name="SellingPrice" value={formData.SellingPrice} onChange={handleInputChange} disabled={formData.AssetSold !== 'Sold'} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 text-right disabled:bg-gray-100" step="0.01" />
+                                        <label className="text-[11px] font-bold text-gray-500 uppercase block mb-1 tracking-widest">Sales Price</label>
+                                        <input type="number" name="SellingPrice" value={formData.SellingPrice} onChange={handleInputChange} disabled={formData.AssetSold !== 'Sold'} className="w-full h-8 border border-slate-200 px-3 text-[12px] font-bold outline-none shadow-sm transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 bg-white text-right text-red-500 disabled:bg-gray-100 rounded" step="0.01" />
                                     </div>
                                 </div>
                                 <div>
-                                    <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Sales Expense</label>
-                                    <input type="number" name="SalesExpense" value={formData.SalesExpense} onChange={handleInputChange} disabled={formData.AssetSold !== 'Sold'} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 text-right disabled:bg-gray-100" step="0.01" />
+                                    <label className="text-[11px] font-bold text-gray-500 uppercase block mb-1 tracking-widest">Sales Expense</label>
+                                    <input type="number" name="SalesExpense" value={formData.SalesExpense} onChange={handleInputChange} disabled={formData.AssetSold !== 'Sold'} className="w-full h-8 border border-slate-200 px-3 text-[12px] font-bold outline-none shadow-sm transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 bg-white text-right disabled:bg-gray-100 rounded" step="0.01" />
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div className="bg-white p-4 border border-slate-200 rounded-[3px] space-y-4">
-                        <span className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">Detailed Info</span>
-                        <div className="grid grid-cols-12 gap-x-6 gap-y-3.5">
-                            <div className="col-span-12">
-                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Asset Full Description</label>
-                                <input type="text" name="AssetLongDescription" value={formData.AssetLongDescription} onChange={handleInputChange} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700" />
+                    {/* Asset Detailed Information */}
+                    <div className="border border-slate-200 rounded-[3px] p-4 relative pt-6 bg-white shadow-sm mb-4">
+                        <span className="absolute -top-3 left-3 bg-white px-3 py-0.5 border border-slate-200 rounded text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2 shadow-sm">
+                             Detailed Info
+                        </span>
+                        <div className="space-y-4">
+                            <div>
+                                <label className="text-[11px] font-bold text-gray-500 uppercase block mb-1 tracking-widest">Asset Full Description</label>
+                                <input type="text" name="AssetLongDescription" value={formData.AssetLongDescription} onChange={handleInputChange} className="w-full h-8 border border-slate-200 px-3 text-[12px] font-bold outline-none shadow-sm transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 text-gray-700 bg-white rounded" placeholder="" />
                             </div>
-                            <div className="col-span-4">
-                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Location / Office</label>
-                                <input type="text" name="Location" value={formData.Location} onChange={handleInputChange} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700" />
-                            </div>
-                            <div className="col-span-4">
-                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Registration / Serial No</label>
-                                <input type="text" name="SerialNo" value={formData.SerialNo} onChange={handleInputChange} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700" />
-                            </div>
-                            <div className="col-span-4">
-                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Warranty Expires</label>
-                                <div className="relative">
-                                    <input type="text" readOnly value={formData.WarrantyExpiry} onClick={() => setShowWarrantyExpiryModal(true)} className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] pr-10 text-gray-700 cursor-pointer" />
-                                    <button onClick={() => setShowWarrantyExpiryModal(true)} className="absolute right-1 top-1 bottom-1 w-8 flex items-center justify-center text-gray-500 hover:text-gray-800 bg-transparent border-none cursor-pointer">
-                                        <Calendar size={16} />
-                                    </button>
+                            <div className="grid grid-cols-3 gap-4">
+                                <div>
+                                    <label className="text-[11px] font-bold text-gray-500 uppercase block mb-1 tracking-widest">Location / Office</label>
+                                    <input type="text" name="Location" value={formData.Location} onChange={handleInputChange} className="w-full h-8 border border-slate-200 px-3 text-[12px] font-bold outline-none shadow-sm transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 text-gray-700 bg-white rounded" />
+                                </div>
+                                <div>
+                                    <label className="text-[11px] font-bold text-gray-500 uppercase block mb-1 tracking-widest">Registration / Serial No</label>
+                                    <input type="text" name="SerialNo" value={formData.SerialNo} onChange={handleInputChange} className="w-full h-8 border border-slate-200 px-3 text-[12px] font-bold outline-none shadow-sm transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 text-gray-700 bg-white rounded" />
+                                </div>
+                                <div>
+                                    <label className="text-[11px] font-bold text-gray-500 uppercase block mb-1 tracking-widest">Warranty Expires</label>
+                                    <div className="flex gap-1 items-center">
+                                        <input 
+                                            type="text" 
+                                            value={formData.WarrantyExpiry} 
+                                            readOnly 
+                                            className="min-w-0 flex-1 h-8 border border-slate-200 px-3 text-[12px] bg-slate-50 rounded outline-none font-bold text-gray-700 shadow-sm cursor-not-allowed" 
+                                        />
+                                        <button 
+                                            onClick={() => setShowWarrantyExpiryModal(true)} 
+                                            className="w-9 h-8 bg-[#0285fd] text-white flex items-center justify-center hover:bg-[#0073ff] rounded transition-all shadow-sm active:scale-95 shrink-0 border-none"
+                                        >
+                                            <Calendar size={14} />
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-                            <div className="col-span-12">
-                                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Internal Reference Notes</label>
-                                <textarea name="Note" value={formData.Note} onChange={handleInputChange} rows={3} className="w-full border border-gray-300 rounded-[3px] px-3 py-2 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 resize-none" />
+                            <div>
+                                <label className="text-[11px] font-bold text-gray-500 uppercase block mb-1 tracking-widest">Internal Reference Notes</label>
+                                <textarea name="Note" value={formData.Note} onChange={handleInputChange} className="w-full h-16 border border-slate-200 p-2 px-3 text-[12px] font-bold outline-none shadow-sm transition-all focus:border-[#00D1FF] focus:ring-2 focus:ring-[#00D1FF]/20 text-gray-700 bg-white rounded resize-none" placeholder="" />
                             </div>
                         </div>
                     </div>

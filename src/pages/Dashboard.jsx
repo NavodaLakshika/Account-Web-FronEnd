@@ -564,6 +564,9 @@ const Dashboard = () => {
     const [dismissedTips, setDismissedTips] = useState(() => {
         try { return JSON.parse(localStorage.getItem('dismissedTips') || '[]'); } catch { return []; }
     });
+    const [disableAllTips, setDisableAllTips] = useState(() => {
+        try { return localStorage.getItem('disableAllTips') === 'true'; } catch { return false; }
+    });
     const tipTimerRef = useRef(null);
     const tipProgressRef = useRef(null);
 
@@ -2627,7 +2630,7 @@ const Dashboard = () => {
 
 
             {/* ===== Notification Tips Panel (one at a time, bigger) ===== */}
-            {(showNotificationTip && !showFirstTimeGuide) && (() => {
+            {(showNotificationTip && !showFirstTimeGuide && !disableAllTips) && (() => {
                 const tip = notificationTips[currentTipIndex];
                 if (!tip || dismissedTips.includes(tip.id)) return null;
                 return (
@@ -2659,16 +2662,28 @@ const Dashboard = () => {
                                 <p className="text-[14px] text-slate-600 leading-relaxed mb-6">
                                     {tip.body}
                                 </p>
-                                <button
-                                    onClick={() => {
-                                        if (tip.onAction) tip.onAction();
-                                        dismissTip(tip.id);
-                                    }}
-                                    className="px-5 py-2.5 rounded text-white text-[14px] font-semibold transition-all hover:opacity-90 shadow-sm"
-                                    style={{ backgroundColor: tip.color || '#16a34a' }}
-                                >
-                                    {tip.action}
-                                </button>
+                                <div className="flex items-center gap-3">
+                                    <button
+                                        onClick={() => {
+                                            if (tip.onAction) tip.onAction();
+                                            dismissTip(tip.id);
+                                        }}
+                                        className="px-5 py-2.5 rounded text-white text-[14px] font-semibold transition-all hover:opacity-90 shadow-sm"
+                                        style={{ backgroundColor: tip.color || '#16a34a' }}
+                                    >
+                                        {tip.action}
+                                    </button>
+                                    <button
+                                        onClick={() => {
+                                            setDisableAllTips(true);
+                                            localStorage.setItem('disableAllTips', 'true');
+                                            setShowNotificationTip(false);
+                                        }}
+                                        className="px-5 py-2.5 rounded text-slate-500 bg-slate-100 hover:bg-slate-200 text-[14px] font-semibold transition-all shadow-sm"
+                                    >
+                                        Don't show tips again
+                                    </button>
+                                </div>
                             </div>
 
                             {/* Right Side: Image */}

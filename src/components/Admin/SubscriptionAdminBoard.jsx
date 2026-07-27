@@ -108,18 +108,18 @@ const SubscriptionAdminBoard = () => {
   return (
     <div className="bg-white shadow-sm border border-slate-200/80 flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-2 duration-300 pb-6 rounded-[5px] overflow-hidden mb-6 min-h-[500px]">
       {/* Header */}
-      <div className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
+      <div className="px-6 py-4 border-b border-slate-200/60 bg-slate-50/50 flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-amber-50 flex items-center justify-center rounded-[5px]">
-            <CalendarClock className="w-4 h-4 text-amber-600" />
+          <div className="w-10 h-10 bg-amber-100/50 flex items-center justify-center rounded-[5px] border border-amber-200/50">
+            <CalendarClock className="w-5 h-5 text-amber-600" />
           </div>
           <div>
-            <h2 className="text-[15px] font-bold text-slate-800">Subscription & Pricing Management</h2>
+            <h2 className="text-base font-bold text-slate-800">Subscription & Pricing Management</h2>
             <p className="text-[11px] text-slate-500 font-medium">Manage employee subscriptions and pricing plans</p>
           </div>
         </div>
         {activeTab === 'plans' && (
-          <div className="flex items-center gap-3 self-start">
+          <div className="flex items-center gap-3">
             <button
               onClick={() => {
                 setEditingPlan(null);
@@ -137,22 +137,21 @@ const SubscriptionAdminBoard = () => {
       {/* Selector Bar */}
       <div className="bg-white p-4 border border-slate-200/80 mx-6 flex flex-col gap-4 rounded-[5px] shadow-sm">
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="text-xs font-black text-slate-500 uppercase tracking-widest mr-2">Select View:</span>
+          <div className="flex flex-wrap items-center bg-slate-100/50 p-1 rounded-[5px] border border-slate-200/60">
             <button
               onClick={() => setActiveTab('users')}
-              className={`px-3 py-1.5 text-xs font-bold rounded-[3px] transition-all ${activeTab === 'users'
-                ? 'bg-[#0078d4] text-white shadow-sm border border-[#0078d4]'
-: 'bg-white hover:bg-slate-50 border border-slate-200 text-slate-600'
+              className={`px-5 py-2 text-[11px] font-bold uppercase tracking-widest rounded-[3px] transition-all flex-1 md:flex-none text-center ${activeTab === 'users'
+                ? 'bg-white text-blue-600 shadow-sm border border-slate-200/60'
+                : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50/50 border border-transparent'
               }`}
             >
               User Subscriptions
             </button>
             <button
               onClick={() => setActiveTab('plans')}
-              className={`px-3 py-1.5 text-xs font-bold rounded-[3px] transition-all ${activeTab === 'plans'
-                ? 'bg-amber-600 text-white shadow-sm border border-amber-600'
-: 'bg-white hover:bg-slate-50 border border-slate-200 text-slate-600'
+              className={`px-5 py-2 text-[11px] font-bold uppercase tracking-widest rounded-[3px] transition-all flex-1 md:flex-none text-center ${activeTab === 'plans'
+                ? 'bg-white text-blue-600 shadow-sm border border-slate-200/60'
+                : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50/50 border border-transparent'
               }`}
             >
               Pricing Plans
@@ -180,16 +179,16 @@ const SubscriptionAdminBoard = () => {
           <div className="w-full overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="bg-slate-50/80 border-b border-slate-100 text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-                  <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Emp Code</th>
-                  <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Name</th>
-                  <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">First Login</th>
-                  <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Expiry Date</th>
-                  <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Status</th>
-                  <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Actions</th>
+                <tr className="bg-[#f8fafc] border-b border-gray-100">
+                  <th className="py-3.5 px-6 text-[11px] font-black tracking-widest uppercase text-gray-400 whitespace-nowrap">Emp Code</th>
+                  <th className="py-3.5 px-6 text-[11px] font-black tracking-widest uppercase text-gray-400 whitespace-nowrap">Name</th>
+                  <th className="py-3.5 px-6 text-[11px] font-black tracking-widest uppercase text-gray-400 whitespace-nowrap">First Login</th>
+                  <th className="py-3.5 px-6 text-[11px] font-black tracking-widest uppercase text-gray-400 whitespace-nowrap">Expiry Date</th>
+                  <th className="py-3.5 px-6 text-[11px] font-black tracking-widest uppercase text-gray-400 whitespace-nowrap">Status</th>
+                  <th className="py-3.5 px-6 text-[11px] font-black tracking-widest uppercase text-gray-400 whitespace-nowrap text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-gray-50">
                 {loadingUsers ? (
                   <tr>
                     <td colSpan="6" className="py-8 text-center text-slate-500">
@@ -202,17 +201,21 @@ const SubscriptionAdminBoard = () => {
                   </tr>
                 ) : (
                   filteredUsers.map(user => (
-                    <tr key={user.emp_Code} className="hover:bg-slate-50 transition-colors border-b border-slate-100">
-                      <td className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100">{user.emp_Code}</td>
-                      <td className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100">{user.emp_Name}</td>
-                      <td className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100">
+                    <tr key={user.emp_Code} className="border-b border-gray-50 hover:bg-blue-50/50 transition-all group">
+                      <td className="py-3.5 px-6">
+                        <span className="text-[13px] font-bold text-slate-700 uppercase">{user.emp_Code}</span>
+                      </td>
+                      <td className="py-3.5 px-6">
+                        <span className="text-[13px] font-semibold text-slate-600">{user.emp_Name}</span>
+                      </td>
+                      <td className="py-3.5 px-6 text-[13px] text-slate-500">
                         {user.first_Login_Date ? new Date(user.first_Login_Date).toLocaleDateString() : <span className="text-slate-400">Never</span>}
                       </td>
-                      <td className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100">
+                      <td className="py-3.5 px-6 text-[13px] text-slate-500">
                         {user.subscription_End_Date ? new Date(user.subscription_End_Date).toLocaleDateString() : <span className="text-slate-400">N/A</span>}
                       </td>
-                      <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
-                        <span className={`px-2 py-0.5 text-[9px] font-black uppercase tracking-widest border rounded-[3px] ${
+                      <td className="py-3.5 px-6">
+                        <span className={`inline-flex items-center gap-1 px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest rounded-[3px] shadow-sm border ${
                           user.subscription_Status === 'Trial' ? 'bg-blue-50 text-blue-600 border-blue-200' :
                           user.subscription_Status === 'Active' ? 'bg-emerald-50 text-emerald-600 border-emerald-200' :
                           'bg-red-50 text-red-600 border-red-200'
@@ -220,17 +223,19 @@ const SubscriptionAdminBoard = () => {
                           {user.subscription_Status || 'Trial'}
                         </span>
                       </td>
-                      <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
-                        <button
-                          onClick={() => {
-                            setSelectedUser(user);
-                            setExtendMonths(1);
-                            setNewStatus(user.subscription_Status || 'Active');
-                          }}
-                          className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100"
-                        >
-                          <CreditCard size={10} /> Manage
-                        </button>
+                      <td className="py-3.5 px-6 text-right">
+                        <div className="flex justify-end">
+                          <button
+                            onClick={() => {
+                              setSelectedUser(user);
+                              setExtendMonths(1);
+                              setNewStatus(user.subscription_Status || 'Active');
+                            }}
+                            className="px-3 py-1.5 text-xs font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-[3px] shadow-sm transition-all flex items-center justify-center gap-1.5 border border-blue-100"
+                          >
+                            <CreditCard size={14} /> Manage
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))

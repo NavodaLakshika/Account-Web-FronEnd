@@ -27,6 +27,13 @@ export const accountService = {
         return response.data;
     },
 
+    getAccountDetails: async (id, companyCode) => {
+        const response = await api.get(`/Account/${id}`, {
+            params: { companyCode }
+        });
+        return response.data;
+    },
+
     getNextId: async (parentCode) => {
         const response = await api.get(`/Account/next-id`, {
             params: { parentCode }
@@ -45,6 +52,11 @@ export const accountService = {
         const response = await api.get(`/Account/customer-accounts`, {
             params: { parentCode }
         });
+        return response.data;
+    },
+
+    deleteAccount: async (accountId) => {
+        const response = await api.delete(`/Account/${accountId}`);
         return response.data;
     }
 };

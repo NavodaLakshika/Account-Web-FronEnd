@@ -50,6 +50,9 @@ const CompanyPromoBoard = ({ isOpen, onClose }) => {
     const [countdown, setCountdown] = useState(AUTO_CLOSE_SECONDS);
     const [exiting, setExiting] = useState(false);
     const [entering, setEntering] = useState(true);
+    const [blockAds, setBlockAds] = useState(() => {
+        try { return localStorage.getItem('blockCompanyPromo') === 'true'; } catch { return false; }
+    });
 
     const handleClose = useCallback(() => {
         if (exiting) return;
@@ -110,7 +113,7 @@ const CompanyPromoBoard = ({ isOpen, onClose }) => {
         }
     }, [countdown, isOpen, exiting, handleClose]);
 
-    if (!isOpen || ads.length === 0) return null;
+    if (!isOpen || ads.length === 0 || blockAds) return null;
 
     const ad = ads[adIndex];
     if (!ad) return null;
@@ -165,16 +168,28 @@ const CompanyPromoBoard = ({ isOpen, onClose }) => {
                     )}
 
                     {/* CTA */}
-                    <a
-                        href="https://www.onimtait.com"
-                        target="_blank"
-                        rel="noreferrer"
-                        className="inline-flex items-center justify-center gap-2 px-5 py-2 rounded-none text-[13px] font-bold text-white transition-all active:scale-95 shadow-md hover:shadow-lg w-fit mt-1"
-                        style={{ backgroundColor: accentColor }}
-                    >
-                        <ExternalLink size={14} />
-                        Learn More
-                    </a>
+                    <div className="flex items-center gap-3 mt-1">
+                        <a
+                            href="https://www.onimtait.com"
+                            target="_blank"
+                            rel="noreferrer"
+                            className="inline-flex items-center justify-center gap-2 px-5 py-2 rounded-none text-[13px] font-bold text-white transition-all active:scale-95 shadow-md hover:shadow-lg w-fit"
+                            style={{ backgroundColor: accentColor }}
+                        >
+                            <ExternalLink size={14} />
+                            Learn More
+                        </a>
+                        <button
+                            onClick={() => {
+                                setBlockAds(true);
+                                localStorage.setItem('blockCompanyPromo', 'true');
+                                handleClose();
+                            }}
+                            className="text-[11px] text-slate-400 hover:text-slate-600 font-medium whitespace-nowrap"
+                        >
+                            Don't show again
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

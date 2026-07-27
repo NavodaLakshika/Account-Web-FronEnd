@@ -74,5 +74,32 @@ export const writeChequeService = {
     } catch (error) {
       throw error.response?.data || 'Failed to load document';
     }
+  },
+
+  async clearDraft(docNo, company = getCompanyCode()) {
+    try {
+      const response = await api.delete(`/WriteCheque/clear?docNo=${encodeURIComponent(docNo)}&company=${encodeURIComponent(company)}`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || 'Failed to clear draft';
+    }
+  },
+
+  async searchApplied(company = getCompanyCode()) {
+    try {
+      const response = await api.get(`/WriteCheque/search-applied?company=${encodeURIComponent(company)}`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || 'Failed to search applied documents';
+    }
+  },
+
+  async voidDoc(data) {
+    try {
+      const response = await api.post('/WriteCheque/void', data);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || 'Failed to void document';
+    }
   }
 };

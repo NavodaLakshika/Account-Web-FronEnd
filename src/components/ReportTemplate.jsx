@@ -457,6 +457,9 @@ const ReportTemplate = ({
                 console.error("API Error:", error);
                 if (error.response && error.response.status === 404) {
                     setApiError("This report is not available in the API yet.");
+                } else if (error.response && error.response.data) {
+                    const msg = error.response.data.message || error.response.data.title || JSON.stringify(error.response.data);
+                    setApiError(msg);
                 } else {
                     setApiData(null);
                     setApiError("Invalid endpoint");

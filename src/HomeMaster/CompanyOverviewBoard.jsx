@@ -14,6 +14,7 @@ const [transactions, setTransactions] = useState([]);
 const [loadingTx, setLoadingTx] = useState(true);
 const [searchTx, setSearchTx] = useState('');
 const [filterType, setFilterType] = useState('All');
+const [timeFilter, setTimeFilter] = useState('Week');
 // Modals
 const [selectedTx, setSelectedTx] = useState(null);
 const [confirmConfig, setConfirmConfig] = useState({ isOpen: false, title: '', message: '', onConfirm: null });
@@ -64,31 +65,96 @@ return matchesSearch && matchesType;
 }, [transactions, searchTx, filterType]);
 // Analytics Calculations
 const revenueTransactions = useMemo(() => {
-return transactions.filter(tx => tx.iid === 'INV' || tx.iid === 'REC' || (tx.category && String(tx.category).toUpperCase() === 'INCOME')
+let revTx = transactions.filter(tx => 
+tx.iid === 'INV' || tx.iid === 'REC' || (tx.category && String(tx.category).toUpperCase() === 'INCOME')
 );
-}, [transactions]);
+
+// Fallback for visualization if strict revenue categories have no data
+if (revTx.length === 0) {
+revTx = transactions.filter(tx => (tx.amount || 0) > 0);
+}
+
+const today = new Date();
+today.setHours(0, 0, 0, 0);
+
+return revTx.filter(tx => {
+if (!tx.postDate) return false;
+const d = new Date(tx.postDate);
+if (isNaN(d.getTime())) return false;
+
+if (timeFilter === 'Week') {
+const firstDayOfWeek = new Date(today);
+firstDayOfWeek.setDate(today.getDate() - today.getDay());
+return d >= firstDayOfWeek;
+} else if (timeFilter === 'Month') {
+return d.getMonth() === today.getMonth() && d.getFullYear() === today.getFullYear();
+} else if (timeFilter === 'Year') {
+return d.getFullYear() === today.getFullYear();
+}
+return true;
+});
+}, [transactions, timeFilter]);
+
 const totalRevenue = revenueTransactions.reduce((sum, tx) => sum + (tx.amount || 0), 0);
-const txCount = transactions.length;
+const txCount = timeFilter === 'All' ? transactions.length : revenueTransactions.length;
 const avgValue = revenueTransactions.length > 0 ? (totalRevenue / revenueTransactions.length) : 0;
-// Real Chart Data based on actual Revenue transactions
+
+// Real Chart Data based on actual Revenue transactions and time filter
 const chartData = useMemo(() => {
-const dataMap = { 'Mon': 0, 'Tue': 0, 'Wed': 0, 'Thu': 0, 'Fri': 0, 'Sat': 0, 'Sun': 0 };
+if (timeFilter === 'Week') {
+const dataMap = { 'Sun': 0, 'Mon': 0, 'Tue': 0, 'Wed': 0, 'Thu': 0, 'Fri': 0, 'Sat': 0 };
 const daysOrder = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 revenueTransactions.forEach(tx => {
-// Check if amount exists and is positive
 if (tx.postDate && (tx.amount || 0) >= 0) {
 const d = new Date(tx.postDate);
 if (!isNaN(d.getTime())) {
-const dayName = daysOrder[d.getDay()];
-dataMap[dayName] += (tx.amount || 0);
+dataMap[daysOrder[d.getDay()]] += (tx.amount || 0);
 }
 }
 });
 return ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(day => ({
-day,
+label: day,
 value: dataMap[day]
 }));
-}, [revenueTransactions]);
+} else if (timeFilter === 'Month') {
+const dataMap = { 'Week 1': 0, 'Week 2': 0, 'Week 3': 0, 'Week 4': 0, 'Week 5': 0 };
+revenueTransactions.forEach(tx => {
+if (tx.postDate && (tx.amount || 0) >= 0) {
+const d = new Date(tx.postDate);
+if (!isNaN(d.getTime())) {
+const date = d.getDate();
+if (date <= 7) dataMap['Week 1'] += (tx.amount || 0);
+else if (date <= 14) dataMap['Week 2'] += (tx.amount || 0);
+else if (date <= 21) dataMap['Week 3'] += (tx.amount || 0);
+else if (date <= 28) dataMap['Week 4'] += (tx.amount || 0);
+else dataMap['Week 5'] += (tx.amount || 0);
+}
+}
+});
+return ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5'].map(w => ({
+label: w,
+value: dataMap[w]
+}));
+} else if (timeFilter === 'Year') {
+const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const dataMap = {};
+months.forEach(m => dataMap[m] = 0);
+revenueTransactions.forEach(tx => {
+if (tx.postDate && (tx.amount || 0) >= 0) {
+const d = new Date(tx.postDate);
+if (!isNaN(d.getTime())) {
+dataMap[months[d.getMonth()]] += (tx.amount || 0);
+}
+}
+});
+return months.map(m => ({
+label: m,
+value: dataMap[m]
+}));
+}
+return [];
+}, [revenueTransactions, timeFilter]);
+
 const tabs = [
 { id: 'overview', label: 'Overview', icon: LayoutDashboard },
 { id: 'sales', label: 'Sales Dashboard', icon: Activity },
@@ -201,14 +267,18 @@ const renderSalesDashboard = () => (
 <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
 <div>
 <h3 className="text-sm font-bold text-gray-800 uppercase tracking-wider flex items-center gap-2">
-<TrendingUp size={16} className="text-[#0285fd]" /> Revenue Overview
+<TrendingUp size={16} className="text-[#0285fd]" /> Revenue
 </h3>
-<p className="text-[11px] text-gray-500 mt-1">Weekly transaction performance</p>
+<p className="text-[11px] text-gray-500 mt-1">
+{timeFilter === 'Week' ? 'Weekly' : timeFilter === 'Month' ? 'Monthly' : 'Yearly'} transaction performance
+</p>
 </div>
 <div className="flex items-center gap-2">
 {['Week', 'Month', 'Year'].map(t => (
-<button key={t} className={`px-4 py-1.5 text-[10px] uppercase tracking-wider font-black transition-all ${
-t === 'Week' ? 'bg-[#0285fd] text-white shadow-sm border border-[#0285fd] rounded-[3px]' : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 rounded-[3px]'
+<button key={t} 
+onClick={() => setTimeFilter(t)}
+className={`px-4 py-1.5 text-[10px] uppercase tracking-wider font-black transition-all ${
+t === timeFilter ? 'bg-[#0285fd] text-white shadow-sm border border-[#0285fd] rounded-[3px]' : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 rounded-[3px]'
 }`}>
 {t}
 </button>
@@ -227,12 +297,12 @@ return (
 <div className="w-full max-w-[40px] bg-[#0285fd] opacity-80 border-t-2 border-[#0285fd] group-hover:opacity-100 transition-all relative rounded-[3px]"
 style={{ height: `${heightPct}%` }}
 >
-<div className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">
+<div className="absolute -top-7 left-1/2 -translate-x-1/2 whitespace-nowrap text-[10px] font-bold text-gray-600 bg-white px-2 py-0.5 rounded shadow-sm border border-gray-200 z-10 hidden group-hover:block">
 Rs {d.value.toLocaleString(undefined, {minimumFractionDigits: 2})}
 </div>
 </div>
 </div>
-<span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">{d.day}</span>
+<span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest whitespace-nowrap">{d.label}</span>
 </div>
 );
 })}
@@ -271,8 +341,8 @@ className="bg-transparent text-xs font-bold text-gray-600 focus:outline-none cur
 <Loader2 className="w-8 h-8 text-[#0285fd] animate-spin" />
 </div>
 ) : filteredTransactions.length === 0 ? (
-<div className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
-<div className="w-16 h-16 bg-white border border-gray-200 flex items-center justify-center mb-4 rounded-[3px]">
+<div className="flex flex-col items-center justify-center h-64 bg-gray-50/50 rounded-[3px] border border-dashed border-gray-200 m-4">
+<div className="w-16 h-16 bg-white border border-gray-200 flex items-center justify-center mb-4 rounded-full shadow-sm">
 <Database className="w-8 h-8 text-gray-400" />
 </div>
 <p className="text-gray-800 font-bold text-sm mb-1">No Transactions Found</p>
@@ -282,21 +352,21 @@ className="bg-transparent text-xs font-bold text-gray-600 focus:outline-none cur
 <table className="w-full text-left border-collapse min-w-[800px]">
 <thead className="sticky top-0 z-10 bg-[#f8fafc] border-b border-gray-200">
 <tr>
-<th className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">Doc No</th>
-<th className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">Type</th>
-<th className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">Account</th>
-<th className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">Date</th>
-<th className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">Amount</th>
-<th className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">Actions</th>
+<th className="px-6 py-3 text-[11px] font-bold text-gray-500 uppercase tracking-wider">Doc No</th>
+<th className="px-6 py-3 text-[11px] font-bold text-gray-500 uppercase tracking-wider">Type</th>
+<th className="px-6 py-3 text-[11px] font-bold text-gray-500 uppercase tracking-wider">Account</th>
+<th className="px-6 py-3 text-[11px] font-bold text-gray-500 uppercase tracking-wider">Date</th>
+<th className="px-6 py-3 text-[11px] font-bold text-gray-500 uppercase tracking-wider text-right">Amount</th>
+<th className="px-6 py-3 text-[11px] font-bold text-gray-500 uppercase tracking-wider text-center">Actions</th>
 </tr>
 </thead>
 <tbody className="divide-y divide-gray-200">
 {filteredTransactions.map(tx => (
 <tr key={tx.docNo} className="hover:bg-gray-50 transition-colors group">
-<td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
-<span className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">{tx.docNo}</span>
+<td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-800">
+{tx.docNo}
 </td>
-<td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
+<td className="px-6 py-4 whitespace-nowrap">
 <span className={`px-3 py-1 text-[9px] font-black uppercase tracking-widest rounded-[3px] border ${
 tx.payType === 'Cash' ? 'bg-emerald-50 text-emerald-700 border-emerald-300' :
 tx.payType === 'Credit' ? 'bg-blue-50 text-blue-700 border-blue-300' :
@@ -305,22 +375,22 @@ tx.payType === 'Credit' ? 'bg-blue-50 text-blue-700 border-blue-300' :
 {tx.payType || 'N/A'}
 </span>
 </td>
-<td className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">{tx.account || 'System'}</td>
-<td className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">{tx.postDate || 'N/A'}</td>
-<td className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">Rs {(tx.amount || 0).toFixed(2)}</td>
-<td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
+<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{tx.account || 'System'}</td>
+<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{tx.postDate || 'N/A'}</td>
+<td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-800 text-right">Rs {(tx.amount || 0).toFixed(2)}</td>
+<td className="px-6 py-4 whitespace-nowrap text-center">
 <div className="flex items-center justify-center gap-2">
 <button onClick={() => setSelectedTx(tx)}
-className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100"
+className="p-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded transition-colors"
 title="View Details"
 >
-<Eye size={10} /> View
+<Eye size={14} />
 </button>
 <button onClick={() => handleDeleteTransaction(tx.docNo)}
-className="px-6 h-10 bg-red-50 text-red-600 text-sm font-bold rounded-[3px] hover:bg-red-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-red-100"
+className="p-1.5 bg-red-50 text-red-600 hover:bg-red-100 rounded transition-colors"
 title="Delete"
 >
-<Trash2 size={10} /> Delete
+<Trash2 size={14} />
 </button>
 </div>
 </td>
@@ -354,7 +424,7 @@ className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-al
 </button>
 </div>
 {/* Horizontal Tab Navigation */}
-<div className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">
+<div className="flex items-center gap-2 p-4 bg-gray-50/50 border-b border-gray-200 shrink-0 overflow-x-auto">
 {tabs.map(tab => {
 const active = activeTab === tab.id;
 return (
@@ -390,7 +460,7 @@ active ? 'bg-[#0285fd] text-white shadow-sm border border-[#0285fd]' : 'bg-white
     {selectedTx && (
         <div className="fixed inset-0 z-[300] flex items-center justify-center bg-black/50 p-4">
             <div className="bg-white border border-gray-200 shadow-2xl w-full max-w-lg overflow-hidden rounded-[3px]">
-                <div className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">
+                <div className="px-6 py-4 border-b border-gray-200 bg-gray-50/50 flex items-center justify-between">
                     <div>
                         <h3 className="text-[15px] font-bold text-gray-800 flex items-center gap-2">
                             <ShieldAlert className="text-emerald-600" size={16} />
@@ -407,25 +477,25 @@ active ? 'bg-[#0285fd] text-white shadow-sm border border-[#0285fd]' : 'bg-white
                         <div className="grid grid-cols-2 gap-x-6 gap-y-4">
                             <div>
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Amount</label>
-                                <div className="px-6 h-10 bg-emerald-50 text-emerald-600 text-sm font-bold rounded-[3px] hover:bg-emerald-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-emerald-100">
+                                <div className="px-4 py-2 bg-emerald-50/50 text-emerald-700 text-sm font-bold rounded-[3px] border border-emerald-100 shadow-sm">
                                     Rs {(selectedTx.amount || 0).toFixed(2)}
                                 </div>
                             </div>
                             <div>
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Date</label>
-                                <div className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">
+                                <div className="px-4 py-2 bg-gray-50/50 text-gray-700 text-sm font-bold rounded-[3px] border border-gray-200 shadow-sm">
                                     {selectedTx.postDate || 'N/A'}
                                 </div>
                             </div>
                             <div>
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Account</label>
-                                <div className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">
+                                <div className="px-4 py-2 bg-gray-50/50 text-gray-700 text-sm font-bold rounded-[3px] border border-gray-200 shadow-sm">
                                     {selectedTx.account || 'System'}
                                 </div>
                             </div>
                             <div>
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Payment Type</label>
-                                <div className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">
+                                <div className="px-4 py-2 bg-gray-50/50 rounded-[3px] border border-gray-200 shadow-sm flex items-center">
                                     <span className={`inline-block px-3 py-0.5 text-[10px] font-black uppercase tracking-widest rounded-[3px] border ${
                                         selectedTx.payType === 'Cash' ? 'bg-emerald-50 text-emerald-700 border-emerald-300' :
                                         selectedTx.payType === 'Credit' ? 'bg-blue-50 text-blue-700 border-blue-300' :

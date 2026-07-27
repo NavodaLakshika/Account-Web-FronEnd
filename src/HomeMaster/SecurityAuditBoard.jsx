@@ -76,18 +76,18 @@ const SecurityAuditBoard = ({ allEmployees = [], allCompanies = [], hierarchy = 
     return (
         <div className="bg-white dark:bg-[#0f172a]/50 backdrop-blur-md shadow-lg border border-slate-200 dark:border-[#334155] flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-2 duration-300 pb-6 rounded-none-[12px] overflow-hidden mb-6">
             {/* Header */}
-            <div className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
+            <div className="px-6 py-4 border-b border-slate-200/60 dark:border-slate-700/60 bg-slate-50/50 dark:bg-slate-800/30 flex flex-wrap items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-purple-500/20 flex items-center justify-center rounded-none">
-                        <ShieldCheck className="w-4 h-4 text-purple-300" />
+                    <div className="w-10 h-10 bg-purple-100/50 dark:bg-purple-900/20 flex items-center justify-center rounded-[5px] border border-purple-200/50 dark:border-purple-800/50">
+                        <ShieldCheck className="w-5 h-5 text-purple-600 dark:text-purple-400" />
                     </div>
                     <div>
-                        <h2 className="text-[15px] font-bold text-slate-800 dark:text-white">Security Audit & Posture</h2>
+                        <h2 className="text-base font-bold text-slate-800 dark:text-white">Security Audit & Posture</h2>
                         <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Vulnerability scanning, access control audits, and threat detection</p>
                     </div>
                 </div>
-                <div className="flex items-center gap-3 self-start">
-                    <span className="text-[11px] text-slate-500 font-medium">Last Scan: {lastScanDate}</span>
+                <div className="flex items-center gap-3">
+                    <span className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Last Scan: {lastScanDate}</span>
                     <button
                         onClick={runScan}
                         disabled={scanning}
@@ -119,20 +119,32 @@ const SecurityAuditBoard = ({ allEmployees = [], allCompanies = [], hierarchy = 
             )}
 
             {/* Vulnerability Metrics */}
-            <div className={`grid grid-cols-1 md:grid-cols-4 gap-4 mx-6 transition-opacity duration-300 ${scanning ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}>
+            <div className={`grid grid-cols-1 md:grid-cols-4 gap-6 mb-8 mx-6 transition-opacity duration-300 ${scanning ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}>
                 {metrics.map((stat, i) => {
-                    const colors = severityColors[stat.severity];
                     const Icon = stat.icon;
+                    // Define gradient based on index to match dashboard
+                    const gradients = [
+                        "from-red-500 to-rose-600 hover:shadow-red-500/30",
+                        "from-amber-400 to-orange-500 hover:shadow-orange-500/30",
+                        "from-slate-500 to-gray-600 hover:shadow-slate-500/30",
+                        "from-[#0285fd] to-indigo-600 hover:shadow-blue-500/30"
+                    ];
+                    
                     return (
-                        <div key={i} className="bg-white dark:bg-[#0f172a]/50 border border-slate-200 dark:border-[#334155] p-5 flex flex-col relative overflow-hidden group">
-                            <div className="absolute -right-4 -top-4 w-16 h-16 bg-white dark:bg-[#0f172a]/50 flex items-center justify-center opacity-30 group-hover:scale-110 transition-transform">
-                                <Icon className={`w-8 h-8 ${colors.icon}`} />
+                        <div key={i} className={`bg-gradient-to-br ${gradients[i]} py-10 px-6 shadow-md hover:shadow-lg hover:-translate-y-1 transition-all duration-300 rounded-[3px] flex items-center gap-5 relative overflow-hidden group`}>
+                            <div className="absolute -right-4 -top-4 w-16 h-16 bg-white/10 rounded-full flex items-center justify-center opacity-30 group-hover:scale-110 transition-transform">
+                                <Icon className="w-8 h-8 text-white" />
                             </div>
-                            <h3 className="text-slate-500 dark:text-slate-400 text-[10px] font-black uppercase tracking-widest mb-2 z-10">{stat.title}</h3>
-                            <div className="flex items-end gap-2 z-10">
-                                <p className={`text-3xl font-black ${colors.text}`}>{stat.value}</p>
+                            <div className="w-12 h-12 bg-white/15 rounded-[3px] flex items-center justify-center shrink-0 z-10">
+                                <Icon className="w-6 h-6 text-white" />
                             </div>
-                            <p className="text-[10px] font-bold text-slate-500 mt-2 z-10 uppercase tracking-wider">{stat.desc}</p>
+                            <div className="flex-1 min-w-0 z-10">
+                                <p className="text-[10px] font-black text-white/80 uppercase tracking-widest mb-0.5 truncate">{stat.title}</p>
+                                <div className="flex items-center justify-between">
+                                    <span className="text-2xl font-black text-white">{stat.value}</span>
+                                </div>
+                                <p className="text-[9px] font-bold text-white/60 mt-1 uppercase tracking-wider truncate">{stat.desc}</p>
+                            </div>
                         </div>
                     );
                 })}
@@ -168,39 +180,48 @@ const SecurityAuditBoard = ({ allEmployees = [], allCompanies = [], hierarchy = 
                             <p className="text-[13px] font-bold text-slate-500 dark:text-slate-400">No critical security events found.</p>
                         </div>
                     ) : (
-                        <table className="w-full text-left border-collapse min-w-[800px]">
+                        <table className="w-full text-left border-collapse">
                             <thead>
-                                <tr className="bg-white dark:bg-[#1e293b]/80 border-b border-slate-200 dark:border-[#334155] text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                                    <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Timestamp</th>
-                                    <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">User</th>
-                                    <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Event Description</th>
-                                    <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">IP Address</th>
-                                    <th className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">Severity</th>
+                                <tr className="bg-[#f8fafc] border-b border-gray-100">
+                                    <th className="py-3.5 px-6 text-[11px] font-black tracking-widest uppercase text-gray-400 whitespace-nowrap">Timestamp</th>
+                                    <th className="py-3.5 px-6 text-[11px] font-black tracking-widest uppercase text-gray-400 whitespace-nowrap">User</th>
+                                    <th className="py-3.5 px-6 text-[11px] font-black tracking-widest uppercase text-gray-400 whitespace-nowrap">Event Description</th>
+                                    <th className="py-3.5 px-6 text-[11px] font-black tracking-widest uppercase text-gray-400 whitespace-nowrap">IP Address</th>
+                                    <th className="py-3.5 px-6 text-[11px] font-black tracking-widest uppercase text-gray-400 whitespace-nowrap text-right">Severity</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-slate-200 dark:divide-white/5">
+                            <tbody className="divide-y divide-gray-50">
                                 {recentSecurityEvents.map((log, idx) => {
                                     const isCritical = log.status === 'Failed' || log.action?.toLowerCase().includes('fail');
                                     const isMedium = log.action?.toLowerCase().includes('role') || log.action?.toLowerCase().includes('password');
-                                    const sevColors = isCritical ? severityColors.high : isMedium ? severityColors.medium : severityColors.low;
+                                    
+                                    // Custom colors mapping based on severity for the badge
+                                    const sevColors = isCritical 
+                                        ? { text: 'text-red-600', bg: 'bg-red-50', border: 'border-red-200' }
+                                        : isMedium
+                                            ? { text: 'text-orange-600', bg: 'bg-orange-50', border: 'border-orange-200' }
+                                            : { text: 'text-emerald-600', bg: 'bg-emerald-50', border: 'border-emerald-200' };
+
                                     return (
-                                        <tr key={log.id || idx} className="hover:bg-white dark:bg-[#0f172a]/50 transition-colors">
-                                            <td className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100">
-                                                {log.date ? new Date(log.date).toLocaleString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true }) : 'N/A'}
+                                        <tr key={log.id || idx} className="border-b border-gray-50 hover:bg-blue-50/50 transition-all group">
+                                            <td className="py-3.5 px-6">
+                                                <span className="text-[13px] font-medium text-gray-700">
+                                                    {log.date ? new Date(log.date).toLocaleString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true }) : 'N/A'}
+                                                </span>
                                             </td>
-<td className="px-6 h-10 bg-gray-50 text-gray-600 text-sm font-bold rounded-[3px] hover:bg-gray-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-gray-100">
-                                                {log.user || 'System'}
+                                            <td className="py-3.5 px-6">
+                                                <span className="text-[13px] font-bold text-slate-700 uppercase">{log.user || 'System'}</span>
                                             </td>
-                                            <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
-                                                <span className="text-[12px] text-slate-600 dark:text-slate-300 font-medium">{log.action || 'Unknown Action'}</span>
+                                            <td className="py-3.5 px-6">
+                                                <span className="text-[12px] text-slate-500 font-semibold">{log.action || 'Unknown Action'}</span>
                                             </td>
-                                            <td className="px-6 h-10 bg-slate-50 text-slate-600 text-sm font-bold rounded-[3px] hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-slate-100">
-                                                {log.ip || '0.0.0.0'}
+                                            <td className="py-3.5 px-6">
+                                                <span className="text-[12px] text-slate-500 font-mono">{log.ip || '0.0.0.0'}</span>
                                             </td>
-                                            <td className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
-                                                <div className="flex justify-center">
-                                                    <div className={`flex items-center gap-1 px-2.5 py-1 border text-[9px] font-black uppercase tracking-widest ${sevColors.bg} ${sevColors.text} ${sevColors.border}`}>
-                                                        {isCritical ? <XCircle className="w-2.5 h-2.5" /> : isMedium ? <AlertTriangle className="w-2.5 h-2.5" /> : <ShieldCheck className="w-2.5 h-2.5" />}
+                                            <td className="py-3.5 px-6 text-right">
+                                                <div className="flex items-center justify-end">
+                                                    <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest rounded-[3px] shadow-sm border ${sevColors.bg} ${sevColors.text} ${sevColors.border}`}>
+                                                        {isCritical ? <XCircle className="w-3 h-3" /> : isMedium ? <AlertTriangle className="w-3 h-3" /> : <ShieldCheck className="w-3 h-3" />}
                                                         {isCritical ? 'High' : isMedium ? 'Medium' : 'Low'}
                                                     </div>
                                                 </div>

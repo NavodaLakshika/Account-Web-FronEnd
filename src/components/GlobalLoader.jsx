@@ -26,7 +26,8 @@ const GlobalLoader = () => {
         };
 
         const handleError = (e) => {
-            setErrorModal({ isOpen: true, message: e.detail?.message || 'An unexpected error occurred.' });
+            // Disabled global error modal to prevent double alerts (local catch blocks already show a toast)
+            // setErrorModal({ isOpen: true, message: e.detail?.message || 'An unexpected error occurred.' });
             handleEnd();
         };
 

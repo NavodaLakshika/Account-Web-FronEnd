@@ -509,12 +509,12 @@ const PayBillBoard = ({ isOpen, onClose }) => {
                                 <tbody>
                                     {loading && (
                                         <tr>
-                                            <td colSpan="8" className="py-12 text-center text-gray-300 font-black italic text-[11px] uppercase tracking-widest animate-pulse">Fetching Vendor Ledgers...</td>
+                                            <td colSpan="9" className="py-16 text-center text-gray-300 font-black text-[11px] uppercase tracking-widest animate-pulse">Fetching Vendor Ledgers...</td>
                                         </tr>
                                     )}
                                     {!loading && bills.length === 0 && (
                                         <tr>
-                                            <td colSpan="8" className="py-12 text-center text-gray-300 font-black italic text-[11px] uppercase tracking-widest">No outstanding bills found.</td>
+                                            <td colSpan="9" className="py-16 text-center text-gray-300 font-black text-[11px] uppercase tracking-widest">No outstanding bills found.</td>
                                         </tr>
                                     )}
                                     {bills.map((bill, idx) => (

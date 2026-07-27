@@ -459,7 +459,7 @@ const JournalEntryBoard = ({ isOpen, onClose, onComplete }) => {
 
     const handleSave = async () => {
         if (tempEntries.length === 0) return showErrorToast("No lines to save.");
-        if (totalDebit !== totalCredit) return showErrorToast("Journal is not balanced!");
+        if (Math.abs(totalDebit - totalCredit) > 0.001) return showErrorToast("Journal is not balanced! Debits must equal Credits.");
 
         try {
             setLoading(true);
@@ -520,7 +520,7 @@ const JournalEntryBoard = ({ isOpen, onClose, onComplete }) => {
                         <div className="flex gap-4">
                             <button
                                 onClick={handleSave}
-                                disabled={loading || tempEntries.length === 0 || totalDebit !== totalCredit}
+                                disabled={loading}
                                 className={`px-6 h-10 bg-[#0285fd] hover:bg-[#0073ff] text-white font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center gap-2 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                             >
                                 {loading ? <Loader2 size={14} className="animate-spin" /> : <CheckCircle2 size={14} />} APPLY
@@ -637,7 +637,7 @@ const JournalEntryBoard = ({ isOpen, onClose, onComplete }) => {
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Ledger Account</label>
                                 <div className="relative">
                                     <select
-                                        value={currentLine.accCode || ''}
+                                        value={currentLine.accId || ''}
                                         onChange={(ev) => {
                                             const val = ev.target.value;
                                             const item = (lookups.accounts || []).find(i => (i.code && i.code.toString() === val) || (i.name && i.name.toString() === val) || i === val);

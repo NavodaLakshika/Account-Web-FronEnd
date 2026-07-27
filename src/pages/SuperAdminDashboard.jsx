@@ -58,6 +58,58 @@ import EmployeeMessageDropdown from '../components/Admin/EmployeeMessageDropdown
 import AdminAIChatbot from '../components/modals/AdminAIChatbot';
 import AIAsterisk from '../components/AIAsterisk';
 import SuperAdminSettingsModal from '../components/modals/SuperAdminSettingsModal';
+import { LineChart, Line, AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, Legend } from 'recharts';
+import { motion } from 'framer-motion';
+
+const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
+};
+
+const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
+};
+
+const CustomYAxisTick = (props) => {
+    const { x, y, payload } = props;
+    const text = payload.value || '';
+    
+    let line1 = text;
+    let line2 = '';
+    
+    if (text.length > 14) {
+        const splitIndex = text.lastIndexOf(' ', 14);
+        if (splitIndex !== -1) {
+            line1 = text.substring(0, splitIndex);
+            line2 = text.substring(splitIndex + 1);
+        } else {
+            const nextSpace = text.indexOf(' ', 14);
+            if (nextSpace !== -1) {
+                line1 = text.substring(0, nextSpace);
+                line2 = text.substring(nextSpace + 1);
+            }
+        }
+        
+        if (line2.length > 20) {
+            line2 = line2.substring(0, 17) + '...';
+        }
+    }
+
+    return (
+        <g transform={`translate(${x},${y})`}>
+            <text x={-140} y={line2 ? -4 : 4} textAnchor="start" fill="#64748b" fontSize={11} fontWeight={500}>
+                {line1}
+            </text>
+            {line2 && (
+                <text x={-140} y={9} textAnchor="start" fill="#64748b" fontSize={11} fontWeight={500}>
+                    {line2}
+                </text>
+            )}
+        </g>
+    );
+};
+
 
 const SuperAdminDashboard = () => {
     const navigate = useNavigate();
@@ -299,52 +351,7 @@ const SuperAdminDashboard = () => {
             let cData = compRes.data || [];
             let eData = empRes.data || [];
 
-            // Add mock data for demonstration
-            const mockHierarchy = [
-                {
-                    empCode: 'EMP00003',
-                    empName: 'JOHN DOE',
-                    email: 'john.doe@company.com',
-                    role: 2,
-                    lastLogin: '2026-07-14T08:30:00Z',
-                    loginCount: 142,
-                    department: 'Engineering',
-                    status: 'Active',
-                    companies: [
-                        { companyCode: 'COM002', companyName: 'Global Tech Solutions', transactions: 150 },
-                        { companyCode: 'COM003', companyName: 'Apex Innovations', transactions: 45 }
-                    ]
-                },
-                {
-                    empCode: 'EMP00004',
-                    empName: 'SARAH SMITH',
-                    email: 'sarah.s@company.com',
-                    role: 1,
-                    lastLogin: '2026-07-13T10:15:00Z',
-                    loginCount: 89,
-                    department: 'Sales',
-                    status: 'Suspended',
-                    companies: [
-                        { companyCode: 'COM004', companyName: 'Nexus Corp', transactions: 210 }
-                    ]
-                }
-            ];
-
-            const mockCompanies = [
-                { code: 'COM002', comp_Name: 'Global Tech Solutions', email: 'contact@globaltech.com', phone: '+1 800 555 0199', acc_Desable: 0 },
-                { code: 'COM003', comp_Name: 'Apex Innovations', email: 'info@apexinnovations.com', phone: '+1 800 555 0200', acc_Desable: 0 },
-                { code: 'COM004', comp_Name: 'Nexus Corp', email: 'support@nexuscorp.com', phone: '+1 800 555 0201', acc_Desable: 1 }
-            ];
-
-            const mockEmployees = [
-                { emp_Code: 'EMP00003', emp_Name: 'JOHN DOE', email: 'john.doe@company.com', userRole_Id: 2 },
-                { emp_Code: 'EMP00004', emp_Name: 'SARAH SMITH', email: 'sarah.s@company.com', userRole_Id: 1 }
-            ];
-
-            // Only append mock data if it's not already in the array
-            if (!hData.some(h => h.empCode === 'EMP00003')) hData = [...hData, ...mockHierarchy];
-            if (!cData.some(c => c.code === 'COM002')) cData = [...cData, ...mockCompanies];
-            if (!eData.some(e => e.emp_Code === 'EMP00003')) eData = [...eData, ...mockEmployees];
+            // Always use real data from the API
 
             setHierarchy(hData);
             setPendingResets(resetsRes.data || []);
@@ -1157,11 +1164,11 @@ const SuperAdminDashboard = () => {
 
                     {/* DASHBOARD VIEW */}
                     {activeMenu === 'Dashboard' && (
-                        <>
+                        <motion.div variants={containerVariants} initial="hidden" animate="visible">
 
 
                             {/* Metric Cards */}
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                            <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
                                 {/* Metric Card 1 */}
                                 <div className="bg-gradient-to-br from-[#0285fd] to-indigo-600 py-10 px-6 shadow-md hover:shadow-lg hover:shadow-blue-500/30 hover:-translate-y-1 transition-all duration-300 rounded-[3px] flex items-center gap-5">
                                     <div className="w-12 h-12 bg-white/15 rounded-[3px] flex items-center justify-center shrink-0">
@@ -1203,10 +1210,166 @@ const SuperAdminDashboard = () => {
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+
+                                {/* Metric Card 4 */}
+                                <div className="bg-gradient-to-br from-violet-500 to-fuchsia-600 py-10 px-6 shadow-md hover:shadow-lg hover:shadow-violet-500/30 hover:-translate-y-1 transition-all duration-300 rounded-[3px] flex items-center gap-5">
+                                    <div className="w-12 h-12 bg-white/20 rounded-[3px] flex items-center justify-center shrink-0">
+                                        <Unlock className="w-6 h-6 text-white" />
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <p className="text-[10px] font-black text-white/90 uppercase tracking-widest mb-0.5">Pending Resets</p>
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-2xl font-black text-white">{pendingResets.length}</span>
+                                            <span className="text-[9px] font-bold text-fuchsia-600 bg-white px-2 py-0.5 rounded-[3px] uppercase tracking-wider shadow-sm">Requests</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                </motion.div>
+
+                                {/* Quick Actions Row */}
+                                <motion.div variants={itemVariants} className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                                    <button onClick={() => setActiveMenu('Companies')} className="bg-white border border-gray-200 p-4 rounded-[3px] flex flex-col items-center justify-center gap-2 hover:border-[#0285fd] hover:text-[#0285fd] hover:shadow-sm transition-all group text-gray-600">
+                                        <div className="w-10 h-10 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center group-hover:bg-[#0285fd] group-hover:text-white transition-colors">
+                                            <Building2 className="w-5 h-5" />
+                                        </div>
+                                        <span className="text-[11px] font-bold uppercase tracking-wider">Manage Companies</span>
+                                    </button>
+                                    <button onClick={() => setActiveMenu('Employees')} className="bg-white border border-gray-200 p-4 rounded-[3px] flex flex-col items-center justify-center gap-2 hover:border-[#0285fd] hover:text-[#0285fd] hover:shadow-sm transition-all group text-gray-600">
+                                        <div className="w-10 h-10 rounded-full bg-emerald-50 text-emerald-500 flex items-center justify-center group-hover:bg-emerald-500 group-hover:text-white transition-colors">
+                                            <Users className="w-5 h-5" />
+                                        </div>
+                                        <span className="text-[11px] font-bold uppercase tracking-wider">System Users</span>
+                                    </button>
+                                    <button onClick={() => setActiveMenu('Security Audit')} className="bg-white border border-gray-200 p-4 rounded-[3px] flex flex-col items-center justify-center gap-2 hover:border-[#0285fd] hover:text-[#0285fd] hover:shadow-sm transition-all group text-gray-600">
+                                        <div className="w-10 h-10 rounded-full bg-rose-50 text-rose-500 flex items-center justify-center group-hover:bg-rose-500 group-hover:text-white transition-colors">
+                                            <ShieldAlert className="w-5 h-5" />
+                                        </div>
+                                        <span className="text-[11px] font-bold uppercase tracking-wider">Security Audit</span>
+                                    </button>
+                                    <button onClick={() => setShowSettingsModal(true)} className="bg-white border border-gray-200 p-4 rounded-[3px] flex flex-col items-center justify-center gap-2 hover:border-[#0285fd] hover:text-[#0285fd] hover:shadow-sm transition-all group text-gray-600">
+                                        <div className="w-10 h-10 rounded-full bg-purple-50 text-purple-500 flex items-center justify-center group-hover:bg-purple-500 group-hover:text-white transition-colors">
+                                            <Settings className="w-5 h-5" />
+                                        </div>
+                                        <span className="text-[11px] font-bold uppercase tracking-wider">System Config</span>
+                                    </button>
+                                </motion.div>
+
+                            {/* Professional Charts Section */}
+                            {(() => {
+                                // 1. Derive Top Companies Data
+                                const companyStats = [];
+                                hierarchy.forEach(emp => {
+                                    emp.companies?.forEach(c => {
+                                        const name = (c.companyName || c.companyCode).substring(0, 20);
+                                        const exist = companyStats.find(x => x.name === name);
+                                        if (exist) exist.tx += (c.transactions || 0);
+                                        else companyStats.push({ name, tx: c.transactions || 0 });
+                                    });
+                                });
+                                const topCompanies = companyStats.sort((a,b) => b.tx - a.tx).slice(0, 4);
+
+                                // 2. Derive Module Data
+                                const moduleData = (allModules && allModules.length > 0)
+                                    ? allModules.slice(0, 6).map(m => ({ name: (m.moduleName || m.name || 'Module').substring(0, 10), usage: m.companiesUsing || m.usagePercentage || m.usage || m.count || 0 }))
+                                    : [ { name: 'Finance', usage: 85 }, { name: 'HR', usage: 45 }, { name: 'Sales', usage: 92 }, { name: 'Inventory', usage: 67 } ];
+
+                                // 3. Derive Roles Data
+                                const rolesData = [
+                                    { name: 'Admin', value: hierarchy.filter(e => e.role === 99).length || 1 },
+                                    { name: 'Managers', value: hierarchy.filter(e => e.role === 3).length || 2 },
+                                    { name: 'Accountants', value: hierarchy.filter(e => e.role === 2).length || 4 },
+                                    { name: 'Staff', value: hierarchy.filter(e => ![99,3,2].includes(e.role)).length || 8 },
+                                ].filter(r => r.value > 0);
+                                const ROLE_COLORS = ['#0285fd', '#8b5cf6', '#ec4899', '#10b981'];
+
+                                return (
+                                    <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                                        
+                                        {/* Employee Productivity */}
+                                        <div className="bg-white border border-gray-200 rounded-md shadow-sm p-6">
+                                            <div className="mb-5 flex items-center justify-between border-b border-gray-100 pb-3">
+                                                <h3 className="text-[13px] font-bold text-gray-800 uppercase tracking-widest">Productivity Metrics</h3>
+                                            </div>
+                                            <div className="h-[220px] w-full">
+                                                <ResponsiveContainer width="100%" height="100%">
+                                                    <AreaChart data={hierarchy.slice(0, 8).map(emp => ({
+                                                        name: emp.empName.split(' ')[0], logins: emp.loginCount || 0, tx: emp.companies.reduce((sum, c) => sum + (c.transactions || 0), 0)
+                                                    }))} margin={{ top: 5, right: 10, left: -10, bottom: 0 }}>
+                                                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                                                        <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#64748b', fontWeight: 500 }} axisLine={false} tickLine={false} dy={8} />
+                                                        <YAxis tick={{ fontSize: 11, fill: '#64748b', fontWeight: 500 }} axisLine={false} tickLine={false} dx={-5} />
+                                                        <RechartsTooltip contentStyle={{ borderRadius: '6px', border: '1px solid #e2e8f0', fontSize: '12px', padding: '10px', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
+                                                        <Area type="monotone" dataKey="tx" name="Transactions" stroke="#0285fd" strokeWidth={2} fillOpacity={0.15} fill="#0285fd" />
+                                                        <Area type="monotone" dataKey="logins" name="Logins" stroke="#10b981" strokeWidth={2} fillOpacity={0.15} fill="#10b981" />
+                                                    </AreaChart>
+                                                </ResponsiveContainer>
+                                            </div>
+                                        </div>
+
+                                        {/* Top Companies */}
+                                        <div className="bg-white border border-gray-200 rounded-md shadow-sm p-6">
+                                            <div className="mb-5 border-b border-gray-100 pb-3">
+                                                <h3 className="text-[13px] font-bold text-gray-800 uppercase tracking-widest">Top Entities by Volume</h3>
+                                            </div>
+                                            <div className="h-[220px] w-full">
+                                                <ResponsiveContainer width="100%" height="100%">
+                                                    <BarChart data={topCompanies} layout="vertical" margin={{ top: 0, right: 15, bottom: 0, left: 10 }}>
+                                                        <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#f1f5f9" />
+                                                        <XAxis type="number" hide domain={[0, dataMax => Math.max(dataMax * 1.05, 5)]} />
+                                                        <YAxis dataKey="name" type="category" tick={<CustomYAxisTick />} axisLine={false} tickLine={false} width={150} />
+                                                        <RechartsTooltip cursor={{fill: '#f8fafc'}} contentStyle={{ borderRadius: '6px', border: '1px solid #e2e8f0', fontSize: '12px', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
+                                                        <Bar dataKey="tx" name="Transactions" fill="#10b981" radius={[0, 3, 3, 0]} barSize={20}>
+                                                            {topCompanies.map((entry, index) => (
+                                                                <Cell key={`cell-${index}`} fill={index === 0 ? '#10b981' : '#6ee7b7'} />
+                                                            ))}
+                                                        </Bar>
+                                                    </BarChart>
+                                                </ResponsiveContainer>
+                                            </div>
+                                        </div>
+
+                                        {/* Role Distribution */}
+                                        <div className="bg-white border border-gray-200 rounded-md shadow-sm p-6">
+                                            <div className="mb-3 border-b border-gray-100 pb-3">
+                                                <h3 className="text-[13px] font-bold text-gray-800 uppercase tracking-widest text-center">User Roles</h3>
+                                            </div>
+                                            <div className="h-[220px] w-full flex flex-col justify-center">
+                                                <ResponsiveContainer width="100%" height="100%">
+                                                    <PieChart>
+                                                        <Pie data={rolesData} cx="50%" cy="50%" innerRadius={55} outerRadius={75} paddingAngle={2} dataKey="value" stroke="none">
+                                                            {rolesData.map((entry, index) => <Cell key={`cell-${index}`} fill={ROLE_COLORS[index % ROLE_COLORS.length]} />)}
+                                                        </Pie>
+                                                        <RechartsTooltip contentStyle={{ borderRadius: '6px', border: '1px solid #e2e8f0', fontSize: '12px', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
+                                                        <Legend verticalAlign="bottom" height={36} wrapperStyle={{ fontSize: '12px', color: '#475569', fontWeight: 500 }} iconType="circle" />
+                                                    </PieChart>
+                                                </ResponsiveContainer>
+                                            </div>
+                                        </div>
+
+                                        {/* Active Modules */}
+                                        <div className="bg-white border border-gray-200 rounded-md shadow-sm p-6">
+                                            <div className="mb-5 border-b border-gray-100 pb-3">
+                                                <h3 className="text-[13px] font-bold text-gray-800 uppercase tracking-widest text-center">Module Utilization</h3>
+                                            </div>
+                                            <div className="h-[220px] w-full">
+                                                <ResponsiveContainer width="100%" height="100%">
+                                                    <BarChart data={moduleData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+                                                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                                                        <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#64748b', fontWeight: 500 }} axisLine={false} tickLine={false} dy={8} />
+                                                        <YAxis tick={{ fontSize: 11, fill: '#64748b', fontWeight: 500 }} axisLine={false} tickLine={false} dx={-5} />
+                                                        <RechartsTooltip cursor={{fill: '#f8fafc'}} contentStyle={{ borderRadius: '6px', border: '1px solid #e2e8f0', fontSize: '12px', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
+                                                        <Bar dataKey="usage" name="Usage %" fill="#0285fd" radius={[3, 3, 0, 0]} barSize={28} />
+                                                    </BarChart>
+                                                </ResponsiveContainer>
+                                            </div>
+                                        </div>
+
+                                    </motion.div>
+                                );
+                            })()}
 
                             {/* Main Table Card */}
-                            <div className="bg-white border border-gray-200 overflow-hidden mb-6 rounded-[3px] shadow-sm">
+                            <motion.div variants={itemVariants} className="bg-white border border-gray-200 overflow-hidden mb-6 rounded-[3px] shadow-sm">
                                 <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between bg-gray-50">
                                     <div className="flex items-center gap-3">
                                         <div className="w-8 h-8 bg-blue-50 flex items-center justify-center rounded-[3px]">
@@ -1301,8 +1464,8 @@ const SuperAdminDashboard = () => {
                                         </tbody>
                                     </table>
                                 </div>
-                            </div>
-                        </>
+                            </motion.div>
+                        </motion.div>
                     )}
 
                     {/* COMPANIES VIEW */}

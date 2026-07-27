@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import SimpleModal from '../components/SimpleModal';
 import CalendarModal from '../components/CalendarModal';
 import { trialBalanceService } from '../services/trialBalance.service';
+import * as XLSX from 'xlsx';
+import ReportPrintModal from '../components/modals/AdminReports/ReportPrintModal';
 
 import {
     Printer,
@@ -54,6 +56,7 @@ const TrialBalanceBoard = ({ isOpen, onClose, companyCodeProp, companyNameProp }
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [datePickerField, setDatePickerField] = useState('dateFrom');
     const [searchTerm, setSearchTerm] = useState('');
+    const [showPrintModal, setShowPrintModal] = useState(false);
 
     useEffect(() => {
         if (isOpen) {
@@ -108,8 +111,44 @@ const TrialBalanceBoard = ({ isOpen, onClose, companyCodeProp, companyNameProp }
     };
 
     const handleDateSelect = (date) => {
+        if (date && date.includes('-')) {
+            const [yyyy, mm, dd] = date.split('-');
+            date = `${dd}/${mm}/${yyyy}`;
+        }
         setFormData(prev => ({ ...prev, [datePickerField]: date }));
         setShowDatePicker(false);
+    };
+
+    const handlePrint = () => {
+        if (reportResults.length === 0) return showErrorToast('No data to print');
+        setShowPrintModal(true);
+    };
+
+    const handleExportExcel = () => {
+        if (reportResults.length === 0) return showErrorToast('No data to export');
+
+        const excelData = reportResults.map(row => ({
+            'Class': row.mainType || 'ACC',
+            'Identifier': row.code,
+            'Nomenclature': row.name,
+            'Account Type': row.accountType || '',
+            'Debit Volume': row.debit,
+            'Credit Volume': row.credit
+        }));
+
+        excelData.push({
+            'Class': '',
+            'Identifier': '',
+            'Nomenclature': '',
+            'Account Type': 'Aggregate:',
+            'Debit Volume': totalDebit,
+            'Credit Volume': totalCredit
+        });
+
+        const worksheet = XLSX.utils.json_to_sheet(excelData);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Trial Balance");
+        XLSX.writeFile(workbook, `Trial_Balance_${formData.dateTo.replace(/\//g, '-')}.xlsx`);
     };
 
     return (
@@ -122,7 +161,7 @@ const TrialBalanceBoard = ({ isOpen, onClose, companyCodeProp, companyNameProp }
                 footer={
                     <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-slate-200 rounded-b-[5px]">
                         <div className="flex gap-3">
-                            <button className="px-6 h-10 border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center gap-2">
+                            <button onClick={handleExportExcel} className="px-6 h-10 border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center gap-2">
                                 <FileSpreadsheet size={14} /> EXPORT EXCEL
                             </button>
                         </div>
@@ -130,7 +169,7 @@ const TrialBalanceBoard = ({ isOpen, onClose, companyCodeProp, companyNameProp }
                             <button onClick={handleClear} className="px-6 h-10 border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center gap-2">
                                 <RefreshCw size={14} /> CLEAR
                             </button>
-                            <button className="px-6 h-10 bg-[#0285fd] hover:bg-[#0073ff] text-white font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center gap-2">
+                            <button onClick={handlePrint} className="px-6 h-10 bg-[#0285fd] hover:bg-[#0073ff] text-white font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center gap-2">
                                 <Printer size={14} /> PRINT REPORT
                             </button>
                         </div>
@@ -351,11 +390,16 @@ const TrialBalanceBoard = ({ isOpen, onClose, companyCodeProp, companyNameProp }
                                                 <td className={`px-4 py-2.5 text-right font-mono font-black tabular-nums ${row.credit > 0 ? 'text-slate-800' : 'text-slate-200'}`}>
                                                     {row.credit.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                                 </td>
+                                                <td className="px-5 py-2.5 text-right">
+                                                    <button onClick={() => window.open('/report/general-ledger', '_blank')} className="text-[#0285fd] hover:text-blue-700 font-black text-[9px] uppercase tracking-wider transition-colors">
+                                                        VIEW LEDGER
+                                                    </button>
+                                                </td>
                                             </tr>
                                         ))}
                                         {reportResults.length === 0 && !loading && (
                                             <tr>
-                                                <td colSpan={5} className="py-32 text-center">
+                                                <td colSpan={6} className="py-32 text-center">
                                                     <div className="flex flex-col items-center gap-3 opacity-20">
                                                         <Search size={48} className="text-gray-400 ml-[300px]" />
                                                         <span className="text-[10px]  font-black uppercase tracking-[0.3em] text-gray-500 item-center ml-[300px]">No discovery records found</span>
@@ -434,6 +478,23 @@ const TrialBalanceBoard = ({ isOpen, onClose, companyCodeProp, companyNameProp }
                 onClose={() => setShowDatePicker(false)}
                 onDateSelect={handleDateSelect}
                 initialDate={formData[datePickerField]}
+            />
+
+            <ReportPrintModal
+                isOpen={showPrintModal}
+                onClose={() => setShowPrintModal(false)}
+                title="Strategic Portfolio Insight: Trial Balance"
+                subtitle={`Period: ${formData.dateFrom} to ${formData.dateTo}`}
+                companyName={companyNameProp || getCompanyCode()}
+                data={reportResults}
+                columns={[
+                    { header: 'Class', accessor: 'mainType' },
+                    { header: 'Identifier', accessor: 'code' },
+                    { header: 'Nomenclature', accessor: 'name' },
+                    { header: 'Debit Volume', accessor: 'debit', align: 'right', format: (val) => val.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) },
+                    { header: 'Credit Volume', accessor: 'credit', align: 'right', format: (val) => val.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }
+                ]}
+                totals={{ debit: totalDebit, credit: totalCredit }}
             />
         </>
     );

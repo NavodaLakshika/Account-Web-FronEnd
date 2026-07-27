@@ -71,6 +71,8 @@ const NewAccountBoard = ({ isOpen, onClose }) => {
         }
     }, [isOpen]);
 
+    // Removed dynamic subgroups fetch based on user preference
+
     useEffect(() => {
         if (isOpen && mainTypes.length > 0) {
             const { companyCode } = getSessionData();
@@ -78,16 +80,17 @@ const NewAccountBoard = ({ isOpen, onClose }) => {
                 t.main_Acc_Name.toLowerCase() === selectedType.toLowerCase() || 
                 t.main_Acc_Name.toLowerCase().includes(selectedType.toLowerCase())
             );
+            const apiType = matched ? matched.main_Acc_Name : selectedType;
             
-            if (matched) {
-                accountService.getParentAccounts(matched.main_Acc_Name, companyCode).then(data => {
-                    setDynamicSubGroups(data);
-                }).catch(err => console.error("Failed to load parent accounts", err));
-            } else {
+            accountService.getParentAccounts(apiType, companyCode).then(data => {
+                setDynamicSubGroups(data);
+            }).catch(err => {
+                console.error("Failed to load parent accounts", err);
                 setDynamicSubGroups([]);
-            }
+            });
         }
     }, [selectedType, mainTypes, isOpen]);
+
 
     const handleCreateClick = () => {
         setShowAccountBoard(true);
@@ -97,7 +100,7 @@ const NewAccountBoard = ({ isOpen, onClose }) => {
         return (
             <AccountBoard
                 isOpen={isOpen}
-                onClose={onClose}
+                onClose={() => setShowAccountBoard(false)}
                 selectedType={selectedType}
             />
         );

@@ -3,6 +3,7 @@ import SimpleModal from '../components/SimpleModal';
 import TransactionFormWrapper from '../components/TransactionFormWrapper';
 import { Save, RotateCcw, X, ChevronDown, List, AlertCircle, Info, Search, ChevronRight, FileText } from 'lucide-react';
 import { accountService } from '../services/account.service';
+import ConfirmModal from '../components/modals/ConfirmModal';
 
 import { getSessionData } from '../utils/session';
 import { showSuccessToast, showErrorToast } from '../utils/toastUtils';
@@ -30,6 +31,7 @@ const AccountBoard = ({ isOpen, onClose, selectedType, initialData }) => {
     const [parentAccounts, setParentAccounts] = useState([]);
     const [mainAccountTypes, setMainAccountTypes] = useState([]);
     const [customerAccounts, setCustomerAccounts] = useState([]);
+    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
     useEffect(() => {
         if (isOpen) {
@@ -128,6 +130,48 @@ const AccountBoard = ({ isOpen, onClose, selectedType, initialData }) => {
         }
     };
 
+    const handleModifierAccountSelect = async (e) => {
+        const val = e.target.value;
+        setFormData(prev => ({ ...prev, accountId: val }));
+        
+        if (val) {
+            setLoading(true);
+            try {
+                const details = await accountService.getAccountDetails(val, companyCode);
+                setFormData(prev => ({
+                    ...prev,
+                    accountId: details.sub_Code || val,
+                    accountName: details.sub_Acc_Name || '',
+                    description: details.description || '',
+                    note: details.note || '',
+                    inactiveAcc: details.inactiveAcc || false,
+                }));
+            } catch (error) {
+                console.error("Failed to load account details", error);
+                showErrorToast("Failed to load account details");
+            } finally {
+                setLoading(false);
+            }
+        }
+    };
+
+    const toggleModifierMode = async (e) => {
+        const checked = e.target.checked;
+        setFormData(prev => ({ ...prev, editSubAccount: checked }));
+        
+        if (!checked && formData.subAccountOfCode) {
+            // Reset to next ID
+            try {
+                const nextId = await accountService.getNextId(formData.subAccountOfCode);
+                setFormData(prev => ({ ...prev, accountId: nextId, accountName: '', description: '', note: '' }));
+            } catch (err) {
+                console.error(err);
+            }
+        } else if (checked) {
+            setFormData(prev => ({ ...prev, accountId: '', accountName: '', description: '', note: '' }));
+        }
+    };
+
     const handleSave = async () => {
         if (!formData.accountId || !formData.accountName) {
             showErrorToast('Please enter Account ID and Name');
@@ -138,9 +182,61 @@ const AccountBoard = ({ isOpen, onClose, selectedType, initialData }) => {
         try {
             await accountService.createAccount({ ...formData, companyCode });
             showSuccessToast('Account Saved Successfully');
-            onClose();
+            
+            // Refresh customer accounts for the current parent
+            if (formData.subAccountOfCode) {
+                const customers = await accountService.getCustomerAccounts(formData.subAccountOfCode);
+                setCustomerAccounts(customers);
+                
+                // If not in edit mode, prep for the next entry
+                if (!formData.editSubAccount) {
+                    try {
+                        const nextId = await accountService.getNextId(formData.subAccountOfCode);
+                        setFormData(prev => ({ 
+                            ...prev, 
+                            accountId: nextId,
+                            accountName: '',
+                            description: '',
+                            note: ''
+                        }));
+                    } catch(e) {
+                        // ignore
+                    }
+                }
+            } else {
+                handleClear();
+            }
         } catch (error) {
-            showErrorToast('Failed to save account');
+            showErrorToast(error.response?.data || error.message || 'Failed to save account');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleDelete = async () => {
+        if (!formData.editSubAccount || !formData.accountId) {
+            showErrorToast('Please select an account to delete in Modifier Mode');
+            return;
+        }
+
+        setDeleteModalOpen(true);
+    };
+
+    const confirmDelete = async () => {
+        setLoading(true);
+        try {
+            await accountService.deleteAccount(formData.accountId);
+            showSuccessToast('Account Deleted Successfully');
+            
+            // Refresh customer accounts for the current parent
+            if (formData.subAccountOfCode) {
+                const customers = await accountService.getCustomerAccounts(formData.subAccountOfCode);
+                setCustomerAccounts(customers);
+            }
+            handleClear();
+            setDeleteModalOpen(false);
+        } catch (error) {
+            showErrorToast(error.response?.data?.message || error.message || 'Failed to delete account');
         } finally {
             setLoading(false);
         }
@@ -174,12 +270,23 @@ const AccountBoard = ({ isOpen, onClose, selectedType, initialData }) => {
                 title="Account Master Configuration — Definition Portal"
                 footer={
                     <div className="bg-slate-50 px-6 py-4 w-full flex justify-between items-center border-t border-slate-200 rounded-b-[5px]">
+                        <div className="flex items-center">
                         <button
                             onClick={handleClear}
                             className="px-6 h-10 border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center gap-2"
                         >
                             <RotateCcw size={14} /> CLEAR
                         </button>
+                        {formData.editSubAccount && (
+                            <button
+                                onClick={handleDelete}
+                                disabled={loading || !formData.accountId}
+                                className="px-6 h-10 border border-red-200 text-red-600 bg-red-50 hover:bg-red-100 font-semibold rounded-[3px] shadow-sm text-[13px] transition-all flex items-center gap-2 ml-4"
+                            >
+                                DELETE
+                            </button>
+                        )}
+                        </div>
                         <button
                             onClick={handleSave}
                             disabled={loading}
@@ -238,12 +345,29 @@ const AccountBoard = ({ isOpen, onClose, selectedType, initialData }) => {
 
                             <div className="col-span-6">
                                 <label className="block text-[13px] font-medium text-gray-700 mb-1.5">A/C Code</label>
-                                <input
-                                    type="text"
-                                    className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700"
-                                    value={formData.accountId}
-                                    onChange={(e) => setFormData({ ...formData, accountId: e.target.value })}
-                                />
+                                {formData.editSubAccount ? (
+                                    <div className="relative">
+                                        <select
+                                            value={formData.accountId}
+                                            onChange={handleModifierAccountSelect}
+                                            className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] cursor-pointer text-gray-700 appearance-none"
+                                            style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1em' }}
+                                        >
+                                            <option value="">Select Account to Modify...</option>
+                                            {customerAccounts.map((cust, i) => (
+                                                <option key={i} value={cust.sub_Cust_Acc_Code}>{cust.sub_Cust_Acc_Code} - {cust.sub_Cust_Acc_Name}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                ) : (
+                                    <input
+                                        type="text"
+                                        className="w-full h-10 border border-gray-300 rounded-[3px] px-3 text-[14px] bg-white outline-none focus:border-[#0285fd] focus:ring-1 focus:ring-[#0285fd] text-gray-700 disabled:bg-gray-50"
+                                        value={formData.accountId}
+                                        onChange={(e) => setFormData({ ...formData, accountId: e.target.value })}
+                                        disabled={loading}
+                                    />
+                                )}
                             </div>
 
                             <div className="col-span-6">
@@ -270,7 +394,7 @@ const AccountBoard = ({ isOpen, onClose, selectedType, initialData }) => {
                                     <input
                                         type="checkbox"
                                         checked={formData.editSubAccount}
-                                        onChange={(e) => setFormData({ ...formData, editSubAccount: e.target.checked })}
+                                        onChange={toggleModifierMode}
                                         className="w-4 h-4 rounded border-gray-300 text-[#0285fd] focus:ring-[#0285fd]"
                                     />
                                     <span className="text-[13px] font-medium text-gray-700">Modifier Mode</span>
@@ -335,6 +459,16 @@ const AccountBoard = ({ isOpen, onClose, selectedType, initialData }) => {
                 </div>
             </TransactionFormWrapper>
 
+            <ConfirmModal 
+                isOpen={deleteModalOpen}
+                onClose={() => setDeleteModalOpen(false)}
+                onConfirm={confirmDelete}
+                title="DELETE ACCOUNT"
+                message={`Are you sure you want to permanently delete account ${formData.accountId} - ${formData.accountName}? This action cannot be undone.`}
+                loading={loading}
+                confirmText="DELETE"
+                variant="danger"
+            />
         </>
     );
 };
