@@ -1,11 +1,12 @@
 import React from 'react';
+import ReactDOM from 'react-dom';
 import { Helmet } from 'react-helmet-async';
 import { X } from 'lucide-react';
 
 const SimpleModal = ({ isOpen, onClose, title, subtitle, children, footer, maxWidth = "max-w-4xl", zoom = 1, showHeaderClose = true, accentColor: accent = localStorage.getItem('topBarColor') || '#0285fd' }) => {
     if (!isOpen) return null;
 
-    return (
+    return ReactDOM.createPortal(
         <div className="fixed inset-0 z-[1000] flex items-start justify-center p-4 pt-12 font-['Tahoma']">
             <Helmet>
                 <title>{title ? `Onimta Accounting | ${title}` : 'Onimta Accounting'}</title>
@@ -41,7 +42,8 @@ const SimpleModal = ({ isOpen, onClose, title, subtitle, children, footer, maxWi
                     </div>
                 )}
             </div>
-        </div>
+        </div>,
+        document.body
     );
 };
 

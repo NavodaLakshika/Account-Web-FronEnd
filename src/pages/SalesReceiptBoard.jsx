@@ -433,13 +433,13 @@ const SalesReceiptBoard = ({ isOpen, onClose }) => {
                                         <th className="px-3 text-right w-28">UNIT RATE</th>
                                         <th className="px-2 text-center w-20">USAGE</th>
                                         <th className="px-4 text-right w-36">EXTENDED NET</th>
-                                        <th className="w-12"></th>
-                                        <th className="text-right px-5 py-3">Action</th></tr>
+                                        <th className="text-center px-5 py-3">ACTION</th>
+                                    </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-50">
                                     {rows.length === 0 ? (
                                         <tr>
-                                            <td colSpan="6" className="text-center py-10 text-gray-300 text-[10px] font-bold uppercase tracking-widest">
+                                            <td colSpan="6" className="text-center py-10 text-gray-400 text-[11px] font-bold uppercase tracking-widest">
                                                 No items allocated to this document
                                             </td>
                                         </tr>
