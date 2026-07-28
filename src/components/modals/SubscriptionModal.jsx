@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X } from 'lucide-react';
+import { X, HelpCircle, Building2, User, CalendarDays, Fingerprint } from 'lucide-react';
 import { subscriptionPlanService } from '../../services/subscriptionPlan.service';
 import { subscriptionService } from '../../services/subscription.service';
 import SubscriptionCheckoutModal from './SubscriptionCheckoutModal';
@@ -140,31 +140,13 @@ const SubscriptionModal = ({ isOpen, onClose }) => {
 
                     <div className="px-12 pb-12 overflow-y-auto flex-1">
                         <div className="max-w-6xl mx-auto">
-                            {/* Top Info Area */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-4 mb-8">
-                                <div className="flex flex-col gap-4">
-                                    <div className="grid grid-cols-[140px_1fr] items-center text-[13px]">
-                                        <span className="text-slate-500">Company ID</span>
-                                        <span className="text-slate-800 font-mono tracking-wider font-semibold">{userData.companyCode}</span>
-                                    </div>
-                                    <div className="grid grid-cols-[140px_1fr] items-center text-[13px]">
-                                        <span className="text-slate-500">Company Name</span>
-                                        <span className="text-slate-800 font-semibold">{userData.companyName}</span>
-                                    </div>
-                                </div>
-                                <div className="flex flex-col gap-4">
-                                    <div className="grid grid-cols-[140px_1fr] items-center text-[13px]">
-                                        <span className="text-slate-500">User</span>
-                                        <span className="text-slate-800 font-semibold">{userData.userName}</span>
-                                    </div>
-                                    <div className="grid grid-cols-[140px_1fr] items-center text-[13px]">
-                                        <span className="text-slate-500">Subscription Expiry</span>
-                                        <span className="text-[#0078d4] font-bold">{userData.expiryDate}</span>
-                                    </div>
-                                </div>
+                            {/* Modal Title & Intro */}
+                            <div className="mb-10 text-center">
+                                <h1 className="text-[28px] font-bold text-slate-900 mb-3">Choose Your Subscription Plan</h1>
+                                <p className="text-[15px] text-slate-500 max-w-2xl mx-auto leading-relaxed">
+                                    Upgrade your account to unlock premium features, add more users, and manage multiple companies seamlessly. Select the plan that best fits your growing business needs.
+                                </p>
                             </div>
-
-                            <div className="h-px bg-gray-200 w-full mb-8"></div>
 
                             {/* Cards Grid */}
                             {loading ? (
@@ -223,6 +205,32 @@ const SubscriptionModal = ({ isOpen, onClose }) => {
                                     ))}
                                 </div>
                             )}
+
+                            {/* FAQ Section */}
+                            <div className="mt-12 bg-[#f8fafc] rounded-[4px] p-8 border border-slate-200">
+                                <div className="flex items-center gap-2 mb-6 border-b border-slate-200 pb-4">
+                                    <HelpCircle className="text-[#0078d4]" size={22} />
+                                    <h3 className="text-[18px] font-semibold text-slate-800">Frequently Asked Questions</h3>
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
+                                    <div>
+                                        <h4 className="text-[14px] font-bold text-slate-800 mb-2">How does billing work?</h4>
+                                        <p className="text-[13px] text-slate-600 leading-relaxed">You will be billed automatically at the beginning of each billing cycle (monthly or annually). You can manage or cancel your subscription at any time.</p>
+                                    </div>
+                                    <div>
+                                        <h4 className="text-[14px] font-bold text-slate-800 mb-2">Can I switch plans later?</h4>
+                                        <p className="text-[13px] text-slate-600 leading-relaxed">Yes, you can upgrade or downgrade your plan at any time. Any prorated charges or credits will be applied automatically to your next invoice.</p>
+                                    </div>
+                                    <div>
+                                        <h4 className="text-[14px] font-bold text-slate-800 mb-2">What payment methods do you accept?</h4>
+                                        <p className="text-[13px] text-slate-600 leading-relaxed">We accept all major credit cards, PayPal, and wire transfers for our annual Enterprise plans.</p>
+                                    </div>
+                                    <div>
+                                        <h4 className="text-[14px] font-bold text-slate-800 mb-2">Is there a setup fee?</h4>
+                                        <p className="text-[13px] text-slate-600 leading-relaxed">No, there are no hidden fees or setup costs. You only pay the flat rate listed for your selected subscription plan.</p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
