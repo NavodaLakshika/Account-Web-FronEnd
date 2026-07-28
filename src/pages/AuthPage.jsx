@@ -541,51 +541,13 @@ const AuthPage = () => {
             {/* Centered Footer Section */}
             <div className="w-full flex flex-col items-center justify-center text-[11px] text-slate-500 font-sans tracking-wide space-y-3 z-20 mt-12 pb-4">
                 <div className="flex gap-4 mb-1">
-                    <button onClick={() => setShowAboutUs(true)} className="text-[#0078d4] hover:text-[#8a2be2] hover:underline transition-colors">Legal</button>
-                    <button onClick={() => setLegalModalConfig({
-                        isOpen: true,
-                        title: 'Privacy Policy',
-                        type: 'Privacy',
-                        content: <div className="space-y-4">
-                            <h3 className="font-bold text-lg text-slate-800">Your Privacy matters to us.</h3>
-                            <p>This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website or use our application. Please read this privacy policy carefully. If you do not agree with the terms of this privacy policy, please do not access the application.</p>
-                            <h4 className="font-bold mt-4">Information Collection</h4>
-                            <p>We may collect information about you in a variety of ways. The information we may collect includes personal data, derivative data, financial data, and mobile device data that you voluntarily give to us when you register.</p>
-                            <h4 className="font-bold mt-4">Data Security</h4>
-                            <p>We use administrative, technical, and physical security measures to help protect your personal information. While we have taken reasonable steps to secure the personal information you provide to us, please be aware that despite our efforts, no security measures are perfect or impenetrable.</p>
-                        </div>
-                    })} className="text-[#0078d4] hover:text-[#8a2be2] hover:underline transition-colors">Privacy</button>
-                    <button onClick={() => setLegalModalConfig({
-                        isOpen: true,
-                        title: 'Security Guarantee',
-                        type: 'Security',
-                        content: <div className="space-y-4">
-                            <h3 className="font-bold text-lg text-slate-800">Enterprise-Grade Security</h3>
-                            <p>We take the security of your financial data extremely seriously. Our platform is built from the ground up with military-grade encryption and strict access controls.</p>
-                            <ul className="list-disc pl-5 space-y-2 mt-4">
-                                <li><strong>End-to-End Encryption:</strong> All data transmitted between your device and our servers is encrypted using TLS 1.3.</li>
-                                <li><strong>Data Storage:</strong> Your data is stored in ISO 27001 certified data centers with 24/7 physical security.</li>
-                                <li><strong>Regular Audits:</strong> We undergo independent third-party security audits and penetration testing quarterly.</li>
-                                <li><strong>Access Control:</strong> Multi-factor authentication, role-based access control (RBAC), and detailed audit logs are strictly enforced.</li>
-                            </ul>
-                        </div>
-                    })} className="text-[#0078d4] hover:text-[#8a2be2] hover:underline transition-colors">Security</button>
+                    <a href="/legal" target="_blank" rel="noopener noreferrer" className="text-[#0078d4] hover:text-[#8a2be2] hover:underline transition-colors">Legal</a>
+                    <a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-[#0078d4] hover:text-[#8a2be2] hover:underline transition-colors">Privacy</a>
+                    <a href="/security" target="_blank" rel="noopener noreferrer" className="text-[#0078d4] hover:text-[#8a2be2] hover:underline transition-colors">Security</a>
                 </div>
                 <div className="flex gap-4 mb-2">
-                    <button onClick={() => setShowHelp(true)} className="text-[#0078d4] hover:text-[#8a2be2] hover:underline transition-colors">Support</button>
-                    <button onClick={() => setLegalModalConfig({
-                        isOpen: true,
-                        title: 'Software License Agreement',
-                        type: 'SLA',
-                        content: <div className="space-y-4">
-                            <h3 className="font-bold text-lg text-slate-800">End User License Agreement (EULA)</h3>
-                            <p>This End-User License Agreement ("EULA") is a legal agreement between you and Onimta Information Technology Pvt Ltd.</p>
-                            <p>This EULA agreement governs your acquisition and use of our Onimta Financial System software ("Software") directly from Onimta Information Technology Pvt Ltd or indirectly through an authorized reseller or distributor.</p>
-                            <h4 className="font-bold mt-4">License Grant</h4>
-                            <p>Onimta grants you a personal, non-transferable, non-exclusive license to use the Onimta Financial System software on your devices in accordance with the terms of this EULA agreement.</p>
-                            <p>You are permitted to load the Software under your control. You are responsible for ensuring your device meets the minimum requirements of the Onimta Financial System software.</p>
-                        </div>
-                    })} className="text-[#0078d4] hover:text-[#8a2be2] hover:underline transition-colors">Software License Agreement</button>
+                    <a href="/support" target="_blank" rel="noopener noreferrer" className="text-[#0078d4] hover:text-[#8a2be2] hover:underline transition-colors">Support</a>
+                    <a href="/sla" target="_blank" rel="noopener noreferrer" className="text-[#0078d4] hover:text-[#8a2be2] hover:underline transition-colors">Software License Agreement</a>
                 </div>
                 <p className="text-center max-w-5xl px-4 text-slate-500">
                     Onimta, Onimta Financial System, and Onimta Cloud are registered trademarks of Onimta Information Technology Pvt Ltd. Terms and conditions, features, support, pricing, and service options subject to change without notice.

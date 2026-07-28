@@ -6,9 +6,9 @@ const ContactSupportModal = ({ isOpen, onClose }) => {
 
     return (
         <>
-            {/* Subtle Backdrop with Blur */}
+            {/* Subtle Backdrop without Blur */}
             <div
-                className={`fixed inset-0 z-[105] bg-black/10 backdrop-blur-[4px] transition-opacity duration-700 cursor-pointer ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+                className={`fixed inset-0 z-[105] bg-black/10 transition-opacity duration-700 cursor-pointer ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
                 onClick={onClose}
             />
 
@@ -19,37 +19,37 @@ const ContactSupportModal = ({ isOpen, onClose }) => {
                     <div className={`relative w-full h-full transition-all duration-700 [transform-style:preserve-3d] ${isFlipped ? '[transform:rotateY(180deg)]' : ''}`}>
 
                         {/* FRONT SIDE (Direct Contact) */}
- <div className="absolute inset-0 w-full h-full bg-white rounded-[3px] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] p-7 [backface-visibility:hidden] flex flex-col justify-center overflow-y-auto custom-scrollbar">
+                        <div className="absolute inset-0 w-full h-full bg-white rounded-none border border-slate-300 shadow-xl p-8 [backface-visibility:hidden] flex flex-col justify-center overflow-y-auto custom-scrollbar">
                             <button
                                 onClick={onClose}
-                                className="absolute top-4 right-4 p-2 text-gray-300 hover:text-[#00acee] transition-colors"
+                                className="absolute top-4 right-4 p-2 text-slate-400 hover:text-[#0078d4] transition-colors"
                             >
-                                <X size={28} />
+                                <X size={24} />
                             </button>
 
                             <div>
-                                <div className="text-center mb-6">
-                                    <h4 className="text-[#1a1a1a] font-mono font-bold text-[13px] uppercase tracking-[0.3em] mb-2 leading-none">Need Assistance?</h4>
-                                    <div className="w-8 h-[2px] bg-[#00D1FF] mx-auto" />
+                                <div className="text-center mb-8">
+                                    <h4 className="text-slate-800 font-bold text-[14px] uppercase tracking-widest mb-3 leading-none">Need Assistance?</h4>
+                                    <div className="w-12 h-[2px] bg-[#0078d4] mx-auto" />
                                 </div>
 
-                                <div className="space-y-3">
+                                <div className="space-y-4">
                                     <a
-                                        href="https://wa.me/94771234567"
+                                        href="https://wa.me/+94755000755"
                                         target="_blank"
                                         rel="noreferrer"
-                                        className="w-full py-3.5 bg-[#25D366] hover:bg-[#20bd5c] text-white flex items-center justify-center gap-3 rounded-[3px] transition-all active:scale-[0.97] group shadow-lg shadow-green-500/10"
+                                        className="w-full py-3.5 bg-[#25D366] hover:bg-[#20bd5c] text-white flex items-center justify-center gap-3 rounded-none transition-all active:scale-[0.98] shadow-sm"
                                     >
-                                        <MessageCircle size={16} />
-                                        <span className="font-bold text-[10px] uppercase tracking-widest">WhatsApp Support</span>
+                                        <MessageCircle size={18} />
+                                        <span className="font-bold text-[11px] uppercase tracking-wider">WhatsApp Support</span>
                                     </a>
 
                                     <a
-                                        href="mailto:it-help@onimta.com"
-                                        className="w-full py-3.5 bg-[#00D1FF] hover:bg-[#00acee] text-white flex items-center justify-center gap-3 rounded-[3px] transition-all active:scale-[0.97] group shadow-lg shadow-cyan-500/10"
+                                        href="mailto:sales@onimtait.com"
+                                        className="w-full py-3.5 bg-[#0078d4] hover:bg-[#005a9e] text-white flex items-center justify-center gap-3 rounded-none transition-all active:scale-[0.98] shadow-sm"
                                     >
-                                        <Mail size={16} />
-                                        <span className="font-bold text-[10px] uppercase tracking-widest">Email Support Desk</span>
+                                        <Mail size={18} />
+                                        <span className="font-bold text-[11px] uppercase tracking-wider">Email Support Desk</span>
                                     </a>
                                 </div>
                             </div>
@@ -58,58 +58,47 @@ const ContactSupportModal = ({ isOpen, onClose }) => {
                             <div className="absolute inset-x-0 bottom-0">
                                 <button
                                     onClick={() => setIsFlipped(true)}
-                                    className="w-full h-10 bg-gray-50/80 hover:bg-[#00acee]/10 text-gray-400 hover:text-[#00acee] transition-all flex items-center justify-center gap-2 border-t border-gray-200 group"
+                                    className="w-full h-12 bg-slate-50 hover:bg-[#0078d4]/10 text-slate-500 hover:text-[#0078d4] transition-all flex items-center justify-center gap-2 border-t border-slate-200 group"
                                 >
-                                    <Building size={12} className="opacity-40 group-hover:opacity-100" />
-                                    <span className="font-black text-[8px] uppercase tracking-[0.3em]">Corporate Profile</span>
+                                    <Building size={14} className="opacity-50 group-hover:opacity-100 transition-opacity" />
+                                    <span className="font-bold text-[10px] uppercase tracking-widest">Corporate Profile</span>
                                     <ChevronRight size={10} className="group-hover:translate-x-1 transition-transform" />
                                 </button>
                             </div>
                         </div>
 
                         {/* BACK SIDE (Folded-Tab Style) */}
- <div className="absolute inset-0 w-full h-full bg-white rounded-[3px] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] [backface-visibility:hidden] [transform:rotateY(180deg)] flex flex-col overflow-hidden ">
+                        <div className="absolute inset-0 w-full h-full bg-white rounded-none border border-slate-300 shadow-xl [backface-visibility:hidden] [transform:rotateY(180deg)] flex flex-col overflow-hidden">
 
                             {/* Top Content (White Branding Area) */}
-                            <div className="flex-grow flex flex-col items-center justify-center relative px-8">
+                            <div className="flex-grow flex flex-col items-center justify-center relative px-8 pb-12">
                                 <button
                                     onClick={onClose}
-                                    className="absolute top-4 right-4 p-2 text-gray-200 hover:text-[#00acee] transition-colors z-20"
+                                    className="absolute top-4 right-4 p-2 text-slate-400 hover:text-[#0078d4] transition-colors z-20"
                                 >
-                                    <X size={28} />
+                                    <X size={24} />
                                 </button>
 
                                 <div className="flex flex-col items-center">
                                     <div className="w-20 h-20 mb-4">
                                         <img src="/logo-removebg.png" alt="Onimta Logo" className="w-full h-full object-contain" />
                                     </div>
-                                    <h3 className="text-gray-500 font-bold tracking-widest text-[16px] uppercase leading-none">Onimta Cloud</h3>
-                                    <p className="text-[#00acee] text-[8px] uppercase tracking-[0.2em] font-black mt-2">Innovative Enterprise Solutions</p>
-                                </div>
-                            </div>
-
-                            {/* Folded Tab Footer Section - User Specific Geometric Logic */}
-                            <div className="relative h-16 w-full mt-auto select-none">
-                                <div className="absolute inset-0" style={{ background: '#3a3a3a', clipPath: 'polygon(0 0, 15% 0, 20% 100%, 0 100%)' }} />
-                                <div className="absolute inset-0" style={{ background: '#4a4a4a', clipPath: 'polygon(0 0, 15% 0, 0 100%)' }} />
-                                <div className="absolute inset-0" style={{ background: '#00BFDE', clipPath: 'polygon(13% 0, 85% 0, 93% 100%, 5% 100%)' }} />
-                                <div className="absolute inset-0" style={{ background: '#3a3a3a', clipPath: 'polygon(85% 0, 100% 0, 100% 100%, 80% 100%)' }} />
-                                <div className="absolute inset-0" style={{ background: '#4a4a4a', clipPath: 'polygon(95% 0, 100% 0, 100% 100%)' }} />
-
-                                <div className="absolute inset-0 flex flex-col items-center justify-center gap-0.5 z-20">
-                                    <p className="text-white text-[7px] tracking-[0.3em] opacity-80 font-bold uppercase">
-                                        Innovative Enterprise Solutions
-                                    </p>
-                                    <a href="https://www.onimtait.com" target="_blank" rel="noreferrer" className="text-white text-[10px] font-black tracking-[0.1em] uppercase hover:underline">
+                                    <h3 className="text-slate-800 font-bold tracking-widest text-[16px] uppercase leading-none">Onimta Cloud</h3>
+                                    <p className="text-[#0078d4] text-[9px] uppercase tracking-[0.2em] font-bold mt-2 mb-4">Innovative Enterprise Solutions</p>
+                                    <a href="https://www.onimtait.com" target="_blank" rel="noreferrer" className="text-slate-500 hover:text-[#0078d4] text-[11px] font-bold tracking-wider uppercase hover:underline transition-colors">
                                         www.onimtait.com
                                     </a>
                                 </div>
+                            </div>
 
+                            {/* Back Button - Symmetrical with Front Side */}
+                            <div className="absolute inset-x-0 bottom-0">
                                 <button
                                     onClick={() => setIsFlipped(false)}
-                                    className="absolute left-4 bottom-3 z-30 text-white/30 hover:text-white transition-colors"
+                                    className="w-full h-12 bg-slate-50 hover:bg-[#0078d4]/10 text-slate-500 hover:text-[#0078d4] transition-all flex items-center justify-center gap-2 border-t border-slate-200 group"
                                 >
-                                    <ArrowLeft size={14} />
+                                    <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
+                                    <span className="font-bold text-[10px] uppercase tracking-widest">Back to Contact</span>
                                 </button>
                             </div>
                         </div>

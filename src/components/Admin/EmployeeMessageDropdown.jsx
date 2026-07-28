@@ -62,9 +62,10 @@ const EmployeeMessageDropdown = ({ allEmployees = [], onClose }) => {
         setLoadingLogs(true);
         try {
             const logs = await smsService.getServerLogs();
-            setMessageLogs(logs);
+            setMessageLogs(Array.isArray(logs) ? logs : (logs?.data && Array.isArray(logs.data) ? logs.data : []));
         } catch {
-            setMessageLogs(smsService.getLocalLogs());
+            const localLogs = smsService.getLocalLogs();
+            setMessageLogs(Array.isArray(localLogs) ? localLogs : []);
         } finally {
             setLoadingLogs(false);
         }
@@ -301,7 +302,7 @@ const EmployeeMessageDropdown = ({ allEmployees = [], onClose }) => {
                                 <div className="flex items-center justify-center h-full">
                                     <Loader2 size={24} className="animate-spin text-[#0285fd]" />
                                 </div>
-                            ) : messageLogs.length === 0 ? (
+                            ) : (!messageLogs || !Array.isArray(messageLogs) || messageLogs.length === 0) ? (
                                 <div className="px-6 h-10 bg-blue-50 text-blue-600 text-sm font-bold rounded-[3px] hover:bg-blue-100 transition-all active:scale-95 flex items-center justify-center gap-2 border border-blue-100">
                                     <History size={40} className="text-gray-300 mb-3" />
                                     <p className="text-gray-800 font-bold text-sm mb-1">No message logs</p>
@@ -309,7 +310,7 @@ const EmployeeMessageDropdown = ({ allEmployees = [], onClose }) => {
                                 </div>
                             ) : (
                                 <div className="space-y-3">
-                                    {messageLogs.map((log, idx) => (
+                                    {(Array.isArray(messageLogs) ? messageLogs : []).map((log, idx) => (
                                         <div key={log.id || idx} className="bg-white border border-gray-200 rounded-[3px] p-4">
                                             <div className="flex items-center justify-between mb-2">
                                                 <div className="flex items-center gap-2">

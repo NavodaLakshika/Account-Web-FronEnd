@@ -6,6 +6,11 @@ import { authService } from './services/auth.service';
 
 import AuthPage from './pages/AuthPage';
 import RegisterPage from './pages/RegisterPage';
+import LegalTermsPage from './pages/LegalTermsPage';
+import PrivacyPage from './pages/PrivacyPage';
+import SecurityPage from './pages/SecurityPage';
+import SLAPage from './pages/SLAPage';
+import SupportPage from './pages/SupportPage';
 import Dashboard from './pages/Dashboard';
 import ItemsServicesReportPage from './pages/ItemsServicesReportPage';
 import ProductsReportPage from './pages/ProductsReportPage';
@@ -46,6 +51,11 @@ function App() {
             {/* Public Routes */}
             <Route path="/login" element={<AuthPage />} />
             <Route path="/register" element={<RegisterPage />} />
+            <Route path="/legal" element={<LegalTermsPage />} />
+            <Route path="/privacy" element={<PrivacyPage />} />
+            <Route path="/security" element={<SecurityPage />} />
+            <Route path="/sla" element={<SLAPage />} />
+            <Route path="/support" element={<SupportPage />} />
 
             {/* Protected Routes */}
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
